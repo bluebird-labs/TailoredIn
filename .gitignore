@@ -10,10 +10,8 @@ build/
 .idea/
 
 # Generated resume PDFs and ephemeral Typst compilation workspace
-packages/resume-builder/Resumes/
-packages/resume-builder/typst/
-packages/backend/resumes/
-packages/backend/typst/
+packages/resume/Resumes/
+packages/resume/typst/
 
 # LinkedIn Playwright session (sensitive auth cookies)
-packages/backend/playwright/.auth/
+packages/linkedin/playwright/.auth/

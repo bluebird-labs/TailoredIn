@@ -1,0 +1,44 @@
+{
+  "name": "@tailoredin/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "mikro-orm": {
+    "configPaths": ["./src/baseOrmConfig.ts"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "sql": "bun src/makePgTypedConfig.ts && bunx pgtyped -c src/pg-typed.config.json",
+    "sql:watch": "bun src/makePgTypedConfig.ts && bunx pgtyped -c src/pg-typed.config.json -w",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "migration:create": "bunx mikro-orm migration:create",
+    "migration:up": "bunx mikro-orm migration:up"
+  },
+  "dependencies": {
+    "@tailoredin/shared": "workspace:*",
+    "@mikro-orm/cli": "^6.4.7",
+    "@mikro-orm/core": "^6.4.7",
+    "@mikro-orm/migrations": "^6.4.7",
+    "@mikro-orm/postgresql": "^6.4.7",
+    "@mikro-orm/reflection": "^6.4.7",
+    "@mikro-orm/seeder": "^6.4.7",
+    "@mikro-orm/sql-highlighter": "^1.0.1",
+    "@pgtyped/runtime": "^2.4.2",
+    "@tselect/status-code": "^1.0.2",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "node-html-parser": "^7.0.1",
+    "npmlog": "^7.0.1",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@pgtyped/cli": "^2.4.2",
+    "@types/node": "^22.13.1",
+    "@types/npmlog": "^7.0.0",
+    "@types/pg": "^8.11.10",
+    "typescript": "^5.7.3"
+  }
+}
