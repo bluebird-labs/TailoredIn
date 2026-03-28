@@ -49,7 +49,7 @@ const archetypeDetails: Record<Archetype, string> = {
 
 @injectable()
 export class JobInsightsExtractor {
-  public constructor(@inject(AiDI.AiProvider) private readonly openAiClient: OpenAI) {}
+  @inject(AiDI.AiProvider) private openAiClient!: OpenAI;
 
   public async extractJobPostingInsights(input: ExtractJobPostingInsightsInput): Promise<JobPostingInsights> {
     const flatJobDescription = this.flattenJobDescription(input.job, input.company);

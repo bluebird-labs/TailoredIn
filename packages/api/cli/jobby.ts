@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 
-import 'reflect-metadata';
 import 'dotenv/config';
 import { binary, run, subcommands } from 'cmd-ts';
 import { jobsCommands }             from './commands/jobs.js';

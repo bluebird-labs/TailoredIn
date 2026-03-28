@@ -4,8 +4,6 @@ import * as NpmLog from 'npmlog';
 import { range }        from 'lodash';
 import { LinkedInUrls } from './LinkedInExplorer.js';
 import { TimeUtil }     from '@tailoredin/shared';
-import { injectable, unmanaged } from 'inversify';
-
 export type LinkedInScrapperConfig = {
   email: string;
   password: string;
@@ -46,14 +44,13 @@ type JobSearchResultDetailsInfo = Omit<JobSearchResult, keyof JobSearchResultLis
 
 export type JobResultCallback = (job: JobSearchResult) => void | Promise<void>;
 
-@injectable()
 export class LinkedInScrapper {
   private readonly logPrefix: string;
   private readonly email: string;
   private readonly password: string;
   private readonly headless: boolean;
 
-  public constructor(@unmanaged() config: LinkedInScrapperConfig) {
+  public constructor(config: LinkedInScrapperConfig) {
     this.email = config.email;
     this.password = config.password;
     this.headless = config.headless;

@@ -14,7 +14,7 @@ import { QueryOpts } from '@tailoredin/db';
 
 @injectable()
 export class JobSearchHandler {
-  public constructor(@inject(LinkedInDI.Orm) private readonly orm: MikroORM) {}
+  @inject(LinkedInDI.Orm) private orm!: MikroORM;
 
   public async ingestJobSearchResult(
     jobSearchResult: LinkedInSearchJobsCommandResult,

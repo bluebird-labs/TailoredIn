@@ -6,8 +6,6 @@ import { LinkedInUrls } from './LinkedInExplorer.js';
 import * as NpmLog from 'npmlog';
 import { TimeUtil } from '@tailoredin/shared';
 import * as Url from 'node:url';
-import { injectable, unmanaged } from 'inversify';
-
 export type LinkedInSearchJobsCommandParams = {
   keywords: string;
   location: 'US' | 'NY';
@@ -57,13 +55,12 @@ export type LinkedInSearchJobsCommandDelegate = TypeUtil.ReturnTypeOrPromise<
   ) => void
 >;
 
-@injectable()
 export class LinkedInSearchJobsCommand {
   private readonly logPrefix: string = this.constructor.name;
 
   public constructor(
-    @unmanaged() private readonly page: Playwright.Page,
-    @unmanaged() private readonly browserContext: Playwright.BrowserContext
+    private readonly page: Playwright.Page,
+    private readonly browserContext: Playwright.BrowserContext
   ) {}
 
   public async search(params: LinkedInSearchJobsCommandParams, delegate: LinkedInSearchJobsCommandDelegate) {

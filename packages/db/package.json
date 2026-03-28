@@ -31,8 +31,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "node-html-parser": "^7.0.1",
-    "npmlog": "^7.0.1",
-    "reflect-metadata": "^0.2.2"
+    "npmlog": "^7.0.1"
   },
   "devDependencies": {
     "@pgtyped/cli": "^2.4.2",

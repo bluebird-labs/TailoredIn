@@ -4,7 +4,6 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,6 +13,6 @@
     "declaration": true,
     "inlineSourceMap": true,
     "outDir": "./dist",
-    "types": ["node", "reflect-metadata"]
+    "types": ["node"]
   }
 }

@@ -15,7 +15,7 @@
   "dependencies": {
     "@koa/cors": "^5.0.0",
     "@koa/router": "^13.1.0",
-    "@mikro-orm/postgresql": "^6.4.3",
+    "@mikro-orm/postgresql": "^6.4.7",
     "@tailoredin/ai": "workspace:*",
     "@tailoredin/db": "workspace:*",
     "@tailoredin/resume": "workspace:*",
@@ -28,7 +28,6 @@
     "koa-body": "^6.0.1",
     "koa-morgan": "^1.0.1",
     "npmlog": "^7.0.1",
-    "reflect-metadata": "^0.2.2",
     "zod": "^3.24.1"
   },
   "devDependencies": {

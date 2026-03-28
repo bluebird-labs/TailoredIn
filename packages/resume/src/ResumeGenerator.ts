@@ -34,10 +34,8 @@ export type GenerateSmartResumeContentInput = {
 
 @injectable()
 export class ResumeGenerator {
-  public constructor(
-    @inject(ResumeDI.JobInsightsExtractor) private readonly jobInsightsExtractor: JobInsightsExtractor,
-    @inject(ResumeDI.WebsiteColorsFinder) private readonly websiteColorsFinder: WebsiteColorsFinder
-  ) {}
+  @inject(ResumeDI.JobInsightsExtractor) private jobInsightsExtractor!: JobInsightsExtractor;
+  @inject(ResumeDI.WebsiteColorsFinder) private websiteColorsFinder!: WebsiteColorsFinder;
 
   public generateRawResumeContent(input: GenerateRawResumeContentInput): BrilliantCVContent {
     return makeResumeContent({

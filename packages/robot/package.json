@@ -7,15 +7,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mikro-orm/postgresql": "^6.4.3",
+    "@mikro-orm/postgresql": "^6.4.7",
     "@tailoredin/db": "workspace:*",
     "@tailoredin/linkedin": "workspace:*",
     "@tailoredin/shared": "workspace:*",
     "date-fns": "^4.1.0",
     "inversify": "^7.0.1",
     "lodash": "^4.17.21",
-    "npmlog": "^7.0.1",
-    "reflect-metadata": "^0.2.2"
+    "npmlog": "^7.0.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.15",

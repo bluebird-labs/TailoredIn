@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import 'dotenv/config';
 import { Container }                          from 'inversify';
 import { MikroORM }                           from '@mikro-orm/postgresql';
@@ -22,7 +21,10 @@ container.bind<ClientOptions>(AiDI.OpenAiConfig).toConstantValue({
   apiKey: Environment.get('OPENAI_API_KEY'),
   project: Environment.get('OPENAI_PROJECT_ID')
 });
-container.bind<IAiProvider>(AiDI.AiProvider).to(OpenAiProvider).inSingletonScope();
+container
+  .bind<IAiProvider>(AiDI.AiProvider)
+  .toDynamicValue(context => new OpenAiProvider(context.get<ClientOptions>(AiDI.OpenAiConfig)))
+  .inSingletonScope();
 container.bind(AiDI.JobInsightsExtractor).to(JobInsightsExtractor).inSingletonScope();
 container.bind(AiDI.WebsiteColorsFinder).to(WebsiteColorsFinder).inSingletonScope();
 container.bind(ResumeDI.ResumeGenerator).to(ResumeGenerator).inSingletonScope();

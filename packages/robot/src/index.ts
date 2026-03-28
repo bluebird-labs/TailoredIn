@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import 'dotenv/config';
 import * as NpmLog                                      from 'npmlog';
 import { MikroORM, RequestContext }                     from '@mikro-orm/postgresql';

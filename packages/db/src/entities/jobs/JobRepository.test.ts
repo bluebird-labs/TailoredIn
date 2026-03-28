@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import 'reflect-metadata';
 import { after, describe, it, TestContext } from 'node:test';
 import { TestUtil } from '@tailoredin/db';
 import { MikroORM } from '@mikro-orm/postgresql';

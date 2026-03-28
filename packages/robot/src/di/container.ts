@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import 'dotenv/config';
 import { Container }                                                       from 'inversify';
 import { MikroORM }                                                        from '@mikro-orm/postgresql';

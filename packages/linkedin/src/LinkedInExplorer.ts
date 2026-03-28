@@ -35,17 +35,12 @@ export const DEFAULT_CONNECTION_TIMEOUT = milliseconds({ seconds: 30 });
 
 @injectable()
 export class LinkedInExplorer {
-  private readonly logPrefix: string;
-  private readonly config: LinkedInExplorerConfig;
+  @inject(LinkedInDI.LinkedInExplorerConfig) private config!: LinkedInExplorerConfig;
+  private readonly logPrefix = this.constructor.name;
   private page!: PlayWright.Page;
   private browser!: PlayWright.Browser;
   private browserContext!: PlayWright.BrowserContext;
   private searchJobsCommand!: LinkedInSearchJobsCommand;
-
-  public constructor(@inject(LinkedInDI.LinkedInExplorerConfig) config: LinkedInExplorerConfig) {
-    this.config = config;
-    this.logPrefix = this.constructor.name;
-  }
 
   public async close() {
     await this.browser.close();

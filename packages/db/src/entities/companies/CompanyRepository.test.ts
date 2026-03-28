@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import 'reflect-metadata';
 import { after, describe, it, TestContext } from 'node:test';
 import { TransientCompany } from './TransientCompany.js';
 import { MikroORM } from '@mikro-orm/postgresql';
