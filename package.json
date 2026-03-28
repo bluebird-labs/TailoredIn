@@ -1,0 +1,26 @@
+{
+  "name": "jobfinder",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "backend": "bun run --cwd packages/backend api",
+    "backend:watch": "bun run --cwd packages/backend api:watch",
+    "robot": "bun run --cwd packages/backend robot",
+    "test": "bun run --cwd packages/backend test",
+    "typecheck": "bun run --cwd packages/backend typecheck && bun run --cwd packages/resume-builder typecheck",
+    "sql": "bun run --cwd packages/backend sql",
+    "sql:watch": "bun run --cwd packages/backend sql:watch",
+    "web-app": "bun run --cwd packages/web-app start",
+    "cvs": "bun packages/resume-builder/cli/index.ts",
+    "check": "biome check packages",
+    "check:fix": "biome check --write packages",
+    "format": "biome format --write packages",
+    "lint": "biome lint packages"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "latest"
+  }
+}

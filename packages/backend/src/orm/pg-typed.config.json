@@ -1,0 +1,19 @@
+{
+  "transforms": [
+    {
+      "mode": "sql",
+      "include": "**/*.pgsql",
+      "emitTemplate": "{{dir}}/{{name}}.sql.ts"
+    }
+  ],
+  "srcDir": "/Users/sylvainestevez/Documents/Code Projects/Ideas/JobFinder/backend/src/orm/entities",
+  "failOnError": true,
+  "camelCaseColumnNames": false,
+  "db": {
+    "host": "localhost",
+    "user": "postgres",
+    "dbName": "postgres",
+    "schema": "public",
+    "password": "postgres"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "resume-builder",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "bin": {
+    "cvs": "./cli/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@oclif/core": "^4.2.6",
+    "date-fns": "^4.1.0",
+    "lodash": "^4.17.21",
+    "yargs": "^17.7.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.15",
+    "@types/node": "^22.13.1",
+    "@types/yargs": "^17.0.33",
+    "typescript": "^5.7.3"
+  }
+}
