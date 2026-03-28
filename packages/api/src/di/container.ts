@@ -1,32 +1,26 @@
 import 'dotenv/config';
-import { Container }                          from 'inversify';
-import { MikroORM }                           from '@mikro-orm/postgresql';
-import { ClientOptions }                      from 'openai';
-import { AiDI, IAiProvider, OpenAiProvider,
-         JobInsightsExtractor,
-         WebsiteColorsFinder }                from '@tailoredin/ai';
-import { ResumeDI, ResumeGenerator }          from '@tailoredin/resume';
-import { makeOrmConfig }                      from '@tailoredin/db';
-import { Environment }                        from '@tailoredin/shared/src/Environment.js';
-import { ApiDI }                              from './DI.js';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { Container } from '@needle-di/core';
+import { AiDI, JobInsightsExtractor, OpenAiProvider, WebsiteColorsFinder } from '@tailoredin/ai';
+import { makeOrmConfig } from '@tailoredin/db';
+import { ResumeDI, ResumeGenerator } from '@tailoredin/resume';
+import { Environment } from '@tailoredin/shared/src/Environment.js';
+import { ApiDI } from './DI.js';
 
 const container = new Container();
 
-container
-  .bind(ApiDI.Orm)
-  .toDynamicValue(() => MikroORM.initSync(makeOrmConfig()))
-  .inSingletonScope();
+container.bind({ provide: ApiDI.Orm, useFactory: () => new MikroORM(makeOrmConfig()) });
 
-container.bind<ClientOptions>(AiDI.OpenAiConfig).toConstantValue({
-  apiKey: Environment.get('OPENAI_API_KEY'),
-  project: Environment.get('OPENAI_PROJECT_ID')
+container.bind({
+  provide: AiDI.OpenAiConfig,
+  useValue: {
+    apiKey: Environment.get('OPENAI_API_KEY'),
+    project: Environment.get('OPENAI_PROJECT_ID')
+  }
 });
-container
-  .bind<IAiProvider>(AiDI.AiProvider)
-  .toDynamicValue(context => new OpenAiProvider(context.get<ClientOptions>(AiDI.OpenAiConfig)))
-  .inSingletonScope();
-container.bind(AiDI.JobInsightsExtractor).to(JobInsightsExtractor).inSingletonScope();
-container.bind(AiDI.WebsiteColorsFinder).to(WebsiteColorsFinder).inSingletonScope();
-container.bind(ResumeDI.ResumeGenerator).to(ResumeGenerator).inSingletonScope();
+container.bind({ provide: AiDI.AiProvider, useClass: OpenAiProvider });
+container.bind({ provide: AiDI.JobInsightsExtractor, useClass: JobInsightsExtractor });
+container.bind({ provide: AiDI.WebsiteColorsFinder, useClass: WebsiteColorsFinder });
+container.bind({ provide: ResumeDI.ResumeGenerator, useClass: ResumeGenerator });
 
 export { container };

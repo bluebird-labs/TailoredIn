@@ -1,7 +1,7 @@
-import { injectable }              from 'inversify';
-import { JobStatus, Job, Company } from '@tailoredin/db';
-import { IJobElector }             from './IJobElector.js';
-import { isBefore, sub }           from 'date-fns';
+import { injectable } from '@needle-di/core';
+import { type Company, type Job, JobStatus } from '@tailoredin/db';
+import { isBefore, sub } from 'date-fns';
+import type { IJobElector } from './IJobElector.js';
 
 type ParsedLocation = {
   city: string | null;

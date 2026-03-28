@@ -1,10 +1,10 @@
-import { Collection } from '@mikro-orm/core';
-import { JobStatusUpdate } from './JobStatusUpdate.js';
-import { TransientJobProps } from './TransientJob.types.js';
-import { Company } from '../companies/Company.js';
-import { RefOrEntity } from '../../helpers.js';
-import { SkillAffinity } from '../skills/SkillAffinity.js';
-import { Skill } from '../skills/Skill.js';
+import type { Collection } from '@mikro-orm/core';
+import type { RefOrEntity } from '../../helpers.js';
+import type { Company } from '../companies/Company.js';
+import type { Skill } from '../skills/Skill.js';
+import type { SkillAffinity } from '../skills/SkillAffinity.js';
+import type { JobStatusUpdate } from './JobStatusUpdate.js';
+import type { TransientJobProps } from './TransientJob.types.js';
 
 export type JobScoresSkillScore = {
   score: number;

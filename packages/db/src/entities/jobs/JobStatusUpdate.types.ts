@@ -1,7 +1,7 @@
-import { Job } from './Job.js';
-import { BaseEntityProps } from '../../BaseEntity.types.js';
-import { JobStatus } from './JobStatus.js';
-import { RefOrEntity } from '../../helpers.js';
+import type { BaseEntityProps } from '../../BaseEntity.types.js';
+import type { RefOrEntity } from '../../helpers.js';
+import type { Job } from './Job.js';
+import type { JobStatus } from './JobStatus.js';
 
 export type JobStatusUpdateProps = {
   id: string;

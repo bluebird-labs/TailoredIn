@@ -1,15 +1,16 @@
 import 'dotenv/config';
-import { after, describe, it, TestContext } from 'node:test';
-import { TestUtil } from '@tailoredin/db';
+import { after, describe, it, type TestContext } from 'node:test';
 import { MikroORM } from '@mikro-orm/postgresql';
+import { TestUtil } from '@tailoredin/db';
 import { makeOrmConfig } from '../../makeOrmConfig.js';
-import { TransientJob } from './TransientJob.js';
-import { Job } from './Job.js';
 import { Company } from '../companies/Company.js';
+import { Job } from './Job.js';
+import { TransientJob } from './TransientJob.js';
+
 import withOrm = TestUtil.withOrm;
 
 describe('JobRepository', () => {
-  const orm = MikroORM.initSync(makeOrmConfig());
+  const orm = new MikroORM(makeOrmConfig());
 
   describe('resolve', () => {
     it(
@@ -17,7 +18,8 @@ describe('JobRepository', () => {
       withOrm(orm, async (t: TestContext, em) => {
         const company = Company.generate();
 
-        await em.persistAndFlush(company);
+        em.persist(company);
+        await em.flush();
         em.clear();
 
         const transientJob = TransientJob.generate();
@@ -33,11 +35,13 @@ describe('JobRepository', () => {
       withOrm(orm, async (t: TestContext, em) => {
         const company = Company.generate();
 
-        await em.persistAndFlush(company);
+        em.persist(company);
+        await em.flush();
 
         const job = Job.generate({ company });
 
-        await em.persistAndFlush(job);
+        em.persist(job);
+        await em.flush();
 
         em.clear();
 

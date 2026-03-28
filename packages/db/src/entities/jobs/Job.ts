@@ -1,13 +1,14 @@
-import { Collection, Entity, EntityRepositoryType, ManyToOne, OneToMany, Property } from '@mikro-orm/core';
+import { Collection, EntityRepositoryType } from '@mikro-orm/core';
+import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
+import type { TypeUtil } from '@tailoredin/shared';
+import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { Company } from '../companies/Company.js';
+import type { JobCreateProps, JobProps, JobScoresProps } from './Job.types.js';
 import { JobRepository } from './JobRepository.js';
+import { JobStatus } from './JobStatus.js';
 import { JobStatusUpdate } from './JobStatusUpdate.js';
 import { TransientJob } from './TransientJob.js';
-import { TransientJobCreateProps } from './TransientJob.types.js';
-import { JobCreateProps, JobProps, JobScoresProps } from './Job.types.js';
-import { JobStatus } from './JobStatus.js';
-import { Company } from '../companies/Company.js';
-import { TypeUtil } from '@tailoredin/shared';
-import { generateUuid, RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import type { TransientJobCreateProps } from './TransientJob.types.js';
 
 @Entity({ tableName: 'jobs', repository: () => JobRepository })
 export class Job extends TransientJob {
@@ -16,12 +17,16 @@ export class Job extends TransientJob {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @OneToMany(() => JobStatusUpdate, jobStatusUpdate => jobStatusUpdate.job, {
-    lazy: true,
-    orderBy: {
-      createdAt: 'DESC'
+  @OneToMany(
+    () => JobStatusUpdate,
+    jobStatusUpdate => jobStatusUpdate.job,
+    {
+      lazy: true,
+      orderBy: {
+        createdAt: 'DESC'
+      }
     }
-  })
+  )
   public readonly statusUpdates: Collection<JobStatusUpdate> = new Collection<JobStatusUpdate>(this);
 
   @ManyToOne(() => Company, {
@@ -33,7 +38,7 @@ export class Job extends TransientJob {
   @Property({ persist: false, nullable: true })
   public scores: Readonly<JobScoresProps> | null;
 
-  protected constructor(props: JobProps) {
+  constructor(props: JobProps) {
     super(props);
     this.id = props.id;
     this.company = props.company;

@@ -1,3 +1,3 @@
-import OpenAI from 'openai';
+import type OpenAi from 'openai';
 
-export interface IAiProvider extends OpenAI {}
+export interface IAiProvider extends OpenAi {}

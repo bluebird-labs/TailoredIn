@@ -1,5 +1,4 @@
-import { TypeUtil } from '@tailoredin/shared';
-import { ObjectUtil } from '@tailoredin/shared';
+import { ObjectUtil, type TypeUtil } from '@tailoredin/shared';
 import { baseOrmConfig } from './baseOrmConfig.js';
 
 export type OrmConfig = typeof baseOrmConfig;

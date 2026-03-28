@@ -1,4 +1,4 @@
-import { TransientCompanyProps } from './TransientCompany.types.js';
+import type { TransientCompanyProps } from './TransientCompany.types.js';
 
 export type CompanyProps = TransientCompanyProps & {
   id: string;

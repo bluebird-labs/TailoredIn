@@ -1,8 +1,8 @@
-import { CVConfigParser }    from './CVConfigParser.js';
-import { BrilliantCVContent } from '../../brilliant-cv/types.js';
-import { Archetype }          from '@tailoredin/db';
-import { ResumeConfig }       from './types.js';
-import { NerdCVConfig }       from './NerdCVConfig.js';
+import { Archetype } from '@tailoredin/db';
+import type { BrilliantCVContent } from '../../brilliant-cv/types.js';
+import { CVConfigParser } from './CVConfigParser.js';
+import { NerdCVConfig } from './NerdCVConfig.js';
+import type { ResumeConfig } from './types.js';
 
 export type MakeCVInput = {
   archetype: Archetype;

@@ -2,9 +2,7 @@ import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20250227223351_genesis extends Migration {
   public override async up(): Promise<void> {
-    this.addSql(
-      `create extension if not exists "uuid-ossp";`
-    );
+    this.addSql(`create extension if not exists "uuid-ossp";`);
 
     this.addSql(
       `create type "job_status" as enum ('new', 'unfit', 'later', 'applied', 'recruiter_screen', 'technical_screen', 'on_site', 'offer', 'rejected', 'no_news', 'expired', 'low_salary', 'retired', 'hm_screen', 'duplicate');`

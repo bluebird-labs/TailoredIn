@@ -1,10 +1,11 @@
-import { Entity, EntityRepositoryType } from '@mikro-orm/core';
-import { TransientSkill } from './TransientSkill.js';
-import { SkillCreateProps, SkillProps, SkillRefreshProps } from './Skill.types.js';
-import { TransientSkillCreateProps } from './TransientSkill.types.js';
-import { SkillRepository } from './SkillRepository.js';
-import { generateUuid, UuidPrimaryKey } from '../../helpers.js';
+import { EntityRepositoryType } from '@mikro-orm/core';
+import { Entity } from '@mikro-orm/decorators/es';
 import { ObjectUtil } from '@tailoredin/shared';
+import { generateUuid, UuidPrimaryKey } from '../../helpers.js';
+import type { SkillCreateProps, SkillProps, SkillRefreshProps } from './Skill.types.js';
+import { SkillRepository } from './SkillRepository.js';
+import { TransientSkill } from './TransientSkill.js';
+import type { TransientSkillCreateProps } from './TransientSkill.types.js';
 
 @Entity({ tableName: 'skills', repository: () => SkillRepository })
 export class Skill extends TransientSkill {
@@ -13,7 +14,7 @@ export class Skill extends TransientSkill {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  protected constructor(props: SkillProps) {
+  constructor(props: SkillProps) {
     super(props);
     this.id = props.id;
   }

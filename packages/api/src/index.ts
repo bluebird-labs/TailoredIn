@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import * as NpmLog from 'npmlog';
-import { server }  from './server.js';
+import { server } from './server.js';
 
 const port = process.env.PORT || 8000;
 

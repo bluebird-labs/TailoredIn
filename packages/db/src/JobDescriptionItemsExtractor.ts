@@ -1,6 +1,6 @@
 import * as HtmlParser from 'node-html-parser';
 import { NodeType } from 'node-html-parser';
-import { Job } from './entities/jobs/Job.js';
+import type { Job } from './entities/jobs/Job.js';
 
 export enum JobDescriptionItemRole {
   TITLE = 'title',
@@ -51,7 +51,7 @@ export abstract class JobDescriptionItemsExtractor {
       }
 
       if (node.nodeType === NodeType.TEXT_NODE || node.rawTagName === 'a') {
-        this.whenNodeHasText(node, text => {
+        JobDescriptionItemsExtractor.whenNodeHasText(node, text => {
           if (items.length === 0 || items[items.length - 1].role !== JobDescriptionItemRole.TEXT) {
             items.push({
               role: JobDescriptionItemRole.TEXT,
@@ -77,7 +77,7 @@ export abstract class JobDescriptionItemsExtractor {
       }
 
       if (node.rawTagName === 'strong') {
-        this.whenNodeHasText(node, text => {
+        JobDescriptionItemsExtractor.whenNodeHasText(node, text => {
           if (items.length === 0 || items[items.length - 1].role !== JobDescriptionItemRole.TEXT) {
             items.push({
               role: JobDescriptionItemRole.TITLE,
@@ -95,7 +95,7 @@ export abstract class JobDescriptionItemsExtractor {
         const bullets: string[] = [];
 
         for (const childNode of node.childNodes) {
-          this.whenNodeHasText(childNode, text => bullets.push(text));
+          JobDescriptionItemsExtractor.whenNodeHasText(childNode, text => bullets.push(text));
         }
 
         items.push({
@@ -123,7 +123,7 @@ export abstract class JobDescriptionItemsExtractor {
   }
 
   private static whenNodeHasText(node: HtmlParser.Node, delegate: (text: string) => void) {
-    const text = this.parseText(node);
+    const text = JobDescriptionItemsExtractor.parseText(node);
 
     if (text !== null) {
       delegate(text);

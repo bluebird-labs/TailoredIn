@@ -1,6 +1,6 @@
-import * as PlayRight from 'playwright';
+import { injectable } from '@needle-di/core';
 import { Vibrant } from 'node-vibrant/node';
-import { injectable } from 'inversify';
+import * as PlayRight from 'playwright';
 
 export type FindWebsitePaletteInput = {
   website: string;

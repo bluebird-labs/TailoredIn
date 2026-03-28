@@ -1,10 +1,10 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
-import { TransientSkillCreateProps } from '../entities/skills/TransientSkill.types.js';
+import * as NpmLog from 'npmlog';
+import { Skill } from '../entities/skills/Skill.js';
 import { SkillAffinity } from '../entities/skills/SkillAffinity.js';
 import { TransientSkill } from '../entities/skills/TransientSkill.js';
-import { Skill } from '../entities/skills/Skill.js';
-import * as NpmLog from 'npmlog';
+import type { TransientSkillCreateProps } from '../entities/skills/TransientSkill.types.js';
 
 const skills = new Map<string, Pick<TransientSkillCreateProps, 'affinity' | 'variants'>>([
   // Languages.

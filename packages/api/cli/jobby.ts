@@ -2,9 +2,9 @@
 
 import 'dotenv/config';
 import { binary, run, subcommands } from 'cmd-ts';
-import { jobsCommands }             from './commands/jobs.js';
-import { utilsCommands }            from './commands/utils/utils.js';
-import * as NpmLog                  from 'npmlog';
+import * as NpmLog from 'npmlog';
+import { jobsCommands } from './commands/jobs.js';
+import { utilsCommands } from './commands/utils/utils.js';
 
 const LOG_PREFIX = 'jobby';
 

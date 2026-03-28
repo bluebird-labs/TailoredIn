@@ -1,6 +1,6 @@
-import { BrilliantCVContent } from '../brilliant-cv/types.js';
-import { Archetype }          from '@tailoredin/db';
-import { makeCV }             from './cvs/makeCV.js';
+import type { Archetype } from '@tailoredin/db';
+import type { BrilliantCVContent } from '../brilliant-cv/types.js';
+import { makeCV } from './cvs/makeCV.js';
 
 export type GenerateCVInput = {
   awesomeColor: string;

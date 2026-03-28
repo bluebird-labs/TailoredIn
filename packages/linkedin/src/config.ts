@@ -1,4 +1,4 @@
-import { JobSearchParams } from './LinkedInScrapper.js';
+import type { JobSearchParams } from './LinkedInScrapper.js';
 
 export type JobSearcherConfig = {
   searches: Record<string, JobSearchParams>;

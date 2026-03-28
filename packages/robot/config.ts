@@ -1,4 +1,4 @@
-import { JobSearchParams } from '@tailoredin/linkedin';
+import type { JobSearchParams } from '@tailoredin/linkedin';
 
 export type JobSearcherConfig = {
   searches: Record<string, JobSearchParams>;

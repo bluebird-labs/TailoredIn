@@ -1,12 +1,13 @@
-import { EntityManager, PrimaryKey, PrimaryKeyOptions, Ref } from '@mikro-orm/postgresql';
-import { BaseEntity } from './BaseEntity.js';
-import Crypto from 'crypto';
-import { Migration } from '@mikro-orm/migrations';
-import * as FS from 'fs/promises';
-import { FsUtil } from '@tailoredin/shared';
 import Path from 'node:path';
+import type { Collection, EntityKey, PrimaryKeyOptions } from '@mikro-orm/core';
+import { PrimaryKey } from '@mikro-orm/decorators/es';
+import type { Migration } from '@mikro-orm/migrations';
+import type { EntityManager, Ref } from '@mikro-orm/postgresql';
+import { FsUtil } from '@tailoredin/shared';
+import Crypto from 'crypto';
+import * as Fs from 'fs/promises';
+import type { BaseEntity } from './BaseEntity.js';
 import { PACKAGE_DIR } from './PACKAGE_DIR.js';
-import { Collection, EntityKey } from '@mikro-orm/core';
 
 export type QueryOpts = {
   em?: EntityManager;
@@ -38,7 +39,7 @@ export const getMigrationSql = async (migration: Migration): Promise<string> => 
     throw new Error(`SQL file not found: ${sqlFilePath}`);
   }
 
-  return FS.readFile(sqlFilePath, 'utf-8');
+  return Fs.readFile(sqlFilePath, 'utf-8');
 };
 
 type AnyFunction = (...args: any[]) => any;

@@ -1,15 +1,15 @@
-import Koa                                   from 'koa';
-import { koaBody }                            from 'koa-body';
-import { makeRouter }                         from './router.js';
-import morgan                                 from 'koa-morgan';
-import * as NpmLog                            from 'npmlog';
-import { StatusCode }                         from '@tselect/status-code';
-import { ZodError }                           from 'zod';
-import { ZodUtil }                            from '@tailoredin/shared';
-import cors                                   from '@koa/cors';
-import { MikroORM, RequestContext }           from '@mikro-orm/postgresql';
-import { container }                          from './di/container.js';
-import { ApiDI }                              from './di/DI.js';
+import cors from '@koa/cors';
+import { type MikroORM, RequestContext } from '@mikro-orm/postgresql';
+import { ZodUtil } from '@tailoredin/shared';
+import { StatusCode } from '@tselect/status-code';
+import Koa from 'koa';
+import { koaBody } from 'koa-body';
+import morgan from 'koa-morgan';
+import * as NpmLog from 'npmlog';
+import { ZodError } from 'zod';
+import { container } from './di/container.js';
+import { ApiDI } from './di/DI.js';
+import { makeRouter } from './router.js';
 
 const app = new Koa();
 const router = makeRouter();

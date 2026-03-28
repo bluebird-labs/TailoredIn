@@ -1,17 +1,20 @@
 import 'dotenv/config';
-import * as NpmLog                                      from 'npmlog';
-import { MikroORM, RequestContext }                     from '@mikro-orm/postgresql';
-import { LinkedInDI, LinkedInExplorer,
-         JobSearchHandler }                             from '@tailoredin/linkedin';
-import { JobStatus }                                    from '@tailoredin/db';
-import { TimeUtil, InspectUtil }                        from '@tailoredin/shared';
-import { milliseconds }                                 from 'date-fns';
-import { omit, pick }                                   from 'lodash';
-import { container }                                    from './di/container.js';
-import { RobotDI }                                      from './di/DI.js';
-import { IJobElector }                                  from './job-elector/IJobElector.js';
-import config                                           from '../config.js';
-import { LinkedInSearchJobsCommandParams }              from '@tailoredin/linkedin';
+import { type MikroORM, RequestContext } from '@mikro-orm/postgresql';
+import { JobStatus } from '@tailoredin/db';
+import {
+  type JobSearchHandler,
+  LinkedInDI,
+  type LinkedInExplorer,
+  type LinkedInSearchJobsCommandParams
+} from '@tailoredin/linkedin';
+import { InspectUtil, TimeUtil } from '@tailoredin/shared';
+import { milliseconds } from 'date-fns';
+import { omit, pick } from 'lodash';
+import * as NpmLog from 'npmlog';
+import config from '../config.js';
+import { container } from './di/container.js';
+import { RobotDI } from './di/DI.js';
+import type { IJobElector } from './job-elector/IJobElector.js';
 
 const LOG_PREFIX = 'TailoredIn';
 const orm = container.get<MikroORM>(LinkedInDI.Orm);

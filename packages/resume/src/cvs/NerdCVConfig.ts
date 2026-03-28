@@ -1,22 +1,54 @@
-import { ResumeConfig } from './types.js';
-import { JobTitle }     from '@tailoredin/db';
-import { Lantern }      from '../data/Lantern.js';
-import { Brightflow }   from '../data/Brightflow.js';
-import { Volvo }        from '../data/Volvo.js';
-import { Luxe }         from '../data/Luxe.js';
+import { JobTitle } from '@tailoredin/db';
+import { Brightflow } from '../data/Brightflow.js';
+import { Lantern } from '../data/Lantern.js';
+import { LuckyCart } from '../data/LuckyCart.js';
+import { Luxe } from '../data/Luxe.js';
+import { Planorama } from '../data/Planorama.js';
 import { StreamNation } from '../data/StreamNation.js';
-import { Planorama }    from '../data/Planorama.js';
-import { LuckyCart }    from '../data/LuckyCart.js';
+import { Volvo } from '../data/Volvo.js';
+import type { ResumeConfig } from './types.js';
 
 export const NerdCVConfig: ResumeConfig = {
   social_networks: ['GitHub', 'LinkedIn'],
   education: ['BS'],
-  headline: 'Experienced software engineer with over a decade of designing and building data-intensive products and platforms. Adept at leading high-performing teams, driving technical excellence, and delivering business-focused solutions. Thrive in fast-paced environments with an ownership mindset and a pragmatic approach to problem-solving.',
+  headline:
+    'Experienced software engineer with over a decade of designing and building data-intensive products and platforms. Adept at leading high-performing teams, driving technical excellence, and delivering business-focused solutions. Thrive in fast-paced environments with an ownership mindset and a pragmatic approach to problem-solving.',
   stack: {
-    architecture: ['OOP Principles & Design Patterns', 'MicroServices', 'ETL', 'Event-driven', 'SOA', 'DDD', 'REST', 'GraphQL'],
+    architecture: [
+      'OOP Principles & Design Patterns',
+      'MicroServices',
+      'ETL',
+      'Event-driven',
+      'SOA',
+      'DDD',
+      'REST',
+      'GraphQL'
+    ],
     backend: ['Node.js (since 2012)', 'TypeScript (expert)', 'Java (rusty)', 'Python (learning)'],
-    storage: ['PostgreSQL', 'MySQL', 'Kafka', 'BullQ', 'ElasticSearch', 'Redis', 'Presto', 'Memcache', 'MongoDB', 'RabbitMQ'],
-    devOps: ['AWS Cloud', 'Docker', 'Kubernetes', 'Terraform', 'Helm', 'GitHub Actions', 'Spinnaker', 'Jenkins', 'Vercel', 'Heroku'],
+    storage: [
+      'PostgreSQL',
+      'MySQL',
+      'Kafka',
+      'BullQ',
+      'ElasticSearch',
+      'Redis',
+      'Presto',
+      'Memcache',
+      'MongoDB',
+      'RabbitMQ'
+    ],
+    devOps: [
+      'AWS Cloud',
+      'Docker',
+      'Kubernetes',
+      'Terraform',
+      'Helm',
+      'GitHub Actions',
+      'Spinnaker',
+      'Jenkins',
+      'Vercel',
+      'Heroku'
+    ],
     telemetry: ['Jaeger', 'Zipkin', 'Grafana', 'Kibana', 'Prometheus', 'Splunk'],
     frontend: ['Ember.js', 'Angular.js', 'SCSS', 'SASS', 'React'],
     interests: ['Go', 'Rust', 'C#']
@@ -28,7 +60,8 @@ export const NerdCVConfig: ResumeConfig = {
       location: 'New York, NY',
       start_date: Lantern.joined(),
       end_date: Lantern.left(),
-      summary: 'Consulted for an early-stage B2B SaaS startup scaling for growth, addressed stability/performance issues and built a scalable foundation',
+      summary:
+        'Consulted for an early-stage B2B SaaS startup scaling for growth, addressed stability/performance issues and built a scalable foundation',
       highlights: [
         'Leveraged LLMs (OpenAI, Anthropic), prompt engineering, and Playwright-driven web scraping to equip sales teams with prospect insights',
         'Enabled local development and CI/CD pipelines: containerized Supabase (PostgreSQL) and BullQ (Redis) using Docker, split existing schema (tables, stored procedures) into manageable SQL migrations, implemented unit testing frameworks and GitHub Actions workflows',
@@ -42,7 +75,8 @@ export const NerdCVConfig: ResumeConfig = {
       location: 'New York, NY',
       start_date: Brightflow.joined(),
       end_date: Brightflow.left(),
-      summary: 'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
+      summary:
+        'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
       highlights: [
         'Built an event-driven ETL framework with Node.js, Kafka (MSK), and Kubernetes Job (EKS), prioritizing robustness, scalability, and observability (X-Ray, CloudWatch, OpenTelemetry, Grafana)',
         'Delivered data to Athena (Apache Presto, S3-indexed) for analytics/ML, Aurora (PostgreSQL) through REST APIs for real-time applications, and complex Excel reports for loan underwriting',
@@ -57,7 +91,8 @@ export const NerdCVConfig: ResumeConfig = {
       location: 'New York, NY',
       start_date: Volvo.promoted(),
       end_date: Volvo.left(),
-      summary: 'Led the Volvo Valet initiative as technical lead and manager, enabling dealerships to manage bookings, loaner vehicles, and premium services for Volvo owners. Oversaw both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
+      summary:
+        'Led the Volvo Valet initiative as technical lead and manager, enabling dealerships to manage bookings, loaner vehicles, and premium services for Volvo owners. Oversaw both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
       highlights: [
         'Redesigned valet services and asset management using Domain-Driven Design, expanding global availability (20+ markets) by optimizing AWS regions and Route53 geolocation for lower latency and higher uptime',
         'Collaborated cross-functionally with operations, product, NSCs, and dealerships to streamline dealer workflows and enhance customer experience',

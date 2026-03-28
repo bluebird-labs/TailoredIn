@@ -1,9 +1,8 @@
-import { Entity, Enum, Property } from '@mikro-orm/core';
+import { Entity, Enum, Property } from '@mikro-orm/decorators/es';
+import { ObjectUtil, type TypeUtil } from '@tailoredin/shared';
 import { BaseEntity } from '../../BaseEntity.js';
-import { TransientJobCreateProps, TransientJobProps } from './TransientJob.types.js';
 import { DISCARDED_JOB_STATUSES, IN_PROCESS_JOB_STATUSES, JobStatus } from './JobStatus.js';
-import { ObjectUtil } from '@tailoredin/shared';
-import { TypeUtil } from '@tailoredin/shared';
+import type { TransientJobCreateProps, TransientJobProps } from './TransientJob.types.js';
 
 @Entity({ abstract: true })
 export class TransientJob extends BaseEntity {
@@ -69,7 +68,7 @@ export class TransientJob extends BaseEntity {
   })
   private descriptionFts: string | null;
 
-  protected constructor(props: TransientJobProps) {
+  constructor(props: TransientJobProps) {
     super(props);
     this.status = props.status;
     this.applyLink = props.applyLink;

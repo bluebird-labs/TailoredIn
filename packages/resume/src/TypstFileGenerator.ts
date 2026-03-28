@@ -1,6 +1,6 @@
 import FS from 'node:fs/promises';
 import Path from 'node:path';
-import { BrilliantCVContent } from '../brilliant-cv/types.js';
+import type { BrilliantCVContent } from '../brilliant-cv/types.js';
 
 /** Escape characters that have special meaning in Typst content brackets [...]. */
 const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>/g, '\\>');
@@ -20,11 +20,7 @@ export class TypstFileGenerator {
         TypstFileGenerator.buildProfessionalTyp(content),
         'utf8'
       ),
-      FS.writeFile(
-        Path.join(workDir, 'modules_en', 'skills.typ'),
-        TypstFileGenerator.buildSkillsTyp(content),
-        'utf8'
-      ),
+      FS.writeFile(Path.join(workDir, 'modules_en', 'skills.typ'), TypstFileGenerator.buildSkillsTyp(content), 'utf8'),
       FS.writeFile(
         Path.join(workDir, 'modules_en', 'education.typ'),
         TypstFileGenerator.buildEducationTyp(content),

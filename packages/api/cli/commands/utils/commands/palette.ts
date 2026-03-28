@@ -1,7 +1,7 @@
+import { AiDI, type WebsiteColorsFinder } from '@tailoredin/ai';
 import { command, positional, string } from 'cmd-ts';
-import { container }                   from '../../../../src/di/container.js';
-import { AiDI, WebsiteColorsFinder }   from '@tailoredin/ai';
-import * as NpmLog                     from 'npmlog';
+import * as NpmLog from 'npmlog';
+import { container } from '../../../../src/di/container.js';
 
 const LOG_PREFIX = 'palette';
 const websiteColorFinder = container.get<WebsiteColorsFinder>(AiDI.WebsiteColorsFinder);

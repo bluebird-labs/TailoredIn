@@ -1,5 +1,5 @@
-import { EntityManager, MikroORM } from '@mikro-orm/postgresql';
-import { TestContext }             from 'node:test';
+import type { TestContext } from 'node:test';
+import type { EntityManager, MikroORM } from '@mikro-orm/postgresql';
 
 type OrmTestFn = (t: TestContext, em: EntityManager) => Promise<void>;
 

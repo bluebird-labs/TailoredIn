@@ -1,12 +1,12 @@
-import { ResumeTemplate }  from './types.js';
-import { JobTitle }        from '@tailoredin/db';
-import { Lantern } from '../data/Lantern.js';
+import { JobTitle } from '@tailoredin/db';
 import { Brightflow } from '../data/Brightflow.js';
-import { Volvo } from '../data/Volvo.js';
-import { Luxe } from '../data/Luxe.js';
-import { StreamNation } from '../data/StreamNation.js';
-import { Planorama } from '../data/Planorama.js';
+import { Lantern } from '../data/Lantern.js';
 import { LuckyCart } from '../data/LuckyCart.js';
+import { Luxe } from '../data/Luxe.js';
+import { Planorama } from '../data/Planorama.js';
+import { StreamNation } from '../data/StreamNation.js';
+import { Volvo } from '../data/Volvo.js';
+import type { ResumeTemplate } from './types.js';
 
 export const LeadICResumeTemplate: ResumeTemplate = {
   social_networks: ['GitHub', 'LinkedIn'],

@@ -1,10 +1,9 @@
-import Router                         from '@koa/router';
-import { StatusCode }                  from '@tselect/status-code';
-import { z }                           from 'zod';
-import { JobDescriptionItemsExtractor,
-         Job, JobStatus, Company }     from '@tailoredin/db';
-import { ResumeGenerator }             from '@tailoredin/resume';
-import { MikroORM }                    from '@mikro-orm/postgresql';
+import type Router from '@koa/router';
+import type { MikroORM } from '@mikro-orm/postgresql';
+import { type Company, Job, JobDescriptionItemsExtractor, JobStatus } from '@tailoredin/db';
+import type { ResumeGenerator } from '@tailoredin/resume';
+import { StatusCode } from '@tselect/status-code';
+import { z } from 'zod';
 
 export const jobRoutes = (router: Router, orm: MikroORM, resumeGenerator: ResumeGenerator) => {
   router.get('/jobs/tops/next', async ctx => {

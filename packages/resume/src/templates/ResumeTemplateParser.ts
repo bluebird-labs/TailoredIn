@@ -1,8 +1,8 @@
-import { BrilliantCVEducation, BrilliantCVExperience, BrilliantCVSkill } from '../../brilliant-cv/types.js';
-import { ResumeData, ResumeTemplate }                                    from './types.js';
-import { StringUtil }                                                    from '@tailoredin/shared';
-import { formatDateRange }                                               from '../dateFormatter.js';
-import { capitalize }                                                    from 'lodash';
+import { StringUtil } from '@tailoredin/shared';
+import { capitalize } from 'lodash';
+import type { BrilliantCVEducation, BrilliantCVExperience, BrilliantCVSkill } from '../../brilliant-cv/types.js';
+import { formatDateRange } from '../dateFormatter.js';
+import type { ResumeData, ResumeTemplate } from './types.js';
 
 export abstract class ResumeTemplateParser {
   public static parse(config: ResumeTemplate): ResumeData {

@@ -1,21 +1,16 @@
-import { JobInsightsExtractor }          from '@tailoredin/ai';
-import { BrilliantCVContent }            from '../brilliant-cv/types.js';
-import Path                              from 'node:path';
-import { snakeCase }                     from 'lodash';
-import { format }                        from 'date-fns';
-import { makeResumeContent }             from './templates/makeResumeContent.js';
-import { Archetype }                     from '@tailoredin/db';
-import { PaletteKey, VibrantSwatch, WebsiteColorsFinder } from '@tailoredin/ai';
-import * as NPMLog                       from 'npmlog';
-import { TypstFileGenerator }            from './TypstFileGenerator.js';
-import FS                                from 'node:fs/promises';
-import { execSync }                      from 'child_process';
-import { ColorUtil }                     from '@tailoredin/shared';
-import { EnumUtil }                      from '@tailoredin/shared';
-import { Company }                       from '@tailoredin/db';
-import { Job }                           from '@tailoredin/db';
-import { inject, injectable }            from 'inversify';
-import { ResumeDI }                      from './DI.js';
+import FS from 'node:fs/promises';
+import Path from 'node:path';
+import { inject, injectable } from '@needle-di/core';
+import { AiDI, JobInsightsExtractor, PaletteKey, type VibrantSwatch, WebsiteColorsFinder } from '@tailoredin/ai';
+import { Archetype, type Company, type Job } from '@tailoredin/db';
+import { ColorUtil, EnumUtil } from '@tailoredin/shared';
+import { execSync } from 'child_process';
+import { format } from 'date-fns';
+import { snakeCase } from 'lodash';
+import * as NpmLog from 'npmlog';
+import type { BrilliantCVContent } from '../brilliant-cv/types.js';
+import { TypstFileGenerator } from './TypstFileGenerator.js';
+import { makeResumeContent } from './templates/makeResumeContent.js';
 
 const TYPST_CWD = Path.resolve(import.meta.dirname, '..', 'typst');
 const DEFAULT_AWESOME_COLOR = '#178FEA';
@@ -34,8 +29,10 @@ export type GenerateSmartResumeContentInput = {
 
 @injectable()
 export class ResumeGenerator {
-  @inject(ResumeDI.JobInsightsExtractor) private jobInsightsExtractor!: JobInsightsExtractor;
-  @inject(ResumeDI.WebsiteColorsFinder) private websiteColorsFinder!: WebsiteColorsFinder;
+  constructor(
+    private readonly jobInsightsExtractor = inject(AiDI.JobInsightsExtractor),
+    private readonly websiteColorsFinder = inject(AiDI.WebsiteColorsFinder)
+  ) {}
 
   public generateRawResumeContent(input: GenerateRawResumeContentInput): BrilliantCVContent {
     return makeResumeContent({
@@ -46,11 +43,11 @@ export class ResumeGenerator {
   }
 
   public async generateSmartResumeContent(input: GenerateSmartResumeContentInput): Promise<BrilliantCVContent> {
-    NPMLog.info(this.constructor.name, `Gathering job posting insights...`);
+    NpmLog.info(this.constructor.name, `Gathering job posting insights...`);
 
     const jobPostingInsights = await this.jobInsightsExtractor.extractJobPostingInsights(input);
 
-    NPMLog.info(this.constructor.name, `Gathered job posting insights:`, jobPostingInsights);
+    NpmLog.info(this.constructor.name, `Gathered job posting insights:`, jobPostingInsights);
 
     const tmpResume = this.generateRawResumeContent({
       company: input.company,
@@ -59,7 +56,7 @@ export class ResumeGenerator {
       awesomeColor: DEFAULT_AWESOME_COLOR
     });
 
-    NPMLog.info(this.constructor.name, `Gathering job application insights...`);
+    NpmLog.info(this.constructor.name, `Gathering job application insights...`);
 
     const jobApplicationInsights = await this.jobInsightsExtractor.extractApplicationInsights({
       resume: tmpResume,
@@ -67,7 +64,7 @@ export class ResumeGenerator {
       company: input.company
     });
 
-    NPMLog.info(this.constructor.name, `Gathered job application insights:`, jobApplicationInsights);
+    NpmLog.info(this.constructor.name, `Gathered job application insights:`, jobApplicationInsights);
 
     const awesomeColor = (await this.extractResumeColors(jobPostingInsights.website)) ?? DEFAULT_AWESOME_COLOR;
 
@@ -92,7 +89,7 @@ export class ResumeGenerator {
   public async extractResumeColors(website: string | null): Promise<string | null> {
     if (website === null) return null;
 
-    NPMLog.info(this.constructor.name, `Gathering website palette...`);
+    NpmLog.info(this.constructor.name, `Gathering website palette...`);
 
     try {
       const swatchPalette = await this.websiteColorsFinder.findWebsitePalette({ website });
@@ -115,7 +112,7 @@ export class ResumeGenerator {
         }
       }
     } catch (err: Error | any) {
-      NPMLog.warn(this.constructor.name, `Error extracting color palette from ${website}`, err);
+      NpmLog.warn(this.constructor.name, `Error extracting color palette from ${website}`, err);
     }
 
     return null;

@@ -1,14 +1,15 @@
 import 'dotenv/config';
-import { after, describe, it, TestContext } from 'node:test';
-import { TransientCompany } from './TransientCompany.js';
+import { after, describe, it, type TestContext } from 'node:test';
 import { MikroORM } from '@mikro-orm/postgresql';
-import { Company } from './Company.js';
 import { TestUtil } from '@tailoredin/db';
 import { makeOrmConfig } from '../../makeOrmConfig.js';
+import { Company } from './Company.js';
+import { TransientCompany } from './TransientCompany.js';
+
 import withOrm = TestUtil.withOrm;
 
 describe('CompanyRepository', () => {
-  const orm = MikroORM.initSync(makeOrmConfig());
+  const orm = new MikroORM(makeOrmConfig());
 
   describe('resolve', () => {
     it(
@@ -30,7 +31,8 @@ describe('CompanyRepository', () => {
           website: null
         });
 
-        await em.persistAndFlush(existingCompany);
+        em.persist(existingCompany);
+        await em.flush();
 
         em.clear();
 

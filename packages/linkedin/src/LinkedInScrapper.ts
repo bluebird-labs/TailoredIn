@@ -1,9 +1,9 @@
-import * as PlayWright from 'playwright';
-import { Locator } from 'playwright';
+import { TimeUtil } from '@tailoredin/shared';
+import { range } from 'lodash';
 import * as NpmLog from 'npmlog';
-import { range }        from 'lodash';
+import type { Locator } from 'playwright';
+import * as PlayWright from 'playwright';
 import { LinkedInUrls } from './LinkedInExplorer.js';
-import { TimeUtil }     from '@tailoredin/shared';
 export type LinkedInScrapperConfig = {
   email: string;
   password: string;
@@ -334,7 +334,7 @@ export class LinkedInScrapper {
         case 'twoHundredKOrHigher':
           searchParams.append('f_SB2', '9');
           break;
-        case 'past':
+        case 'past': {
           // eslint-disable-next-line no-case-declarations
           let ts: number;
           switch (value) {
@@ -352,7 +352,8 @@ export class LinkedInScrapper {
           }
           searchParams.append('f_TPR', `r${ts}`);
           break;
-        case 'jobType':
+        }
+        case 'jobType': {
           // eslint-disable-next-line no-case-declarations
           let t: string;
           switch (value) {
@@ -367,10 +368,11 @@ export class LinkedInScrapper {
           }
           searchParams.append('f_JT', t);
           break;
+        }
         case 'keywords':
           searchParams.append('keywords', value as string);
           break;
-        case 'location':
+        case 'location': {
           // eslint-disable-next-line no-case-declarations
           let geoId: number;
           switch (value) {
@@ -385,6 +387,7 @@ export class LinkedInScrapper {
           }
           searchParams.append('geoId', geoId.toString());
           break;
+        }
         case 'remote':
           for (const val of value as string[]) {
             switch (val) {

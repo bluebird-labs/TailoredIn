@@ -1,7 +1,7 @@
-import { Environment } from '@tailoredin/shared/src/Environment.js';
-import Path from 'node:path';
-import { PACKAGE_DIR } from './PACKAGE_DIR.js';
 import FS from 'node:fs';
+import Path from 'node:path';
+import { Environment } from '@tailoredin/shared/src/Environment.js';
+import { PACKAGE_DIR } from './PACKAGE_DIR.js';
 
 const configFilePath = Path.resolve(PACKAGE_DIR, `pg-typed.config.json`);
 

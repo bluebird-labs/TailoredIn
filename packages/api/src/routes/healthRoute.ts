@@ -1,4 +1,4 @@
-import Router         from '@koa/router';
+import type Router from '@koa/router';
 import { StatusCode } from '@tselect/status-code';
 
 export const healthRoute = (router: Router) => {

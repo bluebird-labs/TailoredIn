@@ -1,19 +1,21 @@
-import { FindOneOrFailOptions, FindOptions, UpsertOptions } from '@mikro-orm/postgresql';
-import { QueryOpts, RefOrEntity } from '../../helpers.js';
-import { Job } from './Job.js';
-import { TransientJob } from './TransientJob.js';
-import { Duration, sub } from 'date-fns';
-import { JobStatus } from './JobStatus.js';
-import { JobProps } from './Job.types.js';
-import { Company } from '../companies/Company.js';
-import { findTopScoredJobs, IFindTopScoredJobsParams, IFindTopScoredJobsResult } from './sql/findTopScoredJobs.sql.js';
+import type { FindOneOrFailOptions, FindOptions, UpsertOptions } from '@mikro-orm/postgresql';
+import { EnumUtil, InspectUtil, type TypeUtil } from '@tailoredin/shared';
+import { type Duration, sub } from 'date-fns';
 import { BaseRepository } from '../../BaseRepository.js';
+import type { QueryOpts, RefOrEntity } from '../../helpers.js';
+import type { Company } from '../companies/Company.js';
 import { Skill } from '../skills/Skill.js';
 import { SkillAffinity } from '../skills/SkillAffinity.js';
-import { TypeUtil } from '@tailoredin/shared';
-import { InspectUtil } from '@tailoredin/shared';
-import { EnumUtil } from '@tailoredin/shared';
-import { IScoreJobByIdParams, scoreJobById } from './sql/scoreJobById.sql.js';
+import { Job } from './Job.js';
+import type { JobProps } from './Job.types.js';
+import { JobStatus } from './JobStatus.js';
+import {
+  findTopScoredJobs,
+  type IFindTopScoredJobsParams,
+  type IFindTopScoredJobsResult
+} from './sql/findTopScoredJobs.sql.js';
+import { type IScoreJobByIdParams, scoreJobById } from './sql/scoreJobById.sql.js';
+import type { TransientJob } from './TransientJob.js';
 
 const SKILL_LIST_KEYS = [
   'expert_skills',

@@ -1,30 +1,26 @@
 import 'dotenv/config';
-import { Container }                                                       from 'inversify';
-import { MikroORM }                                                        from '@mikro-orm/postgresql';
-import { makeOrmConfig }                                                   from '@tailoredin/db';
-import { LinkedInDI, LinkedInExplorer, JobSearchHandler,
-         LinkedInExplorerConfig }                                          from '@tailoredin/linkedin';
-import { Environment }                                                     from '@tailoredin/shared/src/Environment.js';
-import { RobotDI }                                                         from './DI.js';
-import { MyJobElector }                                                    from '../job-elector/MyJobElector.js';
-import { IJobElector }                                                     from '../job-elector/IJobElector.js';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { Container } from '@needle-di/core';
+import { makeOrmConfig } from '@tailoredin/db';
+import { JobSearchHandler, LinkedInDI, LinkedInExplorer, type LinkedInExplorerConfig } from '@tailoredin/linkedin';
+import { Environment } from '@tailoredin/shared/src/Environment.js';
+import { MyJobElector } from '../job-elector/MyJobElector.js';
+import { RobotDI } from './DI.js';
 
 const container = new Container();
 
-container
-  .bind(LinkedInDI.Orm)
-  .toDynamicValue(() => MikroORM.initSync(makeOrmConfig()))
-  .inSingletonScope();
-
-container.bind<IJobElector>(RobotDI.JobElector).to(MyJobElector).inSingletonScope();
-
-container.bind<LinkedInExplorerConfig>(LinkedInDI.LinkedInExplorerConfig).toConstantValue({
-  headless: Environment.get('HEADLESS'),
-  slowMo: Environment.get('SLOW_MO'),
-  email: Environment.get('LINKEDIN_EMAIL'),
-  password: Environment.get('LINKEDIN_PASSWORD')
+container.bind({ provide: LinkedInDI.Orm, useFactory: () => new MikroORM(makeOrmConfig()) });
+container.bind({ provide: RobotDI.JobElector, useClass: MyJobElector });
+container.bind({
+  provide: LinkedInDI.LinkedInExplorerConfig,
+  useValue: {
+    headless: Environment.get('HEADLESS'),
+    slowMo: Environment.get('SLOW_MO'),
+    email: Environment.get('LINKEDIN_EMAIL'),
+    password: Environment.get('LINKEDIN_PASSWORD')
+  } as LinkedInExplorerConfig
 });
-container.bind(LinkedInDI.LinkedInExplorer).to(LinkedInExplorer).inSingletonScope();
-container.bind(LinkedInDI.JobSearchHandler).to(JobSearchHandler).inSingletonScope();
+container.bind({ provide: LinkedInDI.LinkedInExplorer, useClass: LinkedInExplorer });
+container.bind({ provide: LinkedInDI.JobSearchHandler, useClass: JobSearchHandler });
 
 export { container };

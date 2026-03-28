@@ -1,8 +1,9 @@
-import { BaseEntity } from '../../BaseEntity.js';
-import { ArrayType, Entity, Enum, Property } from '@mikro-orm/core';
-import { TransientSkillCreateProps, TransientSkillProps } from './TransientSkill.types.js';
-import { SkillAffinity } from './SkillAffinity.js';
+import { ArrayType } from '@mikro-orm/core';
+import { Entity, Enum, Property } from '@mikro-orm/decorators/es';
 import { StringUtil } from '@tailoredin/shared';
+import { BaseEntity } from '../../BaseEntity.js';
+import { SkillAffinity } from './SkillAffinity.js';
+import type { TransientSkillCreateProps, TransientSkillProps } from './TransientSkill.types.js';
 
 @Entity({ abstract: true })
 export class TransientSkill extends BaseEntity {
@@ -23,7 +24,7 @@ export class TransientSkill extends BaseEntity {
   @Property({ type: new ArrayType(v => v) })
   public readonly variants: string[];
 
-  protected constructor(props: TransientSkillProps) {
+  constructor(props: TransientSkillProps) {
     super(props);
     this.name = props.name;
     this.key = props.key;

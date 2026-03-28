@@ -1,7 +1,7 @@
-import { Company } from './Company.js';
-import { QueryOpts } from '../../helpers.js';
-import { TransientCompany } from './TransientCompany.js';
 import { BaseRepository } from '../../BaseRepository.js';
+import type { QueryOpts } from '../../helpers.js';
+import { Company } from './Company.js';
+import type { TransientCompany } from './TransientCompany.js';
 
 export class CompanyRepository extends BaseRepository<Company> {
   public async resolve(transientCompany: TransientCompany, opts: QueryOpts = {}): Promise<Company> {

@@ -1,7 +1,7 @@
 /** Types generated for queries found in "src/orm/entities/jobs/sql/scoreJobById.pgsql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type stringArray = (string)[];
+export type stringArray = string[];
 
 /** 'ScoreJobById' parameters type */
 export interface IScoreJobByIdParams {
@@ -33,7 +33,18 @@ export interface IScoreJobByIdQuery {
   result: IScoreJobByIdResult;
 }
 
-const scoreJobByIdIR: any = {"usedParamSet":{"expertWeight":true,"interestWeight":true,"avoidWeight":true,"targetSalary":true,"jobId":true},"params":[{"name":"expertWeight","required":false,"transform":{"type":"scalar"},"locs":[{"a":655,"b":667}]},{"name":"interestWeight","required":false,"transform":{"type":"scalar"},"locs":[{"a":714,"b":728}]},{"name":"avoidWeight","required":false,"transform":{"type":"scalar"},"locs":[{"a":775,"b":786}]},{"name":"targetSalary","required":false,"transform":{"type":"scalar"},"locs":[{"a":996,"b":1008}]},{"name":"jobId","required":false,"transform":{"type":"scalar"},"locs":[{"a":1041,"b":1046}]}],"statement":"SELECT j.id                 AS job_id,\n       sk.expert_score      AS expert_score,\n       sk.interest_score    AS interest_score,\n       sk.avoid_score       AS avoid_score,\n       sk.total_skill_score AS total_skill_score,\n       sal.salary_score     AS salary_score,\n       sk.expert_skills     AS expert_skills,\n       sk.interest_skills   AS interest_skills,\n       sk.avoid_skills      AS avoid_skills,\n       sal.average_salary   AS average_salary,\n       sal.target_salary    AS target_salary\nFROM jobs j\n         JOIN LATERAL score_job_skills(j.id,\n                                       j.description_fts,\n                                       :expertWeight::INT,\n                                       :interestWeight::INT,\n                                       :avoidWeight::INT) sk ON TRUE\n         JOIN LATERAL score_job_salary(j.id,\n                                       j.salary_low,\n                                       j.salary_high,\n                                       :targetSalary::INT) sal ON TRUE\nWHERE j.id = :jobId"};
+const scoreJobByIdIr: any = {
+  usedParamSet: { expertWeight: true, interestWeight: true, avoidWeight: true, targetSalary: true, jobId: true },
+  params: [
+    { name: 'expertWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 655, b: 667 }] },
+    { name: 'interestWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 714, b: 728 }] },
+    { name: 'avoidWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 775, b: 786 }] },
+    { name: 'targetSalary', required: false, transform: { type: 'scalar' }, locs: [{ a: 996, b: 1008 }] },
+    { name: 'jobId', required: false, transform: { type: 'scalar' }, locs: [{ a: 1041, b: 1046 }] }
+  ],
+  statement:
+    'SELECT j.id                 AS job_id,\n       sk.expert_score      AS expert_score,\n       sk.interest_score    AS interest_score,\n       sk.avoid_score       AS avoid_score,\n       sk.total_skill_score AS total_skill_score,\n       sal.salary_score     AS salary_score,\n       sk.expert_skills     AS expert_skills,\n       sk.interest_skills   AS interest_skills,\n       sk.avoid_skills      AS avoid_skills,\n       sal.average_salary   AS average_salary,\n       sal.target_salary    AS target_salary\nFROM jobs j\n         JOIN LATERAL score_job_skills(j.id,\n                                       j.description_fts,\n                                       :expertWeight::INT,\n                                       :interestWeight::INT,\n                                       :avoidWeight::INT) sk ON TRUE\n         JOIN LATERAL score_job_salary(j.id,\n                                       j.salary_low,\n                                       j.salary_high,\n                                       :targetSalary::INT) sal ON TRUE\nWHERE j.id = :jobId'
+};
 
 /**
  * Query generated from SQL:
@@ -62,6 +73,4 @@ const scoreJobByIdIR: any = {"usedParamSet":{"expertWeight":true,"interestWeight
  * WHERE j.id = :jobId
  * ```
  */
-export const scoreJobById = new PreparedQuery<IScoreJobByIdParams,IScoreJobByIdResult>(scoreJobByIdIR);
-
-
+export const scoreJobById = new PreparedQuery<IScoreJobByIdParams, IScoreJobByIdResult>(scoreJobByIdIr);

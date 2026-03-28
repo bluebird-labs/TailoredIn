@@ -1,5 +1,5 @@
-import { BaseEntityProps } from '../../BaseEntity.types.js';
-import { JobStatus } from './JobStatus.js';
+import type { BaseEntityProps } from '../../BaseEntity.types.js';
+import type { JobStatus } from './JobStatus.js';
 
 export type TransientJobProps = {
   status: JobStatus;

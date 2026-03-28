@@ -1,18 +1,18 @@
-import * as PlayWright from 'playwright';
+import FS from 'node:fs';
+import Path from 'node:path';
+import { inject, injectable } from '@needle-di/core';
+import { TimeUtil } from '@tailoredin/shared';
+import { milliseconds } from 'date-fns';
 import * as NpmLog from 'npmlog';
 import * as NPMLog from 'npmlog';
-import { milliseconds } from 'date-fns';
-import { TimeUtil } from '@tailoredin/shared';
+import * as PlayWright from 'playwright';
+import { LinkedInDI } from './DI.js';
 import {
   LinkedInSearchJobsCommand,
-  LinkedInSearchJobsCommandDelegate,
-  LinkedInSearchJobsCommandParams
+  type LinkedInSearchJobsCommandDelegate,
+  type LinkedInSearchJobsCommandParams
 } from './LinkedInSearchJobsCommand.js';
-import Path from 'node:path';
 import { PACKAGE_DIR } from './PACKAGE_DIR.js';
-import FS from 'node:fs';
-import { inject, injectable } from 'inversify';
-import { LinkedInDI } from './DI.js';
 
 export type LinkedInExplorerConfig = {
   headless: boolean;
@@ -35,12 +35,17 @@ export const DEFAULT_CONNECTION_TIMEOUT = milliseconds({ seconds: 30 });
 
 @injectable()
 export class LinkedInExplorer {
-  @inject(LinkedInDI.LinkedInExplorerConfig) private config!: LinkedInExplorerConfig;
-  private readonly logPrefix = this.constructor.name;
+  private readonly logPrefix: string;
+  private readonly config: LinkedInExplorerConfig;
   private page!: PlayWright.Page;
   private browser!: PlayWright.Browser;
   private browserContext!: PlayWright.BrowserContext;
   private searchJobsCommand!: LinkedInSearchJobsCommand;
+
+  constructor(config = inject(LinkedInDI.LinkedInExplorerConfig)) {
+    this.config = config;
+    this.logPrefix = this.constructor.name;
+  }
 
   public async close() {
     await this.browser.close();

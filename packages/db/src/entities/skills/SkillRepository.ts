@@ -1,8 +1,8 @@
 import { LockMode } from '@mikro-orm/postgresql';
-import { QueryOpts } from '../../helpers.js';
-import { Skill } from './Skill.js';
-import { TransientSkill } from './TransientSkill.js';
 import { BaseRepository } from '../../BaseRepository.js';
+import type { QueryOpts } from '../../helpers.js';
+import { Skill } from './Skill.js';
+import type { TransientSkill } from './TransientSkill.js';
 
 export type SkillRepositoryRefreshOutput = {
   createdCount: number;
@@ -48,10 +48,8 @@ export class SkillRepository extends BaseRepository<Skill> {
             variants: transientSkill.variants
           });
 
-          if (skill.isTouched()) {
-            em.persist(skill);
-            updatedCount++;
-          }
+          em.persist(skill);
+          updatedCount++;
 
           transientSkillsMap.delete(skill.key); // Won't be inserted.
         } else {

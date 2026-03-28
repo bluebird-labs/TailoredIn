@@ -1,5 +1,5 @@
 import { cloneDeep, mergeWith } from 'lodash';
-import { TypeUtil } from './TypeUtil.js';
+import type { TypeUtil } from './TypeUtil.js';
 
 export namespace ObjectUtil {
   export const mergeWithOverrides = <T extends object>(source: T, overrides: TypeUtil.DeepPartial<T>): T => {

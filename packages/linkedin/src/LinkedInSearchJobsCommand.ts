@@ -1,11 +1,10 @@
-import * as Playwright from 'playwright';
-import { Locator } from 'playwright';
-import { TypeUtil } from '@tailoredin/shared';
-import { omit, range } from 'lodash';
-import { LinkedInUrls } from './LinkedInExplorer.js';
-import * as NpmLog from 'npmlog';
-import { TimeUtil } from '@tailoredin/shared';
 import * as Url from 'node:url';
+import { TimeUtil, type TypeUtil } from '@tailoredin/shared';
+import { omit, range } from 'lodash';
+import * as NpmLog from 'npmlog';
+import type * as Playwright from 'playwright';
+import type { Locator } from 'playwright';
+import { LinkedInUrls } from './LinkedInExplorer.js';
 export type LinkedInSearchJobsCommandParams = {
   keywords: string;
   location: 'US' | 'NY';
@@ -378,7 +377,7 @@ export class LinkedInSearchJobsCommand {
         case 'twoHundredKOrHigher':
           searchParams.append('f_SB2', '9');
           break;
-        case 'past':
+        case 'past': {
           // eslint-disable-next-line no-case-declarations
           let ts: number;
           switch (value) {
@@ -396,7 +395,8 @@ export class LinkedInSearchJobsCommand {
           }
           searchParams.append('f_TPR', `r${ts}`);
           break;
-        case 'jobType':
+        }
+        case 'jobType': {
           // eslint-disable-next-line no-case-declarations
           let t: string;
           switch (value) {
@@ -411,10 +411,11 @@ export class LinkedInSearchJobsCommand {
           }
           searchParams.append('f_JT', t);
           break;
+        }
         case 'keywords':
           searchParams.append('keywords', value as string);
           break;
-        case 'location':
+        case 'location': {
           // eslint-disable-next-line no-case-declarations
           let geoId: number;
           switch (value) {
@@ -429,6 +430,7 @@ export class LinkedInSearchJobsCommand {
           }
           searchParams.append('geoId', geoId.toString());
           break;
+        }
         case 'remote':
           for (const val of value as string[]) {
             switch (val) {

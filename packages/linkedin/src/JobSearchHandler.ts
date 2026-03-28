@@ -1,20 +1,15 @@
-import * as NpmLog from 'npmlog';
-import * as DateParser from 'any-date-parser';
-import { LinkedInUrls } from './LinkedInExplorer.js';
-import { LinkedInSearchJobsCommandResult } from './LinkedInSearchJobsCommand.js';
 import { MikroORM } from '@mikro-orm/postgresql';
-import { Job } from '@tailoredin/db';
-import { Company } from '@tailoredin/db';
-import { TransientJob } from '@tailoredin/db';
-import { TransientCompany } from '@tailoredin/db';
-import { inject, injectable } from 'inversify';
+import { inject, injectable } from '@needle-di/core';
+import { Company, Job, JobStatus, type QueryOpts, type TransientCompany, type TransientJob } from '@tailoredin/db';
+import * as DateParser from 'any-date-parser';
+import * as NpmLog from 'npmlog';
 import { LinkedInDI } from './DI.js';
-import { JobStatus } from '@tailoredin/db';
-import { QueryOpts } from '@tailoredin/db';
+import { LinkedInUrls } from './LinkedInExplorer.js';
+import type { LinkedInSearchJobsCommandResult } from './LinkedInSearchJobsCommand.js';
 
 @injectable()
 export class JobSearchHandler {
-  @inject(LinkedInDI.Orm) private orm!: MikroORM;
+  constructor(private readonly orm = inject(LinkedInDI.Orm)) {}
 
   public async ingestJobSearchResult(
     jobSearchResult: LinkedInSearchJobsCommandResult,

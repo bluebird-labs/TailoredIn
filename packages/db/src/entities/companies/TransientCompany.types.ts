@@ -1,4 +1,4 @@
-import { BaseEntityProps } from '../../BaseEntity.types.js';
+import type { BaseEntityProps } from '../../BaseEntity.types.js';
 
 export type TransientCompanyProps = {
   name: string;

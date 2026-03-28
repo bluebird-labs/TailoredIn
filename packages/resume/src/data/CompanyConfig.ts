@@ -1,5 +1,5 @@
-import { CompanyConfigInput, JobTitle } from '@tailoredin/db';
-import { RawExperience } from '../../brilliant-cv/types.js';
+import type { CompanyConfigInput, JobTitle } from '@tailoredin/db';
+import type { RawExperience } from '../../brilliant-cv/types.js';
 
 export type CompanyPositionInput<B extends string, L extends string> = {
   company: string;

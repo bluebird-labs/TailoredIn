@@ -1,5 +1,10 @@
-import { BrilliantCVEducation, BrilliantCVExperience, BrilliantCVSkill, RawExperience } from '../../brilliant-cv/types.js';
-import { Stack } from '@tailoredin/db';
+import type { Stack } from '@tailoredin/db';
+import type {
+  BrilliantCVEducation,
+  BrilliantCVExperience,
+  BrilliantCVSkill,
+  RawExperience
+} from '../../brilliant-cv/types.js';
 
 export type ResumeConfig = {
   social_networks: ('LinkedIn' | 'GitHub')[];

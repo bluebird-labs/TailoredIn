@@ -1,7 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20250228215854_robot extends Migration {
-
   public override async up(): Promise<void> {
     this.addSql(`alter table "companies"
         add column "website" text null default null;`);
@@ -17,5 +16,4 @@ export class Migration20250228215854_robot extends Migration {
     this.addSql(`alter table "jobs"
         drop column "apply_link";`);
   }
-
 }

@@ -1,8 +1,7 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/decorators/es';
+import { ObjectUtil, type TypeUtil } from '@tailoredin/shared';
 import { BaseEntity } from '../../BaseEntity.js';
-import { TransientCompanyCreateProps, TransientCompanyProps } from './TransientCompany.types.js';
-import { ObjectUtil } from '@tailoredin/shared';
-import { TypeUtil } from '@tailoredin/shared';
+import type { TransientCompanyCreateProps, TransientCompanyProps } from './TransientCompany.types.js';
 
 @Entity({ abstract: true })
 export class TransientCompany extends BaseEntity {
@@ -18,7 +17,7 @@ export class TransientCompany extends BaseEntity {
   @Property({ fieldName: 'linkedin_link', type: 'text', unique: 'companies_linkedin_link_key' })
   public linkedinLink: string;
 
-  protected constructor(props: TransientCompanyProps) {
+  constructor(props: TransientCompanyProps) {
     super(props);
     this.name = props.name;
     this.website = props.website;

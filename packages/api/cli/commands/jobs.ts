@@ -1,10 +1,10 @@
+import type { MikroORM } from '@mikro-orm/postgresql';
+import { Job, JobStatus } from '@tailoredin/db';
+import { EnumUtil } from '@tailoredin/shared';
 import { command, number, positional, string, subcommands } from 'cmd-ts';
-import { EnumUtil }                                         from '@tailoredin/shared';
-import { Job, JobStatus }                                   from '@tailoredin/db';
-import { container }                                        from '../../src/di/container.js';
-import { ApiDI }                                            from '../../src/di/DI.js';
-import { MikroORM }                                         from '@mikro-orm/postgresql';
-import * as NpmLog                                          from 'npmlog';
+import * as NpmLog from 'npmlog';
+import { container } from '../../src/di/container.js';
+import { ApiDI } from '../../src/di/DI.js';
 
 const LOG_PREFIX = 'jobs';
 const orm = container.get<MikroORM>(ApiDI.Orm);
@@ -29,7 +29,8 @@ const moveCommand = command({
       return;
     }
 
-    await orm.em.persistAndFlush(job);
+    orm.em.persist(job);
+    await orm.em.flush();
 
     NpmLog.info(LOG_PREFIX, `Job ${args.job_id} was updated to ${args.status}`);
   }

@@ -1,9 +1,9 @@
-import { Entity, Enum, ManyToOne } from '@mikro-orm/core';
-import { Job } from './Job.js';
+import { Entity, Enum, ManyToOne } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
-import { JobStatusUpdateCreateProps, JobStatusUpdateProps } from './JobStatusUpdate.types.js';
+import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { Job } from './Job.js';
 import { JobStatus } from './JobStatus.js';
-import { generateUuid, RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import type { JobStatusUpdateCreateProps, JobStatusUpdateProps } from './JobStatusUpdate.types.js';
 
 @Entity({ tableName: 'job_status_updates' })
 export class JobStatusUpdate extends BaseEntity {
@@ -20,7 +20,7 @@ export class JobStatusUpdate extends BaseEntity {
   @Enum({ name: 'status', items: () => JobStatus, nativeEnumName: 'job_status' })
   public status: JobStatus;
 
-  protected constructor(props: JobStatusUpdateProps) {
+  constructor(props: JobStatusUpdateProps) {
     super(props);
     this.id = props.id;
     this.job = props.job;

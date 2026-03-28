@@ -1,5 +1,5 @@
-import { BaseEntityProps } from '../../BaseEntity.types.js';
-import { SkillAffinity } from './SkillAffinity.js';
+import type { BaseEntityProps } from '../../BaseEntity.types.js';
+import type { SkillAffinity } from './SkillAffinity.js';
 
 export type TransientSkillProps = {
   name: string;

@@ -1,14 +1,16 @@
-import OpenAI from 'openai';
-import { JobDescriptionItemRole, JobDescriptionItemsExtractor } from '@tailoredin/db';
-import { z } from 'zod';
+import { inject, injectable } from '@needle-di/core';
+import {
+  Archetype,
+  type Company,
+  type Job,
+  JobDescriptionItemRole,
+  JobDescriptionItemsExtractor,
+  SkillName
+} from '@tailoredin/db';
 import { zodResponseFormat } from 'openai/helpers/zod';
-import { BrilliantCVContent } from '../brilliant-cv/types.js';
-import { Archetype } from '@tailoredin/db';
-import { Job } from '@tailoredin/db';
-import { Company } from '@tailoredin/db';
-import { inject, injectable } from 'inversify';
+import { z } from 'zod';
+import type { BrilliantCVContent } from '../brilliant-cv/types.js';
 import { AiDI } from './DI.js';
-import { SkillName } from '@tailoredin/db';
 
 export type ExtractJobApplicationInsightsInput = {
   job: Job;
@@ -49,7 +51,7 @@ const archetypeDetails: Record<Archetype, string> = {
 
 @injectable()
 export class JobInsightsExtractor {
-  @inject(AiDI.AiProvider) private openAiClient!: OpenAI;
+  constructor(private readonly openAiClient = inject(AiDI.AiProvider)) {}
 
   public async extractJobPostingInsights(input: ExtractJobPostingInsightsInput): Promise<JobPostingInsights> {
     const flatJobDescription = this.flattenJobDescription(input.job, input.company);

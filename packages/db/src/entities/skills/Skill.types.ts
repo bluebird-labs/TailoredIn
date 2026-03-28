@@ -1,4 +1,4 @@
-import { TransientSkillProps } from './TransientSkill.types.js';
+import type { TransientSkillProps } from './TransientSkill.types.js';
 
 export type SkillProps = TransientSkillProps & {
   id: string;

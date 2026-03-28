@@ -1,27 +1,29 @@
-import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
-import { BaseEntity } from './BaseEntity.js';
-import { QueryResult } from 'pg';
-import { PreparedQuery } from '@pgtyped/runtime';
-import { QueryOpts } from './helpers.js';
+import type { EntityManager } from '@mikro-orm/core';
+import { EntityRepository } from '@mikro-orm/postgresql';
+import type { IDatabaseConnection, PreparedQuery } from '@pgtyped/runtime';
+import type { BaseEntity } from './BaseEntity.js';
+import type { QueryOpts } from './helpers.js';
 
-export type KnexRawQueryResult<T extends object> = QueryResult<T>;
+export type PgTypedQueryResult<T extends object> = { rows: T[]; rowCount: number };
 
 export class BaseRepository<E extends BaseEntity> extends EntityRepository<E> {
   protected getEm(opts: QueryOpts = {}): EntityManager {
     return opts.em ?? this.em;
   }
 
-  protected extractPgTypedStatement<P, R>(query: PreparedQuery<P, R>): string {
-    // @ts-expect-error TS2341
-    return query.queryIR.statement;
-  }
-
   protected async executePgTypedQuery<P extends object, R extends object>(
     opts: QueryOpts = {},
     preparedQuery: PreparedQuery<P, R>,
     params: P
-  ): Promise<KnexRawQueryResult<R>> {
-    const statement = this.extractPgTypedStatement(preparedQuery);
-    return this.getEm(opts).getKnex().raw<KnexRawQueryResult<R>>(statement, params);
+  ): Promise<PgTypedQueryResult<R>> {
+    const conn = this.getEm(opts).getConnection();
+    const dbConn: IDatabaseConnection = {
+      query: async (sql: string, bindings: unknown[]) => {
+        const rows = (await conn.execute(sql, bindings as unknown[], 'all')) as R[];
+        return { rows, rowCount: rows.length };
+      }
+    };
+    const rows = await preparedQuery.run(params, dbConn);
+    return { rows, rowCount: rows.length };
   }
 }

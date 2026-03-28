@@ -1,8 +1,8 @@
-import { ResumeTemplateParser } from './ResumeTemplateParser.js';
-import { BrilliantCVContent }   from '../../brilliant-cv/types.js';
-import { Archetype }            from '@tailoredin/db';
-import { ResumeTemplate }       from './types.js';
+import { Archetype } from '@tailoredin/db';
+import type { BrilliantCVContent } from '../../brilliant-cv/types.js';
 import { LeadICResumeTemplate } from './LeadICResumeTemplate.js';
+import { ResumeTemplateParser } from './ResumeTemplateParser.js';
+import type { ResumeTemplate } from './types.js';
 
 export type MakeResumeContentInput = {
   archetype: Archetype;

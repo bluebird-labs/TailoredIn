@@ -1,19 +1,19 @@
-import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
-import { BaseEntity } from './BaseEntity.js';
-import { TransientCompany } from './entities/companies/TransientCompany.js';
-import { TransientJob } from './entities/jobs/TransientJob.js';
-import { Company } from './entities/companies/Company.js';
-import { Skill } from './entities/skills/Skill.js';
-import { Job } from './entities/jobs/Job.js';
-import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
-import { TransientSkill } from './entities/skills/TransientSkill.js';
+import Path from 'node:path';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
+import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { Environment } from '@tailoredin/shared/src/Environment.js';
-import Path from 'node:path';
-import { PACKAGE_DIR } from './PACKAGE_DIR.js';
 import { StatusCode } from '@tselect/status-code';
+import { BaseEntity } from './BaseEntity.js';
+import { Company } from './entities/companies/Company.js';
+import { TransientCompany } from './entities/companies/TransientCompany.js';
+import { Job } from './entities/jobs/Job.js';
+import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
+import { TransientJob } from './entities/jobs/TransientJob.js';
+import { Skill } from './entities/skills/Skill.js';
+import { TransientSkill } from './entities/skills/TransientSkill.js';
+import { PACKAGE_DIR } from './PACKAGE_DIR.js';
 
 export const baseOrmConfig = defineConfig({
   debug: false,
@@ -23,8 +23,7 @@ export const baseOrmConfig = defineConfig({
   extensions: [Migrator, SchemaGenerator],
 
   discovery: {
-    warnWhenNoEntities: true,
-    requireEntitiesArray: true
+    warnWhenNoEntities: true
   },
   namingStrategy: UnderscoreNamingStrategy,
   metadataProvider: TsMorphMetadataProvider,
