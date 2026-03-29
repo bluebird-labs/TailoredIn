@@ -1,16 +1,15 @@
-import type { TestContext } from 'node:test';
 import type { EntityManager, MikroORM } from '@mikro-orm/postgresql';
 
-type OrmTestFn = (t: TestContext, em: EntityManager) => Promise<void>;
+type OrmTestFn = (em: EntityManager) => Promise<void>;
 
 export namespace TestUtil {
   export const withOrm = (orm: MikroORM, fn: OrmTestFn) => {
-    return async (t: TestContext) => {
+    return async () => {
       const em = orm.em.fork();
       await em.begin();
 
       try {
-        await fn(t, em);
+        await fn(em);
       } finally {
         await em.rollback();
       }

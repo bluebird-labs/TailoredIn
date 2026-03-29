@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { after, describe, it, type TestContext } from 'node:test';
+import { afterAll, describe, expect, it } from 'bun:test';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { TestUtil } from '@tailoredin/db';
 import { makeOrmConfig } from '../../makeOrmConfig.js';
@@ -7,7 +7,7 @@ import { Company } from '../companies/Company.js';
 import { Job } from './Job.js';
 import { TransientJob } from './TransientJob.js';
 
-import withOrm = TestUtil.withOrm;
+const { withOrm } = TestUtil;
 
 describe('JobRepository', () => {
   const orm = new MikroORM(makeOrmConfig());
@@ -15,7 +15,7 @@ describe('JobRepository', () => {
   describe('resolve', () => {
     it(
       'should create a new job',
-      withOrm(orm, async (t: TestContext, em) => {
+      withOrm(orm, async em => {
         const company = Company.generate();
 
         em.persist(company);
@@ -25,14 +25,14 @@ describe('JobRepository', () => {
         const transientJob = TransientJob.generate();
         const job = await em.repo(Job).resolve(transientJob, company, { em });
 
-        t.assert.ok(typeof job.id === 'string', 'Job ID should be a string');
-        t.assert.equal(job.title, transientJob.title);
+        expect(typeof job.id).toBe('string');
+        expect(job.title).toBe(transientJob.title);
       })
     );
 
     it(
       'should update an existing job',
-      withOrm(orm, async (t: TestContext, em) => {
+      withOrm(orm, async em => {
         const company = Company.generate();
 
         em.persist(company);
@@ -51,14 +51,14 @@ describe('JobRepository', () => {
 
         const updatedJob = await em.repo(Job).resolve(transientJob, company, { em });
 
-        t.assert.equal(updatedJob.id, job.id);
-        t.assert.equal(updatedJob.title, transientJob.title);
-        t.assert.equal(updatedJob.company.id, company.id);
+        expect(updatedJob.id).toBe(job.id);
+        expect(updatedJob.title).toBe(transientJob.title);
+        expect(updatedJob.company.id).toBe(company.id);
       })
     );
   });
 
-  after(async () => {
+  afterAll(async () => {
     await orm.close();
   });
 });
