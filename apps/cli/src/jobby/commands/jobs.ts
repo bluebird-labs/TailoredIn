@@ -1,13 +1,11 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { Job, JobStatus } from '@tailoredin/db';
+import { ApplicationJobDI, ChangeJobStatus } from '@tailoredin/application-job';
+import { JobStatus } from '@tailoredin/domain-job';
 import { EnumUtil } from '@tailoredin/shared';
 import { command, number, positional, string, subcommands } from 'cmd-ts';
 import * as NpmLog from 'npmlog';
 import { container } from '../di/container.js';
-import { CliDI } from '../di/DI.js';
 
 const LOG_PREFIX = 'jobs';
-const orm = container.get<MikroORM>(CliDI.Orm);
 
 const moveCommand = command({
   name: 'move',
@@ -20,17 +18,13 @@ const moveCommand = command({
       throw new Error(`Invalid job status: ${args.status}, choices: ${Object.values(JobStatus)}`);
     }
 
-    const job = await orm.em.getRepository(Job).findOneOrFail(args.job_id);
+    const useCase = container.get(ApplicationJobDI.ChangeJobStatus) as ChangeJobStatus;
+    const result = await useCase.execute({ jobId: args.job_id, newStatus: args.status });
 
-    const changed = job.changeStatus(args.status);
-
-    if (!changed) {
-      NpmLog.warn(LOG_PREFIX, `Job ${args.job_id} is already in status ${args.status}`);
+    if (!result.isOk) {
+      NpmLog.error(LOG_PREFIX, result.error.message);
       return;
     }
-
-    orm.em.persist(job);
-    await orm.em.flush();
 
     NpmLog.info(LOG_PREFIX, `Job ${args.job_id} was updated to ${args.status}`);
   }
@@ -44,9 +38,9 @@ export const retireCommand = command({
   handler: async args => {
     NpmLog.info(LOG_PREFIX, `Retiring jobs older than ${args.days} days...`);
 
-    const count = await orm.em.getRepository(Job).retireOlderThan({
-      days: args.days
-    });
+    const jobRepository = container.get(ApplicationJobDI.JobRepository);
+    const olderThan = new Date(Date.now() - args.days * 24 * 60 * 60 * 1000);
+    const count = await jobRepository.retireOlderThan(olderThan);
 
     NpmLog.info(LOG_PREFIX, `Retired ${count} jobs.`);
   }

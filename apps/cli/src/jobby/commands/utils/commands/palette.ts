@@ -1,10 +1,11 @@
-import { AiDI, type WebsiteColorsFinder } from '@tailoredin/ai';
+import { ApplicationResumeDI } from '@tailoredin/application-resume';
+import type { WebColorService } from '@tailoredin/application-resume';
 import { command, positional, string } from 'cmd-ts';
 import * as NpmLog from 'npmlog';
 import { container } from '../../../di/container.js';
 
 const LOG_PREFIX = 'palette';
-const websiteColorFinder = container.get<WebsiteColorsFinder>(AiDI.WebsiteColorsFinder);
+const webColorService = container.get(ApplicationResumeDI.WebColorService) as WebColorService;
 
 export const palette = command({
   name: 'palette',
@@ -12,10 +13,7 @@ export const palette = command({
     url: positional({ type: string })
   },
   handler: async args => {
-    const colorPalette = await websiteColorFinder.findWebsitePalette({
-      website: args.url
-    });
-
+    const colorPalette = await webColorService.findPalette(args.url);
     NpmLog.info(LOG_PREFIX, 'Palette:', colorPalette);
   }
 });
