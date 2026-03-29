@@ -9,62 +9,44 @@ module.exports = {
       from: {},
       to: {
         circular: true,
-        pathNot: '^apps/api/src/infrastructure/db/entities/[^/]+/'
+        pathNot: '^infrastructure/src/db/entities/[^/]+/'
       }
     },
 
-    // ── domain/shared: no workspace deps ──────────────────────────────
+    // ── domain: no workspace deps except shared ───────────────────────
     {
-      name: 'domain-shared-no-workspace-deps',
+      name: 'domain-no-workspace-deps',
       severity: 'error',
-      comment: 'domain/shared is the foundation layer: no @tailoredin imports allowed.',
-      from: { path: '^domain/shared/' },
-      to: { path: '^(apps|domain/(job|resume)|application)/' }
+      comment: 'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/presentation imports.',
+      from: { path: '^domain/' },
+      to: { path: '^(application|infrastructure|presentation)/' }
     },
 
-    // ── domain/job: only domain/shared ────────────────────────────────
+    // ── application: only domain ──────────────────────────────────────
     {
-      name: 'domain-job-only-domain-shared',
+      name: 'application-no-infra',
       severity: 'error',
-      comment: 'domain/job must only depend on domain/shared — no infrastructure or application imports.',
-      from: { path: '^domain/job/' },
-      to: { path: '^(apps|application|domain/resume)/' }
+      comment: 'application must not depend on infrastructure or presentation.',
+      from: { path: '^application/' },
+      to: { path: '^(infrastructure|presentation)/' }
     },
 
-    // ── domain/resume: only domain/shared + domain/job ────────────────
+    // ── infrastructure: no presentation ───────────────────────────────
     {
-      name: 'domain-resume-only-domain-layers',
+      name: 'infrastructure-no-presentation',
       severity: 'error',
-      comment: 'domain/resume must only depend on domain packages — no infrastructure or application imports.',
-      from: { path: '^domain/resume/' },
-      to: { path: '^(apps|application)/' }
+      comment: 'infrastructure must not depend on presentation.',
+      from: { path: '^infrastructure/' },
+      to: { path: '^presentation/' }
     },
 
-    // ── application/job: no infrastructure or apps ────────────────────
-    {
-      name: 'application-job-no-infra',
-      severity: 'error',
-      comment: 'application/job must not depend on any infrastructure or app packages.',
-      from: { path: '^application/job/' },
-      to: { path: '^(apps|application/resume)/' }
-    },
-
-    // ── application/resume: no infrastructure or apps ─────────────────
-    {
-      name: 'application-resume-no-infra',
-      severity: 'error',
-      comment: 'application/resume must not depend on any infrastructure or app packages.',
-      from: { path: '^application/resume/' },
-      to: { path: '^apps/' }
-    },
-
-    // ── apps/api: must not depend on apps/cli ─────────────────────────
+    // ── presentation/api: must not depend on presentation/cli ─────────
     {
       name: 'api-not-depends-on-cli',
       severity: 'error',
       comment: 'api must not depend on cli.',
-      from: { path: '^apps/api/' },
-      to: { path: '^apps/cli/' }
+      from: { path: '^presentation/api/' },
+      to: { path: '^presentation/cli/' }
     }
   ],
 

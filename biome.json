@@ -54,5 +54,17 @@
   },
   "files": {
     "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts"]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["infrastructure/src/db/entities/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off"
+          }
+        }
+      }
+    }
+  ]
 }
