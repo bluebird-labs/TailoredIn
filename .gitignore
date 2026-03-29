@@ -10,11 +10,12 @@ build/
 .idea/
 
 # Generated resume PDFs and ephemeral Typst compilation workspace
-apps/cli/Resumes/
-libs/resume/typst/
+presentation/cli/Resumes/
+infrastructure/typst/
+infrastructure/resumes/
 
 # LinkedIn Playwright session (sensitive auth cookies)
-libs/linkedin/playwright/.auth/
+infrastructure/src/linkedin/playwright/.auth/
 
 # dependency-cruiser generated graph
 dep-graph.svg
