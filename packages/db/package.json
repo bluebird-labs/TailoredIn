@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "migration:create": "bunx mikro-orm migration:create",
-    "migration:up": "bunx mikro-orm migration:up"
+    "migration:up": "bunx mikro-orm migration:up",
+    "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "@tailoredin/shared": "workspace:*",

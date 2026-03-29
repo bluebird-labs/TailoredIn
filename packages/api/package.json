@@ -10,7 +10,9 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",
