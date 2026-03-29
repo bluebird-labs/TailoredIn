@@ -4,7 +4,14 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "libs/*"
+    "domain/*",
+    "application/*",
+    "libs/shared",
+    "libs/db",
+    "libs/ai",
+    "libs/linkedin",
+    "libs/resume",
+    "libs/robot"
   ],
   "scripts": {
     "backend": "bun run --cwd apps/api src/index.ts",
@@ -13,67 +20,29 @@
     "robot:watch": "bun --watch --cwd apps/cli src/robot/index.ts",
     "cvs": "bun run --cwd apps/cli src/cvs/index.ts",
 
-    "lint": "biome check apps libs",
-    "lint:fix": "biome check --write apps libs",
-    "format": "biome format --write apps libs",
+    "check": "biome check apps libs domain application",
+    "check:fix": "biome check --write apps libs domain application",
+    "format": "biome format --write apps libs domain application",
+    "lint": "biome lint apps libs domain application",
     "typecheck": "bun run --filter '@tailoredin/*' typecheck",
     "test": "bun run --filter '@tailoredin/*' test",
     "test:coverage": "bun run --filter '@tailoredin/*' test:coverage",
 
-    "dep:check": "depcruise apps libs --config .dependency-cruiser.cjs",
-    "dep:graph": "depcruise apps libs --config .dependency-cruiser.cjs --output-type dot | dot -T svg > dep-graph.svg",
-
-    "shared:lint": "biome check libs/shared",
-    "shared:lint:fix": "biome check --write libs/shared",
-    "shared:typecheck": "bun run --cwd libs/shared typecheck",
-    "shared:test": "bun run --cwd libs/shared test",
-    "shared:test:coverage": "bun run --cwd libs/shared test:coverage",
-
-    "db:lint": "biome check libs/db",
-    "db:lint:fix": "biome check --write libs/db",
-    "db:typecheck": "bun run --cwd libs/db typecheck",
-    "db:test": "bun run --cwd libs/db test",
-    "db:test:coverage": "bun run --cwd libs/db test:coverage",
-    "db:sql": "bun run --cwd libs/db sql",
-    "db:sql:watch": "bun run --cwd libs/db sql:watch",
-    "db:migration:create": "bun run --cwd libs/db migration:create",
-    "db:migration:up": "bun run --cwd libs/db migration:up",
-
-    "ai:lint": "biome check libs/ai",
-    "ai:lint:fix": "biome check --write libs/ai",
-    "ai:typecheck": "bun run --cwd libs/ai typecheck",
-    "ai:test": "bun run --cwd libs/ai test",
-    "ai:test:coverage": "bun run --cwd libs/ai test:coverage",
-
-    "linkedin:lint": "biome check libs/linkedin",
-    "linkedin:lint:fix": "biome check --write libs/linkedin",
-    "linkedin:typecheck": "bun run --cwd libs/linkedin typecheck",
-    "linkedin:test": "bun run --cwd libs/linkedin test",
-    "linkedin:test:coverage": "bun run --cwd libs/linkedin test:coverage",
-
-    "resume:lint": "biome check libs/resume",
-    "resume:lint:fix": "biome check --write libs/resume",
-    "resume:typecheck": "bun run --cwd libs/resume typecheck",
-    "resume:test": "bun run --cwd libs/resume test",
-    "resume:test:coverage": "bun run --cwd libs/resume test:coverage",
-
-    "robot:lint": "biome check libs/robot",
-    "robot:lint:fix": "biome check --write libs/robot",
-    "robot:typecheck": "bun run --cwd libs/robot typecheck",
-    "robot:test": "bun run --cwd libs/robot test",
-    "robot:test:coverage": "bun run --cwd libs/robot test:coverage",
+    "dep:check": "depcruise apps domain application --config .dependency-cruiser.cjs",
+    "dep:graph": "depcruise apps domain application --config .dependency-cruiser.cjs --output-type dot | dot -T svg > dep-graph.svg",
 
     "api:lint": "biome check apps/api",
     "api:lint:fix": "biome check --write apps/api",
     "api:typecheck": "bun run --cwd apps/api typecheck",
     "api:test": "bun run --cwd apps/api test",
-    "api:test:coverage": "bun run --cwd apps/api test:coverage",
 
     "cli:lint": "biome check apps/cli",
     "cli:lint:fix": "biome check --write apps/cli",
     "cli:typecheck": "bun run --cwd apps/cli typecheck",
     "cli:test": "bun run --cwd apps/cli test",
-    "cli:test:coverage": "bun run --cwd apps/cli test:coverage"
+
+    "db:migration:create": "bun run --cwd apps/api migration:create",
+    "db:migration:up": "bun run --cwd apps/api migration:up"
   },
   "devDependencies": {
     "@biomejs/biome": "latest",

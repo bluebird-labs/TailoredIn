@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import 'reflect-metadata';
 import 'dotenv/config';
 import { binary, run, subcommands } from 'cmd-ts';
 import * as NpmLog from 'npmlog';

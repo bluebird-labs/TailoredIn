@@ -5,93 +5,66 @@ module.exports = {
     {
       name: 'no-circular',
       severity: 'error',
-      comment: 'Circular dependencies are forbidden across the entire monorepo. Exception: MikroORM bidirectional entity relationships within the same entity group folder are unavoidable with the ORM pattern.',
+      comment: 'Circular dependencies are forbidden across the entire monorepo.',
       from: {},
       to: {
         circular: true,
-        pathNot: '^libs/db/src/entities/[^/]+/'
+        pathNot: '^apps/api/src/infrastructure/db/entities/[^/]+/'
       }
     },
 
-    // ── Libs must never depend on apps ────────────────────────────────
+    // ── domain/shared: no workspace deps ──────────────────────────────
     {
-      name: 'libs-not-depend-on-apps',
+      name: 'domain-shared-no-workspace-deps',
       severity: 'error',
-      comment: 'Library packages must never import from app packages.',
-      from: { path: '^libs/' },
+      comment: 'domain/shared is the foundation layer: no @tailoredin imports allowed.',
+      from: { path: '^domain/shared/' },
+      to: { path: '^(apps|domain/(job|resume)|application)/' }
+    },
+
+    // ── domain/job: only domain/shared ────────────────────────────────
+    {
+      name: 'domain-job-only-domain-shared',
+      severity: 'error',
+      comment: 'domain/job must only depend on domain/shared — no infrastructure or application imports.',
+      from: { path: '^domain/job/' },
+      to: { path: '^(apps|application|domain/resume)/' }
+    },
+
+    // ── domain/resume: only domain/shared + domain/job ────────────────
+    {
+      name: 'domain-resume-only-domain-layers',
+      severity: 'error',
+      comment: 'domain/resume must only depend on domain packages — no infrastructure or application imports.',
+      from: { path: '^domain/resume/' },
+      to: { path: '^(apps|application)/' }
+    },
+
+    // ── application/job: no infrastructure or apps ────────────────────
+    {
+      name: 'application-job-no-infra',
+      severity: 'error',
+      comment: 'application/job must not depend on any infrastructure or app packages.',
+      from: { path: '^application/job/' },
+      to: { path: '^(apps|application/resume)/' }
+    },
+
+    // ── application/resume: no infrastructure or apps ─────────────────
+    {
+      name: 'application-resume-no-infra',
+      severity: 'error',
+      comment: 'application/resume must not depend on any infrastructure or app packages.',
+      from: { path: '^application/resume/' },
       to: { path: '^apps/' }
     },
 
-    // ── shared: no workspace deps ─────────────────────────────────────
+    // ── apps/api: must not depend on apps/cli ─────────────────────────
     {
-      name: 'shared-no-workspace-deps',
+      name: 'api-not-depends-on-cli',
       severity: 'error',
-      comment: 'shared is the foundation layer and must not depend on any other @tailoredin package.',
-      from: { path: '^libs/shared/' },
-      to: { path: '^(apps|libs/(db|ai|linkedin))/' }
-    },
-
-    // ── db: only shared ───────────────────────────────────────────────
-    {
-      name: 'db-only-depends-on-shared',
-      severity: 'error',
-      comment: 'db must not depend on ai, linkedin, or any app.',
-      from: { path: '^libs/db/' },
-      to: { path: '^(apps|libs/(ai|linkedin))/' }
-    },
-
-    // ── ai: only db + shared ──────────────────────────────────────────
-    {
-      name: 'ai-only-depends-on-db-shared',
-      severity: 'error',
-      comment: 'ai must not depend on linkedin or any app.',
-      from: { path: '^libs/ai/' },
-      to: { path: '^(apps|libs/linkedin)/' }
-    },
-
-    // ── linkedin: only db + shared ────────────────────────────────────
-    {
-      name: 'linkedin-only-depends-on-db-shared',
-      severity: 'error',
-      comment: 'linkedin must not depend on ai or any app.',
-      from: { path: '^libs/linkedin/' },
-      to: { path: '^(apps|libs/ai)/' }
-    },
-
-    // ── resume: only ai + db + shared ─────────────────────────────────
-    {
-      name: 'resume-only-depends-on-ai-db-shared',
-      severity: 'error',
-      comment: 'resume must not depend on linkedin, robot, or any app.',
-      from: { path: '^libs/resume/' },
-      to: { path: '^(apps/|libs/(linkedin|robot)/)' }
-    },
-
-    // ── robot lib: only db + shared ───────────────────────────────────
-    {
-      name: 'robot-lib-only-depends-on-db-shared',
-      severity: 'error',
-      comment: 'robot lib must not depend on linkedin, ai, resume, or any app.',
-      from: { path: '^libs/robot/' },
-      to: { path: '^(apps/|libs/(linkedin|ai|resume)/)' }
-    },
-
-    // ── api: only ai + db + resume + shared ───────────────────────────
-    {
-      name: 'api-not-depends-on-cli-linkedin',
-      severity: 'error',
-      comment: 'api must not depend on cli or linkedin.',
+      comment: 'api must not depend on cli.',
       from: { path: '^apps/api/' },
-      to: { path: '^(apps/cli|libs/linkedin)/' }
-    },
-
-    // ── cli: may depend on all libs but not api ───────────────────────
-    {
-      name: 'cli-not-depends-on-api',
-      severity: 'error',
-      comment: 'cli must not depend on the api app.',
-      from: { path: '^apps/cli/' },
-      to: { path: '^apps/api/' }
+      to: { path: '^apps/cli/' }
     }
   ],
 
