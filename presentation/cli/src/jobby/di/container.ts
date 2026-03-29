@@ -15,7 +15,7 @@ import {
   TemplateResumeContentFactory,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
-import { Environment } from '@tailoredin/shared/src/Environment.js';
+import { Environment } from '@tailoredin/core/src/Environment.js';
 
 const orm = await MikroORM.init(ormConfig);
 

@@ -1,5 +1,5 @@
 import * as Url from 'node:url';
-import { TimeUtil, type TypeUtil } from '@tailoredin/shared';
+import { TimeUtil, type TypeUtil } from '@tailoredin/core';
 import { omit, range } from 'lodash';
 import * as NpmLog from 'npmlog';
 import type * as Playwright from 'playwright';

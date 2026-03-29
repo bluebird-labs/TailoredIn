@@ -19,7 +19,7 @@
     "@tailoredin/application": "workspace:*",
     "@tailoredin/domain": "workspace:*",
     "@tailoredin/infrastructure": "workspace:*",
-    "@tailoredin/shared": "workspace:*",
+    "@tailoredin/core": "workspace:*",
     "cmd-ts": "^0.13.0",
     "date-fns": "^4.1.0",
     "npmlog": "^7.0.1",

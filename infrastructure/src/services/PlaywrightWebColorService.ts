@@ -1,6 +1,6 @@
 import { injectable } from '@needle-di/core';
 import type { ColorPaletteDto, WebColorService } from '@tailoredin/application';
-import { ColorUtil, EnumUtil } from '@tailoredin/shared';
+import { ColorUtil, EnumUtil } from '@tailoredin/core';
 import { Vibrant } from 'node-vibrant/node';
 import * as NpmLog from 'npmlog';
 import * as Playwright from 'playwright';

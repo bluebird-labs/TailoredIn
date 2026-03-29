@@ -1,4 +1,4 @@
-import { StringUtil } from '@tailoredin/shared';
+import { StringUtil } from '@tailoredin/core';
 import { capitalize } from 'lodash';
 import type { BrilliantCVEducation, BrilliantCVExperience, BrilliantCVSkill } from '../../brilliant-cv/types.js';
 import { formatDateRange } from '../dateFormatter.js';

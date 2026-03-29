@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture: DDD / Onion Architecture
 
-Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `shared/` package.
+Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `core/` package.
 
 ```
-shared/          ← Cross-cutting pure utilities (no domain, no framework deps)
+core/          ← Cross-cutting pure utilities (no domain, no framework deps)
 domain/          ← Single package: aggregates, value objects, domain services, events
 application/     ← Single package: use cases + ports + DTOs (plain classes, no DI framework)
 infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
@@ -23,7 +23,7 @@ presentation → infrastructure → application → domain → (shared)
 
 | Layer | Package | Purpose |
 |---|---|---|
-| `shared/` | `@tailoredin/shared` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) |
+| `core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) |
 | `domain/` | `@tailoredin/domain` | Aggregates (JobPosting, Company, Skill, Resume), value objects (JobStatus, Archetype, SkillName), domain services (JobElectionService, TailoringStrategyService), domain events |
 | `application/` | `@tailoredin/application` | Use cases (IngestScrapedJob, ScrapeAndIngestJobs, GetJob, GetTopJob, ChangeJobStatus, GenerateResume), ports (JobRepository, CompanyRepository, JobScraper, LlmService, ResumeRenderer, etc.), DTOs |
 | `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, OpenAI LLM service, Playwright scraper + web color service, Typst resume renderer, DI tokens |
@@ -138,4 +138,4 @@ SLOW_MO=0             # ms delay between Playwright actions
 - Bun runs TypeScript natively — no build step required.
 - **NodeNext module resolution**: all relative imports in `.ts` files must use `.js` extensions (e.g., `import { Foo } from './Foo.js'`).
 - **`reflect-metadata` import order**: must be the **first** import in every process entry point. Violating this silently breaks Inversify.
-- **`Environment.ts` side effects**: not in the `shared/src/index.ts` barrel. Import directly as `@tailoredin/shared/src/Environment.js`.
+- **`Environment.ts` side effects**: not in the `core/src/index.ts` barrel. Import directly as `@tailoredin/core/src/Environment.js`.

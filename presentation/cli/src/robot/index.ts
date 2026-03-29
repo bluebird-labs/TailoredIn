@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import type { ScrapeAndIngestJobs } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
-import { TimeUtil } from '@tailoredin/shared';
+import { TimeUtil } from '@tailoredin/core';
 import { milliseconds } from 'date-fns';
 import * as NpmLog from 'npmlog';
 import config from './config.js';

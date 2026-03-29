@@ -3,7 +3,7 @@ import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import { Environment } from '@tailoredin/shared/src/Environment.js';
+import { Environment } from '@tailoredin/core/src/Environment.js';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
 import { Company } from './entities/companies/Company.js';

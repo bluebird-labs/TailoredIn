@@ -1,4 +1,4 @@
-import { TimeUtil } from '@tailoredin/shared';
+import { TimeUtil } from '@tailoredin/core';
 import { range } from 'lodash';
 import * as NpmLog from 'npmlog';
 import type { Locator } from 'playwright';

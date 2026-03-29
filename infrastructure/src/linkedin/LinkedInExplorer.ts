@@ -1,6 +1,6 @@
 import FS from 'node:fs';
 import Path from 'node:path';
-import { TimeUtil } from '@tailoredin/shared';
+import { TimeUtil } from '@tailoredin/core';
 import { milliseconds } from 'date-fns';
 import * as NpmLog from 'npmlog';
 import * as NPMLog from 'npmlog';

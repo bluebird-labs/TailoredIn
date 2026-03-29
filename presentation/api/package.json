@@ -14,7 +14,7 @@
     "@tailoredin/application": "workspace:*",
     "@tailoredin/domain": "workspace:*",
     "@tailoredin/infrastructure": "workspace:*",
-    "@tailoredin/shared": "workspace:*",
+    "@tailoredin/core": "workspace:*",
     "elysia": "latest",
     "npmlog": "^7.0.1"
   },

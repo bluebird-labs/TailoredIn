@@ -1,5 +1,5 @@
 {
-  "name": "@tailoredin/shared",
+  "name": "@tailoredin/core",
   "version": "0.1.0",
   "private": true,
   "type": "module",
