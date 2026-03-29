@@ -1,7 +1,7 @@
 import type { ChangeJobStatus } from '@tailoredin/application';
+import { EnumUtil } from '@tailoredin/core';
 import { JobStatus } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
-import { EnumUtil } from '@tailoredin/core';
 import { command, number, positional, string, subcommands } from 'cmd-ts';
 import * as NpmLog from 'npmlog';
 import { container } from '../di/container.js';

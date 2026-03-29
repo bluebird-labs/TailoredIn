@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
+import { Environment } from '@tailoredin/core/src/Environment.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   DI,
@@ -12,7 +13,6 @@ import {
   PostgresJobRepository,
   PostgresSkillRepository
 } from '@tailoredin/infrastructure';
-import { Environment } from '@tailoredin/core/src/Environment.js';
 
 const orm = await MikroORM.init(ormConfig);
 

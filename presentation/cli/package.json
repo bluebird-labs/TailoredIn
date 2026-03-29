@@ -9,9 +9,7 @@
     "robot": "./src/robot/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "test": "bun test",
-    "test:coverage": "bun test --coverage"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@mikro-orm/postgresql": "^7.0.0",

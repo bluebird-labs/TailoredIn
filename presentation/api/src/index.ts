@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
+import { Environment } from '@tailoredin/core/src/Environment.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   DI,
@@ -17,7 +18,6 @@ import {
   TemplateResumeContentFactory,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
-import { Environment } from '@tailoredin/core/src/Environment.js';
 import { Elysia } from 'elysia';
 import * as NpmLog from 'npmlog';
 import { healthRoutes } from './routes/health.routes.js';
