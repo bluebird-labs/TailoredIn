@@ -1,7 +1,7 @@
+import * as Crypto from 'node:crypto';
 import { EntityRepositoryType } from '@mikro-orm/core';
 import { Entity, Property } from '@mikro-orm/decorators/es';
 import { ObjectUtil, type TypeUtil } from '@tailoredin/shared';
-import * as Crypto from 'crypto';
 import { UuidPrimaryKey } from '../../helpers.js';
 import type { CompanyCreateProps, CompanyProps } from './Company.types.js';
 import { CompanyRepository } from './CompanyRepository.js';

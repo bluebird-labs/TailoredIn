@@ -5,11 +5,11 @@ export type stringArray = string[];
 
 /** 'ScoreJobById' parameters type */
 export interface IScoreJobByIdParams {
-  avoidWeight?: number | null | void;
-  expertWeight?: number | null | void;
-  interestWeight?: number | null | void;
-  jobId?: string | null | void;
-  targetSalary?: number | null | void;
+  avoidWeight?: number | null | undefined;
+  expertWeight?: number | null | undefined;
+  interestWeight?: number | null | undefined;
+  jobId?: string | null | undefined;
+  targetSalary?: number | null | undefined;
 }
 
 /** 'ScoreJobById' return type */

@@ -58,7 +58,7 @@ export abstract class JobDescriptionItemsExtractor {
               text: text
             });
           } else {
-            items[items.length - 1].text += ' ' + text;
+            items[items.length - 1].text += ` ${text}`;
           }
         });
 
@@ -84,7 +84,7 @@ export abstract class JobDescriptionItemsExtractor {
               text: text
             });
           } else {
-            items[items.length - 1].text += ' ' + text;
+            items[items.length - 1].text += ` ${text}`;
           }
         });
 

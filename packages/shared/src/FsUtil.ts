@@ -6,7 +6,7 @@ export namespace FsUtil {
       await FS.access(filePath);
       return true;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err: unknown) {
+    } catch (_err: unknown) {
       return false;
     }
   };

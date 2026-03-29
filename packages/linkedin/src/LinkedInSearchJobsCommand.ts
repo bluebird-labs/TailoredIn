@@ -67,7 +67,7 @@ export class LinkedInSearchJobsCommand {
 
     const maxPages = params.maxPages ?? Number.POSITIVE_INFINITY;
     const searchParams = this.formatSearchParams(omit(params, ['maxPages']));
-    const url = LinkedInUrls.JOBS_SEARCH + '?' + searchParams.toString();
+    const url = `${LinkedInUrls.JOBS_SEARCH}?${searchParams.toString()}`;
 
     await this.page.goto(url, {
       waitUntil: 'load'

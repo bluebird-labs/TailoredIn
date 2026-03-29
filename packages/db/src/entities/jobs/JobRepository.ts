@@ -70,9 +70,11 @@ export class JobRepository extends BaseRepository<Job> {
     const [jobs, skills] = await Promise.all([
       this.getEm(opts)
         .repo(Job)
+        // biome-ignore lint/style/useNamingConvention: MikroORM filter operator
         .find({ id: { $in: jobIds } }, opts),
       this.getEm(opts)
         .repo(Skill)
+        // biome-ignore lint/style/useNamingConvention: MikroORM filter operator
         .find({ id: { $in: Array.from(skillIds) } })
     ]);
 
@@ -155,6 +157,7 @@ export class JobRepository extends BaseRepository<Job> {
 
     const skills = await this.getEm(opts)
       .repo(Skill)
+      // biome-ignore lint/style/useNamingConvention: MikroORM filter operator
       .find({ id: { $in: Array.from(skillIds) } });
 
     const skillMap = new Map<string, Skill>(skills.map(skill => [skill.id, skill]));
@@ -229,6 +232,7 @@ export class JobRepository extends BaseRepository<Job> {
     return this.getEm(opts).transactional(async em => {
       const retirableJobs = await em.find(Job, {
         postedAt: {
+          // biome-ignore lint/style/useNamingConvention: MikroORM filter operator
           $lt: date
         },
         status: JobStatus.NEW
@@ -261,6 +265,7 @@ export class JobRepository extends BaseRepository<Job> {
         {
           company: {
             name: {
+              // biome-ignore lint/style/useNamingConvention: MikroORM filter operator
               $ilike: `%${companyName}%`
             }
           }

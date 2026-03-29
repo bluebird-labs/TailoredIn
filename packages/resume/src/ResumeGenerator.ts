@@ -1,10 +1,10 @@
+import { execSync } from 'node:child_process';
 import FS from 'node:fs/promises';
 import Path from 'node:path';
 import { inject, injectable } from '@needle-di/core';
-import { AiDI, JobInsightsExtractor, PaletteKey, type VibrantSwatch, WebsiteColorsFinder } from '@tailoredin/ai';
+import { AiDI, PaletteKey, type VibrantSwatch } from '@tailoredin/ai';
 import { Archetype, type Company, type Job } from '@tailoredin/db';
 import { ColorUtil, EnumUtil } from '@tailoredin/shared';
-import { execSync } from 'child_process';
 import { format } from 'date-fns';
 import { snakeCase } from 'lodash';
 import * as NpmLog from 'npmlog';
@@ -111,7 +111,7 @@ export class ResumeGenerator {
           return ColorUtil.rgbTripleToHex(rgbByPaletteKey.get(key)!);
         }
       }
-    } catch (err: Error | any) {
+    } catch (err: unknown) {
       NpmLog.warn(this.constructor.name, `Error extracting color palette from ${website}`, err);
     }
 

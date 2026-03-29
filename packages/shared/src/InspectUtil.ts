@@ -1,4 +1,4 @@
-import NodeUtil from 'util';
+import NodeUtil from 'node:util';
 
 export namespace InspectUtil {
   export const inspect = (data: any, options: Parameters<typeof NodeUtil.inspect>[1] = {}): void => {

@@ -8,7 +8,7 @@ export namespace ColorUtil {
   export const hexToRgb = (hex: string): RGBTriple => {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+    hex = hex.replace(shorthandRegex, (_m, r, g, b) => r + r + g + g + b + b);
 
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
@@ -62,5 +62,5 @@ export namespace ColorUtil {
   };
 
   export const rgbTripleToHex = ([r, g, b]: RGBTriple): string =>
-    '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
+    `#${[r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')}`;
 }

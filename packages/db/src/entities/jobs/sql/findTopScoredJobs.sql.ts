@@ -5,12 +5,12 @@ export type stringArray = string[];
 
 /** 'FindTopScoredJobs' parameters type */
 export interface IFindTopScoredJobsParams {
-  avoidWeight?: number | null | void;
-  expertWeight?: number | null | void;
-  hoursPostedMax?: number | null | void;
-  interestWeight?: number | null | void;
-  targetSalary?: number | null | void;
-  top?: number | null | void;
+  avoidWeight?: number | null | undefined;
+  expertWeight?: number | null | undefined;
+  hoursPostedMax?: number | null | undefined;
+  interestWeight?: number | null | undefined;
+  targetSalary?: number | null | undefined;
+  top?: number | null | undefined;
 }
 
 /** 'FindTopScoredJobs' return type */

@@ -140,7 +140,7 @@ export class LinkedInScrapper {
     NpmLog.info(this.logPrefix, `Searching jobs...`);
 
     const searchParams = this.formatSearchParams(params);
-    const url = LinkedInUrls.JOBS_SEARCH + '?' + searchParams.toString();
+    const url = `${LinkedInUrls.JOBS_SEARCH}?${searchParams.toString()}`;
 
     await this.page.goto(url, {
       waitUntil: 'load'

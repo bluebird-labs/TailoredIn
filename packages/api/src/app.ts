@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 app.use(async (ctx, next) => {
   try {
     await next();
-  } catch (err: Error | any) {
+  } catch (err: unknown) {
     NpmLog.error('app', `Unexpected error on route ${ctx.path}`, err);
 
     let status: StatusCode;
@@ -29,12 +29,15 @@ app.use(async (ctx, next) => {
     if (err instanceof ZodError) {
       status = StatusCode.BAD_REQUEST;
       message = ZodUtil.zodErrorToMessage(err);
-    } else if ('statusCode' in err) {
-      status = err.statusCode;
+    } else if (err instanceof Error && 'statusCode' in err) {
+      status = (err as Error & { statusCode: StatusCode }).statusCode;
+      message = err.message;
+    } else if (err instanceof Error) {
+      status = StatusCode.INTERNAL_SERVER_ERROR;
       message = err.message;
     } else {
       status = StatusCode.INTERNAL_SERVER_ERROR;
-      message = err.message;
+      message = String(err);
     }
 
     ctx.status = status;
@@ -45,7 +48,7 @@ app.use(async (ctx, next) => {
     };
   }
 });
-app.use(async (ctx, next) => {
+app.use(async (_ctx, next) => {
   await RequestContext.create(container.get<MikroORM>(ApiDI.Orm).em, next);
 });
 

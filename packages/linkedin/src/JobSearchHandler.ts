@@ -1,4 +1,3 @@
-import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import { Company, Job, JobStatus, type QueryOpts, type TransientCompany, type TransientJob } from '@tailoredin/db';
 import * as DateParser from 'any-date-parser';
@@ -84,7 +83,7 @@ export class JobSearchHandler {
 
   private makeLinkedinLink(linkedinId: string): string {
     const url = new URL(LinkedInUrls.BASE);
-    url.pathname = LinkedInUrls.JOB_VIEW + '/' + linkedinId;
+    url.pathname = `${LinkedInUrls.JOB_VIEW}/${linkedinId}`;
     return url.href;
   }
 
@@ -106,7 +105,7 @@ export class JobSearchHandler {
         if (ksStr) {
           result = parseInt(ksStr, 10) * 1000;
 
-          if (isNaN(result)) {
+          if (Number.isNaN(result)) {
             result = null;
           }
         }

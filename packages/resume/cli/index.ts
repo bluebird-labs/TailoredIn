@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
+import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
 import { Archetype } from '@tailoredin/db';
-import { execSync } from 'child_process';
 import { format } from 'date-fns';
 import Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';

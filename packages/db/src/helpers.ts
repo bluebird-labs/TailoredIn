@@ -1,11 +1,11 @@
+import Crypto from 'node:crypto';
+import * as Fs from 'node:fs/promises';
 import Path from 'node:path';
 import type { Collection, EntityKey, PrimaryKeyOptions } from '@mikro-orm/core';
 import { PrimaryKey } from '@mikro-orm/decorators/es';
 import type { Migration } from '@mikro-orm/migrations';
 import type { EntityManager, Ref } from '@mikro-orm/postgresql';
 import { FsUtil } from '@tailoredin/shared';
-import Crypto from 'crypto';
-import * as Fs from 'fs/promises';
 import type { BaseEntity } from './BaseEntity.js';
 import { PACKAGE_DIR } from './PACKAGE_DIR.js';
 
@@ -31,7 +31,7 @@ export const generateUuid = () => {
 
 export const getMigrationSql = async (migration: Migration): Promise<string> => {
   const name = migration.constructor.name;
-  const fileName = name.replace('Migration', 'Migration_') + '.sql';
+  const fileName = `${name.replace('Migration', 'Migration_')}.sql`;
   const sqlFilePath = Path.resolve(PACKAGE_DIR, 'migrations', fileName);
   const hasSqlFile = await FsUtil.exists(sqlFilePath);
 

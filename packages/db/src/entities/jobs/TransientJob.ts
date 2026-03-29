@@ -66,6 +66,7 @@ export class TransientJob extends BaseEntity {
     nullable: true,
     index: 'description_fts_idx'
   })
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: MikroORM write-only generated tsvector column
   private descriptionFts: string | null;
 
   constructor(props: TransientJobProps) {
