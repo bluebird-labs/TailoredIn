@@ -114,15 +114,18 @@ export function createOrmConfig(db: OrmDbConfig) {
   });
 }
 
-// Default export for MikroORM CLI
-export const ormConfig = createOrmConfig({
-  timezone: env('TZ'),
-  user: env('POSTGRES_USER'),
-  password: env('POSTGRES_PASSWORD'),
-  dbName: env('POSTGRES_DB'),
-  schema: env('POSTGRES_SCHEMA'),
-  host: env('POSTGRES_HOST'),
-  port: envInt('POSTGRES_PORT')
-});
+// Lazily evaluated to avoid env() calls at import time (used by tests that import createOrmConfig only)
+export function getOrmConfig() {
+  return createOrmConfig({
+    timezone: env('TZ'),
+    user: env('POSTGRES_USER'),
+    password: env('POSTGRES_PASSWORD'),
+    dbName: env('POSTGRES_DB'),
+    schema: env('POSTGRES_SCHEMA'),
+    host: env('POSTGRES_HOST'),
+    port: envInt('POSTGRES_PORT')
+  });
+}
 
-export default ormConfig;
+// MikroORM CLI default export — evaluated when the CLI loads this file
+export default getOrmConfig;

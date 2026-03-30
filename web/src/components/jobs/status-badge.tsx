@@ -1,4 +1,4 @@
-import { JobStatus } from '@tailoredin/domain';
+import { JobStatus } from '@tailoredin/api/client';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 

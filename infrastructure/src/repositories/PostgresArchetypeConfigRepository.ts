@@ -31,18 +31,22 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainArchetypeConfig> {
-    const orm = await this.orm.em.findOneOrFail(OrmArchetype, id, { populate: ['user'] });
+    const orm = await this.orm.em.findOneOrFail(OrmArchetype, id, { populate: ['user', 'headline'] });
     return this.toDomain(orm);
   }
 
   public async findByUserAndKey(userId: string, key: ArchetypeEnum): Promise<DomainArchetypeConfig | null> {
-    const orm = await this.orm.em.findOne(OrmArchetype, { user: userId, archetypeKey: key });
+    const orm = await this.orm.em.findOne(
+      OrmArchetype,
+      { user: userId, archetypeKey: key },
+      { populate: ['headline'] }
+    );
     if (!orm) return null;
     return this.toDomain(orm, userId);
   }
 
   public async findAllByUserId(userId: string): Promise<DomainArchetypeConfig[]> {
-    const ormArchetypes = await this.orm.em.find(OrmArchetype, { user: userId });
+    const ormArchetypes = await this.orm.em.find(OrmArchetype, { user: userId }, { populate: ['headline'] });
     return Promise.all(ormArchetypes.map(a => this.toDomain(a, userId)));
   }
 
@@ -229,7 +233,7 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
     const ormPositions = await this.orm.em.find(
       OrmArchetypePosition,
       { archetype: orm.id },
-      { orderBy: { ordinal: 'ASC' } }
+      { orderBy: { ordinal: 'ASC' }, populate: ['resumeCompany'] }
     );
 
     const positions: DomainArchetypePosition[] = [];
@@ -237,7 +241,7 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
       const ormBullets = await this.orm.em.find(
         OrmArchetypePositionBullet,
         { position: pos.id },
-        { orderBy: { ordinal: 'ASC' } }
+        { orderBy: { ordinal: 'ASC' }, populate: ['bullet'] }
       );
 
       const resolvedCompanyId =
@@ -269,7 +273,7 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
     const ormEducation = await this.orm.em.find(
       OrmArchetypeEducation,
       { archetype: orm.id },
-      { orderBy: { ordinal: 'ASC' } }
+      { orderBy: { ordinal: 'ASC' }, populate: ['education'] }
     );
     const educationSelections = ormEducation.map(e => {
       const resolvedEducationId = typeof e.education === 'string' ? e.education : (e.education as { id: string }).id;
@@ -280,7 +284,7 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
     const ormSkillCategories = await this.orm.em.find(
       OrmArchetypeSkillCategory,
       { archetype: orm.id },
-      { orderBy: { ordinal: 'ASC' } }
+      { orderBy: { ordinal: 'ASC' }, populate: ['category'] }
     );
     const skillCategorySelections = ormSkillCategories.map(sc => {
       const resolvedCategoryId = typeof sc.category === 'string' ? sc.category : (sc.category as { id: string }).id;
@@ -291,7 +295,7 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
     const ormSkillItems = await this.orm.em.find(
       OrmArchetypeSkillItem,
       { archetype: orm.id },
-      { orderBy: { ordinal: 'ASC' } }
+      { orderBy: { ordinal: 'ASC' }, populate: ['item'] }
     );
     const skillItemSelections = ormSkillItems.map(si => {
       const resolvedItemId = typeof si.item === 'string' ? si.item : (si.item as { id: string }).id;

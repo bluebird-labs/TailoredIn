@@ -19,7 +19,6 @@
     "@fontsource-variable/geist": "^5.2.8",
     "@hookform/resolvers": "^3.0",
     "@tailoredin/api": "workspace:*",
-    "@tailoredin/domain": "workspace:*",
     "@tanstack/react-query": "^5.0",
     "@tanstack/react-router": "^1.0",
     "class-variance-authority": "^0.7.1",
@@ -38,6 +37,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.0",
     "@tanstack/router-plugin": "^1.0",
+    "@types/node": "^25.5.0",
     "@types/react": "^19.0",
     "@types/react-dom": "^19.0",
     "@vitejs/plugin-react": "^4.0",

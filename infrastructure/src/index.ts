@@ -2,7 +2,7 @@
 export { DI } from './DI.js';
 export type { OrmDbConfig } from './db/orm-config.js';
 // ORM config
-export { createOrmConfig, ormConfig } from './db/orm-config.js';
+export { createOrmConfig, getOrmConfig } from './db/orm-config.js';
 export { PostgresArchetypeConfigRepository } from './repositories/PostgresArchetypeConfigRepository.js';
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 // Repositories

@@ -49,13 +49,41 @@ module.exports = {
       to: { path: '^cli/' }
     },
 
-    // ── web: no infrastructure (use Eden Treaty) ────────────────────
+    // ── web: only public subpath exports ─────────────────────────────
+    {
+      name: 'web-only-api-client',
+      severity: 'error',
+      comment: 'web may only import from @tailoredin/api/client, not the full api barrel.',
+      from: { path: '^web/' },
+      to: { path: '^api/src/', pathNot: '^api/src/client\\.ts$' }
+    },
+    {
+      name: 'web-no-domain',
+      severity: 'error',
+      comment: 'web must not depend on domain directly. Use @tailoredin/api/client to re-export what web needs.',
+      from: { path: '^web/' },
+      to: { path: '^domain/' }
+    },
     {
       name: 'web-no-infrastructure',
       severity: 'error',
-      comment: 'web must use Eden Treaty, not direct infrastructure access.',
+      comment: 'web must not depend on infrastructure.',
       from: { path: '^web/' },
       to: { path: '^infrastructure/' }
+    },
+    {
+      name: 'web-no-application',
+      severity: 'error',
+      comment: 'web must not depend on application.',
+      from: { path: '^web/' },
+      to: { path: '^application/' }
+    },
+    {
+      name: 'web-no-core',
+      severity: 'error',
+      comment: 'web must not depend on core.',
+      from: { path: '^web/' },
+      to: { path: '^core/' }
     },
 
     // ── web ↔ cli: entry-point packages are isolated ────────────────

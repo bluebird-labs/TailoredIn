@@ -1,4 +1,4 @@
-import { JobStatus } from '@tailoredin/domain';
+import { JobStatus } from '@tailoredin/api/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { formatDistanceToNow } from 'date-fns';
