@@ -46,18 +46,35 @@ import { UpdateUserRoute } from './routes/UpdateUserRoute.js';
 const log = Logger.create('API');
 const port = Number(process.env.API_PORT ?? 8000);
 
+const startTimes = new WeakMap<Request, number>();
+
+const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
+const green = (s: string) => `\x1b[32m${s}\x1b[0m`;
+const yellow = (s: string) => `\x1b[33m${s}\x1b[0m`;
+const red = (s: string) => `\x1b[31m${s}\x1b[0m`;
+
+function colorStatus(status: number): string {
+  const s = String(status);
+  if (status < 300) return green(s);
+  if (status < 500) return yellow(s);
+  return red(s);
+}
+
+function formatDuration(ms: number): string {
+  return ms < 1000 ? dim(`${Math.round(ms)}ms`) : dim(`${(ms / 1000).toFixed(2)}s`);
+}
+
 const app = new Elysia()
   .onRequest(({ request }) => {
-    const url = new URL(request.url);
-    if (url.pathname !== '/health') {
-      log.info(`→ ${request.method} ${url.pathname}${url.search}`);
-    }
+    startTimes.set(request, performance.now());
   })
   .onAfterResponse(({ request, set }) => {
     const url = new URL(request.url);
-    if (url.pathname !== '/health') {
-      log.info(`← ${request.method} ${url.pathname} ${(set as { status?: number }).status ?? 200}`);
-    }
+    if (url.pathname === '/health') return;
+    const start = startTimes.get(request);
+    const duration = start ? formatDuration(performance.now() - start) : '';
+    const status = (set as { status?: number }).status ?? 200;
+    log.info(`${request.method} ${url.pathname}${url.search} ${colorStatus(status)} ${duration}`);
   })
   .use(healthRoutes)
   .use(container.get(ListJobsRoute).plugin())
@@ -106,19 +123,21 @@ const app = new Elysia()
     const err = error as unknown as { statusCode?: number; message?: string };
     const statusCode = err.statusCode;
     const message = err.message ?? String(error);
+    const start = startTimes.get(request);
+    const duration = start ? ` ${formatDuration(performance.now() - start)}` : '';
 
     if (code === 'VALIDATION') {
-      log.warn(`${request.method} ${url.pathname} 422 — ${message}`);
+      log.warn(`${request.method} ${url.pathname} ${yellow('422')} ${dim(message)}${duration}`);
       return;
     }
 
     if (statusCode) {
-      log.warn(`${request.method} ${url.pathname} ${statusCode} — ${message}`);
+      log.warn(`${request.method} ${url.pathname} ${yellow(String(statusCode))} ${dim(message)}${duration}`);
       set.status = statusCode;
       return { error: message };
     }
 
-    log.error(`${request.method} ${url.pathname} 500 — ${message}`);
+    log.error(`${request.method} ${url.pathname} ${red('500')} ${dim(message)}${duration}`);
     set.status = 500;
     return { error: 'Internal server error' };
   })
