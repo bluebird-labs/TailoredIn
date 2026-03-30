@@ -88,7 +88,7 @@ graph TD
     style M4AB fill:#86efac
     style M4CDE fill:#86efac
     style M5 fill:#86efac
-    style M6A fill:#facc15
+    style M6A fill:#86efac
     style M6B fill:#e5e7eb
     style M7 fill:#e5e7eb
     style M8 fill:#e5e7eb
