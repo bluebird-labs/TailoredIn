@@ -41,198 +41,179 @@ Auto-generate company research briefs for jobs the user is actively pursuing: pr
 
 Multiple Claude Code sessions can work on different steps simultaneously using git worktrees. Each session gets its own branch and worktree under `.claude/worktrees/`.
 
-### Merge conflict hotspots
-
-Three append-only registry files that every backend branch touches:
-
-| File | What grows | Mitigation |
-|---|---|---|
-| `api/src/index.ts` | DI bindings + `.use()` route registration | Extract into `api/src/container.ts` before Wave 2 |
-| `infrastructure/src/DI.ts` | Token list | Namespace tokens by domain |
-| `application/src/index.ts` | Barrel re-exports | Add sub-barrels (`use-cases/index.ts`, `ports/index.ts`, `dtos/index.ts`) before Wave 2 |
-
-### Wave 1 — zero file overlap, safe to run now
-
-| Session | Step | Branch | Worktree | Packages touched |
-|---|---|---|---|---|
-| 1 | **1B** | `feat/milestone-1b` | `.claude/worktrees/milestone-1b` | `infrastructure/` |
-| 2 | **3A** | `feat/milestone-3a` | `.claude/worktrees/milestone-3a` | `web/` (new), root `package.json` |
-
-### Wave 2 — after 1B merges, prep then parallelize
-
-First commit on main: extract DI container, add sub-barrels, namespace DI tokens. Then:
-
-| Session | Steps | Branch | Worktree | Packages touched |
-|---|---|---|---|---|
-| 1 | **1C** | `feat/milestone-1c` | `.claude/worktrees/milestone-1c` | `infrastructure/` (new factory, DI swap) |
-| 2 | **2A + 2C** | `feat/milestone-2ac` | `.claude/worktrees/milestone-2ac` | `api/src/routes/user.*`, `education.*`, `headlines.*` |
-| 3 | **2B + 2D + 2E** | `feat/milestone-2bde` | `.claude/worktrees/milestone-2bde` | `api/src/routes/companies.*`, `skills.*`, `archetypes.*` |
-
-### Wave 3 — after 3A + relevant M2 endpoints merge
-
-All work lives inside `web/` — low conflict risk, 2-3 sessions:
+### Wave 1 — all `web/` only, safe to parallelize
 
 | Session | Steps | Branch | Worktree |
 |---|---|---|---|
-| 1 | **3B** (jobs) | `feat/milestone-3b` | `.claude/worktrees/milestone-3b` |
-| 2 | **3C + 3E** (profile, skills) | `feat/milestone-3ce` | `.claude/worktrees/milestone-3ce` |
-| 3 | **3D + 3F** (experience, education, archetypes) | `feat/milestone-3df` | `.claude/worktrees/milestone-3df` |
+| 1 | **3A–3C** (job browsing) | `feat/milestone-3` | `.claude/worktrees/milestone-3` |
+| 2 | **4A–4B** (profile + headlines) | `feat/milestone-4ab` | `.claude/worktrees/milestone-4ab` |
+| 3 | **4C–4E** (experience + skills + education) | `feat/milestone-4cde` | `.claude/worktrees/milestone-4cde` |
+
+### Wave 2 — after M4 merges
+
+| Session | Steps | Branch | Worktree |
+|---|---|---|---|
+| 1 | **5A–5B** (archetypes) | `feat/milestone-5` | `.claude/worktrees/milestone-5` |
+| 2 | **6A** (URL job import backend) | `feat/milestone-6a` | `.claude/worktrees/milestone-6a` |
+
+### Wave 3 — after M3 + M5 + 6A merge
+
+| Session | Steps | Branch | Worktree |
+|---|---|---|---|
+| 1 | **6B** (add job UI + resume flow) | `feat/milestone-6b` | `.claude/worktrees/milestone-6b` |
+
+### Wave 4+ — sequential from here
+
+M7 → M8 → M9, one at a time.
 
 ### Dependency graph
 
 ```mermaid
 graph TD
-    1A["1A ✅ Domain entities"] --> 1B["1B ✅ Infra repos"]
-    1B --> 1C["1C: DB ContentFactory"]
-    1B --> PREP["Wave 2 prep: extract DI, sub-barrels"]
-    PREP --> 2AC["2A+2C: User + Education API"]
-    PREP --> 2BDE["2B+2D+2E: Experience + Skills + Archetypes API"]
-    START["main (now)"] --> 1C
-    START --> PREP
-    3A["3A ✅ Frontend scaffold"] --> 3B["3B: Job pages"]
-    3A --> 3CE["3C+3E: Profile + Skills pages"]
-    3A --> 3DF["3D+3F: Experience + Education + Archetypes pages"]
-    2AC --> 3CE
-    2BDE --> 3DF
-    2BDE --> 3B
+    M3["3: Job Browsing"] --> M6B["6B: Add Job UI + resume flow"]
+    M4AB["4A–B: Profile + Headlines"] --> M5["5: Archetypes"]
+    M4CDE["4C–E: Experience + Skills + Education"] --> M5
+    M5 --> M6B
+    M6A["6A: URL job import backend"] --> M6B
+    M6B --> M7["7: LLM-free fallbacks"]
+    M7 --> M8["8: Interview prep"]
+    M8 --> M9["9: CLI phase-out"]
 
-    style 1A fill:#22c55e
-    style 1B fill:#22c55e
-    style 3A fill:#22c55e
-    style 1C fill:#facc15
-    style PREP fill:#facc15
+    style M3 fill:#facc15
+    style M4AB fill:#facc15
+    style M4CDE fill:#facc15
+    style M5 fill:#e5e7eb
+    style M6A fill:#e5e7eb
+    style M6B fill:#e5e7eb
+    style M7 fill:#e5e7eb
+    style M8 fill:#e5e7eb
+    style M9 fill:#e5e7eb
 ```
 
-Yellow = next up. Green = done.
+Yellow = next up. Grey = future.
+
+## Completed Milestones
+
+<details>
+<summary>Milestone 1 — Database-Driven Resume Generation (PRs #4, #6, #9)</summary>
+
+Replaced hardcoded TypeScript templates with database-backed resume content.
+
+- [x] **1A.** Domain + application layer for resume data — PR #4
+- [x] **1B.** Infrastructure: repository implementations — PR #6
+- [x] **1C.** DatabaseResumeContentFactory — PR #9
+</details>
+
+<details>
+<summary>Milestone 2 — Resume Data API (PRs #7, #10)</summary>
+
+CRUD endpoints for all resume content.
+
+- [x] **2A.** User profile endpoints — PR #7
+- [x] **2B.** Work experience endpoints — PR #10
+- [x] **2C.** Education + headline endpoints — PR #7
+- [x] **2D.** Skill category + item endpoints — PR #10
+- [x] **2E.** Archetype endpoints — PR #10
+</details>
 
 ## Milestones
 
-### Milestone 1 — Database-Driven Resume Generation
+### Milestone 3 — Job Browsing
+> Branch: `feat/milestone-3` · Worktree: `.claude/worktrees/milestone-3`
 
-Replace hardcoded TypeScript templates with database-backed resume content so archetypes and resume data are editable without code changes.
+Browse and manage the 11k+ scraped jobs in the web UI.
 
-- [x] **1A. Domain + application layer for resume data** *(session 1)* — PR #4
-  - [x] Add domain entities: `User`, `ResumeCompany`, `ResumeBullet`, `ResumeEducation`, `ResumeSkillCategory`, `ResumeSkillItem`, `ResumeHeadline`, `Archetype` (with positions, bullets, skill/education selections)
-  - [x] Add repository ports: `UserRepository`, `ResumeCompanyRepository`, `ResumeEducationRepository`, `ResumeSkillCategoryRepository`, `ResumeHeadlineRepository`, `ArchetypeRepository`
-  - [x] Add DTOs for resume data read/write in `application/`
-- [x] **1B. Infrastructure: repository implementations** *(session 2, after 1A)* — PR #6
-  - [x] Implement each resume repository against the existing ORM entities and migration
-  - [x] Add DI tokens for all new repositories
-  - [x] Wire repositories into the API composition root
-  - [x] Verify with a smoke test: seed data → repository read → assert correctness
-- [ ] **1C. DatabaseResumeContentFactory** *(session 3, after 1B)*
-  - [ ] Implement `DatabaseResumeContentFactory` that reads from repositories + archetype to build `ResumeContentDto`
-  - [ ] Replace `TemplateResumeContentFactory` binding in DI with the new implementation
-  - [ ] Verify: `GenerateResume` use case produces identical PDFs from DB data as from the old templates
-  - [ ] Remove `LeadICResumeTemplate.ts` and all hardcoded company data files in `infrastructure/src/resume/`
+- [ ] **3A. Job list page**
+  - [ ] Paginated table with score, company, title, status badge, posted date
+  - [ ] Sort by score (default), posted date
+  - [ ] Filter by status (NEW, APPLIED, etc.)
+- [ ] **3B. Job detail page**
+  - [ ] Full posting info: description, company, location, salary, LinkedIn link
+  - [ ] Status controls: move job through the funnel (NEW → APPLIED → …)
+- [ ] **3C. Resume download on job detail**
+  - [ ] "Generate Resume" button triggers `PUT /jobs/:id/generate-resume`
+  - [ ] Progress indicator while generating
+  - [ ] Download resulting PDF
 
-### Milestone 2 — Resume Data API
+### Milestone 4 — Profile & Resume Editing
+> Branch: `feat/milestone-4ab` (profile + headlines) + `feat/milestone-4cde` (experience + skills + education)
 
-CRUD endpoints for all resume content. Each step is independent and can run in parallel worktrees.
+Edit all resume content that feeds into PDF generation.
 
-- [ ] **2A. User profile endpoints** *(session, parallel)*
-  - [ ] `GET /user` — return the single user profile
-  - [ ] `PUT /user` — update personal info (name, email, phone, GitHub, LinkedIn, location)
-- [ ] **2B. Work experience endpoints** *(session, parallel)*
-  - [ ] `GET /resume/companies` — list all companies with nested locations and bullets
-  - [ ] `POST /resume/companies` — create a company entry
-  - [ ] `PUT /resume/companies/:id` — update company metadata (name, website, domain, dates)
-  - [ ] `DELETE /resume/companies/:id` — remove a company and cascade
-  - [ ] `POST /resume/companies/:id/bullets` — add a bullet
-  - [ ] `PUT /resume/companies/:id/bullets/:bulletId` — update a bullet
-  - [ ] `DELETE /resume/companies/:id/bullets/:bulletId` — remove a bullet
-  - [ ] `PUT /resume/companies/:id/locations` — replace locations for a company
-- [ ] **2C. Education + headline endpoints** *(session, parallel)*
-  - [ ] `GET /resume/education` — list education entries
-  - [ ] `POST /resume/education` — create
-  - [ ] `PUT /resume/education/:id` — update
-  - [ ] `DELETE /resume/education/:id` — remove
-  - [ ] `GET /resume/headlines` — list headlines
-  - [ ] `POST /resume/headlines` — create
-  - [ ] `PUT /resume/headlines/:id` — update
-  - [ ] `DELETE /resume/headlines/:id` — remove
-- [ ] **2D. Skill category + item endpoints** *(session, parallel)*
-  - [ ] `GET /resume/skills` — list categories with nested items
-  - [ ] `POST /resume/skills` — create a category
-  - [ ] `PUT /resume/skills/:id` — update category (name, order)
-  - [ ] `DELETE /resume/skills/:id` — remove category and its items
-  - [ ] `POST /resume/skills/:id/items` — add item to category
-  - [ ] `PUT /resume/skills/:id/items/:itemId` — update item
-  - [ ] `DELETE /resume/skills/:id/items/:itemId` — remove item
-- [ ] **2E. Archetype endpoints** *(session, parallel)*
-  - [ ] `GET /archetypes` — list archetypes with nested positions, bullets, skills, education
-  - [ ] `POST /archetypes` — create archetype
-  - [ ] `PUT /archetypes/:id` — update archetype metadata
-  - [ ] `DELETE /archetypes/:id` — remove archetype and cascade
-  - [ ] `PUT /archetypes/:id/positions` — set position selections (company refs + bullet overrides)
-  - [ ] `PUT /archetypes/:id/skills` — set skill category/item selections
-  - [ ] `PUT /archetypes/:id/education` — set education selections
-
-### Milestone 3 — Frontend Foundation
-
-Stand up a web frontend and implement the core pages.
-
-- [x] **3A. Frontend scaffold** *(session 1)* — PR #5
-  - [x] Choose framework (React 19 + Vite 6 + Eden Treaty + shadcn/ui + TanStack) — decision doc in `.claude/plans/frontend-framework-decision.md`
-  - [x] Set up build tooling, dev server with API proxy to port 8000
-  - [x] Add to monorepo workspace, wire `bun run web` and `bun run web:dev` scripts
-  - [x] Create shell layout: sidebar nav, content area, toast notifications
-  - [x] Set up routing: `/jobs`, `/resume`, `/resume/experience`, `/resume/skills`, `/resume/education`, `/archetypes`
-- [ ] **3B. Job browsing pages** *(session, after 3A, parallel with 3C–3F)*
-  - [ ] Job list page: ranked list with score, company, title, status badge, posted date
-  - [ ] Job detail page: full posting info, status controls, "Generate Resume" button
-  - [ ] PDF download: trigger generation, show progress, download resulting PDF
-- [ ] **3C. Profile + headlines page** *(session, after 3A, parallel)*
-  - [ ] Inline-editable form for user profile fields
-  - [ ] Headlines list with add/edit/delete
-- [ ] **3D. Work experience page** *(session, after 3A, parallel)*
+- [ ] **4A. Profile page**
+  - [ ] Inline-editable form for user fields (name, email, phone, GitHub, LinkedIn, location)
+- [ ] **4B. Headlines page**
+  - [ ] List headlines with add/edit/delete
+- [ ] **4C. Work experience page**
   - [ ] Company list with expand/collapse for bullets and locations
   - [ ] Add/edit/remove companies, bullets, locations
   - [ ] Drag-to-reorder bullets
-- [ ] **3E. Skills page** *(session, after 3A, parallel)*
+- [ ] **4D. Skills page**
   - [ ] Skill categories with nested items, add/edit/remove for both levels
   - [ ] Drag-to-reorder categories and items
-- [ ] **3F. Education + archetypes pages** *(session, after 3A, parallel)*
-  - [ ] Education CRUD page
-  - [ ] Archetype list page: view/create/edit archetypes
-  - [ ] Archetype detail: select positions, override bullets, select skills/education from the user's master data
+- [ ] **4E. Education page**
+  - [ ] Education entries: add/edit/remove
 
-### Milestone 4 — LLM-Free Fallbacks
+### Milestone 5 — Archetypes
+> Branch: `feat/milestone-5` · Worktree: `.claude/worktrees/milestone-5`
 
-Make the tool usable without an OpenAI key or LinkedIn credentials.
+Configure which resume content appears for each archetype.
 
-- [ ] **4A. Manual job entry** *(session, parallel)*
-  - [ ] `POST /jobs` endpoint — create a job posting by hand (title, company, description, URL)
-  - [ ] Web UI: "Add Job" form on the jobs page
-  - [ ] `IngestManualJob` use case that skips scraping, runs election + scoring
-- [ ] **4B. Generic resume generation without LLM** *(session, parallel)*
-  - [ ] Fallback path in `GenerateResume`: if no LLM key, skip insight extraction, use user-supplied archetype + default keywords
-  - [ ] Web UI: archetype picker + keyword input on the job detail page when generating without LLM
+- [ ] **5A. Archetype list page**
+  - [ ] List archetypes with create/delete
+- [ ] **5B. Archetype detail page**
+  - [ ] Edit archetype metadata (name, headline selection)
+  - [ ] Select positions (company refs + bullet overrides)
+  - [ ] Select skill categories/items
+  - [ ] Select education entries
 
-### Milestone 5 — Interview Prep (Pillar 3)
+### Milestone 6 — Single-URL Job Import + Resume Generation
+> Branch: `feat/milestone-6a` (backend) + `feat/milestone-6b` (UI)
+
+Paste a LinkedIn job URL → scrape → generate a tailored PDF. The end-to-end payoff.
+
+- [ ] **6A. URL-based job import (backend)**
+  - [ ] `POST /jobs` endpoint accepts a LinkedIn URL (or manual fields as fallback)
+  - [ ] `IngestJobByUrl` use case: scrape single posting, run election + scoring
+- [ ] **6B. "Add Job" UI + resume generation flow**
+  - [ ] "Add Job" form on jobs page: paste URL or enter fields manually
+  - [ ] After import, navigate to job detail → generate resume → download PDF
+
+### Milestone 7 — LLM-Free Fallbacks
+> Branch: `feat/milestone-7` · Worktree: `.claude/worktrees/milestone-7`
+
+Make the tool usable without an OpenAI key.
+
+- [ ] **7A. Generic resume generation**
+  - [ ] Fallback path in `GenerateResume`: skip insight extraction when no LLM key
+  - [ ] Use user-supplied archetype + default keywords
+- [ ] **7B. LLM-free UI**
+  - [ ] Archetype picker + keyword input on job detail when generating without LLM
+
+### Milestone 8 — Interview Prep
+> Branch: `feat/milestone-8` · Worktree: `.claude/worktrees/milestone-8`
 
 Auto-generate company research briefs for active job pursuits.
 
-- [ ] **5A. Domain + application layer** *(session 1)*
+- [ ] **8A. Domain + backend**
   - [ ] `CompanyBrief` domain entity (product overview, tech stack, culture, recent news, key people)
   - [ ] `GenerateCompanyBrief` use case, `CompanyBriefRepository` port
-  - [ ] LLM prompt for brief generation via `LlmService`
-- [ ] **5B. Infrastructure + API** *(session 2, after 5A)*
   - [ ] ORM entity, migration, repository implementation
   - [ ] `POST /jobs/:id/generate-brief`, `GET /jobs/:id/brief` endpoints
-- [ ] **5C. Web UI** *(session 3, after 5B)*
+- [ ] **8B. Web UI**
   - [ ] Brief panel on job detail page
   - [ ] Generate/refresh button, structured display of brief sections
 
-### Milestone 6 — CLI Phase-Out
+### Milestone 9 — CLI Phase-Out
+> Branch: `feat/milestone-9` · Worktree: `.claude/worktrees/milestone-9`
 
-Remove CLI tools once the web app fully covers their functionality.
+Remove CLI tools once the web app covers their functionality.
 
-- [ ] **6A. Migrate robot to background service** *(session 1)*
-  - [ ] Move scraping loop from `cli/src/robot/` into a background worker started by the API process
-  - [ ] Add API endpoints: `POST /robot/start`, `POST /robot/stop`, `GET /robot/status`
+- [ ] **9A. Migrate robot to background service**
+  - [ ] Move scraping loop into a background worker started by the API process
+  - [ ] `POST /robot/start`, `POST /robot/stop`, `GET /robot/status` endpoints
   - [ ] Web UI controls for the scraping daemon
-- [ ] **6B. Remove CLI packages** *(session 2, after 6A and all web UI covers CLI functionality)*
-  - [ ] Delete `cli/` package entirely
-  - [ ] Remove CLI-related scripts from root `package.json`
-  - [ ] Update CLAUDE.md and any docs
+- [ ] **9B. Remove CLI packages**
+  - [ ] Delete `cli/` package
+  - [ ] Remove CLI scripts from root `package.json`
+  - [ ] Update CLAUDE.md

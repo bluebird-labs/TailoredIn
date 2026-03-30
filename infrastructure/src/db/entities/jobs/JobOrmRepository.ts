@@ -139,7 +139,6 @@ export class JobOrmRepository extends BaseRepository<Job> {
   public async retireOlderThan(olderThan: Date, opts: QueryOpts = {}): Promise<number> {
     return this.getEm(opts).transactional(async em => {
       const retirableJobs = await em.find(Job, {
-        // biome-ignore lint/style/useNamingConvention: MikroORM filter operator
         postedAt: { $lt: olderThan },
         status: JobStatus.NEW
       });
