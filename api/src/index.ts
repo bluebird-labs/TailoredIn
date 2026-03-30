@@ -27,6 +27,7 @@ import { ListArchetypesRoute } from './routes/ListArchetypesRoute.js';
 import { ListCompaniesRoute } from './routes/ListCompaniesRoute.js';
 import { ListEducationRoute } from './routes/ListEducationRoute.js';
 import { ListHeadlinesRoute } from './routes/ListHeadlinesRoute.js';
+import { ListJobsRoute } from './routes/ListJobsRoute.js';
 import { ListSkillCategoriesRoute } from './routes/ListSkillCategoriesRoute.js';
 import { ReplaceLocationsRoute } from './routes/ReplaceLocationsRoute.js';
 import { SetArchetypeEducationRoute } from './routes/SetArchetypeEducationRoute.js';
@@ -48,6 +49,7 @@ const port = Number(process.env.API_PORT ?? 8000);
 
 const app = new Elysia()
   .use(healthRoutes)
+  .use(container.get(ListJobsRoute).plugin())
   .use(container.get(GetTopJobRoute).plugin())
   .use(container.get(GetJobRoute).plugin())
   .use(container.get(ChangeJobStatusRoute).plugin())

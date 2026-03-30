@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { GenerateResume } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
@@ -18,8 +19,12 @@ export class GenerateResumeRoute {
           return { error: result.error.message };
         }
 
-        set.status = 201;
-        return { data: { pdf_path: result.value.pdfPath } };
+        const pdfPath = result.value.pdfPath;
+        const fileName = pdfPath.split('/').pop() ?? 'resume.pdf';
+        const pdfBuffer = readFileSync(pdfPath);
+        set.headers['content-type'] = 'application/pdf';
+        set.headers['content-disposition'] = `attachment; filename="${fileName}"`;
+        return pdfBuffer;
       },
       {
         params: t.Object({ id: t.String({ format: 'uuid' }) })

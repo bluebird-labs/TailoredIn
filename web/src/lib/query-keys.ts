@@ -1,7 +1,7 @@
 export const queryKeys = {
   jobs: {
     all: ['jobs'] as const,
-    list: () => [...queryKeys.jobs.all, 'list'] as const,
+    list: (params: Record<string, unknown>) => [...queryKeys.jobs.all, 'list', params] as const,
     detail: (id: string) => [...queryKeys.jobs.all, 'detail', id] as const,
     top: (params: Record<string, unknown>) => [...queryKeys.jobs.all, 'top', params] as const
   },
