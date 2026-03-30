@@ -18,9 +18,6 @@ infrastructure/resumes/
 # LinkedIn Playwright session (sensitive auth cookies)
 infrastructure/src/linkedin/playwright/.auth/
 
-# TanStack Router auto-generated route tree
-web/src/routeTree.gen.ts
-
 # dependency-cruiser generated graph
 dep-graph.svg
 temp/

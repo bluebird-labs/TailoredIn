@@ -39,11 +39,9 @@ function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
         <SidebarMenu>
           {items.map(item => (
             <SidebarMenuItem key={item.to}>
-              <SidebarMenuButton asChild isActive={!!matchRoute({ to: item.to, fuzzy: true })}>
-                <Link to={item.to}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
+              <SidebarMenuButton render={<Link to={item.to} />} isActive={!!matchRoute({ to: item.to, fuzzy: true })}>
+                <item.icon />
+                <span>{item.label}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
