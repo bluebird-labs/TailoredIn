@@ -16,7 +16,6 @@
     "@tailoredin/domain": "workspace:*",
     "@tailoredin/infrastructure": "workspace:*",
     "@tailoredin/core": "workspace:*",
-    "@elysiajs/static": "latest",
     "elysia": "latest"
   },
   "devDependencies": {

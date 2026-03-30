@@ -1,5 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
+import { ChangeJobStatus, GenerateResume, GetJob, GetTopJob } from '@tailoredin/application';
 import { Environment } from '@tailoredin/core/src/Environment.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
@@ -45,6 +46,20 @@ container.bind({
 });
 container.bind({ provide: DI.Job.Scraper, useClass: PlaywrightJobScraper });
 
+// Job use cases
+container.bind({
+  provide: DI.Job.GetTopJob,
+  useFactory: () => new GetTopJob(container.get(DI.Job.Repository))
+});
+container.bind({
+  provide: DI.Job.GetJob,
+  useFactory: () => new GetJob(container.get(DI.Job.Repository))
+});
+container.bind({
+  provide: DI.Job.ChangeJobStatus,
+  useFactory: () => new ChangeJobStatus(container.get(DI.Job.Repository))
+});
+
 // Resume repositories + services
 container.bind({ provide: DI.Resume.UserRepository, useClass: PostgresUserRepository });
 container.bind({ provide: DI.Resume.CompanyRepository, useClass: PostgresResumeCompanyRepository });
@@ -62,5 +77,18 @@ container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
 container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({ provide: DI.Resume.ContentFactory, useClass: TemplateResumeContentFactory });
+
+// Resume use cases
+container.bind({
+  provide: DI.Resume.GenerateResume,
+  useFactory: () =>
+    new GenerateResume(
+      container.get(DI.Job.Repository),
+      container.get(DI.Resume.LlmService),
+      container.get(DI.Resume.WebColorService),
+      container.get(DI.Resume.Renderer),
+      container.get(DI.Resume.ContentFactory)
+    )
+});
 
 export { container, orm };
