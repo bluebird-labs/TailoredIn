@@ -1,0 +1,4 @@
+import { treaty } from '@elysiajs/eden';
+import type { App } from '@tailoredin/api';
+
+export const api = treaty<App>('/api');

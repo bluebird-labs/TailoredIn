@@ -6,6 +6,12 @@
     "indentStyle": "space",
     "indentWidth": 2
   },
+  "css": {
+    "parser": {
+      "cssModules": false,
+      "tailwindDirectives": true
+    }
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
@@ -53,7 +59,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts", "!**/routeTree.gen.ts"]
   },
   "overrides": [
     {
@@ -62,6 +68,23 @@
         "rules": {
           "style": {
             "useNamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["web/src/components/ui/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off",
+            "useExhaustiveDependencies": "off"
+          },
+          "suspicious": {
+            "noDocumentCookie": "off"
+          },
+          "a11y": {
+            "noLabelWithoutControl": "off"
           }
         }
       }
