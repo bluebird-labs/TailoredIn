@@ -19,6 +19,7 @@ import { DeleteHeadlineRoute } from './routes/DeleteHeadlineRoute.js';
 import { DeleteSkillCategoryRoute } from './routes/DeleteSkillCategoryRoute.js';
 import { DeleteSkillItemRoute } from './routes/DeleteSkillItemRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
+import { GetCurrentUserRoute } from './routes/GetCurrentUserRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
 import { GetTopJobRoute } from './routes/GetTopJobRoute.js';
 import { GetUserRoute } from './routes/GetUserRoute.js';
@@ -54,6 +55,7 @@ const app = new Elysia()
   .use(container.get(GetJobRoute).plugin())
   .use(container.get(ChangeJobStatusRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
+  .use(container.get(GetCurrentUserRoute).plugin())
   .use(container.get(GetUserRoute).plugin())
   .use(container.get(UpdateUserRoute).plugin())
   .use(container.get(ListEducationRoute).plugin())
