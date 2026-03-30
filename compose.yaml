@@ -1,4 +1,4 @@
-name: job-searcher
+name: tailored-in
 
 services:
   postgres:

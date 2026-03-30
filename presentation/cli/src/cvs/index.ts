@@ -3,6 +3,7 @@
 import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { Archetype } from '@tailoredin/domain';
 import { generateCV } from '@tailoredin/infrastructure/src/resume/generateCV.js';
 import { TYPST_DIR } from '@tailoredin/infrastructure/src/resume/TYPST_DIR.js';
@@ -11,6 +12,7 @@ import { format } from 'date-fns';
 import Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
+const log = Logger.create('cvs');
 const AWESOME_COLOR_PRESETS = ['skyblue', 'red', 'nephritis', 'concrete', 'darknight'] as const;
 const TYPST_CWD = TYPST_DIR;
 
@@ -86,14 +88,14 @@ Yargs(hideBin(process.argv))
         execSync(`typst compile cv.typ "${pdfPath}"`, { cwd: TYPST_CWD, stdio: 'pipe' });
       } catch (err: any) {
         const stderr = (err.stderr as Buffer | undefined)?.toString() ?? String(err.message);
-        console.error('Failed to compile Typst CV:\n', stderr);
+        log.error('Failed to compile Typst CV:\n', stderr);
         return;
       }
 
       try {
         execSync(`open -a Preview "${pdfPath}"`, { stdio: 'inherit' });
       } catch (err) {
-        console.error('Failed to open the PDF', err);
+        log.error('Failed to open the PDF', err);
       }
     }
   )

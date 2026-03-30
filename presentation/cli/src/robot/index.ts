@@ -2,13 +2,13 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import type { ScrapeAndIngestJobs } from '@tailoredin/application';
 import { TimeUtil } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { DI } from '@tailoredin/infrastructure';
 import { milliseconds } from 'date-fns';
-import * as NpmLog from 'npmlog';
 import config from './config.js';
 import { container, orm } from './container.js';
 
-const LOG_PREFIX = 'TailoredIn';
+const log = Logger.create('TailoredIn');
 
 const searchAll = async () => {
   const useCase = container.get(DI.ScrapeAndIngestJobs) as ScrapeAndIngestJobs;
@@ -25,16 +25,16 @@ Promise.resolve()
       try {
         await searchAll();
       } catch (err) {
-        NpmLog.error(LOG_PREFIX, 'Search round failed', err);
+        log.error('Search round failed', err);
       }
 
-      NpmLog.notice(LOG_PREFIX, `Search round is over, entering 15-30 minutes break. Now is ${new Date()}`);
+      log.info(`Search round is over, entering 15-30 minutes break. Now is ${new Date()}`);
 
       await TimeUtil.waitRandom(milliseconds({ minutes: 15 }), milliseconds({ minutes: 30 }));
     }
   })
   .catch(async err => {
-    NpmLog.error(LOG_PREFIX, 'Robot crashed', err);
+    log.error('Robot crashed', err);
     await orm.close(true);
     process.exit(1);
   });

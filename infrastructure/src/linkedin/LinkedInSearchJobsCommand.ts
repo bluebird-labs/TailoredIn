@@ -1,7 +1,7 @@
 import * as Url from 'node:url';
 import { TimeUtil, type TypeUtil } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { omit, range } from 'lodash';
-import * as NpmLog from 'npmlog';
 import type * as Playwright from 'playwright';
 import type { Locator } from 'playwright';
 import { LinkedInUrls } from './LinkedInUrls.js';
@@ -55,7 +55,7 @@ export type LinkedInSearchJobsCommandDelegate = TypeUtil.ReturnTypeOrPromise<
 >;
 
 export class LinkedInSearchJobsCommand {
-  private readonly logPrefix: string = this.constructor.name;
+  private readonly log = Logger.create('LinkedInSearchJobsCommand');
 
   public constructor(
     private readonly page: Playwright.Page,
@@ -63,7 +63,7 @@ export class LinkedInSearchJobsCommand {
   ) {}
 
   public async search(params: LinkedInSearchJobsCommandParams, delegate: LinkedInSearchJobsCommandDelegate) {
-    NpmLog.info(this.logPrefix, `Search for jobs...`, params);
+    this.log.info('Search for jobs...', params);
 
     const maxPages = params.maxPages ?? Number.POSITIVE_INFINITY;
     const searchParams = this.formatSearchParams(omit(params, ['maxPages']));
@@ -76,7 +76,7 @@ export class LinkedInSearchJobsCommand {
     const pageNumbers = (await this.parsePagination()).slice(0, maxPages);
 
     for (const pageNumber of pageNumbers) {
-      NpmLog.notice(this.logPrefix, `Parsing page ${pageNumber} of ${pageNumbers.length}...`);
+      this.log.info(`Parsing page ${pageNumber} of ${pageNumbers.length}...`);
 
       if (pageNumber !== 1) {
         await this.loadNextPage(pageNumber);
@@ -112,7 +112,7 @@ export class LinkedInSearchJobsCommand {
     const { jobListLocators, jobListBoundingBox } = await this.parseJobListLocators();
     const jobDetailsWrapperSelector = 'div.jobs-search__job-details--wrapper';
 
-    NpmLog.notice(this.logPrefix, `Found ${jobListLocators.length} jobs on current page.`);
+    this.log.info(`Found ${jobListLocators.length} jobs on current page.`);
 
     // Place the mouse within the list.
     await this.page.mouse.move(jobListBoundingBox.x + 10, jobListBoundingBox.y + 10);
@@ -143,7 +143,7 @@ export class LinkedInSearchJobsCommand {
         await this.page.mouse.wheel(0, 128);
         await this.waitRandom();
       } catch (err) {
-        NpmLog.error(this.logPrefix, `An error occurred while parsing a job`, err);
+        this.log.error('An error occurred while parsing a job', err);
       }
     }
   }

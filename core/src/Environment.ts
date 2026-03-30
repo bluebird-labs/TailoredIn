@@ -1,13 +1,11 @@
-import * as NpmLog from 'npmlog';
 import { z } from 'zod';
 import { EnumUtil } from './EnumUtil.js';
+import { Logger } from './Logger.js';
 import { NodeEnv } from './NodeEnv.js';
-
-const LOG_PREFIX = 'Environment';
 
 const zBool = () => z.enum(['true', 'false']).transform(v => v === 'true');
 
-const EnvSchema = z.strictObject({
+const EnvSchema = z.object({
   TZ: z.string(),
 
   POSTGRES_HOST: z.string(),
@@ -29,11 +27,23 @@ const EnvSchema = z.strictObject({
 
 type Env = z.infer<typeof EnvSchema>;
 
+// Lazy initialization — env is parsed on first access, not at module evaluation time.
+// Bun loads .env natively, but the MikroORM CLI may import this module before all
+// env vars are available. Deferring avoids validation errors during module evaluation.
+let env: Env | null = null;
+
+function getEnv(): Env {
+  if (!env) {
+    env = EnvSchema.parse(process.env);
+  }
+  return env;
+}
+
 export namespace Environment {
   let nodeEnv: string | undefined | NodeEnv = process.env.NODE_ENV;
 
   if (!nodeEnv) {
-    NpmLog.warn(LOG_PREFIX, `NODE_ENV is not set. Defaulting to ${NodeEnv.DEV}.`);
+    Logger.create('Environment').warn(`NODE_ENV is not set. Defaulting to ${NodeEnv.DEV}.`);
     nodeEnv = NodeEnv.DEV;
   }
 
@@ -41,11 +51,8 @@ export namespace Environment {
     throw new Error(`NODE_ENV must be set to one of ${EnumUtil.values(NodeEnv).join(', ')}`);
   }
 
-  // Env vars are populated by `import 'dotenv/config'` in each process entry point.
-  const env: Env = EnvSchema.parse(process.env);
-
   export const get = <K extends keyof Env>(key: K): Env[K] => {
-    return env[key];
+    return getEnv()[key];
   };
 
   export const NODE_ENV = nodeEnv;

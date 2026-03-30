@@ -1,6 +1,6 @@
 import { TimeUtil } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { range } from 'lodash';
-import * as NpmLog from 'npmlog';
 import type { Locator } from 'playwright';
 import * as PlayWright from 'playwright';
 import { LinkedInUrls } from './LinkedInExplorer.js';
@@ -45,7 +45,7 @@ type JobSearchResultDetailsInfo = Omit<JobSearchResult, keyof JobSearchResultLis
 export type JobResultCallback = (job: JobSearchResult) => void | Promise<void>;
 
 export class LinkedInScrapper {
-  private readonly logPrefix: string;
+  private readonly log = Logger.create('LinkedInScrapper');
   private readonly email: string;
   private readonly password: string;
   private readonly headless: boolean;
@@ -56,7 +56,6 @@ export class LinkedInScrapper {
     this.headless = config.headless;
     this._browser = null;
     this._page = null;
-    this.logPrefix = this.constructor.name;
   }
 
   private _browser: PlayWright.Browser | null;
@@ -79,7 +78,7 @@ export class LinkedInScrapper {
   }
 
   public async open() {
-    NpmLog.info(this.logPrefix, `Setting up scrapper...`);
+    this.log.info('Setting up scrapper...');
 
     this._browser = await PlayWright.chromium.launch({ headless: this.headless });
     this._page = await this.browser.newPage({
@@ -92,7 +91,7 @@ export class LinkedInScrapper {
   }
 
   public async login() {
-    NpmLog.info(this.logPrefix, `Logging in...`);
+    this.log.info('Logging in...');
 
     await this.page.goto(LinkedInUrls.LOGIN, {
       waitUntil: 'load',
@@ -117,16 +116,16 @@ export class LinkedInScrapper {
     await this.page.waitForLoadState('load');
 
     if (this.page.url().includes('checkpoint/challenge')) {
-      NpmLog.notice(this.logPrefix, 'Captcha challenge!');
+      this.log.info('Captcha challenge!');
 
       if (this.headless) {
-        NpmLog.warn(this.logPrefix, `Aborting due to captcha in headless mode.`);
+        this.log.warn('Aborting due to captcha in headless mode.');
         return;
       }
 
       while (true) {
         if (!this.page.url().includes('checkpoint/challenge')) {
-          NpmLog.notice(this.logPrefix, 'Captcha solved!');
+          this.log.info('Captcha solved!');
           break;
         }
         await TimeUtil.wait(2000);
@@ -137,7 +136,7 @@ export class LinkedInScrapper {
   }
 
   public async searchJobs(params: JobSearchParams, callback: JobResultCallback) {
-    NpmLog.info(this.logPrefix, `Searching jobs...`);
+    this.log.info('Searching jobs...');
 
     const searchParams = this.formatSearchParams(params);
     const url = `${LinkedInUrls.JOBS_SEARCH}?${searchParams.toString()}`;
@@ -149,7 +148,7 @@ export class LinkedInScrapper {
     const pageNumbers = await this.parsePagination();
 
     for (const pageNumber of pageNumbers) {
-      NpmLog.notice(this.logPrefix, `Parsing page ${pageNumber} of ${pageNumbers.length}...`);
+      this.log.info(`Parsing page ${pageNumber} of ${pageNumbers.length}...`);
 
       if (pageNumber !== 1) {
         await this.loadNextPage(pageNumber);
@@ -162,7 +161,7 @@ export class LinkedInScrapper {
   private async parseCurrentPage(callback: JobResultCallback): Promise<void> {
     const { jobListLocators, jobListBoundingBox } = await this.parseJobListLocators();
 
-    NpmLog.notice(this.logPrefix, `Found ${jobListLocators.length} jobs on current page.`);
+    this.log.info(`Found ${jobListLocators.length} jobs on current page.`);
 
     // Place the mouse within the list.
     await this.page.mouse.move(jobListBoundingBox.x + 10, jobListBoundingBox.y + 10);
@@ -179,7 +178,7 @@ export class LinkedInScrapper {
         await this.page.mouse.wheel(0, 128);
         await this.waitRandom();
       } catch (err) {
-        NpmLog.error(this.logPrefix, `An error occurred while parsing a job`, err);
+        this.log.error('An error occurred while parsing a job', err);
       }
     }
   }
@@ -257,7 +256,7 @@ export class LinkedInScrapper {
       description_html: descriptionHtml
     };
 
-    NpmLog.notice(this.logPrefix, `Parsed details for job ${jobId}`);
+    this.log.info(`Parsed details for job ${jobId}`);
 
     return jobDetailsInfo;
   }
@@ -274,7 +273,7 @@ export class LinkedInScrapper {
       companyLogoUrl: companyLogoUrl as string
     };
 
-    NpmLog.notice(this.logPrefix, `Found job in list: ${jobListInfo.jobId}`);
+    this.log.info(`Found job in list: ${jobListInfo.jobId}`);
 
     return jobListInfo;
   }

@@ -12,12 +12,11 @@
   },
   "dependencies": {
     "@tailoredin/domain": "workspace:*",
-    "any-date-parser": "^1.5.4",
-    "npmlog": "^7.0.1"
+    "@tailoredin/core": "workspace:*",
+    "any-date-parser": "^1.5.4"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "@types/npmlog": "^7.0.0",
     "typescript": "^5.7.3"
   }
 }

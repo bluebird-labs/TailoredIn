@@ -13,12 +13,10 @@
     "@tailoredin/domain": "workspace:*",
     "@tailoredin/infrastructure": "workspace:*",
     "@tailoredin/core": "workspace:*",
-    "elysia": "latest",
-    "npmlog": "^7.0.1"
+    "elysia": "latest"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "@types/npmlog": "^7.0.0",
     "typescript": "^5.7.3"
   }
 }
