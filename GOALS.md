@@ -43,22 +43,31 @@ Multiple Claude Code sessions can work on different steps simultaneously using g
 
 ### ~~Wave 1~~ ✅ Complete
 
-### Wave 2 — after M4 merges ← CURRENT
+### Wave 2 — ← CURRENT
 
 | Session | Steps | Branch | Worktree |
 |---|---|---|---|
 | 1 | **5A–5B** (archetypes) | `feat/milestone-5` | `.claude/worktrees/milestone-5` |
 | 2 | **6A** (URL job import backend) | `feat/milestone-6a` | `.claude/worktrees/milestone-6a` |
+| 3 | **9** (company classification) | `feat/milestone-9` | `.claude/worktrees/milestone-9` |
 
-### Wave 3 — after M3 + M5 + 6A merge
+### Wave 3 — after M5 + M6A merge
 
 | Session | Steps | Branch | Worktree |
 |---|---|---|---|
 | 1 | **6B** (add job UI + resume flow) | `feat/milestone-6b` | `.claude/worktrees/milestone-6b` |
+| 2 | **8** (job triaging) | `feat/milestone-8` | `.claude/worktrees/milestone-8` |
 
-### Wave 4+ — sequential from here
+### Wave 4 — after M6B + M9 merge
 
-M7 → M8 → M9, one at a time.
+| Session | Steps | Branch | Worktree |
+|---|---|---|---|
+| 1 | **7** (LLM-free fallbacks) | `feat/milestone-7` | `.claude/worktrees/milestone-7` |
+| 2 | **10** (interview prep) | `feat/milestone-10` | `.claude/worktrees/milestone-10` |
+
+### Wave 5
+
+M11 (CLI phase-out), sequential.
 
 ### Dependency graph
 
@@ -70,18 +79,22 @@ graph TD
     M5 --> M6B
     M6A["6A: URL job import backend"] --> M6B
     M6B --> M7["7: LLM-free fallbacks"]
-    M7 --> M8["8: Interview prep"]
-    M8 --> M9["9: CLI phase-out"]
+    M6B --> M8["8: Job triaging"]
+    M8 --> M9["9: Company classification"]
+    M9 --> M10["10: Interview prep"]
+    M10 --> M11["11: CLI phase-out"]
 
     style M3 fill:#86efac
     style M4AB fill:#86efac
     style M4CDE fill:#86efac
-    style M5 fill:#facc15
+    style M5 fill:#86efac
     style M6A fill:#facc15
     style M6B fill:#e5e7eb
     style M7 fill:#e5e7eb
     style M8 fill:#e5e7eb
     style M9 fill:#e5e7eb
+    style M10 fill:#e5e7eb
+    style M11 fill:#e5e7eb
 ```
 
 Green = done. Yellow = next up. Grey = future.
@@ -143,6 +156,7 @@ Configure which resume content appears for each archetype.
   - [ ] List archetypes with create/delete
 - [ ] **5B. Archetype detail page**
   - [ ] Edit archetype metadata (name, headline selection)
+  - [ ] Default headline fallback when archetype doesn't specify one
   - [ ] Select positions (company refs + bullet overrides)
   - [ ] Select skill categories/items
   - [ ] Select education entries
@@ -170,30 +184,60 @@ Make the tool usable without an OpenAI key.
 - [ ] **7B. LLM-free UI**
   - [ ] Archetype picker + keyword input on job detail when generating without LLM
 
-### Milestone 8 — Interview Prep
+### Milestone 8 — Job Triaging
 > Branch: `feat/milestone-8` · Worktree: `.claude/worktrees/milestone-8`
+
+Lifecycle-driven job management UI. Jobs should be triaged, tracked through stages, and resurfaced when needed.
+
+- [ ] **8A. Triaging UI**
+  - [ ] Dedicated triage view for new jobs (separate from the full job list)
+  - [ ] Bulk actions for status changes
+- [ ] **8B. Lifecycle views**
+  - [ ] Status-based views/filters (applied, interviewing, archived, etc.)
+  - [ ] Reopen archived jobs
+- [ ] **8C. Apply button**
+  - [ ] Apply button shows the underlying platform (Greenhouse, Workday, Lever, etc.)
+- [ ] **8D. Experience titles**
+  - [ ] Show job titles on the experience page
+
+### Milestone 9 — Company Classification
+> Branch: `feat/milestone-9` · Worktree: `.claude/worktrees/milestone-9`
+
+Structured company metadata instead of flat tags.
+
+- [ ] **9A. Domain model**
+  - [ ] Business type enum: B2B, B2C, B2B2C, etc.
+  - [ ] Industry enum: automobile, security, finance, etc.
+  - [ ] Stage enum: Seed, Series A, Series B, etc.
+  - [ ] Migration + ORM entity updates
+- [ ] **9B. Classification UI**
+  - [ ] Company detail/edit with classification fields
+  - [ ] Job list filtering by company classification
+
+### Milestone 10 — Interview Prep
+> Branch: `feat/milestone-10` · Worktree: `.claude/worktrees/milestone-10`
 
 Auto-generate company research briefs for active job pursuits.
 
-- [ ] **8A. Domain + backend**
+- [ ] **10A. Domain + backend**
   - [ ] `CompanyBrief` domain entity (product overview, tech stack, culture, recent news, key people)
   - [ ] `GenerateCompanyBrief` use case, `CompanyBriefRepository` port
   - [ ] ORM entity, migration, repository implementation
   - [ ] `POST /jobs/:id/generate-brief`, `GET /jobs/:id/brief` endpoints
-- [ ] **8B. Web UI**
+- [ ] **10B. Web UI**
   - [ ] Brief panel on job detail page
   - [ ] Generate/refresh button, structured display of brief sections
 
-### Milestone 9 — CLI Phase-Out
-> Branch: `feat/milestone-9` · Worktree: `.claude/worktrees/milestone-9`
+### Milestone 11 — CLI Phase-Out
+> Branch: `feat/milestone-11` · Worktree: `.claude/worktrees/milestone-11`
 
 Remove CLI tools once the web app covers their functionality.
 
-- [ ] **9A. Migrate robot to background service**
+- [ ] **11A. Migrate robot to background service**
   - [ ] Move scraping loop into a background worker started by the API process
   - [ ] `POST /robot/start`, `POST /robot/stop`, `GET /robot/status` endpoints
   - [ ] Web UI controls for the scraping daemon
-- [ ] **9B. Remove CLI packages**
+- [ ] **11B. Remove CLI packages**
   - [ ] Delete `cli/` package
   - [ ] Remove CLI scripts from root `package.json`
   - [ ] Update CLAUDE.md

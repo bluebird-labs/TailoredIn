@@ -230,6 +230,7 @@ function ArchetypesPage() {
                         <Button
                           variant="ghost"
                           size="icon-sm"
+                          nativeButton={false}
                           render={<Link to="/archetypes/$archetypeId" params={{ archetypeId: archetype.id }} />}
                         >
                           <Eye className="h-4 w-4" />
