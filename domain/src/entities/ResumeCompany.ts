@@ -1,7 +1,7 @@
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ResumeCompanyId } from '../value-objects/ResumeCompanyId.js';
 import type { ResumeLocation } from '../value-objects/ResumeLocation.js';
-import type { ResumeBullet } from './ResumeBullet.js';
+import { ResumeBullet } from './ResumeBullet.js';
 
 export type ResumeCompanyCreateProps = {
   userId: string;
@@ -58,6 +58,34 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     this.bullets = props.bullets;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
+  }
+
+  public addBullet(props: { content: string; ordinal: number }): ResumeBullet {
+    const bullet = ResumeBullet.create({ resumeCompanyId: this.id.value, ...props });
+    this.bullets.push(bullet);
+    this.updatedAt = new Date();
+    return bullet;
+  }
+
+  public updateBullet(bulletId: string, update: { content?: string; ordinal?: number }): void {
+    const bullet = this.bullets.find(b => b.id.value === bulletId);
+    if (!bullet) throw new Error(`Bullet not found: ${bulletId}`);
+    if (update.content !== undefined) bullet.content = update.content;
+    if (update.ordinal !== undefined) bullet.ordinal = update.ordinal;
+    bullet.updatedAt = new Date();
+    this.updatedAt = new Date();
+  }
+
+  public removeBullet(bulletId: string): void {
+    const index = this.bullets.findIndex(b => b.id.value === bulletId);
+    if (index === -1) throw new Error(`Bullet not found: ${bulletId}`);
+    this.bullets.splice(index, 1);
+    this.updatedAt = new Date();
+  }
+
+  public replaceLocations(locations: ResumeLocation[]): void {
+    this.locations.splice(0, this.locations.length, ...locations);
+    this.updatedAt = new Date();
   }
 
   public static create(props: ResumeCompanyCreateProps): ResumeCompany {
