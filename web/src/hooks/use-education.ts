@@ -2,13 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 
-// Eden Treaty merges /users/:id (GetUser/UpdateUser) with /users/:userId/resume/education
-// into a union type. We narrow via Extract to get the education-route branch.
-type UsersReturn = ReturnType<typeof api.users>;
-type EducationBranch = Extract<UsersReturn, { resume: unknown }>;
-
 function educationApi(userId: string) {
-  return (api.users({ id: userId, userId }) as EducationBranch).resume.education;
+  return api.users({ userId }).resume.education;
 }
 
 export function useEducation(userId: string | undefined) {
