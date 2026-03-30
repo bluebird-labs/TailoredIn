@@ -15,7 +15,12 @@ import {
   PlaywrightWebColorService,
   PostgresCompanyRepository,
   PostgresJobRepository,
+  PostgresResumeCompanyRepository,
+  PostgresResumeEducationRepository,
+  PostgresResumeHeadlineRepository,
+  PostgresResumeSkillCategoryRepository,
   PostgresSkillRepository,
+  PostgresUserRepository,
   TemplateResumeContentFactory,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
@@ -36,6 +41,11 @@ container.bind({ provide: MikroORM, useValue: orm });
 container.bind({ provide: DI.JobRepository, useClass: PostgresJobRepository });
 container.bind({ provide: DI.CompanyRepository, useClass: PostgresCompanyRepository });
 container.bind({ provide: DI.SkillRepository, useClass: PostgresSkillRepository });
+container.bind({ provide: DI.UserRepository, useClass: PostgresUserRepository });
+container.bind({ provide: DI.ResumeCompanyRepository, useClass: PostgresResumeCompanyRepository });
+container.bind({ provide: DI.ResumeEducationRepository, useClass: PostgresResumeEducationRepository });
+container.bind({ provide: DI.ResumeHeadlineRepository, useClass: PostgresResumeHeadlineRepository });
+container.bind({ provide: DI.ResumeSkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
 
 // Infrastructure: Services
 container.bind({

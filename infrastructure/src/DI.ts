@@ -12,7 +12,17 @@ import type {
   ScrapeAndIngestJobs,
   WebColorService
 } from '@tailoredin/application';
-import type { CompanyRepository, JobElector, JobRepository, SkillRepository } from '@tailoredin/domain';
+import type {
+  CompanyRepository,
+  JobElector,
+  JobRepository,
+  ResumeCompanyRepository,
+  ResumeEducationRepository,
+  ResumeHeadlineRepository,
+  ResumeSkillCategoryRepository,
+  SkillRepository,
+  UserRepository
+} from '@tailoredin/domain';
 
 export const DI = {
   // Job ports
@@ -22,7 +32,14 @@ export const DI = {
   JobElector: new InjectionToken<JobElector>('DI.JobElector'),
   JobScraper: new InjectionToken<JobScraper>('DI.JobScraper'),
 
-  // Resume ports
+  // Resume data ports
+  UserRepository: new InjectionToken<UserRepository>('DI.UserRepository'),
+  ResumeCompanyRepository: new InjectionToken<ResumeCompanyRepository>('DI.ResumeCompanyRepository'),
+  ResumeEducationRepository: new InjectionToken<ResumeEducationRepository>('DI.ResumeEducationRepository'),
+  ResumeHeadlineRepository: new InjectionToken<ResumeHeadlineRepository>('DI.ResumeHeadlineRepository'),
+  ResumeSkillCategoryRepository: new InjectionToken<ResumeSkillCategoryRepository>('DI.ResumeSkillCategoryRepository'),
+
+  // Resume service ports
   LlmService: new InjectionToken<LlmService>('DI.LlmService'),
   WebColorService: new InjectionToken<WebColorService>('DI.WebColorService'),
   ResumeRenderer: new InjectionToken<ResumeRenderer>('DI.ResumeRenderer'),
