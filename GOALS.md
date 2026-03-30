@@ -82,14 +82,14 @@ All work lives inside `web/` — low conflict risk, 2-3 sessions:
 
 ```mermaid
 graph TD
-    1A["1A ✅ Domain entities"] --> 1B["1B: Infra repos"]
+    1A["1A ✅ Domain entities"] --> 1B["1B ✅ Infra repos"]
     1B --> 1C["1C: DB ContentFactory"]
     1B --> PREP["Wave 2 prep: extract DI, sub-barrels"]
     PREP --> 2AC["2A+2C: User + Education API"]
     PREP --> 2BDE["2B+2D+2E: Experience + Skills + Archetypes API"]
-    START["main (now)"] --> 1B
-    START --> 3A["3A: Frontend scaffold"]
-    3A --> 3B["3B: Job pages"]
+    START["main (now)"] --> 1C
+    START --> PREP
+    3A["3A ✅ Frontend scaffold"] --> 3B["3B: Job pages"]
     3A --> 3CE["3C+3E: Profile + Skills pages"]
     3A --> 3DF["3D+3F: Experience + Education + Archetypes pages"]
     2AC --> 3CE
@@ -97,8 +97,10 @@ graph TD
     2BDE --> 3B
 
     style 1A fill:#22c55e
-    style 1B fill:#facc15
-    style 3A fill:#facc15
+    style 1B fill:#22c55e
+    style 3A fill:#22c55e
+    style 1C fill:#facc15
+    style PREP fill:#facc15
 ```
 
 Yellow = next up. Green = done.
@@ -113,11 +115,11 @@ Replace hardcoded TypeScript templates with database-backed resume content so ar
   - [x] Add domain entities: `User`, `ResumeCompany`, `ResumeBullet`, `ResumeEducation`, `ResumeSkillCategory`, `ResumeSkillItem`, `ResumeHeadline`, `Archetype` (with positions, bullets, skill/education selections)
   - [x] Add repository ports: `UserRepository`, `ResumeCompanyRepository`, `ResumeEducationRepository`, `ResumeSkillCategoryRepository`, `ResumeHeadlineRepository`, `ArchetypeRepository`
   - [x] Add DTOs for resume data read/write in `application/`
-- [ ] **1B. Infrastructure: repository implementations** *(session 2, after 1A)*
-  - [ ] Implement each resume repository against the existing ORM entities and migration
-  - [ ] Add DI tokens for all new repositories
-  - [ ] Wire repositories into the API composition root
-  - [ ] Verify with a smoke test: seed data → repository read → assert correctness
+- [x] **1B. Infrastructure: repository implementations** *(session 2, after 1A)* — PR #6
+  - [x] Implement each resume repository against the existing ORM entities and migration
+  - [x] Add DI tokens for all new repositories
+  - [x] Wire repositories into the API composition root
+  - [x] Verify with a smoke test: seed data → repository read → assert correctness
 - [ ] **1C. DatabaseResumeContentFactory** *(session 3, after 1B)*
   - [ ] Implement `DatabaseResumeContentFactory` that reads from repositories + archetype to build `ResumeContentDto`
   - [ ] Replace `TemplateResumeContentFactory` binding in DI with the new implementation
@@ -170,12 +172,12 @@ CRUD endpoints for all resume content. Each step is independent and can run in p
 
 Stand up a web frontend and implement the core pages.
 
-- [ ] **3A. Frontend scaffold** *(session 1)*
+- [x] **3A. Frontend scaffold** *(session 1)* — PR #5
   - [x] Choose framework (React 19 + Vite 6 + Eden Treaty + shadcn/ui + TanStack) — decision doc in `.claude/plans/frontend-framework-decision.md`
-  - [ ] Set up build tooling, dev server with API proxy to port 8000
-  - [ ] Add to monorepo workspace, wire `bun run web` and `bun run web:dev` scripts
-  - [ ] Create shell layout: sidebar nav, content area, toast notifications
-  - [ ] Set up routing: `/jobs`, `/resume`, `/resume/experience`, `/resume/skills`, `/resume/education`, `/archetypes`
+  - [x] Set up build tooling, dev server with API proxy to port 8000
+  - [x] Add to monorepo workspace, wire `bun run web` and `bun run web:dev` scripts
+  - [x] Create shell layout: sidebar nav, content area, toast notifications
+  - [x] Set up routing: `/jobs`, `/resume`, `/resume/experience`, `/resume/skills`, `/resume/education`, `/archetypes`
 - [ ] **3B. Job browsing pages** *(session, after 3A, parallel with 3C–3F)*
   - [ ] Job list page: ranked list with score, company, title, status badge, posted date
   - [ ] Job detail page: full posting info, status controls, "Generate Resume" button
