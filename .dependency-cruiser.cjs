@@ -58,11 +58,11 @@ module.exports = {
       to: { path: '^api/src/', pathNot: '^api/src/client\\.ts$' }
     },
     {
-      name: 'web-only-domain-web',
+      name: 'web-no-domain',
       severity: 'error',
-      comment: 'web may only import from @tailoredin/domain/web, not the full domain barrel.',
+      comment: 'web must not depend on domain directly. Use @tailoredin/api/client to re-export what web needs.',
       from: { path: '^web/' },
-      to: { path: '^domain/src/', pathNot: '^domain/src/web\\.ts$' }
+      to: { path: '^domain/' }
     },
     {
       name: 'web-no-infrastructure',
