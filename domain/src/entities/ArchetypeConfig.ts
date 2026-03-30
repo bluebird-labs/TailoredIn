@@ -65,6 +65,25 @@ export class ArchetypeConfig extends AggregateRoot<ArchetypeConfigId> {
     this.updatedAt = props.updatedAt;
   }
 
+  public replacePositions(positions: ArchetypePosition[]): void {
+    this.positions.splice(0, this.positions.length, ...positions);
+    this.updatedAt = new Date();
+  }
+
+  public replaceEducationSelections(selections: ArchetypeEducationSelection[]): void {
+    this.educationSelections.splice(0, this.educationSelections.length, ...selections);
+    this.updatedAt = new Date();
+  }
+
+  public replaceSkillSelections(
+    categories: ArchetypeSkillCategorySelection[],
+    items: ArchetypeSkillItemSelection[]
+  ): void {
+    this.skillCategorySelections.splice(0, this.skillCategorySelections.length, ...categories);
+    this.skillItemSelections.splice(0, this.skillItemSelections.length, ...items);
+    this.updatedAt = new Date();
+  }
+
   public static create(props: ArchetypeConfigCreateProps): ArchetypeConfig {
     const now = new Date();
     return new ArchetypeConfig({

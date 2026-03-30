@@ -1,19 +1,41 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
+  AddBullet,
+  AddSkillItem,
   ChangeJobStatus,
+  CreateArchetype,
+  CreateCompany,
   CreateEducation,
   CreateHeadline,
+  CreateSkillCategory,
+  DeleteArchetype,
+  DeleteBullet,
+  DeleteCompany,
   DeleteEducation,
   DeleteHeadline,
+  DeleteSkillCategory,
+  DeleteSkillItem,
   GenerateResume,
   GetJob,
   GetTopJob,
   GetUser,
+  ListArchetypes,
+  ListCompanies,
   ListEducation,
   ListHeadlines,
+  ListSkillCategories,
+  ReplaceLocations,
+  SetArchetypeEducation,
+  SetArchetypePositions,
+  SetArchetypeSkills,
+  UpdateArchetype,
+  UpdateBullet,
+  UpdateCompany,
   UpdateEducation,
   UpdateHeadline,
+  UpdateSkillCategory,
+  UpdateSkillItem,
   UpdateUser
 } from '@tailoredin/application';
 import { Environment } from '@tailoredin/core/src/Environment.js';
@@ -174,6 +196,101 @@ container.bind({
 container.bind({
   provide: DI.Resume.DeleteHeadline,
   useFactory: () => new DeleteHeadline(container.get(DI.Resume.HeadlineRepository))
+});
+
+// Work Experience use cases
+container.bind({
+  provide: DI.Resume.ListCompanies,
+  useFactory: () => new ListCompanies(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.CreateCompany,
+  useFactory: () => new CreateCompany(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateCompany,
+  useFactory: () => new UpdateCompany(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.DeleteCompany,
+  useFactory: () => new DeleteCompany(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.AddBullet,
+  useFactory: () => new AddBullet(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateBullet,
+  useFactory: () => new UpdateBullet(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.DeleteBullet,
+  useFactory: () => new DeleteBullet(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.ReplaceLocations,
+  useFactory: () => new ReplaceLocations(container.get(DI.Resume.CompanyRepository))
+});
+
+// Skills use cases
+container.bind({
+  provide: DI.Resume.ListSkillCategories,
+  useFactory: () => new ListSkillCategories(container.get(DI.Resume.SkillCategoryRepository))
+});
+container.bind({
+  provide: DI.Resume.CreateSkillCategory,
+  useFactory: () => new CreateSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateSkillCategory,
+  useFactory: () => new UpdateSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
+});
+container.bind({
+  provide: DI.Resume.DeleteSkillCategory,
+  useFactory: () => new DeleteSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
+});
+container.bind({
+  provide: DI.Resume.AddSkillItem,
+  useFactory: () => new AddSkillItem(container.get(DI.Resume.SkillCategoryRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateSkillItem,
+  useFactory: () => new UpdateSkillItem(container.get(DI.Resume.SkillCategoryRepository))
+});
+container.bind({
+  provide: DI.Resume.DeleteSkillItem,
+  useFactory: () => new DeleteSkillItem(container.get(DI.Resume.SkillCategoryRepository))
+});
+
+// Archetype use cases
+container.bind({ provide: DI.Archetype.ConfigRepository, useClass: PostgresArchetypeConfigRepository });
+container.bind({
+  provide: DI.Archetype.ListArchetypes,
+  useFactory: () => new ListArchetypes(container.get(DI.Archetype.ConfigRepository))
+});
+container.bind({
+  provide: DI.Archetype.CreateArchetype,
+  useFactory: () => new CreateArchetype(container.get(DI.Archetype.ConfigRepository))
+});
+container.bind({
+  provide: DI.Archetype.UpdateArchetype,
+  useFactory: () => new UpdateArchetype(container.get(DI.Archetype.ConfigRepository))
+});
+container.bind({
+  provide: DI.Archetype.DeleteArchetype,
+  useFactory: () => new DeleteArchetype(container.get(DI.Archetype.ConfigRepository))
+});
+container.bind({
+  provide: DI.Archetype.SetPositions,
+  useFactory: () => new SetArchetypePositions(container.get(DI.Archetype.ConfigRepository))
+});
+container.bind({
+  provide: DI.Archetype.SetSkills,
+  useFactory: () => new SetArchetypeSkills(container.get(DI.Archetype.ConfigRepository))
+});
+container.bind({
+  provide: DI.Archetype.SetEducation,
+  useFactory: () => new SetArchetypeEducation(container.get(DI.Archetype.ConfigRepository))
 });
 
 export { container, orm };
