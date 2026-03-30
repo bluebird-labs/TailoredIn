@@ -4,6 +4,7 @@ import { env, envInt } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   createOrmConfig,
+  DatabaseResumeContentFactory,
   DI,
   OPENAI_CONFIG,
   OpenAiLlmService,
@@ -19,7 +20,6 @@ import {
   PostgresUserRepository,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
-import { DatabaseResumeContentFactory } from '@tailoredin/infrastructure/src/services/DatabaseResumeContentFactory.js';
 
 const orm = await MikroORM.init(
   createOrmConfig({

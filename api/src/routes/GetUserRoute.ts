@@ -9,13 +9,13 @@ export class GetUserRoute {
 
   public plugin() {
     return new Elysia().get(
-      '/users/:id',
+      '/users/:userId',
       async ({ params }) => {
-        const user = await this.getUser.execute({ userId: params.id });
+        const user = await this.getUser.execute({ userId: params.userId });
         return { data: user };
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }) })
+        params: t.Object({ userId: t.String({ format: 'uuid' }) })
       }
     );
   }

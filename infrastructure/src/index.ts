@@ -13,6 +13,10 @@ export { PostgresResumeHeadlineRepository } from './repositories/PostgresResumeH
 export { PostgresResumeSkillCategoryRepository } from './repositories/PostgresResumeSkillCategoryRepository.js';
 export { PostgresSkillRepository } from './repositories/PostgresSkillRepository.js';
 export { PostgresUserRepository } from './repositories/PostgresUserRepository.js';
+// Legacy CV generation (used by cli/cvs)
+export { generateCV } from './resume/generateCV.js';
+export { TYPST_DIR } from './resume/TYPST_DIR.js';
+export { TypstFileGenerator } from './resume/TypstFileGenerator.js';
 export { DatabaseResumeContentFactory } from './services/DatabaseResumeContentFactory.js';
 export type { OpenAiConfig } from './services/OpenAiLlmService.js';
 // Services

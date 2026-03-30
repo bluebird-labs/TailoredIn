@@ -12,11 +12,11 @@
     "web"
   ],
   "scripts": {
-    "backend": "bun run --cwd api src/index.ts",
-    "backend:watch": "bun --watch --cwd api src/index.ts",
-    "robot": "bun run --cwd cli src/robot/index.ts",
-    "robot:watch": "bun --watch --cwd cli src/robot/index.ts",
-    "cvs": "bun run --cwd cli src/cvs/index.ts",
+    "backend": "bun run api/src/index.ts",
+    "backend:watch": "bun --watch api/src/index.ts",
+    "robot": "bun run cli/src/robot/index.ts",
+    "robot:watch": "bun --watch cli/src/robot/index.ts",
+    "cvs": "bun run cli/src/cvs/index.ts",
 
     "web": "bun run --cwd web dev",
     "web:build": "bun run --cwd web build",

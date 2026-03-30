@@ -9,10 +9,10 @@ export class UpdateUserRoute {
 
   public plugin() {
     return new Elysia().put(
-      '/users/:id',
+      '/users/:userId',
       async ({ params, body }) => {
         const user = await this.updateUser.execute({
-          userId: params.id,
+          userId: params.userId,
           email: body.email,
           firstName: body.first_name,
           lastName: body.last_name,
@@ -25,7 +25,7 @@ export class UpdateUserRoute {
         return { data: user };
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        params: t.Object({ userId: t.String({ format: 'uuid' }) }),
         body: t.Object({
           email: t.String({ format: 'email' }),
           first_name: t.String({ minLength: 1 }),

@@ -1,5 +1,4 @@
-import type { MakeResumeContentInput, ResumeContentFactory } from '@tailoredin/application';
-import type { ResumeContentDto } from '@tailoredin/application/src/dtos/ResumeContentDto.js';
+import type { MakeResumeContentInput, ResumeContentDto, ResumeContentFactory } from '@tailoredin/application';
 import { StringUtil } from '@tailoredin/core';
 import type {
   ArchetypeConfigRepository,
