@@ -48,20 +48,18 @@ const port = Number(process.env.API_PORT ?? 8000);
 
 const startTimes = new WeakMap<Request, number>();
 
-const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
-const green = (s: string) => `\x1b[32m${s}\x1b[0m`;
-const yellow = (s: string) => `\x1b[33m${s}\x1b[0m`;
-const red = (s: string) => `\x1b[31m${s}\x1b[0m`;
-
-function colorStatus(status: number): string {
-  const s = String(status);
-  if (status < 300) return green(s);
-  if (status < 500) return yellow(s);
-  return red(s);
+function formatDuration(ms: number): string {
+  return ms < 1000 ? `${Math.round(ms)}ms` : `${(ms / 1000).toFixed(2)}s`;
 }
 
-function formatDuration(ms: number): string {
-  return ms < 1000 ? dim(`${Math.round(ms)}ms`) : dim(`${(ms / 1000).toFixed(2)}s`);
+function logRequest(request: Request, status: number, start?: number) {
+  const url = new URL(request.url);
+  if (url.pathname === '/health') return;
+  const duration = start ? ` (${formatDuration(performance.now() - start)})` : '';
+  const msg = `${request.method} ${url.pathname}${url.search} ${status}${duration}`;
+  if (status >= 500) log.error(msg);
+  else if (status >= 400) log.warn(msg);
+  else log.info(msg);
 }
 
 const app = new Elysia()
@@ -69,12 +67,8 @@ const app = new Elysia()
     startTimes.set(request, performance.now());
   })
   .onAfterResponse(({ request, set }) => {
-    const url = new URL(request.url);
-    if (url.pathname === '/health') return;
-    const start = startTimes.get(request);
-    const duration = start ? formatDuration(performance.now() - start) : '';
     const status = (set as { status?: number }).status ?? 200;
-    log.info(`${request.method} ${url.pathname}${url.search} ${colorStatus(status)} ${duration}`);
+    logRequest(request, status, startTimes.get(request));
   })
   .use(healthRoutes)
   .use(container.get(ListJobsRoute).plugin())
@@ -119,27 +113,15 @@ const app = new Elysia()
   .use(container.get(SetArchetypeSkillsRoute).plugin())
   .use(container.get(SetArchetypeEducationRoute).plugin())
   .onError(({ request, error, set, code }) => {
-    const url = new URL(request.url);
     const err = error as unknown as { statusCode?: number; message?: string };
-    const statusCode = err.statusCode;
     const message = err.message ?? String(error);
-    const start = startTimes.get(request);
-    const duration = start ? ` ${formatDuration(performance.now() - start)}` : '';
 
-    if (code === 'VALIDATION') {
-      log.warn(`${request.method} ${url.pathname} ${yellow('422')} ${dim(message)}${duration}`);
-      return;
-    }
+    if (code === 'VALIDATION') return;
 
-    if (statusCode) {
-      log.warn(`${request.method} ${url.pathname} ${yellow(String(statusCode))} ${dim(message)}${duration}`);
-      set.status = statusCode;
-      return { error: message };
-    }
-
-    log.error(`${request.method} ${url.pathname} ${red('500')} ${dim(message)}${duration}`);
-    set.status = 500;
-    return { error: 'Internal server error' };
+    const statusCode = err.statusCode ?? 500;
+    set.status = statusCode;
+    logRequest(request, statusCode, startTimes.get(request));
+    return { error: statusCode === 500 ? 'Internal server error' : message };
   })
   .listen(port);
 
