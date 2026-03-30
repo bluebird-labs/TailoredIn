@@ -134,7 +134,6 @@
         "@fontsource-variable/geist": "^5.2.8",
         "@hookform/resolvers": "^3.0",
         "@tailoredin/api": "workspace:*",
-        "@tailoredin/domain": "workspace:*",
         "@tanstack/react-query": "^5.0",
         "@tanstack/react-router": "^1.0",
         "class-variance-authority": "^0.7.1",

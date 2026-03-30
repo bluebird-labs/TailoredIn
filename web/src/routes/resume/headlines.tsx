@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useHeadlines } from '@/hooks/use-headlines';
 import { useCurrentUser } from '@/hooks/use-user';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
@@ -50,14 +51,7 @@ function HeadlinesPage() {
   const [editingHeadline, setEditingHeadline] = useState<Headline | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Headline | null>(null);
 
-  const { data: headlinesResponse, isLoading } = useQuery({
-    queryKey: queryKeys.resume.headlines(),
-    queryFn: async () => {
-      const response = await api.users({ userId: userId! }).resume.headlines.get();
-      return response.data;
-    },
-    enabled: !!userId
-  });
+  const { data: headlinesResponse, isLoading } = useHeadlines(userId);
 
   const headlines = headlinesResponse?.data ?? [];
 
