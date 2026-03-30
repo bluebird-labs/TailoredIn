@@ -13,6 +13,7 @@ import type {
   WebColorService
 } from '@tailoredin/application';
 import type {
+  ArchetypeConfigRepository,
   CompanyRepository,
   JobElector,
   JobRepository,
@@ -44,6 +45,7 @@ export const DI = {
     EducationRepository: new InjectionToken<ResumeEducationRepository>('DI.Resume.EducationRepository'),
     HeadlineRepository: new InjectionToken<ResumeHeadlineRepository>('DI.Resume.HeadlineRepository'),
     SkillCategoryRepository: new InjectionToken<ResumeSkillCategoryRepository>('DI.Resume.SkillCategoryRepository'),
+    ArchetypeConfigRepository: new InjectionToken<ArchetypeConfigRepository>('DI.Resume.ArchetypeConfigRepository'),
     LlmService: new InjectionToken<LlmService>('DI.Resume.LlmService'),
     WebColorService: new InjectionToken<WebColorService>('DI.Resume.WebColorService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),

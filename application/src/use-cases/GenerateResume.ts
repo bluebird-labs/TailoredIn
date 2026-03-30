@@ -1,5 +1,14 @@
 import { Logger } from '@tailoredin/core/src/Logger.js';
-import { Archetype, err, type JobPosting, type JobRepository, ok, type Result, Resume } from '@tailoredin/domain';
+import {
+  Archetype,
+  err,
+  type JobPosting,
+  type JobRepository,
+  ok,
+  type Result,
+  Resume,
+  type UserRepository
+} from '@tailoredin/domain';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeOutputDto } from '../dtos/ResumeOutputDto.js';
 import type { LlmService } from '../ports/LlmService.js';
@@ -14,6 +23,7 @@ export class GenerateResume {
 
   public constructor(
     private readonly jobRepository: JobRepository,
+    private readonly userRepository: UserRepository,
     private readonly llmService: LlmService,
     private readonly webColorService: WebColorService,
     private readonly resumeRenderer: ResumeRenderer,
@@ -38,9 +48,11 @@ export class GenerateResume {
     });
 
     const archetype = postingInsights.archetype ?? Archetype.LEAD_IC;
+    const user = await this.userRepository.findSingle();
 
     // Build a preliminary resume to give context to the application insights LLM call.
-    const tmpContent = this.resumeContentFactory.make({
+    const tmpContent = await this.resumeContentFactory.make({
+      userId: user.id.value,
       archetype,
       awesomeColor: DEFAULT_AWESOME_COLOR,
       keywords: []
@@ -65,7 +77,8 @@ export class GenerateResume {
       if (primaryColor) awesomeColor = primaryColor;
     }
 
-    const content = this.resumeContentFactory.make({
+    const content = await this.resumeContentFactory.make({
+      userId: user.id.value,
       archetype,
       awesomeColor,
       keywords: appInsights.keywords
