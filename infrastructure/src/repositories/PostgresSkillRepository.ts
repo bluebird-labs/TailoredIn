@@ -1,7 +1,13 @@
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { injectable } from '@needle-di/core';
-import type { SkillRefreshOutput, SkillRepository } from '@tailoredin/application';
-import { Skill as DomainSkill, type SkillAffinity, type SkillCreateProps, SkillId } from '@tailoredin/domain';
+import {
+  Skill as DomainSkill,
+  type SkillAffinity,
+  type SkillCreateProps,
+  SkillId,
+  type SkillRefreshOutput,
+  type SkillRepository
+} from '@tailoredin/domain';
 import { Skill as OrmSkill, type SkillCreateProps as OrmSkillCreateProps } from '../db/entities/skills/Skill.js';
 import type { SkillOrmRepository } from '../db/entities/skills/SkillOrmRepository.js';
 

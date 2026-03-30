@@ -1,4 +1,4 @@
-import type { ResumeHeadline } from '@tailoredin/domain';
+import type { ResumeHeadline } from '../entities/ResumeHeadline.js';
 
 export interface ResumeHeadlineRepository {
   findByIdOrFail(id: string): Promise<ResumeHeadline>;

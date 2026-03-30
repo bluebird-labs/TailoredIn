@@ -1,4 +1,4 @@
-import type { ResumeSkillCategory } from '@tailoredin/domain';
+import type { ResumeSkillCategory } from '../entities/ResumeSkillCategory.js';
 
 export interface ResumeSkillCategoryRepository {
   findByIdOrFail(id: string): Promise<ResumeSkillCategory>;

@@ -1,4 +1,4 @@
-import type { ResumeEducation } from '@tailoredin/domain';
+import type { ResumeEducation } from '../entities/ResumeEducation.js';
 
 export interface ResumeEducationRepository {
   findAllByUserId(userId: string): Promise<ResumeEducation[]>;

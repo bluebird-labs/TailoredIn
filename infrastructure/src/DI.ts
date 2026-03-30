@@ -1,21 +1,18 @@
 import { InjectionToken } from '@needle-di/core';
 import type {
   ChangeJobStatus,
-  CompanyRepository,
   GenerateResume,
   GetJob,
   GetTopJob,
   IngestScrapedJob,
-  JobElector,
-  JobRepository,
   JobScraper,
   LlmService,
   ResumeContentFactory,
   ResumeRenderer,
   ScrapeAndIngestJobs,
-  SkillRepository,
   WebColorService
 } from '@tailoredin/application';
+import type { CompanyRepository, JobElector, JobRepository, SkillRepository } from '@tailoredin/domain';
 
 export const DI = {
   // Job ports

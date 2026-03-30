@@ -1,4 +1,4 @@
-import type { ResumeCompany } from '@tailoredin/domain';
+import type { ResumeCompany } from '../entities/ResumeCompany.js';
 
 export interface ResumeCompanyRepository {
   findByIdOrFail(id: string): Promise<ResumeCompany>;

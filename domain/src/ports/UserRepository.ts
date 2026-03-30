@@ -1,4 +1,4 @@
-import type { User } from '@tailoredin/domain';
+import type { User } from '../entities/User.js';
 
 export interface UserRepository {
   findByIdOrFail(id: string): Promise<User>;

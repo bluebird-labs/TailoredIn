@@ -1,6 +1,6 @@
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { injectable } from '@needle-di/core';
-import type { FindScoredParams, FindTopScoredParams, JobRepository, UpsertJobProps } from '@tailoredin/application';
+import type { FindScoredParams, FindTopScoredParams, JobRepository, UpsertJobProps } from '@tailoredin/domain';
 import {
   type Company as DomainCompany,
   JobId,

@@ -1,4 +1,4 @@
-import type { Company, CompanyCreateProps } from '@tailoredin/domain';
+import type { Company, CompanyCreateProps } from '../entities/Company.js';
 
 export interface CompanyRepository {
   upsertByLinkedinLink(props: CompanyCreateProps): Promise<Company>;

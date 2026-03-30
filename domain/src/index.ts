@@ -37,6 +37,17 @@ export { User } from './entities/User.js';
 export { JobScrapedEvent } from './events/JobScrapedEvent.js';
 export { JobStatusChangedEvent } from './events/JobStatusChangedEvent.js';
 export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
+// Ports — repository interfaces
+export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
+export type { CompanyRepository } from './ports/CompanyRepository.js';
+export type { JobElector } from './ports/JobElector.js';
+export type { FindScoredParams, FindTopScoredParams, JobRepository, UpsertJobProps } from './ports/JobRepository.js';
+export type { ResumeCompanyRepository } from './ports/ResumeCompanyRepository.js';
+export type { ResumeEducationRepository } from './ports/ResumeEducationRepository.js';
+export type { ResumeHeadlineRepository } from './ports/ResumeHeadlineRepository.js';
+export type { ResumeSkillCategoryRepository } from './ports/ResumeSkillCategoryRepository.js';
+export type { SkillRefreshOutput, SkillRepository } from './ports/SkillRepository.js';
+export type { UserRepository } from './ports/UserRepository.js';
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
 export { ValueObject } from './ValueObject.js';

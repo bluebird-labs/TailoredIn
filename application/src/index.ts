@@ -29,12 +29,7 @@ export type {
 } from './dtos/ResumeDataDto.js';
 export type { ResumeOutputDto } from './dtos/ResumeOutputDto.js';
 export type { ScrapeResultDto } from './dtos/ScrapeResultDto.js';
-// Ports — resume data
-export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
-// Ports — job discovery
-export type { CompanyRepository } from './ports/CompanyRepository.js';
-export type { JobElector } from './ports/JobElector.js';
-export type { FindScoredParams, FindTopScoredParams, JobRepository, UpsertJobProps } from './ports/JobRepository.js';
+// Ports — application-level (service adapters, not repositories)
 export type { FetchJobDetailsDelegate, JobScraper, ScrapeResultCallback } from './ports/JobScraper.js';
 export type {
   ApplicationInsightsDto,
@@ -43,14 +38,8 @@ export type {
   JobPostingInsightsDto,
   LlmService
 } from './ports/LlmService.js';
-export type { ResumeCompanyRepository } from './ports/ResumeCompanyRepository.js';
 export type { MakeResumeContentInput, ResumeContentFactory } from './ports/ResumeContentFactory.js';
-export type { ResumeEducationRepository } from './ports/ResumeEducationRepository.js';
-export type { ResumeHeadlineRepository } from './ports/ResumeHeadlineRepository.js';
 export type { RenderResumeInput, ResumeRenderer } from './ports/ResumeRenderer.js';
-export type { ResumeSkillCategoryRepository } from './ports/ResumeSkillCategoryRepository.js';
-export type { SkillRefreshOutput, SkillRepository } from './ports/SkillRepository.js';
-export type { UserRepository } from './ports/UserRepository.js';
 export type { ColorPaletteDto, WebColorService } from './ports/WebColorService.js';
 
 // Use cases

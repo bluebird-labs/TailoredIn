@@ -1,7 +1,11 @@
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { injectable } from '@needle-di/core';
-import type { CompanyRepository } from '@tailoredin/application';
-import { type CompanyCreateProps, CompanyId, Company as DomainCompany } from '@tailoredin/domain';
+import {
+  type CompanyCreateProps,
+  CompanyId,
+  type CompanyRepository,
+  Company as DomainCompany
+} from '@tailoredin/domain';
 import { Company as OrmCompany } from '../db/entities/companies/Company.js';
 import type { CompanyOrmRepository } from '../db/entities/companies/CompanyOrmRepository.js';
 

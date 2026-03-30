@@ -1,4 +1,4 @@
-import type { Skill, SkillCreateProps } from '@tailoredin/domain';
+import type { Skill, SkillCreateProps } from '../entities/Skill.js';
 
 export type SkillRefreshOutput = {
   createdCount: number;
