@@ -11,6 +11,7 @@ import {
   PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   PlaywrightJobScraper,
   PlaywrightWebColorService,
+  PostgresArchetypeConfigRepository,
   PostgresCompanyRepository,
   PostgresJobRepository,
   PostgresResumeCompanyRepository,
@@ -19,9 +20,9 @@ import {
   PostgresResumeSkillCategoryRepository,
   PostgresSkillRepository,
   PostgresUserRepository,
-  TemplateResumeContentFactory,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
+import { DatabaseResumeContentFactory } from '@tailoredin/infrastructure/src/services/DatabaseResumeContentFactory.js';
 
 const orm = await MikroORM.init(
   createOrmConfig({
@@ -76,6 +77,7 @@ container.bind({ provide: DI.Resume.CompanyRepository, useClass: PostgresResumeC
 container.bind({ provide: DI.Resume.EducationRepository, useClass: PostgresResumeEducationRepository });
 container.bind({ provide: DI.Resume.HeadlineRepository, useClass: PostgresResumeHeadlineRepository });
 container.bind({ provide: DI.Resume.SkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
+container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: PostgresArchetypeConfigRepository });
 container.bind({
   provide: OPENAI_CONFIG,
   useValue: {
@@ -86,7 +88,18 @@ container.bind({
 container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
 container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
-container.bind({ provide: DI.Resume.ContentFactory, useClass: TemplateResumeContentFactory });
+container.bind({
+  provide: DI.Resume.ContentFactory,
+  useFactory: () =>
+    new DatabaseResumeContentFactory(
+      container.get(DI.Resume.UserRepository),
+      container.get(DI.Resume.HeadlineRepository),
+      container.get(DI.Resume.ArchetypeConfigRepository),
+      container.get(DI.Resume.CompanyRepository),
+      container.get(DI.Resume.EducationRepository),
+      container.get(DI.Resume.SkillCategoryRepository)
+    )
+});
 
 // Resume use cases
 container.bind({
@@ -94,6 +107,7 @@ container.bind({
   useFactory: () =>
     new GenerateResume(
       container.get(DI.Job.Repository),
+      container.get(DI.Resume.UserRepository),
       container.get(DI.Resume.LlmService),
       container.get(DI.Resume.WebColorService),
       container.get(DI.Resume.Renderer),

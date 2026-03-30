@@ -10,12 +10,18 @@ import {
   OPENAI_CONFIG,
   OpenAiLlmService,
   PlaywrightWebColorService,
+  PostgresArchetypeConfigRepository,
   PostgresCompanyRepository,
   PostgresJobRepository,
+  PostgresResumeCompanyRepository,
+  PostgresResumeEducationRepository,
+  PostgresResumeHeadlineRepository,
+  PostgresResumeSkillCategoryRepository,
   PostgresSkillRepository,
-  TemplateResumeContentFactory,
+  PostgresUserRepository,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
+import { DatabaseResumeContentFactory } from '@tailoredin/infrastructure/src/services/DatabaseResumeContentFactory.js';
 
 const orm = await MikroORM.init(
   createOrmConfig({
@@ -43,9 +49,26 @@ container.bind({
     project: Environment.get('OPENAI_PROJECT_ID')
   }
 });
+container.bind({ provide: DI.Resume.UserRepository, useClass: PostgresUserRepository });
+container.bind({ provide: DI.Resume.CompanyRepository, useClass: PostgresResumeCompanyRepository });
+container.bind({ provide: DI.Resume.EducationRepository, useClass: PostgresResumeEducationRepository });
+container.bind({ provide: DI.Resume.HeadlineRepository, useClass: PostgresResumeHeadlineRepository });
+container.bind({ provide: DI.Resume.SkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
+container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: PostgresArchetypeConfigRepository });
 container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
 container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
-container.bind({ provide: DI.Resume.ContentFactory, useClass: TemplateResumeContentFactory });
+container.bind({
+  provide: DI.Resume.ContentFactory,
+  useFactory: () =>
+    new DatabaseResumeContentFactory(
+      container.get(DI.Resume.UserRepository),
+      container.get(DI.Resume.HeadlineRepository),
+      container.get(DI.Resume.ArchetypeConfigRepository),
+      container.get(DI.Resume.CompanyRepository),
+      container.get(DI.Resume.EducationRepository),
+      container.get(DI.Resume.SkillCategoryRepository)
+    )
+});
 
 export { container, orm };
