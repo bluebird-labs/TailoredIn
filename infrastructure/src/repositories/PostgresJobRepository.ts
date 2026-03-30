@@ -1,6 +1,14 @@
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { injectable } from '@needle-di/core';
-import type { FindScoredParams, FindTopScoredParams, JobRepository, UpsertJobProps } from '@tailoredin/domain';
+import type {
+  FindPaginatedParams,
+  FindScoredParams,
+  FindTopScoredParams,
+  JobListItem,
+  JobRepository,
+  PaginatedResult,
+  UpsertJobProps
+} from '@tailoredin/domain';
 import {
   type Company as DomainCompany,
   JobId,
@@ -11,7 +19,7 @@ import {
 } from '@tailoredin/domain';
 import { Company as OrmCompany } from '../db/entities/companies/Company.js';
 import { Job as OrmJob } from '../db/entities/jobs/Job.js';
-import type { JobOrmRepository, JobScoresProps } from '../db/entities/jobs/JobOrmRepository.js';
+import type { JobListScoresProps, JobOrmRepository, JobScoresProps } from '../db/entities/jobs/JobOrmRepository.js';
 import { JobStatusUpdate } from '../db/entities/jobs/JobStatusUpdate.js';
 import { SkillAffinity as OrmSkillAffinity } from '../db/entities/skills/SkillAffinity.js';
 
@@ -29,13 +37,14 @@ export class PostgresJobRepository implements JobRepository {
     return this.toDomain(orm);
   }
 
-  public async findScoredByIdOrFail(params: FindScoredParams): Promise<JobPosting> {
+  public async findScoredByIdOrFail(params: FindScoredParams): Promise<{ job: JobPosting; companyName: string }> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     const ormJob = await repo.findScoredByIdOrFail(
       { jobId: params.jobId, targetSalary: params.targetSalary },
       { populate: ['company', 'statusUpdates'] }
     );
-    return this.toDomainWithScores(ormJob, ormJob.__scores);
+    const job = this.toDomainWithScores(ormJob, ormJob.__scores);
+    return { job, companyName: (ormJob.company as import('../db/entities/companies/Company.js').Company).name };
   }
 
   public async findTopScored(params: FindTopScoredParams): Promise<JobPosting[]> {
@@ -74,6 +83,30 @@ export class PostgresJobRepository implements JobRepository {
     job.clearDomainEvents();
   }
 
+  public async findPaginated(params: FindPaginatedParams): Promise<PaginatedResult<JobListItem>> {
+    const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
+    const result = await repo.findPaginatedScored({
+      page: params.page,
+      pageSize: params.pageSize,
+      targetSalary: params.targetSalary,
+      statuses: params.statuses,
+      sortBy: params.sortBy,
+      expertWeight: params.expertWeight,
+      interestWeight: params.interestWeight,
+      avoidWeight: params.avoidWeight
+    });
+
+    return {
+      items: result.items.map(item => ({
+        job: this.toDomainWithListScores(item, item.__scores),
+        companyName: item.__companyName
+      })),
+      total: result.total,
+      page: params.page,
+      pageSize: params.pageSize
+    };
+  }
+
   public async retireOlderThan(olderThan: Date): Promise<number> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     return repo.retireOlderThan(olderThan);
@@ -105,6 +138,20 @@ export class PostgresJobRepository implements JobRepository {
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });
+  }
+
+  private toDomainWithListScores(orm: OrmJob, listScores: JobListScoresProps): JobPosting {
+    const job = this.toDomain(orm);
+    job.score({
+      salary: listScores.salaryScore,
+      skills: {
+        total: { score: listScores.totalSkillScore, matches: [] },
+        [SkillAffinity.EXPERT]: { score: listScores.expertScore, matches: [] },
+        [SkillAffinity.INTEREST]: { score: 0, matches: [] },
+        [SkillAffinity.AVOID]: { score: 0, matches: [] }
+      }
+    });
+    return job;
   }
 
   private toDomainWithScores(orm: OrmJob, ormScores: JobScoresProps): JobPosting {

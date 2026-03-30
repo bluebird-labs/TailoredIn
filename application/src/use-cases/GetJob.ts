@@ -5,10 +5,15 @@ export type GetJobInput = {
   targetSalary: number;
 };
 
+export type GetJobOutput = {
+  job: JobPosting;
+  companyName: string;
+};
+
 export class GetJob {
   public constructor(private readonly jobRepository: JobRepository) {}
 
-  public async execute(input: GetJobInput): Promise<JobPosting> {
+  public async execute(input: GetJobInput): Promise<GetJobOutput> {
     return this.jobRepository.findScoredByIdOrFail({
       jobId: input.jobId,
       targetSalary: input.targetSalary

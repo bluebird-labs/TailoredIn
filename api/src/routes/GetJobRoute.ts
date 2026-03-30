@@ -11,12 +11,12 @@ export class GetJobRoute {
     return new Elysia().get(
       '/jobs/:id',
       async ({ params, query }) => {
-        const job = await this.getJob.execute({
+        const result = await this.getJob.execute({
           jobId: params.id,
           targetSalary: query.target_salary
         });
 
-        return { data: job };
+        return { data: { ...result.job, companyName: result.companyName } };
       },
       {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),

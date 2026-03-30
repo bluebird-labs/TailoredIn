@@ -24,6 +24,7 @@ import {
   ListCompanies,
   ListEducation,
   ListHeadlines,
+  ListJobs,
   ListSkillCategories,
   ReplaceLocations,
   SetArchetypeEducation,
@@ -106,6 +107,10 @@ container.bind({
 container.bind({
   provide: DI.Job.ChangeJobStatus,
   useFactory: () => new ChangeJobStatus(container.get(DI.Job.Repository))
+});
+container.bind({
+  provide: DI.Job.ListJobs,
+  useFactory: () => new ListJobs(container.get(DI.Job.Repository))
 });
 
 // Resume repositories + services

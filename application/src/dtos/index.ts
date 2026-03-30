@@ -4,6 +4,7 @@ export type {
   ArchetypePositionDto
 } from './ArchetypeConfigDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
+export type { JobListItemDto, PaginatedJobListDto } from './JobListItemDto.js';
 export type { JobScoresDto, SkillScoreDto } from './JobScoresDto.js';
 export type { JobSearchConfigDto } from './JobSearchConfigDto.js';
 export type { JobSummaryDto } from './JobSummaryDto.js';

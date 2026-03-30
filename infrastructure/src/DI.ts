@@ -25,6 +25,7 @@ import type {
   ListCompanies,
   ListEducation,
   ListHeadlines,
+  ListJobs,
   ListSkillCategories,
   LlmService,
   ReplaceLocations,
@@ -68,7 +69,8 @@ export const DI = {
     ScrapeAndIngestJobs: new InjectionToken<ScrapeAndIngestJobs>('DI.Job.ScrapeAndIngestJobs'),
     GetTopJob: new InjectionToken<GetTopJob>('DI.Job.GetTopJob'),
     GetJob: new InjectionToken<GetJob>('DI.Job.GetJob'),
-    ChangeJobStatus: new InjectionToken<ChangeJobStatus>('DI.Job.ChangeJobStatus')
+    ChangeJobStatus: new InjectionToken<ChangeJobStatus>('DI.Job.ChangeJobStatus'),
+    ListJobs: new InjectionToken<ListJobs>('DI.Job.ListJobs')
   },
 
   Resume: {

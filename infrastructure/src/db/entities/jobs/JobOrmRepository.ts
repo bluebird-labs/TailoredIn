@@ -7,6 +7,11 @@ import { SkillAffinity } from '../skills/SkillAffinity.js';
 import { Job, type JobProps } from './Job.js';
 import { JobStatus } from './JobStatus.js';
 import {
+  findPaginatedScoredJobsByDate,
+  findPaginatedScoredJobsByScore,
+  type IFindPaginatedScoredJobsByScoreResult
+} from './sql/findPaginatedScoredJobs.sql.js';
+import {
   findTopScoredJobs,
   type IFindTopScoredJobsParams,
   type IFindTopScoredJobsResult
@@ -26,6 +31,12 @@ const DEFAULT_WEIGHTS = {
 };
 
 export type ScoredJob = Job & { scores: JobScoresProps };
+
+export type JobListScoresProps = {
+  expertScore: number;
+  totalSkillScore: number;
+  salaryScore: number | null;
+};
 
 export type JobScoresSkillScore = { score: number; matches: Skill[] };
 export type JobScoresProps = {
@@ -118,6 +129,61 @@ export class JobOrmRepository extends BaseRepository<Job> {
     const scores = this.buildScores(row, skillMap);
 
     return Object.assign(job, { __scores: scores });
+  }
+
+  public async findPaginatedScored(
+    params: {
+      page: number;
+      pageSize: number;
+      targetSalary: number;
+      statuses?: string[];
+      sortBy?: 'score' | 'posted_at';
+      expertWeight?: number;
+      interestWeight?: number;
+      avoidWeight?: number;
+    },
+    opts: QueryOpts = {}
+  ): Promise<{ items: Array<Job & { __scores: JobListScoresProps; __companyName: string }>; total: number }> {
+    const offset = (params.page - 1) * params.pageSize;
+    const queryParams = {
+      limit: params.pageSize,
+      offset,
+      targetSalary: params.targetSalary,
+      statuses: params.statuses?.length ? params.statuses : null,
+      ...this.weights(params)
+    };
+
+    const query = params.sortBy === 'posted_at' ? findPaginatedScoredJobsByDate : findPaginatedScoredJobsByScore;
+    const result = await this.executePgTypedQuery(opts, query, queryParams);
+
+    if (result.rowCount === 0) return { items: [], total: 0 };
+
+    const total = Number.parseInt(result.rows[0].total_count, 10);
+    const jobIds = result.rows.map(r => r.job_id);
+    const resultMap = new Map<string, IFindPaginatedScoredJobsByScoreResult>();
+    for (const row of result.rows) resultMap.set(row.job_id, row);
+
+    const jobs = await this.getEm(opts)
+      .repo(Job)
+      .find({ id: { $in: jobIds } }, opts);
+
+    const jobMap = new Map(jobs.map(j => [j.id, j]));
+
+    const items = jobIds
+      .map(id => {
+        const job = jobMap.get(id);
+        const row = resultMap.get(id)!;
+        if (!job) return null;
+        const scores: JobListScoresProps = {
+          expertScore: row.expert_score ?? 0,
+          totalSkillScore: row.total_skill_score ?? 0,
+          salaryScore: row.salary_score
+        };
+        return Object.assign(job, { __scores: scores, __companyName: row.company_name });
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    return { items, total };
   }
 
   public async upsert(

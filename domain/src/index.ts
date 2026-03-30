@@ -41,7 +41,15 @@ export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
 export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { JobElector } from './ports/JobElector.js';
-export type { FindScoredParams, FindTopScoredParams, JobRepository, UpsertJobProps } from './ports/JobRepository.js';
+export type {
+  FindPaginatedParams,
+  FindScoredParams,
+  FindTopScoredParams,
+  JobListItem,
+  JobRepository,
+  PaginatedResult,
+  UpsertJobProps
+} from './ports/JobRepository.js';
 export type { ResumeCompanyRepository } from './ports/ResumeCompanyRepository.js';
 export type { ResumeEducationRepository } from './ports/ResumeEducationRepository.js';
 export type { ResumeHeadlineRepository } from './ports/ResumeHeadlineRepository.js';
