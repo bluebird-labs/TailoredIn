@@ -19,13 +19,10 @@ const orm = await MikroORM.init(ormConfig);
 const container = new Container();
 
 container.bind({ provide: MikroORM, useValue: orm });
-container.bind({ provide: DI.JobRepository, useClass: PostgresJobRepository });
-container.bind({ provide: DI.CompanyRepository, useClass: PostgresCompanyRepository });
-container.bind({ provide: DI.SkillRepository, useClass: PostgresSkillRepository });
-container.bind({
-  provide: DI.JobElector,
-  useValue: new JobElectionService()
-});
+container.bind({ provide: DI.Job.Repository, useClass: PostgresJobRepository });
+container.bind({ provide: DI.Job.CompanyRepository, useClass: PostgresCompanyRepository });
+container.bind({ provide: DI.Job.SkillRepository, useClass: PostgresSkillRepository });
+container.bind({ provide: DI.Job.Elector, useValue: new JobElectionService() });
 container.bind({
   provide: PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   useValue: {
@@ -35,6 +32,6 @@ container.bind({
     password: Environment.get('LINKEDIN_PASSWORD')
   }
 });
-container.bind({ provide: DI.JobScraper, useClass: PlaywrightJobScraper });
+container.bind({ provide: DI.Job.Scraper, useClass: PlaywrightJobScraper });
 
 export { container, orm };

@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow: Worktrees for Feature Work
+
+**Never commit feature/milestone work directly to main.** Before starting any milestone step, check `GOALS.md` for the prescribed branch name and worktree path, then create the worktree:
+
+```bash
+git worktree add .claude/worktrees/<name> -b feat/<branch-name>
+```
+
+Do all work inside that worktree. Merge to main only after the PR is approved.
+
 ## Architecture: DDD / Onion Architecture
 
 Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `core/` package.

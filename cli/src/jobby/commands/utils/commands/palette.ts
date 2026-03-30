@@ -1,11 +1,10 @@
-import type { WebColorService } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core/src/Logger.js';
 import { DI } from '@tailoredin/infrastructure';
 import { command, positional, string } from 'cmd-ts';
 import { container } from '../../../di/container.js';
 
 const log = Logger.create('palette');
-const webColorService = container.get(DI.WebColorService) as WebColorService;
+const webColorService = container.get(DI.Resume.WebColorService);
 
 export const palette = command({
   name: 'palette',

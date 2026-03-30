@@ -1,4 +1,3 @@
-import type { ChangeJobStatus } from '@tailoredin/application';
 import { EnumUtil } from '@tailoredin/core';
 import { Logger } from '@tailoredin/core/src/Logger.js';
 import { JobStatus } from '@tailoredin/domain';
@@ -19,7 +18,7 @@ const moveCommand = command({
       throw new Error(`Invalid job status: ${args.status}, choices: ${Object.values(JobStatus)}`);
     }
 
-    const useCase = container.get(DI.ChangeJobStatus) as ChangeJobStatus;
+    const useCase = container.get(DI.Job.ChangeJobStatus);
     const result = await useCase.execute({ jobId: args.job_id, newStatus: args.status });
 
     if (!result.isOk) {
@@ -39,7 +38,7 @@ export const retireCommand = command({
   handler: async args => {
     log.info(`Retiring jobs older than ${args.days} days...`);
 
-    const jobRepository = container.get(DI.JobRepository);
+    const jobRepository = container.get(DI.Job.Repository);
     const olderThan = new Date(Date.now() - args.days * 24 * 60 * 60 * 1000);
     const count = await jobRepository.retireOlderThan(olderThan);
 

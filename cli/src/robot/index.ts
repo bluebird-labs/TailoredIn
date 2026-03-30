@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import 'dotenv/config';
-import type { ScrapeAndIngestJobs } from '@tailoredin/application';
 import { TimeUtil } from '@tailoredin/core';
 import { Logger } from '@tailoredin/core/src/Logger.js';
 import { DI } from '@tailoredin/infrastructure';
@@ -11,7 +10,7 @@ import { container, orm } from './container.js';
 const log = Logger.create('TailoredIn');
 
 const searchAll = async () => {
-  const useCase = container.get(DI.ScrapeAndIngestJobs) as ScrapeAndIngestJobs;
+  const useCase = container.get(DI.Job.ScrapeAndIngestJobs);
   const searches = Object.entries(config.searches);
   const activeSearches = config.only ? searches.filter(([name]) => config.only?.includes(name)) : searches;
 

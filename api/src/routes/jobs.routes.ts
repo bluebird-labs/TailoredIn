@@ -1,5 +1,4 @@
 import type { Container } from '@needle-di/core';
-import type { ChangeJobStatus, GenerateResume, GetJob, GetTopJob } from '@tailoredin/application';
 import { JobStatus } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
@@ -9,7 +8,7 @@ export const jobRoutes = (container: Container) =>
     .get(
       '/tops/next',
       async ({ query }) => {
-        const useCase = container.get(DI.GetTopJob) as GetTopJob;
+        const useCase = container.get(DI.Job.GetTopJob);
         const job = await useCase.execute({
           targetSalary: query.target_salary,
           hoursPostedMax: query.hours_posted_max
@@ -27,7 +26,7 @@ export const jobRoutes = (container: Container) =>
     .get(
       '/:id',
       async ({ params, query }) => {
-        const useCase = container.get(DI.GetJob) as GetJob;
+        const useCase = container.get(DI.Job.GetJob);
         const job = await useCase.execute({
           jobId: params.id,
           targetSalary: query.target_salary
@@ -45,7 +44,7 @@ export const jobRoutes = (container: Container) =>
     .put(
       '/:id/status',
       async ({ params, body, set }) => {
-        const useCase = container.get(DI.ChangeJobStatus) as ChangeJobStatus;
+        const useCase = container.get(DI.Job.ChangeJobStatus);
         const result = await useCase.execute({
           jobId: params.id,
           newStatus: body.status
@@ -67,7 +66,7 @@ export const jobRoutes = (container: Container) =>
     .put(
       '/:id/generate-resume',
       async ({ params, set }) => {
-        const useCase = container.get(DI.GenerateResume) as GenerateResume;
+        const useCase = container.get(DI.Resume.GenerateResume);
         const result = await useCase.execute({ jobId: params.id });
 
         if (!result.isOk) {
