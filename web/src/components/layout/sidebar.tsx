@@ -3,6 +3,7 @@ import { Briefcase, GraduationCap, Layers, type LucideIcon, ScrollText, Sparkles
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/layout/theme-toggle.js';
 
 interface NavItem {
   label: string;
@@ -65,6 +67,13 @@ export function AppSidebar() {
         <NavGroup label="Resume" items={resumeNav} />
         <NavGroup label="Templates" items={archetypeNav} />
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <ThemeToggle />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
