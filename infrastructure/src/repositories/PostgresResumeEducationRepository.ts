@@ -12,6 +12,12 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 export class PostgresResumeEducationRepository implements ResumeEducationRepository {
   public constructor(private readonly orm: MikroORM) {}
 
+  public async findByIdOrFail(id: string): Promise<DomainResumeEducation> {
+    const orm = await this.orm.em.findOneOrFail(OrmResumeEducation, id, { populate: ['user'] });
+    const userId = typeof orm.user === 'string' ? orm.user : (orm.user as { id: string }).id;
+    return this.toDomain(orm, userId);
+  }
+
   public async findAllByUserId(userId: string): Promise<DomainResumeEducation[]> {
     const ormEntities = await this.orm.em.find(OrmResumeEducation, { user: userId }, { orderBy: { ordinal: 'ASC' } });
     return ormEntities.map(e => this.toDomain(e, userId));
