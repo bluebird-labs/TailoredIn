@@ -43,10 +43,10 @@ Auto-generate company research briefs for jobs the user is actively pursuing: pr
 
 Replace hardcoded TypeScript templates with database-backed resume content so archetypes and resume data are editable without code changes.
 
-- [ ] **1A. Domain + application layer for resume data** *(session 1)*
-  - [ ] Add domain entities: `User`, `ResumeCompany`, `ResumeBullet`, `ResumeEducation`, `ResumeSkillCategory`, `ResumeSkillItem`, `ResumeHeadline`, `Archetype` (with positions, bullets, skill/education selections)
-  - [ ] Add repository ports: `UserRepository`, `ResumeCompanyRepository`, `ResumeEducationRepository`, `ResumeSkillCategoryRepository`, `ResumeHeadlineRepository`, `ArchetypeRepository`
-  - [ ] Add DTOs for resume data read/write in `application/`
+- [x] **1A. Domain + application layer for resume data** *(session 1)* — PR #4
+  - [x] Add domain entities: `User`, `ResumeCompany`, `ResumeBullet`, `ResumeEducation`, `ResumeSkillCategory`, `ResumeSkillItem`, `ResumeHeadline`, `Archetype` (with positions, bullets, skill/education selections)
+  - [x] Add repository ports: `UserRepository`, `ResumeCompanyRepository`, `ResumeEducationRepository`, `ResumeSkillCategoryRepository`, `ResumeHeadlineRepository`, `ArchetypeRepository`
+  - [x] Add DTOs for resume data read/write in `application/`
 - [ ] **1B. Infrastructure: repository implementations** *(session 2, after 1A)*
   - [ ] Implement each resume repository against the existing ORM entities and migration
   - [ ] Add DI tokens for all new repositories
@@ -105,7 +105,7 @@ CRUD endpoints for all resume content. Each step is independent and can run in p
 Stand up a web frontend and implement the core pages.
 
 - [ ] **3A. Frontend scaffold** *(session 1)*
-  - [ ] Choose framework (React + Vite recommended), add `presentation/web/` package
+  - [x] Choose framework (React 19 + Vite 6 + Eden Treaty + shadcn/ui + TanStack) — decision doc in `.claude/plans/frontend-framework-decision.md`
   - [ ] Set up build tooling, dev server with API proxy to port 8000
   - [ ] Add to monorepo workspace, wire `bun run web` and `bun run web:dev` scripts
   - [ ] Create shell layout: sidebar nav, content area, toast notifications
@@ -161,10 +161,10 @@ Auto-generate company research briefs for active job pursuits.
 Remove CLI tools once the web app fully covers their functionality.
 
 - [ ] **6A. Migrate robot to background service** *(session 1)*
-  - [ ] Move scraping loop from `presentation/cli/src/robot/` into a background worker started by the API process
+  - [ ] Move scraping loop from `cli/src/robot/` into a background worker started by the API process
   - [ ] Add API endpoints: `POST /robot/start`, `POST /robot/stop`, `GET /robot/status`
   - [ ] Web UI controls for the scraping daemon
 - [ ] **6B. Remove CLI packages** *(session 2, after 6A and all web UI covers CLI functionality)*
-  - [ ] Delete `presentation/cli/` entirely
+  - [ ] Delete `cli/` package entirely
   - [ ] Remove CLI-related scripts from root `package.json`
   - [ ] Update CLAUDE.md and any docs

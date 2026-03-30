@@ -11,12 +11,13 @@ core/          ← Cross-cutting pure utilities (no domain, no framework deps)
 domain/          ← Single package: aggregates, value objects, domain services, events
 application/     ← Single package: use cases + ports + DTOs (plain classes, no DI framework)
 infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
-presentation/    ← Entry points: api (HTTP server), cli (commands, robot)
+api/             ← Elysia HTTP server + DI composition root
+cli/             ← CLI entry points: jobby, cvs, robot
 ```
 
 **Dependency rule (inward only):**
 ```
-presentation → infrastructure → application → domain → (shared)
+api/cli → infrastructure → application → domain → (core)
 ```
 
 ### Layer Details
@@ -27,8 +28,8 @@ presentation → infrastructure → application → domain → (shared)
 | `domain/` | `@tailoredin/domain` | Aggregates (JobPosting, Company, Skill, Resume), value objects (JobStatus, Archetype, SkillName), domain services (JobElectionService, TailoringStrategyService), domain events |
 | `application/` | `@tailoredin/application` | Use cases (IngestScrapedJob, ScrapeAndIngestJobs, GetJob, GetTopJob, ChangeJobStatus, GenerateResume), ports (JobRepository, CompanyRepository, JobScraper, LlmService, ResumeRenderer, etc.), DTOs |
 | `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, OpenAI LLM service, Playwright scraper + web color service, Typst resume renderer, DI tokens |
-| `presentation/api` | `@tailoredin/api` | Elysia HTTP routes + DI composition root |
-| `presentation/cli` | `@tailoredin/cli` | CLI entry points: `jobby` (job management), `cvs` (resume generation), `robot` (scraping daemon) |
+| `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root |
+| `cli/` | `@tailoredin/cli` | CLI entry points: `jobby` (job management), `cvs` (resume generation), `robot` (scraping daemon) |
 
 ## Commands
 
@@ -71,32 +72,32 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 ## Key Design Decisions
 
 ### Plain Application Layer (No DI Framework)
-Use cases are plain TypeScript classes with explicit constructor parameters. The `@needle-di/core` framework (`@injectable`, `inject`, `InjectionToken`) is only used in `infrastructure/` and `presentation/` composition roots. This keeps the application layer framework-agnostic and testable.
+Use cases are plain TypeScript classes with explicit constructor parameters. The `@needle-di/core` framework (`@injectable`, `inject`, `InjectionToken`) is only used in `infrastructure/` and entry-point composition roots (`api/`, `cli/`). This keeps the application layer framework-agnostic and testable.
 
 ### MikroORM Entities as ORM Aggregates
 The ORM entities in `infrastructure/src/db/entities/` are separate from the domain entities in `domain/src/entities/`. The repository implementations in `infrastructure/src/repositories/` map between them.
 
 ### DI Tokens
-DI tokens are defined in `infrastructure/src/DI.ts` as a single `DI` object. Composition roots in `presentation/` use these tokens to wire up the container.
+DI tokens are defined in `infrastructure/src/DI.ts` as a single `DI` object. Composition roots in `api/` and `cli/` use these tokens to wire up the container.
 
 ### Dependency Injection
-Composition roots (`presentation/api/src/index.ts`, `presentation/cli/src/*/container.ts`) import DI tokens from `@tailoredin/infrastructure` and wire up all services. Add new services by:
+Composition roots (`api/src/index.ts`, `cli/src/*/container.ts`) import DI tokens from `@tailoredin/infrastructure` and wire up all services. Add new services by:
 1. Adding a port interface to `application/src/ports/`
 2. Adding an implementation to `infrastructure/src/`
 3. Adding a DI token to `infrastructure/src/DI.ts`
 4. Binding it in the appropriate composition root
 
 ## Entry Points
-- `presentation/api/src/index.ts` — starts Elysia server on port 8000
-- `presentation/cli/src/robot/index.ts` — infinite loop: scrape LinkedIn → ingest → sleep 15–30 min
-- `presentation/cli/src/jobby/index.ts` — `cmd-ts` CLI for manual job operations (`move`, `retire`)
-- `presentation/cli/src/cvs/index.ts` — Yargs `cvs` CLI for generating tailored PDFs
+- `api/src/index.ts` — starts Elysia server on port 8000
+- `cli/src/robot/index.ts` — infinite loop: scrape LinkedIn → ingest → sleep 15–30 min
+- `cli/src/jobby/index.ts` — `cmd-ts` CLI for manual job operations (`move`, `retire`)
+- `cli/src/cvs/index.ts` — Yargs `cvs` CLI for generating tailored PDFs
 
 ## Data Flow
 
 **Job Discovery:**
 ```
-presentation/cli/robot → ScrapeAndIngestJobs use case
+cli/robot → ScrapeAndIngestJobs use case
   → PlaywrightJobScraper (infrastructure) → LinkedIn scraping
   → IngestScrapedJob use case
     → CompanyRepository.upsertByLinkedinLink() + JobRepository.upsertByLinkedinId()

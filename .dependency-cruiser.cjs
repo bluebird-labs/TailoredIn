@@ -17,36 +17,36 @@ module.exports = {
     {
       name: 'domain-no-workspace-deps',
       severity: 'error',
-      comment: 'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/presentation imports.',
+      comment: 'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/api/cli/web imports.',
       from: { path: '^domain/' },
-      to: { path: '^(application|infrastructure|presentation)/' }
+      to: { path: '^(application|infrastructure|api|cli|web)/' }
     },
 
     // ── application: only domain ──────────────────────────────────────
     {
       name: 'application-no-infra',
       severity: 'error',
-      comment: 'application must not depend on infrastructure or presentation.',
+      comment: 'application must not depend on infrastructure, api, cli, or web.',
       from: { path: '^application/' },
-      to: { path: '^(infrastructure|presentation)/' }
+      to: { path: '^(infrastructure|api|cli|web)/' }
     },
 
-    // ── infrastructure: no presentation ───────────────────────────────
+    // ── infrastructure: no api/cli/web ───────────────────────────────
     {
-      name: 'infrastructure-no-presentation',
+      name: 'infrastructure-no-entrypoints',
       severity: 'error',
-      comment: 'infrastructure must not depend on presentation.',
+      comment: 'infrastructure must not depend on api, cli, or web.',
       from: { path: '^infrastructure/' },
-      to: { path: '^presentation/' }
+      to: { path: '^(api|cli|web)/' }
     },
 
-    // ── presentation/api: must not depend on presentation/cli ─────────
+    // ── api: must not depend on cli ──────────────────────────────────
     {
       name: 'api-not-depends-on-cli',
       severity: 'error',
       comment: 'api must not depend on cli.',
-      from: { path: '^presentation/api/' },
-      to: { path: '^presentation/cli/' }
+      from: { path: '^api/' },
+      to: { path: '^cli/' }
     }
   ],
 

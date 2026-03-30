@@ -10,7 +10,7 @@ build/
 .idea/
 
 # Generated resume PDFs and ephemeral Typst compilation workspace
-presentation/cli/Resumes/
+cli/Resumes/
 infrastructure/typst/
 infrastructure/resumes/
 
