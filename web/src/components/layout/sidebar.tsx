@@ -1,8 +1,10 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import { Briefcase, GraduationCap, Layers, type LucideIcon, ScrollText, Sparkles, User, Wrench } from 'lucide-react';
+import { ThemeToggle } from '@/components/layout/theme-toggle.js';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -65,6 +67,13 @@ export function AppSidebar() {
         <NavGroup label="Resume" items={resumeNav} />
         <NavGroup label="Templates" items={archetypeNav} />
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <ThemeToggle />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
