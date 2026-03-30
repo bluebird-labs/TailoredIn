@@ -1,59 +1,24 @@
-import { z } from 'zod';
-import { EnumUtil } from './EnumUtil.js';
-import { Logger } from './Logger.js';
-import { NodeEnv } from './NodeEnv.js';
-
-const zBool = () => z.enum(['true', 'false']).transform(v => v === 'true');
-
-const EnvSchema = z.object({
-  TZ: z.string(),
-
-  POSTGRES_HOST: z.string(),
-  POSTGRES_PORT: z.coerce.number(),
-  POSTGRES_USER: z.string(),
-  POSTGRES_PASSWORD: z.string(),
-  POSTGRES_DB: z.string(),
-  POSTGRES_SCHEMA: z.string(),
-
-  LINKEDIN_EMAIL: z.string().email(),
-  LINKEDIN_PASSWORD: z.string(),
-
-  HEADLESS: zBool(),
-  SLOW_MO: z.coerce.number().int().min(0),
-
-  OPENAI_API_KEY: z.string(),
-  OPENAI_PROJECT_ID: z.string()
-});
-
-type Env = z.infer<typeof EnvSchema>;
-
-// Lazy initialization — env is parsed on first access, not at module evaluation time.
-// Bun loads .env natively, but the MikroORM CLI may import this module before all
-// env vars are available. Deferring avoids validation errors during module evaluation.
-let env: Env | null = null;
-
-function getEnv(): Env {
-  if (!env) {
-    env = EnvSchema.parse(process.env);
+/**
+ * Typed access to process.env. Bun loads .env natively — no dotenv needed.
+ * Throws at call time (not import time) if a requested key is missing.
+ */
+export function env(key: string): string {
+  const value = process.env[key];
+  if (value === undefined) {
+    throw new Error(`Missing required environment variable: ${key}`);
   }
-  return env;
+  return value;
 }
 
-export namespace Environment {
-  let nodeEnv: string | undefined | NodeEnv = process.env.NODE_ENV;
-
-  if (!nodeEnv) {
-    Logger.create('Environment').warn(`NODE_ENV is not set. Defaulting to ${NodeEnv.DEV}.`);
-    nodeEnv = NodeEnv.DEV;
+export function envInt(key: string): number {
+  const raw = env(key);
+  const n = Number.parseInt(raw, 10);
+  if (Number.isNaN(n)) {
+    throw new Error(`Environment variable ${key} must be an integer, got: ${raw}`);
   }
+  return n;
+}
 
-  if (!nodeEnv || !EnumUtil.is(nodeEnv, NodeEnv)) {
-    throw new Error(`NODE_ENV must be set to one of ${EnumUtil.values(NodeEnv).join(', ')}`);
-  }
-
-  export const get = <K extends keyof Env>(key: K): Env[K] => {
-    return getEnv()[key];
-  };
-
-  export const NODE_ENV = nodeEnv;
+export function envBool(key: string): boolean {
+  return env(key) === 'true';
 }

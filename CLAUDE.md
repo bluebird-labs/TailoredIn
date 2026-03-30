@@ -139,7 +139,7 @@ LINKEDIN_EMAIL, LINKEDIN_PASSWORD
 HEADLESS=true         # set false to watch Playwright browser
 SLOW_MO=0             # ms delay between Playwright actions
 ```
-`dotenv/config` is imported at the top of each process entry point. Do NOT hardcode a `path` option — dotenv resolves `.env` relative to `process.cwd()`, which is the repo root when launched via `bun run`.
+Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config`.
 
 ## Tooling Notes
 
@@ -148,5 +148,5 @@ SLOW_MO=0             # ms delay between Playwright actions
 - **mise** manages Bun and Typst versions (pinned in `.mise.toml`). Run `mise install` after cloning.
 - Bun runs TypeScript natively — no build step required.
 - **NodeNext module resolution**: all relative imports in `.ts` files must use `.js` extensions (e.g., `import { Foo } from './Foo.js'`).
-- **`reflect-metadata` import order**: must be the **first** import in every process entry point. Violating this silently breaks Inversify.
-- **`Environment.ts` side effects**: not in the `core/src/index.ts` barrel. Import directly as `@tailoredin/core/src/Environment.js`.
+- **`env()` helpers**: Use `env(key)`, `envInt(key)`, `envBool(key)` from `@tailoredin/core` for typed env access. They throw at call time if a key is missing — no side effects at import.
+- **No deep subpath imports from `@tailoredin/core`**: Always import from `@tailoredin/core`, never from `@tailoredin/core/src/Foo.js`. Everything is exported via the barrel.

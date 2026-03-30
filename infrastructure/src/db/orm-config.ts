@@ -3,7 +3,7 @@ import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import { Environment } from '@tailoredin/core/src/Environment.js';
+import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
 import { Archetype } from './entities/archetypes/Archetype.js';
@@ -114,15 +114,15 @@ export function createOrmConfig(db: OrmDbConfig) {
   });
 }
 
-// Default export for MikroORM CLI (reads process.env via Environment)
+// Default export for MikroORM CLI
 export const ormConfig = createOrmConfig({
-  timezone: Environment.get('TZ'),
-  user: Environment.get('POSTGRES_USER'),
-  password: Environment.get('POSTGRES_PASSWORD'),
-  dbName: Environment.get('POSTGRES_DB'),
-  schema: Environment.get('POSTGRES_SCHEMA'),
-  host: Environment.get('POSTGRES_HOST'),
-  port: Environment.get('POSTGRES_PORT')
+  timezone: env('TZ'),
+  user: env('POSTGRES_USER'),
+  password: env('POSTGRES_PASSWORD'),
+  dbName: env('POSTGRES_DB'),
+  schema: env('POSTGRES_SCHEMA'),
+  host: env('POSTGRES_HOST'),
+  port: envInt('POSTGRES_PORT')
 });
 
 export default ormConfig;

@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { Skill } from '../entities/skills/Skill.js';
 import { SkillAffinity } from '../entities/skills/SkillAffinity.js';
 import type { SkillOrmRepository } from '../entities/skills/SkillOrmRepository.js';

@@ -1,5 +1,4 @@
-import { EnumUtil } from '@tailoredin/core';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { EnumUtil, Logger } from '@tailoredin/core';
 import { JobStatus } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { command, number, positional, string, subcommands } from 'cmd-ts';

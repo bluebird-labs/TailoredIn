@@ -1,7 +1,6 @@
 import FS from 'node:fs';
 import Path from 'node:path';
-import { TimeUtil } from '@tailoredin/core';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger, TimeUtil } from '@tailoredin/core';
 import { milliseconds } from 'date-fns';
 import * as PlayWright from 'playwright';
 import {

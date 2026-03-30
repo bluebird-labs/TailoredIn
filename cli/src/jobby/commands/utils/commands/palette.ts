@@ -1,4 +1,4 @@
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { DI } from '@tailoredin/infrastructure';
 import { command, positional, string } from 'cmd-ts';
 import { container } from '../../../di/container.js';

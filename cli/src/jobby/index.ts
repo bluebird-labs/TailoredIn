@@ -1,8 +1,6 @@
 #!/usr/bin/env bun
 
-import 'reflect-metadata';
-import 'dotenv/config';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { binary, run, subcommands } from 'cmd-ts';
 import { jobsCommands } from './commands/jobs.js';
 import { utilsCommands } from './commands/utils/utils.js';

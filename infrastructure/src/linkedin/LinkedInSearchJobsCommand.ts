@@ -1,6 +1,5 @@
 import * as Url from 'node:url';
-import { TimeUtil, type TypeUtil } from '@tailoredin/core';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger, TimeUtil, type TypeUtil } from '@tailoredin/core';
 import { omit, range } from 'lodash';
 import type * as Playwright from 'playwright';
 import type { Locator } from 'playwright';

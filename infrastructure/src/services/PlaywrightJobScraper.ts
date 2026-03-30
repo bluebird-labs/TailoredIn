@@ -1,8 +1,7 @@
 import FS from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { JobScraper, JobSearchConfigDto, ScrapeResultCallback } from '@tailoredin/application';
-import { TimeUtil } from '@tailoredin/core';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger, TimeUtil } from '@tailoredin/core';
 import * as Playwright from 'playwright';
 import { DEFAULT_AUTH_FILE as AUTH_FILE } from '../linkedin/LinkedInExplorer.js';
 import { LinkedInSearchJobsCommand } from '../linkedin/LinkedInSearchJobsCommand.js';

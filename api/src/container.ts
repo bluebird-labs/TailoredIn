@@ -39,7 +39,7 @@ import {
   UpdateSkillItem,
   UpdateUser
 } from '@tailoredin/application';
-import { Environment } from '@tailoredin/core/src/Environment.js';
+import { env, envBool, envInt } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   createOrmConfig,
@@ -64,13 +64,13 @@ import { DatabaseResumeContentFactory } from '@tailoredin/infrastructure/src/ser
 
 const orm = await MikroORM.init(
   createOrmConfig({
-    timezone: Environment.get('TZ'),
-    user: Environment.get('POSTGRES_USER'),
-    password: Environment.get('POSTGRES_PASSWORD'),
-    dbName: Environment.get('POSTGRES_DB'),
-    schema: Environment.get('POSTGRES_SCHEMA'),
-    host: Environment.get('POSTGRES_HOST'),
-    port: Environment.get('POSTGRES_PORT')
+    timezone: env('TZ'),
+    user: env('POSTGRES_USER'),
+    password: env('POSTGRES_PASSWORD'),
+    dbName: env('POSTGRES_DB'),
+    schema: env('POSTGRES_SCHEMA'),
+    host: env('POSTGRES_HOST'),
+    port: envInt('POSTGRES_PORT')
   })
 );
 
@@ -87,10 +87,10 @@ container.bind({ provide: DI.Job.Elector, useValue: new JobElectionService() });
 container.bind({
   provide: PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   useValue: {
-    headless: Environment.get('HEADLESS'),
-    slowMo: Environment.get('SLOW_MO'),
-    email: Environment.get('LINKEDIN_EMAIL'),
-    password: Environment.get('LINKEDIN_PASSWORD')
+    headless: envBool('HEADLESS'),
+    slowMo: envInt('SLOW_MO'),
+    email: env('LINKEDIN_EMAIL'),
+    password: env('LINKEDIN_PASSWORD')
   }
 });
 container.bind({ provide: DI.Job.Scraper, useClass: PlaywrightJobScraper });
@@ -123,8 +123,8 @@ container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: Postgre
 container.bind({
   provide: OPENAI_CONFIG,
   useValue: {
-    apiKey: Environment.get('OPENAI_API_KEY'),
-    project: Environment.get('OPENAI_PROJECT_ID')
+    apiKey: env('OPENAI_API_KEY'),
+    project: env('OPENAI_PROJECT_ID')
   }
 });
 container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });

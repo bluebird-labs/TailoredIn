@@ -1,7 +1,4 @@
-import 'reflect-metadata';
-import 'dotenv/config';
-import { TimeUtil } from '@tailoredin/core';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger, TimeUtil } from '@tailoredin/core';
 import { DI } from '@tailoredin/infrastructure';
 import { milliseconds } from 'date-fns';
 import config from './config.js';

@@ -1,4 +1,4 @@
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import {
   Archetype,
   err,

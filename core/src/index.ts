@@ -1,12 +1,13 @@
 export * from './ColorUtil.js';
 export * from './EnumUtil.js';
+export { env, envBool, envInt } from './Environment.js';
 export * from './FsUtil.js';
 export * from './InspectUtil.js';
+export type { ILogObj } from './Logger.js';
+export { Logger } from './Logger.js';
 export * from './NodeEnv.js';
 export * from './ObjectUtil.js';
 export * from './StringUtil.js';
 export * from './TimeUtil.js';
 export * from './TypeUtil.js';
 export * from './ZodUtil.js';
-// Environment is NOT exported here — it has side effects.
-// Import directly: import { Environment } from '@tailoredin/core/src/Environment.js'

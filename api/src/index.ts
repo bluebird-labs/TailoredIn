@@ -1,6 +1,4 @@
-import 'reflect-metadata';
-import 'dotenv/config';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container } from './container.js';
 import { AddBulletRoute } from './routes/AddBulletRoute.js';

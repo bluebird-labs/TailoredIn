@@ -1,4 +1,4 @@
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { type JobRepository, JobStatus } from '@tailoredin/domain';
 import type { JobSearchConfigDto } from '../dtos/JobSearchConfigDto.js';
 import type { JobScraper } from '../ports/JobScraper.js';

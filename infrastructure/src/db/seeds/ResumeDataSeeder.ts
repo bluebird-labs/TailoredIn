@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { Archetype } from '../entities/archetypes/Archetype.js';
 import { ArchetypeEducation } from '../entities/archetypes/ArchetypeEducation.js';
 import { ArchetypePosition } from '../entities/archetypes/ArchetypePosition.js';

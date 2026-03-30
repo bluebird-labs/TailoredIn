@@ -3,7 +3,7 @@
 import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger } from '@tailoredin/core';
 import { Archetype } from '@tailoredin/domain';
 import { generateCV } from '@tailoredin/infrastructure/src/resume/generateCV.js';
 import { TYPST_DIR } from '@tailoredin/infrastructure/src/resume/TYPST_DIR.js';

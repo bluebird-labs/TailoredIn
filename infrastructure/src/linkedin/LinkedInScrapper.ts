@@ -1,5 +1,4 @@
-import { TimeUtil } from '@tailoredin/core';
-import { Logger } from '@tailoredin/core/src/Logger.js';
+import { Logger, TimeUtil } from '@tailoredin/core';
 import { range } from 'lodash';
 import type { Locator } from 'playwright';
 import * as PlayWright from 'playwright';
