@@ -17,7 +17,7 @@ export class Company extends AggregateRoot<CompanyId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: CompanyId;
     name: string;
     website: string | null;
@@ -37,12 +37,12 @@ export class Company extends AggregateRoot<CompanyId> {
     this.updatedAt = props.updatedAt;
   }
 
-  setWebsite(value: string): void {
+  public setWebsite(value: string): void {
     this.website = value;
     this.updatedAt = new Date();
   }
 
-  static create(props: CompanyCreateProps): Company {
+  public static create(props: CompanyCreateProps): Company {
     const now = new Date();
     return new Company({
       id: CompanyId.generate(),

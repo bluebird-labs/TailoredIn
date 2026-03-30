@@ -6,9 +6,9 @@ import { Elysia, t } from 'elysia';
 
 @injectable()
 export class ChangeJobStatusRoute {
-  constructor(private readonly changeJobStatus: ChangeJobStatus = inject(DI.Job.ChangeJobStatus)) {}
+  public constructor(private readonly changeJobStatus: ChangeJobStatus = inject(DI.Job.ChangeJobStatus)) {}
 
-  plugin() {
+  public plugin() {
     return new Elysia().put(
       '/jobs/:id/status',
       async ({ params, body, set }) => {

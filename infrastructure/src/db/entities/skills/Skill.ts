@@ -42,7 +42,7 @@ export class Skill extends BaseEntity {
   @Property({ type: new ArrayType(v => v) })
   public variants: string[];
 
-  constructor(props: SkillProps) {
+  public constructor(props: SkillProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.name = props.name;
@@ -51,14 +51,14 @@ export class Skill extends BaseEntity {
     this.variants = props.variants;
   }
 
-  static normalizeName(name: string): string {
+  public static normalizeName(name: string): string {
     return name
       .toLowerCase()
       .replace(/[\s\-./]+/g, '_')
       .replace(/[^a-z0-9_]/g, '');
   }
 
-  static create(props: SkillCreateProps): Skill {
+  public static create(props: SkillCreateProps): Skill {
     const now = new Date();
     const allVariants = props.variants.includes(props.name) ? props.variants : [props.name, ...props.variants];
     return new Skill({
@@ -72,7 +72,7 @@ export class Skill extends BaseEntity {
     });
   }
 
-  refresh(props: SkillRefreshProps): void {
+  public refresh(props: SkillRefreshProps): void {
     if (props.name !== undefined) this.name = props.name;
     if (props.affinity !== undefined) this.affinity = props.affinity;
     if (props.variants !== undefined) this.variants = props.variants;

@@ -39,7 +39,7 @@ export class Company extends BaseEntity {
   @Property({ fieldName: 'ignored', type: 'boolean', default: false })
   public ignored: boolean;
 
-  constructor(props: CompanyProps) {
+  public constructor(props: CompanyProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.name = props.name;
@@ -49,7 +49,7 @@ export class Company extends BaseEntity {
     this.ignored = props.ignored;
   }
 
-  static create(props: CompanyCreateProps): Company {
+  public static create(props: CompanyCreateProps): Company {
     const now = new Date();
     return new Company({
       ...props,

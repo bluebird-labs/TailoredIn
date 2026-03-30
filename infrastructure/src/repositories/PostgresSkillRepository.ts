@@ -13,15 +13,15 @@ import type { SkillOrmRepository } from '../db/entities/skills/SkillOrmRepositor
 
 @injectable()
 export class PostgresSkillRepository implements SkillRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async refreshAll(skills: SkillCreateProps[]): Promise<SkillRefreshOutput> {
+  public async refreshAll(skills: SkillCreateProps[]): Promise<SkillRefreshOutput> {
     const repo = this.orm.em.getRepository(OrmSkill) as SkillOrmRepository;
     const ormSkills = skills.map(s => OrmSkill.create(s as OrmSkillCreateProps));
     return repo.refreshAll(ormSkills);
   }
 
-  async findAll(): Promise<DomainSkill[]> {
+  public async findAll(): Promise<DomainSkill[]> {
     const ormSkills = await this.orm.em.findAll(OrmSkill);
     return ormSkills.map(s => this.toDomain(s));
   }

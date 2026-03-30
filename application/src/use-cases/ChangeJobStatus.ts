@@ -7,9 +7,9 @@ export type ChangeJobStatusInput = {
 };
 
 export class ChangeJobStatus {
-  constructor(private readonly jobRepository: JobRepository) {}
+  public constructor(private readonly jobRepository: JobRepository) {}
 
-  async execute(input: ChangeJobStatusInput): Promise<Result<void, Error>> {
+  public async execute(input: ChangeJobStatusInput): Promise<Result<void, Error>> {
     let job: JobPosting;
     try {
       job = await this.jobRepository.findByIdOrFail(input.jobId);

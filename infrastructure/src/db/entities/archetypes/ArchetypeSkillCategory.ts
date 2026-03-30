@@ -30,7 +30,7 @@ export class ArchetypeSkillCategory extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ArchetypeSkillCategoryProps) {
+  public constructor(props: ArchetypeSkillCategoryProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.archetype = props.archetype;
@@ -38,7 +38,7 @@ export class ArchetypeSkillCategory extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ArchetypeSkillCategoryCreateProps): ArchetypeSkillCategory {
+  public static create(props: ArchetypeSkillCategoryCreateProps): ArchetypeSkillCategory {
     const now = new Date();
     return new ArchetypeSkillCategory({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

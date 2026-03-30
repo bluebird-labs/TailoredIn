@@ -38,7 +38,7 @@ export class ResumeSkillCategory extends BaseEntity {
   )
   public readonly items: Collection<ResumeSkillItem> = new Collection<ResumeSkillItem>(this);
 
-  constructor(props: ResumeSkillCategoryProps) {
+  public constructor(props: ResumeSkillCategoryProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.user = props.user;
@@ -46,7 +46,7 @@ export class ResumeSkillCategory extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ResumeSkillCategoryCreateProps): ResumeSkillCategory {
+  public static create(props: ResumeSkillCategoryCreateProps): ResumeSkillCategory {
     const now = new Date();
     return new ResumeSkillCategory({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

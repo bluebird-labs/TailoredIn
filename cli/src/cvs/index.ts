@@ -86,8 +86,9 @@ Yargs(hideBin(process.argv))
 
       try {
         execSync(`typst compile cv.typ "${pdfPath}"`, { cwd: TYPST_CWD, stdio: 'pipe' });
-      } catch (err: any) {
-        const stderr = (err.stderr as Buffer | undefined)?.toString() ?? String(err.message);
+      } catch (err: unknown) {
+        const error = err as { stderr?: Buffer; message?: string };
+        const stderr = error.stderr?.toString() ?? String(error.message);
         log.error('Failed to compile Typst CV:\n', stderr);
         return;
       }

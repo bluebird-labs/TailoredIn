@@ -30,7 +30,7 @@ export class ArchetypeSkillItem extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ArchetypeSkillItemProps) {
+  public constructor(props: ArchetypeSkillItemProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.archetype = props.archetype;
@@ -38,7 +38,7 @@ export class ArchetypeSkillItem extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ArchetypeSkillItemCreateProps): ArchetypeSkillItem {
+  public static create(props: ArchetypeSkillItemCreateProps): ArchetypeSkillItem {
     const now = new Date();
     return new ArchetypeSkillItem({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

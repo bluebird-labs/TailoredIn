@@ -17,7 +17,7 @@ export class Resume extends AggregateRoot<ResumeId> {
   public readonly outputPath: string;
   public readonly generatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeId;
     jobId: string;
     archetype: Archetype;
@@ -33,7 +33,7 @@ export class Resume extends AggregateRoot<ResumeId> {
     this.generatedAt = props.generatedAt;
   }
 
-  static create(props: ResumeCreateProps): Resume {
+  public static create(props: ResumeCreateProps): Resume {
     const resume = new Resume({
       id: ResumeId.generate(),
       jobId: props.jobId,

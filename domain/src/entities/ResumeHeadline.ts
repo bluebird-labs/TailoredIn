@@ -14,7 +14,7 @@ export class ResumeHeadline extends Entity<ResumeHeadlineId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeHeadlineId;
     userId: string;
     headlineLabel: string;
@@ -30,7 +30,7 @@ export class ResumeHeadline extends Entity<ResumeHeadlineId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ResumeHeadlineCreateProps): ResumeHeadline {
+  public static create(props: ResumeHeadlineCreateProps): ResumeHeadline {
     const now = new Date();
     return new ResumeHeadline({
       id: ResumeHeadlineId.generate(),

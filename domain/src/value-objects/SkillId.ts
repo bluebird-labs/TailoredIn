@@ -1,15 +1,15 @@
 import { ValueObject } from '../ValueObject.js';
 
 export class SkillId extends ValueObject<{ value: string }> {
-  constructor(value: string) {
+  public constructor(value: string) {
     super({ value });
   }
 
-  get value(): string {
+  public get value(): string {
     return this.props.value;
   }
 
-  static generate(): SkillId {
+  public static generate(): SkillId {
     return new SkillId(crypto.randomUUID());
   }
 }

@@ -28,7 +28,7 @@ export class ResumeHeadline extends BaseEntity {
   @Property({ name: 'summary_text', type: 'text' })
   public summaryText: string;
 
-  constructor(props: ResumeHeadlineProps) {
+  public constructor(props: ResumeHeadlineProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.user = props.user;
@@ -36,7 +36,7 @@ export class ResumeHeadline extends BaseEntity {
     this.summaryText = props.summaryText;
   }
 
-  static create(props: ResumeHeadlineCreateProps): ResumeHeadline {
+  public static create(props: ResumeHeadlineCreateProps): ResumeHeadline {
     const now = new Date();
     return new ResumeHeadline({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

@@ -5,9 +5,9 @@ import { Elysia, t } from 'elysia';
 
 @injectable()
 export class GetTopJobRoute {
-  constructor(private readonly getTopJob: GetTopJob = inject(DI.Job.GetTopJob)) {}
+  public constructor(private readonly getTopJob: GetTopJob = inject(DI.Job.GetTopJob)) {}
 
-  plugin() {
+  public plugin() {
     return new Elysia().get(
       '/jobs/tops/next',
       async ({ query }) => {

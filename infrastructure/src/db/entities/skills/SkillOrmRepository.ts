@@ -3,7 +3,7 @@ import { BaseRepository } from '../../BaseRepository.js';
 import { Skill } from './Skill.js';
 
 export class SkillOrmRepository extends BaseRepository<Skill> {
-  async refreshAll(newSkills: Skill[]): Promise<{
+  public async refreshAll(newSkills: Skill[]): Promise<{
     createdCount: number;
     deletedCount: number;
     updatedCount: number;

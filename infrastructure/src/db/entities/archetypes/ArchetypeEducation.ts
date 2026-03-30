@@ -30,7 +30,7 @@ export class ArchetypeEducation extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ArchetypeEducationProps) {
+  public constructor(props: ArchetypeEducationProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.archetype = props.archetype;
@@ -38,7 +38,7 @@ export class ArchetypeEducation extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ArchetypeEducationCreateProps): ArchetypeEducation {
+  public static create(props: ArchetypeEducationCreateProps): ArchetypeEducation {
     const now = new Date();
     return new ArchetypeEducation({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

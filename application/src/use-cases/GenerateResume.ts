@@ -12,7 +12,7 @@ const DEFAULT_AWESOME_COLOR = '#178FEA';
 export class GenerateResume {
   private readonly log = Logger.create(GenerateResume.name);
 
-  constructor(
+  public constructor(
     private readonly jobRepository: JobRepository,
     private readonly llmService: LlmService,
     private readonly webColorService: WebColorService,
@@ -20,7 +20,7 @@ export class GenerateResume {
     private readonly resumeContentFactory: ResumeContentFactory
   ) {}
 
-  async execute(input: GenerateResumeDto): Promise<Result<ResumeOutputDto, Error>> {
+  public async execute(input: GenerateResumeDto): Promise<Result<ResumeOutputDto, Error>> {
     let job: JobPosting;
     try {
       job = await this.jobRepository.findByIdOrFail(input.jobId);

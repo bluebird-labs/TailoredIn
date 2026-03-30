@@ -17,7 +17,7 @@ export class ResumeSkillCategory extends AggregateRoot<ResumeSkillCategoryId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeSkillCategoryId;
     userId: string;
     categoryName: string;
@@ -35,7 +35,7 @@ export class ResumeSkillCategory extends AggregateRoot<ResumeSkillCategoryId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ResumeSkillCategoryCreateProps): ResumeSkillCategory {
+  public static create(props: ResumeSkillCategoryCreateProps): ResumeSkillCategory {
     const now = new Date();
     return new ResumeSkillCategory({
       id: ResumeSkillCategoryId.generate(),

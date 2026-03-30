@@ -5,9 +5,9 @@ import { Elysia, t } from 'elysia';
 
 @injectable()
 export class GenerateResumeRoute {
-  constructor(private readonly generateResume: GenerateResume = inject(DI.Resume.GenerateResume)) {}
+  public constructor(private readonly generateResume: GenerateResume = inject(DI.Resume.GenerateResume)) {}
 
-  plugin() {
+  public plugin() {
     return new Elysia().put(
       '/jobs/:id/generate-resume',
       async ({ params, set }) => {

@@ -18,7 +18,7 @@ export class Skill extends Entity<SkillId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: SkillId;
     name: string;
     key: string;
@@ -36,7 +36,7 @@ export class Skill extends Entity<SkillId> {
     this.updatedAt = props.updatedAt;
   }
 
-  refresh(props: SkillRefreshProps): void {
+  public refresh(props: SkillRefreshProps): void {
     const mutable = this as { name?: string; affinity?: SkillAffinity; variants?: string[]; updatedAt: Date };
     if (props.name !== undefined) mutable.name = props.name;
     if (props.affinity !== undefined) mutable.affinity = props.affinity;
@@ -44,14 +44,14 @@ export class Skill extends Entity<SkillId> {
     mutable.updatedAt = new Date();
   }
 
-  static normalizeName(name: string): string {
+  public static normalizeName(name: string): string {
     return name
       .toLowerCase()
       .replace(/[\s\-./]+/g, '_')
       .replace(/[^a-z0-9_]/g, '');
   }
 
-  static create(props: SkillCreateProps): Skill {
+  public static create(props: SkillCreateProps): Skill {
     const now = new Date();
     const allVariants = props.variants.includes(props.name) ? props.variants : [props.name, ...props.variants];
     return new Skill({

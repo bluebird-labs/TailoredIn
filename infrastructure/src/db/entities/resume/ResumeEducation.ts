@@ -40,7 +40,7 @@ export class ResumeEducation extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ResumeEducationProps) {
+  public constructor(props: ResumeEducationProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.user = props.user;
@@ -51,7 +51,7 @@ export class ResumeEducation extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ResumeEducationCreateProps): ResumeEducation {
+  public static create(props: ResumeEducationCreateProps): ResumeEducation {
     const now = new Date();
     return new ResumeEducation({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

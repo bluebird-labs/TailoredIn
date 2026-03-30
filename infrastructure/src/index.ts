@@ -1,7 +1,8 @@
 // DI tokens
 export { DI } from './DI.js';
+export type { OrmDbConfig } from './db/orm-config.js';
 // ORM config
-export { ormConfig } from './db/orm-config.js';
+export { createOrmConfig, ormConfig } from './db/orm-config.js';
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 // Repositories
 export { PostgresJobRepository } from './repositories/PostgresJobRepository.js';

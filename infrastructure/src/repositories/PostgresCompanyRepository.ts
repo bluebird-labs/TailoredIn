@@ -11,16 +11,16 @@ import type { CompanyOrmRepository } from '../db/entities/companies/CompanyOrmRe
 
 @injectable()
 export class PostgresCompanyRepository implements CompanyRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async upsertByLinkedinLink(props: CompanyCreateProps): Promise<DomainCompany> {
+  public async upsertByLinkedinLink(props: CompanyCreateProps): Promise<DomainCompany> {
     const repo = this.orm.em.getRepository(OrmCompany) as CompanyOrmRepository;
     const ormCompany = await repo.upsert(props);
     await this.orm.em.flush();
     return this.toDomain(ormCompany);
   }
 
-  async save(company: DomainCompany): Promise<void> {
+  public async save(company: DomainCompany): Promise<void> {
     const ormCompany = await this.orm.em.findOneOrFail(OrmCompany, company.id.value);
     ormCompany.name = company.name;
     ormCompany.website = company.website;

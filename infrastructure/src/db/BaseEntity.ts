@@ -14,7 +14,7 @@ export class BaseEntity extends MikroOrmBaseEntity {
   @Property({ name: 'updated_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public updatedAt: Date;
 
-  constructor(props: BaseEntityProps) {
+  public constructor(props: BaseEntityProps) {
     super();
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;

@@ -5,7 +5,7 @@ import type { ValueObject } from './ValueObject.js';
 export abstract class AggregateRoot<TId extends ValueObject<{ value: string }>> extends Entity<TId> {
   private _domainEvents: DomainEvent[] = [];
 
-  get domainEvents(): ReadonlyArray<DomainEvent> {
+  public get domainEvents(): ReadonlyArray<DomainEvent> {
     return this._domainEvents;
   }
 
@@ -13,7 +13,7 @@ export abstract class AggregateRoot<TId extends ValueObject<{ value: string }>> 
     this._domainEvents.push(event);
   }
 
-  clearDomainEvents(): void {
+  public clearDomainEvents(): void {
     this._domainEvents = [];
   }
 }

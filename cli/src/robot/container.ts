@@ -5,8 +5,8 @@ import { Container } from '@needle-di/core';
 import { Environment } from '@tailoredin/core/src/Environment.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
+  createOrmConfig,
   DI,
-  ormConfig,
   PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   PlaywrightJobScraper,
   PostgresCompanyRepository,
@@ -14,7 +14,17 @@ import {
   PostgresSkillRepository
 } from '@tailoredin/infrastructure';
 
-const orm = await MikroORM.init(ormConfig);
+const orm = await MikroORM.init(
+  createOrmConfig({
+    timezone: Environment.get('TZ'),
+    user: Environment.get('POSTGRES_USER'),
+    password: Environment.get('POSTGRES_PASSWORD'),
+    dbName: Environment.get('POSTGRES_DB'),
+    schema: Environment.get('POSTGRES_SCHEMA'),
+    host: Environment.get('POSTGRES_HOST'),
+    port: Environment.get('POSTGRES_PORT')
+  })
+);
 
 const container = new Container();
 
@@ -26,8 +36,8 @@ container.bind({ provide: DI.Job.Elector, useValue: new JobElectionService() });
 container.bind({
   provide: PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   useValue: {
-    headless: process.env.HEADLESS !== 'false',
-    slowMo: Number(process.env.SLOW_MO ?? 0),
+    headless: Environment.get('HEADLESS'),
+    slowMo: Environment.get('SLOW_MO'),
     email: Environment.get('LINKEDIN_EMAIL'),
     password: Environment.get('LINKEDIN_PASSWORD')
   }

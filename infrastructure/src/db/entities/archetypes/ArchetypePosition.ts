@@ -62,7 +62,7 @@ export class ArchetypePosition extends BaseEntity {
   )
   public readonly bullets: Collection<ArchetypePositionBullet> = new Collection<ArchetypePositionBullet>(this);
 
-  constructor(props: ArchetypePositionProps) {
+  public constructor(props: ArchetypePositionProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.archetype = props.archetype;
@@ -76,7 +76,7 @@ export class ArchetypePosition extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ArchetypePositionCreateProps): ArchetypePosition {
+  public static create(props: ArchetypePositionCreateProps): ArchetypePosition {
     const now = new Date();
     return new ArchetypePosition({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

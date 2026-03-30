@@ -28,7 +28,7 @@ export class ResumeBullet extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ResumeBulletProps) {
+  public constructor(props: ResumeBulletProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.resumeCompany = props.resumeCompany;
@@ -36,7 +36,7 @@ export class ResumeBullet extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ResumeBulletCreateProps): ResumeBullet {
+  public static create(props: ResumeBulletCreateProps): ResumeBullet {
     const now = new Date();
     return new ResumeBullet({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

@@ -114,7 +114,7 @@ export class Job extends BaseEntity {
   )
   public readonly statusUpdates: Collection<JobStatusUpdate> = new Collection<JobStatusUpdate>(this);
 
-  constructor(props: JobProps) {
+  public constructor(props: JobProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.company = props.company;
@@ -137,11 +137,11 @@ export class Job extends BaseEntity {
     this.applicantsCount = props.applicantsCount;
   }
 
-  get companyId(): string {
+  public get companyId(): string {
     return this.company.id;
   }
 
-  static create(props: JobCreateProps): Job {
+  public static create(props: JobCreateProps): Job {
     const now = new Date();
     return new Job({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

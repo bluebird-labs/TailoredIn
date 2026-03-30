@@ -30,7 +30,7 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeCompanyId;
     userId: string;
     companyName: string;
@@ -60,7 +60,7 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ResumeCompanyCreateProps): ResumeCompany {
+  public static create(props: ResumeCompanyCreateProps): ResumeCompany {
     const now = new Date();
     return new ResumeCompany({
       id: ResumeCompanyId.generate(),

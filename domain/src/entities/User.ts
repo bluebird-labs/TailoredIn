@@ -22,7 +22,7 @@ export class User extends Entity<UserId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: UserId;
     email: string;
     firstName: string;
@@ -46,7 +46,7 @@ export class User extends Entity<UserId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: UserCreateProps): User {
+  public static create(props: UserCreateProps): User {
     const now = new Date();
     return new User({
       id: UserId.generate(),

@@ -17,19 +17,19 @@ import { SkillAffinity as OrmSkillAffinity } from '../db/entities/skills/SkillAf
 
 @injectable()
 export class PostgresJobRepository implements JobRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async findById(id: string): Promise<JobPosting | null> {
+  public async findById(id: string): Promise<JobPosting | null> {
     const orm = await this.orm.em.findOne(OrmJob, id);
     return orm ? this.toDomain(orm) : null;
   }
 
-  async findByIdOrFail(id: string): Promise<JobPosting> {
+  public async findByIdOrFail(id: string): Promise<JobPosting> {
     const orm = await this.orm.em.findOneOrFail(OrmJob, id);
     return this.toDomain(orm);
   }
 
-  async findScoredByIdOrFail(params: FindScoredParams): Promise<JobPosting> {
+  public async findScoredByIdOrFail(params: FindScoredParams): Promise<JobPosting> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     const ormJob = await repo.findScoredByIdOrFail(
       { jobId: params.jobId, targetSalary: params.targetSalary },
@@ -38,7 +38,7 @@ export class PostgresJobRepository implements JobRepository {
     return this.toDomainWithScores(ormJob, ormJob.__scores);
   }
 
-  async findTopScored(params: FindTopScoredParams): Promise<JobPosting[]> {
+  public async findTopScored(params: FindTopScoredParams): Promise<JobPosting[]> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     const ormJobs = await repo.findTopScored(
       { top: params.top, targetSalary: params.targetSalary, hoursPostedMax: params.hoursPostedMax },
@@ -47,7 +47,7 @@ export class PostgresJobRepository implements JobRepository {
     return ormJobs.map(j => this.toDomainWithScores(j, j.__scores));
   }
 
-  async upsertByLinkedinId(props: UpsertJobProps, company: DomainCompany): Promise<JobPosting> {
+  public async upsertByLinkedinId(props: UpsertJobProps, company: DomainCompany): Promise<JobPosting> {
     const ormCompany = await this.orm.em.findOneOrFail(OrmCompany, company.id.value);
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     const ormJob = await repo.upsert({ ...props, company: ormCompany });
@@ -55,7 +55,7 @@ export class PostgresJobRepository implements JobRepository {
     return this.toDomain(ormJob);
   }
 
-  async save(job: JobPosting): Promise<void> {
+  public async save(job: JobPosting): Promise<void> {
     const ormJob = await this.orm.em.findOneOrFail(OrmJob, job.id.value);
     ormJob.status = job.status as unknown as (typeof ormJob)['status'];
     ormJob.applyLink = job.applyLink;
@@ -74,7 +74,7 @@ export class PostgresJobRepository implements JobRepository {
     job.clearDomainEvents();
   }
 
-  async retireOlderThan(olderThan: Date): Promise<number> {
+  public async retireOlderThan(olderThan: Date): Promise<number> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     return repo.retireOlderThan(olderThan);
   }

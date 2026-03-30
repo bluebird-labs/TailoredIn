@@ -6,9 +6,9 @@ export type GetTopJobInput = {
 };
 
 export class GetTopJob {
-  constructor(private readonly jobRepository: JobRepository) {}
+  public constructor(private readonly jobRepository: JobRepository) {}
 
-  async execute(input: GetTopJobInput): Promise<JobPosting | null> {
+  public async execute(input: GetTopJobInput): Promise<JobPosting | null> {
     const results = await this.jobRepository.findTopScored({
       top: 1,
       targetSalary: input.targetSalary,

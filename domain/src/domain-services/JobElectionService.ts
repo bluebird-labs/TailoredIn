@@ -14,7 +14,7 @@ type ParsedLocation = {
  * All election rules live here and must stay pure — no I/O, no side effects.
  */
 export class JobElectionService {
-  elect(job: JobPosting, company: Company): JobStatus {
+  public elect(job: JobPosting, company: Company): JobStatus {
     if (!job.isNew()) {
       return job.status;
     }

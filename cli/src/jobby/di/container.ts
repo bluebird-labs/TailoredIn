@@ -5,10 +5,10 @@ import { Container } from '@needle-di/core';
 import { Environment } from '@tailoredin/core/src/Environment.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
+  createOrmConfig,
   DI,
   OPENAI_CONFIG,
   OpenAiLlmService,
-  ormConfig,
   PlaywrightWebColorService,
   PostgresCompanyRepository,
   PostgresJobRepository,
@@ -17,7 +17,17 @@ import {
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 
-const orm = await MikroORM.init(ormConfig);
+const orm = await MikroORM.init(
+  createOrmConfig({
+    timezone: Environment.get('TZ'),
+    user: Environment.get('POSTGRES_USER'),
+    password: Environment.get('POSTGRES_PASSWORD'),
+    dbName: Environment.get('POSTGRES_DB'),
+    schema: Environment.get('POSTGRES_SCHEMA'),
+    host: Environment.get('POSTGRES_HOST'),
+    port: Environment.get('POSTGRES_PORT')
+  })
+);
 
 const container = new Container();
 

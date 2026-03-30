@@ -28,7 +28,7 @@ export class ResumeSkillItem extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ResumeSkillItemProps) {
+  public constructor(props: ResumeSkillItemProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.category = props.category;
@@ -36,7 +36,7 @@ export class ResumeSkillItem extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ResumeSkillItemCreateProps): ResumeSkillItem {
+  public static create(props: ResumeSkillItemCreateProps): ResumeSkillItem {
     const now = new Date();
     return new ResumeSkillItem({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

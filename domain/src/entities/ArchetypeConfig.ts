@@ -35,7 +35,7 @@ export class ArchetypeConfig extends AggregateRoot<ArchetypeConfigId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ArchetypeConfigId;
     userId: string;
     archetypeKey: Archetype;
@@ -65,7 +65,7 @@ export class ArchetypeConfig extends AggregateRoot<ArchetypeConfigId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ArchetypeConfigCreateProps): ArchetypeConfig {
+  public static create(props: ArchetypeConfigCreateProps): ArchetypeConfig {
     const now = new Date();
     return new ArchetypeConfig({
       id: ArchetypeConfigId.generate(),

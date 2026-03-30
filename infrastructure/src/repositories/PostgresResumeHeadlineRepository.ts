@@ -10,19 +10,19 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresResumeHeadlineRepository implements ResumeHeadlineRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async findByIdOrFail(id: string): Promise<DomainResumeHeadline> {
+  public async findByIdOrFail(id: string): Promise<DomainResumeHeadline> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeHeadline, id, { populate: ['user'] });
     return this.toDomain(orm);
   }
 
-  async findAllByUserId(userId: string): Promise<DomainResumeHeadline[]> {
+  public async findAllByUserId(userId: string): Promise<DomainResumeHeadline[]> {
     const ormEntities = await this.orm.em.find(OrmResumeHeadline, { user: userId });
     return ormEntities.map(e => this.toDomain(e, userId));
   }
 
-  async save(headline: DomainResumeHeadline): Promise<void> {
+  public async save(headline: DomainResumeHeadline): Promise<void> {
     const existing = await this.orm.em.findOne(OrmResumeHeadline, headline.id.value);
 
     if (existing) {
@@ -46,7 +46,7 @@ export class PostgresResumeHeadlineRepository implements ResumeHeadlineRepositor
     await this.orm.em.flush();
   }
 
-  async delete(id: string): Promise<void> {
+  public async delete(id: string): Promise<void> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeHeadline, id);
     this.orm.em.remove(orm);
     await this.orm.em.flush();

@@ -28,7 +28,7 @@ export class ResumeCompanyLocation extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ResumeCompanyLocationProps) {
+  public constructor(props: ResumeCompanyLocationProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.resumeCompany = props.resumeCompany;
@@ -36,7 +36,7 @@ export class ResumeCompanyLocation extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ResumeCompanyLocationCreateProps): ResumeCompanyLocation {
+  public static create(props: ResumeCompanyLocationCreateProps): ResumeCompanyLocation {
     const now = new Date();
     return new ResumeCompanyLocation({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

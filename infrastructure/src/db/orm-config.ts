@@ -3,6 +3,7 @@ import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import { Environment } from '@tailoredin/core/src/Environment.js';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
 import { Archetype } from './entities/archetypes/Archetype.js';
@@ -26,79 +27,102 @@ import { User } from './entities/users/User.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
-export const ormConfig = defineConfig({
-  debug: false,
-  allowGlobalContext: true,
+export type OrmDbConfig = {
+  timezone: string;
+  user: string;
+  password: string;
+  dbName: string;
+  schema: string;
+  host: string;
+  port: number;
+};
 
-  entities: [
-    BaseEntity,
-    Company,
-    Skill,
-    Job,
-    JobStatusUpdate,
-    User,
-    ResumeCompany,
-    ResumeCompanyLocation,
-    ResumeBullet,
-    ResumeEducation,
-    ResumeSkillCategory,
-    ResumeSkillItem,
-    ResumeHeadline,
-    Archetype,
-    ArchetypeEducation,
-    ArchetypeSkillCategory,
-    ArchetypeSkillItem,
-    ArchetypePosition,
-    ArchetypePositionBullet
-  ],
-  extensions: [Migrator, SchemaGenerator],
+export function createOrmConfig(db: OrmDbConfig) {
+  return defineConfig({
+    debug: false,
+    allowGlobalContext: true,
 
-  discovery: { warnWhenNoEntities: true },
-  namingStrategy: UnderscoreNamingStrategy,
-  metadataProvider: TsMorphMetadataProvider,
-  highlighter: new SqlHighlighter(),
-  forceUtcTimezone: true,
-  implicitTransactions: false,
-  ensureDatabase: true,
-  preferTs: true,
-  forceEntityConstructor: true,
-  multipleStatements: true,
-  useBatchInserts: true,
-  useBatchUpdates: true,
-  colors: true,
-  timezone: process.env.TZ,
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  dbName: process.env.POSTGRES_DB,
-  schema: process.env.POSTGRES_SCHEMA,
-  host: process.env.POSTGRES_HOST,
-  port: Number(process.env.POSTGRES_PORT),
+    entities: [
+      BaseEntity,
+      Company,
+      Skill,
+      Job,
+      JobStatusUpdate,
+      User,
+      ResumeCompany,
+      ResumeCompanyLocation,
+      ResumeBullet,
+      ResumeEducation,
+      ResumeSkillCategory,
+      ResumeSkillItem,
+      ResumeHeadline,
+      Archetype,
+      ArchetypeEducation,
+      ArchetypeSkillCategory,
+      ArchetypeSkillItem,
+      ArchetypePosition,
+      ArchetypePositionBullet
+    ],
+    extensions: [Migrator, SchemaGenerator],
 
-  findOneOrFailHandler: (entityName, where) => {
-    const err = new Error(`Entity not found: ${entityName} (${JSON.stringify(where)})`);
-    Object.assign(err, { statusCode: StatusCode.NOT_FOUND });
-    throw err;
-  },
+    discovery: { warnWhenNoEntities: true },
+    namingStrategy: UnderscoreNamingStrategy,
+    metadataProvider: TsMorphMetadataProvider,
+    highlighter: new SqlHighlighter(),
+    forceUtcTimezone: true,
+    implicitTransactions: false,
+    ensureDatabase: true,
+    preferTs: true,
+    forceEntityConstructor: true,
+    multipleStatements: true,
+    useBatchInserts: true,
+    useBatchUpdates: true,
+    colors: true,
+    timezone: db.timezone,
+    user: db.user,
+    password: db.password,
+    dbName: db.dbName,
+    schema: db.schema,
+    host: db.host,
+    port: db.port,
 
-  seeder: {
-    pathTs: Path.resolve(PACKAGE_DIR, 'seeds'),
-    emit: 'ts'
-  },
+    findOneOrFailHandler: (entityName, where) => {
+      const err = new Error(`Entity not found: ${entityName} (${JSON.stringify(where)})`);
+      Object.assign(err, { statusCode: StatusCode.NOT_FOUND });
+      throw err;
+    },
 
-  migrations: {
-    tableName: 'mikro_orm_migrations',
-    transactional: true,
-    allOrNothing: true,
-    snapshot: false,
-    pathTs: Path.resolve(PACKAGE_DIR, 'migrations'),
-    glob: 'Migration_*.ts',
-    emit: 'ts',
-    generator: TSMigrationGenerator,
-    fileName: (timestamp: string, name?: string): string => {
-      if (!name) throw new Error('No name provided for migration');
-      return `Migration_${timestamp}_${name}`;
+    seeder: {
+      pathTs: Path.resolve(PACKAGE_DIR, 'seeds'),
+      emit: 'ts'
+    },
+
+    migrations: {
+      tableName: 'mikro_orm_migrations',
+      transactional: true,
+      allOrNothing: true,
+      snapshot: false,
+      pathTs: Path.resolve(PACKAGE_DIR, 'migrations'),
+      glob: 'Migration_*.ts',
+      emit: 'ts',
+      generator: TSMigrationGenerator,
+      fileName: (timestamp: string, name?: string): string => {
+        if (!name) throw new Error('No name provided for migration');
+        return `Migration_${timestamp}_${name}`;
+      }
     }
-  }
+  });
+}
+
+// Default export for MikroORM CLI (reads process.env via Environment)
+export const ormConfig = createOrmConfig({
+  timezone: Environment.get('TZ'),
+  user: Environment.get('POSTGRES_USER'),
+  password: Environment.get('POSTGRES_PASSWORD'),
+  dbName: Environment.get('POSTGRES_DB'),
+  schema: Environment.get('POSTGRES_SCHEMA'),
+  host: Environment.get('POSTGRES_HOST'),
+  port: Environment.get('POSTGRES_PORT')
 });
 
 export default ormConfig;

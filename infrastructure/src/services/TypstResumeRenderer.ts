@@ -12,7 +12,7 @@ const RESUMES_DIR = Path.resolve(import.meta.dirname, '..', '..', 'resumes');
 
 @injectable()
 export class TypstResumeRenderer implements ResumeRenderer {
-  async render(input: RenderResumeInput): Promise<string> {
+  public async render(input: RenderResumeInput): Promise<string> {
     const { content, companyName, archetype } = input;
     const outputDir = Path.resolve(RESUMES_DIR, snakeCase(companyName.toLowerCase()));
     const date = format(new Date(), 'yyyy_MM_dd');

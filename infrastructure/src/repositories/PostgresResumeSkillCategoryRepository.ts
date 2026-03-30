@@ -13,14 +13,14 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresResumeSkillCategoryRepository implements ResumeSkillCategoryRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async findByIdOrFail(id: string): Promise<DomainResumeSkillCategory> {
+  public async findByIdOrFail(id: string): Promise<DomainResumeSkillCategory> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeSkillCategory, id, { populate: ['user'] });
     return this.toDomain(orm);
   }
 
-  async findAllByUserId(userId: string): Promise<DomainResumeSkillCategory[]> {
+  public async findAllByUserId(userId: string): Promise<DomainResumeSkillCategory[]> {
     const ormCategories = await this.orm.em.find(
       OrmResumeSkillCategory,
       { user: userId },
@@ -29,7 +29,7 @@ export class PostgresResumeSkillCategoryRepository implements ResumeSkillCategor
     return Promise.all(ormCategories.map(c => this.toDomain(c, userId)));
   }
 
-  async save(category: DomainResumeSkillCategory): Promise<void> {
+  public async save(category: DomainResumeSkillCategory): Promise<void> {
     const existing = await this.orm.em.findOne(OrmResumeSkillCategory, category.id.value);
 
     if (existing) {
@@ -66,7 +66,7 @@ export class PostgresResumeSkillCategoryRepository implements ResumeSkillCategor
     await this.orm.em.flush();
   }
 
-  async delete(id: string): Promise<void> {
+  public async delete(id: string): Promise<void> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeSkillCategory, id);
     this.orm.em.remove(orm);
     await this.orm.em.flush();

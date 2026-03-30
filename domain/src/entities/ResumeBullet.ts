@@ -14,7 +14,7 @@ export class ResumeBullet extends Entity<ResumeBulletId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeBulletId;
     resumeCompanyId: string;
     content: string;
@@ -30,7 +30,7 @@ export class ResumeBullet extends Entity<ResumeBulletId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ResumeBulletCreateProps): ResumeBullet {
+  public static create(props: ResumeBulletCreateProps): ResumeBullet {
     const now = new Date();
     return new ResumeBullet({
       id: ResumeBulletId.generate(),

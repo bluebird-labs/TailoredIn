@@ -15,14 +15,20 @@ export class JobStatusUpdate extends BaseEntity {
   @Enum({ name: 'status', items: () => JobStatus, nativeEnumName: 'job_status' })
   public status: JobStatus;
 
-  constructor(props: { id: string; job: RefOrEntity<Job>; status: JobStatus; createdAt: Date; updatedAt: Date }) {
+  public constructor(props: {
+    id: string;
+    job: RefOrEntity<Job>;
+    status: JobStatus;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.job = props.job;
     this.status = props.status;
   }
 
-  static create(props: { job: RefOrEntity<Job>; status: JobStatus }): JobStatusUpdate {
+  public static create(props: { job: RefOrEntity<Job>; status: JobStatus }): JobStatusUpdate {
     const now = new Date();
     return new JobStatusUpdate({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

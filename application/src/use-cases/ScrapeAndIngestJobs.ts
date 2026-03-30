@@ -7,13 +7,13 @@ import type { IngestScrapedJob } from './IngestScrapedJob.js';
 export class ScrapeAndIngestJobs {
   private readonly log = Logger.create(ScrapeAndIngestJobs.name);
 
-  constructor(
+  public constructor(
     private readonly jobScraper: JobScraper,
     private readonly jobRepository: JobRepository,
     private readonly ingestScrapedJob: IngestScrapedJob
   ) {}
 
-  async execute(configs: JobSearchConfigDto[]): Promise<void> {
+  public async execute(configs: JobSearchConfigDto[]): Promise<void> {
     await this.jobScraper.connect();
 
     try {

@@ -7,7 +7,7 @@ import type { ResumeTemplate } from '../resume/templates/types.js';
 
 @injectable()
 export class TemplateResumeContentFactory implements ResumeContentFactory {
-  make(input: MakeResumeContentInput): ResumeContentDto {
+  public make(input: MakeResumeContentInput): ResumeContentDto {
     const { archetype, awesomeColor, keywords } = input;
 
     let config: ResumeTemplate;

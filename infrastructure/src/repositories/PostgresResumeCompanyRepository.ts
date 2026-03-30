@@ -15,19 +15,19 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresResumeCompanyRepository implements ResumeCompanyRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async findByIdOrFail(id: string): Promise<DomainResumeCompany> {
+  public async findByIdOrFail(id: string): Promise<DomainResumeCompany> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeCompany, id, { populate: ['user'] });
     return this.toDomain(orm);
   }
 
-  async findAllByUserId(userId: string): Promise<DomainResumeCompany[]> {
+  public async findAllByUserId(userId: string): Promise<DomainResumeCompany[]> {
     const ormCompanies = await this.orm.em.find(OrmResumeCompany, { user: userId });
     return Promise.all(ormCompanies.map(c => this.toDomain(c, userId)));
   }
 
-  async save(company: DomainResumeCompany): Promise<void> {
+  public async save(company: DomainResumeCompany): Promise<void> {
     const existing = await this.orm.em.findOne(OrmResumeCompany, company.id.value);
 
     if (existing) {
@@ -79,7 +79,7 @@ export class PostgresResumeCompanyRepository implements ResumeCompanyRepository 
     await this.orm.em.flush();
   }
 
-  async delete(id: string): Promise<void> {
+  public async delete(id: string): Promise<void> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeCompany, id);
     this.orm.em.remove(orm);
     await this.orm.em.flush();

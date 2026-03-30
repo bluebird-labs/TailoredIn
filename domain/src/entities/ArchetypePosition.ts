@@ -29,7 +29,7 @@ export class ArchetypePosition extends Entity<ArchetypePositionId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ArchetypePositionId;
     archetypeId: string;
     resumeCompanyId: string;
@@ -59,7 +59,7 @@ export class ArchetypePosition extends Entity<ArchetypePositionId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ArchetypePositionCreateProps): ArchetypePosition {
+  public static create(props: ArchetypePositionCreateProps): ArchetypePosition {
     const now = new Date();
     return new ArchetypePosition({
       id: ArchetypePositionId.generate(),

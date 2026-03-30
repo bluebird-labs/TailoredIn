@@ -30,7 +30,7 @@ export class ArchetypePositionBullet extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
-  constructor(props: ArchetypePositionBulletProps) {
+  public constructor(props: ArchetypePositionBulletProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.position = props.position;
@@ -38,7 +38,7 @@ export class ArchetypePositionBullet extends BaseEntity {
     this.ordinal = props.ordinal;
   }
 
-  static create(props: ArchetypePositionBulletCreateProps): ArchetypePositionBullet {
+  public static create(props: ArchetypePositionBulletCreateProps): ArchetypePositionBullet {
     const now = new Date();
     return new ArchetypePositionBullet({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

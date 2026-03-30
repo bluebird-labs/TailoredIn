@@ -32,7 +32,7 @@ export class LinkedInExplorer {
   private browserContext!: PlayWright.BrowserContext;
   private searchJobsCommand!: LinkedInSearchJobsCommand;
 
-  constructor(config: LinkedInExplorerConfig) {
+  public constructor(config: LinkedInExplorerConfig) {
     this.config = config;
   }
 

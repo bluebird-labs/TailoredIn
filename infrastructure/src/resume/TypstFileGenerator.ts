@@ -9,7 +9,7 @@ const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>
 const escapeToml = (str: string): string => str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 export class TypstFileGenerator {
-  static async generate(content: BrilliantCVContent, workDir: string): Promise<void> {
+  public static async generate(content: BrilliantCVContent, workDir: string): Promise<void> {
     await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
 
     await Promise.all([

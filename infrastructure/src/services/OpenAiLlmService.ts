@@ -39,11 +39,11 @@ const ApplicationInsightsSchema = z.strictObject({
 export class OpenAiLlmService implements LlmService {
   private readonly client: OpenAI;
 
-  constructor(config = inject(OPENAI_CONFIG) as OpenAiConfig) {
+  public constructor(config = inject(OPENAI_CONFIG) as OpenAiConfig) {
     this.client = new OpenAI({ apiKey: config.apiKey, project: config.project });
   }
 
-  async extractJobPostingInsights(input: ExtractJobPostingInsightsInput): Promise<JobPostingInsightsDto> {
+  public async extractJobPostingInsights(input: ExtractJobPostingInsightsInput): Promise<JobPostingInsightsDto> {
     const description = `${input.companyName} is looking for a ${input.jobTitle} in ${input.jobLocation}\n${input.jobDescription}`;
 
     const completion = await this.client.beta.chat.completions.parse({
@@ -67,7 +67,7 @@ export class OpenAiLlmService implements LlmService {
     return completion.choices[0].message.parsed ?? { website: null, archetype: Archetype.IC };
   }
 
-  async extractApplicationInsights(input: ExtractApplicationInsightsInput): Promise<ApplicationInsightsDto> {
+  public async extractApplicationInsights(input: ExtractApplicationInsightsInput): Promise<ApplicationInsightsDto> {
     const description = `${input.companyName} is looking for a ${input.jobTitle} in ${input.jobLocation}\n${input.jobDescription}`;
 
     const completion = await this.client.beta.chat.completions.parse({

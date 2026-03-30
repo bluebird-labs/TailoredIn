@@ -12,7 +12,7 @@ export class TailoringStrategyService {
    * Maps a job archetype to the resume template archetype used for generation.
    * Currently all archetypes default to LEAD_IC template — extend as templates are added.
    */
-  resolveTemplateArchetype(archetype: Archetype): Archetype {
+  public resolveTemplateArchetype(archetype: Archetype): Archetype {
     switch (archetype) {
       case Archetype.IC:
       case Archetype.LEAD_IC:
@@ -25,7 +25,7 @@ export class TailoringStrategyService {
   /**
    * Computes what fraction of the requested keywords appear in the job description.
    */
-  computeTailoringScore(keywords: string[], jobDescription: string): TailoringScore {
+  public computeTailoringScore(keywords: string[], jobDescription: string): TailoringScore {
     const desc = jobDescription.toLowerCase();
     const matched = keywords.filter(kw => desc.includes(kw.toLowerCase())).length;
     return new TailoringScore(matched, keywords.length);

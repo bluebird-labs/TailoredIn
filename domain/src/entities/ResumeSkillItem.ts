@@ -14,7 +14,7 @@ export class ResumeSkillItem extends Entity<ResumeSkillItemId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeSkillItemId;
     categoryId: string;
     skillName: string;
@@ -30,7 +30,7 @@ export class ResumeSkillItem extends Entity<ResumeSkillItemId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ResumeSkillItemCreateProps): ResumeSkillItem {
+  public static create(props: ResumeSkillItemCreateProps): ResumeSkillItem {
     const now = new Date();
     return new ResumeSkillItem({
       id: ResumeSkillItemId.generate(),

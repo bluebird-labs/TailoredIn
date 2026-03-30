@@ -10,14 +10,14 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresResumeEducationRepository implements ResumeEducationRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async findAllByUserId(userId: string): Promise<DomainResumeEducation[]> {
+  public async findAllByUserId(userId: string): Promise<DomainResumeEducation[]> {
     const ormEntities = await this.orm.em.find(OrmResumeEducation, { user: userId }, { orderBy: { ordinal: 'ASC' } });
     return ormEntities.map(e => this.toDomain(e, userId));
   }
 
-  async save(education: DomainResumeEducation): Promise<void> {
+  public async save(education: DomainResumeEducation): Promise<void> {
     const existing = await this.orm.em.findOne(OrmResumeEducation, education.id.value);
 
     if (existing) {
@@ -47,7 +47,7 @@ export class PostgresResumeEducationRepository implements ResumeEducationReposit
     await this.orm.em.flush();
   }
 
-  async delete(id: string): Promise<void> {
+  public async delete(id: string): Promise<void> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeEducation, id);
     this.orm.em.remove(orm);
     await this.orm.em.flush();

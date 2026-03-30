@@ -17,7 +17,7 @@ enum PaletteKey {
 @injectable()
 export class PlaywrightWebColorService implements WebColorService {
   private readonly log = Logger.create(PlaywrightWebColorService.name);
-  async findPalette(websiteUrl: string): Promise<ColorPaletteDto> {
+  public async findPalette(websiteUrl: string): Promise<ColorPaletteDto> {
     const browser = await Playwright.chromium.launch({ headless: true });
     const page = await browser.newPage();
     await page.goto(websiteUrl);
@@ -37,7 +37,7 @@ export class PlaywrightWebColorService implements WebColorService {
     };
   }
 
-  async findPrimaryColor(websiteUrl: string): Promise<string | null> {
+  public async findPrimaryColor(websiteUrl: string): Promise<string | null> {
     try {
       const browser = await Playwright.chromium.launch({ headless: true });
       const page = await browser.newPage();

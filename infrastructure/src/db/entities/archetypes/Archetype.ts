@@ -75,7 +75,7 @@ export class Archetype extends BaseEntity {
   )
   public readonly positions: Collection<ArchetypePosition> = new Collection<ArchetypePosition>(this);
 
-  constructor(props: ArchetypeProps) {
+  public constructor(props: ArchetypeProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.user = props.user;
@@ -86,7 +86,7 @@ export class Archetype extends BaseEntity {
     this.socialNetworks = props.socialNetworks;
   }
 
-  static create(props: ArchetypeCreateProps): Archetype {
+  public static create(props: ArchetypeCreateProps): Archetype {
     const now = new Date();
     return new Archetype({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

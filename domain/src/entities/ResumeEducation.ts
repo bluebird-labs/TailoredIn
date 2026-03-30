@@ -20,7 +20,7 @@ export class ResumeEducation extends Entity<ResumeEducationId> {
   public readonly createdAt: Date;
   public updatedAt: Date;
 
-  constructor(props: {
+  public constructor(props: {
     id: ResumeEducationId;
     userId: string;
     degreeTitle: string;
@@ -42,7 +42,7 @@ export class ResumeEducation extends Entity<ResumeEducationId> {
     this.updatedAt = props.updatedAt;
   }
 
-  static create(props: ResumeEducationCreateProps): ResumeEducation {
+  public static create(props: ResumeEducationCreateProps): ResumeEducation {
     const now = new Date();
     return new ResumeEducation({
       id: ResumeEducationId.generate(),

@@ -43,7 +43,7 @@ export class User extends BaseEntity {
   @Property({ name: 'location_label', type: 'text', nullable: true })
   public locationLabel: string | null;
 
-  constructor(props: UserProps) {
+  public constructor(props: UserProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.email = props.email;
@@ -55,7 +55,7 @@ export class User extends BaseEntity {
     this.locationLabel = props.locationLabel;
   }
 
-  static create(props: UserCreateProps): User {
+  public static create(props: UserCreateProps): User {
     const now = new Date();
     return new User({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

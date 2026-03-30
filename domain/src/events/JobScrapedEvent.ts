@@ -1,10 +1,10 @@
 import type { DomainEvent } from '../DomainEvent.js';
 
 export class JobScrapedEvent implements DomainEvent {
-  readonly eventName = 'job.scraped';
-  readonly occurredAt: Date;
+  public readonly eventName = 'job.scraped';
+  public readonly occurredAt: Date;
 
-  constructor(
+  public constructor(
     public readonly linkedinId: string,
     public readonly companyName: string
   ) {

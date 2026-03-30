@@ -19,13 +19,13 @@ export class IngestScrapedJob {
   private static readonly JOB_VIEW_BASE = 'https://www.linkedin.com/jobs/view';
   private readonly log = Logger.create(IngestScrapedJob.name);
 
-  constructor(
+  public constructor(
     private readonly jobRepository: JobRepository,
     private readonly companyRepository: CompanyRepository,
     private readonly jobElector: JobElector
   ) {}
 
-  async execute(scrapeResult: ScrapeResultDto): Promise<IngestScrapedJobResult> {
+  public async execute(scrapeResult: ScrapeResultDto): Promise<IngestScrapedJobResult> {
     const companyProps = {
       name: scrapeResult.companyName,
       website: scrapeResult.companyWebsite,

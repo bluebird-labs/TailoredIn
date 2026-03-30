@@ -65,7 +65,7 @@ export class ResumeCompany extends BaseEntity {
   )
   public readonly bullets: Collection<ResumeBullet> = new Collection<ResumeBullet>(this);
 
-  constructor(props: ResumeCompanyProps) {
+  public constructor(props: ResumeCompanyProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.user = props.user;
@@ -78,7 +78,7 @@ export class ResumeCompany extends BaseEntity {
     this.promotedAt = props.promotedAt;
   }
 
-  static create(props: ResumeCompanyCreateProps): ResumeCompany {
+  public static create(props: ResumeCompanyCreateProps): ResumeCompany {
     const now = new Date();
     return new ResumeCompany({ ...props, id: generateUuid(), createdAt: now, updatedAt: now });
   }

@@ -7,11 +7,11 @@ export abstract class Entity<TId extends ValueObject<{ value: string }>> {
     this._id = id;
   }
 
-  get id(): TId {
+  public get id(): TId {
     return this._id;
   }
 
-  equals(other: Entity<TId>): boolean {
+  public equals(other: Entity<TId>): boolean {
     if (other === null || other === undefined) return false;
     if (other.constructor !== this.constructor) return false;
     return this._id.equals(other._id);

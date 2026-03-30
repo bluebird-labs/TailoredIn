@@ -27,11 +27,17 @@
       "recommended": true,
       "suspicious": {
         "noConsole": "error",
-        "noExplicitAny": "off"
+        "noExplicitAny": "error"
       },
       "style": {
         "noNamespace": "off",
         "noNonNullAssertion": "off",
+        "useConsistentMemberAccessibility": {
+          "level": "error",
+          "options": {
+            "accessibility": "explicit"
+          }
+        },
         "useNamingConvention": {
           "level": "error",
           "options": {

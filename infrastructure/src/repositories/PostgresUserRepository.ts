@@ -5,20 +5,20 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresUserRepository implements UserRepository {
-  constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM) {}
 
-  async findByIdOrFail(id: string): Promise<DomainUser> {
+  public async findByIdOrFail(id: string): Promise<DomainUser> {
     const orm = await this.orm.em.findOneOrFail(OrmUser, id);
     return this.toDomain(orm);
   }
 
-  async findSingle(): Promise<DomainUser> {
+  public async findSingle(): Promise<DomainUser> {
     const [orm] = await this.orm.em.findAll(OrmUser, { limit: 1 });
     if (!orm) throw new Error('No user found');
     return this.toDomain(orm);
   }
 
-  async save(user: DomainUser): Promise<void> {
+  public async save(user: DomainUser): Promise<void> {
     const orm = await this.orm.em.findOneOrFail(OrmUser, user.id.value);
     orm.email = user.email;
     orm.firstName = user.firstName;

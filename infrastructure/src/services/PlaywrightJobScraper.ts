@@ -25,9 +25,9 @@ export class PlaywrightJobScraper implements JobScraper {
   private page!: Playwright.Page;
   private searchCommand!: LinkedInSearchJobsCommand;
 
-  constructor(private readonly config = inject(PLAYWRIGHT_JOB_SCRAPER_CONFIG) as PlaywrightJobScraperConfig) {}
+  public constructor(private readonly config = inject(PLAYWRIGHT_JOB_SCRAPER_CONFIG) as PlaywrightJobScraperConfig) {}
 
-  async connect(): Promise<void> {
+  public async connect(): Promise<void> {
     this.log.info('Launching browser...');
 
     this.browser = await Playwright.chromium.launch({
@@ -50,11 +50,11 @@ export class PlaywrightJobScraper implements JobScraper {
     }
   }
 
-  async close(): Promise<void> {
+  public async close(): Promise<void> {
     await this.browser?.close();
   }
 
-  async search(config: JobSearchConfigDto, onResult: ScrapeResultCallback): Promise<void> {
+  public async search(config: JobSearchConfigDto, onResult: ScrapeResultCallback): Promise<void> {
     await this.searchCommand.search(config, async (result, parseDetails) => {
       await onResult(
         {

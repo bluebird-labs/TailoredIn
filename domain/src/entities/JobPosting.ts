@@ -59,7 +59,7 @@ export class JobPosting extends AggregateRoot<JobId> {
   public updatedAt: Date;
   public scores: Readonly<JobScores> | null = null;
 
-  constructor(props: {
+  public constructor(props: {
     id: JobId;
     companyId: string;
     status: JobStatus;
@@ -109,33 +109,33 @@ export class JobPosting extends AggregateRoot<JobId> {
 
   // --- Queries ---
 
-  isNew(): boolean {
+  public isNew(): boolean {
     return this.status === JobStatus.NEW;
   }
 
-  isInProcess(): boolean {
+  public isInProcess(): boolean {
     return IN_PROCESS_JOB_STATUSES.has(this.status);
   }
 
-  isDiscarded(): boolean {
+  public isDiscarded(): boolean {
     return DISCARDED_JOB_STATUSES.has(this.status);
   }
 
-  isRemote(): boolean {
+  public isRemote(): boolean {
     return this.remote === 'remote';
   }
 
-  hasMoreApplicantsThan(count: number, ifNull = false): boolean {
+  public hasMoreApplicantsThan(count: number, ifNull = false): boolean {
     if (this.applicantsCount === null) return ifNull;
     return this.applicantsCount >= count;
   }
 
-  hasLessApplicantsThan(count: number, ifNull = true): boolean {
+  public hasLessApplicantsThan(count: number, ifNull = true): boolean {
     if (this.applicantsCount === null) return ifNull;
     return this.applicantsCount <= count;
   }
 
-  isWithinSalaryRange(min: number, target: number, ifNull = true): boolean {
+  public isWithinSalaryRange(min: number, target: number, ifNull = true): boolean {
     if (this.salaryLow === null && this.salaryHigh === null) return ifNull;
     const low = this.salaryLow ?? this.salaryHigh!;
     const high = this.salaryHigh ?? this.salaryLow!;
@@ -145,7 +145,7 @@ export class JobPosting extends AggregateRoot<JobId> {
 
   // --- Commands ---
 
-  changeStatus(newStatus: JobStatus): boolean {
+  public changeStatus(newStatus: JobStatus): boolean {
     if (this.status === newStatus) return false;
     const oldStatus = this.status;
     this.status = newStatus;
@@ -154,26 +154,26 @@ export class JobPosting extends AggregateRoot<JobId> {
     return true;
   }
 
-  retire(): boolean {
+  public retire(): boolean {
     return this.changeStatus(JobStatus.RETIRED);
   }
 
-  setApplyLink(value: string): void {
+  public setApplyLink(value: string): void {
     this.applyLink = value;
     this.updatedAt = new Date();
   }
 
-  setInitialStatus(status: JobStatus): void {
+  public setInitialStatus(status: JobStatus): void {
     this.status = status;
   }
 
-  score(scores: JobScores): void {
+  public score(scores: JobScores): void {
     this.scores = scores;
   }
 
   // --- Factory ---
 
-  static create(props: JobPostingCreateProps): JobPosting {
+  public static create(props: JobPostingCreateProps): JobPosting {
     const now = new Date();
     return new JobPosting({
       id: JobId.generate(),

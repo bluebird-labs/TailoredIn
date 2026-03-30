@@ -3,6 +3,15 @@ export namespace StringUtil {
     return str.endsWith(char) ? str : `${str}${char}`;
   };
 
+  export const toKebabCase = (str: string): string => {
+    return str
+      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toLowerCase();
+  };
+
   export const toLowerSnakeCase = (str: string): string => {
     // Convert to lowercase
     const lowercase = str.toLowerCase();
