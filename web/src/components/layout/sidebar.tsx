@@ -1,5 +1,6 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import { Briefcase, GraduationCap, Layers, type LucideIcon, ScrollText, Sparkles, User, Wrench } from 'lucide-react';
+import { ThemeToggle } from '@/components/layout/theme-toggle.js';
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +13,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { ThemeToggle } from '@/components/layout/theme-toggle.js';
 
 interface NavItem {
   label: string;

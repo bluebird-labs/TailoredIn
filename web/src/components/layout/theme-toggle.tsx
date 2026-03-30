@@ -1,7 +1,7 @@
 import { Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { SidebarMenuButton } from '@/components/ui/sidebar';
-import { toggleTheme, type Theme } from '@/lib/theme.js';
+import { type Theme, toggleTheme } from '@/lib/theme.js';
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() =>
