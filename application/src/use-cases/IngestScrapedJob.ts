@@ -1,10 +1,14 @@
 import { Logger } from '@tailoredin/core/src/Logger.js';
-import { type Company, type JobPosting, JobStatus } from '@tailoredin/domain';
+import {
+  type Company,
+  type CompanyRepository,
+  type JobElector,
+  type JobPosting,
+  type JobRepository,
+  JobStatus
+} from '@tailoredin/domain';
 import * as DateParser from 'any-date-parser';
 import type { ScrapeResultDto } from '../dtos/ScrapeResultDto.js';
-import type { CompanyRepository } from '../ports/CompanyRepository.js';
-import type { JobElector } from '../ports/JobElector.js';
-import type { JobRepository } from '../ports/JobRepository.js';
 
 export type IngestScrapedJobResult = {
   job: JobPosting;

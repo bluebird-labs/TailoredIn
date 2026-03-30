@@ -1,0 +1,42 @@
+import { Entity } from '../Entity.js';
+import { ResumeBulletId } from '../value-objects/ResumeBulletId.js';
+
+export type ResumeBulletCreateProps = {
+  resumeCompanyId: string;
+  content: string;
+  ordinal: number;
+};
+
+export class ResumeBullet extends Entity<ResumeBulletId> {
+  public readonly resumeCompanyId: string;
+  public content: string;
+  public ordinal: number;
+  public readonly createdAt: Date;
+  public updatedAt: Date;
+
+  constructor(props: {
+    id: ResumeBulletId;
+    resumeCompanyId: string;
+    content: string;
+    ordinal: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    super(props.id);
+    this.resumeCompanyId = props.resumeCompanyId;
+    this.content = props.content;
+    this.ordinal = props.ordinal;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+  }
+
+  static create(props: ResumeBulletCreateProps): ResumeBullet {
+    const now = new Date();
+    return new ResumeBullet({
+      id: ResumeBulletId.generate(),
+      ...props,
+      createdAt: now,
+      updatedAt: now
+    });
+  }
+}

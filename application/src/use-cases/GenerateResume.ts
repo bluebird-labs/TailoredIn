@@ -1,8 +1,7 @@
 import { Logger } from '@tailoredin/core/src/Logger.js';
-import { Archetype, err, type JobPosting, ok, type Result, Resume } from '@tailoredin/domain';
+import { Archetype, err, type JobPosting, type JobRepository, ok, type Result, Resume } from '@tailoredin/domain';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeOutputDto } from '../dtos/ResumeOutputDto.js';
-import type { JobRepository } from '../ports/JobRepository.js';
 import type { LlmService } from '../ports/LlmService.js';
 import type { ResumeContentFactory } from '../ports/ResumeContentFactory.js';
 import type { ResumeRenderer } from '../ports/ResumeRenderer.js';

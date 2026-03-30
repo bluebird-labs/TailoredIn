@@ -1,4 +1,5 @@
-import type { Company, JobPosting, JobPostingCreateProps } from '@tailoredin/domain';
+import type { Company } from '../entities/Company.js';
+import type { JobPosting, JobPostingCreateProps } from '../entities/JobPosting.js';
 
 export type FindTopScoredParams = {
   top: number;

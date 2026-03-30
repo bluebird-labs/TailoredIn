@@ -1,5 +1,4 @@
-import type { JobPosting } from '@tailoredin/domain';
-import type { JobRepository } from '../ports/JobRepository.js';
+import type { JobPosting, JobRepository } from '@tailoredin/domain';
 
 export type GetTopJobInput = {
   targetSalary: number;

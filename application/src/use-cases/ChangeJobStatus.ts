@@ -1,6 +1,5 @@
-import type { JobPosting, JobStatus } from '@tailoredin/domain';
+import type { JobPosting, JobRepository, JobStatus } from '@tailoredin/domain';
 import { err, ok, type Result } from '@tailoredin/domain';
-import type { JobRepository } from '../ports/JobRepository.js';
 
 export type ChangeJobStatusInput = {
   jobId: string;
