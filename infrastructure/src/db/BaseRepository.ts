@@ -19,7 +19,16 @@ export class BaseRepository<E extends BaseEntity> extends EntityRepository<E> {
     const conn = this.getEm(opts).getConnection();
     const dbConn: IDatabaseConnection = {
       query: async (sql: string, bindings: unknown[]) => {
-        const rows = (await conn.execute(sql, bindings as unknown[], 'all')) as R[];
+        // pgtyped emits PostgreSQL-native $N placeholders. MikroORM's execute()
+        // expects ? placeholders. Convert $N → ? and expand repeated $N refs.
+        const mapped: unknown[] = [];
+        const convertedSql = sql.replace(/\$(\d+)/g, (_, n) => {
+          let val = bindings[Number.parseInt(n, 10) - 1];
+          if (Array.isArray(val)) val = `{${val.join(',')}}`;
+          mapped.push(val);
+          return '?';
+        });
+        const rows = (await conn.execute(convertedSql, mapped as unknown[], 'all')) as R[];
         return { rows, rowCount: rows.length };
       }
     };

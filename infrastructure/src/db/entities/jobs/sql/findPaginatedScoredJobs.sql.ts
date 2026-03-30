@@ -49,16 +49,16 @@ const findPaginatedScoredJobsByScoreIr: any = {
     offset: true
   },
   params: [
-    { name: 'expertWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 556, b: 568 }] },
-    { name: 'interestWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 615, b: 629 }] },
-    { name: 'avoidWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 676, b: 687 }] },
-    { name: 'targetSalary', required: false, transform: { type: 'scalar' }, locs: [{ a: 897, b: 909 }] },
-    { name: 'statuses', required: false, transform: { type: 'scalar' }, locs: [{ a: 939, b: 947 }, { a: 977, b: 985 }] },
-    { name: 'limit', required: false, transform: { type: 'scalar' }, locs: [{ a: 1113, b: 1118 }] },
-    { name: 'offset', required: false, transform: { type: 'scalar' }, locs: [{ a: 1134, b: 1140 }] }
+    { name: 'expertWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 819, b: 831 }] },
+    { name: 'interestWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 878, b: 892 }] },
+    { name: 'avoidWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 939, b: 950 }] },
+    { name: 'targetSalary', required: false, transform: { type: 'scalar' }, locs: [{ a: 1160, b: 1172 }] },
+    { name: 'statuses', required: false, transform: { type: 'scalar' }, locs: [{ a: 1223, b: 1231 }, { a: 1273, b: 1281 }] },
+    { name: 'limit', required: false, transform: { type: 'scalar' }, locs: [{ a: 1408, b: 1413 }] },
+    { name: 'offset', required: false, transform: { type: 'scalar' }, locs: [{ a: 1427, b: 1433 }] }
   ],
   statement:
-    "SELECT j.id                 AS job_id,\n       j.title              AS title,\n       j.status             AS status,\n       j.posted_at          AS posted_at,\n       c.name               AS company_name,\n       sk.expert_score      AS expert_score,\n       sk.interest_score    AS interest_score,\n       sk.avoid_score       AS avoid_score,\n       sk.total_skill_score AS total_skill_score,\n       sal.salary_score     AS salary_score,\n       sk.expert_skills     AS expert_skills,\n       sk.interest_skills   AS interest_skills,\n       sk.avoid_skills      AS avoid_skills,\n       COUNT(*) OVER()      AS total_count\nFROM jobs j\n         JOIN companies c ON c.id = j.company_id\n         JOIN LATERAL score_job_skills(j.id,\n                                       j.description_fts,\n                                       :expertWeight::INT,\n                                       :interestWeight::INT,\n                                       :avoidWeight::INT) sk ON TRUE\n         JOIN LATERAL score_job_salary(j.id,\n                                       j.salary_low,\n                                       j.salary_high,\n                                       :targetSalary::INT) sal ON TRUE\nWHERE c.ignored = FALSE\n  AND (:statuses::text[] IS NULL OR j.status = ANY(:statuses::text[]))\nORDER BY sk.expert_score DESC,\n         sk.total_skill_score DESC,\n         sal.salary_score DESC NULLS LAST\nLIMIT :limit::INT\nOFFSET :offset::INT"
+    "SELECT j.id                 AS job_id,\n       j.title              AS title,\n       j.status             AS status,\n       j.posted_at          AS posted_at,\n       c.name               AS company_name,\n       sk.expert_score      AS expert_score,\n       sk.interest_score    AS interest_score,\n       sk.avoid_score       AS avoid_score,\n       sk.total_skill_score AS total_skill_score,\n       sal.salary_score     AS salary_score,\n       sk.expert_skills     AS expert_skills,\n       sk.interest_skills   AS interest_skills,\n       sk.avoid_skills      AS avoid_skills,\n       COUNT(*) OVER()      AS total_count\nFROM jobs j\n         JOIN companies c ON c.id = j.company_id\n         JOIN LATERAL score_job_skills(j.id,\n                                       j.description_fts,\n                                       :expertWeight::INT,\n                                       :interestWeight::INT,\n                                       :avoidWeight::INT) sk ON TRUE\n         JOIN LATERAL score_job_salary(j.id,\n                                       j.salary_low,\n                                       j.salary_high,\n                                       :targetSalary::INT) sal ON TRUE\nWHERE c.ignored = FALSE\n  AND (:statuses::text[] IS NULL OR j.status::text = ANY(:statuses::text[]))\nORDER BY sk.expert_score DESC,\n         sk.total_skill_score DESC,\n         sal.salary_score DESC NULLS LAST\nLIMIT :limit::INT\nOFFSET :offset::INT"
 };
 
 /**
@@ -90,7 +90,7 @@ const findPaginatedScoredJobsByScoreIr: any = {
  *                                        j.salary_high,
  *                                        :targetSalary::INT) sal ON TRUE
  * WHERE c.ignored = FALSE
- *   AND (:statuses::text[] IS NULL OR j.status = ANY(:statuses::text[]))
+ *   AND (:statuses::text[] IS NULL OR j.status::text = ANY(:statuses::text[]))
  * ORDER BY sk.expert_score DESC,
  *          sk.total_skill_score DESC,
  *          sal.salary_score DESC NULLS LAST
@@ -149,16 +149,16 @@ const findPaginatedScoredJobsByDateIr: any = {
     offset: true
   },
   params: [
-    { name: 'expertWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 556, b: 568 }] },
-    { name: 'interestWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 615, b: 629 }] },
-    { name: 'avoidWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 676, b: 687 }] },
-    { name: 'targetSalary', required: false, transform: { type: 'scalar' }, locs: [{ a: 897, b: 909 }] },
-    { name: 'statuses', required: false, transform: { type: 'scalar' }, locs: [{ a: 939, b: 947 }, { a: 977, b: 985 }] },
-    { name: 'limit', required: false, transform: { type: 'scalar' }, locs: [{ a: 1052, b: 1057 }] },
-    { name: 'offset', required: false, transform: { type: 'scalar' }, locs: [{ a: 1073, b: 1079 }] }
+    { name: 'expertWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 819, b: 831 }] },
+    { name: 'interestWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 878, b: 892 }] },
+    { name: 'avoidWeight', required: false, transform: { type: 'scalar' }, locs: [{ a: 939, b: 950 }] },
+    { name: 'targetSalary', required: false, transform: { type: 'scalar' }, locs: [{ a: 1160, b: 1172 }] },
+    { name: 'statuses', required: false, transform: { type: 'scalar' }, locs: [{ a: 1223, b: 1231 }, { a: 1273, b: 1281 }] },
+    { name: 'limit', required: false, transform: { type: 'scalar' }, locs: [{ a: 1336, b: 1341 }] },
+    { name: 'offset', required: false, transform: { type: 'scalar' }, locs: [{ a: 1355, b: 1361 }] }
   ],
   statement:
-    "SELECT j.id                 AS job_id,\n       j.title              AS title,\n       j.status             AS status,\n       j.posted_at          AS posted_at,\n       c.name               AS company_name,\n       sk.expert_score      AS expert_score,\n       sk.interest_score    AS interest_score,\n       sk.avoid_score       AS avoid_score,\n       sk.total_skill_score AS total_skill_score,\n       sal.salary_score     AS salary_score,\n       sk.expert_skills     AS expert_skills,\n       sk.interest_skills   AS interest_skills,\n       sk.avoid_skills      AS avoid_skills,\n       COUNT(*) OVER()      AS total_count\nFROM jobs j\n         JOIN companies c ON c.id = j.company_id\n         JOIN LATERAL score_job_skills(j.id,\n                                       j.description_fts,\n                                       :expertWeight::INT,\n                                       :interestWeight::INT,\n                                       :avoidWeight::INT) sk ON TRUE\n         JOIN LATERAL score_job_salary(j.id,\n                                       j.salary_low,\n                                       j.salary_high,\n                                       :targetSalary::INT) sal ON TRUE\nWHERE c.ignored = FALSE\n  AND (:statuses::text[] IS NULL OR j.status = ANY(:statuses::text[]))\nORDER BY j.posted_at DESC NULLS LAST\nLIMIT :limit::INT\nOFFSET :offset::INT"
+    "SELECT j.id                 AS job_id,\n       j.title              AS title,\n       j.status             AS status,\n       j.posted_at          AS posted_at,\n       c.name               AS company_name,\n       sk.expert_score      AS expert_score,\n       sk.interest_score    AS interest_score,\n       sk.avoid_score       AS avoid_score,\n       sk.total_skill_score AS total_skill_score,\n       sal.salary_score     AS salary_score,\n       sk.expert_skills     AS expert_skills,\n       sk.interest_skills   AS interest_skills,\n       sk.avoid_skills      AS avoid_skills,\n       COUNT(*) OVER()      AS total_count\nFROM jobs j\n         JOIN companies c ON c.id = j.company_id\n         JOIN LATERAL score_job_skills(j.id,\n                                       j.description_fts,\n                                       :expertWeight::INT,\n                                       :interestWeight::INT,\n                                       :avoidWeight::INT) sk ON TRUE\n         JOIN LATERAL score_job_salary(j.id,\n                                       j.salary_low,\n                                       j.salary_high,\n                                       :targetSalary::INT) sal ON TRUE\nWHERE c.ignored = FALSE\n  AND (:statuses::text[] IS NULL OR j.status::text = ANY(:statuses::text[]))\nORDER BY j.posted_at DESC NULLS LAST\nLIMIT :limit::INT\nOFFSET :offset::INT"
 };
 
 /**

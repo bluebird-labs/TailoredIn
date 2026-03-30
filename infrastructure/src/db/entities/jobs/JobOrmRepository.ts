@@ -165,7 +165,7 @@ export class JobOrmRepository extends BaseRepository<Job> {
 
     const jobs = await this.getEm(opts)
       .repo(Job)
-      .find({ id: { $in: jobIds } }, opts);
+      .find({ id: { $in: jobIds } }, { ...opts, populate: ['company'] });
 
     const jobMap = new Map(jobs.map(j => [j.id, j]));
 
