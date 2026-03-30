@@ -8,9 +8,7 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "test": "bun test",
-    "test:coverage": "bun test --coverage"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tailoredin/domain": "workspace:*",
