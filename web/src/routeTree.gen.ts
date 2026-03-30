@@ -14,6 +14,7 @@ import { Route as JobsIndexRouteImport } from './routes/jobs/index'
 import { Route as ArchetypesIndexRouteImport } from './routes/archetypes/index'
 import { Route as ResumeSkillsRouteImport } from './routes/resume/skills'
 import { Route as ResumeProfileRouteImport } from './routes/resume/profile'
+import { Route as ResumeHeadlinesRouteImport } from './routes/resume/headlines'
 import { Route as ResumeExperienceRouteImport } from './routes/resume/experience'
 import { Route as ResumeEducationRouteImport } from './routes/resume/education'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
@@ -44,6 +45,11 @@ const ResumeProfileRoute = ResumeProfileRouteImport.update({
   path: '/resume/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumeHeadlinesRoute = ResumeHeadlinesRouteImport.update({
+  id: '/resume/headlines',
+  path: '/resume/headlines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumeExperienceRoute = ResumeExperienceRouteImport.update({
   id: '/resume/experience',
   path: '/resume/experience',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
+  '/resume/headlines': typeof ResumeHeadlinesRoute
   '/resume/profile': typeof ResumeProfileRoute
   '/resume/skills': typeof ResumeSkillsRoute
   '/archetypes/': typeof ArchetypesIndexRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
+  '/resume/headlines': typeof ResumeHeadlinesRoute
   '/resume/profile': typeof ResumeProfileRoute
   '/resume/skills': typeof ResumeSkillsRoute
   '/archetypes': typeof ArchetypesIndexRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
+  '/resume/headlines': typeof ResumeHeadlinesRoute
   '/resume/profile': typeof ResumeProfileRoute
   '/resume/skills': typeof ResumeSkillsRoute
   '/archetypes/': typeof ArchetypesIndexRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/resume/education'
     | '/resume/experience'
+    | '/resume/headlines'
     | '/resume/profile'
     | '/resume/skills'
     | '/archetypes/'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/resume/education'
     | '/resume/experience'
+    | '/resume/headlines'
     | '/resume/profile'
     | '/resume/skills'
     | '/archetypes'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/resume/education'
     | '/resume/experience'
+    | '/resume/headlines'
     | '/resume/profile'
     | '/resume/skills'
     | '/archetypes/'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   JobsJobIdRoute: typeof JobsJobIdRoute
   ResumeEducationRoute: typeof ResumeEducationRoute
   ResumeExperienceRoute: typeof ResumeExperienceRoute
+  ResumeHeadlinesRoute: typeof ResumeHeadlinesRoute
   ResumeProfileRoute: typeof ResumeProfileRoute
   ResumeSkillsRoute: typeof ResumeSkillsRoute
   ArchetypesIndexRoute: typeof ArchetypesIndexRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resume/headlines': {
+      id: '/resume/headlines'
+      path: '/resume/headlines'
+      fullPath: '/resume/headlines'
+      preLoaderRoute: typeof ResumeHeadlinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resume/experience': {
       id: '/resume/experience'
       path: '/resume/experience'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   JobsJobIdRoute: JobsJobIdRoute,
   ResumeEducationRoute: ResumeEducationRoute,
   ResumeExperienceRoute: ResumeExperienceRoute,
+  ResumeHeadlinesRoute: ResumeHeadlinesRoute,
   ResumeProfileRoute: ResumeProfileRoute,
   ResumeSkillsRoute: ResumeSkillsRoute,
   ArchetypesIndexRoute: ArchetypesIndexRoute,

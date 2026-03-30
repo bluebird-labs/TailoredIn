@@ -1,5 +1,15 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Briefcase, GraduationCap, Layers, type LucideIcon, ScrollText, Sparkles, User, Wrench } from 'lucide-react';
+import {
+  Briefcase,
+  GraduationCap,
+  Heading,
+  Layers,
+  type LucideIcon,
+  ScrollText,
+  Sparkles,
+  User,
+  Wrench
+} from 'lucide-react';
 import { ThemeToggle } from '@/components/layout/theme-toggle.js';
 import {
   Sidebar,
@@ -24,6 +34,7 @@ const jobsNav: NavItem[] = [{ label: 'Jobs', to: '/jobs', icon: Briefcase }];
 
 const resumeNav: NavItem[] = [
   { label: 'Profile', to: '/resume/profile', icon: User },
+  { label: 'Headlines', to: '/resume/headlines', icon: Heading },
   { label: 'Experience', to: '/resume/experience', icon: ScrollText },
   { label: 'Skills', to: '/resume/skills', icon: Wrench },
   { label: 'Education', to: '/resume/education', icon: GraduationCap }
