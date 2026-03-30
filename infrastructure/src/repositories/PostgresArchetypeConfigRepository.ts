@@ -36,7 +36,11 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
   }
 
   public async findByUserAndKey(userId: string, key: ArchetypeEnum): Promise<DomainArchetypeConfig | null> {
-    const orm = await this.orm.em.findOne(OrmArchetype, { user: userId, archetypeKey: key }, { populate: ['headline'] });
+    const orm = await this.orm.em.findOne(
+      OrmArchetype,
+      { user: userId, archetypeKey: key },
+      { populate: ['headline'] }
+    );
     if (!orm) return null;
     return this.toDomain(orm, userId);
   }
