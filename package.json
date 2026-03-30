@@ -37,8 +37,8 @@
     "cli:typecheck": "bun run --cwd presentation/cli typecheck",
     "cli:test": "bun run --cwd presentation/cli test",
 
-    "db:migration:create": "bun run --cwd infrastructure migration:create",
-    "db:migration:up": "bun run --cwd infrastructure migration:up"
+    "db:migration:create": "set -a && . ./.env && bun run --cwd infrastructure migration:create",
+    "db:migration:up": "set -a && . ./.env && bun run --cwd infrastructure migration:up"
   },
   "devDependencies": {
     "@biomejs/biome": "latest",

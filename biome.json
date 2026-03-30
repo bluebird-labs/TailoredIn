@@ -20,7 +20,7 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noConsole": "off",
+        "noConsole": "error",
         "noExplicitAny": "off"
       },
       "style": {

@@ -1,6 +1,6 @@
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { type Company, type JobPosting, JobStatus } from '@tailoredin/domain';
 import * as DateParser from 'any-date-parser';
-import * as NpmLog from 'npmlog';
 import type { ScrapeResultDto } from '../dtos/ScrapeResultDto.js';
 import type { CompanyRepository } from '../ports/CompanyRepository.js';
 import type { JobElector } from '../ports/JobElector.js';
@@ -13,6 +13,7 @@ export type IngestScrapedJobResult = {
 
 export class IngestScrapedJob {
   private static readonly JOB_VIEW_BASE = 'https://www.linkedin.com/jobs/view';
+  private readonly log = Logger.create(IngestScrapedJob.name);
 
   constructor(
     private readonly jobRepository: JobRepository,
@@ -84,7 +85,7 @@ export class IngestScrapedJob {
     const parsePart = (part: string): number | null => {
       const match = part.match(reg);
       if (!match) {
-        NpmLog.warn(IngestScrapedJob.name, `Unhandled salary format: ${salary}`);
+        this.log.warn(`Unhandled salary format: ${salary}`);
         return null;
       }
       const ksStr = match[1];
@@ -100,7 +101,7 @@ export class IngestScrapedJob {
     if (salary.includes('-')) {
       const parts = salary.split('-').map(x => x.trim());
       if (parts.length !== 2) {
-        NpmLog.warn(IngestScrapedJob.name, `Unhandled salary format: ${salary}`);
+        this.log.warn(`Unhandled salary format: ${salary}`);
         return { low: null, high: null };
       }
       return { low: parsePart(parts[0]), high: parsePart(parts[1]) };

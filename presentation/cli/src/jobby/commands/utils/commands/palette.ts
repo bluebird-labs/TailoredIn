@@ -1,10 +1,10 @@
 import type { WebColorService } from '@tailoredin/application';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { DI } from '@tailoredin/infrastructure';
 import { command, positional, string } from 'cmd-ts';
-import * as NpmLog from 'npmlog';
 import { container } from '../../../di/container.js';
 
-const LOG_PREFIX = 'palette';
+const log = Logger.create('palette');
 const webColorService = container.get(DI.WebColorService) as WebColorService;
 
 export const palette = command({
@@ -14,6 +14,6 @@ export const palette = command({
   },
   handler: async args => {
     const colorPalette = await webColorService.findPalette(args.url);
-    NpmLog.info(LOG_PREFIX, 'Palette:', colorPalette);
+    log.info('Palette:', colorPalette);
   }
 });

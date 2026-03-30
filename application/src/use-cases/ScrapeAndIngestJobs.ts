@@ -1,12 +1,12 @@
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { JobStatus } from '@tailoredin/domain';
-import * as NpmLog from 'npmlog';
 import type { JobSearchConfigDto } from '../dtos/JobSearchConfigDto.js';
 import type { JobRepository } from '../ports/JobRepository.js';
 import type { JobScraper } from '../ports/JobScraper.js';
 import type { IngestScrapedJob } from './IngestScrapedJob.js';
 
 export class ScrapeAndIngestJobs {
-  private static readonly LOG_PREFIX = ScrapeAndIngestJobs.name;
+  private readonly log = Logger.create(ScrapeAndIngestJobs.name);
 
   constructor(
     private readonly jobScraper: JobScraper,
@@ -19,7 +19,7 @@ export class ScrapeAndIngestJobs {
 
     try {
       for (const config of configs) {
-        NpmLog.notice(ScrapeAndIngestJobs.LOG_PREFIX, `Searching for "${config.keywords}"...`);
+        this.log.info(`Searching for "${config.keywords}"...`);
 
         await this.jobScraper.search(config, async (scrapeResult, fetchDetails) => {
           const { job, company } = await this.ingestScrapedJob.execute(scrapeResult);
@@ -40,13 +40,13 @@ export class ScrapeAndIngestJobs {
           }
 
           if (job.status === JobStatus.NEW) {
-            NpmLog.info(ScrapeAndIngestJobs.LOG_PREFIX, `Job added: ${job.title} at ${company.name}`);
+            this.log.info(`Job added: ${job.title} at ${company.name}`);
           } else {
-            NpmLog.warn(ScrapeAndIngestJobs.LOG_PREFIX, `Job rejected (${job.status}): ${job.title}`);
+            this.log.warn(`Job rejected (${job.status}): ${job.title}`);
           }
         });
 
-        NpmLog.notice(ScrapeAndIngestJobs.LOG_PREFIX, `Done searching for "${config.keywords}".`);
+        this.log.info(`Done searching for "${config.keywords}".`);
       }
     } finally {
       await this.jobScraper.close();

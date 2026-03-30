@@ -2,7 +2,7 @@ import FS from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { JobScraper, JobSearchConfigDto, ScrapeResultCallback } from '@tailoredin/application';
 import { TimeUtil } from '@tailoredin/core';
-import * as NpmLog from 'npmlog';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import * as Playwright from 'playwright';
 import { DEFAULT_AUTH_FILE as AUTH_FILE } from '../linkedin/LinkedInExplorer.js';
 import { LinkedInSearchJobsCommand } from '../linkedin/LinkedInSearchJobsCommand.js';
@@ -19,6 +19,7 @@ export type PlaywrightJobScraperConfig = {
 
 @injectable()
 export class PlaywrightJobScraper implements JobScraper {
+  private readonly log = Logger.create(PlaywrightJobScraper.name);
   private browser!: Playwright.Browser;
   private browserContext!: Playwright.BrowserContext;
   private page!: Playwright.Page;
@@ -27,7 +28,7 @@ export class PlaywrightJobScraper implements JobScraper {
   constructor(private readonly config = inject(PLAYWRIGHT_JOB_SCRAPER_CONFIG) as PlaywrightJobScraperConfig) {}
 
   async connect(): Promise<void> {
-    NpmLog.info(PlaywrightJobScraper.name, 'Launching browser...');
+    this.log.info('Launching browser...');
 
     this.browser = await Playwright.chromium.launch({
       headless: this.config.headless,
@@ -85,7 +86,7 @@ export class PlaywrightJobScraper implements JobScraper {
   }
 
   private async login(): Promise<void> {
-    NpmLog.info(PlaywrightJobScraper.name, 'Logging in...');
+    this.log.info('Logging in...');
     await this.page.goto(LinkedInUrls.LOGIN);
     await this.page.fill('input[name="session_key"]', this.config.email);
     await this.page.fill('input[name="session_password"]', this.config.password);

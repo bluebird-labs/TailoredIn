@@ -1,8 +1,8 @@
 import { injectable } from '@needle-di/core';
 import type { ColorPaletteDto, WebColorService } from '@tailoredin/application';
 import { ColorUtil, EnumUtil } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { Vibrant } from 'node-vibrant/node';
-import * as NpmLog from 'npmlog';
 import * as Playwright from 'playwright';
 
 enum PaletteKey {
@@ -16,6 +16,7 @@ enum PaletteKey {
 
 @injectable()
 export class PlaywrightWebColorService implements WebColorService {
+  private readonly log = Logger.create(PlaywrightWebColorService.name);
   async findPalette(websiteUrl: string): Promise<ColorPaletteDto> {
     const browser = await Playwright.chromium.launch({ headless: true });
     const page = await browser.newPage();
@@ -65,7 +66,7 @@ export class PlaywrightWebColorService implements WebColorService {
         }
       }
     } catch (err) {
-      NpmLog.warn(PlaywrightWebColorService.name, `Error extracting colors from ${websiteUrl}`, err);
+      this.log.warn(`Error extracting colors from ${websiteUrl}`, err);
     }
 
     return null;

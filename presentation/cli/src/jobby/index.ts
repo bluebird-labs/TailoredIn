@@ -2,12 +2,12 @@
 
 import 'reflect-metadata';
 import 'dotenv/config';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { binary, run, subcommands } from 'cmd-ts';
-import * as NpmLog from 'npmlog';
 import { jobsCommands } from './commands/jobs.js';
 import { utilsCommands } from './commands/utils/utils.js';
 
-const LOG_PREFIX = 'jobby';
+const log = Logger.create('jobby');
 
 const jobby = subcommands({
   name: 'jobby',
@@ -20,10 +20,10 @@ const jobby = subcommands({
 
 run(binary(jobby), process.argv)
   .then(() => {
-    NpmLog.info(LOG_PREFIX, 'Done.');
+    log.info('Done.');
     process.exit(0);
   })
   .catch(err => {
-    NpmLog.error(LOG_PREFIX, 'Command crashed.', err);
+    log.error('Command crashed.', err);
     process.exit(1);
   });

@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import { Environment } from '@tailoredin/core/src/Environment.js';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   DI,
@@ -19,7 +20,6 @@ import {
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 import { Elysia } from 'elysia';
-import * as NpmLog from 'npmlog';
 import { healthRoutes } from './routes/health.routes.js';
 import { jobRoutes } from './routes/jobs.routes.js';
 
@@ -66,6 +66,7 @@ container.bind({ provide: DI.ResumeContentFactory, useClass: TemplateResumeConte
 
 // --- App ---
 
+const log = Logger.create('API');
 const port = Number(process.env.API_PORT ?? 8000);
 
 const app = new Elysia()
@@ -81,12 +82,12 @@ const app = new Elysia()
       return { error: message };
     }
 
-    NpmLog.error('API', message);
+    log.error(message);
     set.status = 500;
     return { error: 'Internal server error' };
   })
   .listen(port);
 
-NpmLog.info('API', `Listening on port ${port}...`);
+log.info(`Listening on port ${port}...`);
 
 export type App = typeof app;

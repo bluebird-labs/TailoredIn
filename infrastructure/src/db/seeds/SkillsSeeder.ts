@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
-import * as NpmLog from 'npmlog';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { Skill } from '../entities/skills/Skill.js';
 import { SkillAffinity } from '../entities/skills/SkillAffinity.js';
 import type { SkillOrmRepository } from '../entities/skills/SkillOrmRepository.js';
@@ -126,6 +126,8 @@ const skills = new Map<string, { affinity: SkillAffinity; variants: string[] }>(
 ]);
 
 export class SkillsSeeder extends Seeder {
+  private readonly log = Logger.create('SkillsSeeder');
+
   public async run(em: EntityManager): Promise<void> {
     const newSkills: Skill[] = [];
 
@@ -136,6 +138,6 @@ export class SkillsSeeder extends Seeder {
     const repo = em.getRepository(Skill) as SkillOrmRepository;
     const stats = await repo.refreshAll(newSkills);
 
-    NpmLog.info(this.constructor.name, `All skills refreshed.`, stats);
+    this.log.info('All skills refreshed.', stats);
   }
 }

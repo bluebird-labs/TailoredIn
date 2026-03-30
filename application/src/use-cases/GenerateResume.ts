@@ -1,5 +1,5 @@
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { Archetype, err, type JobPosting, ok, type Result, Resume } from '@tailoredin/domain';
-import * as NpmLog from 'npmlog';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeOutputDto } from '../dtos/ResumeOutputDto.js';
 import type { JobRepository } from '../ports/JobRepository.js';
@@ -11,6 +11,8 @@ import type { WebColorService } from '../ports/WebColorService.js';
 const DEFAULT_AWESOME_COLOR = '#178FEA';
 
 export class GenerateResume {
+  private readonly log = Logger.create(GenerateResume.name);
+
   constructor(
     private readonly jobRepository: JobRepository,
     private readonly llmService: LlmService,
@@ -27,7 +29,7 @@ export class GenerateResume {
       return err(new Error(`Job not found: ${input.jobId}`));
     }
 
-    NpmLog.info(GenerateResume.name, 'Extracting job posting insights...');
+    this.log.info('Extracting job posting insights...');
 
     const postingInsights = await this.llmService.extractJobPostingInsights({
       jobDescription: job.description,
@@ -45,7 +47,7 @@ export class GenerateResume {
       keywords: []
     });
 
-    NpmLog.info(GenerateResume.name, 'Extracting application insights...');
+    this.log.info('Extracting application insights...');
 
     const appInsights = await this.llmService.extractApplicationInsights({
       jobDescription: job.description,
@@ -59,7 +61,7 @@ export class GenerateResume {
     let awesomeColor = DEFAULT_AWESOME_COLOR;
 
     if (postingInsights.website) {
-      NpmLog.info(GenerateResume.name, 'Extracting website colors...');
+      this.log.info('Extracting website colors...');
       const primaryColor = await this.webColorService.findPrimaryColor(postingInsights.website);
       if (primaryColor) awesomeColor = primaryColor;
     }
@@ -70,7 +72,7 @@ export class GenerateResume {
       keywords: appInsights.keywords
     });
 
-    NpmLog.info(GenerateResume.name, 'Rendering resume PDF...');
+    this.log.info('Rendering resume PDF...');
 
     const pdfPath = await this.resumeRenderer.render({
       content,

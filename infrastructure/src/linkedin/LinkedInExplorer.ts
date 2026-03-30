@@ -1,9 +1,8 @@
 import FS from 'node:fs';
 import Path from 'node:path';
 import { TimeUtil } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core/src/Logger.js';
 import { milliseconds } from 'date-fns';
-import * as NpmLog from 'npmlog';
-import * as NPMLog from 'npmlog';
 import * as PlayWright from 'playwright';
 import {
   LinkedInSearchJobsCommand,
@@ -26,7 +25,7 @@ export const DEFAULT_AUTH_FILE = Path.resolve(PACKAGE_DIR, 'playwright/.auth/lin
 export const DEFAULT_CONNECTION_TIMEOUT = milliseconds({ seconds: 30 });
 
 export class LinkedInExplorer {
-  private readonly logPrefix: string;
+  private readonly log = Logger.create('LinkedInExplorer');
   private readonly config: LinkedInExplorerConfig;
   private page!: PlayWright.Page;
   private browser!: PlayWright.Browser;
@@ -35,7 +34,6 @@ export class LinkedInExplorer {
 
   constructor(config: LinkedInExplorerConfig) {
     this.config = config;
-    this.logPrefix = this.constructor.name;
   }
 
   public async close() {
@@ -43,7 +41,7 @@ export class LinkedInExplorer {
   }
 
   public async connect(): Promise<void> {
-    NpmLog.info(this.logPrefix, `Launching browser...`);
+    this.log.info('Launching browser...');
 
     this.browser = await PlayWright.chromium.launch({
       headless: this.config.headless,
@@ -65,7 +63,7 @@ export class LinkedInExplorer {
       waitUntil: 'load'
     });
 
-    NPMLog.info(this.logPrefix, 'Connected, checking for login required...');
+    this.log.info('Connected, checking for login required...');
 
     if (await this.isLoggedOut()) {
       await this.login();
@@ -83,7 +81,7 @@ export class LinkedInExplorer {
   }
 
   public async login(): Promise<void> {
-    NpmLog.info(this.logPrefix, `Logging in...`);
+    this.log.info('Logging in...');
 
     await this.page.goto(LinkedInUrls.LOGIN);
     await this.page.fill('input[name="session_key"]', this.config.email);

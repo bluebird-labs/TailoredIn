@@ -20,12 +20,10 @@
     "@tailoredin/core": "workspace:*",
     "cmd-ts": "^0.13.0",
     "date-fns": "^4.1.0",
-    "npmlog": "^7.0.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "@types/npmlog": "^7.0.0",
     "@types/yargs": "^17.0.33",
     "typescript": "^5.7.3"
   }
