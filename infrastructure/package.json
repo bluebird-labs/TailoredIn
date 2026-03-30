@@ -8,8 +8,9 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "test": "bun test",
-    "test:coverage": "bun test --coverage",
+    "test": "echo 'No unit tests yet'",
+    "test:coverage": "echo 'No unit tests yet'",
+    "test:integration": "bun test test-integration/",
     "typecheck": "tsc --noEmit",
     "migration:create": "bunx mikro-orm migration:create",
     "migration:up": "bunx mikro-orm migration:up"
