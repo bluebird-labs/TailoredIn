@@ -59,8 +59,8 @@ bun run lint           # lint only
 bun run dep:check      # verify no circular deps or cross-layer violations
 
 # API server
-bun run backend              # start on port 8000
-bun run backend:watch        # start with --watch
+bun run api                  # start on port 8000
+bun run api:watch            # start with --watch
 
 # Background scraping robot
 bun run robot

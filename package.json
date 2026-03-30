@@ -12,8 +12,8 @@
     "web"
   ],
   "scripts": {
-    "backend": "bun run api/src/index.ts",
-    "backend:watch": "bun --watch api/src/index.ts",
+    "api": "bun run api/src/index.ts",
+    "api:watch": "bun --watch api/src/index.ts",
     "robot": "bun run cli/src/robot/index.ts",
     "robot:watch": "bun --watch cli/src/robot/index.ts",
     "cvs": "bun run cli/src/cvs/index.ts",
