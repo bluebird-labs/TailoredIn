@@ -37,6 +37,72 @@ Auto-generate company research briefs for jobs the user is actively pursuing: pr
 - **Truthful.** Resume content comes from the user, not the AI. The LLM's role is to analyze job postings and optimize presentation of the user's real experience — never to generate or embellish qualifications.
 - **Dogfooded.** The author is the primary user. Features ship when they solve a real problem in an active job search.
 
+## Parallel Execution Strategy
+
+Multiple Claude Code sessions can work on different steps simultaneously using git worktrees. Each session gets its own branch and worktree under `.claude/worktrees/`.
+
+### Merge conflict hotspots
+
+Three append-only registry files that every backend branch touches:
+
+| File | What grows | Mitigation |
+|---|---|---|
+| `api/src/index.ts` | DI bindings + `.use()` route registration | Extract into `api/src/container.ts` before Wave 2 |
+| `infrastructure/src/DI.ts` | Token list | Namespace tokens by domain |
+| `application/src/index.ts` | Barrel re-exports | Add sub-barrels (`use-cases/index.ts`, `ports/index.ts`, `dtos/index.ts`) before Wave 2 |
+
+### Wave 1 — zero file overlap, safe to run now
+
+| Session | Step | Branch | Worktree | Packages touched |
+|---|---|---|---|---|
+| 1 | **1B** | `feat/milestone-1b` | `.claude/worktrees/milestone-1b` | `infrastructure/` |
+| 2 | **3A** | `feat/milestone-3a` | `.claude/worktrees/milestone-3a` | `web/` (new), root `package.json` |
+
+### Wave 2 — after 1B merges, prep then parallelize
+
+First commit on main: extract DI container, add sub-barrels, namespace DI tokens. Then:
+
+| Session | Steps | Branch | Worktree | Packages touched |
+|---|---|---|---|---|
+| 1 | **1C** | `feat/milestone-1c` | `.claude/worktrees/milestone-1c` | `infrastructure/` (new factory, DI swap) |
+| 2 | **2A + 2C** | `feat/milestone-2ac` | `.claude/worktrees/milestone-2ac` | `api/src/routes/user.*`, `education.*`, `headlines.*` |
+| 3 | **2B + 2D + 2E** | `feat/milestone-2bde` | `.claude/worktrees/milestone-2bde` | `api/src/routes/companies.*`, `skills.*`, `archetypes.*` |
+
+### Wave 3 — after 3A + relevant M2 endpoints merge
+
+All work lives inside `web/` — low conflict risk, 2-3 sessions:
+
+| Session | Steps | Branch | Worktree |
+|---|---|---|---|
+| 1 | **3B** (jobs) | `feat/milestone-3b` | `.claude/worktrees/milestone-3b` |
+| 2 | **3C + 3E** (profile, skills) | `feat/milestone-3ce` | `.claude/worktrees/milestone-3ce` |
+| 3 | **3D + 3F** (experience, education, archetypes) | `feat/milestone-3df` | `.claude/worktrees/milestone-3df` |
+
+### Dependency graph
+
+```mermaid
+graph TD
+    1A["1A ✅ Domain entities"] --> 1B["1B: Infra repos"]
+    1B --> 1C["1C: DB ContentFactory"]
+    1B --> PREP["Wave 2 prep: extract DI, sub-barrels"]
+    PREP --> 2AC["2A+2C: User + Education API"]
+    PREP --> 2BDE["2B+2D+2E: Experience + Skills + Archetypes API"]
+    START["main (now)"] --> 1B
+    START --> 3A["3A: Frontend scaffold"]
+    3A --> 3B["3B: Job pages"]
+    3A --> 3CE["3C+3E: Profile + Skills pages"]
+    3A --> 3DF["3D+3F: Experience + Education + Archetypes pages"]
+    2AC --> 3CE
+    2BDE --> 3DF
+    2BDE --> 3B
+
+    style 1A fill:#22c55e
+    style 1B fill:#facc15
+    style 3A fill:#facc15
+```
+
+Yellow = next up. Green = done.
+
 ## Milestones
 
 ### Milestone 1 — Database-Driven Resume Generation
