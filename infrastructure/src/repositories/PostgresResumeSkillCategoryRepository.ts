@@ -1,5 +1,5 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { inject, injectable } from '@needle-di/core';
 import {
   ResumeSkillCategory as DomainResumeSkillCategory,
   ResumeSkillItem as DomainResumeSkillItem,
@@ -13,7 +13,7 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresResumeSkillCategoryRepository implements ResumeSkillCategoryRepository {
-  public constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainResumeSkillCategory> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeSkillCategory, id, { populate: ['user'] });

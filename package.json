@@ -1,7 +1,40 @@
 {
   "name": "tailoredin",
   "version": "0.1.0",
+  "devDependencies": {
+    "@biomejs/biome": "latest",
+    "dependency-cruiser": "^17"
+  },
   "private": true,
+  "scripts": {
+    "api": "bun run api/src/index.ts",
+    "api:watch": "bun --watch api/src/index.ts",
+    "robot": "bun run cli/src/robot/index.ts",
+    "robot:watch": "bun --watch cli/src/robot/index.ts",
+    "cvs": "bun run cli/src/cvs/index.ts",
+    "web": "bun run --cwd web dev",
+    "web:build": "bun run --cwd web build",
+    "web:preview": "bun run --cwd web preview",
+    "check": "biome check domain application infrastructure core api cli web",
+    "check:fix": "biome check --write domain application infrastructure core api cli web",
+    "format": "biome format --write domain application infrastructure core api cli web",
+    "lint": "biome lint domain application infrastructure core api cli web",
+    "typecheck": "bun run --filter '@tailoredin/*' typecheck",
+    "test": "bun run --filter '@tailoredin/*' test",
+    "test:coverage": "bun run --filter '@tailoredin/*' test:coverage",
+    "dep:check": "depcruise domain application infrastructure api cli --config .dependency-cruiser.cjs",
+    "dep:graph": "depcruise domain application infrastructure api cli --config .dependency-cruiser.cjs --output-type dot | dot -T svg > dep-graph.svg",
+    "api:lint": "biome check api",
+    "api:lint:fix": "biome check --write api",
+    "api:typecheck": "bun run --cwd api typecheck",
+    "api:test": "bun run --cwd api test",
+    "cli:lint": "biome check cli",
+    "cli:lint:fix": "biome check --write cli",
+    "cli:typecheck": "bun run --cwd cli typecheck",
+    "cli:test": "bun run --cwd cli test",
+    "db:migration:create": "set -a && . ./.env && bun run --cwd infrastructure migration:create",
+    "db:migration:up": "set -a && . ./.env && bun run --cwd infrastructure migration:up"
+  },
   "workspaces": [
     "domain",
     "application",
@@ -10,44 +43,5 @@
     "api",
     "cli",
     "web"
-  ],
-  "scripts": {
-    "api": "bun run api/src/index.ts",
-    "api:watch": "bun --watch api/src/index.ts",
-    "robot": "bun run cli/src/robot/index.ts",
-    "robot:watch": "bun --watch cli/src/robot/index.ts",
-    "cvs": "bun run cli/src/cvs/index.ts",
-
-    "web": "bun run --cwd web dev",
-    "web:build": "bun run --cwd web build",
-    "web:preview": "bun run --cwd web preview",
-
-    "check": "biome check domain application infrastructure core api cli web",
-    "check:fix": "biome check --write domain application infrastructure core api cli web",
-    "format": "biome format --write domain application infrastructure core api cli web",
-    "lint": "biome lint domain application infrastructure core api cli web",
-    "typecheck": "bun run --filter '@tailoredin/*' typecheck",
-    "test": "bun run --filter '@tailoredin/*' test",
-    "test:coverage": "bun run --filter '@tailoredin/*' test:coverage",
-
-    "dep:check": "depcruise domain application infrastructure api cli --config .dependency-cruiser.cjs",
-    "dep:graph": "depcruise domain application infrastructure api cli --config .dependency-cruiser.cjs --output-type dot | dot -T svg > dep-graph.svg",
-
-    "api:lint": "biome check api",
-    "api:lint:fix": "biome check --write api",
-    "api:typecheck": "bun run --cwd api typecheck",
-    "api:test": "bun run --cwd api test",
-
-    "cli:lint": "biome check cli",
-    "cli:lint:fix": "biome check --write cli",
-    "cli:typecheck": "bun run --cwd cli typecheck",
-    "cli:test": "bun run --cwd cli test",
-
-    "db:migration:create": "set -a && . ./.env && bun run --cwd infrastructure migration:create",
-    "db:migration:up": "set -a && . ./.env && bun run --cwd infrastructure migration:up"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "latest",
-    "dependency-cruiser": "^17"
-  }
+  ]
 }

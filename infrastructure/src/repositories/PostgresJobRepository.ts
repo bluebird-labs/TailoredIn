@@ -1,5 +1,5 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { inject, injectable } from '@needle-di/core';
 import type {
   FindPaginatedParams,
   FindScoredParams,
@@ -25,7 +25,7 @@ import { SkillAffinity as OrmSkillAffinity } from '../db/entities/skills/SkillAf
 
 @injectable()
 export class PostgresJobRepository implements JobRepository {
-  public constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findById(id: string): Promise<JobPosting | null> {
     const orm = await this.orm.em.findOne(OrmJob, id);

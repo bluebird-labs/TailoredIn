@@ -1,5 +1,5 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { inject, injectable } from '@needle-di/core';
 import {
   type CompanyCreateProps,
   CompanyId,
@@ -11,7 +11,7 @@ import type { CompanyOrmRepository } from '../db/entities/companies/CompanyOrmRe
 
 @injectable()
 export class PostgresCompanyRepository implements CompanyRepository {
-  public constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async upsertByLinkedinLink(props: CompanyCreateProps): Promise<DomainCompany> {
     const repo = this.orm.em.getRepository(OrmCompany) as CompanyOrmRepository;

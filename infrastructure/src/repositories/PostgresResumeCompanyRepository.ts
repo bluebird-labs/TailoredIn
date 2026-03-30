@@ -1,5 +1,5 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { inject, injectable } from '@needle-di/core';
 import {
   ResumeBullet as DomainResumeBullet,
   ResumeCompany as DomainResumeCompany,
@@ -15,7 +15,7 @@ import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresResumeCompanyRepository implements ResumeCompanyRepository {
-  public constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainResumeCompany> {
     const orm = await this.orm.em.findOneOrFail(OrmResumeCompany, id, { populate: ['user'] });

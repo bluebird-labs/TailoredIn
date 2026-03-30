@@ -1,11 +1,11 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { inject, injectable } from '@needle-di/core';
 import { User as DomainUser, UserId, type UserRepository } from '@tailoredin/domain';
 import { User as OrmUser } from '../db/entities/users/User.js';
 
 @injectable()
 export class PostgresUserRepository implements UserRepository {
-  public constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainUser> {
     const orm = await this.orm.em.findOneOrFail(OrmUser, id);

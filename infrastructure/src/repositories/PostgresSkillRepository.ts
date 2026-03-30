@@ -1,5 +1,5 @@
-import type { MikroORM } from '@mikro-orm/postgresql';
-import { injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/postgresql';
+import { inject, injectable } from '@needle-di/core';
 import {
   Skill as DomainSkill,
   type SkillAffinity,
@@ -13,7 +13,7 @@ import type { SkillOrmRepository } from '../db/entities/skills/SkillOrmRepositor
 
 @injectable()
 export class PostgresSkillRepository implements SkillRepository {
-  public constructor(private readonly orm: MikroORM) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async refreshAll(skills: SkillCreateProps[]): Promise<SkillRefreshOutput> {
     const repo = this.orm.em.getRepository(OrmSkill) as SkillOrmRepository;
