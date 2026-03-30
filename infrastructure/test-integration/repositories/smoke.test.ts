@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
-import { MikroORM } from '@mikro-orm/postgresql';
+import type { MikroORM } from '@mikro-orm/postgresql';
 import {
   ResumeBulletId,
   type ResumeCompany,
@@ -15,17 +15,14 @@ import {
   type User,
   UserId
 } from '@tailoredin/domain';
-import { ormConfig } from '../../src/db/orm-config.js';
+import { ResumeDataSeeder } from '../../src/db/seeds/ResumeDataSeeder.js';
 import { PostgresResumeCompanyRepository } from '../../src/repositories/PostgresResumeCompanyRepository.js';
 import { PostgresResumeEducationRepository } from '../../src/repositories/PostgresResumeEducationRepository.js';
 import { PostgresResumeHeadlineRepository } from '../../src/repositories/PostgresResumeHeadlineRepository.js';
 import { PostgresResumeSkillCategoryRepository } from '../../src/repositories/PostgresResumeSkillCategoryRepository.js';
 import { PostgresUserRepository } from '../../src/repositories/PostgresUserRepository.js';
+import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase.js';
 
-/**
- * Smoke test: verifies repository implementations against a seeded database.
- * Requires: PostgreSQL running + `bun run db:migration:up` + ResumeDataSeeder executed.
- */
 describe('Resume repository smoke tests', () => {
   let orm: MikroORM;
   let userRepo: PostgresUserRepository;
@@ -36,7 +33,10 @@ describe('Resume repository smoke tests', () => {
   let seededUser: User;
 
   beforeAll(async () => {
-    orm = await MikroORM.init(ormConfig);
+    orm = await setupTestDatabase();
+
+    await orm.seeder.seed(ResumeDataSeeder);
+
     userRepo = new PostgresUserRepository(orm);
     companyRepo = new PostgresResumeCompanyRepository(orm);
     educationRepo = new PostgresResumeEducationRepository(orm);
@@ -44,10 +44,10 @@ describe('Resume repository smoke tests', () => {
     skillCategoryRepo = new PostgresResumeSkillCategoryRepository(orm);
 
     seededUser = await userRepo.findSingle();
-  });
+  }, 60_000);
 
   afterAll(async () => {
-    await orm.close();
+    await teardownTestDatabase();
   });
 
   describe('PostgresUserRepository', () => {

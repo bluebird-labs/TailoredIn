@@ -1,28 +1,14 @@
-import type { FindOneOrFailOptions, FindOptions, UpsertOptions } from '@mikro-orm/postgresql';
+import type { FindOneOrFailOptions, FindOptions, SqlEntityManager, UpsertOptions } from '@mikro-orm/postgresql';
 import { BaseRepository } from '../../BaseRepository.js';
 import type { QueryOpts } from '../../helpers.js';
 import type { Company } from '../companies/Company.js';
 import { Skill } from '../skills/Skill.js';
 import { SkillAffinity } from '../skills/SkillAffinity.js';
 import { Job, type JobProps } from './Job.js';
+import { findPaginatedScoredJobs, findTopScoredJobs, type ScoreResult, scoreJobById } from './JobScoringQueries.js';
 import { JobStatus } from './JobStatus.js';
-import {
-  findPaginatedScoredJobsByDate,
-  findPaginatedScoredJobsByScore,
-  type IFindPaginatedScoredJobsByScoreResult
-} from './sql/findPaginatedScoredJobs.sql.js';
-import {
-  findTopScoredJobs,
-  type IFindTopScoredJobsParams,
-  type IFindTopScoredJobsResult
-} from './sql/findTopScoredJobs.sql.js';
-import { scoreJobById } from './sql/scoreJobById.sql.js';
 
-const SKILL_LIST_KEYS = [
-  'expert_skills',
-  'interest_skills',
-  'avoid_skills'
-] as const satisfies (keyof IFindTopScoredJobsResult)[];
+const SKILL_LIST_KEYS = ['expert_skills', 'interest_skills', 'avoid_skills'] as const satisfies (keyof ScoreResult)[];
 
 const DEFAULT_WEIGHTS = {
   expertWeight: 8,
@@ -44,7 +30,7 @@ export type JobScoresProps = {
   skills: Record<SkillAffinity, JobScoresSkillScore> & { total: JobScoresSkillScore };
 };
 
-type WeightParams = Pick<IFindTopScoredJobsParams, 'expertWeight' | 'interestWeight' | 'avoidWeight'>;
+type WeightParams = { expertWeight: number; interestWeight: number; avoidWeight: number };
 
 export class JobOrmRepository extends BaseRepository<Job> {
   public async findTopScored<Hint extends string = never>(
@@ -58,20 +44,21 @@ export class JobOrmRepository extends BaseRepository<Job> {
     },
     opts: QueryOpts & FindOptions<Job, Hint> = {}
   ): Promise<Array<Job & { __scores: JobScoresProps }>> {
-    const result = await this.executePgTypedQuery(opts, findTopScoredJobs, {
+    const em = this.getEm(opts) as SqlEntityManager;
+    const rows = await findTopScoredJobs(em, {
       top: params.top,
       targetSalary: params.targetSalary,
       hoursPostedMax: params.hoursPostedMax ?? 48,
       ...this.weights(params)
     });
 
-    if (result.rowCount === 0) return [];
+    if (rows.length === 0) return [];
 
     const jobIds: string[] = [];
-    const resultMap = new Map<string, IFindTopScoredJobsResult>();
+    const resultMap = new Map<string, ScoreResult>();
     const skillIds = new Set<string>();
 
-    for (const row of result.rows) {
+    for (const row of rows) {
       jobIds.push(row.job_id);
       resultMap.set(row.job_id, row);
       for (const key of SKILL_LIST_KEYS) {
@@ -80,12 +67,8 @@ export class JobOrmRepository extends BaseRepository<Job> {
     }
 
     const [jobs, skills] = await Promise.all([
-      this.getEm(opts)
-        .repo(Job)
-        .find({ id: { $in: jobIds } }, opts),
-      this.getEm(opts)
-        .repo(Skill)
-        .find({ id: { $in: Array.from(skillIds) } })
+      em.repo(Job).find({ id: { $in: jobIds } }, opts),
+      em.repo(Skill).find({ id: { $in: Array.from(skillIds) } })
     ]);
 
     const skillMap = new Map(skills.map(s => [s.id, s]));
@@ -107,24 +90,23 @@ export class JobOrmRepository extends BaseRepository<Job> {
     },
     opts: QueryOpts & FindOneOrFailOptions<Job, Hint> = {}
   ): Promise<Job & { __scores: JobScoresProps }> {
-    const job = await this.getEm(opts).findOneOrFail(Job, params.jobId, opts);
-    const result = await this.executePgTypedQuery(opts, scoreJobById, {
+    const em = this.getEm(opts) as SqlEntityManager;
+    const job = await em.findOneOrFail(Job, params.jobId, opts);
+    const rows = await scoreJobById(em, {
       jobId: params.jobId,
       targetSalary: params.targetSalary,
       ...this.weights(params)
     });
 
-    if (result.rowCount === 0) throw new Error(`Could not score job ${params.jobId}`);
+    if (rows.length === 0) throw new Error(`Could not score job ${params.jobId}`);
 
-    const row = result.rows[0];
+    const row = rows[0];
     const skillIds = new Set<string>();
     for (const key of SKILL_LIST_KEYS) {
       for (const id of (row[key] as string[] | null) ?? []) skillIds.add(id);
     }
 
-    const skills = await this.getEm(opts)
-      .repo(Skill)
-      .find({ id: { $in: Array.from(skillIds) } });
+    const skills = await em.repo(Skill).find({ id: { $in: Array.from(skillIds) } });
     const skillMap = new Map(skills.map(s => [s.id, s]));
     const scores = this.buildScores(row, skillMap);
 
@@ -144,29 +126,25 @@ export class JobOrmRepository extends BaseRepository<Job> {
     },
     opts: QueryOpts = {}
   ): Promise<{ items: Array<Job & { __scores: JobListScoresProps; __companyName: string }>; total: number }> {
+    const em = this.getEm(opts) as SqlEntityManager;
     const offset = (params.page - 1) * params.pageSize;
-    const queryParams = {
+
+    const rows = await findPaginatedScoredJobs(em, {
       limit: params.pageSize,
       offset,
       targetSalary: params.targetSalary,
       statuses: params.statuses?.length ? params.statuses : null,
+      sortBy: params.sortBy ?? 'score',
       ...this.weights(params)
-    };
+    });
 
-    const query = params.sortBy === 'posted_at' ? findPaginatedScoredJobsByDate : findPaginatedScoredJobsByScore;
-    const result = await this.executePgTypedQuery(opts, query, queryParams);
+    if (rows.length === 0) return { items: [], total: 0 };
 
-    if (result.rowCount === 0) return { items: [], total: 0 };
+    const total = Number.parseInt(rows[0].total_count, 10);
+    const jobIds = rows.map(r => r.job_id);
+    const resultMap = new Map(rows.map(r => [r.job_id, r]));
 
-    const total = Number.parseInt(result.rows[0].total_count, 10);
-    const jobIds = result.rows.map(r => r.job_id);
-    const resultMap = new Map<string, IFindPaginatedScoredJobsByScoreResult>();
-    for (const row of result.rows) resultMap.set(row.job_id, row);
-
-    const jobs = await this.getEm(opts)
-      .repo(Job)
-      .find({ id: { $in: jobIds } }, { ...opts, populate: ['company'] });
-
+    const jobs = await em.repo(Job).find({ id: { $in: jobIds } }, { ...opts, populate: ['company'] });
     const jobMap = new Map(jobs.map(j => [j.id, j]));
 
     const items = jobIds
@@ -221,7 +199,7 @@ export class JobOrmRepository extends BaseRepository<Job> {
     });
   }
 
-  private buildScores(row: IFindTopScoredJobsResult, skillMap: Map<string, Skill>): JobScoresProps {
+  private buildScores(row: ScoreResult, skillMap: Map<string, Skill>): JobScoresProps {
     const byAffinity: Record<SkillAffinity, Skill[]> = {
       [SkillAffinity.EXPERT]: [],
       [SkillAffinity.INTEREST]: [],

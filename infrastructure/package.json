@@ -10,7 +10,7 @@
   "scripts": {
     "test": "bun test test/",
     "test:coverage": "bun test test/ --coverage",
-    "test:integration": "bun test test-integration/",
+    "test:integration": "bun test test-integration/ --timeout 60000",
     "typecheck": "tsc --noEmit",
     "migration:create": "bunx mikro-orm migration:create",
     "migration:up": "bunx mikro-orm migration:up"
@@ -30,12 +30,12 @@
     "@mikro-orm/seeder": "^7.0.0",
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "@needle-di/core": "^0.12.0",
-    "@pgtyped/runtime": "^2.4.2",
     "@tailoredin/application": "workspace:*",
     "@tailoredin/core": "workspace:*",
     "@tailoredin/domain": "workspace:*",
     "@tselect/status-code": "^1.0.2",
     "date-fns": "^4.1.0",
+    "kysely": "0.28.14",
     "lodash": "^4.17.21",
     "node-vibrant": "^4.0.3",
     "openai": "^4.83.0",
@@ -43,10 +43,9 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@pgtyped/cli": "^2.4.2",
     "@types/lodash": "^4.17.0",
     "@types/node": "^22.13.1",
-    "@types/pg": "^8.11.10",
+    "testcontainers": "^11.13.0",
     "typescript": "^5.7.3"
   }
 }

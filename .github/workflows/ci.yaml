@@ -68,6 +68,18 @@ jobs:
       - name: Run tests with coverage thresholds
         run: bun run --filter '@tailoredin/*' test:coverage
 
+  test-integration:
+    name: Integration Tests
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.deps == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Run integration tests
+        run: bun run --cwd infrastructure test:integration
+
   gitleaks:
     name: Secret Scanning
     runs-on: ubuntu-latest
