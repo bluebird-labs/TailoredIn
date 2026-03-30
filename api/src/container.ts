@@ -1,6 +1,21 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
-import { ChangeJobStatus, GenerateResume, GetJob, GetTopJob } from '@tailoredin/application';
+import {
+  ChangeJobStatus,
+  CreateEducation,
+  CreateHeadline,
+  DeleteEducation,
+  DeleteHeadline,
+  GenerateResume,
+  GetJob,
+  GetTopJob,
+  GetUser,
+  ListEducation,
+  ListHeadlines,
+  UpdateEducation,
+  UpdateHeadline,
+  UpdateUser
+} from '@tailoredin/application';
 import { Environment } from '@tailoredin/core/src/Environment.js';
 import { JobElectionService } from '@tailoredin/domain';
 import {
@@ -113,6 +128,52 @@ container.bind({
       container.get(DI.Resume.Renderer),
       container.get(DI.Resume.ContentFactory)
     )
+});
+
+// User use cases
+container.bind({
+  provide: DI.Resume.GetUser,
+  useFactory: () => new GetUser(container.get(DI.Resume.UserRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateUser,
+  useFactory: () => new UpdateUser(container.get(DI.Resume.UserRepository))
+});
+
+// Education use cases
+container.bind({
+  provide: DI.Resume.ListEducation,
+  useFactory: () => new ListEducation(container.get(DI.Resume.EducationRepository))
+});
+container.bind({
+  provide: DI.Resume.CreateEducation,
+  useFactory: () => new CreateEducation(container.get(DI.Resume.EducationRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateEducation,
+  useFactory: () => new UpdateEducation(container.get(DI.Resume.EducationRepository))
+});
+container.bind({
+  provide: DI.Resume.DeleteEducation,
+  useFactory: () => new DeleteEducation(container.get(DI.Resume.EducationRepository))
+});
+
+// Headline use cases
+container.bind({
+  provide: DI.Resume.ListHeadlines,
+  useFactory: () => new ListHeadlines(container.get(DI.Resume.HeadlineRepository))
+});
+container.bind({
+  provide: DI.Resume.CreateHeadline,
+  useFactory: () => new CreateHeadline(container.get(DI.Resume.HeadlineRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdateHeadline,
+  useFactory: () => new UpdateHeadline(container.get(DI.Resume.HeadlineRepository))
+});
+container.bind({
+  provide: DI.Resume.DeleteHeadline,
+  useFactory: () => new DeleteHeadline(container.get(DI.Resume.HeadlineRepository))
 });
 
 export { container, orm };

@@ -1,15 +1,25 @@
 import { InjectionToken } from '@needle-di/core';
 import type {
   ChangeJobStatus,
+  CreateEducation,
+  CreateHeadline,
+  DeleteEducation,
+  DeleteHeadline,
   GenerateResume,
   GetJob,
   GetTopJob,
+  GetUser,
   IngestScrapedJob,
   JobScraper,
+  ListEducation,
+  ListHeadlines,
   LlmService,
   ResumeContentFactory,
   ResumeRenderer,
   ScrapeAndIngestJobs,
+  UpdateEducation,
+  UpdateHeadline,
+  UpdateUser,
   WebColorService
 } from '@tailoredin/application';
 import type {
@@ -50,6 +60,16 @@ export const DI = {
     WebColorService: new InjectionToken<WebColorService>('DI.Resume.WebColorService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
-    GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume')
+    GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
+    GetUser: new InjectionToken<GetUser>('DI.Resume.GetUser'),
+    UpdateUser: new InjectionToken<UpdateUser>('DI.Resume.UpdateUser'),
+    ListEducation: new InjectionToken<ListEducation>('DI.Resume.ListEducation'),
+    CreateEducation: new InjectionToken<CreateEducation>('DI.Resume.CreateEducation'),
+    UpdateEducation: new InjectionToken<UpdateEducation>('DI.Resume.UpdateEducation'),
+    DeleteEducation: new InjectionToken<DeleteEducation>('DI.Resume.DeleteEducation'),
+    ListHeadlines: new InjectionToken<ListHeadlines>('DI.Resume.ListHeadlines'),
+    CreateHeadline: new InjectionToken<CreateHeadline>('DI.Resume.CreateHeadline'),
+    UpdateHeadline: new InjectionToken<UpdateHeadline>('DI.Resume.UpdateHeadline'),
+    DeleteHeadline: new InjectionToken<DeleteHeadline>('DI.Resume.DeleteHeadline')
   }
 };
