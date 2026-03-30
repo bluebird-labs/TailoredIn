@@ -47,6 +47,18 @@ const log = Logger.create('API');
 const port = Number(process.env.API_PORT ?? 8000);
 
 const app = new Elysia()
+  .onRequest(({ request }) => {
+    const url = new URL(request.url);
+    if (url.pathname !== '/health') {
+      log.info(`→ ${request.method} ${url.pathname}${url.search}`);
+    }
+  })
+  .onAfterResponse(({ request, set }) => {
+    const url = new URL(request.url);
+    if (url.pathname !== '/health') {
+      log.info(`← ${request.method} ${url.pathname} ${(set as { status?: number }).status ?? 200}`);
+    }
+  })
   .use(healthRoutes)
   .use(container.get(ListJobsRoute).plugin())
   .use(container.get(GetTopJobRoute).plugin())
@@ -89,17 +101,24 @@ const app = new Elysia()
   .use(container.get(SetArchetypePositionsRoute).plugin())
   .use(container.get(SetArchetypeSkillsRoute).plugin())
   .use(container.get(SetArchetypeEducationRoute).plugin())
-  .onError(({ error, set }) => {
+  .onError(({ request, error, set, code }) => {
+    const url = new URL(request.url);
     const err = error as unknown as { statusCode?: number; message?: string };
     const statusCode = err.statusCode;
     const message = err.message ?? String(error);
 
+    if (code === 'VALIDATION') {
+      log.warn(`${request.method} ${url.pathname} 422 — ${message}`);
+      return;
+    }
+
     if (statusCode) {
+      log.warn(`${request.method} ${url.pathname} ${statusCode} — ${message}`);
       set.status = statusCode;
       return { error: message };
     }
 
-    log.error(message);
+    log.error(`${request.method} ${url.pathname} 500 — ${message}`);
     set.status = 500;
     return { error: 'Internal server error' };
   })
