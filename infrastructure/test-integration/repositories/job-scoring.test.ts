@@ -14,7 +14,6 @@ import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase
 
 describe('Job scoring queries', () => {
   let orm: MikroORM;
-  let companyId: string;
   let jobWithSkillsId: string;
   let jobWithSalaryId: string;
   let jobNoMatchesId: string;
@@ -36,7 +35,6 @@ describe('Job scoring queries', () => {
       website: null,
       logoUrl: null
     });
-    companyId = company.id;
     em.persist(company);
 
     // Job with TypeScript and Go in description (expert + interest matches)
