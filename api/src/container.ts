@@ -20,6 +20,8 @@ import {
   GetJob,
   GetTopJob,
   GetUser,
+  IngestJobByUrl,
+  IngestScrapedJob,
   ListArchetypes,
   ListCompanies,
   ListEducation,
@@ -111,6 +113,24 @@ container.bind({
 container.bind({
   provide: DI.Job.ListJobs,
   useFactory: () => new ListJobs(container.get(DI.Job.Repository))
+});
+container.bind({
+  provide: DI.Job.IngestScrapedJob,
+  useFactory: () =>
+    new IngestScrapedJob(
+      container.get(DI.Job.Repository),
+      container.get(DI.Job.CompanyRepository),
+      container.get(DI.Job.Elector)
+    )
+});
+container.bind({
+  provide: DI.Job.IngestJobByUrl,
+  useFactory: () =>
+    new IngestJobByUrl(
+      container.get(DI.Job.Scraper),
+      container.get(DI.Job.Repository),
+      container.get(DI.Job.IngestScrapedJob)
+    )
 });
 
 // Resume repositories + services

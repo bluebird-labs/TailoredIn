@@ -22,6 +22,7 @@ import { GetJobRoute } from './routes/GetJobRoute.js';
 import { GetTopJobRoute } from './routes/GetTopJobRoute.js';
 import { GetUserRoute } from './routes/GetUserRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
+import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
 import { ListArchetypesRoute } from './routes/ListArchetypesRoute.js';
 import { ListCompaniesRoute } from './routes/ListCompaniesRoute.js';
 import { ListEducationRoute } from './routes/ListEducationRoute.js';
@@ -75,6 +76,7 @@ const app = new Elysia()
   .use(container.get(GetTopJobRoute).plugin())
   .use(container.get(GetJobRoute).plugin())
   .use(container.get(ChangeJobStatusRoute).plugin())
+  .use(container.get(IngestJobByUrlRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
   .use(container.get(GetCurrentUserRoute).plugin())
   .use(container.get(GetUserRoute).plugin())
