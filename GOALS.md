@@ -41,15 +41,9 @@ Auto-generate company research briefs for jobs the user is actively pursuing: pr
 
 Multiple Claude Code sessions can work on different steps simultaneously using git worktrees. Each session gets its own branch and worktree under `.claude/worktrees/`.
 
-### Wave 1 — all `web/` only, safe to parallelize
+### ~~Wave 1~~ ✅ Complete
 
-| Session | Steps | Branch | Worktree |
-|---|---|---|---|
-| 1 | **3A–3C** (job browsing) | `feat/milestone-3` | `.claude/worktrees/milestone-3` |
-| 2 | **4A–4B** (profile + headlines) | `feat/milestone-4ab` | `.claude/worktrees/milestone-4ab` |
-| 3 | **4C–4E** (experience + skills + education) | `feat/milestone-4cde` | `.claude/worktrees/milestone-4cde` |
-
-### Wave 2 — after M4 merges
+### Wave 2 — after M4 merges ← CURRENT
 
 | Session | Steps | Branch | Worktree |
 |---|---|---|---|
@@ -79,18 +73,18 @@ graph TD
     M7 --> M8["8: Interview prep"]
     M8 --> M9["9: CLI phase-out"]
 
-    style M3 fill:#facc15
-    style M4AB fill:#facc15
-    style M4CDE fill:#facc15
-    style M5 fill:#e5e7eb
-    style M6A fill:#e5e7eb
+    style M3 fill:#86efac
+    style M4AB fill:#86efac
+    style M4CDE fill:#86efac
+    style M5 fill:#facc15
+    style M6A fill:#facc15
     style M6B fill:#e5e7eb
     style M7 fill:#e5e7eb
     style M8 fill:#e5e7eb
     style M9 fill:#e5e7eb
 ```
 
-Yellow = next up. Grey = future.
+Green = done. Yellow = next up. Grey = future.
 
 ## Completed Milestones
 
@@ -116,43 +110,29 @@ CRUD endpoints for all resume content.
 - [x] **2E.** Archetype endpoints — PR #10
 </details>
 
-## Milestones
-
-### Milestone 3 — Job Browsing
-> Branch: `feat/milestone-3` · Worktree: `.claude/worktrees/milestone-3`
+<details>
+<summary>Milestone 3 — Job Browsing (PR #11)</summary>
 
 Browse and manage the 11k+ scraped jobs in the web UI.
 
-- [ ] **3A. Job list page**
-  - [ ] Paginated table with score, company, title, status badge, posted date
-  - [ ] Sort by score (default), posted date
-  - [ ] Filter by status (NEW, APPLIED, etc.)
-- [ ] **3B. Job detail page**
-  - [ ] Full posting info: description, company, location, salary, LinkedIn link
-  - [ ] Status controls: move job through the funnel (NEW → APPLIED → …)
-- [ ] **3C. Resume download on job detail**
-  - [ ] "Generate Resume" button triggers `PUT /jobs/:id/generate-resume`
-  - [ ] Progress indicator while generating
-  - [ ] Download resulting PDF
+- [x] **3A.** Job list page — paginated table with score, company, title, status badge, posted date; sort/filter
+- [x] **3B.** Job detail page — full posting info, status controls
+- [x] **3C.** Resume download on job detail — generate + download PDF
+</details>
 
-### Milestone 4 — Profile & Resume Editing
-> Branch: `feat/milestone-4ab` (profile + headlines) + `feat/milestone-4cde` (experience + skills + education)
+<details>
+<summary>Milestone 4 — Profile & Resume Editing (PRs #12, #13)</summary>
 
 Edit all resume content that feeds into PDF generation.
 
-- [ ] **4A. Profile page**
-  - [ ] Inline-editable form for user fields (name, email, phone, GitHub, LinkedIn, location)
-- [ ] **4B. Headlines page**
-  - [ ] List headlines with add/edit/delete
-- [ ] **4C. Work experience page**
-  - [ ] Company list with expand/collapse for bullets and locations
-  - [ ] Add/edit/remove companies, bullets, locations
-  - [ ] Drag-to-reorder bullets
-- [ ] **4D. Skills page**
-  - [ ] Skill categories with nested items, add/edit/remove for both levels
-  - [ ] Drag-to-reorder categories and items
-- [ ] **4E. Education page**
-  - [ ] Education entries: add/edit/remove
+- [x] **4A.** Profile page — PR #13
+- [x] **4B.** Headlines page — PR #13
+- [x] **4C.** Work experience page — PR #12
+- [x] **4D.** Skills page — PR #12
+- [x] **4E.** Education page — PR #12
+</details>
+
+## Milestones
 
 ### Milestone 5 — Archetypes
 > Branch: `feat/milestone-5` · Worktree: `.claude/worktrees/milestone-5`
