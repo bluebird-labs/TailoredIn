@@ -35,6 +35,8 @@ export type { GetTopJobInput } from './GetTopJob.js';
 export { GetTopJob } from './GetTopJob.js';
 export type { GetUserInput } from './GetUser.js';
 export { GetUser } from './GetUser.js';
+export type { IngestJobByUrlOutput } from './IngestJobByUrl.js';
+export { IngestJobByUrl, InvalidLinkedInUrlError, ScrapeFailedError } from './IngestJobByUrl.js';
 export type { IngestScrapedJobResult } from './IngestScrapedJob.js';
 export { IngestScrapedJob } from './IngestScrapedJob.js';
 export type { ListArchetypesInput } from './ListArchetypes.js';

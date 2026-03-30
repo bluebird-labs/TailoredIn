@@ -8,8 +8,14 @@ export type FetchJobDetailsDelegate = () => Promise<{
 
 export type ScrapeResultCallback = (result: ScrapeResultDto, fetchDetails: FetchJobDetailsDelegate) => Promise<void>;
 
+export type ScrapeByUrlResult = {
+  result: ScrapeResultDto;
+  fetchDetails: FetchJobDetailsDelegate;
+};
+
 export interface JobScraper {
   connect(): Promise<void>;
   close(): Promise<void>;
   search(config: JobSearchConfigDto, onResult: ScrapeResultCallback): Promise<void>;
+  scrapeByUrl(url: string): Promise<ScrapeByUrlResult>;
 }

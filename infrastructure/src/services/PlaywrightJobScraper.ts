@@ -1,11 +1,12 @@
 import FS from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
-import type { JobScraper, JobSearchConfigDto, ScrapeResultCallback } from '@tailoredin/application';
+import type { JobScraper, JobSearchConfigDto, ScrapeByUrlResult, ScrapeResultCallback } from '@tailoredin/application';
 import { Logger, TimeUtil } from '@tailoredin/core';
 import * as Playwright from 'playwright';
 import { DEFAULT_AUTH_FILE as AUTH_FILE } from '../linkedin/LinkedInExplorer.js';
 import { LinkedInSearchJobsCommand } from '../linkedin/LinkedInSearchJobsCommand.js';
 import { LinkedInUrls } from '../linkedin/LinkedInUrls.js';
+import { LinkedInViewJobCommand } from '../linkedin/LinkedInViewJobCommand.js';
 
 export const PLAYWRIGHT_JOB_SCRAPER_CONFIG = 'PlaywrightJobScraperConfig';
 
@@ -51,6 +52,34 @@ export class PlaywrightJobScraper implements JobScraper {
 
   public async close(): Promise<void> {
     await this.browser?.close();
+  }
+
+  public async scrapeByUrl(url: string): Promise<ScrapeByUrlResult> {
+    const viewCommand = new LinkedInViewJobCommand(this.page, this.browserContext);
+    const { result: raw, fetchDetails } = await viewCommand.scrape(url);
+
+    return {
+      result: {
+        jobId: raw.jobId,
+        jobTitle: raw.jobTitle,
+        jobLink: raw.jobLink,
+        applyLink: raw.applyLink,
+        location: raw.location,
+        salary: raw.salary,
+        jobType: raw.jobType,
+        remote: raw.remote,
+        posted: raw.posted,
+        jobLevel: raw.jobLevel,
+        applicants: raw.applicants,
+        description: raw.description,
+        descriptionHtml: raw.description_html,
+        companyName: raw.companyName,
+        companyLogoUrl: raw.companyLogoUrl,
+        companyLink: raw.companyLink,
+        companyWebsite: raw.companyWebsite
+      },
+      fetchDetails
+    };
   }
 
   public async search(config: JobSearchConfigDto, onResult: ScrapeResultCallback): Promise<void> {
