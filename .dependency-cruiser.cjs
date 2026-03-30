@@ -47,6 +47,31 @@ module.exports = {
       comment: 'api must not depend on cli.',
       from: { path: '^api/' },
       to: { path: '^cli/' }
+    },
+
+    // ── web: no infrastructure (use Eden Treaty) ────────────────────
+    {
+      name: 'web-no-infrastructure',
+      severity: 'error',
+      comment: 'web must use Eden Treaty, not direct infrastructure access.',
+      from: { path: '^web/' },
+      to: { path: '^infrastructure/' }
+    },
+
+    // ── web ↔ cli: entry-point packages are isolated ────────────────
+    {
+      name: 'web-not-depends-on-cli',
+      severity: 'error',
+      comment: 'web must not depend on cli.',
+      from: { path: '^web/' },
+      to: { path: '^cli/' }
+    },
+    {
+      name: 'cli-not-depends-on-web',
+      severity: 'error',
+      comment: 'cli must not depend on web.',
+      from: { path: '^cli/' },
+      to: { path: '^web/' }
     }
   ],
 

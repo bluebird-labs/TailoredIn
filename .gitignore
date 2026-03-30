@@ -20,4 +20,5 @@ infrastructure/src/linkedin/playwright/.auth/
 
 # dependency-cruiser generated graph
 dep-graph.svg
+temp/
 infrastructure/temp/

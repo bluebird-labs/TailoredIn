@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
@@ -13,6 +16,7 @@
     "@tailoredin/domain": "workspace:*",
     "@tailoredin/infrastructure": "workspace:*",
     "@tailoredin/core": "workspace:*",
+    "@elysiajs/static": "latest",
     "elysia": "latest"
   },
   "devDependencies": {

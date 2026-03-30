@@ -1,5 +1,8 @@
 import 'reflect-metadata';
 import 'dotenv/config';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { staticPlugin } from '@elysiajs/static';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import { Environment } from '@tailoredin/core/src/Environment.js';
@@ -79,6 +82,9 @@ container.bind({ provide: DI.ResumeContentFactory, useClass: TemplateResumeConte
 const log = Logger.create('API');
 const port = Number(process.env.API_PORT ?? 8000);
 
+const webDistPath = resolve(import.meta.dirname!, '../../web/dist');
+const serveSpa = existsSync(webDistPath);
+
 const app = new Elysia()
   .use(healthRoutes)
   .use(jobRoutes(container))
@@ -97,6 +103,17 @@ const app = new Elysia()
     return { error: 'Internal server error' };
   })
   .listen(port);
+
+if (serveSpa) {
+  app
+    .use(staticPlugin({ assets: webDistPath, prefix: '/' }))
+    .get(
+      '/*',
+      () =>
+        new Response(readFileSync(`${webDistPath}/index.html`, 'utf-8'), { headers: { 'content-type': 'text/html' } })
+    );
+  log.info('Serving SPA from web/dist');
+}
 
 log.info(`Listening on port ${port}...`);
 

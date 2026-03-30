@@ -8,7 +8,8 @@
     "infrastructure",
     "core",
     "api",
-    "cli"
+    "cli",
+    "web"
   ],
   "scripts": {
     "backend": "bun run --cwd api src/index.ts",
@@ -17,10 +18,14 @@
     "robot:watch": "bun --watch --cwd cli src/robot/index.ts",
     "cvs": "bun run --cwd cli src/cvs/index.ts",
 
-    "check": "biome check domain application infrastructure core api cli",
-    "check:fix": "biome check --write domain application infrastructure core api cli",
-    "format": "biome format --write domain application infrastructure core api cli",
-    "lint": "biome lint domain application infrastructure core api cli",
+    "web": "bun run --cwd web dev",
+    "web:build": "bun run --cwd web build",
+    "web:preview": "bun run --cwd web preview",
+
+    "check": "biome check domain application infrastructure core api cli web",
+    "check:fix": "biome check --write domain application infrastructure core api cli web",
+    "format": "biome format --write domain application infrastructure core api cli web",
+    "lint": "biome lint domain application infrastructure core api cli web",
     "typecheck": "bun run --filter '@tailoredin/*' typecheck",
     "test": "bun run --filter '@tailoredin/*' test",
     "test:coverage": "bun run --filter '@tailoredin/*' test:coverage",
