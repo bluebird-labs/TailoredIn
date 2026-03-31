@@ -1,13 +1,16 @@
-name: tailored-in
+name: ${COMPOSE_PROJECT_NAME:-tailored-in}
 
 services:
   postgres:
     image: postgres:17-alpine
     ports:
-      - 5432:5432
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+
+volumes:
+  pg-data:

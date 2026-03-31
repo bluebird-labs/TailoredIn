@@ -10,17 +10,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "EnterWorktree",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "scripts/session-bootstrap.sh"
-          }
-        ]
-      }
     ]
   },
   "permissions": {
