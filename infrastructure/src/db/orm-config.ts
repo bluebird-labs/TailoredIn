@@ -72,7 +72,7 @@ export function createOrmConfig(db: OrmDbConfig) {
     discovery: { warnWhenNoEntities: true },
     namingStrategy: UnderscoreNamingStrategy,
     metadataProvider: TsMorphMetadataProvider,
-    metadataCache: { options: { cacheDir: Path.resolve(PACKAGE_DIR, '../../temp') } },
+    metadataCache: { options: { cacheDir: Path.resolve(PACKAGE_DIR, '../../.mikroorm-cache') } },
     highlighter: new SqlHighlighter(),
     forceUtcTimezone: true,
     implicitTransactions: false,
