@@ -65,9 +65,9 @@ Multiple Claude Code sessions can work on different steps simultaneously using g
 | 1 | **7** (LLM-free fallbacks) | `feat/milestone-7` | `.claude/worktrees/milestone-7` |
 | 2 | **10** (interview prep) | `feat/milestone-10` | `.claude/worktrees/milestone-10` |
 
-### Wave 5
+### Wave 5+
 
-M11 (CLI phase-out), sequential.
+M11 (experience as positions) → M12 (CLI phase-out), sequential.
 
 ### Dependency graph
 
@@ -82,7 +82,8 @@ graph TD
     M6B --> M8["8: Job triaging"]
     M8 --> M9["9: Company classification"]
     M9 --> M10["10: Interview prep"]
-    M10 --> M11["11: CLI phase-out"]
+    M10 --> M11["11: Experience as positions"]
+    M11 --> M12["12: CLI phase-out"]
 
     style M3 fill:#86efac
     style M4AB fill:#86efac
@@ -93,8 +94,9 @@ graph TD
     style M7 fill:#86efac
     style M8 fill:#86efac
     style M9 fill:#86efac
-    style M10 fill:#facc15
+    style M10 fill:#86efac
     style M11 fill:#e5e7eb
+    style M12 fill:#e5e7eb
 ```
 
 Green = done. Yellow = next up. Grey = future.
@@ -228,16 +230,35 @@ Auto-generate company research briefs for active job pursuits.
   - [ ] Brief panel on job detail page
   - [ ] Generate/refresh button, structured display of brief sections
 
-### Milestone 11 — CLI Phase-Out
+### Milestone 11 — Experience as Positions
 > Branch: `feat/milestone-11` · Worktree: `.claude/worktrees/milestone-11`
+
+Refactor resume experience from company-centric to position-centric. A person can hold multiple roles at the same company (e.g., promoted from Senior Engineer to Engineering Manager).
+
+- [ ] **11A. Domain model refactor**
+  - [ ] `ResumePosition` entity under `ResumeCompany` (title, startDate, endDate, summary)
+  - [ ] Bullets move from company to position
+  - [ ] Remove `jobTitle`, `joinedAt`, `leftAt`, `promotedAt` from `ResumeCompany`
+  - [ ] Migration: split existing company-level fields into positions
+- [ ] **11B. Application + infrastructure**
+  - [ ] Update use cases, DTOs, and repository implementations
+  - [ ] Update `ArchetypePosition` to reference `ResumePosition` instead of duplicating data
+  - [ ] Update `DatabaseResumeContentFactory` to build from positions
+- [ ] **11C. Experience page**
+  - [ ] Show positions grouped by company
+  - [ ] CRUD for positions within a company
+  - [ ] Archetype detail page references positions directly
+
+### Milestone 12 — CLI Phase-Out
+> Branch: `feat/milestone-12` · Worktree: `.claude/worktrees/milestone-12`
 
 Remove CLI tools once the web app covers their functionality.
 
-- [ ] **11A. Migrate robot to background service**
+- [ ] **12A. Migrate robot to background service**
   - [ ] Move scraping loop into a background worker started by the API process
   - [ ] `POST /robot/start`, `POST /robot/stop`, `GET /robot/status` endpoints
   - [ ] Web UI controls for the scraping daemon
-- [ ] **11B. Remove CLI packages**
+- [ ] **12B. Remove CLI packages**
   - [ ] Delete `cli/` package
   - [ ] Remove CLI scripts from root `package.json`
   - [ ] Update CLAUDE.md
