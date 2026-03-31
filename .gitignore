@@ -1,3 +1,5 @@
+# .claude/settings.json is tracked (shared hooks + permissions)
+# .claude/settings.local.json is gitignored (personal overrides)
 .claude/settings.local.json
 .claude/worktrees/
 node_modules/
