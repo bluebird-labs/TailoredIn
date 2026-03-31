@@ -9,6 +9,7 @@ import {
   type ResumeHeadline,
   ResumeHeadlineId,
   ResumeLocation,
+  ResumePositionId,
   type ResumeSkillCategory,
   ResumeSkillCategoryId,
   ResumeSkillItemId,
@@ -88,8 +89,16 @@ describe('Resume repository smoke tests', () => {
       expect(company.createdAt).toBeInstanceOf(Date);
     });
 
-    test('companies have nested bullets', () => {
-      const withBullets = companies.find(c => c.bullets.length > 0);
+    test('companies have nested positions with bullets', () => {
+      const withPositions = companies.find(c => c.positions.length > 0);
+      expect(withPositions).toBeDefined();
+      const position = withPositions!.positions[0];
+      expect(position.id).toBeInstanceOf(ResumePositionId);
+      expect(position.title).toBeString();
+      expect(position.startDate).toBeString();
+      expect(position.endDate).toBeString();
+
+      const withBullets = withPositions!.positions.find(p => p.bullets.length > 0);
       expect(withBullets).toBeDefined();
       const bullet = withBullets!.bullets[0];
       expect(bullet.id).toBeInstanceOf(ResumeBulletId);
