@@ -13,6 +13,7 @@ import {
   User,
   Wrench
 } from 'lucide-react';
+import { PalettePicker } from '@/components/layout/palette-picker.js';
 import { ThemeToggle } from '@/components/layout/theme-toggle.js';
 import {
   Sidebar,
@@ -94,6 +95,9 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <PalettePicker />
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <ThemeToggle />
           </SidebarMenuItem>
