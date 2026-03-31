@@ -1,4 +1,4 @@
-import type { JobListItem, JobRepository, JobStatus } from '@tailoredin/domain';
+import type { BusinessType, CompanyStage, Industry, JobListItem, JobRepository, JobStatus } from '@tailoredin/domain';
 import type { JobListItemDto, PaginatedJobListDto } from '../dtos/JobListItemDto.js';
 
 export type ListJobsInput = {
@@ -6,6 +6,9 @@ export type ListJobsInput = {
   pageSize: number;
   targetSalary: number;
   statuses?: JobStatus[];
+  businessTypes?: BusinessType[];
+  industries?: Industry[];
+  stages?: CompanyStage[];
   sortBy?: 'score' | 'posted_at';
   sortDir?: 'asc' | 'desc';
 };
@@ -19,6 +22,9 @@ export class ListJobs {
       pageSize: input.pageSize,
       targetSalary: input.targetSalary,
       statuses: input.statuses,
+      businessTypes: input.businessTypes,
+      industries: input.industries,
+      stages: input.stages,
       sortBy: input.sortBy,
       sortDir: input.sortDir
     });
@@ -37,6 +43,7 @@ function toJobListItemDto(item: JobListItem): JobListItemDto {
   return {
     id: job.id.value,
     title: job.title,
+    companyId: item.companyId,
     companyName: item.companyName,
     status: job.status,
     postedAt: job.postedAt?.toISOString() ?? null,

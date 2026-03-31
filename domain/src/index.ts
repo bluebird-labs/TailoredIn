@@ -70,7 +70,10 @@ export {
   ArchetypeSkillCategorySelection,
   ArchetypeSkillItemSelection
 } from './value-objects/ArchetypeSelections.js';
+export { BusinessType } from './value-objects/BusinessType.js';
 export { CompanyId } from './value-objects/CompanyId.js';
+export { CompanyStage } from './value-objects/CompanyStage.js';
+export { Industry } from './value-objects/Industry.js';
 export { JobId } from './value-objects/JobId.js';
 export { DISCARDED_JOB_STATUSES, IN_PROCESS_JOB_STATUSES, JobStatus } from './value-objects/JobStatus.js';
 export { ResumeBulletId } from './value-objects/ResumeBulletId.js';

@@ -19,6 +19,7 @@ export type PaginatedScoreResult = ScoreResult & {
   title: string;
   status: string;
   posted_at: Date | null;
+  company_id: string;
   company_name: string;
   total_count: string;
 };
@@ -175,6 +176,9 @@ export async function findPaginatedScoredJobs(
   params: WeightParams &
     SalaryParam & {
       statuses: string[] | null;
+      businessTypes: string[] | null;
+      industries: string[] | null;
+      stages: string[] | null;
       limit: number;
       offset: number;
       sortBy: 'score' | 'posted_at';
@@ -185,6 +189,17 @@ export async function findPaginatedScoredJobs(
 
   const statusFilter =
     params.statuses && params.statuses.length > 0 ? sql`AND j.status::text = ANY(${params.statuses}::text[])` : sql``;
+
+  const businessTypeFilter =
+    params.businessTypes && params.businessTypes.length > 0
+      ? sql`AND c.business_type = ANY(${params.businessTypes}::text[])`
+      : sql``;
+
+  const industryFilter =
+    params.industries && params.industries.length > 0 ? sql`AND c.industry = ANY(${params.industries}::text[])` : sql``;
+
+  const stageFilter =
+    params.stages && params.stages.length > 0 ? sql`AND c.stage = ANY(${params.stages}::text[])` : sql``;
 
   const orderBy =
     params.sortBy === 'posted_at'
@@ -207,6 +222,9 @@ export async function findPaginatedScoredJobs(
         JOIN companies c ON c.id = j.company_id
         WHERE c.ignored = FALSE
           ${statusFilter}
+          ${businessTypeFilter}
+          ${industryFilter}
+          ${stageFilter}
       ),
       job_skill_matches AS (
         SELECT DISTINCT ON (fj.id, sk.skill_id) fj.id AS job_id, sk.skill_id, sk.affinity
@@ -231,6 +249,7 @@ export async function findPaginatedScoredJobs(
         j.title,
         j.status::text AS status,
         j.posted_at,
+        c.id AS company_id,
         c.name AS company_name,
         js.expert_score,
         js.interest_score,

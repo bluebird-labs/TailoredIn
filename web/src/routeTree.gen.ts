@@ -17,6 +17,7 @@ import { Route as ResumeProfileRouteImport } from './routes/resume/profile'
 import { Route as ResumeHeadlinesRouteImport } from './routes/resume/headlines'
 import { Route as ResumeExperienceRouteImport } from './routes/resume/experience'
 import { Route as ResumeEducationRouteImport } from './routes/resume/education'
+import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
 import { Route as ArchetypesArchetypeIdRouteImport } from './routes/archetypes/$archetypeId'
 
@@ -60,6 +61,11 @@ const ResumeEducationRoute = ResumeEducationRouteImport.update({
   path: '/resume/education',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
+  id: '/companies/$companyId',
+  path: '/companies/$companyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
   path: '/jobs/$jobId',
@@ -74,6 +80,7 @@ const ArchetypesArchetypeIdRoute = ArchetypesArchetypeIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/archetypes/$archetypeId'
+    | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/education'
     | '/resume/experience'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/archetypes/$archetypeId'
+    | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/education'
     | '/resume/experience'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/archetypes/$archetypeId'
+    | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/education'
     | '/resume/experience'
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArchetypesArchetypeIdRoute: typeof ArchetypesArchetypeIdRoute
+  CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   ResumeEducationRoute: typeof ResumeEducationRoute
   ResumeExperienceRoute: typeof ResumeExperienceRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeEducationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/companies/$companyId': {
+      id: '/companies/$companyId'
+      path: '/companies/$companyId'
+      fullPath: '/companies/$companyId'
+      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
       path: '/jobs/$jobId'
@@ -238,6 +258,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArchetypesArchetypeIdRoute: ArchetypesArchetypeIdRoute,
+  CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   ResumeEducationRoute: ResumeEducationRoute,
   ResumeExperienceRoute: ResumeExperienceRoute,

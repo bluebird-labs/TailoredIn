@@ -1,8 +1,13 @@
 import { inject, injectable } from '@needle-di/core';
 import type { ListJobs } from '@tailoredin/application';
-import { JobStatus } from '@tailoredin/domain';
+import { BusinessType, CompanyStage, Industry, JobStatus } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
+
+function toArray<T>(value: T | T[] | undefined): T[] | undefined {
+  if (value === undefined) return undefined;
+  return Array.isArray(value) ? value : [value];
+}
 
 @injectable()
 export class ListJobsRoute {
@@ -16,7 +21,10 @@ export class ListJobsRoute {
           page: query.page,
           pageSize: query.page_size,
           targetSalary: query.target_salary,
-          statuses: query.status as JobStatus[] | undefined,
+          statuses: toArray(query.status) as JobStatus[] | undefined,
+          businessTypes: toArray(query.business_type) as BusinessType[] | undefined,
+          industries: toArray(query.industry) as Industry[] | undefined,
+          stages: toArray(query.stage) as CompanyStage[] | undefined,
           sortBy: query.sort_by,
           sortDir: query.sort_dir
         });
@@ -29,6 +37,9 @@ export class ListJobsRoute {
           page_size: t.Numeric({ minimum: 1, maximum: 100, default: 25 }),
           target_salary: t.Numeric({ minimum: 100000 }),
           status: t.Optional(t.Union([t.Array(t.Enum(JobStatus)), t.Enum(JobStatus)])),
+          business_type: t.Optional(t.Union([t.Array(t.Enum(BusinessType)), t.Enum(BusinessType)])),
+          industry: t.Optional(t.Union([t.Array(t.Enum(Industry)), t.Enum(Industry)])),
+          stage: t.Optional(t.Union([t.Array(t.Enum(CompanyStage)), t.Enum(CompanyStage)])),
           sort_by: t.Optional(t.Union([t.Literal('score'), t.Literal('posted_at')])),
           sort_dir: t.Optional(t.Union([t.Literal('asc'), t.Literal('desc')]))
         })

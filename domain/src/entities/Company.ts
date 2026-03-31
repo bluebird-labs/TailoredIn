@@ -1,11 +1,17 @@
 import { AggregateRoot } from '../AggregateRoot.js';
+import type { BusinessType } from '../value-objects/BusinessType.js';
 import { CompanyId } from '../value-objects/CompanyId.js';
+import type { CompanyStage } from '../value-objects/CompanyStage.js';
+import type { Industry } from '../value-objects/Industry.js';
 
 export type CompanyCreateProps = {
   name: string;
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string;
+  businessType?: BusinessType | null;
+  industry?: Industry | null;
+  stage?: CompanyStage | null;
 };
 
 export class Company extends AggregateRoot<CompanyId> {
@@ -14,6 +20,9 @@ export class Company extends AggregateRoot<CompanyId> {
   public logoUrl: string | null;
   public readonly linkedinLink: string;
   public readonly ignored: boolean;
+  public businessType: BusinessType | null;
+  public industry: Industry | null;
+  public stage: CompanyStage | null;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -24,6 +33,9 @@ export class Company extends AggregateRoot<CompanyId> {
     logoUrl: string | null;
     linkedinLink: string;
     ignored: boolean;
+    businessType: BusinessType | null;
+    industry: Industry | null;
+    stage: CompanyStage | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -33,12 +45,30 @@ export class Company extends AggregateRoot<CompanyId> {
     this.logoUrl = props.logoUrl;
     this.linkedinLink = props.linkedinLink;
     this.ignored = props.ignored;
+    this.businessType = props.businessType;
+    this.industry = props.industry;
+    this.stage = props.stage;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
 
   public setWebsite(value: string): void {
     this.website = value;
+    this.updatedAt = new Date();
+  }
+
+  public setBusinessType(value: BusinessType | null): void {
+    this.businessType = value;
+    this.updatedAt = new Date();
+  }
+
+  public setIndustry(value: Industry | null): void {
+    this.industry = value;
+    this.updatedAt = new Date();
+  }
+
+  public setStage(value: CompanyStage | null): void {
+    this.stage = value;
     this.updatedAt = new Date();
   }
 
@@ -51,6 +81,9 @@ export class Company extends AggregateRoot<CompanyId> {
       logoUrl: props.logoUrl,
       linkedinLink: props.linkedinLink,
       ignored: false,
+      businessType: props.businessType ?? null,
+      industry: props.industry ?? null,
+      stage: props.stage ?? null,
       createdAt: now,
       updatedAt: now
     });

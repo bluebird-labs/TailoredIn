@@ -17,6 +17,7 @@ import type {
   DeleteSkillItem,
   GenerateResume,
   GetJob,
+  GetJobCompany,
   GetTopJob,
   GetUser,
   IngestJobByUrl,
@@ -41,6 +42,7 @@ import type {
   UpdateCompany,
   UpdateEducation,
   UpdateHeadline,
+  UpdateJobCompany,
   UpdateSkillCategory,
   UpdateSkillItem,
   UpdateUser,
@@ -72,7 +74,9 @@ export const DI = {
     GetTopJob: new InjectionToken<GetTopJob>('DI.Job.GetTopJob'),
     GetJob: new InjectionToken<GetJob>('DI.Job.GetJob'),
     ChangeJobStatus: new InjectionToken<ChangeJobStatus>('DI.Job.ChangeJobStatus'),
-    ListJobs: new InjectionToken<ListJobs>('DI.Job.ListJobs')
+    ListJobs: new InjectionToken<ListJobs>('DI.Job.ListJobs'),
+    GetJobCompany: new InjectionToken<GetJobCompany>('DI.Job.GetJobCompany'),
+    UpdateJobCompany: new InjectionToken<UpdateJobCompany>('DI.Job.UpdateJobCompany')
   },
 
   Resume: {

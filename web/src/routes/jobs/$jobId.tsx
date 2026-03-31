@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   BarChart3,
   Briefcase,
+  Building2,
   DollarSign,
   Download,
   ExternalLink,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { ClassificationBadge } from '@/components/companies/classification-badge';
 import { JobStatusBadge } from '@/components/jobs/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -146,7 +148,17 @@ function JobDetailPage() {
     );
   }
 
-  const job = data as typeof data & { companyName?: string };
+  const job = data as typeof data & {
+    company?: {
+      id: string;
+      name: string;
+      website: string | null;
+      linkedinLink: string;
+      businessType: string | null;
+      industry: string | null;
+      stage: string | null;
+    };
+  };
   const scores = job.scores;
 
   return (
@@ -165,7 +177,19 @@ function JobDetailPage() {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold">{job.title}</h1>
-            <p className="text-lg text-muted-foreground">{job.companyName ?? 'Unknown Company'}</p>
+            <p className="text-lg text-muted-foreground">
+              {job.company ? (
+                <Link
+                  to="/companies/$companyId"
+                  params={{ companyId: job.company.id }}
+                  className="hover:text-primary hover:underline"
+                >
+                  {job.company.name}
+                </Link>
+              ) : (
+                'Unknown Company'
+              )}
+            </p>
           </div>
           <JobStatusBadge status={job.status} />
         </div>
@@ -229,6 +253,44 @@ function JobDetailPage() {
       </div>
 
       <Separator />
+
+      {/* Company info */}
+      {job.company && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Building2 className="h-4 w-4" />
+              Company
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                to="/companies/$companyId"
+                params={{ companyId: job.company.id }}
+                className="font-medium text-primary hover:underline"
+              >
+                {job.company.name}
+              </Link>
+              {job.company.website && (
+                <a
+                  href={job.company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  Website
+                </a>
+              )}
+              <span className="text-muted-foreground">|</span>
+              <ClassificationBadge label="Type" value={job.company.businessType} />
+              <ClassificationBadge label="Industry" value={job.company.industry} />
+              <ClassificationBadge label="Stage" value={job.company.stage} />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Controls row */}
       <div className="flex items-center gap-4">

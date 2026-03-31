@@ -10,7 +10,11 @@ import type {
   UpsertJobProps
 } from '@tailoredin/domain';
 import {
-  type Company as DomainCompany,
+  type BusinessType,
+  CompanyId,
+  type CompanyStage,
+  Company as DomainCompany,
+  type Industry,
   JobId,
   JobPosting,
   type JobScores,
@@ -37,14 +41,16 @@ export class PostgresJobRepository implements JobRepository {
     return this.toDomain(orm);
   }
 
-  public async findScoredByIdOrFail(params: FindScoredParams): Promise<{ job: JobPosting; companyName: string }> {
+  public async findScoredByIdOrFail(params: FindScoredParams): Promise<{ job: JobPosting; company: DomainCompany }> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     const ormJob = await repo.findScoredByIdOrFail(
       { jobId: params.jobId, targetSalary: params.targetSalary },
       { populate: ['company', 'statusUpdates'] }
     );
     const job = this.toDomainWithScores(ormJob, ormJob.__scores);
-    return { job, companyName: (ormJob.company as import('../db/entities/companies/Company.js').Company).name };
+    const ormCompany = ormJob.company as import('../db/entities/companies/Company.js').Company;
+    const company = this.ormCompanyToDomain(ormCompany);
+    return { job, company };
   }
 
   public async findTopScored(params: FindTopScoredParams): Promise<JobPosting[]> {
@@ -90,6 +96,9 @@ export class PostgresJobRepository implements JobRepository {
       pageSize: params.pageSize,
       targetSalary: params.targetSalary,
       statuses: params.statuses,
+      businessTypes: params.businessTypes,
+      industries: params.industries,
+      stages: params.stages,
       sortBy: params.sortBy,
       expertWeight: params.expertWeight,
       interestWeight: params.interestWeight,
@@ -99,6 +108,7 @@ export class PostgresJobRepository implements JobRepository {
     return {
       items: result.items.map(item => ({
         job: this.toDomainWithListScores(item, item.__scores),
+        companyId: item.__companyId,
         companyName: item.__companyName
       })),
       total: result.total,
@@ -205,5 +215,21 @@ export class PostgresJobRepository implements JobRepository {
         [SkillAffinity.AVOID]: mapAffinity(OrmSkillAffinity.AVOID)
       }
     };
+  }
+
+  private ormCompanyToDomain(orm: import('../db/entities/companies/Company.js').Company): DomainCompany {
+    return new DomainCompany({
+      id: new CompanyId(orm.id),
+      name: orm.name,
+      website: orm.website,
+      logoUrl: orm.logoUrl,
+      linkedinLink: orm.linkedinLink,
+      ignored: orm.ignored,
+      businessType: orm.businessType as BusinessType | null,
+      industry: orm.industry as Industry | null,
+      stage: orm.stage as CompanyStage | null,
+      createdAt: orm.createdAt,
+      updatedAt: orm.updatedAt
+    });
   }
 }
