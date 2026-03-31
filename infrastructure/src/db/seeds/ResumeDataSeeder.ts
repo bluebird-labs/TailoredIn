@@ -151,6 +151,7 @@ export class ResumeDataSeeder extends Seeder {
         companyMention: def.companyMention,
         websiteUrl: def.websiteUrl,
         businessDomain: def.businessDomain,
+        jobTitle: null,
         joinedAt: def.joinedAt,
         leftAt: def.leftAt,
         promotedAt: def.promotedAt

@@ -1,8 +1,11 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
+  Archive,
   Briefcase,
+  GitBranch,
   GraduationCap,
   Heading,
+  Inbox,
   Layers,
   type LucideIcon,
   ScrollText,
@@ -27,10 +30,16 @@ import {
 interface NavItem {
   label: string;
   to: string;
+  search?: Record<string, unknown>;
   icon: LucideIcon;
 }
 
-const jobsNav: NavItem[] = [{ label: 'Jobs', to: '/jobs', icon: Briefcase }];
+const jobsNav: NavItem[] = [
+  { label: 'Triage', to: '/jobs', search: { view: 'triage' }, icon: Inbox },
+  { label: 'Pipeline', to: '/jobs', search: { view: 'pipeline' }, icon: GitBranch },
+  { label: 'Archive', to: '/jobs', search: { view: 'archive' }, icon: Archive },
+  { label: 'All Jobs', to: '/jobs', search: { view: 'all' }, icon: Briefcase }
+];
 
 const resumeNav: NavItem[] = [
   { label: 'Profile', to: '/resume/profile', icon: User },
@@ -45,14 +54,19 @@ const archetypeNav: NavItem[] = [{ label: 'Archetypes', to: '/archetypes', icon:
 function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
   const matchRoute = useMatchRoute();
 
+  function isActive(item: NavItem) {
+    if (!item.search) return !!matchRoute({ to: item.to, fuzzy: true });
+    return !!matchRoute({ to: item.to, fuzzy: true, search: item.search });
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map(item => (
-            <SidebarMenuItem key={item.to}>
-              <SidebarMenuButton render={<Link to={item.to} />} isActive={!!matchRoute({ to: item.to, fuzzy: true })}>
+            <SidebarMenuItem key={`${item.to}-${item.label}`}>
+              <SidebarMenuButton render={<Link to={item.to} search={item.search ?? {}} />} isActive={isActive(item)}>
                 <item.icon />
                 <span>{item.label}</span>
               </SidebarMenuButton>

@@ -43,6 +43,7 @@ export class PostgresResumeCompanyRepository implements ResumeCompanyRepository 
         companyMention: company.companyMention,
         websiteUrl: company.websiteUrl,
         businessDomain: company.businessDomain,
+        jobTitle: company.jobTitle,
         joinedAt: company.joinedAt,
         leftAt: company.leftAt,
         promotedAt: company.promotedAt,
@@ -90,6 +91,7 @@ export class PostgresResumeCompanyRepository implements ResumeCompanyRepository 
     orm.companyMention = domain.companyMention;
     orm.websiteUrl = domain.websiteUrl;
     orm.businessDomain = domain.businessDomain;
+    orm.jobTitle = domain.jobTitle;
     orm.joinedAt = domain.joinedAt;
     orm.leftAt = domain.leftAt;
     orm.promotedAt = domain.promotedAt;
@@ -185,6 +187,7 @@ export class PostgresResumeCompanyRepository implements ResumeCompanyRepository 
       companyMention: orm.companyMention,
       websiteUrl: orm.websiteUrl,
       businessDomain: orm.businessDomain,
+      jobTitle: orm.jobTitle,
       joinedAt: orm.joinedAt,
       leftAt: orm.leftAt,
       promotedAt: orm.promotedAt,

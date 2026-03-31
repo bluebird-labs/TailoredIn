@@ -14,6 +14,7 @@ type Company = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
+  jobTitle: string | null;
   joinedAt: string;
   leftAt: string;
   promotedAt: string | null;
@@ -45,7 +46,9 @@ export function CompanyCard({ company, onEdit }: CompanyCardProps) {
       <Card>
         <CardHeader>
           <div>
-            <CardTitle>{company.companyName}</CardTitle>
+            <CardTitle>
+              {company.jobTitle ? `${company.jobTitle} at ${company.companyName}` : company.companyName}
+            </CardTitle>
             <CardDescription>
               {company.businessDomain} &middot; {company.joinedAt} &ndash; {company.leftAt}
               {company.promotedAt && ` (promoted ${company.promotedAt})`}

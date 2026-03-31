@@ -20,6 +20,7 @@ export function useCreateCompany() {
       company_mention: string | null;
       website_url: string | null;
       business_domain: string;
+      job_title: string | null;
       joined_at: string;
       left_at: string;
       promoted_at: string | null;
@@ -47,6 +48,7 @@ export function useUpdateCompany() {
       company_mention?: string | null;
       website_url?: string | null;
       business_domain?: string;
+      job_title?: string | null;
       joined_at?: string;
       left_at?: string;
       promoted_at?: string | null;

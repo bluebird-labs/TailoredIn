@@ -26,6 +26,7 @@ export type ResumeCompanyDto = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
+  jobTitle: string | null;
   joinedAt: string;
   leftAt: string;
   promotedAt: string | null;

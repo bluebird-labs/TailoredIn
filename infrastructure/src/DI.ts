@@ -2,6 +2,7 @@ import { InjectionToken } from '@needle-di/core';
 import type {
   AddBullet,
   AddSkillItem,
+  BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
   CreateCompany,
@@ -74,6 +75,7 @@ export const DI = {
     GetTopJob: new InjectionToken<GetTopJob>('DI.Job.GetTopJob'),
     GetJob: new InjectionToken<GetJob>('DI.Job.GetJob'),
     ChangeJobStatus: new InjectionToken<ChangeJobStatus>('DI.Job.ChangeJobStatus'),
+    BulkChangeJobStatus: new InjectionToken<BulkChangeJobStatus>('DI.Job.BulkChangeJobStatus'),
     ListJobs: new InjectionToken<ListJobs>('DI.Job.ListJobs'),
     GetJobCompany: new InjectionToken<GetJobCompany>('DI.Job.GetJobCompany'),
     UpdateJobCompany: new InjectionToken<UpdateJobCompany>('DI.Job.UpdateJobCompany')

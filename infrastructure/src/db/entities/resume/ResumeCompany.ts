@@ -13,6 +13,7 @@ export type ResumeCompanyProps = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
+  jobTitle: string | null;
   joinedAt: string;
   leftAt: string;
   promotedAt: string | null;
@@ -41,6 +42,9 @@ export class ResumeCompany extends BaseEntity {
 
   @Property({ name: 'business_domain', type: 'text' })
   public businessDomain: string;
+
+  @Property({ name: 'job_title', type: 'text', nullable: true })
+  public jobTitle: string | null;
 
   @Property({ name: 'joined_at', type: 'text' })
   public joinedAt: string;
@@ -73,6 +77,7 @@ export class ResumeCompany extends BaseEntity {
     this.companyMention = props.companyMention;
     this.websiteUrl = props.websiteUrl;
     this.businessDomain = props.businessDomain;
+    this.jobTitle = props.jobTitle;
     this.joinedAt = props.joinedAt;
     this.leftAt = props.leftAt;
     this.promotedAt = props.promotedAt;
