@@ -15,7 +15,7 @@ export class IngestJobByUrlRoute {
         try {
           const result = await this.ingestJobByUrl.execute(body);
           set.status = 201;
-          return { data: { ...result.job, companyName: result.company.name } };
+          return { data: { ...result.job, id: result.job.id.value, companyName: result.company.name } };
         } catch (err) {
           if (err instanceof InvalidLinkedInUrlError) {
             set.status = 422;

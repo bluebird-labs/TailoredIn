@@ -2,8 +2,10 @@ import { JobStatus } from '@tailoredin/api/client';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { z } from 'zod';
+import { AddJobDialog } from '@/components/jobs/add-job-dialog';
 import { JobStatusBadge } from '@/components/jobs/status-badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -58,6 +60,7 @@ function SortIcon({ column, current, dir }: { column: string; current: string; d
 function JobsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const setSearch = (updates: Partial<JobSearch>) => {
     navigate({
@@ -126,6 +129,10 @@ function JobsPage() {
               ))}
             </SelectContent>
           </Select>
+          <Button onClick={() => setAddDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Job
+          </Button>
         </div>
       </div>
 
@@ -232,6 +239,12 @@ function JobsPage() {
           </div>
         </div>
       )}
+
+      <AddJobDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        onSuccess={jobId => navigate({ to: '/jobs/$jobId', params: { jobId } })}
+      />
     </div>
   );
 }
