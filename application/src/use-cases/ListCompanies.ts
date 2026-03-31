@@ -19,6 +19,7 @@ function toCompanyDto(company: ResumeCompany): ResumeCompanyDto {
     companyMention: company.companyMention,
     websiteUrl: company.websiteUrl,
     businessDomain: company.businessDomain,
+    jobTitle: company.jobTitle,
     joinedAt: company.joinedAt,
     leftAt: company.leftAt,
     promotedAt: company.promotedAt,

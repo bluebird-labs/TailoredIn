@@ -2,6 +2,8 @@ export type { AddBulletInput } from './AddBullet.js';
 export { AddBullet } from './AddBullet.js';
 export type { AddSkillItemInput } from './AddSkillItem.js';
 export { AddSkillItem } from './AddSkillItem.js';
+export type { BulkChangeJobStatusInput } from './BulkChangeJobStatus.js';
+export { BulkChangeJobStatus } from './BulkChangeJobStatus.js';
 export type { ChangeJobStatusInput } from './ChangeJobStatus.js';
 export { ChangeJobStatus } from './ChangeJobStatus.js';
 export type { CreateArchetypeInput } from './CreateArchetype.js';

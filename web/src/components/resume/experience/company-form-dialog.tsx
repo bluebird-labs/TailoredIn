@@ -14,6 +14,7 @@ const companySchema = z.object({
   companyMention: z.string().nullable(),
   websiteUrl: z.string().nullable(),
   businessDomain: z.string().min(1, 'Required'),
+  jobTitle: z.string().nullable(),
   joinedAt: z.string().min(1, 'Required'),
   leftAt: z.string().min(1, 'Required'),
   promotedAt: z.string().nullable()
@@ -27,6 +28,7 @@ type Company = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
+  jobTitle: string | null;
   joinedAt: string;
   leftAt: string;
   promotedAt: string | null;
@@ -55,6 +57,7 @@ export function CompanyFormDialog({ open, onOpenChange, company }: CompanyFormDi
       companyMention: null,
       websiteUrl: null,
       businessDomain: '',
+      jobTitle: null,
       joinedAt: '',
       leftAt: '',
       promotedAt: null
@@ -70,6 +73,7 @@ export function CompanyFormDialog({ open, onOpenChange, company }: CompanyFormDi
               companyMention: company.companyMention,
               websiteUrl: company.websiteUrl,
               businessDomain: company.businessDomain,
+              jobTitle: company.jobTitle,
               joinedAt: company.joinedAt,
               leftAt: company.leftAt,
               promotedAt: company.promotedAt
@@ -79,6 +83,7 @@ export function CompanyFormDialog({ open, onOpenChange, company }: CompanyFormDi
               companyMention: null,
               websiteUrl: null,
               businessDomain: '',
+              jobTitle: null,
               joinedAt: '',
               leftAt: '',
               promotedAt: null
@@ -98,6 +103,7 @@ export function CompanyFormDialog({ open, onOpenChange, company }: CompanyFormDi
           company_mention: data.companyMention || null,
           website_url: data.websiteUrl || null,
           business_domain: data.businessDomain,
+          job_title: data.jobTitle || null,
           joined_at: data.joinedAt,
           left_at: data.leftAt,
           promoted_at: data.promotedAt || null
@@ -116,6 +122,7 @@ export function CompanyFormDialog({ open, onOpenChange, company }: CompanyFormDi
           company_mention: data.companyMention || null,
           website_url: data.websiteUrl || null,
           business_domain: data.businessDomain,
+          job_title: data.jobTitle || null,
           joined_at: data.joinedAt,
           left_at: data.leftAt,
           promoted_at: data.promotedAt || null,
@@ -143,6 +150,11 @@ export function CompanyFormDialog({ open, onOpenChange, company }: CompanyFormDi
             <Label htmlFor="companyName">Company Name</Label>
             <Input id="companyName" {...register('companyName')} placeholder="Acme Corp" />
             {errors.companyName && <p className="text-xs text-destructive">{errors.companyName.message}</p>}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="jobTitle">Job Title (optional)</Label>
+            <Input id="jobTitle" {...register('jobTitle')} placeholder="Senior Software Engineer" />
           </div>
 
           <div className="flex flex-col gap-1.5">

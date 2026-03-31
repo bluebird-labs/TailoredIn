@@ -3,6 +3,7 @@ import { Container } from '@needle-di/core';
 import {
   AddBullet,
   AddSkillItem,
+  BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
   CreateCompany,
@@ -111,6 +112,10 @@ container.bind({
 container.bind({
   provide: DI.Job.ChangeJobStatus,
   useFactory: () => new ChangeJobStatus(container.get(DI.Job.Repository))
+});
+container.bind({
+  provide: DI.Job.BulkChangeJobStatus,
+  useFactory: () => new BulkChangeJobStatus(container.get(DI.Job.Repository))
 });
 container.bind({
   provide: DI.Job.ListJobs,

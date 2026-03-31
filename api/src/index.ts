@@ -3,6 +3,7 @@ import { Elysia } from 'elysia';
 import { container, llmAvailable } from './container.js';
 import { AddBulletRoute } from './routes/AddBulletRoute.js';
 import { AddSkillItemRoute } from './routes/AddSkillItemRoute.js';
+import { BulkChangeJobStatusRoute } from './routes/BulkChangeJobStatusRoute.js';
 import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
 import { CreateArchetypeRoute } from './routes/CreateArchetypeRoute.js';
@@ -80,6 +81,7 @@ const app = new Elysia()
   .use(container.get(GetTopJobRoute).plugin())
   .use(container.get(GetJobRoute).plugin())
   .use(container.get(ChangeJobStatusRoute).plugin())
+  .use(container.get(BulkChangeJobStatusRoute).plugin())
   .use(container.get(IngestJobByUrlRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
   // Companies

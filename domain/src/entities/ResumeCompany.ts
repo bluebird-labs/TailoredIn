@@ -9,6 +9,7 @@ export type ResumeCompanyCreateProps = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
+  jobTitle: string | null;
   joinedAt: string;
   leftAt: string;
   promotedAt: string | null;
@@ -22,6 +23,7 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
   public companyMention: string | null;
   public websiteUrl: string | null;
   public businessDomain: string;
+  public jobTitle: string | null;
   public joinedAt: string;
   public leftAt: string;
   public promotedAt: string | null;
@@ -37,6 +39,7 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     companyMention: string | null;
     websiteUrl: string | null;
     businessDomain: string;
+    jobTitle: string | null;
     joinedAt: string;
     leftAt: string;
     promotedAt: string | null;
@@ -51,6 +54,7 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     this.companyMention = props.companyMention;
     this.websiteUrl = props.websiteUrl;
     this.businessDomain = props.businessDomain;
+    this.jobTitle = props.jobTitle;
     this.joinedAt = props.joinedAt;
     this.leftAt = props.leftAt;
     this.promotedAt = props.promotedAt;

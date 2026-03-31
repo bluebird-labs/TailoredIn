@@ -7,6 +7,7 @@ export type CreateCompanyInput = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
+  jobTitle: string | null;
   joinedAt: string;
   leftAt: string;
   promotedAt: string | null;
@@ -24,6 +25,7 @@ export class CreateCompany {
       companyMention: input.companyMention,
       websiteUrl: input.websiteUrl,
       businessDomain: input.businessDomain,
+      jobTitle: input.jobTitle,
       joinedAt: input.joinedAt,
       leftAt: input.leftAt,
       promotedAt: input.promotedAt,
@@ -40,6 +42,7 @@ export class CreateCompany {
       companyMention: company.companyMention,
       websiteUrl: company.websiteUrl,
       businessDomain: company.businessDomain,
+      jobTitle: company.jobTitle,
       joinedAt: company.joinedAt,
       leftAt: company.leftAt,
       promotedAt: company.promotedAt,

@@ -12,7 +12,8 @@ import {
   ExternalLink,
   Loader2,
   MapPin,
-  Monitor
+  Monitor,
+  RotateCcw
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -27,7 +28,9 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ARCHETYPE_KEY_LABELS } from '@/hooks/use-archetypes';
 import { api } from '@/lib/api';
+import { detectAtsPlatform } from '@/lib/ats-platform';
 import { DEFAULT_TARGET_SALARY } from '@/lib/constants';
+import { isDiscardedStatus } from '@/lib/job-views';
 import { queryKeys } from '@/lib/query-keys';
 
 export const Route = createFileRoute('/jobs/$jobId')({
@@ -246,7 +249,10 @@ function JobDetailPage() {
               className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
             >
               <ExternalLink className="h-3.5 w-3.5" />
-              Apply
+              {(() => {
+                const platform = detectAtsPlatform(job.applyLink!);
+                return platform ? `Apply on ${platform.name}` : 'Apply';
+              })()}
             </a>
           )}
         </div>
@@ -313,6 +319,17 @@ function JobDetailPage() {
             </SelectContent>
           </Select>
         </div>
+
+        {isDiscardedStatus(job.status) && (
+          <Button
+            variant="outline"
+            onClick={() => statusMutation.mutate(JobStatus.NEW)}
+            disabled={statusMutation.isPending}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Reopen
+          </Button>
+        )}
 
         {llmAvailable ? (
           <Button onClick={handleGenerateResume} disabled={isGenerating} variant="default">
