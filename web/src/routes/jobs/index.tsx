@@ -112,8 +112,12 @@ function JobsPage() {
         offset:
           updates.offset !== undefined
             ? updates.offset
-            : ('sort' in updates || 'view' in updates || 'subStatus' in updates ||
-               'businessType' in updates || 'industry' in updates || 'stage' in updates)
+            : 'sort' in updates ||
+                'view' in updates ||
+                'subStatus' in updates ||
+                'businessType' in updates ||
+                'industry' in updates ||
+                'stage' in updates
               ? 0
               : prev.offset
       })

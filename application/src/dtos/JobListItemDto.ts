@@ -13,4 +13,3 @@ export type JobListItemDto = {
   totalSkillScore: number;
   salaryScore: number | null;
 };
-
