@@ -1,39 +1,41 @@
 import type { BusinessType, CompanyStage, Industry, JobListItem, JobRepository, JobStatus } from '@tailoredin/domain';
-import type { JobListItemDto, PaginatedJobListDto } from '../dtos/JobListItemDto.js';
+import type { JobListItemDto } from '../dtos/JobListItemDto.js';
+import type { PaginatedDto } from '../dtos/PaginationDto.js';
 
 export type ListJobsInput = {
-  page: number;
-  pageSize: number;
+  limit: number;
+  offset: number;
   targetSalary: number;
   statuses?: JobStatus[];
   businessTypes?: BusinessType[];
   industries?: Industry[];
   stages?: CompanyStage[];
-  sortBy?: 'score' | 'posted_at';
-  sortDir?: 'asc' | 'desc';
+  sort: string;
 };
 
 export class ListJobs {
   public constructor(private readonly jobRepository: JobRepository) {}
 
-  public async execute(input: ListJobsInput): Promise<PaginatedJobListDto> {
+  public async execute(input: ListJobsInput): Promise<PaginatedDto<JobListItemDto>> {
     const result = await this.jobRepository.findPaginated({
-      page: input.page,
-      pageSize: input.pageSize,
+      limit: input.limit,
+      offset: input.offset,
       targetSalary: input.targetSalary,
       statuses: input.statuses,
       businessTypes: input.businessTypes,
       industries: input.industries,
       stages: input.stages,
-      sortBy: input.sortBy,
-      sortDir: input.sortDir
+      sort: input.sort
     });
 
     return {
       items: result.items.map(toJobListItemDto),
-      total: result.total,
-      page: result.page,
-      pageSize: result.pageSize
+      pagination: {
+        limit: input.limit,
+        offset: input.offset,
+        total: result.total,
+        hasNext: input.offset + input.limit < result.total
+      }
     };
   }
 }
