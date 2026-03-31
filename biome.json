@@ -65,7 +65,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts", "!**/routeTree.gen.ts"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/temp", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts", "!**/routeTree.gen.ts"]
   },
   "overrides": [
     {

@@ -1,4 +1,5 @@
-import { cloneDeep, mergeWith } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep.js';
+import mergeWith from 'lodash/mergeWith.js';
 import type { TypeUtil } from './TypeUtil.js';
 
 export namespace ObjectUtil {
