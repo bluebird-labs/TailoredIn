@@ -20,12 +20,11 @@ export class ListJobsRoute {
         const result = await this.listJobs.execute({
           limit: query.limit,
           offset: query.offset,
-          targetSalary: query.target_salary,
           statuses: toArray(query.status) as JobStatus[] | undefined,
           businessTypes: toArray(query.business_type) as BusinessType[] | undefined,
           industries: toArray(query.industry) as Industry[] | undefined,
           stages: toArray(query.stage) as CompanyStage[] | undefined,
-          sort: query.sort ?? 'score:desc'
+          sort: query.sort ?? 'posted_at:desc'
         });
 
         return { data: result.items, pagination: result.pagination };
@@ -34,7 +33,6 @@ export class ListJobsRoute {
         query: t.Object({
           limit: t.Numeric({ minimum: 1, maximum: 100, default: 25 }),
           offset: t.Numeric({ minimum: 0, default: 0 }),
-          target_salary: t.Numeric({ minimum: 100000 }),
           status: t.Optional(t.Union([t.Array(t.Enum(JobStatus)), t.Enum(JobStatus)])),
           business_type: t.Optional(t.Union([t.Array(t.Enum(BusinessType)), t.Enum(BusinessType)])),
           industry: t.Optional(t.Union([t.Array(t.Enum(Industry)), t.Enum(Industry)])),

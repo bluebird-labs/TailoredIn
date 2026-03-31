@@ -28,12 +28,9 @@ export class GenerateCompanyBrief {
       return err(new Error('Company briefs require an OpenAI API key'));
     }
 
-    let job: Awaited<ReturnType<JobRepository['findScoredByIdOrFail']>>;
+    let job: Awaited<ReturnType<JobRepository['findByIdWithCompanyOrFail']>>;
     try {
-      job = await this.jobRepository.findScoredByIdOrFail({
-        jobId: input.jobId,
-        targetSalary: 0
-      });
+      job = await this.jobRepository.findByIdWithCompanyOrFail(input.jobId);
     } catch {
       return err(new Error(`Job not found: ${input.jobId}`));
     }

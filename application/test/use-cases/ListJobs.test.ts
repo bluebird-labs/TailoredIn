@@ -8,10 +8,9 @@ function createMockJobRepository(overrides: Partial<JobRepository> = {}): JobRep
     findByIdOrFail: async () => {
       throw new Error('not found');
     },
-    findScoredByIdOrFail: async () => {
+    findByIdWithCompanyOrFail: async () => {
       throw new Error('not found');
     },
-    findTopScored: async () => [],
     findPaginated: async () => ({ items: [], total: 0 }),
     upsertByLinkedinId: async () => {
       throw new Error('not implemented');
@@ -46,16 +45,7 @@ function makeJobListItem(
     descriptionHtml: '<p>A great role</p>',
     applicantsCount: 25,
     createdAt: new Date(),
-    updatedAt: new Date(),
-    scores: {
-      salary: 0.8,
-      skills: {
-        total: { score: 12, matches: [] },
-        expert: { score: 8, matches: [] },
-        interest: { score: 4, matches: [] },
-        avoid: { score: 0, matches: [] }
-      }
-    }
+    updatedAt: new Date()
   });
   return { job, companyId: 'company-1', companyName: overrides.companyName ?? 'Acme Corp' };
 }
@@ -71,7 +61,7 @@ describe('ListJobs', () => {
     });
     const uc = new ListJobs(repo);
 
-    const result = await uc.execute({ limit: 25, offset: 25, targetSalary: 200000, sort: 'score:desc' });
+    const result = await uc.execute({ limit: 25, offset: 25, sort: 'posted_at:desc' });
 
     expect(result.pagination.total).toBe(42);
     expect(result.pagination.limit).toBe(25);
@@ -82,9 +72,6 @@ describe('ListJobs', () => {
     expect(result.items[0].companyName).toBe('Alpha Inc');
     expect(result.items[0].status).toBe(JobStatus.NEW);
     expect(result.items[0].postedAt).toBe(new Date('2026-03-01').toISOString());
-    expect(result.items[0].expertScore).toBe(8);
-    expect(result.items[0].totalSkillScore).toBe(12);
-    expect(result.items[0].salaryScore).toBe(0.8);
   });
 
   test('passes params through to repository', async () => {
@@ -100,7 +87,6 @@ describe('ListJobs', () => {
     await uc.execute({
       limit: 10,
       offset: 20,
-      targetSalary: 180000,
       statuses: [JobStatus.NEW, JobStatus.APPLIED],
       sort: 'posted_at:desc'
     });
@@ -108,7 +94,6 @@ describe('ListJobs', () => {
     expect(capturedParams).not.toBeNull();
     expect(capturedParams!.limit).toBe(10);
     expect(capturedParams!.offset).toBe(20);
-    expect(capturedParams!.targetSalary).toBe(180000);
     expect(capturedParams!.statuses).toEqual([JobStatus.NEW, JobStatus.APPLIED]);
     expect(capturedParams!.sort).toBe('posted_at:desc');
   });
@@ -117,7 +102,7 @@ describe('ListJobs', () => {
     const repo = createMockJobRepository();
     const uc = new ListJobs(repo);
 
-    const result = await uc.execute({ limit: 25, offset: 0, targetSalary: 200000, sort: 'score:desc' });
+    const result = await uc.execute({ limit: 25, offset: 0, sort: 'posted_at:desc' });
 
     expect(result.items).toHaveLength(0);
     expect(result.pagination.total).toBe(0);
@@ -130,7 +115,7 @@ describe('ListJobs', () => {
     });
     const uc = new ListJobs(repo);
 
-    const result = await uc.execute({ limit: 25, offset: 0, targetSalary: 200000, sort: 'score:desc' });
+    const result = await uc.execute({ limit: 25, offset: 0, sort: 'posted_at:desc' });
 
     expect(result.items[0].postedAt).toBeNull();
   });

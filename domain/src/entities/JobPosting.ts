@@ -2,18 +2,6 @@ import { AggregateRoot } from '../AggregateRoot.js';
 import { JobStatusChangedEvent } from '../events/JobStatusChangedEvent.js';
 import { JobId } from '../value-objects/JobId.js';
 import { DISCARDED_JOB_STATUSES, IN_PROCESS_JOB_STATUSES, JobStatus } from '../value-objects/JobStatus.js';
-import type { SkillAffinity } from '../value-objects/SkillAffinity.js';
-import type { Skill } from './Skill.js';
-
-export type JobScoresSkillScore = {
-  score: number;
-  matches: Skill[];
-};
-
-export type JobScores = {
-  salary: number | null;
-  skills: Record<SkillAffinity, JobScoresSkillScore> & { total: JobScoresSkillScore };
-};
 
 export type JobPostingCreateProps = {
   companyId: string;
@@ -57,7 +45,6 @@ export class JobPosting extends AggregateRoot<JobId> {
   public readonly companyId: string;
   public readonly createdAt: Date;
   public updatedAt: Date;
-  public scores: Readonly<JobScores> | null = null;
 
   public constructor(props: {
     id: JobId;
@@ -81,7 +68,6 @@ export class JobPosting extends AggregateRoot<JobId> {
     applicantsCount: number | null;
     createdAt: Date;
     updatedAt: Date;
-    scores?: JobScores | null;
   }) {
     super(props.id);
     this.companyId = props.companyId;
@@ -104,7 +90,6 @@ export class JobPosting extends AggregateRoot<JobId> {
     this.applicantsCount = props.applicantsCount;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
-    this.scores = props.scores ?? null;
   }
 
   // --- Queries ---
@@ -165,10 +150,6 @@ export class JobPosting extends AggregateRoot<JobId> {
 
   public setInitialStatus(status: JobStatus): void {
     this.status = status;
-  }
-
-  public score(scores: JobScores): void {
-    this.scores = scores;
   }
 
   // --- Factory ---

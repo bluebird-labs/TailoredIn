@@ -2,8 +2,6 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import type {
   FindPaginatedParams,
-  FindScoredParams,
-  FindTopScoredParams,
   JobListItem,
   JobRepository,
   PaginatedResult,
@@ -16,16 +14,12 @@ import {
   Company as DomainCompany,
   type Industry,
   JobId,
-  JobPosting,
-  type JobScores,
-  SkillAffinity,
-  SkillId
+  JobPosting
 } from '@tailoredin/domain';
 import { Company as OrmCompany } from '../db/entities/companies/Company.js';
 import { Job as OrmJob } from '../db/entities/jobs/Job.js';
-import type { JobListScoresProps, JobOrmRepository, JobScoresProps } from '../db/entities/jobs/JobOrmRepository.js';
+import type { JobOrmRepository } from '../db/entities/jobs/JobOrmRepository.js';
 import { JobStatusUpdate } from '../db/entities/jobs/JobStatusUpdate.js';
-import { SkillAffinity as OrmSkillAffinity } from '../db/entities/skills/SkillAffinity.js';
 
 @injectable()
 export class PostgresJobRepository implements JobRepository {
@@ -41,25 +35,13 @@ export class PostgresJobRepository implements JobRepository {
     return this.toDomain(orm);
   }
 
-  public async findScoredByIdOrFail(params: FindScoredParams): Promise<{ job: JobPosting; company: DomainCompany }> {
+  public async findByIdWithCompanyOrFail(jobId: string): Promise<{ job: JobPosting; company: DomainCompany }> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
-    const ormJob = await repo.findScoredByIdOrFail(
-      { jobId: params.jobId, targetSalary: params.targetSalary },
-      { populate: ['company', 'statusUpdates'] }
-    );
-    const job = this.toDomainWithScores(ormJob, ormJob.__scores);
-    const ormCompany = ormJob.company as import('../db/entities/companies/Company.js').Company;
-    const company = this.ormCompanyToDomain(ormCompany);
+    const result = await repo.findByIdWithCompany(jobId, { populate: ['company', 'statusUpdates'] });
+    if (!result) throw new Error(`Job not found: ${jobId}`);
+    const job = this.toDomain(result);
+    const company = this.ormCompanyToDomain(result.company);
     return { job, company };
-  }
-
-  public async findTopScored(params: FindTopScoredParams): Promise<JobPosting[]> {
-    const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
-    const ormJobs = await repo.findTopScored(
-      { top: params.top, targetSalary: params.targetSalary, hoursPostedMax: params.hoursPostedMax },
-      { populate: ['company', 'statusUpdates'] }
-    );
-    return ormJobs.map(j => this.toDomainWithScores(j, j.__scores));
   }
 
   public async upsertByLinkedinId(props: UpsertJobProps, company: DomainCompany): Promise<JobPosting> {
@@ -91,23 +73,19 @@ export class PostgresJobRepository implements JobRepository {
 
   public async findPaginated(params: FindPaginatedParams): Promise<PaginatedResult<JobListItem>> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
-    const result = await repo.findPaginatedScored({
+    const result = await repo.findPaginated({
       limit: params.limit,
       offset: params.offset,
-      targetSalary: params.targetSalary,
       statuses: params.statuses,
       businessTypes: params.businessTypes,
       industries: params.industries,
       stages: params.stages,
-      sort: params.sort,
-      expertWeight: params.expertWeight,
-      interestWeight: params.interestWeight,
-      avoidWeight: params.avoidWeight
+      sort: params.sort
     });
 
     return {
       items: result.items.map(item => ({
-        job: this.toDomainWithListScores(item, item.__scores),
+        job: this.toDomain(item),
         companyId: item.__companyId,
         companyName: item.__companyName
       })),
@@ -146,73 +124,6 @@ export class PostgresJobRepository implements JobRepository {
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });
-  }
-
-  private toDomainWithListScores(orm: OrmJob, listScores: JobListScoresProps): JobPosting {
-    const job = this.toDomain(orm);
-    job.score({
-      salary: listScores.salaryScore,
-      skills: {
-        total: { score: listScores.totalSkillScore, matches: [] },
-        [SkillAffinity.EXPERT]: { score: listScores.expertScore, matches: [] },
-        [SkillAffinity.INTEREST]: { score: 0, matches: [] },
-        [SkillAffinity.AVOID]: { score: 0, matches: [] }
-      }
-    });
-    return job;
-  }
-
-  private toDomainWithScores(orm: OrmJob, ormScores: JobScoresProps): JobPosting {
-    const job = this.toDomain(orm);
-    job.score(this.mapScores(ormScores));
-    return job;
-  }
-
-  private mapScores(ormScores: JobScoresProps): JobScores {
-    const mapAffinity = (affinity: OrmSkillAffinity) => ({
-      score: ormScores.skills[affinity].score,
-      matches: ormScores.skills[affinity].matches.map(
-        s =>
-          ({
-            id: new SkillId(s.id),
-            name: s.name,
-            key: s.key,
-            affinity: s.affinity as unknown as SkillAffinity,
-            variants: s.variants,
-            createdAt: s.createdAt,
-            updatedAt: s.updatedAt,
-            equals: () => false,
-            domainEvents: [],
-            clearDomainEvents: () => {},
-            refresh: () => {}
-          }) as unknown as import('@tailoredin/domain').Skill
-      )
-    });
-
-    return {
-      salary: ormScores.salary,
-      skills: {
-        total: {
-          score: ormScores.skills.total.score,
-          matches: ormScores.skills.total.matches.map(
-            s =>
-              ({
-                id: new SkillId(s.id),
-                name: s.name,
-                key: s.key,
-                affinity: s.affinity as unknown as SkillAffinity,
-                variants: s.variants,
-                createdAt: s.createdAt,
-                updatedAt: s.updatedAt,
-                equals: () => false
-              }) as unknown as import('@tailoredin/domain').Skill
-          )
-        },
-        [SkillAffinity.EXPERT]: mapAffinity(OrmSkillAffinity.EXPERT),
-        [SkillAffinity.INTEREST]: mapAffinity(OrmSkillAffinity.INTEREST),
-        [SkillAffinity.AVOID]: mapAffinity(OrmSkillAffinity.AVOID)
-      }
-    };
   }
 
   private ormCompanyToDomain(orm: import('../db/entities/companies/Company.js').Company): DomainCompany {

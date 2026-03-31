@@ -8,7 +8,7 @@ type JobViewConfig = {
   label: string;
   icon: LucideIcon;
   statuses: JobStatus[] | undefined;
-  defaultSort: 'score' | 'posted_at';
+  defaultSort: 'posted_at';
   statusOptions: { value: string; label: string }[];
 };
 
@@ -66,7 +66,7 @@ export const JOB_VIEW_CONFIG: Record<JobView, JobViewConfig> = {
     label: 'Triage',
     icon: Inbox,
     statuses: TRIAGE_STATUSES,
-    defaultSort: 'score',
+    defaultSort: 'posted_at',
     statusOptions: toOptions(TRIAGE_STATUSES)
   },
   pipeline: {

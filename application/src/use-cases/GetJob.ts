@@ -3,7 +3,6 @@ import type { CompanyDto } from '../dtos/CompanyDto.js';
 
 export type GetJobInput = {
   jobId: string;
-  targetSalary: number;
 };
 
 export type GetJobOutput = {
@@ -15,10 +14,7 @@ export class GetJob {
   public constructor(private readonly jobRepository: JobRepository) {}
 
   public async execute(input: GetJobInput): Promise<GetJobOutput> {
-    const result = await this.jobRepository.findScoredByIdOrFail({
-      jobId: input.jobId,
-      targetSalary: input.targetSalary
-    });
+    const result = await this.jobRepository.findByIdWithCompanyOrFail(input.jobId);
 
     return {
       job: result.job,

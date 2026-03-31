@@ -4,7 +4,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { formatDistanceToNow } from 'date-fns';
 import {
   ArrowLeft,
-  BarChart3,
   Briefcase,
   Building2,
   DollarSign,
@@ -33,7 +32,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ARCHETYPE_KEY_LABELS } from '@/hooks/use-archetypes';
 import { api } from '@/lib/api';
 import { detectAtsPlatform } from '@/lib/ats-platform';
-import { DEFAULT_TARGET_SALARY } from '@/lib/constants';
 import { isDiscardedStatus } from '@/lib/job-views';
 import { queryKeys } from '@/lib/query-keys';
 
@@ -77,9 +75,7 @@ function JobDetailPage() {
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.jobs.detail(jobId),
     queryFn: async () => {
-      const res = await api.jobs({ id: jobId }).get({
-        query: { target_salary: DEFAULT_TARGET_SALARY }
-      });
+      const res = await api.jobs({ id: jobId }).get();
       if (res.error) throw new Error(String(res.error));
       return res.data.data;
     }
@@ -166,8 +162,6 @@ function JobDetailPage() {
       stage: string | null;
     };
   };
-  const scores = job.scores;
-
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Back link */}
@@ -393,26 +387,6 @@ function JobDetailPage() {
         )}
       </div>
 
-      {/* Scores */}
-      {scores && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BarChart3 className="h-4 w-4" />
-              Scores
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <ScoreItem label="Expert" value={scores.skills.expert?.score ?? 0} />
-              <ScoreItem label="Interest" value={scores.skills.interest?.score ?? 0} />
-              <ScoreItem label="Avoid" value={scores.skills.avoid?.score ?? 0} />
-              <ScoreItem label="Salary" value={scores.salary} />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Company Brief */}
       <CompanyBriefPanel jobId={jobId} llmAvailable={llmAvailable} />
 
@@ -563,15 +537,6 @@ function BriefSection({ title, content }: { title: string; content: string }) {
     <div>
       <h4 className="text-sm font-semibold mb-1">{title}</h4>
       <p className="text-sm text-muted-foreground whitespace-pre-line">{content}</p>
-    </div>
-  );
-}
-
-function ScoreItem({ label, value }: { label: string; value: number | null }) {
-  return (
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-lg font-semibold tabular-nums">{value ?? '—'}</p>
     </div>
   );
 }

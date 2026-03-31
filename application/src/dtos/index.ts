@@ -9,7 +9,6 @@ export type { CompanyDto } from './CompanyDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
 export type { IngestJobByUrlInput, ManualJobFieldsDto } from './IngestJobByUrlDto.js';
 export type { JobListItemDto } from './JobListItemDto.js';
-export type { JobScoresDto, SkillScoreDto } from './JobScoresDto.js';
 export type { JobSearchConfigDto } from './JobSearchConfigDto.js';
 export type { JobSummaryDto } from './JobSummaryDto.js';
 export type { PaginatedDto, PaginationMeta } from './PaginationDto.js';

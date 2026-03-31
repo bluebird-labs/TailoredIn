@@ -8,15 +8,11 @@ import type { JobStatus } from '../value-objects/JobStatus.js';
 export type FindPaginatedParams = {
   limit: number;
   offset: number;
-  targetSalary: number;
   statuses?: JobStatus[];
   businessTypes?: BusinessType[];
   industries?: Industry[];
   stages?: CompanyStage[];
   sort: string;
-  expertWeight?: number;
-  interestWeight?: number;
-  avoidWeight?: number;
 };
 
 export type PaginatedResult<T> = {
@@ -30,30 +26,12 @@ export type JobListItem = {
   companyName: string;
 };
 
-export type FindTopScoredParams = {
-  top: number;
-  targetSalary: number;
-  hoursPostedMax?: number;
-  expertWeight?: number;
-  interestWeight?: number;
-  avoidWeight?: number;
-};
-
-export type FindScoredParams = {
-  jobId: string;
-  targetSalary: number;
-  expertWeight?: number;
-  interestWeight?: number;
-  avoidWeight?: number;
-};
-
 export type UpsertJobProps = Omit<JobPostingCreateProps, 'companyId'>;
 
 export interface JobRepository {
   findById(id: string): Promise<JobPosting | null>;
   findByIdOrFail(id: string): Promise<JobPosting>;
-  findScoredByIdOrFail(params: FindScoredParams): Promise<{ job: JobPosting; company: Company }>;
-  findTopScored(params: FindTopScoredParams): Promise<JobPosting[]>;
+  findByIdWithCompanyOrFail(jobId: string): Promise<{ job: JobPosting; company: Company }>;
   findPaginated(params: FindPaginatedParams): Promise<PaginatedResult<JobListItem>>;
   upsertByLinkedinId(props: UpsertJobProps, company: Company): Promise<JobPosting>;
   save(job: JobPosting): Promise<void>;

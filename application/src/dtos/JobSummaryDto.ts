@@ -1,5 +1,4 @@
 import type { JobStatus } from '@tailoredin/domain';
-import type { JobScoresDto } from './JobScoresDto.js';
 
 export type JobSummaryDto = {
   id: string;
@@ -21,7 +20,6 @@ export type JobSummaryDto = {
   descriptionHtml: string;
   applicantsCount: number | null;
   companyId: string;
-  scores: JobScoresDto | null;
   createdAt: Date;
   updatedAt: Date;
 };
