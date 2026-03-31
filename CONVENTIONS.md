@@ -79,6 +79,88 @@ api/cli → infrastructure → application → domain → core
 - Each class has a `plugin()` method returning an Elysia instance
 - Composition root resolves routes: `container.get(RouteClass).plugin()`
 
+## API Conventions
+
+All HTTP endpoints follow these conventions. Inspired by Stripe and GitHub API design.
+
+### Response Envelope
+
+Every response uses one of two shapes:
+
+**Success:**
+```typescript
+{
+  data: T,
+  pagination?: {
+    limit: number,
+    offset: number,
+    total: number,
+    hasNext: boolean
+  }
+}
+```
+
+**Error:**
+```typescript
+{
+  error: {
+    code: string,
+    message: string
+  }
+}
+```
+
+- `data` contains the resource directly — a single object or an array, never wrapped in an extra key
+- `pagination` is present only on paginated list endpoints
+- HTTP status codes carry the success/failure signal — no redundant booleans
+- `error.code` is a machine-readable string (e.g., `"NOT_FOUND"`, `"INVALID_URL"`, `"SCRAPE_FAILED"`)
+- `error.message` is a human-readable explanation
+
+### HTTP Status Codes
+
+| Status | Usage |
+|---|---|
+| `200` | Successful GET, PUT/PATCH that returns data |
+| `201` | Successful POST that creates a resource |
+| `204` | Successful DELETE or mutation with no response body |
+| `400` | Validation failure, malformed request |
+| `404` | Resource not found |
+| `422` | Request is well-formed but semantically invalid (e.g., invalid LinkedIn URL) |
+| `500` | Unexpected server error — return generic message, never leak internals |
+| `502` | Upstream/external service failure |
+
+### Pagination
+
+List endpoints use **limit/offset** pagination:
+
+| Param | Type | Default | Constraint |
+|---|---|---|---|
+| `limit` | `number` | `25` | `1 ≤ limit ≤ 100` |
+| `offset` | `number` | `0` | `≥ 0` |
+
+Response includes `pagination` with `total` (full count of matching records) and `hasNext` (convenience boolean: `offset + limit < total`).
+
+### Sorting
+
+A single `sort` query parameter with comma-separated fields. Each field has an optional `:asc` or `:desc` suffix. Default direction is ascending.
+
+```
+GET /jobs?sort=score:desc,posted_at
+```
+
+Each route defines its own set of allowed sort fields. Unknown fields are ignored or return `400`.
+
+### Filtering
+
+- Query parameter names use **snake_case** matching the field name (e.g., `target_salary`, `business_type`)
+- Array values use repeated params: `?status=NEW&status=APPLIED`
+- Elysia's `t.Union([t.Array(...), t.Enum(...)])` pattern handles both single and array values
+- Enum-based filters use the domain enum values directly
+
+### Query Parameter Casing
+
+All query parameters use **snake_case** — no camelCase, no kebab-case.
+
 ## File & Import Conventions
 
 - **PascalCase** for all class/entity/route files
