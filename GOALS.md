@@ -91,7 +91,7 @@ graph TD
     style M6A fill:#86efac
     style M6B fill:#86efac
     style M7 fill:#86efac
-    style M8 fill:#facc15
+    style M8 fill:#86efac
     style M9 fill:#86efac
     style M10 fill:#facc15
     style M11 fill:#e5e7eb
@@ -156,7 +156,7 @@ Configure which resume content appears for each archetype.
   - [ ] List archetypes with create/delete
 - [ ] **5B. Archetype detail page**
   - [ ] Edit archetype metadata (name, headline selection)
-  - [ ] Default headline fallback when archetype doesn't specify one
+  - [x] Default headline fallback when archetype doesn't specify one
   - [ ] Select positions (company refs + bullet overrides)
   - [ ] Select skill categories/items
   - [ ] Select education entries

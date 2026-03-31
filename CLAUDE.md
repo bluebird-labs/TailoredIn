@@ -40,6 +40,7 @@ api/cli → infrastructure → application → domain → (core)
 | `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, OpenAI LLM service, Playwright scraper + web color service, Typst resume renderer, DI tokens |
 | `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root |
 | `cli/` | `@tailoredin/cli` | CLI entry points: `jobby` (job management), `cvs` (resume generation), `robot` (scraping daemon) |
+| `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend. Only imports from `@tailoredin/api/client` (Eden Treaty) |
 
 ## Commands
 
@@ -55,16 +56,26 @@ bun run check:fix      # lint + format with auto-fix
 bun run format         # format only
 bun run lint           # lint only
 
+# Dead code detection
+bun run knip           # unused files, exports, dependencies
+
 # Dependency boundary enforcement
 bun run dep:check      # verify no circular deps or cross-layer violations
 
+# Dev (API + web with hot-reload)
+bun run dev                  # runs api:dev + web:dev in parallel
+
 # API server
 bun run api                  # start on port 8000
-bun run api:watch            # start with --watch
+bun run api:dev              # start with --watch
+
+# Web frontend
+bun run web                  # Vite production preview
+bun run web:dev              # Vite dev server
 
 # Background scraping robot
 bun run robot
-bun run robot:watch
+bun run robot:dev
 
 # Resume builder CLI
 bun run cvs gen --archetype nerd --theme skyblue --company_name "Acme" --keywords node typescript
@@ -117,15 +128,22 @@ cli/robot → ScrapeAndIngestJobs use case
 **Resume Generation:**
 ```
 PUT /jobs/:id/generate-resume → GenerateResume use case
-  → LlmService.extractJobPostingInsights() (GPT-4o structured output)
+  → LlmService.extractJobPostingInsights() (GPT-4o structured output, skipped if no API key)
   → WebColorService.findPrimaryColor() (Playwright + node-vibrant)
   → ResumeContentFactory.make() → ResumeRenderer.render() → Typst compile → PDF
 ```
 
-## Database
-PostgreSQL via MikroORM (`infrastructure/src/db/`). Config in `infrastructure/src/db/orm-config.ts`. Entities: `Job`, `Company`, `Skill`, `SkillAffinity`, `JobStatusUpdate`. All tables use `UnderscoreNamingStrategy`.
+**Single-URL Job Import:**
+```
+POST /jobs { linkedinUrl } → IngestJobByUrl use case
+  → PlaywrightJobScraper.scrapeByUrl() → scrape single posting
+  → IngestScrapedJob → election + scoring
+```
 
-**Job scoring**: `JobOrmRepository` uses pgtyped SQL with skill affinity weights (EXPERT=8, INTEREST=2, AVOID=2) to rank jobs.
+## Database
+PostgreSQL via MikroORM (`infrastructure/src/db/`). Config in `infrastructure/src/db/orm-config.ts`. Entities: `Job`, `Company`, `Skill`, `SkillAffinity`, `JobStatusUpdate`, `User`, `ResumeCompany`, `ResumeEducation`, `ResumeHeadline`, `ResumeSkillCategory`, `ResumeSkillItem`, `Archetype`, `ArchetypePosition`. All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`).
+
+**Job scoring**: `JobOrmRepository` uses Kysely query builder with skill affinity weights (EXPERT=8, INTEREST=2, AVOID=2) to rank jobs.
 
 ### Job Status Lifecycle
 `JobStatus` enum covers the full funnel: `NEW → APPLIED → RECRUITER_SCREEN → TECHNICAL_SCREEN → ON_SITE → OFFER`. Auto-rejection statuses set by the robot: `RETIRED`, `DUPLICATE`, `HIGH_APPLICANTS`, `LOCATION_UNFIT`, `POSTED_TOO_LONG_AGO`. Manual statuses: `UNFIT`, `EXPIRED`, `LOW_SALARY`.
@@ -144,6 +162,7 @@ Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config
 ## Tooling Notes
 
 - **Biome 2.x** handles all linting and formatting (replaces ESLint + Prettier). Config at root `biome.json`.
+- **Knip** detects dead code, unused exports, and unused dependencies. Config at `knip.json`. Run `bun run knip`.
 - **dependency-cruiser** enforces Onion Architecture boundaries. Run `bun run dep:check`. Config at `.dependency-cruiser.cjs`.
 - **mise** manages Bun and Typst versions (pinned in `.mise.toml`). Run `mise install` after cloning.
 - Bun runs TypeScript natively — no build step required.

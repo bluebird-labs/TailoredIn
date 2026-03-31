@@ -26,13 +26,18 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       throw new Error(`ArchetypeConfig not found for archetype: ${input.archetype}`);
     }
 
-    const [user, headline, companies, allEducation, allCategories] = await Promise.all([
+    const [user, headlines, companies, allEducation, allCategories] = await Promise.all([
       this.userRepo.findByIdOrFail(input.userId),
-      this.headlineRepo.findByIdOrFail(config.headlineId),
+      this.headlineRepo.findAllByUserId(input.userId),
       this.companyRepo.findAllByUserId(input.userId),
       this.educationRepo.findAllByUserId(input.userId),
       this.skillCategoryRepo.findAllByUserId(input.userId)
     ]);
+
+    const headline = headlines.find(h => h.id.value === config.headlineId) ?? headlines[0];
+    if (!headline) {
+      throw new Error(`No headlines found for user: ${input.userId}`);
+    }
 
     // Build bullet lookup from all companies
     const bulletMap = new Map<string, string>();
