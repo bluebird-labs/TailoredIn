@@ -2,6 +2,7 @@ import Path from 'node:path';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { SeedManager } from '@mikro-orm/seeder';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
@@ -67,7 +68,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       ArchetypePosition,
       ArchetypePositionBullet
     ],
-    extensions: [Migrator, SchemaGenerator],
+    extensions: [Migrator, SchemaGenerator, SeedManager],
 
     discovery: { warnWhenNoEntities: true },
     namingStrategy: UnderscoreNamingStrategy,

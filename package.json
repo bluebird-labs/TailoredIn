@@ -36,7 +36,8 @@
     "cli:typecheck": "bun run --cwd cli typecheck",
     "cli:test": "bun run --cwd cli test",
     "db:migration:create": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:create",
-    "db:migration:up": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:up"
+    "db:migration:up": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:up",
+    "db:seed": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure seed:run"
   },
   "workspaces": [
     "domain",
