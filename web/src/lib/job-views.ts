@@ -4,7 +4,7 @@ import { Archive, Briefcase, GitBranch, Inbox } from 'lucide-react';
 
 export type JobView = 'triage' | 'pipeline' | 'archive' | 'all';
 
-export type JobViewConfig = {
+type JobViewConfig = {
   label: string;
   icon: LucideIcon;
   statuses: JobStatus[] | undefined;
