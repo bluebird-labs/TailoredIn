@@ -10,6 +10,7 @@ dist/
 build/
 .idea/
 .superpowers/
+nimbalyst-local/
 
 # Generated resume PDFs and ephemeral Typst compilation workspace
 cli/Resumes/
