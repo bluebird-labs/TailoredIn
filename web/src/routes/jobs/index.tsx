@@ -16,13 +16,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useBulkChangeStatus } from '@/hooks/use-bulk-status';
 import { api } from '@/lib/api';
-import { DEFAULT_PAGE_SIZE, DEFAULT_TARGET_SALARY } from '@/lib/constants';
+import { DEFAULT_LIMIT, DEFAULT_TARGET_SALARY } from '@/lib/constants';
 import { getViewStatuses, JOB_VIEW_CONFIG, JOB_VIEWS, type JobView } from '@/lib/job-views';
 import { queryKeys } from '@/lib/query-keys';
 
 const jobSearchSchema = z.object({
-  page: z.number().min(1).optional().default(1).catch(1),
-  pageSize: z.number().min(1).max(100).optional().default(DEFAULT_PAGE_SIZE).catch(DEFAULT_PAGE_SIZE),
+  limit: z.number().min(1).max(100).optional().default(DEFAULT_LIMIT).catch(DEFAULT_LIMIT),
+  offset: z.number().min(0).optional().default(0).catch(0),
   view: z.enum(['triage', 'pipeline', 'archive', 'all']).optional().default('triage').catch('triage'),
   subStatus: z.string().default('all').catch('all'),
   businessType: z
@@ -40,8 +40,7 @@ const jobSearchSchema = z.object({
     .optional()
     .default('all')
     .catch('all'),
-  sortBy: z.enum(['score', 'posted_at']).optional(),
-  sortDir: z.enum(['asc', 'desc']).optional().default('desc').catch('desc')
+  sort: z.string().optional()
 });
 
 type JobSearch = z.output<typeof jobSearchSchema>;
@@ -91,33 +90,36 @@ function JobsPage() {
 
   const view = search.view as JobView;
   const viewConfig = JOB_VIEW_CONFIG[view];
-  const sortBy = search.sortBy ?? viewConfig.defaultSort;
+  const defaultSort = `${viewConfig.defaultSort}:desc`;
+  const currentSort = search.sort ?? defaultSort;
+  const [sortBy, sortDir = 'desc'] = currentSort.split(':') as [string, 'asc' | 'desc'];
   const isTriage = view === 'triage';
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const bulkMutation = useBulkChangeStatus();
 
-  // Clear selection on page/view change
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset selection when page or view changes
+  // Clear selection on offset/view change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset selection when offset or view changes
   useEffect(() => {
     setSelectedIds(new Set());
-  }, [search.page, view]);
+  }, [search.offset, view]);
 
   const setSearch = (updates: Partial<JobSearch>) => {
     navigate({
       search: (prev: JobSearch) => ({
         ...prev,
         ...updates,
-        page:
-          updates.page ??
-          ('sortBy' in updates ||
-          'view' in updates ||
-          'subStatus' in updates ||
-          'businessType' in updates ||
-          'industry' in updates ||
-          'stage' in updates
-            ? 1
-            : prev.page)
+        offset:
+          updates.offset !== undefined
+            ? updates.offset
+            : 'sort' in updates ||
+                'view' in updates ||
+                'subStatus' in updates ||
+                'businessType' in updates ||
+                'industry' in updates ||
+                'stage' in updates
+              ? 0
+              : prev.offset
       })
     });
   };
@@ -129,21 +131,20 @@ function JobsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.jobs.list({
-      page: search.page,
-      pageSize: search.pageSize,
+      limit: search.limit,
+      offset: search.offset,
       view,
       subStatus: search.subStatus,
       businessType: search.businessType,
       industry: search.industry,
       stage: search.stage,
-      sortBy,
-      sortDir: search.sortDir
+      sort: currentSort
     }),
     queryFn: async () => {
       const res = await api.jobs.get({
         query: {
-          page: search.page,
-          page_size: search.pageSize,
+          limit: search.limit,
+          offset: search.offset,
           target_salary: DEFAULT_TARGET_SALARY,
           // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
           status: statuses as any,
@@ -153,24 +154,24 @@ function JobsPage() {
           industry: industryParam as any,
           // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
           stage: stageParam as any,
-          sort_by: sortBy,
-          sort_dir: search.sortDir
+          sort: currentSort
         }
       });
       if (res.error) throw new Error(String(res.error));
-      return res.data.data;
+      return res.data;
     }
   });
 
-  const totalPages = data ? Math.ceil(data.total / data.pageSize) : 0;
-  const pageItemIds = data?.items.map(j => j.id) ?? [];
+  const totalPages = data ? Math.ceil(data.pagination.total / data.pagination.limit) : 0;
+  const currentPage = data ? Math.floor(data.pagination.offset / data.pagination.limit) + 1 : 1;
+  const pageItemIds = data?.data.map(j => j.id) ?? [];
   const allSelected = pageItemIds.length > 0 && pageItemIds.every(id => selectedIds.has(id));
 
   const toggleSort = (column: 'score' | 'posted_at') => {
     if (sortBy === column) {
-      setSearch({ sortBy: column, sortDir: search.sortDir === 'asc' ? 'desc' : 'asc' });
+      setSearch({ sort: `${column}:${sortDir === 'asc' ? 'desc' : 'asc'}` });
     } else {
-      setSearch({ sortBy: column, sortDir: 'desc' });
+      setSearch({ sort: `${column}:desc` });
     }
   };
 
@@ -218,7 +219,7 @@ function JobsPage() {
               key={v}
               variant={view === v ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => setSearch({ view: v, subStatus: 'all', sortBy: undefined })}
+              onClick={() => setSearch({ view: v, subStatus: 'all', sort: undefined })}
             >
               <Icon className="mr-1.5 h-4 w-4" />
               {config.label}
@@ -358,7 +359,7 @@ function JobsPage() {
               <TableHead className="w-[80px]">
                 <button type="button" className="flex items-center font-medium" onClick={() => toggleSort('score')}>
                   Score
-                  <SortIcon column="score" current={sortBy} dir={search.sortDir} />
+                  <SortIcon column="score" current={sortBy} dir={sortDir} />
                 </button>
               </TableHead>
               <TableHead>Company</TableHead>
@@ -367,7 +368,7 @@ function JobsPage() {
               <TableHead className="w-[140px]">
                 <button type="button" className="flex items-center font-medium" onClick={() => toggleSort('posted_at')}>
                   Posted
-                  <SortIcon column="posted_at" current={sortBy} dir={search.sortDir} />
+                  <SortIcon column="posted_at" current={sortBy} dir={sortDir} />
                 </button>
               </TableHead>
             </TableRow>
@@ -398,7 +399,7 @@ function JobsPage() {
                     </TableCell>
                   </TableRow>
                 ))
-              : data?.items.map(job => (
+              : data?.data.map(job => (
                   <TableRow key={job.id} data-state={selectedIds.has(job.id) ? 'selected' : undefined}>
                     {isTriage && (
                       <TableCell>
@@ -430,7 +431,7 @@ function JobsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-            {!isLoading && data?.items.length === 0 && (
+            {!isLoading && data?.data.length === 0 && (
               <TableRow>
                 <TableCell colSpan={colSpan} className="h-24 text-center text-muted-foreground">
                   No jobs found.
@@ -444,14 +445,14 @@ function JobsPage() {
       {data && totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {data.total.toLocaleString()} jobs — page {data.page} of {totalPages}
+            {data.pagination.total.toLocaleString()} jobs — page {currentPage} of {totalPages}
           </p>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              disabled={search.page <= 1}
-              onClick={() => setSearch({ page: search.page - 1 })}
+              disabled={search.offset <= 0}
+              onClick={() => setSearch({ offset: Math.max(0, search.offset - search.limit) })}
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
@@ -459,8 +460,8 @@ function JobsPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={search.page >= totalPages}
-              onClick={() => setSearch({ page: search.page + 1 })}
+              disabled={data && !data.pagination.hasNext}
+              onClick={() => setSearch({ offset: search.offset + search.limit })}
             >
               Next
               <ChevronRight className="h-4 w-4" />

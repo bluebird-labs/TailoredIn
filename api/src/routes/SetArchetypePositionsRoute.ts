@@ -27,7 +27,7 @@ export class SetArchetypePositionsRoute {
         });
         if (!result.isOk) {
           set.status = 404;
-          return { error: result.error.message };
+          return { error: { code: 'NOT_FOUND', message: result.error.message } };
         }
         set.status = 204;
         return;

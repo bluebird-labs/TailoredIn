@@ -17,7 +17,7 @@ export class GenerateCompanyBriefRoute {
 
         if (!result.isOk) {
           set.status = 400;
-          return { error: result.error.message };
+          return { error: { code: 'GENERATION_FAILED', message: result.error.message } };
         }
 
         return { data: result.value };

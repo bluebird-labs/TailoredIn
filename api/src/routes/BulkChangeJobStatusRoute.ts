@@ -18,7 +18,7 @@ export class BulkChangeJobStatusRoute {
         });
 
         if (!result.isOk) {
-          return { error: result.error.message };
+          return { error: { code: 'BULK_STATUS_FAILED', message: result.error.message } };
         }
 
         return { data: result.value };

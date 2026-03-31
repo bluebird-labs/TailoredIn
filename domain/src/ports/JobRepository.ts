@@ -6,15 +6,14 @@ import type { Industry } from '../value-objects/Industry.js';
 import type { JobStatus } from '../value-objects/JobStatus.js';
 
 export type FindPaginatedParams = {
-  page: number;
-  pageSize: number;
+  limit: number;
+  offset: number;
   targetSalary: number;
   statuses?: JobStatus[];
   businessTypes?: BusinessType[];
   industries?: Industry[];
   stages?: CompanyStage[];
-  sortBy?: 'score' | 'posted_at';
-  sortDir?: 'asc' | 'desc';
+  sort: string;
   expertWeight?: number;
   interestWeight?: number;
   avoidWeight?: number;
@@ -23,8 +22,6 @@ export type FindPaginatedParams = {
 export type PaginatedResult<T> = {
   items: T[];
   total: number;
-  page: number;
-  pageSize: number;
 };
 
 export type JobListItem = {

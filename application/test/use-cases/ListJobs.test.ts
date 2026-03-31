@@ -12,7 +12,7 @@ function createMockJobRepository(overrides: Partial<JobRepository> = {}): JobRep
       throw new Error('not found');
     },
     findTopScored: async () => [],
-    findPaginated: async () => ({ items: [], total: 0, page: 1, pageSize: 25 }),
+    findPaginated: async () => ({ items: [], total: 0 }),
     upsertByLinkedinId: async () => {
       throw new Error('not implemented');
     },
@@ -57,7 +57,7 @@ function makeJobListItem(
       }
     }
   });
-  return { job, companyName: overrides.companyName ?? 'Acme Corp' };
+  return { job, companyId: 'company-1', companyName: overrides.companyName ?? 'Acme Corp' };
 }
 
 describe('ListJobs', () => {
@@ -67,15 +67,16 @@ describe('ListJobs', () => {
       makeJobListItem({ title: 'Frontend Dev', companyName: 'Beta LLC' })
     ];
     const repo = createMockJobRepository({
-      findPaginated: async () => ({ items, total: 42, page: 2, pageSize: 25 })
+      findPaginated: async () => ({ items, total: 42 })
     });
     const uc = new ListJobs(repo);
 
-    const result = await uc.execute({ page: 2, pageSize: 25, targetSalary: 200000 });
+    const result = await uc.execute({ limit: 25, offset: 25, targetSalary: 200000, sort: 'score:desc' });
 
-    expect(result.total).toBe(42);
-    expect(result.page).toBe(2);
-    expect(result.pageSize).toBe(25);
+    expect(result.pagination.total).toBe(42);
+    expect(result.pagination.limit).toBe(25);
+    expect(result.pagination.offset).toBe(25);
+    expect(result.pagination.hasNext).toBe(false);
     expect(result.items).toHaveLength(2);
     expect(result.items[0].title).toBe('Backend Engineer');
     expect(result.items[0].companyName).toBe('Alpha Inc');
@@ -91,47 +92,45 @@ describe('ListJobs', () => {
     const repo = createMockJobRepository({
       findPaginated: async params => {
         capturedParams = params;
-        return { items: [], total: 0, page: 1, pageSize: 10 };
+        return { items: [], total: 0 };
       }
     });
     const uc = new ListJobs(repo);
 
     await uc.execute({
-      page: 3,
-      pageSize: 10,
+      limit: 10,
+      offset: 20,
       targetSalary: 180000,
       statuses: [JobStatus.NEW, JobStatus.APPLIED],
-      sortBy: 'posted_at',
-      sortDir: 'desc'
+      sort: 'posted_at:desc'
     });
 
     expect(capturedParams).not.toBeNull();
-    expect(capturedParams!.page).toBe(3);
-    expect(capturedParams!.pageSize).toBe(10);
+    expect(capturedParams!.limit).toBe(10);
+    expect(capturedParams!.offset).toBe(20);
     expect(capturedParams!.targetSalary).toBe(180000);
     expect(capturedParams!.statuses).toEqual([JobStatus.NEW, JobStatus.APPLIED]);
-    expect(capturedParams!.sortBy).toBe('posted_at');
-    expect(capturedParams!.sortDir).toBe('desc');
+    expect(capturedParams!.sort).toBe('posted_at:desc');
   });
 
   test('returns empty items when repository returns empty result', async () => {
     const repo = createMockJobRepository();
     const uc = new ListJobs(repo);
 
-    const result = await uc.execute({ page: 1, pageSize: 25, targetSalary: 200000 });
+    const result = await uc.execute({ limit: 25, offset: 0, targetSalary: 200000, sort: 'score:desc' });
 
     expect(result.items).toHaveLength(0);
-    expect(result.total).toBe(0);
+    expect(result.pagination.total).toBe(0);
   });
 
   test('handles job with null postedAt', async () => {
     const item = makeJobListItem({ postedAt: null });
     const repo = createMockJobRepository({
-      findPaginated: async () => ({ items: [item], total: 1, page: 1, pageSize: 25 })
+      findPaginated: async () => ({ items: [item], total: 1 })
     });
     const uc = new ListJobs(repo);
 
-    const result = await uc.execute({ page: 1, pageSize: 25, targetSalary: 200000 });
+    const result = await uc.execute({ limit: 25, offset: 0, targetSalary: 200000, sort: 'score:desc' });
 
     expect(result.items[0].postedAt).toBeNull();
   });

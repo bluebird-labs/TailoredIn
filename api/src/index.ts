@@ -144,7 +144,12 @@ const app = new Elysia()
     const statusCode = err.statusCode ?? 500;
     set.status = statusCode;
     logRequest(request, statusCode, startTimes.get(request));
-    return { error: statusCode === 500 ? 'Internal server error' : message };
+    return {
+      error: {
+        code: statusCode === 500 ? 'INTERNAL_ERROR' : 'SERVER_ERROR',
+        message: statusCode === 500 ? 'Internal server error' : message
+      }
+    };
   })
   .listen(port);
 

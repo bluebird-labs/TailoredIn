@@ -13,10 +13,3 @@ export type JobListItemDto = {
   totalSkillScore: number;
   salaryScore: number | null;
 };
-
-export type PaginatedJobListDto = {
-  items: JobListItemDto[];
-  total: number;
-  page: number;
-  pageSize: number;
-};
