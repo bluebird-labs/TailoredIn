@@ -21,3 +21,6 @@ infrastructure/src/linkedin/playwright/.auth/
 # dependency-cruiser generated graph
 dep-graph.svg
 infrastructure/temp/
+
+# Database backups
+backups/
