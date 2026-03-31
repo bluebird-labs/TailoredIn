@@ -87,7 +87,7 @@ export const JOB_VIEW_CONFIG: Record<JobView, JobViewConfig> = {
     label: 'All Jobs',
     icon: Briefcase,
     statuses: undefined,
-    defaultSort: 'score',
+    defaultSort: 'posted_at',
     statusOptions: Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label }))
   }
 };

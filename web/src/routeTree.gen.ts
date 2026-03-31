@@ -17,8 +17,8 @@ import { Route as ResumeProfileRouteImport } from './routes/resume/profile'
 import { Route as ResumeHeadlinesRouteImport } from './routes/resume/headlines'
 import { Route as ResumeExperienceRouteImport } from './routes/resume/experience'
 import { Route as ResumeEducationRouteImport } from './routes/resume/education'
-import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
+import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 import { Route as ArchetypesArchetypeIdRouteImport } from './routes/archetypes/$archetypeId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -61,14 +61,14 @@ const ResumeEducationRoute = ResumeEducationRouteImport.update({
   path: '/resume/education',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
-  id: '/companies/$companyId',
-  path: '/companies/$companyId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/jobs/$jobId',
   path: '/jobs/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
+  id: '/companies/$companyId',
+  path: '/companies/$companyId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchetypesArchetypeIdRoute = ArchetypesArchetypeIdRouteImport.update({
@@ -231,18 +231,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeEducationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/companies/$companyId': {
-      id: '/companies/$companyId'
-      path: '/companies/$companyId'
-      fullPath: '/companies/$companyId'
-      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
       path: '/jobs/$jobId'
       fullPath: '/jobs/$jobId'
       preLoaderRoute: typeof JobsJobIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies/$companyId': {
+      id: '/companies/$companyId'
+      path: '/companies/$companyId'
+      fullPath: '/companies/$companyId'
+      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archetypes/$archetypeId': {

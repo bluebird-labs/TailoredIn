@@ -168,7 +168,7 @@ function JobsPage() {
 
   const toggleSort = (column: 'score' | 'posted_at') => {
     if (sortBy === column) {
-      setSearch({ sortDir: search.sortDir === 'asc' ? 'desc' : 'asc' });
+      setSearch({ sortBy: column, sortDir: search.sortDir === 'asc' ? 'desc' : 'asc' });
     } else {
       setSearch({ sortBy: column, sortDir: 'desc' });
     }
@@ -248,51 +248,60 @@ function JobsPage() {
               </SelectContent>
             </Select>
           )}
-          <Select
-            value={search.businessType as string}
-            onValueChange={value => setSearch({ businessType: value as JobSearch['businessType'] })}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {BUSINESS_TYPE_OPTIONS.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={search.industry as string}
-            onValueChange={value => setSearch({ industry: value as JobSearch['industry'] })}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Industry" />
-            </SelectTrigger>
-            <SelectContent>
-              {INDUSTRY_OPTIONS.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={search.stage as string}
-            onValueChange={value => setSearch({ stage: value as JobSearch['stage'] })}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Stage" />
-            </SelectTrigger>
-            <SelectContent>
-              {STAGE_OPTIONS.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Type</span>
+            <Select
+              value={search.businessType as string}
+              onValueChange={value => setSearch({ businessType: value as JobSearch['businessType'] })}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {BUSINESS_TYPE_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Industry</span>
+            <Select
+              value={search.industry as string}
+              onValueChange={value => setSearch({ industry: value as JobSearch['industry'] })}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Industry" />
+              </SelectTrigger>
+              <SelectContent>
+                {INDUSTRY_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Stage</span>
+            <Select
+              value={search.stage as string}
+              onValueChange={value => setSearch({ stage: value as JobSearch['stage'] })}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Stage" />
+              </SelectTrigger>
+              <SelectContent>
+                {STAGE_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Button onClick={() => setAddDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add Job
