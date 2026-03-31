@@ -11,9 +11,9 @@ import { SkillsSeeder } from './SkillsSeeder.js';
 export class DatabaseSeeder extends Seeder {
   public async run(em: EntityManager): Promise<void> {
     return this.call(em, [
-      SkillsSeeder,      // skills (no FK deps)
-      ResumeDataSeeder,  // user → resume data → archetypes
-      JobDataSeeder,     // companies → jobs → job_status_updates
+      SkillsSeeder, // skills (no FK deps)
+      ResumeDataSeeder, // user → resume data → archetypes
+      JobDataSeeder // companies → jobs → job_status_updates
     ]);
   }
 }

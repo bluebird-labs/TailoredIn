@@ -1,8 +1,8 @@
 import Path from 'node:path';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { defineConfig, SchemaGenerator, UnderscoreNamingStrategy } from '@mikro-orm/postgresql';
-import { SeedManager } from '@mikro-orm/seeder';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { SeedManager } from '@mikro-orm/seeder';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
