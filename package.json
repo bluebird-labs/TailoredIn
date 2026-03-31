@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "devDependencies": {
     "@biomejs/biome": "latest",
-    "dependency-cruiser": "^17"
+    "dependency-cruiser": "^17",
+    "knip": "^6.1.0"
   },
   "private": true,
   "scripts": {
@@ -23,6 +24,7 @@
     "typecheck": "bun run --filter '@tailoredin/*' typecheck",
     "test": "bun run --filter '@tailoredin/*' test",
     "test:coverage": "bun run --filter '@tailoredin/*' test:coverage",
+    "knip": "knip",
     "dep:check": "depcruise domain application infrastructure api cli web --config .dependency-cruiser.cjs",
     "dep:graph": "depcruise domain application infrastructure api cli web --config .dependency-cruiser.cjs --output-type dot | dot -T svg > dep-graph.svg",
     "api:lint": "biome check api",

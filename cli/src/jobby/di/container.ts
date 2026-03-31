@@ -69,4 +69,4 @@ container.bind({
     )
 });
 
-export { container, orm };
+export { container };

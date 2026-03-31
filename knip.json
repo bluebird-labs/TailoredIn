@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "core": {},
+    "domain": {},
+    "application": {},
+    "infrastructure": {
+      "entry": ["test-integration/**/*.test.ts", "test-integration/support/**"]
+    },
+    "api": {},
+    "cli": {},
+    "web": {
+      "ignore": ["src/components/ui/**"]
+    }
+  },
+  "ignoreBinaries": ["dot"],
+  "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates"]
+}

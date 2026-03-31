@@ -29,7 +29,7 @@ const moveCommand = command({
   }
 });
 
-export const retireCommand = command({
+const retireCommand = command({
   name: 'retire',
   args: {
     days: positional({ type: number })

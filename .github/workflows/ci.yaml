@@ -84,6 +84,16 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - run: bun run --cwd infrastructure test:integration
 
+  knip:
+    name: Dead Code
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.deps == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bun
+      - run: bun run knip
+
   dep-check:
     name: Dependency Boundaries
     needs: changes

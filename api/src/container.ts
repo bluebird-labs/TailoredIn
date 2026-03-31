@@ -318,4 +318,4 @@ container.bind({
   useFactory: () => new SetArchetypeEducation(container.get(DI.Archetype.ConfigRepository))
 });
 
-export { container, orm };
+export { container };

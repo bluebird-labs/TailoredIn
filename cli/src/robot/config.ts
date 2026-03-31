@@ -1,6 +1,6 @@
 import type { JobSearchConfigDto } from '@tailoredin/application';
 
-export type JobSearcherConfig = {
+type JobSearcherConfig = {
   searches: Record<string, JobSearchConfigDto>;
   only?: (keyof JobSearcherConfig['searches'])[];
 };
