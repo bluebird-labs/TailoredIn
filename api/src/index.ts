@@ -19,6 +19,7 @@ import { DeleteSkillCategoryRoute } from './routes/DeleteSkillCategoryRoute.js';
 import { DeleteSkillItemRoute } from './routes/DeleteSkillItemRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
 import { GetCurrentUserRoute } from './routes/GetCurrentUserRoute.js';
+import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
 import { GetTopJobRoute } from './routes/GetTopJobRoute.js';
 import { GetUserRoute } from './routes/GetUserRoute.js';
@@ -39,6 +40,7 @@ import { UpdateBulletRoute } from './routes/UpdateBulletRoute.js';
 import { UpdateCompanyRoute } from './routes/UpdateCompanyRoute.js';
 import { UpdateEducationRoute } from './routes/UpdateEducationRoute.js';
 import { UpdateHeadlineRoute } from './routes/UpdateHeadlineRoute.js';
+import { UpdateJobCompanyRoute } from './routes/UpdateJobCompanyRoute.js';
 import { UpdateSkillCategoryRoute } from './routes/UpdateSkillCategoryRoute.js';
 import { UpdateSkillItemRoute } from './routes/UpdateSkillItemRoute.js';
 import { UpdateUserRoute } from './routes/UpdateUserRoute.js';
@@ -80,6 +82,9 @@ const app = new Elysia()
   .use(container.get(ChangeJobStatusRoute).plugin())
   .use(container.get(IngestJobByUrlRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
+  // Companies
+  .use(container.get(GetJobCompanyRoute).plugin())
+  .use(container.get(UpdateJobCompanyRoute).plugin())
   .use(container.get(GetCurrentUserRoute).plugin())
   .use(container.get(GetUserRoute).plugin())
   .use(container.get(UpdateUserRoute).plugin())

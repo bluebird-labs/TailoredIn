@@ -1,4 +1,8 @@
 export const queryKeys = {
+  companies: {
+    all: ['companies'] as const,
+    detail: (id: string) => [...queryKeys.companies.all, 'detail', id] as const
+  },
   jobs: {
     all: ['jobs'] as const,
     list: (params: Record<string, unknown>) => [...queryKeys.jobs.all, 'list', params] as const,

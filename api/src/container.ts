@@ -18,6 +18,7 @@ import {
   DeleteSkillItem,
   GenerateResume,
   GetJob,
+  GetJobCompany,
   GetTopJob,
   GetUser,
   IngestJobByUrl,
@@ -37,6 +38,7 @@ import {
   UpdateCompany,
   UpdateEducation,
   UpdateHeadline,
+  UpdateJobCompany,
   UpdateSkillCategory,
   UpdateSkillItem,
   UpdateUser
@@ -131,6 +133,14 @@ container.bind({
       container.get(DI.Job.Repository),
       container.get(DI.Job.IngestScrapedJob)
     )
+});
+container.bind({
+  provide: DI.Job.GetJobCompany,
+  useFactory: () => new GetJobCompany(container.get(DI.Job.CompanyRepository))
+});
+container.bind({
+  provide: DI.Job.UpdateJobCompany,
+  useFactory: () => new UpdateJobCompany(container.get(DI.Job.CompanyRepository))
 });
 
 // Resume repositories + services

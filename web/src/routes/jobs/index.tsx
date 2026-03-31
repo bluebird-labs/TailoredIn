@@ -1,10 +1,11 @@
-import { JobStatus } from '@tailoredin/api/client';
+import { BusinessType, CompanyStage, Industry, JobStatus } from '@tailoredin/api/client';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { z } from 'zod';
+import { formatClassificationLabel } from '@/components/companies/classification-badge';
 import { AddJobDialog } from '@/components/jobs/add-job-dialog';
 import { JobStatusBadge } from '@/components/jobs/status-badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,21 @@ const jobSearchSchema = z.object({
     .optional()
     .default(JobStatus.NEW)
     .catch(JobStatus.NEW),
+  businessType: z
+    .union([z.nativeEnum(BusinessType), z.literal('all')])
+    .optional()
+    .default('all')
+    .catch('all'),
+  industry: z
+    .union([z.nativeEnum(Industry), z.literal('all')])
+    .optional()
+    .default('all')
+    .catch('all'),
+  stage: z
+    .union([z.nativeEnum(CompanyStage), z.literal('all')])
+    .optional()
+    .default('all')
+    .catch('all'),
   sortBy: z.enum(['score', 'posted_at']).optional().default('score').catch('score'),
   sortDir: z.enum(['asc', 'desc']).optional().default('desc').catch('desc')
 });
@@ -52,6 +68,21 @@ const STATUS_OPTIONS = [
   { value: JobStatus.RETIRED, label: 'Retired' }
 ] as const;
 
+const BUSINESS_TYPE_OPTIONS = [
+  { value: 'all', label: 'All types' },
+  ...Object.values(BusinessType).map(v => ({ value: v, label: formatClassificationLabel(v) }))
+] as const;
+
+const INDUSTRY_OPTIONS = [
+  { value: 'all', label: 'All industries' },
+  ...Object.values(Industry).map(v => ({ value: v, label: formatClassificationLabel(v) }))
+] as const;
+
+const STAGE_OPTIONS = [
+  { value: 'all', label: 'All stages' },
+  ...Object.values(CompanyStage).map(v => ({ value: v, label: formatClassificationLabel(v) }))
+] as const;
+
 function SortIcon({ column, current, dir }: { column: string; current: string; dir: string }) {
   if (column !== current) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-muted-foreground/50" />;
   return dir === 'asc' ? <ArrowUp className="ml-1 h-3.5 w-3.5" /> : <ArrowDown className="ml-1 h-3.5 w-3.5" />;
@@ -62,23 +93,31 @@ function JobsPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
+  const filterKeys = ['sortBy', 'status', 'businessType', 'industry', 'stage'] as const;
+
   const setSearch = (updates: Partial<JobSearch>) => {
     navigate({
       search: (prev: JobSearch) => ({
         ...prev,
         ...updates,
-        page: updates.page ?? ('sortBy' in updates || 'status' in updates ? 1 : prev.page)
+        page: updates.page ?? (filterKeys.some(k => k in updates) ? 1 : prev.page)
       })
     });
   };
 
   const statusParam = search.status === 'all' ? undefined : [search.status];
+  const businessTypeParam = search.businessType === 'all' ? undefined : [search.businessType];
+  const industryParam = search.industry === 'all' ? undefined : [search.industry];
+  const stageParam = search.stage === 'all' ? undefined : [search.stage];
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.jobs.list({
       page: search.page,
       pageSize: search.pageSize,
       status: search.status,
+      businessType: search.businessType,
+      industry: search.industry,
+      stage: search.stage,
       sortBy: search.sortBy,
       sortDir: search.sortDir
     }),
@@ -88,8 +127,14 @@ function JobsPage() {
           page: search.page,
           page_size: search.pageSize,
           target_salary: DEFAULT_TARGET_SALARY,
-          // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for status arrays
+          // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
           status: statusParam as any,
+          // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
+          business_type: businessTypeParam as any,
+          // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
+          industry: industryParam as any,
+          // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
+          stage: stageParam as any,
           sort_by: search.sortBy,
           sort_dir: search.sortDir
         }
@@ -113,16 +158,61 @@ function JobsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Jobs</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Select
             value={search.status as string}
             onValueChange={value => setSearch({ status: value as JobSearch['status'] })}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={search.businessType as string}
+            onValueChange={value => setSearch({ businessType: value as JobSearch['businessType'] })}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {BUSINESS_TYPE_OPTIONS.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={search.industry as string}
+            onValueChange={value => setSearch({ industry: value as JobSearch['industry'] })}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Industry" />
+            </SelectTrigger>
+            <SelectContent>
+              {INDUSTRY_OPTIONS.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={search.stage as string}
+            onValueChange={value => setSearch({ stage: value as JobSearch['stage'] })}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Stage" />
+            </SelectTrigger>
+            <SelectContent>
+              {STAGE_OPTIONS.map(opt => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>

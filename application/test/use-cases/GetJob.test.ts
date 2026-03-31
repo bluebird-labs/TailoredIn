@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { JobId, JobPosting, type JobRepository, JobStatus } from '@tailoredin/domain';
+import { Company, CompanyId, JobId, JobPosting, type JobRepository, JobStatus } from '@tailoredin/domain';
 import { GetJob } from '../../src/use-cases/GetJob.js';
 
 function createMockJobRepository(overrides: Partial<JobRepository> = {}): JobRepository {
@@ -48,27 +48,46 @@ function makeJobPosting(): JobPosting {
   });
 }
 
+function makeCompany(): Company {
+  return new Company({
+    id: new CompanyId('company-1'),
+    name: 'Acme Corp',
+    website: null,
+    logoUrl: null,
+    linkedinLink: 'https://linkedin.com/company/acme',
+    ignored: false,
+    businessType: null,
+    industry: null,
+    stage: null,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
+}
+
 describe('GetJob', () => {
-  test('returns job with company name', async () => {
+  test('returns job with company dto', async () => {
     const job = makeJobPosting();
+    const company = makeCompany();
     const repo = createMockJobRepository({
-      findScoredByIdOrFail: async () => ({ job, companyName: 'Acme Corp' })
+      findScoredByIdOrFail: async () => ({ job, company })
     });
     const uc = new GetJob(repo);
 
     const result = await uc.execute({ jobId: 'job-1', targetSalary: 200000 });
 
     expect(result.job).toBe(job);
-    expect(result.companyName).toBe('Acme Corp');
+    expect(result.company.name).toBe('Acme Corp');
+    expect(result.company.id).toBe('company-1');
   });
 
   test('passes params to repository', async () => {
     let capturedParams: Parameters<JobRepository['findScoredByIdOrFail']>[0] | null = null;
     const job = makeJobPosting();
+    const company = makeCompany();
     const repo = createMockJobRepository({
       findScoredByIdOrFail: async params => {
         capturedParams = params;
-        return { job, companyName: 'Test' };
+        return { job, company };
       }
     });
     const uc = new GetJob(repo);

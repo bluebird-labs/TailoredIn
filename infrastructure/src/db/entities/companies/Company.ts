@@ -11,11 +11,17 @@ export type CompanyProps = {
   logoUrl: string | null;
   linkedinLink: string;
   ignored: boolean;
+  businessType: string | null;
+  industry: string | null;
+  stage: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export type CompanyCreateProps = Omit<CompanyProps, 'id' | 'createdAt' | 'updatedAt' | 'ignored'>;
+export type CompanyCreateProps = Omit<
+  CompanyProps,
+  'id' | 'createdAt' | 'updatedAt' | 'ignored' | 'businessType' | 'industry' | 'stage'
+>;
 
 @Entity({ tableName: 'companies', repository: () => CompanyOrmRepository })
 export class Company extends BaseEntity {
@@ -39,6 +45,15 @@ export class Company extends BaseEntity {
   @Property({ fieldName: 'ignored', type: 'boolean', default: false })
   public ignored: boolean;
 
+  @Property({ fieldName: 'business_type', type: 'text', nullable: true })
+  public businessType: string | null;
+
+  @Property({ fieldName: 'industry', type: 'text', nullable: true })
+  public industry: string | null;
+
+  @Property({ fieldName: 'stage', type: 'text', nullable: true })
+  public stage: string | null;
+
   public constructor(props: CompanyProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
@@ -47,6 +62,9 @@ export class Company extends BaseEntity {
     this.logoUrl = props.logoUrl;
     this.linkedinLink = props.linkedinLink;
     this.ignored = props.ignored;
+    this.businessType = props.businessType;
+    this.industry = props.industry;
+    this.stage = props.stage;
   }
 
   public static create(props: CompanyCreateProps): Company {
@@ -55,6 +73,9 @@ export class Company extends BaseEntity {
       ...props,
       id: generateUuid(),
       ignored: false,
+      businessType: null,
+      industry: null,
+      stage: null,
       createdAt: now,
       updatedAt: now
     });

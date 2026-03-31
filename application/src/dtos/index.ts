@@ -3,6 +3,7 @@ export type {
   ArchetypePositionBulletDto,
   ArchetypePositionDto
 } from './ArchetypeConfigDto.js';
+export type { CompanyDto } from './CompanyDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
 export type { IngestJobByUrlInput, ManualJobFieldsDto } from './IngestJobByUrlDto.js';
 export type { JobListItemDto, PaginatedJobListDto } from './JobListItemDto.js';

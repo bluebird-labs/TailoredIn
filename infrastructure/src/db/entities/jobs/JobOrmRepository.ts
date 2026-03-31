@@ -119,13 +119,19 @@ export class JobOrmRepository extends BaseRepository<Job> {
       pageSize: number;
       targetSalary: number;
       statuses?: string[];
+      businessTypes?: string[];
+      industries?: string[];
+      stages?: string[];
       sortBy?: 'score' | 'posted_at';
       expertWeight?: number;
       interestWeight?: number;
       avoidWeight?: number;
     },
     opts: QueryOpts = {}
-  ): Promise<{ items: Array<Job & { __scores: JobListScoresProps; __companyName: string }>; total: number }> {
+  ): Promise<{
+    items: Array<Job & { __scores: JobListScoresProps; __companyId: string; __companyName: string }>;
+    total: number;
+  }> {
     const em = this.getEm(opts) as SqlEntityManager;
     const offset = (params.page - 1) * params.pageSize;
 
@@ -134,6 +140,9 @@ export class JobOrmRepository extends BaseRepository<Job> {
       offset,
       targetSalary: params.targetSalary,
       statuses: params.statuses?.length ? params.statuses : null,
+      businessTypes: params.businessTypes?.length ? params.businessTypes : null,
+      industries: params.industries?.length ? params.industries : null,
+      stages: params.stages?.length ? params.stages : null,
       sortBy: params.sortBy ?? 'score',
       ...this.weights(params)
     });
@@ -157,7 +166,7 @@ export class JobOrmRepository extends BaseRepository<Job> {
           totalSkillScore: row.total_skill_score ?? 0,
           salaryScore: row.salary_score
         };
-        return Object.assign(job, { __scores: scores, __companyName: row.company_name });
+        return Object.assign(job, { __scores: scores, __companyId: row.company_id, __companyName: row.company_name });
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
 

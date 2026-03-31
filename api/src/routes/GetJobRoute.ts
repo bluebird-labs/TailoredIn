@@ -16,7 +16,7 @@ export class GetJobRoute {
           targetSalary: query.target_salary
         });
 
-        return { data: { ...result.job, companyName: result.companyName } };
+        return { data: { ...result.job, company: result.company } };
       },
       {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
