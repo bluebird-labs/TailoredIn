@@ -22,7 +22,7 @@ export class UpdateEducationRoute {
 
         if (!result.isOk) {
           set.status = 404;
-          return { error: result.error.message };
+          return { error: { code: 'NOT_FOUND', message: result.error.message } };
         }
 
         return { data: result.value };

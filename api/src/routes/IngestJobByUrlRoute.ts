@@ -19,11 +19,11 @@ export class IngestJobByUrlRoute {
         } catch (err) {
           if (err instanceof InvalidLinkedInUrlError) {
             set.status = 422;
-            return { error: 'INVALID_URL', message: err.message };
+            return { error: { code: 'INVALID_URL', message: err.message } };
           }
           if (err instanceof ScrapeFailedError) {
             set.status = 502;
-            return { error: 'SCRAPE_FAILED', message: err.message };
+            return { error: { code: 'SCRAPE_FAILED', message: err.message } };
           }
           throw err;
         }

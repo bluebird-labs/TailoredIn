@@ -15,7 +15,7 @@ export class GetCompanyBriefRoute {
 
         if (!result.isOk) {
           set.status = 400;
-          return { error: result.error.message };
+          return { error: { code: 'NOT_FOUND', message: result.error.message } };
         }
 
         return { data: result.value };
