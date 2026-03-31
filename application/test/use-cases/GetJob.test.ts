@@ -8,10 +8,9 @@ function createMockJobRepository(overrides: Partial<JobRepository> = {}): JobRep
     findByIdOrFail: async () => {
       throw new Error('not found');
     },
-    findScoredByIdOrFail: async () => {
+    findByIdWithCompanyOrFail: async () => {
       throw new Error('not found');
     },
-    findTopScored: async () => [],
     findPaginated: async () => ({ items: [], total: 0 }),
     upsertByLinkedinId: async () => {
       throw new Error('not implemented');
@@ -69,40 +68,38 @@ describe('GetJob', () => {
     const job = makeJobPosting();
     const company = makeCompany();
     const repo = createMockJobRepository({
-      findScoredByIdOrFail: async () => ({ job, company })
+      findByIdWithCompanyOrFail: async () => ({ job, company })
     });
     const uc = new GetJob(repo);
 
-    const result = await uc.execute({ jobId: 'job-1', targetSalary: 200000 });
+    const result = await uc.execute({ jobId: 'job-1' });
 
     expect(result.job).toBe(job);
     expect(result.company.name).toBe('Acme Corp');
     expect(result.company.id).toBe('company-1');
   });
 
-  test('passes params to repository', async () => {
-    let capturedParams: Parameters<JobRepository['findScoredByIdOrFail']>[0] | null = null;
+  test('passes jobId to repository', async () => {
+    let capturedJobId: string | null = null;
     const job = makeJobPosting();
     const company = makeCompany();
     const repo = createMockJobRepository({
-      findScoredByIdOrFail: async params => {
-        capturedParams = params;
+      findByIdWithCompanyOrFail: async jobId => {
+        capturedJobId = jobId;
         return { job, company };
       }
     });
     const uc = new GetJob(repo);
 
-    await uc.execute({ jobId: 'job-1', targetSalary: 180000 });
+    await uc.execute({ jobId: 'job-1' });
 
-    expect(capturedParams).not.toBeNull();
-    expect(capturedParams!.jobId).toBe('job-1');
-    expect(capturedParams!.targetSalary).toBe(180000);
+    expect(capturedJobId).toBe('job-1');
   });
 
   test('throws when job not found', async () => {
     const repo = createMockJobRepository();
     const uc = new GetJob(repo);
 
-    expect(uc.execute({ jobId: 'nonexistent', targetSalary: 200000 })).rejects.toThrow('not found');
+    expect(uc.execute({ jobId: 'nonexistent' })).rejects.toThrow('not found');
   });
 });

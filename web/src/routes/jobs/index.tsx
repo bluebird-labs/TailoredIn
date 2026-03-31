@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useBulkChangeStatus } from '@/hooks/use-bulk-status';
 import { api } from '@/lib/api';
-import { DEFAULT_LIMIT, DEFAULT_TARGET_SALARY } from '@/lib/constants';
+import { DEFAULT_LIMIT } from '@/lib/constants';
 import { getViewStatuses, JOB_VIEW_CONFIG, JOB_VIEWS, type JobView } from '@/lib/job-views';
 import { queryKeys } from '@/lib/query-keys';
 
@@ -145,7 +145,6 @@ function JobsPage() {
         query: {
           limit: search.limit,
           offset: search.offset,
-          target_salary: DEFAULT_TARGET_SALARY,
           // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
           status: statuses as any,
           // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty type doesn't match Elysia's union schema for filter arrays
@@ -167,12 +166,8 @@ function JobsPage() {
   const pageItemIds = data?.data.map(j => j.id) ?? [];
   const allSelected = pageItemIds.length > 0 && pageItemIds.every(id => selectedIds.has(id));
 
-  const toggleSort = (column: 'score' | 'posted_at') => {
-    if (sortBy === column) {
-      setSearch({ sort: `${column}:${sortDir === 'asc' ? 'desc' : 'asc'}` });
-    } else {
-      setSearch({ sort: `${column}:desc` });
-    }
+  const toggleSort = () => {
+    setSearch({ sort: `posted_at:${sortDir === 'asc' ? 'desc' : 'asc'}` });
   };
 
   const toggleSelect = (id: string) => {
@@ -205,7 +200,7 @@ function JobsPage() {
     );
   };
 
-  const colSpan = isTriage ? 6 : 5;
+  const colSpan = isTriage ? 5 : 4;
 
   return (
     <div className="space-y-4">
@@ -356,17 +351,11 @@ function JobsPage() {
                   <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} aria-label="Select all" />
                 </TableHead>
               )}
-              <TableHead className="w-[80px]">
-                <button type="button" className="flex items-center font-medium" onClick={() => toggleSort('score')}>
-                  Score
-                  <SortIcon column="score" current={sortBy} dir={sortDir} />
-                </button>
-              </TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Title</TableHead>
               <TableHead className="w-[120px]">Status</TableHead>
               <TableHead className="w-[140px]">
-                <button type="button" className="flex items-center font-medium" onClick={() => toggleSort('posted_at')}>
+                <button type="button" className="flex items-center font-medium" onClick={toggleSort}>
                   Posted
                   <SortIcon column="posted_at" current={sortBy} dir={sortDir} />
                 </button>
@@ -382,9 +371,6 @@ function JobsPage() {
                         <Skeleton className="h-4 w-4" />
                       </TableCell>
                     )}
-                    <TableCell>
-                      <Skeleton className="h-4 w-10" />
-                    </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-28" />
                     </TableCell>
@@ -410,7 +396,6 @@ function JobsPage() {
                         />
                       </TableCell>
                     )}
-                    <TableCell className="font-mono text-sm tabular-nums">{job.expertScore}</TableCell>
                     <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
                       {job.companyName}
                     </TableCell>

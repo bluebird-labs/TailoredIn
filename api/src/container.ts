@@ -24,7 +24,6 @@ import {
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
-  GetTopJob,
   GetUser,
   IngestJobByUrl,
   IngestScrapedJob,
@@ -107,10 +106,6 @@ container.bind({
 container.bind({ provide: DI.Job.Scraper, useClass: PlaywrightJobScraper });
 
 // Job use cases
-container.bind({
-  provide: DI.Job.GetTopJob,
-  useFactory: () => new GetTopJob(container.get(DI.Job.Repository))
-});
 container.bind({
   provide: DI.Job.GetJob,
   useFactory: () => new GetJob(container.get(DI.Job.Repository))

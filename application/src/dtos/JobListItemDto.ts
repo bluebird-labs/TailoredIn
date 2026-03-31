@@ -9,7 +9,4 @@ export type JobListItemDto = {
   postedAt: string | null;
   locationRaw: string;
   salaryRaw: string | null;
-  expertScore: number;
-  totalSkillScore: number;
-  salaryScore: number | null;
 };

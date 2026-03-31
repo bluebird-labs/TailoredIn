@@ -5,7 +5,6 @@ import type { PaginatedDto } from '../dtos/PaginationDto.js';
 export type ListJobsInput = {
   limit: number;
   offset: number;
-  targetSalary: number;
   statuses?: JobStatus[];
   businessTypes?: BusinessType[];
   industries?: Industry[];
@@ -20,7 +19,6 @@ export class ListJobs {
     const result = await this.jobRepository.findPaginated({
       limit: input.limit,
       offset: input.offset,
-      targetSalary: input.targetSalary,
       statuses: input.statuses,
       businessTypes: input.businessTypes,
       industries: input.industries,
@@ -50,9 +48,6 @@ function toJobListItemDto(item: JobListItem): JobListItemDto {
     status: job.status,
     postedAt: job.postedAt?.toISOString() ?? null,
     locationRaw: job.locationRaw,
-    salaryRaw: job.salaryRaw,
-    expertScore: job.scores?.skills.expert?.score ?? 0,
-    totalSkillScore: job.scores?.skills.total?.score ?? 0,
-    salaryScore: job.scores?.salary ?? null
+    salaryRaw: job.salaryRaw
   };
 }

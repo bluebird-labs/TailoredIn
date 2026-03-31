@@ -26,7 +26,6 @@ import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
 import { GetCurrentUserRoute } from './routes/GetCurrentUserRoute.js';
 import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
-import { GetTopJobRoute } from './routes/GetTopJobRoute.js';
 import { GetUserRoute } from './routes/GetUserRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
@@ -83,7 +82,6 @@ const app = new Elysia()
   .use(healthRoutes)
   .use(configRoute(llmAvailable))
   .use(container.get(ListJobsRoute).plugin())
-  .use(container.get(GetTopJobRoute).plugin())
   .use(container.get(GetJobRoute).plugin())
   .use(container.get(ChangeJobStatusRoute).plugin())
   .use(container.get(BulkChangeJobStatusRoute).plugin())

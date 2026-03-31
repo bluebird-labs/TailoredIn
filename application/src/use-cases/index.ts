@@ -43,8 +43,6 @@ export type { GetJobInput, GetJobOutput } from './GetJob.js';
 export { GetJob } from './GetJob.js';
 export type { GetJobCompanyInput } from './GetJobCompany.js';
 export { GetJobCompany } from './GetJobCompany.js';
-export type { GetTopJobInput } from './GetTopJob.js';
-export { GetTopJob } from './GetTopJob.js';
 export type { GetUserInput } from './GetUser.js';
 export { GetUser } from './GetUser.js';
 export type { IngestJobByUrlOutput } from './IngestJobByUrl.js';

@@ -10,19 +10,15 @@ export class GetJobRoute {
   public plugin() {
     return new Elysia().get(
       '/jobs/:id',
-      async ({ params, query }) => {
+      async ({ params }) => {
         const result = await this.getJob.execute({
-          jobId: params.id,
-          targetSalary: query.target_salary
+          jobId: params.id
         });
 
         return { data: { ...result.job, company: result.company } };
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }) }),
-        query: t.Object({
-          target_salary: t.Numeric({ minimum: 100000 })
-        })
+        params: t.Object({ id: t.String({ format: 'uuid' }) })
       }
     );
   }
