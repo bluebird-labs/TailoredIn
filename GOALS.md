@@ -65,9 +65,15 @@ Multiple Claude Code sessions can work on different steps simultaneously using g
 | 1 | **7** (LLM-free fallbacks) | `feat/milestone-7` | `.claude/worktrees/milestone-7` |
 | 2 | **10** (interview prep) | `feat/milestone-10` | `.claude/worktrees/milestone-10` |
 
-### Wave 5+
+### Wave 5 — ← CURRENT
 
-M11 (experience as positions) → M12 (CLI phase-out), sequential.
+| Session | Steps | Branch | Worktree |
+|---|---|---|---|
+| 1 | **12** (QA pass) | `feat/milestone-12` | `.claude/worktrees/milestone-12` |
+
+### Wave 6+
+
+M13 (CLI phase-out), sequential.
 
 ### Dependency graph
 
@@ -83,7 +89,8 @@ graph TD
     M8 --> M9["9: Company classification"]
     M9 --> M10["10: Interview prep"]
     M10 --> M11["11: Experience as positions"]
-    M11 --> M12["12: CLI phase-out"]
+    M11 --> M12["12: QA pass"]
+    M12 --> M13["13: CLI phase-out"]
 
     style M3 fill:#86efac
     style M4AB fill:#86efac
@@ -96,7 +103,8 @@ graph TD
     style M9 fill:#86efac
     style M10 fill:#86efac
     style M11 fill:#86efac
-    style M12 fill:#e5e7eb
+    style M12 fill:#facc15
+    style M13 fill:#e5e7eb
 ```
 
 Green = done. Yellow = next up. Grey = future.
@@ -249,16 +257,44 @@ Refactor resume experience from company-centric to position-centric. A person ca
   - [ ] CRUD for positions within a company
   - [ ] Archetype detail page references positions directly
 
-### Milestone 12 — CLI Phase-Out
+### Milestone 12 — QA Pass
 > Branch: `feat/milestone-12` · Worktree: `.claude/worktrees/milestone-12`
+
+Systematic walkthrough of the entire UI after rapid M5–M11 merges. Test every page, report bugs, fix issues, and note UX improvements.
+
+- [ ] **12A. Job browsing**
+  - [ ] Job list — pagination, sorting, filtering by status, score display
+  - [ ] Job detail — full info, status changes, resume generation, download PDF
+  - [ ] Add job — LinkedIn URL import, manual entry fallback
+  - [ ] Triage view — bulk actions, lifecycle views
+  - [ ] Company classification — badges, filters, edit dialog
+- [ ] **12B. Resume editing**
+  - [ ] Profile page — user info CRUD
+  - [ ] Headlines page — CRUD, default headline fallback
+  - [ ] Experience page — companies with positions, CRUD for both, bullets, locations
+  - [ ] Skills page — categories + items CRUD
+  - [ ] Education page — CRUD
+- [ ] **12C. Archetypes**
+  - [ ] Archetype list — create, edit, delete
+  - [ ] Archetype detail — headline selection, position selection (references resume positions), skill/education selection
+- [ ] **12D. Interview prep**
+  - [ ] Company brief generation — generate, refresh, display sections
+- [ ] **12E. Cross-cutting**
+  - [ ] LLM-free mode — resume generation without OpenAI key
+  - [ ] Navigation — sidebar links, routing, breadcrumbs
+  - [ ] Error handling — 404s, API errors, loading states
+  - [ ] Responsive behavior — basic viewport checks
+
+### Milestone 13 — CLI Phase-Out
+> Branch: `feat/milestone-13` · Worktree: `.claude/worktrees/milestone-13`
 
 Remove CLI tools once the web app covers their functionality.
 
-- [ ] **12A. Migrate robot to background service**
+- [ ] **13A. Migrate robot to background service**
   - [ ] Move scraping loop into a background worker started by the API process
   - [ ] `POST /robot/start`, `POST /robot/stop`, `GET /robot/status` endpoints
   - [ ] Web UI controls for the scraping daemon
-- [ ] **12B. Remove CLI packages**
+- [ ] **13B. Remove CLI packages**
   - [ ] Delete `cli/` package
   - [ ] Remove CLI scripts from root `package.json`
   - [ ] Update CLAUDE.md
