@@ -12,7 +12,7 @@ function createMockJobRepository(overrides: Partial<JobRepository> = {}): JobRep
       throw new Error('not found');
     },
     findTopScored: async () => [],
-    findPaginated: async () => ({ items: [], total: 0, page: 1, pageSize: 25 }),
+    findPaginated: async () => ({ items: [], total: 0 }),
     upsertByLinkedinId: async () => {
       throw new Error('not implemented');
     },

@@ -115,15 +115,14 @@ export class JobOrmRepository extends BaseRepository<Job> {
 
   public async findPaginatedScored(
     params: {
-      page: number;
-      pageSize: number;
+      limit: number;
+      offset: number;
       targetSalary: number;
       statuses?: string[];
       businessTypes?: string[];
       industries?: string[];
       stages?: string[];
-      sortBy?: 'score' | 'posted_at';
-      sortDir?: 'asc' | 'desc';
+      sort: string;
       expertWeight?: number;
       interestWeight?: number;
       avoidWeight?: number;
@@ -134,18 +133,20 @@ export class JobOrmRepository extends BaseRepository<Job> {
     total: number;
   }> {
     const em = this.getEm(opts) as SqlEntityManager;
-    const offset = (params.page - 1) * params.pageSize;
+    const [sortField, sortDirection] = params.sort.split(':');
+    const sortBy = sortField === 'posted_at' ? 'posted_at' : 'score';
+    const sortDir = sortDirection === 'asc' ? 'asc' : 'desc';
 
     const rows = await findPaginatedScoredJobs(em, {
-      limit: params.pageSize,
-      offset,
+      limit: params.limit,
+      offset: params.offset,
       targetSalary: params.targetSalary,
       statuses: params.statuses?.length ? params.statuses : null,
       businessTypes: params.businessTypes?.length ? params.businessTypes : null,
       industries: params.industries?.length ? params.industries : null,
       stages: params.stages?.length ? params.stages : null,
-      sortBy: params.sortBy ?? 'score',
-      sortDir: params.sortDir ?? 'desc',
+      sortBy,
+      sortDir,
       ...this.weights(params)
     });
 

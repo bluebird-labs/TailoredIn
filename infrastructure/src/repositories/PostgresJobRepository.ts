@@ -92,15 +92,14 @@ export class PostgresJobRepository implements JobRepository {
   public async findPaginated(params: FindPaginatedParams): Promise<PaginatedResult<JobListItem>> {
     const repo = this.orm.em.getRepository(OrmJob) as JobOrmRepository;
     const result = await repo.findPaginatedScored({
-      page: params.page,
-      pageSize: params.pageSize,
+      limit: params.limit,
+      offset: params.offset,
       targetSalary: params.targetSalary,
       statuses: params.statuses,
       businessTypes: params.businessTypes,
       industries: params.industries,
       stages: params.stages,
-      sortBy: params.sortBy,
-      sortDir: params.sortDir,
+      sort: params.sort,
       expertWeight: params.expertWeight,
       interestWeight: params.interestWeight,
       avoidWeight: params.avoidWeight
@@ -112,9 +111,7 @@ export class PostgresJobRepository implements JobRepository {
         companyId: item.__companyId,
         companyName: item.__companyName
       })),
-      total: result.total,
-      page: params.page,
-      pageSize: params.pageSize
+      total: result.total
     };
   }
 
