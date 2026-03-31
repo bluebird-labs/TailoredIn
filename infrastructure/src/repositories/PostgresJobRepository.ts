@@ -100,6 +100,7 @@ export class PostgresJobRepository implements JobRepository {
       industries: params.industries,
       stages: params.stages,
       sortBy: params.sortBy,
+      sortDir: params.sortDir,
       expertWeight: params.expertWeight,
       interestWeight: params.interestWeight,
       avoidWeight: params.avoidWeight

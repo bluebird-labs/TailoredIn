@@ -123,6 +123,7 @@ export class JobOrmRepository extends BaseRepository<Job> {
       industries?: string[];
       stages?: string[];
       sortBy?: 'score' | 'posted_at';
+      sortDir?: 'asc' | 'desc';
       expertWeight?: number;
       interestWeight?: number;
       avoidWeight?: number;
@@ -144,6 +145,7 @@ export class JobOrmRepository extends BaseRepository<Job> {
       industries: params.industries?.length ? params.industries : null,
       stages: params.stages?.length ? params.stages : null,
       sortBy: params.sortBy ?? 'score',
+      sortDir: params.sortDir ?? 'desc',
       ...this.weights(params)
     });
 

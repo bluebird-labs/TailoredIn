@@ -1,4 +1,5 @@
 import type { SqlEntityManager } from '@mikro-orm/postgresql';
+import type { Kysely, RawBuilder } from 'kysely';
 import { sql } from 'kysely';
 
 export type ScoreResult = {
@@ -182,6 +183,7 @@ export async function findPaginatedScoredJobs(
       limit: number;
       offset: number;
       sortBy: 'score' | 'posted_at';
+      sortDir: 'asc' | 'desc';
     }
 ): Promise<PaginatedScoreResult[]> {
   const db = em.getKysely();
@@ -201,75 +203,192 @@ export async function findPaginatedScoredJobs(
   const stageFilter =
     params.stages && params.stages.length > 0 ? sql`AND c.stage = ANY(${params.stages}::text[])` : sql``;
 
-  const orderBy =
-    params.sortBy === 'posted_at'
-      ? sql`ORDER BY j.posted_at DESC NULLS LAST`
-      : sql`ORDER BY js.expert_score DESC, total_skill_score DESC, salary_score DESC NULLS LAST`;
+  const dir = params.sortDir === 'asc' ? sql`ASC` : sql`DESC`;
 
-  const { rows } = await sql<PaginatedScoreResult>`
-      WITH skill_counts AS (
-        SELECT s.affinity, COUNT(*)::INT AS cnt
-        FROM skills s
-        GROUP BY s.affinity
-      ),
-      skill_keywords AS (
-        SELECT s.id AS skill_id, s.affinity, UNNEST(s.variants || ARRAY[s.name]) AS variant
-        FROM skills s
-      ),
-      filtered_jobs AS (
-        SELECT j.*
-        FROM jobs j
-        JOIN companies c ON c.id = j.company_id
-        WHERE c.ignored = FALSE
-          ${statusFilter}
-          ${businessTypeFilter}
-          ${industryFilter}
-          ${stageFilter}
-      ),
-      job_skill_matches AS (
-        SELECT DISTINCT ON (fj.id, sk.skill_id) fj.id AS job_id, sk.skill_id, sk.affinity
-        FROM filtered_jobs fj, skill_keywords sk
-        WHERE fj.description_fts @@ PLAINTO_TSQUERY('english', sk.variant)
-      ),
-      job_scores AS (
-        SELECT
-          fj.id AS job_id,
-          COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'expert'), ARRAY[]::uuid[]) AS expert_skills,
-          COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'interest'), ARRAY[]::uuid[]) AS interest_skills,
-          COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'avoid'), ARRAY[]::uuid[]) AS avoid_skills,
-          ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'expert'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'expert'), 1)) * 100)::INT AS expert_score,
-          ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'interest'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'interest'), 1)) * 100)::INT AS interest_score,
-          ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'avoid'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'avoid'), 1)) * 100)::INT AS avoid_score
-        FROM filtered_jobs fj
-        LEFT JOIN job_skill_matches jsm ON jsm.job_id = fj.id
-        GROUP BY fj.id
-      )
-      SELECT
-        js.job_id,
-        j.title,
-        j.status::text AS status,
-        j.posted_at,
-        c.id AS company_id,
-        c.name AS company_name,
-        js.expert_score,
-        js.interest_score,
-        js.avoid_score,
-        ((${params.expertWeight} * js.expert_score + ${params.interestWeight} * js.interest_score - ${params.avoidWeight} * js.avoid_score)::DECIMAL / ${totalWeights})::INT AS total_skill_score,
-        CASE
-          WHEN j.salary_low IS NULL AND j.salary_high IS NULL THEN NULL
-          ELSE ((COALESCE((j.salary_low + j.salary_high)::DECIMAL / 2.0, j.salary_low::DECIMAL, j.salary_high::DECIMAL) / ${params.targetSalary}) * 100.0)::INT
-        END AS salary_score,
-        js.expert_skills,
-        js.interest_skills,
-        js.avoid_skills,
-        COUNT(*) OVER()::TEXT AS total_count
-      FROM job_scores js
-      JOIN jobs j ON j.id = js.job_id
-      JOIN companies c ON c.id = j.company_id
-      ${orderBy}
-      LIMIT ${params.limit}::INT
-      OFFSET ${params.offset}::INT
-    `.execute(db);
+  // When sorting by posted_at, paginate BEFORE scoring — only score the page's jobs.
+  // When sorting by score, we must score all filtered jobs before paginating.
+  const { rows } =
+    params.sortBy === 'posted_at'
+      ? await findPaginatedByDate(db, {
+          ...params,
+          dir,
+          totalWeights,
+          statusFilter,
+          businessTypeFilter,
+          industryFilter,
+          stageFilter
+        })
+      : await findPaginatedByScore(db, {
+          ...params,
+          dir,
+          totalWeights,
+          statusFilter,
+          businessTypeFilter,
+          industryFilter,
+          stageFilter
+        });
 
   return rows;
+}
+
+type PaginatedQueryParams = WeightParams &
+  SalaryParam & {
+    limit: number;
+    offset: number;
+    dir: RawBuilder<unknown>;
+    totalWeights: number;
+    statusFilter: RawBuilder<unknown>;
+    businessTypeFilter: RawBuilder<unknown>;
+    industryFilter: RawBuilder<unknown>;
+    stageFilter: RawBuilder<unknown>;
+  };
+
+/**
+ * Sort by posted_at: paginate first, then score only the page's jobs.
+ * This avoids the expensive cross-join for the full dataset.
+ */
+async function findPaginatedByDate(
+  // biome-ignore lint/suspicious/noExplicitAny: Kysely generic DB type not available
+  db: Kysely<any>,
+  params: PaginatedQueryParams
+) {
+  return sql<PaginatedScoreResult>`
+    WITH filtered_jobs AS (
+      SELECT j.*, COUNT(*) OVER()::TEXT AS total_count
+      FROM jobs j
+      JOIN companies c ON c.id = j.company_id
+      WHERE c.ignored = FALSE
+        ${params.statusFilter}
+        ${params.businessTypeFilter}
+        ${params.industryFilter}
+        ${params.stageFilter}
+      ORDER BY j.posted_at ${params.dir} NULLS LAST
+      LIMIT ${params.limit}::INT
+      OFFSET ${params.offset}::INT
+    ),
+    skill_counts AS (
+      SELECT s.affinity, COUNT(*)::INT AS cnt
+      FROM skills s
+      GROUP BY s.affinity
+    ),
+    skill_keywords AS (
+      SELECT s.id AS skill_id, s.affinity, UNNEST(s.variants || ARRAY[s.name]) AS variant
+      FROM skills s
+    ),
+    job_skill_matches AS (
+      SELECT DISTINCT ON (fj.id, sk.skill_id) fj.id AS job_id, sk.skill_id, sk.affinity
+      FROM filtered_jobs fj, skill_keywords sk
+      WHERE fj.description_fts @@ PLAINTO_TSQUERY('english', sk.variant)
+    ),
+    job_scores AS (
+      SELECT
+        fj.id AS job_id,
+        COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'expert'), ARRAY[]::uuid[]) AS expert_skills,
+        COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'interest'), ARRAY[]::uuid[]) AS interest_skills,
+        COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'avoid'), ARRAY[]::uuid[]) AS avoid_skills,
+        ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'expert'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'expert'), 1)) * 100)::INT AS expert_score,
+        ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'interest'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'interest'), 1)) * 100)::INT AS interest_score,
+        ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'avoid'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'avoid'), 1)) * 100)::INT AS avoid_score
+      FROM filtered_jobs fj
+      LEFT JOIN job_skill_matches jsm ON jsm.job_id = fj.id
+      GROUP BY fj.id
+    )
+    SELECT
+      js.job_id,
+      fj.title,
+      fj.status::text AS status,
+      fj.posted_at,
+      c.id AS company_id,
+      c.name AS company_name,
+      js.expert_score,
+      js.interest_score,
+      js.avoid_score,
+      ((${params.expertWeight} * js.expert_score + ${params.interestWeight} * js.interest_score - ${params.avoidWeight} * js.avoid_score)::DECIMAL / ${params.totalWeights})::INT AS total_skill_score,
+      CASE
+        WHEN fj.salary_low IS NULL AND fj.salary_high IS NULL THEN NULL
+        ELSE ((COALESCE((fj.salary_low + fj.salary_high)::DECIMAL / 2.0, fj.salary_low::DECIMAL, fj.salary_high::DECIMAL) / ${params.targetSalary}) * 100.0)::INT
+      END AS salary_score,
+      js.expert_skills,
+      js.interest_skills,
+      js.avoid_skills,
+      fj.total_count
+    FROM job_scores js
+    JOIN filtered_jobs fj ON fj.id = js.job_id
+    JOIN companies c ON c.id = fj.company_id
+    ORDER BY fj.posted_at ${params.dir} NULLS LAST
+  `.execute(db);
+}
+
+/**
+ * Sort by score: must score all filtered jobs before paginating.
+ */
+async function findPaginatedByScore(
+  // biome-ignore lint/suspicious/noExplicitAny: Kysely generic DB type not available
+  db: Kysely<any>,
+  params: PaginatedQueryParams
+) {
+  return sql<PaginatedScoreResult>`
+    WITH skill_counts AS (
+      SELECT s.affinity, COUNT(*)::INT AS cnt
+      FROM skills s
+      GROUP BY s.affinity
+    ),
+    skill_keywords AS (
+      SELECT s.id AS skill_id, s.affinity, UNNEST(s.variants || ARRAY[s.name]) AS variant
+      FROM skills s
+    ),
+    filtered_jobs AS (
+      SELECT j.*
+      FROM jobs j
+      JOIN companies c ON c.id = j.company_id
+      WHERE c.ignored = FALSE
+        ${params.statusFilter}
+        ${params.businessTypeFilter}
+        ${params.industryFilter}
+        ${params.stageFilter}
+    ),
+    job_skill_matches AS (
+      SELECT DISTINCT ON (fj.id, sk.skill_id) fj.id AS job_id, sk.skill_id, sk.affinity
+      FROM filtered_jobs fj, skill_keywords sk
+      WHERE fj.description_fts @@ PLAINTO_TSQUERY('english', sk.variant)
+    ),
+    job_scores AS (
+      SELECT
+        fj.id AS job_id,
+        COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'expert'), ARRAY[]::uuid[]) AS expert_skills,
+        COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'interest'), ARRAY[]::uuid[]) AS interest_skills,
+        COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'avoid'), ARRAY[]::uuid[]) AS avoid_skills,
+        ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'expert'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'expert'), 1)) * 100)::INT AS expert_score,
+        ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'interest'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'interest'), 1)) * 100)::INT AS interest_score,
+        ((CARDINALITY(COALESCE(ARRAY_AGG(jsm.skill_id) FILTER (WHERE jsm.affinity = 'avoid'), ARRAY[]::uuid[]))::DECIMAL / GREATEST((SELECT cnt FROM skill_counts WHERE affinity = 'avoid'), 1)) * 100)::INT AS avoid_score
+      FROM filtered_jobs fj
+      LEFT JOIN job_skill_matches jsm ON jsm.job_id = fj.id
+      GROUP BY fj.id
+    )
+    SELECT
+      js.job_id,
+      j.title,
+      j.status::text AS status,
+      j.posted_at,
+      c.id AS company_id,
+      c.name AS company_name,
+      js.expert_score,
+      js.interest_score,
+      js.avoid_score,
+      ((${params.expertWeight} * js.expert_score + ${params.interestWeight} * js.interest_score - ${params.avoidWeight} * js.avoid_score)::DECIMAL / ${params.totalWeights})::INT AS total_skill_score,
+      CASE
+        WHEN j.salary_low IS NULL AND j.salary_high IS NULL THEN NULL
+        ELSE ((COALESCE((j.salary_low + j.salary_high)::DECIMAL / 2.0, j.salary_low::DECIMAL, j.salary_high::DECIMAL) / ${params.targetSalary}) * 100.0)::INT
+      END AS salary_score,
+      js.expert_skills,
+      js.interest_skills,
+      js.avoid_skills,
+      COUNT(*) OVER()::TEXT AS total_count
+    FROM job_scores js
+    JOIN jobs j ON j.id = js.job_id
+    JOIN companies c ON c.id = j.company_id
+    ORDER BY js.expert_score ${params.dir}, total_skill_score ${params.dir}, salary_score ${params.dir} NULLS LAST
+    LIMIT ${params.limit}::INT
+    OFFSET ${params.offset}::INT
+  `.execute(db);
 }
