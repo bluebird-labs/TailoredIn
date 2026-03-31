@@ -157,105 +157,58 @@ Edit all resume content that feeds into PDF generation.
 
 ## Milestones
 
-### Milestone 5 — Archetypes
-> Branch: `feat/milestone-5` · Worktree: `.claude/worktrees/milestone-5`
+<details>
+<summary>Milestone 5 — Archetypes (PR #15)</summary>
 
-Configure which resume content appears for each archetype.
+- [x] **5A.** Archetype list page — list with create/delete
+- [x] **5B.** Archetype detail page — metadata, headline selection, positions, skills, education
+- [x] Default headline fallback when archetype doesn't specify one
+</details>
 
-- [ ] **5A. Archetype list page**
-  - [ ] List archetypes with create/delete
-- [ ] **5B. Archetype detail page**
-  - [ ] Edit archetype metadata (name, headline selection)
-  - [x] Default headline fallback when archetype doesn't specify one
-  - [ ] Select positions (company refs + bullet overrides)
-  - [ ] Select skill categories/items
-  - [ ] Select education entries
+<details>
+<summary>Milestone 6 — Single-URL Job Import + Resume Generation (PRs #16, #17)</summary>
 
-### Milestone 6 — Single-URL Job Import + Resume Generation
-> Branch: `feat/milestone-6a` (backend) + `feat/milestone-6b` (UI)
+- [x] **6A.** URL-based job import backend — `POST /jobs`, `IngestJobByUrl` use case
+- [x] **6B.** "Add Job" UI + resume generation flow
+</details>
 
-Paste a LinkedIn job URL → scrape → generate a tailored PDF. The end-to-end payoff.
+<details>
+<summary>Milestone 7 — LLM-Free Fallbacks (PR #19)</summary>
 
-- [ ] **6A. URL-based job import (backend)**
-  - [ ] `POST /jobs` endpoint accepts a LinkedIn URL (or manual fields as fallback)
-  - [ ] `IngestJobByUrl` use case: scrape single posting, run election + scoring
-- [ ] **6B. "Add Job" UI + resume generation flow**
-  - [ ] "Add Job" form on jobs page: paste URL or enter fields manually
-  - [ ] After import, navigate to job detail → generate resume → download PDF
+- [x] **7A.** Generic resume generation — fallback when no LLM key
+- [x] **7B.** LLM-free UI — archetype picker + keyword input
+</details>
 
-### Milestone 7 — LLM-Free Fallbacks
-> Branch: `feat/milestone-7` · Worktree: `.claude/worktrees/milestone-7`
+<details>
+<summary>Milestone 8 — Job Triaging (PR #20)</summary>
 
-Make the tool usable without an OpenAI key.
+- [x] **8A.** Triaging UI — triage view, bulk actions
+- [x] **8B.** Lifecycle views — status-based filters, reopen archived
+- [x] **8C.** Apply button — shows underlying platform
+- [x] **8D.** Experience titles — job titles on experience page
+</details>
 
-- [ ] **7A. Generic resume generation**
-  - [ ] Fallback path in `GenerateResume`: skip insight extraction when no LLM key
-  - [ ] Use user-supplied archetype + default keywords
-- [ ] **7B. LLM-free UI**
-  - [ ] Archetype picker + keyword input on job detail when generating without LLM
+<details>
+<summary>Milestone 9 — Company Classification (PR #18)</summary>
 
-### Milestone 8 — Job Triaging
-> Branch: `feat/milestone-8` · Worktree: `.claude/worktrees/milestone-8`
+- [x] **9A.** Domain model — BusinessType, Industry, Stage enums + migration
+- [x] **9B.** Classification UI — company detail/edit, job list filtering
+</details>
 
-Lifecycle-driven job management UI. Jobs should be triaged, tracked through stages, and resurfaced when needed.
+<details>
+<summary>Milestone 10 — Interview Prep (PR #21)</summary>
 
-- [ ] **8A. Triaging UI**
-  - [ ] Dedicated triage view for new jobs (separate from the full job list)
-  - [ ] Bulk actions for status changes
-- [ ] **8B. Lifecycle views**
-  - [ ] Status-based views/filters (applied, interviewing, archived, etc.)
-  - [ ] Reopen archived jobs
-- [ ] **8C. Apply button**
-  - [ ] Apply button shows the underlying platform (Greenhouse, Workday, Lever, etc.)
-- [ ] **8D. Experience titles**
-  - [ ] Show job titles on the experience page
+- [x] **10A.** Domain + backend — CompanyBrief entity, GenerateCompanyBrief use case, endpoints
+- [x] **10B.** Web UI — brief panel on job detail, generate/refresh
+</details>
 
-### Milestone 9 — Company Classification
-> Branch: `feat/milestone-9` · Worktree: `.claude/worktrees/milestone-9`
+<details>
+<summary>Milestone 11 — Experience as Positions (PR #22)</summary>
 
-Structured company metadata instead of flat tags.
-
-- [ ] **9A. Domain model**
-  - [ ] Business type enum: B2B, B2C, B2B2C, etc.
-  - [ ] Industry enum: automobile, security, finance, etc.
-  - [ ] Stage enum: Seed, Series A, Series B, etc.
-  - [ ] Migration + ORM entity updates
-- [ ] **9B. Classification UI**
-  - [ ] Company detail/edit with classification fields
-  - [ ] Job list filtering by company classification
-
-### Milestone 10 — Interview Prep
-> Branch: `feat/milestone-10` · Worktree: `.claude/worktrees/milestone-10`
-
-Auto-generate company research briefs for active job pursuits.
-
-- [ ] **10A. Domain + backend**
-  - [ ] `CompanyBrief` domain entity (product overview, tech stack, culture, recent news, key people)
-  - [ ] `GenerateCompanyBrief` use case, `CompanyBriefRepository` port
-  - [ ] ORM entity, migration, repository implementation
-  - [ ] `POST /jobs/:id/generate-brief`, `GET /jobs/:id/brief` endpoints
-- [ ] **10B. Web UI**
-  - [ ] Brief panel on job detail page
-  - [ ] Generate/refresh button, structured display of brief sections
-
-### Milestone 11 — Experience as Positions
-> Branch: `feat/milestone-11` · Worktree: `.claude/worktrees/milestone-11`
-
-Refactor resume experience from company-centric to position-centric. A person can hold multiple roles at the same company (e.g., promoted from Senior Engineer to Engineering Manager).
-
-- [ ] **11A. Domain model refactor**
-  - [ ] `ResumePosition` entity under `ResumeCompany` (title, startDate, endDate, summary)
-  - [ ] Bullets move from company to position
-  - [ ] Remove `jobTitle`, `joinedAt`, `leftAt`, `promotedAt` from `ResumeCompany`
-  - [ ] Migration: split existing company-level fields into positions
-- [ ] **11B. Application + infrastructure**
-  - [ ] Update use cases, DTOs, and repository implementations
-  - [ ] Update `ArchetypePosition` to reference `ResumePosition` instead of duplicating data
-  - [ ] Update `DatabaseResumeContentFactory` to build from positions
-- [ ] **11C. Experience page**
-  - [ ] Show positions grouped by company
-  - [ ] CRUD for positions within a company
-  - [ ] Archetype detail page references positions directly
+- [x] **11A.** Domain model refactor — ResumePosition entity, bullets under positions, migration
+- [x] **11B.** Application + infrastructure — use cases, DTOs, ArchetypePosition references ResumePosition
+- [x] **11C.** Experience page — positions grouped by company, CRUD, archetype references
+</details>
 
 ### Milestone 12 — QA Pass
 > Branch: `feat/milestone-12` · Worktree: `.claude/worktrees/milestone-12`
