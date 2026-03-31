@@ -18,30 +18,28 @@ export class ListJobsRoute {
       '/jobs',
       async ({ query }) => {
         const result = await this.listJobs.execute({
-          page: query.page,
-          pageSize: query.page_size,
+          limit: query.limit,
+          offset: query.offset,
           targetSalary: query.target_salary,
           statuses: toArray(query.status) as JobStatus[] | undefined,
           businessTypes: toArray(query.business_type) as BusinessType[] | undefined,
           industries: toArray(query.industry) as Industry[] | undefined,
           stages: toArray(query.stage) as CompanyStage[] | undefined,
-          sortBy: query.sort_by,
-          sortDir: query.sort_dir
+          sort: query.sort ?? 'score:desc'
         });
 
-        return { data: result };
+        return { data: result.items, pagination: result.pagination };
       },
       {
         query: t.Object({
-          page: t.Numeric({ minimum: 1, default: 1 }),
-          page_size: t.Numeric({ minimum: 1, maximum: 100, default: 25 }),
+          limit: t.Numeric({ minimum: 1, maximum: 100, default: 25 }),
+          offset: t.Numeric({ minimum: 0, default: 0 }),
           target_salary: t.Numeric({ minimum: 100000 }),
           status: t.Optional(t.Union([t.Array(t.Enum(JobStatus)), t.Enum(JobStatus)])),
           business_type: t.Optional(t.Union([t.Array(t.Enum(BusinessType)), t.Enum(BusinessType)])),
           industry: t.Optional(t.Union([t.Array(t.Enum(Industry)), t.Enum(Industry)])),
           stage: t.Optional(t.Union([t.Array(t.Enum(CompanyStage)), t.Enum(CompanyStage)])),
-          sort_by: t.Optional(t.Union([t.Literal('score'), t.Literal('posted_at')])),
-          sort_dir: t.Optional(t.Union([t.Literal('asc'), t.Literal('desc')]))
+          sort: t.Optional(t.String())
         })
       }
     );
