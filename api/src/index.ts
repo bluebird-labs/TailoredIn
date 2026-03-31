@@ -18,7 +18,9 @@ import { DeleteEducationRoute } from './routes/DeleteEducationRoute.js';
 import { DeleteHeadlineRoute } from './routes/DeleteHeadlineRoute.js';
 import { DeleteSkillCategoryRoute } from './routes/DeleteSkillCategoryRoute.js';
 import { DeleteSkillItemRoute } from './routes/DeleteSkillItemRoute.js';
+import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
+import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
 import { GetCurrentUserRoute } from './routes/GetCurrentUserRoute.js';
 import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
@@ -84,6 +86,9 @@ const app = new Elysia()
   .use(container.get(BulkChangeJobStatusRoute).plugin())
   .use(container.get(IngestJobByUrlRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
+  // Company Briefs
+  .use(container.get(GetCompanyBriefRoute).plugin())
+  .use(container.get(GenerateCompanyBriefRoute).plugin())
   // Companies
   .use(container.get(GetJobCompanyRoute).plugin())
   .use(container.get(UpdateJobCompanyRoute).plugin())
@@ -123,6 +128,7 @@ const app = new Elysia()
   .use(container.get(SetArchetypePositionsRoute).plugin())
   .use(container.get(SetArchetypeSkillsRoute).plugin())
   .use(container.get(SetArchetypeEducationRoute).plugin())
+  // @ts-expect-error Elysia type instantiation depth exceeded with many chained routes
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
     const message = err.message ?? String(error);

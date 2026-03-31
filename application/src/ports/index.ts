@@ -1,8 +1,10 @@
 export type { FetchJobDetailsDelegate, JobScraper, ScrapeByUrlResult, ScrapeResultCallback } from './JobScraper.js';
 export type {
   ApplicationInsightsDto,
+  CompanyBriefSectionsDto,
   ExtractApplicationInsightsInput,
   ExtractJobPostingInsightsInput,
+  GenerateCompanyBriefInput as LlmGenerateCompanyBriefInput,
   JobPostingInsightsDto,
   LlmService
 } from './LlmService.js';

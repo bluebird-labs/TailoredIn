@@ -5,9 +5,11 @@ export type OpenAiConfig = { apiKey: string; project: string };
 
 import type {
   ApplicationInsightsDto,
+  CompanyBriefSectionsDto,
   ExtractApplicationInsightsInput,
   ExtractJobPostingInsightsInput,
   JobPostingInsightsDto,
+  LlmGenerateCompanyBriefInput,
   LlmService
 } from '@tailoredin/application';
 import { Archetype, SkillName } from '@tailoredin/domain';
@@ -28,6 +30,18 @@ const archetypeDetails: Record<Archetype, string> = {
 const PostingInsightsSchema = z.strictObject({
   website: z.string().nullable().describe("The company's website or null if not confident"),
   archetype: z.nativeEnum(Archetype).describe('The closest matching position archetype')
+});
+
+const CompanyBriefSchema = z.strictObject({
+  productOverview: z
+    .string()
+    .describe('2-3 paragraph overview of what the company does, its products, and market position'),
+  techStack: z.string().describe('Known or inferred technologies, languages, frameworks, and infrastructure'),
+  culture: z.string().describe('Company culture, values, work style, and what they look for in candidates'),
+  recentNews: z
+    .string()
+    .describe('Recent notable events: funding rounds, product launches, acquisitions, leadership changes'),
+  keyPeople: z.string().describe('Key leadership: CEO, CTO, VP Eng, and other relevant executives with brief context')
 });
 
 const ApplicationInsightsSchema = z.strictObject({
@@ -93,5 +107,37 @@ export class OpenAiLlmService implements LlmService {
 
     const parsed = completion.choices[0].message.parsed ?? { keywords: [], core: [] };
     return { keywords: parsed.keywords, coreSkills: parsed.core };
+  }
+
+  public async generateCompanyBrief(input: LlmGenerateCompanyBriefInput): Promise<CompanyBriefSectionsDto> {
+    const context = [
+      `Company: ${input.companyName}`,
+      input.companyWebsite ? `Website: ${input.companyWebsite}` : null,
+      `Job title: ${input.jobTitle}`,
+      `Job description:\n${input.jobDescription}`
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const completion = await this.client.beta.chat.completions.parse({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a career coach helping a software engineer prepare for a job interview. ' +
+            'Generate a comprehensive company brief based on the provided information. ' +
+            'Use your knowledge about the company to fill in details beyond what the job description provides. ' +
+            'For sections where you have limited information, be honest about what is inferred vs confirmed. ' +
+            'Write in a clear, professional style with bullet points where appropriate.'
+        },
+        { role: 'user', content: context }
+      ],
+      response_format: zodResponseFormat(CompanyBriefSchema, 'company_brief')
+    });
+
+    const parsed = completion.choices[0].message.parsed;
+    if (!parsed) throw new Error('Failed to parse company brief response');
+    return parsed;
   }
 }

@@ -12,6 +12,9 @@ export { ArchetypePosition } from './entities/ArchetypePosition.js';
 // Entities — job discovery
 export type { CompanyCreateProps } from './entities/Company.js';
 export { Company } from './entities/Company.js';
+// Entities — company briefs
+export type { CompanyBriefCreateProps, CompanyBriefSections } from './entities/CompanyBrief.js';
+export { CompanyBrief } from './entities/CompanyBrief.js';
 export type { JobPostingCreateProps, JobScores, JobScoresSkillScore } from './entities/JobPosting.js';
 export { JobPosting } from './entities/JobPosting.js';
 export type { ResumeCreateProps } from './entities/Resume.js';
@@ -39,6 +42,7 @@ export { JobStatusChangedEvent } from './events/JobStatusChangedEvent.js';
 export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
 // Ports — repository interfaces
 export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
+export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { JobElector } from './ports/JobElector.js';
 export type {
@@ -71,6 +75,7 @@ export {
   ArchetypeSkillItemSelection
 } from './value-objects/ArchetypeSelections.js';
 export { BusinessType } from './value-objects/BusinessType.js';
+export { CompanyBriefId } from './value-objects/CompanyBriefId.js';
 export { CompanyId } from './value-objects/CompanyId.js';
 export { CompanyStage } from './value-objects/CompanyStage.js';
 export { Industry } from './value-objects/Industry.js';
