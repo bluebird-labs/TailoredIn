@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { GenerateResume } from '@tailoredin/application';
+import { Archetype } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
@@ -11,11 +12,15 @@ export class GenerateResumeRoute {
   public plugin() {
     return new Elysia().put(
       '/jobs/:id/generate-resume',
-      async ({ params, set }) => {
-        const result = await this.generateResume.execute({ jobId: params.id });
+      async ({ params, body, set }) => {
+        const result = await this.generateResume.execute({
+          jobId: params.id,
+          archetype: body?.archetype as Archetype | undefined,
+          keywords: body?.keywords
+        });
 
         if (!result.isOk) {
-          set.status = 404;
+          set.status = 400;
           return { error: result.error.message };
         }
 
@@ -27,7 +32,13 @@ export class GenerateResumeRoute {
         return pdfBuffer;
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }) })
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        body: t.Optional(
+          t.Object({
+            archetype: t.Optional(t.Enum(Archetype)),
+            keywords: t.Optional(t.Array(t.String()))
+          })
+        )
       }
     );
   }

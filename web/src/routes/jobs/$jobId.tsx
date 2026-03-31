@@ -18,9 +18,12 @@ import { toast } from 'sonner';
 import { JobStatusBadge } from '@/components/jobs/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ARCHETYPE_KEY_LABELS } from '@/hooks/use-archetypes';
 import { api } from '@/lib/api';
 import { DEFAULT_TARGET_SALARY } from '@/lib/constants';
 import { queryKeys } from '@/lib/query-keys';
@@ -49,6 +52,18 @@ function JobDetailPage() {
   const { jobId } = Route.useParams();
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedArchetype, setSelectedArchetype] = useState('leader_individual_contributor');
+  const [keywordsInput, setKeywordsInput] = useState('');
+
+  const { data: configData } = useQuery({
+    queryKey: queryKeys.config.capabilities(),
+    queryFn: async () => {
+      const res = await fetch('/api/config');
+      return res.json() as Promise<{ llmAvailable: boolean }>;
+    },
+    staleTime: Number.POSITIVE_INFINITY
+  });
+  const llmAvailable = configData?.llmAvailable ?? true;
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.jobs.detail(jobId),
@@ -79,7 +94,16 @@ function JobDetailPage() {
   const handleGenerateResume = async () => {
     setIsGenerating(true);
     try {
-      const res = await fetch(`/api/jobs/${jobId}/generate-resume`, { method: 'PUT' });
+      const fetchOptions: RequestInit = { method: 'PUT' };
+      if (!llmAvailable) {
+        const keywords = keywordsInput
+          .split(',')
+          .map(k => k.trim())
+          .filter(Boolean);
+        fetchOptions.headers = { 'Content-Type': 'application/json' };
+        fetchOptions.body = JSON.stringify({ archetype: selectedArchetype, keywords });
+      }
+      const res = await fetch(`/api/jobs/${jobId}/generate-resume`, fetchOptions);
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(err.error ?? `HTTP ${res.status}`);
@@ -228,19 +252,62 @@ function JobDetailPage() {
           </Select>
         </div>
 
-        <Button onClick={handleGenerateResume} disabled={isGenerating} variant="default">
-          {isGenerating ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" />
-              Generate Resume
-            </>
-          )}
-        </Button>
+        {llmAvailable ? (
+          <Button onClick={handleGenerateResume} disabled={isGenerating} variant="default">
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Generate Resume
+              </>
+            )}
+          </Button>
+        ) : (
+          <div className="flex items-end gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="archetype-select">Archetype</Label>
+              <Select value={selectedArchetype} onValueChange={v => v && setSelectedArchetype(v)}>
+                <SelectTrigger id="archetype-select" className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(ARCHETYPE_KEY_LABELS).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="keywords-input">Keywords (comma-separated)</Label>
+              <Input
+                id="keywords-input"
+                value={keywordsInput}
+                onChange={e => setKeywordsInput(e.target.value)}
+                placeholder="react, typescript, aws..."
+                className="w-[260px]"
+              />
+            </div>
+            <Button onClick={handleGenerateResume} disabled={isGenerating} variant="default">
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Generate Resume
+                </>
+              )}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Scores */}

@@ -82,7 +82,7 @@ export const DI = {
     HeadlineRepository: new InjectionToken<ResumeHeadlineRepository>('DI.Resume.HeadlineRepository'),
     SkillCategoryRepository: new InjectionToken<ResumeSkillCategoryRepository>('DI.Resume.SkillCategoryRepository'),
     ArchetypeConfigRepository: new InjectionToken<ArchetypeConfigRepository>('DI.Resume.ArchetypeConfigRepository'),
-    LlmService: new InjectionToken<LlmService>('DI.Resume.LlmService'),
+    LlmService: new InjectionToken<LlmService | null>('DI.Resume.LlmService'),
     WebColorService: new InjectionToken<WebColorService>('DI.Resume.WebColorService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),

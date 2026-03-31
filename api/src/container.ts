@@ -41,7 +41,7 @@ import {
   UpdateSkillItem,
   UpdateUser
 } from '@tailoredin/application';
-import { env, envBool, envInt } from '@tailoredin/core';
+import { env, envBool, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   createOrmConfig,
@@ -140,14 +140,16 @@ container.bind({ provide: DI.Resume.EducationRepository, useClass: PostgresResum
 container.bind({ provide: DI.Resume.HeadlineRepository, useClass: PostgresResumeHeadlineRepository });
 container.bind({ provide: DI.Resume.SkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
 container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: PostgresArchetypeConfigRepository });
-container.bind({
-  provide: OPENAI_CONFIG,
-  useValue: {
-    apiKey: env('OPENAI_API_KEY'),
-    project: env('OPENAI_PROJECT_ID')
-  }
-});
-container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
+const openAiApiKey = envOptional('OPENAI_API_KEY');
+const openAiProject = envOptional('OPENAI_PROJECT_ID');
+export const llmAvailable = !!(openAiApiKey && openAiProject);
+
+if (llmAvailable) {
+  container.bind({ provide: OPENAI_CONFIG, useValue: { apiKey: openAiApiKey, project: openAiProject } });
+  container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
+} else {
+  container.bind({ provide: DI.Resume.LlmService, useValue: null });
+}
 container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({

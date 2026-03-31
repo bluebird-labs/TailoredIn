@@ -1,9 +1,10 @@
 import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
-import { container } from './container.js';
+import { container, llmAvailable } from './container.js';
 import { AddBulletRoute } from './routes/AddBulletRoute.js';
 import { AddSkillItemRoute } from './routes/AddSkillItemRoute.js';
 import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
+import { configRoute } from './routes/ConfigRoute.js';
 import { CreateArchetypeRoute } from './routes/CreateArchetypeRoute.js';
 import { CreateCompanyRoute } from './routes/CreateCompanyRoute.js';
 import { CreateEducationRoute } from './routes/CreateEducationRoute.js';
@@ -72,6 +73,7 @@ const app = new Elysia()
     logRequest(request, status, startTimes.get(request));
   })
   .use(healthRoutes)
+  .use(configRoute(llmAvailable))
   .use(container.get(ListJobsRoute).plugin())
   .use(container.get(GetTopJobRoute).plugin())
   .use(container.get(GetJobRoute).plugin())

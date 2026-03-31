@@ -20,5 +20,9 @@ export const queryKeys = {
     all: ['archetypes'] as const,
     list: () => [...queryKeys.archetypes.all, 'list'] as const,
     detail: (id: string) => [...queryKeys.archetypes.all, 'detail', id] as const
+  },
+  config: {
+    all: ['config'] as const,
+    capabilities: () => [...queryKeys.config.all, 'capabilities'] as const
   }
 };
