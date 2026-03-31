@@ -35,7 +35,7 @@ Given you're targeting Series B+ and your background is platform/infrastructure,
 > Current CI: Biome, dependency-cruiser, Knip, `tsc --strict`, Bun tests + coverage, DB integration tests (Testcontainers), CodeRabbit, Gitleaks.
 
 - [x] **Knip** — Added as CI gate. Catches dead code, unused exports/deps.
-- [x] **CodeRabbit** — Installed as GitHub App with `.coderabbit.yaml`.
+- [x] ~~CodeRabbit~~ — Rejected. Not free for private repos.
 - [ ] **Type Coverage** — Revisit when `any` leakage becomes a real problem. Biome's `noExplicitAny: error` covers most cases.
 - [ ] **Elysia OpenAPI Snapshot** — Revisit when API surface stabilizes (post-M6B).
 - [x] ~~Sherif~~ — Rejected. Dependency-cruiser already covers architectural boundaries. Manifest cosmetics not worth a gate for a solo project.
