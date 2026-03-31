@@ -4,6 +4,7 @@ export type { OrmDbConfig } from './db/orm-config.js';
 // ORM config
 export { createOrmConfig, getOrmConfig } from './db/orm-config.js';
 export { PostgresArchetypeConfigRepository } from './repositories/PostgresArchetypeConfigRepository.js';
+export { PostgresCompanyBriefRepository } from './repositories/PostgresCompanyBriefRepository.js';
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 // Repositories
 export { PostgresJobRepository } from './repositories/PostgresJobRepository.js';

@@ -27,7 +27,23 @@ export type ExtractApplicationInsightsInput = {
   resumeContent: ResumeContentDto;
 };
 
+export type GenerateCompanyBriefInput = {
+  companyName: string;
+  companyWebsite: string | null;
+  jobTitle: string;
+  jobDescription: string;
+};
+
+export type CompanyBriefSectionsDto = {
+  productOverview: string;
+  techStack: string;
+  culture: string;
+  recentNews: string;
+  keyPeople: string;
+};
+
 export interface LlmService {
   extractJobPostingInsights(input: ExtractJobPostingInsightsInput): Promise<JobPostingInsightsDto>;
   extractApplicationInsights(input: ExtractApplicationInsightsInput): Promise<ApplicationInsightsDto>;
+  generateCompanyBrief(input: GenerateCompanyBriefInput): Promise<CompanyBriefSectionsDto>;
 }

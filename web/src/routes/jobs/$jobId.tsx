@@ -10,10 +10,14 @@ import {
   DollarSign,
   Download,
   ExternalLink,
+  FileText,
   Loader2,
+  Lock,
   MapPin,
   Monitor,
-  RotateCcw
+  RefreshCw,
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -409,6 +413,9 @@ function JobDetailPage() {
         </Card>
       )}
 
+      {/* Company Brief */}
+      <CompanyBriefPanel jobId={jobId} llmAvailable={llmAvailable} />
+
       {/* Description */}
       <Card>
         <CardHeader>
@@ -423,6 +430,139 @@ function JobDetailPage() {
           />
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+type CompanyBriefData = {
+  id: string;
+  companyId: string;
+  productOverview: string;
+  techStack: string;
+  culture: string;
+  recentNews: string;
+  keyPeople: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function CompanyBriefPanel({ jobId, llmAvailable }: { jobId: string; llmAvailable: boolean }) {
+  const queryClient = useQueryClient();
+
+  const { data: briefData, isLoading } = useQuery({
+    queryKey: queryKeys.jobs.brief(jobId),
+    queryFn: async () => {
+      const res = await fetch(`/api/jobs/${jobId}/brief`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json() as Promise<{ data: CompanyBriefData | null }>;
+    }
+  });
+
+  const generateMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/jobs/${jobId}/generate-brief`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
+      return res.json() as Promise<{ data: CompanyBriefData }>;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.brief(jobId) });
+      toast.success('Company brief generated');
+    },
+    onError: (err: Error) => {
+      toast.error(`Failed to generate brief: ${err.message}`);
+    }
+  });
+
+  if (!llmAvailable) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Lock className="h-4 w-4 text-muted-foreground" />
+            Company Brief
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Company briefs require an OpenAI API key.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isLoading) {
+    return <Skeleton className="h-32 w-full" />;
+  }
+
+  const brief = briefData?.data;
+
+  if (!brief) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <FileText className="h-4 w-4" />
+            Company Brief
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending} variant="outline">
+            {generateMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate Company Brief
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <FileText className="h-4 w-4" />
+          Company Brief
+        </CardTitle>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => generateMutation.mutate()}
+          disabled={generateMutation.isPending}
+        >
+          {generateMutation.isPending ? (
+            <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-1 h-3.5 w-3.5" />
+          )}
+          Refresh
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <BriefSection title="Product Overview" content={brief.productOverview} />
+        <BriefSection title="Tech Stack" content={brief.techStack} />
+        <BriefSection title="Culture" content={brief.culture} />
+        <BriefSection title="Recent News" content={brief.recentNews} />
+        <BriefSection title="Key People" content={brief.keyPeople} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function BriefSection({ title, content }: { title: string; content: string }) {
+  return (
+    <div>
+      <h4 className="text-sm font-semibold mb-1">{title}</h4>
+      <p className="text-sm text-muted-foreground whitespace-pre-line">{content}</p>
     </div>
   );
 }

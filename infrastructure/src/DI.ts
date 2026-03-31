@@ -16,7 +16,9 @@ import type {
   DeleteHeadline,
   DeleteSkillCategory,
   DeleteSkillItem,
+  GenerateCompanyBrief,
   GenerateResume,
+  GetCompanyBrief,
   GetJob,
   GetJobCompany,
   GetTopJob,
@@ -51,6 +53,7 @@ import type {
 } from '@tailoredin/application';
 import type {
   ArchetypeConfigRepository,
+  CompanyBriefRepository,
   CompanyRepository,
   JobElector,
   JobRepository,
@@ -118,6 +121,12 @@ export const DI = {
     AddSkillItem: new InjectionToken<AddSkillItem>('DI.Resume.AddSkillItem'),
     UpdateSkillItem: new InjectionToken<UpdateSkillItem>('DI.Resume.UpdateSkillItem'),
     DeleteSkillItem: new InjectionToken<DeleteSkillItem>('DI.Resume.DeleteSkillItem')
+  },
+
+  CompanyBrief: {
+    Repository: new InjectionToken<CompanyBriefRepository>('DI.CompanyBrief.Repository'),
+    GenerateCompanyBrief: new InjectionToken<GenerateCompanyBrief>('DI.CompanyBrief.GenerateCompanyBrief'),
+    GetCompanyBrief: new InjectionToken<GetCompanyBrief>('DI.CompanyBrief.GetCompanyBrief')
   },
 
   Archetype: {

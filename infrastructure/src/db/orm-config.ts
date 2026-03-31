@@ -13,6 +13,7 @@ import { ArchetypePositionBullet } from './entities/archetypes/ArchetypePosition
 import { ArchetypeSkillCategory } from './entities/archetypes/ArchetypeSkillCategory.js';
 import { ArchetypeSkillItem } from './entities/archetypes/ArchetypeSkillItem.js';
 import { Company } from './entities/companies/Company.js';
+import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
 import { ResumeBullet } from './entities/resume/ResumeBullet.js';
@@ -45,6 +46,7 @@ export function createOrmConfig(db: OrmDbConfig) {
     entities: [
       BaseEntity,
       Company,
+      CompanyBrief,
       Skill,
       Job,
       JobStatusUpdate,

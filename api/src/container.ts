@@ -17,7 +17,9 @@ import {
   DeleteHeadline,
   DeleteSkillCategory,
   DeleteSkillItem,
+  GenerateCompanyBrief,
   GenerateResume,
+  GetCompanyBrief,
   GetJob,
   GetJobCompany,
   GetTopJob,
@@ -56,6 +58,7 @@ import {
   PlaywrightJobScraper,
   PlaywrightWebColorService,
   PostgresArchetypeConfigRepository,
+  PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresJobRepository,
   PostgresResumeCompanyRepository,
@@ -192,6 +195,22 @@ container.bind({
       container.get(DI.Resume.Renderer),
       container.get(DI.Resume.ContentFactory)
     )
+});
+
+// Company Brief
+container.bind({ provide: DI.CompanyBrief.Repository, useClass: PostgresCompanyBriefRepository });
+container.bind({
+  provide: DI.CompanyBrief.GenerateCompanyBrief,
+  useFactory: () =>
+    new GenerateCompanyBrief(
+      container.get(DI.Job.Repository),
+      container.get(DI.CompanyBrief.Repository),
+      container.get(DI.Resume.LlmService)
+    )
+});
+container.bind({
+  provide: DI.CompanyBrief.GetCompanyBrief,
+  useFactory: () => new GetCompanyBrief(container.get(DI.Job.Repository), container.get(DI.CompanyBrief.Repository))
 });
 
 // User use cases
