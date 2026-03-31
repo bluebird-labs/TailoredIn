@@ -89,11 +89,11 @@ graph TD
     style M4CDE fill:#86efac
     style M5 fill:#86efac
     style M6A fill:#86efac
-    style M6B fill:#e5e7eb
-    style M7 fill:#e5e7eb
-    style M8 fill:#e5e7eb
-    style M9 fill:#e5e7eb
-    style M10 fill:#e5e7eb
+    style M6B fill:#86efac
+    style M7 fill:#86efac
+    style M8 fill:#facc15
+    style M9 fill:#86efac
+    style M10 fill:#facc15
     style M11 fill:#e5e7eb
 ```
 
