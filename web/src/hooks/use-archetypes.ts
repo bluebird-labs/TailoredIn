@@ -89,13 +89,13 @@ export function useSetArchetypePositions() {
     }: {
       id: string;
       positions: {
-        resume_company_id: string;
-        job_title: string;
+        resume_position_id: string;
+        job_title: string | null;
         display_company_name: string;
         location_label: string;
-        start_date: string;
-        end_date: string;
-        role_summary: string;
+        start_date: string | null;
+        end_date: string | null;
+        role_summary: string | null;
         ordinal: number;
         bullets: { bullet_id: string; ordinal: number }[];
       }[];

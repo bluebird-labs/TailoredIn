@@ -12,6 +12,7 @@ import { ResumeCompany } from '../entities/resume/ResumeCompany.js';
 import { ResumeCompanyLocation } from '../entities/resume/ResumeCompanyLocation.js';
 import { ResumeEducation } from '../entities/resume/ResumeEducation.js';
 import { ResumeHeadline } from '../entities/resume/ResumeHeadline.js';
+import { ResumePosition } from '../entities/resume/ResumePosition.js';
 import { ResumeSkillCategory } from '../entities/resume/ResumeSkillCategory.js';
 import { ResumeSkillItem } from '../entities/resume/ResumeSkillItem.js';
 import { User } from '../entities/users/User.js';
@@ -30,9 +31,9 @@ export class ResumeDataSeeder extends Seeder {
     });
     em.persist(user);
 
-    // ── 2. Resume Companies + Locations + Bullets ────────────────────────
-    const companies = this.createCompanies(em, user);
-    const bulletsByCompany = this.createBullets(em, companies);
+    // ── 2. Resume Companies + Positions + Locations + Bullets ────────────
+    const { companies, positions } = this.createCompaniesAndPositions(em, user);
+    const bulletsByCompany = this.createBullets(em, positions);
 
     // ── 3. Education ─────────────────────────────────────────────────────
     const education = this.createEducation(em, user);
@@ -50,18 +51,28 @@ export class ResumeDataSeeder extends Seeder {
     em.persist(headline);
 
     // ── 6. Archetypes ────────────────────────────────────────────────────
-    this.createLeadICArchetype(em, user, headline, companies, bulletsByCompany, education, categories, items);
-    this.createNerdArchetype(em, user, headline, companies, bulletsByCompany, education, categories, items);
+    this.createLeadICArchetype(
+      em,
+      user,
+      headline,
+      companies,
+      positions,
+      bulletsByCompany,
+      education,
+      categories,
+      items
+    );
+    this.createNerdArchetype(em, user, headline, companies, positions, bulletsByCompany, education, categories, items);
 
     await em.flush();
     Logger.create(this.constructor.name).info('Resume data seeded successfully.');
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Companies
+  // Companies + Positions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  private createCompanies(em: EntityManager, user: User) {
+  private createCompaniesAndPositions(em: EntityManager, user: User) {
     const defs = [
       {
         key: 'lantern',
@@ -142,7 +153,8 @@ export class ResumeDataSeeder extends Seeder {
       }
     ] as const;
 
-    const result: Record<string, ResumeCompany> = {};
+    const companies: Record<string, ResumeCompany> = {};
+    const positions: Record<string, ResumePosition[]> = {};
 
     for (const def of defs) {
       const company = ResumeCompany.create({
@@ -150,11 +162,7 @@ export class ResumeDataSeeder extends Seeder {
         companyName: def.companyName,
         companyMention: def.companyMention,
         websiteUrl: def.websiteUrl,
-        businessDomain: def.businessDomain,
-        jobTitle: null,
-        joinedAt: def.joinedAt,
-        leftAt: def.leftAt,
-        promotedAt: def.promotedAt
+        businessDomain: def.businessDomain
       });
       em.persist(company);
 
@@ -164,17 +172,56 @@ export class ResumeDataSeeder extends Seeder {
         );
       }
 
-      result[def.key] = company;
+      companies[def.key] = company;
+
+      // Create positions for this company
+      if (def.promotedAt) {
+        // Two positions: promoted role (ordinal 0) and original role (ordinal 1)
+        const promotedPosition = ResumePosition.create({
+          resumeCompany: company,
+          title: '',
+          startDate: def.promotedAt,
+          endDate: def.leftAt,
+          summary: null,
+          ordinal: 0
+        });
+        em.persist(promotedPosition);
+
+        const originalPosition = ResumePosition.create({
+          resumeCompany: company,
+          title: '',
+          startDate: def.joinedAt,
+          endDate: def.promotedAt,
+          summary: null,
+          ordinal: 1
+        });
+        em.persist(originalPosition);
+
+        positions[def.key] = [promotedPosition, originalPosition];
+      } else {
+        // Single position
+        const position = ResumePosition.create({
+          resumeCompany: company,
+          title: '',
+          startDate: def.joinedAt,
+          endDate: def.leftAt,
+          summary: null,
+          ordinal: 0
+        });
+        em.persist(position);
+
+        positions[def.key] = [position];
+      }
     }
 
-    return result;
+    return { companies, positions };
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Bullets (master pool per company)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  private createBullets(em: EntityManager, companies: Record<string, ResumeCompany>) {
+  private createBullets(em: EntityManager, positions: Record<string, ResumePosition[]>) {
     const bulletDefs: Record<string, string[]> = {
       lantern: [
         'Leveraged LLMs (OpenAI, Anthropic), prompt engineering, and Playwright-driven web scraping to equip sales teams with prospect insights',
@@ -234,7 +281,7 @@ export class ResumeDataSeeder extends Seeder {
 
     for (const [key, texts] of Object.entries(bulletDefs)) {
       result[key] = texts.map((content, i) => {
-        const bullet = ResumeBullet.create({ resumeCompany: companies[key], content, ordinal: i });
+        const bullet = ResumeBullet.create({ resumePosition: positions[key][0], content, ordinal: i });
         em.persist(bullet);
         return bullet;
       });
@@ -339,6 +386,7 @@ export class ResumeDataSeeder extends Seeder {
     user: User,
     headline: ResumeHeadline,
     companies: Record<string, ResumeCompany>,
+    positions: Record<string, ResumePosition[]>,
     bullets: Record<string, ResumeBullet[]>,
     education: ResumeEducation[],
     categories: Record<string, ResumeSkillCategory>,
@@ -368,9 +416,10 @@ export class ResumeDataSeeder extends Seeder {
     }
 
     // Positions (8 entries, matching LeadICResumeTemplate)
-    const positions = [
+    const archetypePositions = [
       {
         company: companies.lantern,
+        resumePosition: positions.lantern[0],
         jobTitle: 'Staff Software Engineer',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
@@ -382,6 +431,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.brightflow,
+        resumePosition: positions.brightflow[0],
         jobTitle: 'Staff Software Engineer',
         displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
         locationLabel: 'New York, NY',
@@ -393,6 +443,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.volvo,
+        resumePosition: positions.volvo[0],
         jobTitle: 'Tech Lead Manager',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'New York, NY',
@@ -404,6 +455,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.volvo,
+        resumePosition: positions.volvo[1],
         jobTitle: 'Senior Software Engineer',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'Stockholm, Sweden',
@@ -414,6 +466,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.luxe,
+        resumePosition: positions.luxe[0],
         jobTitle: 'Lead Software Engineer',
         displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
         locationLabel: 'San Francisco, CA',
@@ -424,6 +477,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.streamnation,
+        resumePosition: positions.streamnation[0],
         jobTitle: 'Software Engineer',
         displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
         locationLabel: 'San Francisco, CA',
@@ -434,6 +488,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.planorama,
+        resumePosition: positions.planorama[0],
         jobTitle: 'Lead Software Engineer',
         displayCompanyName: 'Planorama',
         locationLabel: 'Paris, France',
@@ -444,6 +499,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.luckycart,
+        resumePosition: positions.luckycart[0],
         jobTitle: 'Software Engineer',
         displayCompanyName: 'LuckyCart',
         locationLabel: 'Paris, France',
@@ -454,12 +510,12 @@ export class ResumeDataSeeder extends Seeder {
       }
     ];
 
-    for (let pi = 0; pi < positions.length; pi++) {
-      const def = positions[pi];
+    for (let pi = 0; pi < archetypePositions.length; pi++) {
+      const def = archetypePositions[pi];
       const companyKey = Object.entries(companies).find(([, c]) => c === def.company)![0];
       const pos = ArchetypePosition.create({
         archetype,
-        resumeCompany: def.company,
+        resumePosition: def.resumePosition,
         jobTitle: def.jobTitle,
         displayCompanyName: def.displayCompanyName,
         locationLabel: def.locationLabel,
@@ -491,6 +547,7 @@ export class ResumeDataSeeder extends Seeder {
     user: User,
     headline: ResumeHeadline,
     companies: Record<string, ResumeCompany>,
+    positions: Record<string, ResumePosition[]>,
     bullets: Record<string, ResumeBullet[]>,
     education: ResumeEducation[],
     categories: Record<string, ResumeSkillCategory>,
@@ -526,9 +583,10 @@ export class ResumeDataSeeder extends Seeder {
 
     // Positions — Nerd uses SOFTWARE_ENGINEER for Lantern (instead of STAFF_ENGINEER)
     // and slightly different summary for Lantern
-    const positions = [
+    const archetypePositions = [
       {
         company: companies.lantern,
+        resumePosition: positions.lantern[0],
         jobTitle: 'Software Engineer',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
@@ -540,6 +598,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.brightflow,
+        resumePosition: positions.brightflow[0],
         jobTitle: 'Staff Software Engineer',
         displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
         locationLabel: 'New York, NY',
@@ -551,6 +610,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.volvo,
+        resumePosition: positions.volvo[0],
         jobTitle: 'Tech Lead Manager',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'New York, NY',
@@ -562,6 +622,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.volvo,
+        resumePosition: positions.volvo[1],
         jobTitle: 'Senior Software Engineer',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'Stockholm, Sweden',
@@ -572,6 +633,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.luxe,
+        resumePosition: positions.luxe[0],
         jobTitle: 'Lead Software Engineer',
         displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
         locationLabel: 'San Francisco, CA',
@@ -582,6 +644,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.streamnation,
+        resumePosition: positions.streamnation[0],
         jobTitle: 'Software Engineer',
         displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
         locationLabel: 'San Francisco, CA',
@@ -592,6 +655,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.planorama,
+        resumePosition: positions.planorama[0],
         jobTitle: 'Lead Software Engineer',
         displayCompanyName: 'Planorama',
         locationLabel: 'Paris, France',
@@ -602,6 +666,7 @@ export class ResumeDataSeeder extends Seeder {
       },
       {
         company: companies.luckycart,
+        resumePosition: positions.luckycart[0],
         jobTitle: 'Software Engineer',
         displayCompanyName: 'LuckyCart',
         locationLabel: 'Paris, France',
@@ -612,12 +677,12 @@ export class ResumeDataSeeder extends Seeder {
       }
     ];
 
-    for (let pi = 0; pi < positions.length; pi++) {
-      const def = positions[pi];
+    for (let pi = 0; pi < archetypePositions.length; pi++) {
+      const def = archetypePositions[pi];
       const companyKey = Object.entries(companies).find(([, c]) => c === def.company)![0];
       const pos = ArchetypePosition.create({
         archetype,
-        resumeCompany: def.company,
+        resumePosition: def.resumePosition,
         jobTitle: def.jobTitle,
         displayCompanyName: def.displayCompanyName,
         locationLabel: def.locationLabel,

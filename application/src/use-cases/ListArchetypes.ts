@@ -22,7 +22,7 @@ function toArchetypeDto(config: ArchetypeConfig): ArchetypeConfigDto {
     socialNetworks: config.socialNetworks,
     positions: config.positions.map(p => ({
       id: p.id.value,
-      resumeCompanyId: p.resumeCompanyId,
+      resumePositionId: p.resumePositionId,
       jobTitle: p.jobTitle,
       displayCompanyName: p.displayCompanyName,
       locationLabel: p.locationLabel,

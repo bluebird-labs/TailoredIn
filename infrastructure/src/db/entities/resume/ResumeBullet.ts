@@ -1,11 +1,11 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
-import { ResumeCompany } from './ResumeCompany.js';
+import { ResumePosition } from './ResumePosition.js';
 
 export type ResumeBulletProps = {
   id: string;
-  resumeCompany: RefOrEntity<ResumeCompany>;
+  resumePosition: RefOrEntity<ResumePosition>;
   content: string;
   ordinal: number;
   createdAt: Date;
@@ -19,8 +19,8 @@ export class ResumeBullet extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => ResumeCompany, { lazy: true, name: 'resume_company_id' })
-  public readonly resumeCompany: RefOrEntity<ResumeCompany>;
+  @ManyToOne(() => ResumePosition, { lazy: true, name: 'resume_position_id' })
+  public readonly resumePosition: RefOrEntity<ResumePosition>;
 
   @Property({ name: 'content', type: 'text' })
   public content: string;
@@ -31,7 +31,7 @@ export class ResumeBullet extends BaseEntity {
   public constructor(props: ResumeBulletProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
-    this.resumeCompany = props.resumeCompany;
+    this.resumePosition = props.resumePosition;
     this.content = props.content;
     this.ordinal = props.ordinal;
   }

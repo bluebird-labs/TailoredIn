@@ -14,7 +14,7 @@ export class SetArchetypePositionsRoute {
         const result = await this.setPositions.execute({
           archetypeId: params.id,
           positions: body.positions.map(p => ({
-            resumeCompanyId: p.resume_company_id,
+            resumePositionId: p.resume_position_id,
             jobTitle: p.job_title,
             displayCompanyName: p.display_company_name,
             locationLabel: p.location_label,
@@ -37,13 +37,13 @@ export class SetArchetypePositionsRoute {
         body: t.Object({
           positions: t.Array(
             t.Object({
-              resume_company_id: t.String({ format: 'uuid' }),
-              job_title: t.String({ minLength: 1 }),
+              resume_position_id: t.String({ format: 'uuid' }),
+              job_title: t.Nullable(t.String()),
               display_company_name: t.String({ minLength: 1 }),
               location_label: t.String({ minLength: 1 }),
-              start_date: t.String({ minLength: 1 }),
-              end_date: t.String({ minLength: 1 }),
-              role_summary: t.String(),
+              start_date: t.Nullable(t.String()),
+              end_date: t.Nullable(t.String()),
+              role_summary: t.Nullable(t.String()),
               ordinal: t.Integer({ minimum: 0 }),
               bullets: t.Array(
                 t.Object({

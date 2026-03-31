@@ -20,12 +20,7 @@ export function useCreateCompany() {
       company_mention: string | null;
       website_url: string | null;
       business_domain: string;
-      job_title: string | null;
-      joined_at: string;
-      left_at: string;
-      promoted_at: string | null;
       locations: { label: string; ordinal: number }[];
-      bullets: { content: string; ordinal: number }[];
     }) => {
       const { data } = await api.resume.companies.post(input);
       return data;
@@ -48,10 +43,6 @@ export function useUpdateCompany() {
       company_mention?: string | null;
       website_url?: string | null;
       business_domain?: string;
-      job_title?: string | null;
-      joined_at?: string;
-      left_at?: string;
-      promoted_at?: string | null;
     }) => {
       await api.resume.companies({ id }).put(body);
     },
@@ -76,8 +67,8 @@ export function useDeleteCompany() {
 export function useAddBullet() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ companyId, content, ordinal }: { companyId: string; content: string; ordinal: number }) => {
-      const { data } = await api.resume.companies({ id: companyId }).bullets.post({ content, ordinal });
+    mutationFn: async ({ positionId, content, ordinal }: { positionId: string; content: string; ordinal: number }) => {
+      const { data } = await api.resume.positions({ positionId }).bullets.post({ content, ordinal });
       return data;
     },
     onSuccess: () => {
@@ -90,16 +81,16 @@ export function useUpdateBullet() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
-      companyId,
+      positionId,
       bulletId,
       ...body
     }: {
-      companyId: string;
+      positionId: string;
       bulletId: string;
       content?: string;
       ordinal?: number;
     }) => {
-      await api.resume.companies({ id: companyId }).bullets({ bulletId }).put(body);
+      await api.resume.positions({ positionId }).bullets({ bulletId }).put(body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.resume.companies() });
@@ -110,8 +101,8 @@ export function useUpdateBullet() {
 export function useDeleteBullet() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ companyId, bulletId }: { companyId: string; bulletId: string }) => {
-      await api.resume.companies({ id: companyId }).bullets({ bulletId }).delete();
+    mutationFn: async ({ positionId, bulletId }: { positionId: string; bulletId: string }) => {
+      await api.resume.positions({ positionId }).bullets({ bulletId }).delete();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.resume.companies() });

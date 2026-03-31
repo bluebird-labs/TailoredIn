@@ -2,20 +2,20 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
-import { ResumeCompany } from '../resume/ResumeCompany.js';
+import { ResumePosition } from '../resume/ResumePosition.js';
 import { Archetype } from './Archetype.js';
 import { ArchetypePositionBullet } from './ArchetypePositionBullet.js';
 
 export type ArchetypePositionProps = {
   id: string;
   archetype: RefOrEntity<Archetype>;
-  resumeCompany: RefOrEntity<ResumeCompany>;
-  jobTitle: string;
+  resumePosition: RefOrEntity<ResumePosition>;
+  jobTitle: string | null;
   displayCompanyName: string;
   locationLabel: string;
-  startDate: string;
-  endDate: string;
-  roleSummary: string;
+  startDate: string | null;
+  endDate: string | null;
+  roleSummary: string | null;
   ordinal: number;
   createdAt: Date;
   updatedAt: Date;
@@ -31,11 +31,11 @@ export class ArchetypePosition extends BaseEntity {
   @ManyToOne(() => Archetype, { lazy: true, name: 'archetype_id' })
   public readonly archetype: RefOrEntity<Archetype>;
 
-  @ManyToOne(() => ResumeCompany, { lazy: true, name: 'resume_company_id' })
-  public readonly resumeCompany: RefOrEntity<ResumeCompany>;
+  @ManyToOne(() => ResumePosition, { lazy: true, name: 'resume_position_id' })
+  public readonly resumePosition: RefOrEntity<ResumePosition>;
 
-  @Property({ name: 'job_title', type: 'text' })
-  public jobTitle: string;
+  @Property({ name: 'job_title', type: 'text', nullable: true })
+  public jobTitle: string | null;
 
   @Property({ name: 'display_company_name', type: 'text' })
   public displayCompanyName: string;
@@ -43,14 +43,14 @@ export class ArchetypePosition extends BaseEntity {
   @Property({ name: 'location_label', type: 'text' })
   public locationLabel: string;
 
-  @Property({ name: 'start_date', type: 'text' })
-  public startDate: string;
+  @Property({ name: 'start_date', type: 'text', nullable: true })
+  public startDate: string | null;
 
-  @Property({ name: 'end_date', type: 'text' })
-  public endDate: string;
+  @Property({ name: 'end_date', type: 'text', nullable: true })
+  public endDate: string | null;
 
-  @Property({ name: 'role_summary', type: 'text' })
-  public roleSummary: string;
+  @Property({ name: 'role_summary', type: 'text', nullable: true })
+  public roleSummary: string | null;
 
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
@@ -66,7 +66,7 @@ export class ArchetypePosition extends BaseEntity {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.archetype = props.archetype;
-    this.resumeCompany = props.resumeCompany;
+    this.resumePosition = props.resumePosition;
     this.jobTitle = props.jobTitle;
     this.displayCompanyName = props.displayCompanyName;
     this.locationLabel = props.locationLabel;

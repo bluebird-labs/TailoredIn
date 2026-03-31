@@ -9,6 +9,9 @@ function createMockCompanyRepository(overrides: Partial<ResumeCompanyRepository>
     },
     findAllByUserId: async () => [],
     save: async () => {},
+    findByPositionIdOrFail: async () => {
+      throw new Error('not found');
+    },
     delete: async () => {},
     ...overrides
   };
@@ -29,11 +32,7 @@ describe('CreateCompany', () => {
       companyMention: 'acquired',
       websiteUrl: 'https://acme.com',
       businessDomain: 'SaaS',
-      joinedAt: '2020-01',
-      leftAt: '2023-01',
-      promotedAt: null,
-      locations: [{ label: 'NYC', ordinal: 0 }],
-      bullets: [{ content: 'Built APIs', ordinal: 0 }]
+      locations: [{ label: 'NYC', ordinal: 0 }]
     });
 
     expect(saved).not.toBeNull();
@@ -43,7 +42,7 @@ describe('CreateCompany', () => {
     expect(result.id).toBeTruthy();
   });
 
-  test('includes bullets via addBullet', async () => {
+  test('returns empty positions array', async () => {
     const repo = createMockCompanyRepository();
     const uc = new CreateCompany(repo);
     const result = await uc.execute({
@@ -52,19 +51,10 @@ describe('CreateCompany', () => {
       companyMention: null,
       websiteUrl: null,
       businessDomain: 'SaaS',
-      joinedAt: '2020-01',
-      leftAt: '2023-01',
-      promotedAt: null,
-      locations: [],
-      bullets: [
-        { content: 'First', ordinal: 0 },
-        { content: 'Second', ordinal: 1 }
-      ]
+      locations: []
     });
 
-    expect(result.bullets).toHaveLength(2);
-    expect(result.bullets[0].content).toBe('First');
-    expect(result.bullets[1].content).toBe('Second');
+    expect(result.positions).toHaveLength(0);
   });
 
   test('includes locations', async () => {
@@ -76,14 +66,10 @@ describe('CreateCompany', () => {
       companyMention: null,
       websiteUrl: null,
       businessDomain: 'SaaS',
-      joinedAt: '2020-01',
-      leftAt: '2023-01',
-      promotedAt: null,
       locations: [
         { label: 'NYC', ordinal: 0 },
         { label: 'Remote', ordinal: 1 }
-      ],
-      bullets: []
+      ]
     });
 
     expect(result.locations).toHaveLength(2);

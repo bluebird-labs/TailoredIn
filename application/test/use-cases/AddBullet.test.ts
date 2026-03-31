@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { ResumeCompany, type ResumeCompanyRepository } from '@tailoredin/domain';
+import { ResumeCompany, type ResumeCompanyRepository, type ResumePosition } from '@tailoredin/domain';
 import { AddBullet } from '../../src/use-cases/AddBullet.js';
 
 function createMockCompanyRepository(overrides: Partial<ResumeCompanyRepository> = {}): ResumeCompanyRepository {
@@ -9,44 +9,51 @@ function createMockCompanyRepository(overrides: Partial<ResumeCompanyRepository>
     },
     findAllByUserId: async () => [],
     save: async () => {},
+    findByPositionIdOrFail: async () => {
+      throw new Error('not found');
+    },
     delete: async () => {},
     ...overrides
   };
 }
 
-function makeCompany() {
-  return ResumeCompany.create({
+function makeCompanyWithPosition(): { company: ResumeCompany; position: ResumePosition } {
+  const company = ResumeCompany.create({
     userId: 'user-1',
     companyName: 'Acme',
     companyMention: null,
     websiteUrl: null,
     businessDomain: 'SaaS',
-    joinedAt: '2020-01',
-    leftAt: '2023-01',
-    promotedAt: null,
-    locations: [],
-    bullets: []
+    locations: []
   });
+  const position = company.addPosition({
+    title: 'Engineer',
+    startDate: '2020-01',
+    endDate: '2023-01',
+    summary: null,
+    ordinal: 0
+  });
+  return { company, position };
 }
 
 describe('AddBullet', () => {
-  test('returns error when company not found', async () => {
+  test('returns error when position not found', async () => {
     const repo = createMockCompanyRepository();
     const uc = new AddBullet(repo);
-    const result = await uc.execute({ companyId: 'nonexistent', content: 'Test', ordinal: 0 });
+    const result = await uc.execute({ positionId: 'nonexistent', content: 'Test', ordinal: 0 });
     expect(result.isOk).toBe(false);
     if (result.isErr) {
-      expect(result.error.message).toContain('Company not found');
+      expect(result.error.message).toContain('Position not found');
     }
   });
 
   test('adds bullet and returns DTO', async () => {
-    const company = makeCompany();
+    const { company, position } = makeCompanyWithPosition();
     const repo = createMockCompanyRepository({
-      findByIdOrFail: async () => company
+      findByPositionIdOrFail: async () => company
     });
     const uc = new AddBullet(repo);
-    const result = await uc.execute({ companyId: company.id.value, content: 'New bullet', ordinal: 3 });
+    const result = await uc.execute({ positionId: position.id.value, content: 'New bullet', ordinal: 3 });
 
     expect(result.isOk).toBe(true);
     if (result.isOk) {
@@ -54,6 +61,6 @@ describe('AddBullet', () => {
       expect(result.value.ordinal).toBe(3);
       expect(result.value.id).toBeTruthy();
     }
-    expect(company.bullets).toHaveLength(1);
+    expect(position.bullets).toHaveLength(1);
   });
 });

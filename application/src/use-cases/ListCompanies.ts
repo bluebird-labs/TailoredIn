@@ -12,18 +12,22 @@ export class ListCompanies {
   }
 }
 
-function toCompanyDto(company: ResumeCompany): ResumeCompanyDto {
+export function toCompanyDto(company: ResumeCompany): ResumeCompanyDto {
   return {
     id: company.id.value,
     companyName: company.companyName,
     companyMention: company.companyMention,
     websiteUrl: company.websiteUrl,
     businessDomain: company.businessDomain,
-    jobTitle: company.jobTitle,
-    joinedAt: company.joinedAt,
-    leftAt: company.leftAt,
-    promotedAt: company.promotedAt,
     locations: company.locations.map(l => ({ label: l.label, ordinal: l.ordinal })),
-    bullets: company.bullets.map(b => ({ id: b.id.value, content: b.content, ordinal: b.ordinal }))
+    positions: company.positions.map(p => ({
+      id: p.id.value,
+      title: p.title,
+      startDate: p.startDate,
+      endDate: p.endDate,
+      summary: p.summary,
+      ordinal: p.ordinal,
+      bullets: p.bullets.map(b => ({ id: b.id.value, content: b.content, ordinal: b.ordinal }))
+    }))
   };
 }

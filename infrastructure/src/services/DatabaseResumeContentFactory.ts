@@ -5,6 +5,7 @@ import type {
   ResumeCompanyRepository,
   ResumeEducationRepository,
   ResumeHeadlineRepository,
+  ResumePosition,
   ResumeSkillCategoryRepository,
   UserRepository
 } from '@tailoredin/domain';
@@ -39,11 +40,15 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       throw new Error(`No headlines found for user: ${input.userId}`);
     }
 
-    // Build bullet lookup from all companies
+    // Build bullet + position lookups from all companies
     const bulletMap = new Map<string, string>();
+    const positionMap = new Map<string, ResumePosition>();
     for (const company of companies) {
-      for (const bullet of company.bullets) {
-        bulletMap.set(bullet.id.value, bullet.content);
+      for (const position of company.positions) {
+        positionMap.set(position.id.value, position);
+        for (const bullet of position.bullets) {
+          bulletMap.set(bullet.id.value, bullet.content);
+        }
       }
     }
 
@@ -59,10 +64,12 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       header_quote: headline.summaryText
     };
 
-    // Experience — from archetype positions
+    // Experience — from archetype positions, with fallback to resume position data
     const sortedPositions = [...config.positions].sort((a, b) => a.ordinal - b.ordinal);
-    const experience = sortedPositions.map(position => {
-      const sortedBullets = [...position.bullets].sort((a, b) => a.ordinal - b.ordinal);
+    const experience = sortedPositions.map(archetypePos => {
+      const resumePos = positionMap.get(archetypePos.resumePositionId);
+
+      const sortedBullets = [...archetypePos.bullets].sort((a, b) => a.ordinal - b.ordinal);
       const highlights = sortedBullets.map(ref => {
         const content = bulletMap.get(ref.bulletId);
         if (!content) {
@@ -71,12 +78,17 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
         return StringUtil.ensureEndsWith(content, '.');
       });
 
+      const title = archetypePos.jobTitle ?? resumePos?.title ?? '';
+      const startDate = archetypePos.startDate ?? resumePos?.startDate ?? '';
+      const endDate = archetypePos.endDate ?? resumePos?.endDate ?? '';
+      const summary = archetypePos.roleSummary ?? resumePos?.summary ?? '';
+
       return {
-        title: position.jobTitle,
-        society: position.displayCompanyName,
-        date: formatDateRange(position.startDate, position.endDate),
-        location: position.locationLabel,
-        summary: position.roleSummary,
+        title,
+        society: archetypePos.displayCompanyName,
+        date: formatDateRange(startDate, endDate),
+        location: archetypePos.locationLabel,
+        summary,
         highlights
       };
     });

@@ -22,12 +22,7 @@ export class CreateCompanyRoute {
           companyMention: body.company_mention,
           websiteUrl: body.website_url,
           businessDomain: body.business_domain,
-          jobTitle: body.job_title,
-          joinedAt: body.joined_at,
-          leftAt: body.left_at,
-          promotedAt: body.promoted_at,
-          locations: body.locations,
-          bullets: body.bullets
+          locations: body.locations
         });
         set.status = 201;
         return { data };
@@ -38,12 +33,7 @@ export class CreateCompanyRoute {
           company_mention: t.Nullable(t.String()),
           website_url: t.Nullable(t.String()),
           business_domain: t.String({ minLength: 1 }),
-          job_title: t.Nullable(t.String()),
-          joined_at: t.String({ minLength: 1 }),
-          left_at: t.String({ minLength: 1 }),
-          promoted_at: t.Nullable(t.String()),
-          locations: t.Array(t.Object({ label: t.String({ minLength: 1 }), ordinal: t.Integer({ minimum: 0 }) })),
-          bullets: t.Array(t.Object({ content: t.String({ minLength: 1 }), ordinal: t.Integer({ minimum: 0 }) }))
+          locations: t.Array(t.Object({ label: t.String({ minLength: 1 }), ordinal: t.Integer({ minimum: 0 }) }))
         })
       }
     );

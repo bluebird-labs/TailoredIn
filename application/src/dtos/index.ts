@@ -24,6 +24,7 @@ export type {
   ResumeEducationEntryDto,
   ResumeHeadlineDto,
   ResumeLocationDto,
+  ResumePositionDto,
   ResumeSkillCategoryDto,
   ResumeSkillItemDto,
   UserDto

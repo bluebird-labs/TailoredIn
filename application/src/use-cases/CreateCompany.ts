@@ -1,5 +1,6 @@
 import { ResumeCompany, type ResumeCompanyRepository, ResumeLocation } from '@tailoredin/domain';
 import type { ResumeCompanyDto } from '../dtos/ResumeDataDto.js';
+import { toCompanyDto } from './ListCompanies.js';
 
 export type CreateCompanyInput = {
   userId: string;
@@ -7,12 +8,7 @@ export type CreateCompanyInput = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
-  jobTitle: string | null;
-  joinedAt: string;
-  leftAt: string;
-  promotedAt: string | null;
   locations: { label: string; ordinal: number }[];
-  bullets: { content: string; ordinal: number }[];
 };
 
 export class CreateCompany {
@@ -25,29 +21,9 @@ export class CreateCompany {
       companyMention: input.companyMention,
       websiteUrl: input.websiteUrl,
       businessDomain: input.businessDomain,
-      jobTitle: input.jobTitle,
-      joinedAt: input.joinedAt,
-      leftAt: input.leftAt,
-      promotedAt: input.promotedAt,
-      locations: input.locations.map(l => new ResumeLocation(l.label, l.ordinal)),
-      bullets: []
+      locations: input.locations.map(l => new ResumeLocation(l.label, l.ordinal))
     });
-    for (const b of input.bullets) {
-      company.addBullet({ content: b.content, ordinal: b.ordinal });
-    }
     await this.companyRepository.save(company);
-    return {
-      id: company.id.value,
-      companyName: company.companyName,
-      companyMention: company.companyMention,
-      websiteUrl: company.websiteUrl,
-      businessDomain: company.businessDomain,
-      jobTitle: company.jobTitle,
-      joinedAt: company.joinedAt,
-      leftAt: company.leftAt,
-      promotedAt: company.promotedAt,
-      locations: company.locations.map(l => ({ label: l.label, ordinal: l.ordinal })),
-      bullets: company.bullets.map(b => ({ id: b.id.value, content: b.content, ordinal: b.ordinal }))
-    };
+    return toCompanyDto(company);
   }
 }

@@ -5,13 +5,13 @@ export type ArchetypePositionBulletDto = {
 
 export type ArchetypePositionDto = {
   id: string;
-  resumeCompanyId: string;
-  jobTitle: string;
+  resumePositionId: string;
+  jobTitle: string | null;
   displayCompanyName: string;
   locationLabel: string;
-  startDate: string;
-  endDate: string;
-  roleSummary: string;
+  startDate: string | null;
+  endDate: string | null;
+  roleSummary: string | null;
   ordinal: number;
   bullets: ArchetypePositionBulletDto[];
 };

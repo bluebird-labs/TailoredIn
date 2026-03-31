@@ -3,8 +3,8 @@ import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es
 import { BaseEntity } from '../../BaseEntity.js';
 import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
 import { User } from '../users/User.js';
-import { ResumeBullet } from './ResumeBullet.js';
 import { ResumeCompanyLocation } from './ResumeCompanyLocation.js';
+import { ResumePosition } from './ResumePosition.js';
 
 export type ResumeCompanyProps = {
   id: string;
@@ -13,10 +13,6 @@ export type ResumeCompanyProps = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
-  jobTitle: string | null;
-  joinedAt: string;
-  leftAt: string;
-  promotedAt: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -43,18 +39,6 @@ export class ResumeCompany extends BaseEntity {
   @Property({ name: 'business_domain', type: 'text' })
   public businessDomain: string;
 
-  @Property({ name: 'job_title', type: 'text', nullable: true })
-  public jobTitle: string | null;
-
-  @Property({ name: 'joined_at', type: 'text' })
-  public joinedAt: string;
-
-  @Property({ name: 'left_at', type: 'text' })
-  public leftAt: string;
-
-  @Property({ name: 'promoted_at', type: 'text', nullable: true })
-  public promotedAt: string | null;
-
   @OneToMany(
     () => ResumeCompanyLocation,
     loc => loc.resumeCompany,
@@ -63,11 +47,11 @@ export class ResumeCompany extends BaseEntity {
   public readonly locations: Collection<ResumeCompanyLocation> = new Collection<ResumeCompanyLocation>(this);
 
   @OneToMany(
-    () => ResumeBullet,
-    bullet => bullet.resumeCompany,
+    () => ResumePosition,
+    pos => pos.resumeCompany,
     { lazy: true, orderBy: { ordinal: 'ASC' } }
   )
-  public readonly bullets: Collection<ResumeBullet> = new Collection<ResumeBullet>(this);
+  public readonly positions: Collection<ResumePosition> = new Collection<ResumePosition>(this);
 
   public constructor(props: ResumeCompanyProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
@@ -77,10 +61,6 @@ export class ResumeCompany extends BaseEntity {
     this.companyMention = props.companyMention;
     this.websiteUrl = props.websiteUrl;
     this.businessDomain = props.businessDomain;
-    this.jobTitle = props.jobTitle;
-    this.joinedAt = props.joinedAt;
-    this.leftAt = props.leftAt;
-    this.promotedAt = props.promotedAt;
   }
 
   public static create(props: ResumeCompanyCreateProps): ResumeCompany {

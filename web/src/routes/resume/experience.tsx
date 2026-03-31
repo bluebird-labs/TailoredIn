@@ -17,12 +17,16 @@ type Company = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
-  jobTitle: string | null;
-  joinedAt: string;
-  leftAt: string;
-  promotedAt: string | null;
   locations: { label: string; ordinal: number }[];
-  bullets: { id: string; content: string; ordinal: number }[];
+  positions: {
+    id: string;
+    title: string;
+    startDate: string;
+    endDate: string;
+    summary: string | null;
+    ordinal: number;
+    bullets: { id: string; content: string; ordinal: number }[];
+  }[];
 };
 
 function ExperiencePage() {

@@ -1,7 +1,8 @@
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ResumeCompanyId } from '../value-objects/ResumeCompanyId.js';
 import type { ResumeLocation } from '../value-objects/ResumeLocation.js';
-import { ResumeBullet } from './ResumeBullet.js';
+import type { ResumePositionCreateProps } from './ResumePosition.js';
+import { ResumePosition } from './ResumePosition.js';
 
 export type ResumeCompanyCreateProps = {
   userId: string;
@@ -9,12 +10,7 @@ export type ResumeCompanyCreateProps = {
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
-  jobTitle: string | null;
-  joinedAt: string;
-  leftAt: string;
-  promotedAt: string | null;
   locations: ResumeLocation[];
-  bullets: ResumeBullet[];
 };
 
 export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
@@ -23,12 +19,8 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
   public companyMention: string | null;
   public websiteUrl: string | null;
   public businessDomain: string;
-  public jobTitle: string | null;
-  public joinedAt: string;
-  public leftAt: string;
-  public promotedAt: string | null;
   public readonly locations: ResumeLocation[];
-  public readonly bullets: ResumeBullet[];
+  public readonly positions: ResumePosition[];
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -39,12 +31,8 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     companyMention: string | null;
     websiteUrl: string | null;
     businessDomain: string;
-    jobTitle: string | null;
-    joinedAt: string;
-    leftAt: string;
-    promotedAt: string | null;
     locations: ResumeLocation[];
-    bullets: ResumeBullet[];
+    positions: ResumePosition[];
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -54,37 +42,30 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     this.companyMention = props.companyMention;
     this.websiteUrl = props.websiteUrl;
     this.businessDomain = props.businessDomain;
-    this.jobTitle = props.jobTitle;
-    this.joinedAt = props.joinedAt;
-    this.leftAt = props.leftAt;
-    this.promotedAt = props.promotedAt;
     this.locations = props.locations;
-    this.bullets = props.bullets;
+    this.positions = props.positions;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
 
-  public addBullet(props: { content: string; ordinal: number }): ResumeBullet {
-    const bullet = ResumeBullet.create({ resumeCompanyId: this.id.value, ...props });
-    this.bullets.push(bullet);
+  public addPosition(props: Omit<ResumePositionCreateProps, 'resumeCompanyId'>): ResumePosition {
+    const position = ResumePosition.create({ resumeCompanyId: this.id.value, ...props });
+    this.positions.push(position);
     this.updatedAt = new Date();
-    return bullet;
+    return position;
   }
 
-  public updateBullet(bulletId: string, update: { content?: string; ordinal?: number }): void {
-    const bullet = this.bullets.find(b => b.id.value === bulletId);
-    if (!bullet) throw new Error(`Bullet not found: ${bulletId}`);
-    if (update.content !== undefined) bullet.content = update.content;
-    if (update.ordinal !== undefined) bullet.ordinal = update.ordinal;
-    bullet.updatedAt = new Date();
+  public removePosition(positionId: string): void {
+    const index = this.positions.findIndex(p => p.id.value === positionId);
+    if (index === -1) throw new Error(`Position not found: ${positionId}`);
+    this.positions.splice(index, 1);
     this.updatedAt = new Date();
   }
 
-  public removeBullet(bulletId: string): void {
-    const index = this.bullets.findIndex(b => b.id.value === bulletId);
-    if (index === -1) throw new Error(`Bullet not found: ${bulletId}`);
-    this.bullets.splice(index, 1);
-    this.updatedAt = new Date();
+  public findPositionOrFail(positionId: string): ResumePosition {
+    const position = this.positions.find(p => p.id.value === positionId);
+    if (!position) throw new Error(`Position not found: ${positionId}`);
+    return position;
   }
 
   public replaceLocations(locations: ResumeLocation[]): void {
@@ -97,6 +78,7 @@ export class ResumeCompany extends AggregateRoot<ResumeCompanyId> {
     return new ResumeCompany({
       id: ResumeCompanyId.generate(),
       ...props,
+      positions: [],
       createdAt: now,
       updatedAt: now
     });

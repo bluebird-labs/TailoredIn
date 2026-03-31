@@ -4,26 +4,26 @@ import { ArchetypePositionId } from '../value-objects/ArchetypePositionId.js';
 
 export type ArchetypePositionCreateProps = {
   archetypeId: string;
-  resumeCompanyId: string;
-  jobTitle: string;
+  resumePositionId: string;
+  jobTitle: string | null;
   displayCompanyName: string;
   locationLabel: string;
-  startDate: string;
-  endDate: string;
-  roleSummary: string;
+  startDate: string | null;
+  endDate: string | null;
+  roleSummary: string | null;
   ordinal: number;
   bullets: ArchetypePositionBulletRef[];
 };
 
 export class ArchetypePosition extends Entity<ArchetypePositionId> {
   public readonly archetypeId: string;
-  public readonly resumeCompanyId: string;
-  public jobTitle: string;
+  public readonly resumePositionId: string;
+  public jobTitle: string | null;
   public displayCompanyName: string;
   public locationLabel: string;
-  public startDate: string;
-  public endDate: string;
-  public roleSummary: string;
+  public startDate: string | null;
+  public endDate: string | null;
+  public roleSummary: string | null;
   public ordinal: number;
   public readonly bullets: ArchetypePositionBulletRef[];
   public readonly createdAt: Date;
@@ -32,13 +32,13 @@ export class ArchetypePosition extends Entity<ArchetypePositionId> {
   public constructor(props: {
     id: ArchetypePositionId;
     archetypeId: string;
-    resumeCompanyId: string;
-    jobTitle: string;
+    resumePositionId: string;
+    jobTitle: string | null;
     displayCompanyName: string;
     locationLabel: string;
-    startDate: string;
-    endDate: string;
-    roleSummary: string;
+    startDate: string | null;
+    endDate: string | null;
+    roleSummary: string | null;
     ordinal: number;
     bullets: ArchetypePositionBulletRef[];
     createdAt: Date;
@@ -46,7 +46,7 @@ export class ArchetypePosition extends Entity<ArchetypePositionId> {
   }) {
     super(props.id);
     this.archetypeId = props.archetypeId;
-    this.resumeCompanyId = props.resumeCompanyId;
+    this.resumePositionId = props.resumePositionId;
     this.jobTitle = props.jobTitle;
     this.displayCompanyName = props.displayCompanyName;
     this.locationLabel = props.locationLabel;

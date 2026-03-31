@@ -9,10 +9,10 @@ export class UpdateBulletRoute {
 
   public plugin() {
     return new Elysia().put(
-      '/resume/companies/:id/bullets/:bulletId',
+      '/resume/positions/:positionId/bullets/:bulletId',
       async ({ params, body, set }) => {
         const result = await this.updateBullet.execute({
-          companyId: params.id,
+          positionId: params.positionId,
           bulletId: params.bulletId,
           content: body.content,
           ordinal: body.ordinal
@@ -25,7 +25,7 @@ export class UpdateBulletRoute {
         return;
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }), bulletId: t.String({ format: 'uuid' }) }),
+        params: t.Object({ positionId: t.String({ format: 'uuid' }), bulletId: t.String({ format: 'uuid' }) }),
         body: t.Object({
           content: t.Optional(t.String({ minLength: 1 })),
           ordinal: t.Optional(t.Integer({ minimum: 0 }))

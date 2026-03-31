@@ -37,13 +37,13 @@ function ArchetypeDetailPage() {
     socialNetworks: string[];
     positions: Array<{
       id: string;
-      resumeCompanyId: string;
-      jobTitle: string;
+      resumePositionId: string;
+      jobTitle: string | null;
       displayCompanyName: string;
       locationLabel: string;
-      startDate: string;
-      endDate: string;
-      roleSummary: string;
+      startDate: string | null;
+      endDate: string | null;
+      roleSummary: string | null;
       ordinal: number;
       bullets: { bulletId: string; ordinal: number }[];
     }>;
@@ -60,11 +60,16 @@ function ArchetypeDetailPage() {
     companyMention: string | null;
     websiteUrl: string | null;
     businessDomain: string;
-    joinedAt: string;
-    leftAt: string;
-    promotedAt: string | null;
     locations: { label: string; ordinal: number }[];
-    bullets: { id: string; content: string; ordinal: number }[];
+    positions: {
+      id: string;
+      title: string;
+      startDate: string;
+      endDate: string;
+      summary: string | null;
+      ordinal: number;
+      bullets: { id: string; content: string; ordinal: number }[];
+    }[];
   }>;
   const categories = (skillsResponse?.data ?? []) as Array<{
     id: string;
