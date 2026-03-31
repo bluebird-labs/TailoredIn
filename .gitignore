@@ -9,6 +9,7 @@ node_modules/
 dist/
 build/
 .idea/
+.superpowers/
 
 # Generated resume PDFs and ephemeral Typst compilation workspace
 cli/Resumes/
