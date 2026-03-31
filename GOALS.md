@@ -95,7 +95,7 @@ graph TD
     style M8 fill:#86efac
     style M9 fill:#86efac
     style M10 fill:#86efac
-    style M11 fill:#e5e7eb
+    style M11 fill:#86efac
     style M12 fill:#e5e7eb
 ```
 
