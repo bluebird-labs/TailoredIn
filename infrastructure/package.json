@@ -13,7 +13,8 @@
     "test:integration": "bun test test-integration/ --timeout 60000",
     "typecheck": "tsc --noEmit",
     "migration:create": "bunx mikro-orm migration:create",
-    "migration:up": "bunx mikro-orm migration:up"
+    "migration:up": "bunx mikro-orm migration:up",
+    "seed:run": "bunx mikro-orm seeder:run"
   },
   "mikro-orm": {
     "configPaths": [
