@@ -8,7 +8,6 @@ import {
   ArchetypePositionBulletRef,
   ArchetypeSkillCategorySelection,
   ArchetypeSkillItemSelection,
-  ResumeBullet,
   ResumeCompany,
   type ResumeCompanyRepository,
   ResumeEducation,
@@ -46,27 +45,29 @@ const makeHeadline = () =>
     summaryText: 'Experienced engineer building data-intensive products.'
   });
 
-const makeBullet = (companyId: string, content: string, ordinal: number) =>
-  ResumeBullet.create({ resumeCompanyId: companyId, content, ordinal });
-
 const makeCompany = () => {
-  const bullets = [
-    makeBullet('tmp', 'Built a scalable API platform', 0),
-    makeBullet('tmp', 'Led migration to microservices', 1),
-    makeBullet('tmp', 'Improved CI/CD pipeline speed by 3x', 2)
-  ];
-  return ResumeCompany.create({
+  const company = ResumeCompany.create({
     userId: USER_ID,
     companyName: 'Acme Corp',
     companyMention: 'contract',
     websiteUrl: 'https://acme.com',
     businessDomain: 'B2B SaaS',
-    joinedAt: '2023-01',
-    leftAt: '2024-06',
-    promotedAt: null,
-    locations: [new ResumeLocation('New York, NY', 0)],
-    bullets
+    locations: [new ResumeLocation('New York, NY', 0)]
   });
+
+  const position = company.addPosition({
+    title: 'Staff Software Engineer',
+    startDate: '2023-01',
+    endDate: '2024-06',
+    summary: null,
+    ordinal: 0
+  });
+
+  position.addBullet({ content: 'Built a scalable API platform', ordinal: 0 });
+  position.addBullet({ content: 'Led migration to microservices', ordinal: 1 });
+  position.addBullet({ content: 'Improved CI/CD pipeline speed by 3x', ordinal: 2 });
+
+  return company;
 };
 
 const makeEducation = () =>
@@ -99,9 +100,10 @@ const makeArchetypeConfig = (
   category: ResumeSkillCategory,
   headline: ResumeHeadline
 ) => {
+  const resumePosition = company.positions[0];
   const position = ArchetypePosition.create({
     archetypeId: 'tmp',
-    resumeCompanyId: company.id.value,
+    resumePositionId: resumePosition.id.value,
     jobTitle: 'Staff Software Engineer',
     displayCompanyName: 'Acme Corp #smallcaps[(contract)]',
     locationLabel: 'New York, NY',
@@ -110,8 +112,8 @@ const makeArchetypeConfig = (
     roleSummary: 'Led platform team building scalable APIs',
     ordinal: 0,
     bullets: [
-      new ArchetypePositionBulletRef(company.bullets[0].id.value, 0),
-      new ArchetypePositionBulletRef(company.bullets[1].id.value, 1)
+      new ArchetypePositionBulletRef(resumePosition.bullets[0].id.value, 0),
+      new ArchetypePositionBulletRef(resumePosition.bullets[1].id.value, 1)
     ]
   });
 
@@ -158,6 +160,7 @@ const mockArchetypeConfigRepo = (config: ArchetypeConfig | null): ArchetypeConfi
 
 const mockCompanyRepo = (companies: ResumeCompany[]): ResumeCompanyRepository => ({
   findByIdOrFail: async () => companies[0],
+  findByPositionIdOrFail: async () => companies[0],
   findAllByUserId: async () => companies,
   save: async () => {},
   delete: async () => {}
@@ -326,10 +329,10 @@ describe('DatabaseResumeContentFactory', () => {
     const education = makeEducation();
     const category = makeSkillCategory();
 
-    // Position references a bullet that doesn't exist in any company
+    // Position references a bullet that doesn't exist
     const position = ArchetypePosition.create({
       archetypeId: 'tmp',
-      resumeCompanyId: 'company-1',
+      resumePositionId: 'position-1',
       jobTitle: 'Engineer',
       displayCompanyName: 'Acme',
       locationLabel: 'NYC',
@@ -403,10 +406,11 @@ describe('DatabaseResumeContentFactory', () => {
     const company = makeCompany();
     const education = makeEducation();
     const category = makeSkillCategory();
+    const resumePosition = company.positions[0];
 
     const pos1 = ArchetypePosition.create({
       archetypeId: 'tmp',
-      resumeCompanyId: company.id.value,
+      resumePositionId: resumePosition.id.value,
       jobTitle: 'Second Position',
       displayCompanyName: 'Acme',
       locationLabel: 'NYC',
@@ -414,12 +418,12 @@ describe('DatabaseResumeContentFactory', () => {
       endDate: '2022-01',
       roleSummary: 'Second',
       ordinal: 1,
-      bullets: [new ArchetypePositionBulletRef(company.bullets[0].id.value, 0)]
+      bullets: [new ArchetypePositionBulletRef(resumePosition.bullets[0].id.value, 0)]
     });
 
     const pos0 = ArchetypePosition.create({
       archetypeId: 'tmp',
-      resumeCompanyId: company.id.value,
+      resumePositionId: resumePosition.id.value,
       jobTitle: 'First Position',
       displayCompanyName: 'Acme',
       locationLabel: 'NYC',
@@ -427,7 +431,7 @@ describe('DatabaseResumeContentFactory', () => {
       endDate: '2024-01',
       roleSummary: 'First',
       ordinal: 0,
-      bullets: [new ArchetypePositionBulletRef(company.bullets[1].id.value, 0)]
+      bullets: [new ArchetypePositionBulletRef(resumePosition.bullets[1].id.value, 0)]
     });
 
     // Deliberately pass in reverse order
@@ -456,5 +460,52 @@ describe('DatabaseResumeContentFactory', () => {
     const result = await factory.make(makeInput());
     expect(result.experience[0].title).toBe('First Position');
     expect(result.experience[1].title).toBe('Second Position');
+  });
+
+  test('falls back to resume position data when archetype overrides are null', async () => {
+    const headline = makeHeadline();
+    const company = makeCompany();
+    const education = makeEducation();
+    const category = makeSkillCategory();
+    const resumePosition = company.positions[0];
+
+    const position = ArchetypePosition.create({
+      archetypeId: 'tmp',
+      resumePositionId: resumePosition.id.value,
+      jobTitle: null, // Falls back to resumePosition.title
+      displayCompanyName: 'Acme Corp',
+      locationLabel: 'NYC',
+      startDate: null, // Falls back to resumePosition.startDate
+      endDate: null, // Falls back to resumePosition.endDate
+      roleSummary: null, // Falls back to resumePosition.summary
+      ordinal: 0,
+      bullets: [new ArchetypePositionBulletRef(resumePosition.bullets[0].id.value, 0)]
+    });
+
+    const config = ArchetypeConfig.create({
+      userId: USER_ID,
+      archetypeKey: Archetype.LEAD_IC,
+      archetypeLabel: 'Lead IC',
+      archetypeDescription: null,
+      headlineId: headline.id.value,
+      socialNetworks: [],
+      positions: [position],
+      educationSelections: [],
+      skillCategorySelections: [],
+      skillItemSelections: []
+    });
+
+    const factory = new DatabaseResumeContentFactory(
+      mockUserRepo(makeUser()),
+      mockHeadlineRepo(headline),
+      mockArchetypeConfigRepo(config),
+      mockCompanyRepo([company]),
+      mockEducationRepo([education]),
+      mockSkillCategoryRepo([category])
+    );
+
+    const result = await factory.make(makeInput());
+    expect(result.experience[0].title).toBe('Staff Software Engineer'); // From resumePosition
+    expect(result.experience[0].date).toBe('Jan 2023 – Jun 2024'); // From resumePosition
   });
 });

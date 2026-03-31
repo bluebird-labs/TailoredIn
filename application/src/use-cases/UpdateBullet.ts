@@ -1,7 +1,7 @@
 import { err, ok, type Result, type ResumeCompany, type ResumeCompanyRepository } from '@tailoredin/domain';
 
 export type UpdateBulletInput = {
-  companyId: string;
+  positionId: string;
   bulletId: string;
   content?: string;
   ordinal?: number;
@@ -13,13 +13,14 @@ export class UpdateBullet {
   public async execute(input: UpdateBulletInput): Promise<Result<void, Error>> {
     let company: ResumeCompany;
     try {
-      company = await this.companyRepository.findByIdOrFail(input.companyId);
+      company = await this.companyRepository.findByPositionIdOrFail(input.positionId);
     } catch {
-      return err(new Error(`Company not found: ${input.companyId}`));
+      return err(new Error(`Position not found: ${input.positionId}`));
     }
 
     try {
-      company.updateBullet(input.bulletId, { content: input.content, ordinal: input.ordinal });
+      const position = company.findPositionOrFail(input.positionId);
+      position.updateBullet(input.bulletId, { content: input.content, ordinal: input.ordinal });
     } catch (e) {
       return err(e as Error);
     }

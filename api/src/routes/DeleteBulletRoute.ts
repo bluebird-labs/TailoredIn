@@ -9,10 +9,10 @@ export class DeleteBulletRoute {
 
   public plugin() {
     return new Elysia().delete(
-      '/resume/companies/:id/bullets/:bulletId',
+      '/resume/positions/:positionId/bullets/:bulletId',
       async ({ params, set }) => {
         const result = await this.deleteBullet.execute({
-          companyId: params.id,
+          positionId: params.positionId,
           bulletId: params.bulletId
         });
         if (!result.isOk) {
@@ -23,7 +23,7 @@ export class DeleteBulletRoute {
         return;
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }), bulletId: t.String({ format: 'uuid' }) })
+        params: t.Object({ positionId: t.String({ format: 'uuid' }), bulletId: t.String({ format: 'uuid' }) })
       }
     );
   }

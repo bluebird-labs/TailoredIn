@@ -2,13 +2,13 @@ import { Entity } from '../Entity.js';
 import { ResumeBulletId } from '../value-objects/ResumeBulletId.js';
 
 export type ResumeBulletCreateProps = {
-  resumeCompanyId: string;
+  resumePositionId: string;
   content: string;
   ordinal: number;
 };
 
 export class ResumeBullet extends Entity<ResumeBulletId> {
-  public readonly resumeCompanyId: string;
+  public readonly resumePositionId: string;
   public content: string;
   public ordinal: number;
   public readonly createdAt: Date;
@@ -16,14 +16,14 @@ export class ResumeBullet extends Entity<ResumeBulletId> {
 
   public constructor(props: {
     id: ResumeBulletId;
-    resumeCompanyId: string;
+    resumePositionId: string;
     content: string;
     ordinal: number;
     createdAt: Date;
     updatedAt: Date;
   }) {
     super(props.id);
-    this.resumeCompanyId = props.resumeCompanyId;
+    this.resumePositionId = props.resumePositionId;
     this.content = props.content;
     this.ordinal = props.ordinal;
     this.createdAt = props.createdAt;

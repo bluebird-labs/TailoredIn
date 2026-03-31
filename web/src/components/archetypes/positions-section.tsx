@@ -8,28 +8,35 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSetArchetypePositions } from '@/hooks/use-archetypes';
 
+type ResumePosition = {
+  id: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  summary: string | null;
+  ordinal: number;
+  bullets: { id: string; content: string; ordinal: number }[];
+};
+
 type Company = {
   id: string;
   companyName: string;
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
-  joinedAt: string;
-  leftAt: string;
-  promotedAt: string | null;
   locations: { label: string; ordinal: number }[];
-  bullets: { id: string; content: string; ordinal: number }[];
+  positions: ResumePosition[];
 };
 
 type ArchetypePosition = {
   id: string;
-  resumeCompanyId: string;
-  jobTitle: string;
+  resumePositionId: string;
+  jobTitle: string | null;
   displayCompanyName: string;
   locationLabel: string;
-  startDate: string;
-  endDate: string;
-  roleSummary: string;
+  startDate: string | null;
+  endDate: string | null;
+  roleSummary: string | null;
   ordinal: number;
   bullets: { bulletId: string; ordinal: number }[];
 };
@@ -42,7 +49,7 @@ type PositionsSectionProps = {
 
 function toLocal(p: ArchetypePosition): LocalPosition {
   return {
-    resumeCompanyId: p.resumeCompanyId,
+    resumePositionId: p.resumePositionId,
     jobTitle: p.jobTitle,
     displayCompanyName: p.displayCompanyName,
     locationLabel: p.locationLabel,
@@ -110,7 +117,7 @@ export function PositionsSection({ archetypeId, positions, companies }: Position
       {
         id: archetypeId,
         positions: localPositions.map(p => ({
-          resume_company_id: p.resumeCompanyId,
+          resume_position_id: p.resumePositionId,
           job_title: p.jobTitle,
           display_company_name: p.displayCompanyName,
           location_label: p.locationLabel,
@@ -126,6 +133,16 @@ export function PositionsSection({ archetypeId, positions, companies }: Position
         onError: () => toast.error('Failed to save positions')
       }
     );
+  }
+
+  // Compute display title: use jobTitle override if set, otherwise look up the resume position title
+  function getDisplayTitle(pos: LocalPosition): string {
+    if (pos.jobTitle) return pos.jobTitle;
+    for (const company of companies) {
+      const rp = company.positions.find(p => p.id === pos.resumePositionId);
+      if (rp) return rp.title;
+    }
+    return 'Untitled Position';
   }
 
   return (
@@ -154,12 +171,13 @@ export function PositionsSection({ archetypeId, positions, companies }: Position
           <SortableList items={localPositions.map((_, i) => ({ id: String(i) }))} onReorder={handleReorder}>
             <div className="flex flex-col gap-2">
               {localPositions.map((pos, index) => (
-                <SortableItem key={`${pos.resumeCompanyId}-${pos.jobTitle}`} id={String(index)}>
+                <SortableItem key={`${pos.resumePositionId}-${pos.ordinal}`} id={String(index)}>
                   <div className="flex items-center justify-between rounded-lg border p-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium">{pos.jobTitle}</p>
+                      <p className="font-medium">{getDisplayTitle(pos)}</p>
                       <p className="text-sm text-muted-foreground">
-                        {pos.displayCompanyName} &middot; {pos.startDate} – {pos.endDate}
+                        {pos.displayCompanyName}
+                        {pos.startDate && pos.endDate ? ` \u00B7 ${pos.startDate} \u2013 ${pos.endDate}` : ''}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {pos.locationLabel} &middot; {pos.bullets.length} bullet{pos.bullets.length !== 1 ? 's' : ''}

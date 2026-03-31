@@ -20,18 +20,24 @@ export type ResumeBulletDto = {
   ordinal: number;
 };
 
+export type ResumePositionDto = {
+  id: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  summary: string | null;
+  ordinal: number;
+  bullets: ResumeBulletDto[];
+};
+
 export type ResumeCompanyDto = {
   id: string;
   companyName: string;
   companyMention: string | null;
   websiteUrl: string | null;
   businessDomain: string;
-  jobTitle: string | null;
-  joinedAt: string;
-  leftAt: string;
-  promotedAt: string | null;
   locations: ResumeLocationDto[];
-  bullets: ResumeBulletDto[];
+  positions: ResumePositionDto[];
 };
 
 export type ResumeEducationEntryDto = {

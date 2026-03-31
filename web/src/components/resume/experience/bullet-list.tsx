@@ -15,11 +15,11 @@ type Bullet = {
 };
 
 type BulletListProps = {
-  companyId: string;
+  positionId: string;
   bullets: Bullet[];
 };
 
-export function BulletList({ companyId, bullets }: BulletListProps) {
+export function BulletList({ positionId, bullets }: BulletListProps) {
   const sorted = [...bullets].sort((a, b) => a.ordinal - b.ordinal);
   const addBullet = useAddBullet();
   const updateBullet = useUpdateBullet();
@@ -35,7 +35,7 @@ export function BulletList({ companyId, bullets }: BulletListProps) {
     if (!content) return;
     const ordinal = sorted.length > 0 ? Math.max(...sorted.map(b => b.ordinal)) + 1 : 0;
     addBullet.mutate(
-      { companyId, content, ordinal },
+      { positionId, content, ordinal },
       {
         onSuccess: () => {
           setNewContent('');
@@ -63,7 +63,7 @@ export function BulletList({ companyId, bullets }: BulletListProps) {
       setEditingId(null);
       return;
     }
-    updateBullet.mutate({ companyId, bulletId: bullet.id, content }, { onSuccess: () => setEditingId(null) });
+    updateBullet.mutate({ positionId, bulletId: bullet.id, content }, { onSuccess: () => setEditingId(null) });
   }
 
   function handleEditKeyDown(e: KeyboardEvent, bullet: Bullet) {
@@ -82,7 +82,7 @@ export function BulletList({ companyId, bullets }: BulletListProps) {
     for (let i = 0; i < reordered.length; i++) {
       const bullet = reordered[i];
       if (bullet.ordinal !== i) {
-        updateBullet.mutate({ companyId, bulletId: bullet.id, ordinal: i });
+        updateBullet.mutate({ positionId, bulletId: bullet.id, ordinal: i });
       }
     }
   }
@@ -90,7 +90,7 @@ export function BulletList({ companyId, bullets }: BulletListProps) {
   function handleDelete() {
     if (!deleteTarget) return;
     deleteBullet.mutate(
-      { companyId, bulletId: deleteTarget.id },
+      { positionId, bulletId: deleteTarget.id },
       {
         onSuccess: () => {
           toast.success('Bullet deleted');

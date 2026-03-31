@@ -21,6 +21,7 @@ import { ResumeCompany } from './entities/resume/ResumeCompany.js';
 import { ResumeCompanyLocation } from './entities/resume/ResumeCompanyLocation.js';
 import { ResumeEducation } from './entities/resume/ResumeEducation.js';
 import { ResumeHeadline } from './entities/resume/ResumeHeadline.js';
+import { ResumePosition } from './entities/resume/ResumePosition.js';
 import { ResumeSkillCategory } from './entities/resume/ResumeSkillCategory.js';
 import { ResumeSkillItem } from './entities/resume/ResumeSkillItem.js';
 import { Skill } from './entities/skills/Skill.js';
@@ -54,6 +55,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       ResumeCompany,
       ResumeCompanyLocation,
       ResumeBullet,
+      ResumePosition,
       ResumeEducation,
       ResumeSkillCategory,
       ResumeSkillItem,

@@ -19,9 +19,9 @@ import { ArchetypePositionBullet as OrmArchetypePositionBullet } from '../db/ent
 import { ArchetypeSkillCategory as OrmArchetypeSkillCategory } from '../db/entities/archetypes/ArchetypeSkillCategory.js';
 import { ArchetypeSkillItem as OrmArchetypeSkillItem } from '../db/entities/archetypes/ArchetypeSkillItem.js';
 import { ResumeBullet as OrmResumeBullet } from '../db/entities/resume/ResumeBullet.js';
-import { ResumeCompany as OrmResumeCompany } from '../db/entities/resume/ResumeCompany.js';
 import { ResumeEducation as OrmResumeEducation } from '../db/entities/resume/ResumeEducation.js';
 import { ResumeHeadline as OrmResumeHeadline } from '../db/entities/resume/ResumeHeadline.js';
+import { ResumePosition as OrmResumePosition } from '../db/entities/resume/ResumePosition.js';
 import { ResumeSkillCategory as OrmResumeSkillCategory } from '../db/entities/resume/ResumeSkillCategory.js';
 import { ResumeSkillItem as OrmResumeSkillItem } from '../db/entities/resume/ResumeSkillItem.js';
 import { User as OrmUser } from '../db/entities/users/User.js';
@@ -116,11 +116,11 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
   private persistPositions(config: DomainArchetypeConfig): void {
     const archetypeRef = this.orm.em.getReference(OrmArchetype, config.id.value);
     for (const pos of config.positions) {
-      const companyRef = this.orm.em.getReference(OrmResumeCompany, pos.resumeCompanyId);
+      const positionRef = this.orm.em.getReference(OrmResumePosition, pos.resumePositionId);
       const ormPos = new OrmArchetypePosition({
         id: pos.id.value,
         archetype: archetypeRef,
-        resumeCompany: companyRef,
+        resumePosition: positionRef,
         jobTitle: pos.jobTitle,
         displayCompanyName: pos.displayCompanyName,
         locationLabel: pos.locationLabel,
@@ -233,7 +233,7 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
     const ormPositions = await this.orm.em.find(
       OrmArchetypePosition,
       { archetype: orm.id },
-      { orderBy: { ordinal: 'ASC' }, populate: ['resumeCompany'] }
+      { orderBy: { ordinal: 'ASC' }, populate: ['resumePosition'] }
     );
 
     const positions: DomainArchetypePosition[] = [];
@@ -244,14 +244,14 @@ export class PostgresArchetypeConfigRepository implements ArchetypeConfigReposit
         { orderBy: { ordinal: 'ASC' }, populate: ['bullet'] }
       );
 
-      const resolvedCompanyId =
-        typeof pos.resumeCompany === 'string' ? pos.resumeCompany : (pos.resumeCompany as { id: string }).id;
+      const resolvedPositionId =
+        typeof pos.resumePosition === 'string' ? pos.resumePosition : (pos.resumePosition as { id: string }).id;
 
       positions.push(
         new DomainArchetypePosition({
           id: new ArchetypePositionId(pos.id),
           archetypeId: orm.id,
-          resumeCompanyId: resolvedCompanyId,
+          resumePositionId: resolvedPositionId,
           jobTitle: pos.jobTitle,
           displayCompanyName: pos.displayCompanyName,
           locationLabel: pos.locationLabel,

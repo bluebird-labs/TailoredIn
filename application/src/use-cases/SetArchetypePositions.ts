@@ -11,13 +11,13 @@ import {
 export type SetArchetypePositionsInput = {
   archetypeId: string;
   positions: {
-    resumeCompanyId: string;
-    jobTitle: string;
+    resumePositionId: string;
+    jobTitle: string | null;
     displayCompanyName: string;
     locationLabel: string;
-    startDate: string;
-    endDate: string;
-    roleSummary: string;
+    startDate: string | null;
+    endDate: string | null;
+    roleSummary: string | null;
     ordinal: number;
     bullets: { bulletId: string; ordinal: number }[];
   }[];
@@ -37,7 +37,7 @@ export class SetArchetypePositions {
     const positions = input.positions.map(p =>
       ArchetypePosition.create({
         archetypeId: config.id.value,
-        resumeCompanyId: p.resumeCompanyId,
+        resumePositionId: p.resumePositionId,
         jobTitle: p.jobTitle,
         displayCompanyName: p.displayCompanyName,
         locationLabel: p.locationLabel,

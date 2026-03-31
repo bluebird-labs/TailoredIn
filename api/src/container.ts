@@ -9,12 +9,14 @@ import {
   CreateCompany,
   CreateEducation,
   CreateHeadline,
+  CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
   DeleteBullet,
   DeleteCompany,
   DeleteEducation,
   DeleteHeadline,
+  DeletePosition,
   DeleteSkillCategory,
   DeleteSkillItem,
   GenerateCompanyBrief,
@@ -42,6 +44,7 @@ import {
   UpdateEducation,
   UpdateHeadline,
   UpdateJobCompany,
+  UpdatePosition,
   UpdateSkillCategory,
   UpdateSkillItem,
   UpdateUser
@@ -275,6 +278,18 @@ container.bind({
 container.bind({
   provide: DI.Resume.DeleteCompany,
   useFactory: () => new DeleteCompany(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.CreatePosition,
+  useFactory: () => new CreatePosition(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.UpdatePosition,
+  useFactory: () => new UpdatePosition(container.get(DI.Resume.CompanyRepository))
+});
+container.bind({
+  provide: DI.Resume.DeletePosition,
+  useFactory: () => new DeletePosition(container.get(DI.Resume.CompanyRepository))
 });
 container.bind({
   provide: DI.Resume.AddBullet,

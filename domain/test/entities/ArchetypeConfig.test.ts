@@ -159,7 +159,7 @@ describe('ArchetypePosition', () => {
     const bulletRef = new ArchetypePositionBulletRef('bullet-1', 0);
     const position = ArchetypePosition.create({
       archetypeId: 'arch-1',
-      resumeCompanyId: 'company-1',
+      resumePositionId: 'position-1',
       jobTitle: 'Senior Software Engineer',
       displayCompanyName: 'Volvo Cars',
       locationLabel: 'Stockholm, Sweden',
@@ -171,7 +171,7 @@ describe('ArchetypePosition', () => {
     });
 
     expect(position.archetypeId).toBe('arch-1');
-    expect(position.resumeCompanyId).toBe('company-1');
+    expect(position.resumePositionId).toBe('position-1');
     expect(position.jobTitle).toBe('Senior Software Engineer');
     expect(position.displayCompanyName).toBe('Volvo Cars');
     expect(position.locationLabel).toBe('Stockholm, Sweden');

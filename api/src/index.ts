@@ -10,12 +10,14 @@ import { CreateArchetypeRoute } from './routes/CreateArchetypeRoute.js';
 import { CreateCompanyRoute } from './routes/CreateCompanyRoute.js';
 import { CreateEducationRoute } from './routes/CreateEducationRoute.js';
 import { CreateHeadlineRoute } from './routes/CreateHeadlineRoute.js';
+import { CreatePositionRoute } from './routes/CreatePositionRoute.js';
 import { CreateSkillCategoryRoute } from './routes/CreateSkillCategoryRoute.js';
 import { DeleteArchetypeRoute } from './routes/DeleteArchetypeRoute.js';
 import { DeleteBulletRoute } from './routes/DeleteBulletRoute.js';
 import { DeleteCompanyRoute } from './routes/DeleteCompanyRoute.js';
 import { DeleteEducationRoute } from './routes/DeleteEducationRoute.js';
 import { DeleteHeadlineRoute } from './routes/DeleteHeadlineRoute.js';
+import { DeletePositionRoute } from './routes/DeletePositionRoute.js';
 import { DeleteSkillCategoryRoute } from './routes/DeleteSkillCategoryRoute.js';
 import { DeleteSkillItemRoute } from './routes/DeleteSkillItemRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
@@ -44,6 +46,7 @@ import { UpdateCompanyRoute } from './routes/UpdateCompanyRoute.js';
 import { UpdateEducationRoute } from './routes/UpdateEducationRoute.js';
 import { UpdateHeadlineRoute } from './routes/UpdateHeadlineRoute.js';
 import { UpdateJobCompanyRoute } from './routes/UpdateJobCompanyRoute.js';
+import { UpdatePositionRoute } from './routes/UpdatePositionRoute.js';
 import { UpdateSkillCategoryRoute } from './routes/UpdateSkillCategoryRoute.js';
 import { UpdateSkillItemRoute } from './routes/UpdateSkillItemRoute.js';
 import { UpdateUserRoute } from './routes/UpdateUserRoute.js';
@@ -108,6 +111,9 @@ const app = new Elysia()
   .use(container.get(CreateCompanyRoute).plugin())
   .use(container.get(UpdateCompanyRoute).plugin())
   .use(container.get(DeleteCompanyRoute).plugin())
+  .use(container.get(CreatePositionRoute).plugin())
+  .use(container.get(UpdatePositionRoute).plugin())
+  .use(container.get(DeletePositionRoute).plugin())
   .use(container.get(AddBulletRoute).plugin())
   .use(container.get(UpdateBulletRoute).plugin())
   .use(container.get(DeleteBulletRoute).plugin())

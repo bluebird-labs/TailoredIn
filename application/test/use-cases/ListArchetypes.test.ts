@@ -36,7 +36,7 @@ describe('ListArchetypes', () => {
       positions: [
         ArchetypePosition.create({
           archetypeId: 'temp',
-          resumeCompanyId: 'company-1',
+          resumePositionId: 'position-1',
           jobTitle: 'Staff Engineer',
           displayCompanyName: 'Acme',
           locationLabel: 'NYC',

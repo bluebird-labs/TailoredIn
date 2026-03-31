@@ -2,7 +2,7 @@ import { err, ok, type Result, type ResumeCompany, type ResumeCompanyRepository 
 import type { ResumeBulletDto } from '../dtos/ResumeDataDto.js';
 
 export type AddBulletInput = {
-  companyId: string;
+  positionId: string;
   content: string;
   ordinal: number;
 };
@@ -13,12 +13,13 @@ export class AddBullet {
   public async execute(input: AddBulletInput): Promise<Result<ResumeBulletDto, Error>> {
     let company: ResumeCompany;
     try {
-      company = await this.companyRepository.findByIdOrFail(input.companyId);
+      company = await this.companyRepository.findByPositionIdOrFail(input.positionId);
     } catch {
-      return err(new Error(`Company not found: ${input.companyId}`));
+      return err(new Error(`Position not found: ${input.positionId}`));
     }
 
-    const bullet = company.addBullet({ content: input.content, ordinal: input.ordinal });
+    const position = company.findPositionOrFail(input.positionId);
+    const bullet = position.addBullet({ content: input.content, ordinal: input.ordinal });
     await this.companyRepository.save(company);
 
     return ok({ id: bullet.id.value, content: bullet.content, ordinal: bullet.ordinal });

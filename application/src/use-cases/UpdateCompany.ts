@@ -6,10 +6,6 @@ export type UpdateCompanyInput = {
   companyMention?: string | null;
   websiteUrl?: string | null;
   businessDomain?: string;
-  jobTitle?: string | null;
-  joinedAt?: string;
-  leftAt?: string;
-  promotedAt?: string | null;
 };
 
 export class UpdateCompany {
@@ -27,10 +23,6 @@ export class UpdateCompany {
     if (input.companyMention !== undefined) company.companyMention = input.companyMention;
     if (input.websiteUrl !== undefined) company.websiteUrl = input.websiteUrl;
     if (input.businessDomain !== undefined) company.businessDomain = input.businessDomain;
-    if (input.jobTitle !== undefined) company.jobTitle = input.jobTitle;
-    if (input.joinedAt !== undefined) company.joinedAt = input.joinedAt;
-    if (input.leftAt !== undefined) company.leftAt = input.leftAt;
-    if (input.promotedAt !== undefined) company.promotedAt = input.promotedAt;
     company.updatedAt = new Date();
 
     await this.companyRepository.save(company);

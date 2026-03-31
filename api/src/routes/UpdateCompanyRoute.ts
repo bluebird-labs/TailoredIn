@@ -16,11 +16,7 @@ export class UpdateCompanyRoute {
           companyName: body.company_name,
           companyMention: body.company_mention,
           websiteUrl: body.website_url,
-          businessDomain: body.business_domain,
-          jobTitle: body.job_title,
-          joinedAt: body.joined_at,
-          leftAt: body.left_at,
-          promotedAt: body.promoted_at
+          businessDomain: body.business_domain
         });
         if (!result.isOk) {
           set.status = 404;
@@ -35,11 +31,7 @@ export class UpdateCompanyRoute {
           company_name: t.Optional(t.String({ minLength: 1 })),
           company_mention: t.Optional(t.Nullable(t.String())),
           website_url: t.Optional(t.Nullable(t.String())),
-          business_domain: t.Optional(t.String({ minLength: 1 })),
-          job_title: t.Optional(t.Nullable(t.String())),
-          joined_at: t.Optional(t.String({ minLength: 1 })),
-          left_at: t.Optional(t.String({ minLength: 1 })),
-          promoted_at: t.Optional(t.Nullable(t.String()))
+          business_domain: t.Optional(t.String({ minLength: 1 }))
         })
       }
     );

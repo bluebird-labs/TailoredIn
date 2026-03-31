@@ -9,6 +9,9 @@ function createMockCompanyRepository(overrides: Partial<ResumeCompanyRepository>
     },
     findAllByUserId: async () => [],
     save: async () => {},
+    findByPositionIdOrFail: async () => {
+      throw new Error('not found');
+    },
     delete: async () => {},
     ...overrides
   };
@@ -29,13 +32,16 @@ describe('ListCompanies', () => {
       companyMention: null,
       websiteUrl: 'https://acme.com',
       businessDomain: 'SaaS',
-      joinedAt: '2020-01',
-      leftAt: '2023-01',
-      promotedAt: null,
-      locations: [new ResumeLocation('NYC', 0)],
-      bullets: []
+      locations: [new ResumeLocation('NYC', 0)]
     });
-    company.addBullet({ content: 'Built APIs', ordinal: 0 });
+    const position = company.addPosition({
+      title: 'Engineer',
+      startDate: '2020-01',
+      endDate: '2023-01',
+      summary: null,
+      ordinal: 0
+    });
+    position.addBullet({ content: 'Built APIs', ordinal: 0 });
 
     const repo = createMockCompanyRepository({
       findAllByUserId: async () => [company]
@@ -47,8 +53,10 @@ describe('ListCompanies', () => {
     expect(result[0].companyName).toBe('Acme');
     expect(result[0].locations).toHaveLength(1);
     expect(result[0].locations[0].label).toBe('NYC');
-    expect(result[0].bullets).toHaveLength(1);
-    expect(result[0].bullets[0].content).toBe('Built APIs');
+    expect(result[0].positions).toHaveLength(1);
+    expect(result[0].positions[0].title).toBe('Engineer');
+    expect(result[0].positions[0].bullets).toHaveLength(1);
+    expect(result[0].positions[0].bullets[0].content).toBe('Built APIs');
     expect(result[0].id).toBe(company.id.value);
   });
 });
