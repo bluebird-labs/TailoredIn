@@ -24,7 +24,7 @@ export class GenerateResume {
   public constructor(
     private readonly jobRepository: JobRepository,
     private readonly userRepository: UserRepository,
-    private readonly llmService: LlmService,
+    private readonly llmService: LlmService | null,
     private readonly webColorService: WebColorService,
     private readonly resumeRenderer: ResumeRenderer,
     private readonly resumeContentFactory: ResumeContentFactory
@@ -38,50 +38,64 @@ export class GenerateResume {
       return err(new Error(`Job not found: ${input.jobId}`));
     }
 
-    this.log.info('Extracting job posting insights...');
-
-    const postingInsights = await this.llmService.extractJobPostingInsights({
-      jobDescription: job.description,
-      companyName: job.companyId,
-      jobTitle: job.title,
-      jobLocation: job.locationRaw
-    });
-
-    const archetype = postingInsights.archetype ?? Archetype.LEAD_IC;
     const user = await this.userRepository.findSingle();
 
-    // Build a preliminary resume to give context to the application insights LLM call.
-    const tmpContent = await this.resumeContentFactory.make({
-      userId: user.id.value,
-      archetype,
-      awesomeColor: DEFAULT_AWESOME_COLOR,
-      keywords: []
-    });
-
-    this.log.info('Extracting application insights...');
-
-    const appInsights = await this.llmService.extractApplicationInsights({
-      jobDescription: job.description,
-      companyName: job.companyId,
-      jobTitle: job.title,
-      jobLocation: job.locationRaw,
-      archetype,
-      resumeContent: tmpContent
-    });
-
+    let archetype: Archetype;
+    let keywords: string[];
     let awesomeColor = DEFAULT_AWESOME_COLOR;
 
-    if (postingInsights.website) {
-      this.log.info('Extracting website colors...');
-      const primaryColor = await this.webColorService.findPrimaryColor(postingInsights.website);
-      if (primaryColor) awesomeColor = primaryColor;
+    if (this.llmService) {
+      this.log.info('Extracting job posting insights...');
+
+      const postingInsights = await this.llmService.extractJobPostingInsights({
+        jobDescription: job.description,
+        companyName: job.companyId,
+        jobTitle: job.title,
+        jobLocation: job.locationRaw
+      });
+
+      archetype = postingInsights.archetype ?? Archetype.LEAD_IC;
+
+      // Build a preliminary resume to give context to the application insights LLM call.
+      const tmpContent = await this.resumeContentFactory.make({
+        userId: user.id.value,
+        archetype,
+        awesomeColor: DEFAULT_AWESOME_COLOR,
+        keywords: []
+      });
+
+      this.log.info('Extracting application insights...');
+
+      const appInsights = await this.llmService.extractApplicationInsights({
+        jobDescription: job.description,
+        companyName: job.companyId,
+        jobTitle: job.title,
+        jobLocation: job.locationRaw,
+        archetype,
+        resumeContent: tmpContent
+      });
+
+      keywords = appInsights.keywords;
+
+      if (postingInsights.website) {
+        this.log.info('Extracting website colors...');
+        const primaryColor = await this.webColorService.findPrimaryColor(postingInsights.website);
+        if (primaryColor) awesomeColor = primaryColor;
+      }
+    } else {
+      if (!input.archetype) {
+        return err(new Error('Archetype is required when LLM is not available'));
+      }
+      archetype = input.archetype;
+      keywords = input.keywords ?? [];
+      this.log.info('LLM unavailable — using manual archetype and keywords');
     }
 
     const content = await this.resumeContentFactory.make({
       userId: user.id.value,
       archetype,
       awesomeColor,
-      keywords: appInsights.keywords
+      keywords
     });
 
     this.log.info('Rendering resume PDF...');
@@ -95,7 +109,7 @@ export class GenerateResume {
     const resume = Resume.create({
       jobId: job.id.value,
       archetype,
-      keywords: appInsights.keywords,
+      keywords,
       outputPath: pdfPath
     });
 

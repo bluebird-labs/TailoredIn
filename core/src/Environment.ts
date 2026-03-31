@@ -19,6 +19,10 @@ export function envInt(key: string): number {
   return n;
 }
 
+export function envOptional(key: string): string | undefined {
+  return process.env[key];
+}
+
 export function envBool(key: string): boolean {
   return env(key) === 'true';
 }

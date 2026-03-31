@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
-import { env, envInt } from '@tailoredin/core';
+import { env, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   createOrmConfig,
@@ -40,20 +40,21 @@ container.bind({ provide: DI.Job.Repository, useClass: PostgresJobRepository });
 container.bind({ provide: DI.Job.CompanyRepository, useClass: PostgresCompanyRepository });
 container.bind({ provide: DI.Job.SkillRepository, useClass: PostgresSkillRepository });
 container.bind({ provide: DI.Job.Elector, useValue: new JobElectionService() });
-container.bind({
-  provide: OPENAI_CONFIG,
-  useValue: {
-    apiKey: env('OPENAI_API_KEY'),
-    project: env('OPENAI_PROJECT_ID')
-  }
-});
+const openAiApiKey = envOptional('OPENAI_API_KEY');
+const openAiProject = envOptional('OPENAI_PROJECT_ID');
+
+if (openAiApiKey && openAiProject) {
+  container.bind({ provide: OPENAI_CONFIG, useValue: { apiKey: openAiApiKey, project: openAiProject } });
+  container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
+} else {
+  container.bind({ provide: DI.Resume.LlmService, useValue: null });
+}
 container.bind({ provide: DI.Resume.UserRepository, useClass: PostgresUserRepository });
 container.bind({ provide: DI.Resume.CompanyRepository, useClass: PostgresResumeCompanyRepository });
 container.bind({ provide: DI.Resume.EducationRepository, useClass: PostgresResumeEducationRepository });
 container.bind({ provide: DI.Resume.HeadlineRepository, useClass: PostgresResumeHeadlineRepository });
 container.bind({ provide: DI.Resume.SkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
 container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: PostgresArchetypeConfigRepository });
-container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
 container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({

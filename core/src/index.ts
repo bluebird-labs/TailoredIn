@@ -1,6 +1,6 @@
 export * from './ColorUtil.js';
 export * from './EnumUtil.js';
-export { env, envBool, envInt } from './Environment.js';
+export { env, envBool, envInt, envOptional } from './Environment.js';
 export * from './FsUtil.js';
 export * from './InspectUtil.js';
 export type { ILogObj } from './Logger.js';
