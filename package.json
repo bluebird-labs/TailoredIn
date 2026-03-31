@@ -9,13 +9,13 @@
   "private": true,
   "scripts": {
     "api": "bun run api/src/index.ts",
-    "api:dev": "bun --watch api/src/index.ts",
+    "api:dev": "bun --env-file=${BUN_ENV_FILE:-.env} --watch api/src/index.ts",
     "dev": "bun run --parallel api:dev web:dev",
     "robot": "bun run cli/src/robot/index.ts",
     "robot:dev": "bun --watch cli/src/robot/index.ts",
     "cvs": "bun run cli/src/cvs/index.ts",
     "web": "bun run --cwd web preview",
-    "web:dev": "bun run --cwd web dev",
+    "web:dev": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd web dev",
     "web:build": "bun run --cwd web build",
     "check": "biome check domain application infrastructure core api cli web",
     "check:fix": "biome check --write domain application infrastructure core api cli web",
@@ -35,8 +35,8 @@
     "cli:lint:fix": "biome check --write cli",
     "cli:typecheck": "bun run --cwd cli typecheck",
     "cli:test": "bun run --cwd cli test",
-    "db:migration:create": "set -a && . ./.env && bun run --cwd infrastructure migration:create",
-    "db:migration:up": "set -a && . ./.env && bun run --cwd infrastructure migration:up"
+    "db:migration:create": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:create",
+    "db:migration:up": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:up"
   },
   "workspaces": [
     "domain",
