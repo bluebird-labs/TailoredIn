@@ -15,7 +15,7 @@ import { useUpdateArchetype } from '@/hooks/use-archetypes';
 
 type Headline = {
   id: string;
-  headlineLabel: string;
+  label: string;
 };
 
 type MetadataSectionProps = {
@@ -47,7 +47,7 @@ export function MetadataSection({
   const [editing, setEditing] = useState(false);
   const updateMutation = useUpdateArchetype();
 
-  const headlineName = headlines.find(h => h.id === headlineId)?.headlineLabel ?? '—';
+  const headlineName = headlines.find(h => h.id === headlineId)?.label ?? '—';
 
   const {
     register,
@@ -163,7 +163,7 @@ export function MetadataSection({
                   <SelectContent>
                     {headlines.map(h => (
                       <SelectItem key={h.id} value={h.id}>
-                        {h.headlineLabel}
+                        {h.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
