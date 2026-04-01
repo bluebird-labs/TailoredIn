@@ -23,6 +23,7 @@ import type {
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
+  GetProfile,
   GetUser,
   IngestJobByUrl,
   IngestScrapedJob,
@@ -48,6 +49,7 @@ import type {
   UpdateHeadline,
   UpdateJobCompany,
   UpdatePosition,
+  UpdateProfile,
   UpdateSkillCategory,
   UpdateSkillItem,
   UpdateUser,
@@ -59,6 +61,7 @@ import type {
   CompanyRepository,
   JobElector,
   JobRepository,
+  ProfileRepository,
   ResumeCompanyRepository,
   ResumeEducationRepository,
   ResumeHeadlineRepository,
@@ -126,6 +129,12 @@ export const DI = {
     AddSkillItem: new InjectionToken<AddSkillItem>('DI.Resume.AddSkillItem'),
     UpdateSkillItem: new InjectionToken<UpdateSkillItem>('DI.Resume.UpdateSkillItem'),
     DeleteSkillItem: new InjectionToken<DeleteSkillItem>('DI.Resume.DeleteSkillItem')
+  },
+
+  Profile: {
+    Repository: new InjectionToken<ProfileRepository>('DI.Profile.Repository'),
+    GetProfile: new InjectionToken<GetProfile>('DI.Profile.GetProfile'),
+    UpdateProfile: new InjectionToken<UpdateProfile>('DI.Profile.UpdateProfile')
   },
 
   CompanyBrief: {

@@ -17,6 +17,7 @@ import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
+import { Profile } from './entities/profile/Profile.js';
 import { ResumeBullet } from './entities/resume/ResumeBullet.js';
 import { ResumeCompany } from './entities/resume/ResumeCompany.js';
 import { ResumeCompanyLocation } from './entities/resume/ResumeCompanyLocation.js';
@@ -52,6 +53,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       Skill,
       Job,
       JobStatusUpdate,
+      Profile,
       User,
       ResumeCompany,
       ResumeCompanyLocation,

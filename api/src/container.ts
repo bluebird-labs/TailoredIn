@@ -24,6 +24,7 @@ import {
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
+  GetProfile,
   GetUser,
   IngestJobByUrl,
   IngestScrapedJob,
@@ -44,6 +45,7 @@ import {
   UpdateHeadline,
   UpdateJobCompany,
   UpdatePosition,
+  UpdateProfile,
   UpdateSkillCategory,
   UpdateSkillItem,
   UpdateUser
@@ -63,6 +65,7 @@ import {
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresJobRepository,
+  PostgresProfileRepository,
   PostgresResumeCompanyRepository,
   PostgresResumeEducationRepository,
   PostgresResumeHeadlineRepository,
@@ -219,6 +222,17 @@ container.bind({
 container.bind({
   provide: DI.Resume.UpdateUser,
   useFactory: () => new UpdateUser(container.get(DI.Resume.UserRepository))
+});
+
+// Profile
+container.bind({ provide: DI.Profile.Repository, useClass: PostgresProfileRepository });
+container.bind({
+  provide: DI.Profile.GetProfile,
+  useFactory: () => new GetProfile(container.get(DI.Profile.Repository))
+});
+container.bind({
+  provide: DI.Profile.UpdateProfile,
+  useFactory: () => new UpdateProfile(container.get(DI.Profile.Repository))
 });
 
 // Education use cases

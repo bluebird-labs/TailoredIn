@@ -12,6 +12,7 @@ export type { JobListItemDto } from './JobListItemDto.js';
 export type { JobSearchConfigDto } from './JobSearchConfigDto.js';
 export type { JobSummaryDto } from './JobSummaryDto.js';
 export type { PaginatedDto, PaginationMeta } from './PaginationDto.js';
+export type { ProfileDto } from './ProfileDto.js';
 export type {
   ResumeContentDto,
   ResumeEducationDto,

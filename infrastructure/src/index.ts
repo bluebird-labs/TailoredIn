@@ -8,6 +8,7 @@ export { PostgresCompanyBriefRepository } from './repositories/PostgresCompanyBr
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 // Repositories
 export { PostgresJobRepository } from './repositories/PostgresJobRepository.js';
+export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 export { PostgresResumeCompanyRepository } from './repositories/PostgresResumeCompanyRepository.js';
 export { PostgresResumeEducationRepository } from './repositories/PostgresResumeEducationRepository.js';
 export { PostgresResumeHeadlineRepository } from './repositories/PostgresResumeHeadlineRepository.js';
