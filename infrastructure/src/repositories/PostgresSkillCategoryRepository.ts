@@ -1,3 +1,4 @@
+import { type Reference, wrap } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import {
@@ -22,8 +23,8 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
 
   public async findByItemIdOrFail(itemId: string): Promise<DomainSkillCategory> {
     const ormItem = await this.orm.em.findOneOrFail(OrmSkillItem, itemId, { populate: ['category'] });
-    const categoryId =
-      typeof ormItem.category === 'string' ? ormItem.category : (ormItem.category as { id: string }).id;
+    const catRef = ormItem.category as string | Reference<OrmSkillCategory> | OrmSkillCategory;
+    const categoryId = typeof catRef === 'string' ? catRef : (wrap(catRef).getPrimaryKey() as string);
     return this.findByIdOrFail(categoryId);
   }
 
@@ -109,7 +110,8 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
   }
 
   private async toDomain(orm: OrmSkillCategory): Promise<DomainSkillCategory> {
-    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
+    const ref = orm.profile as string | Reference<Profile> | Profile;
+    const profileId = typeof ref === 'string' ? ref : (wrap(ref).getPrimaryKey() as string);
 
     const ormItems = await this.orm.em.find(OrmSkillItem, { category: orm.id }, { orderBy: { ordinal: 'ASC' } });
 
