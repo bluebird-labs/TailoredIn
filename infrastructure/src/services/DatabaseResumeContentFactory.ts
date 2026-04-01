@@ -34,7 +34,7 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
     // Headline — from archetype or fallback to first available
     const headlines = await this.headlineRepo.findAll();
     const headline = archetype.headlineId
-      ? headlines.find(h => h.id.value === archetype.headlineId) ?? headlines[0]
+      ? (headlines.find(h => h.id.value === archetype.headlineId) ?? headlines[0])
       : headlines[0];
     if (!headline) {
       throw new Error('No headlines found');
