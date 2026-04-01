@@ -1,5 +1,4 @@
-import type { TagRepository } from '@tailoredin/domain';
-import { TagDimension } from '@tailoredin/domain';
+import type { TagDimension, TagRepository } from '@tailoredin/domain';
 import type { TagDto } from '../../dtos/TagDto.js';
 
 export type ListTagsInput = {

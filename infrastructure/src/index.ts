@@ -7,6 +7,7 @@ export { PostgresArchetypeConfigRepository } from './repositories/PostgresArchet
 export { PostgresCompanyBriefRepository } from './repositories/PostgresCompanyBriefRepository.js';
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 export { PostgresEducationRepository } from './repositories/PostgresEducationRepository.js';
+export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepository.js';
 // Repositories
 export { PostgresJobRepository } from './repositories/PostgresJobRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';

@@ -16,6 +16,7 @@ import { ArchetypeSkillItem } from './entities/archetypes/ArchetypeSkillItem.js'
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
+import { Headline as OrmHeadline } from './entities/headline/Headline.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
 import { Profile } from './entities/profile/Profile.js';
@@ -28,6 +29,7 @@ import { ResumePosition } from './entities/resume/ResumePosition.js';
 import { ResumeSkillCategory } from './entities/resume/ResumeSkillCategory.js';
 import { ResumeSkillItem } from './entities/resume/ResumeSkillItem.js';
 import { Skill } from './entities/skills/Skill.js';
+import { Tag as OrmTag } from './entities/tag/Tag.js';
 import { User } from './entities/users/User.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
@@ -70,7 +72,9 @@ export function createOrmConfig(db: OrmDbConfig) {
       ArchetypeSkillCategory,
       ArchetypeSkillItem,
       ArchetypePosition,
-      ArchetypePositionBullet
+      ArchetypePositionBullet,
+      OrmHeadline,
+      OrmTag
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
