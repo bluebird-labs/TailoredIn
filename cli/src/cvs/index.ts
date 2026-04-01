@@ -4,8 +4,8 @@ import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
 import { Logger } from '@tailoredin/core';
-import { ArchetypeKey } from '@tailoredin/domain';
-import { generateCV, TYPST_DIR, TypstFileGenerator } from '@tailoredin/infrastructure';
+import { ArchetypeKey, TailoringStrategyService } from '@tailoredin/domain';
+import { generateCV, TEMPLATE_LAYOUTS, TYPST_DIR, TypstFileGenerator } from '@tailoredin/infrastructure';
 import { format } from 'date-fns';
 import Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -80,7 +80,8 @@ Yargs(hideBin(process.argv))
       const pdfPath = Path.resolve(outputDir, `Sylvain-Estevez-${date}.pdf`);
 
       await Fs.mkdir(outputDir, { recursive: true });
-      await TypstFileGenerator.generate(cvContent, TYPST_CWD);
+      const templateStyle = new TailoringStrategyService().resolveTemplateStyle(args.archetype as ArchetypeKey);
+      await TypstFileGenerator.generate(cvContent, TYPST_CWD, TEMPLATE_LAYOUTS[templateStyle]);
 
       try {
         execSync(`typst compile cv.typ "${pdfPath}"`, { cwd: TYPST_CWD, stdio: 'pipe' });

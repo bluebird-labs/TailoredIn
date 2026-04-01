@@ -97,3 +97,4 @@ export { TagId } from './value-objects/TagId.js';
 export { TagProfile } from './value-objects/TagProfile.js';
 export { TagSet } from './value-objects/TagSet.js';
 export { TailoringScore } from './value-objects/TailoringScore.js';
+export { TemplateStyle } from './value-objects/TemplateStyle.js';

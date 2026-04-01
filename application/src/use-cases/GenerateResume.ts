@@ -8,7 +8,8 @@ import {
   ok,
   type ProfileRepository,
   type Result,
-  Resume
+  Resume,
+  TailoringStrategyService
 } from '@tailoredin/domain';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeOutputDto } from '../dtos/ResumeOutputDto.js';
@@ -109,10 +110,14 @@ export class GenerateResume {
 
     this.log.info('Rendering resume PDF...');
 
+    const tailoringStrategy = new TailoringStrategyService();
+    const templateStyle = tailoringStrategy.resolveTemplateStyle(archetype);
+
     const pdfPath = await this.resumeRenderer.render({
       content,
       companyName: job.companyId,
-      archetype
+      archetype,
+      templateStyle
     });
 
     const resume = Resume.create({

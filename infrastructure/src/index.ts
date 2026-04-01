@@ -19,6 +19,7 @@ export { PostgresTagRepository } from './repositories/PostgresTagRepository.js';
 export { generateCV } from './resume/generateCV.js';
 export { TYPST_DIR } from './resume/TYPST_DIR.js';
 export { TypstFileGenerator } from './resume/TypstFileGenerator.js';
+export { TEMPLATE_LAYOUTS } from './resume/templateLayouts.js';
 export { DatabaseResumeContentFactory } from './services/DatabaseResumeContentFactory.js';
 export type { OpenAiConfig } from './services/OpenAiLlmService.js';
 // Services
