@@ -20,6 +20,18 @@ import { CreateEducationRoute2 } from './routes/education/CreateEducationRoute2.
 import { DeleteEducationRoute2 } from './routes/education/DeleteEducationRoute2.js';
 import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
 import { UpdateEducationRoute2 } from './routes/education/UpdateEducationRoute2.js';
+import { AddBullet2Route } from './routes/experience/AddBullet2Route.js';
+import { AddBulletVariantRoute } from './routes/experience/AddBulletVariantRoute.js';
+import { ApproveBulletVariantRoute } from './routes/experience/ApproveBulletVariantRoute.js';
+import { CreateExperienceRoute } from './routes/experience/CreateExperienceRoute.js';
+import { DeleteBullet2Route } from './routes/experience/DeleteBullet2Route.js';
+import { DeleteBulletVariantRoute } from './routes/experience/DeleteBulletVariantRoute.js';
+import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute.js';
+import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
+import { RejectBulletVariantRoute } from './routes/experience/RejectBulletVariantRoute.js';
+import { UpdateBullet2Route } from './routes/experience/UpdateBullet2Route.js';
+import { UpdateBulletVariantRoute } from './routes/experience/UpdateBulletVariantRoute.js';
+import { UpdateExperienceRoute as UpdateExperienceRoute2 } from './routes/experience/UpdateExperienceRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
 import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
@@ -158,6 +170,19 @@ const app = new Elysia()
   .use(container.get(DeleteHeadline2Route).plugin())
   // Tags
   .use(container.get(ListTagsRoute).plugin())
+  // Experiences (new domain)
+  .use(container.get(ListExperiencesRoute).plugin())
+  .use(container.get(CreateExperienceRoute).plugin())
+  .use(container.get(UpdateExperienceRoute2).plugin())
+  .use(container.get(DeleteExperienceRoute).plugin())
+  .use(container.get(AddBullet2Route).plugin())
+  .use(container.get(UpdateBullet2Route).plugin())
+  .use(container.get(DeleteBullet2Route).plugin())
+  .use(container.get(AddBulletVariantRoute).plugin())
+  .use(container.get(UpdateBulletVariantRoute).plugin())
+  .use(container.get(DeleteBulletVariantRoute).plugin())
+  .use(container.get(ApproveBulletVariantRoute).plugin())
+  .use(container.get(RejectBulletVariantRoute).plugin())
   // @ts-expect-error Elysia type instantiation depth exceeded with many chained routes
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
