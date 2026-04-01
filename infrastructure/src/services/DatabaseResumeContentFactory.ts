@@ -54,14 +54,33 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
 
     // Experience — from content_selection experienceSelections
     const experienceMap = new Map(allExperiences.map(e => [e.id.value, e]));
+
+    const variantMap = new Map<string, { text: string; bulletOrdinal: number }>();
+    for (const exp of allExperiences) {
+      for (const bullet of exp.bullets) {
+        for (const variant of bullet.variants) {
+          variantMap.set(variant.id.value, {
+            text: variant.text,
+            bulletOrdinal: bullet.ordinal
+          });
+        }
+      }
+    }
+
     const experience = cs.experienceSelections.map(sel => {
       const exp = experienceMap.get(sel.experienceId);
       if (!exp) {
         throw new Error(`Experience not found: ${sel.experienceId}`);
       }
 
-      const sortedBullets = [...exp.bullets].sort((a, b) => a.ordinal - b.ordinal);
-      const highlights = sortedBullets.map(b => StringUtil.ensureEndsWith(b.content, '.'));
+      const highlights: string[] = [];
+      for (const variantId of sel.bulletVariantIds) {
+        const entry = variantMap.get(variantId);
+        if (!entry) {
+          continue;
+        }
+        highlights.push(StringUtil.ensureEndsWith(entry.text, '.'));
+      }
 
       return {
         title: exp.title,
