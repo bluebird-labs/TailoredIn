@@ -7,8 +7,6 @@ export { TailoringStrategyService } from './domain-services/TailoringStrategySer
 export { Entity } from './Entity.js';
 export type { ArchetypeConfigCreateProps } from './entities/ArchetypeConfig.js';
 export { ArchetypeConfig } from './entities/ArchetypeConfig.js';
-export type { EducationCreateProps } from './entities/Education.js';
-export { Education } from './entities/Education.js';
 export type { ArchetypePositionCreateProps } from './entities/ArchetypePosition.js';
 export { ArchetypePosition } from './entities/ArchetypePosition.js';
 // Entities — job discovery
@@ -17,6 +15,8 @@ export { Company } from './entities/Company.js';
 // Entities — company briefs
 export type { CompanyBriefCreateProps, CompanyBriefSections } from './entities/CompanyBrief.js';
 export { CompanyBrief } from './entities/CompanyBrief.js';
+export type { EducationCreateProps } from './entities/Education.js';
+export { Education } from './entities/Education.js';
 export type { JobPostingCreateProps } from './entities/JobPosting.js';
 export { JobPosting } from './entities/JobPosting.js';
 export type { ProfileCreateProps } from './entities/Profile.js';
@@ -50,9 +50,9 @@ export { JobStatusChangedEvent } from './events/JobStatusChangedEvent.js';
 export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
 // Ports — repository interfaces
 export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
-export type { EducationRepository } from './ports/EducationRepository.js';
 export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
+export type { EducationRepository } from './ports/EducationRepository.js';
 export type { JobElector } from './ports/JobElector.js';
 export type {
   FindPaginatedParams,

@@ -1,4 +1,4 @@
-import { type EducationRepository, type Result, err, ok } from '@tailoredin/domain';
+import { type EducationRepository, err, ok, type Result } from '@tailoredin/domain';
 
 export type DeleteEducation2Input = {
   educationId: string;
