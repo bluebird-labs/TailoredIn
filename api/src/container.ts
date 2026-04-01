@@ -10,6 +10,7 @@ import {
   CreateEducation,
   CreateEducation2,
   CreateHeadline,
+  CreateHeadline2,
   CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
@@ -18,6 +19,7 @@ import {
   DeleteEducation,
   DeleteEducation2,
   DeleteHeadline,
+  DeleteHeadline2,
   DeletePosition,
   DeleteSkillCategory,
   DeleteSkillItem,
@@ -35,8 +37,10 @@ import {
   ListEducation,
   ListEducation2,
   ListHeadlines,
+  ListHeadlines2,
   ListJobs,
   ListSkillCategories,
+  ListTags,
   ReplaceLocations,
   SetArchetypeEducation,
   SetArchetypePositions,
@@ -47,6 +51,7 @@ import {
   UpdateEducation,
   UpdateEducation2,
   UpdateHeadline,
+  UpdateHeadline2,
   UpdateJobCompany,
   UpdatePosition,
   UpdateProfile,
@@ -69,6 +74,7 @@ import {
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
+  PostgresHeadlineRepository,
   PostgresJobRepository,
   PostgresProfileRepository,
   PostgresResumeCompanyRepository,
@@ -76,6 +82,7 @@ import {
   PostgresResumeHeadlineRepository,
   PostgresResumeSkillCategoryRepository,
   PostgresSkillRepository,
+  PostgresTagRepository,
   PostgresUserRepository,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
@@ -293,6 +300,32 @@ container.bind({
 container.bind({
   provide: DI.Resume.DeleteHeadline,
   useFactory: () => new DeleteHeadline(container.get(DI.Resume.HeadlineRepository))
+});
+
+// S2 Headlines (new domain model)
+container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
+container.bind({ provide: DI.Tag.Repository, useClass: PostgresTagRepository });
+container.bind({
+  provide: DI.Headline.List,
+  useFactory: () => new ListHeadlines2(container.get(DI.Headline.Repository))
+});
+container.bind({
+  provide: DI.Headline.Create,
+  useFactory: () => new CreateHeadline2(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
+});
+container.bind({
+  provide: DI.Headline.Update,
+  useFactory: () => new UpdateHeadline2(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
+});
+container.bind({
+  provide: DI.Headline.Delete,
+  useFactory: () => new DeleteHeadline2(container.get(DI.Headline.Repository))
+});
+
+// Tags
+container.bind({
+  provide: DI.Tag.List,
+  useFactory: () => new ListTags(container.get(DI.Tag.Repository))
 });
 
 // Work Experience use cases
