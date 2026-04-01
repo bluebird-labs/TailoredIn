@@ -9,15 +9,15 @@ import {
   OPENAI_CONFIG,
   OpenAiLlmService,
   PlaywrightWebColorService,
-  PostgresArchetypeConfigRepository,
+  PostgresArchetypeRepository,
   PostgresCompanyRepository,
+  PostgresEducationRepository,
+  PostgresExperienceRepository,
+  PostgresHeadlineRepository,
   PostgresJobRepository,
-  PostgresResumeCompanyRepository,
-  PostgresResumeEducationRepository,
-  PostgresResumeHeadlineRepository,
-  PostgresResumeSkillCategoryRepository,
+  PostgresProfileRepository,
+  PostgresSkillCategoryRepository,
   PostgresSkillRepository,
-  PostgresUserRepository,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 
@@ -49,24 +49,24 @@ if (openAiApiKey && openAiProject) {
 } else {
   container.bind({ provide: DI.Resume.LlmService, useValue: null });
 }
-container.bind({ provide: DI.Resume.UserRepository, useClass: PostgresUserRepository });
-container.bind({ provide: DI.Resume.CompanyRepository, useClass: PostgresResumeCompanyRepository });
-container.bind({ provide: DI.Resume.EducationRepository, useClass: PostgresResumeEducationRepository });
-container.bind({ provide: DI.Resume.HeadlineRepository, useClass: PostgresResumeHeadlineRepository });
-container.bind({ provide: DI.Resume.SkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
-container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: PostgresArchetypeConfigRepository });
+container.bind({ provide: DI.Profile.Repository, useClass: PostgresProfileRepository });
+container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
+container.bind({ provide: DI.Archetype.Repository, useClass: PostgresArchetypeRepository });
+container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
+container.bind({ provide: DI.Education.Repository, useClass: PostgresEducationRepository });
+container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
 container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({
   provide: DI.Resume.ContentFactory,
   useFactory: () =>
     new DatabaseResumeContentFactory(
-      container.get(DI.Resume.UserRepository),
-      container.get(DI.Resume.HeadlineRepository),
-      container.get(DI.Resume.ArchetypeConfigRepository),
-      container.get(DI.Resume.CompanyRepository),
-      container.get(DI.Resume.EducationRepository),
-      container.get(DI.Resume.SkillCategoryRepository)
+      container.get(DI.Profile.Repository),
+      container.get(DI.Headline.Repository),
+      container.get(DI.Archetype.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.Education.Repository),
+      container.get(DI.SkillCategory.Repository)
     )
 });
 

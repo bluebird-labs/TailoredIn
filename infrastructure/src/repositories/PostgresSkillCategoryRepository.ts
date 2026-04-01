@@ -21,7 +21,7 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
   }
 
   public async findByItemIdOrFail(itemId: string): Promise<DomainSkillCategory> {
-    const ormItem = await this.orm.em.findOneOrFail(OrmSkillItem, itemId, { populate: ['category'] });
+    const _ormItem = await this.orm.em.findOneOrFail(OrmSkillItem, itemId, { populate: ['category'] });
     const [row] = await this.orm.em
       .getConnection()
       .execute<[{ skill_category_id: string }]>(`SELECT skill_category_id FROM skill_items WHERE id = '${itemId}'`);

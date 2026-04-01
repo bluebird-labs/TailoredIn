@@ -1,76 +1,54 @@
 import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container, llmAvailable } from './container.js';
-import { AddBulletRoute } from './routes/AddBulletRoute.js';
-import { CreateArchetype2Route } from './routes/archetype2/CreateArchetype2Route.js';
-import { DeleteArchetype2Route } from './routes/archetype2/DeleteArchetype2Route.js';
-import { ListArchetypes2Route } from './routes/archetype2/ListArchetypes2Route.js';
-import { SetArchetypeContent2Route } from './routes/archetype2/SetArchetypeContent2Route.js';
-import { SetArchetypeTagProfile2Route } from './routes/archetype2/SetArchetypeTagProfile2Route.js';
-import { UpdateArchetype2Route } from './routes/archetype2/UpdateArchetype2Route.js';
+import { CreateArchetypeRoute } from './routes/archetype/CreateArchetypeRoute.js';
+import { DeleteArchetypeRoute } from './routes/archetype/DeleteArchetypeRoute.js';
+import { ListArchetypesRoute } from './routes/archetype/ListArchetypesRoute.js';
+import { SetArchetypeContentRoute } from './routes/archetype/SetArchetypeContentRoute.js';
+import { SetArchetypeTagProfileRoute } from './routes/archetype/SetArchetypeTagProfileRoute.js';
+import { UpdateArchetypeRoute } from './routes/archetype/UpdateArchetypeRoute.js';
 import { BulkChangeJobStatusRoute } from './routes/BulkChangeJobStatusRoute.js';
 import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
-import { CreateCompanyRoute } from './routes/CreateCompanyRoute.js';
-import { CreateEducationRoute } from './routes/CreateEducationRoute.js';
-import { CreateHeadlineRoute } from './routes/CreateHeadlineRoute.js';
-import { CreatePositionRoute } from './routes/CreatePositionRoute.js';
-import { DeleteBulletRoute } from './routes/DeleteBulletRoute.js';
-import { DeleteCompanyRoute } from './routes/DeleteCompanyRoute.js';
-import { DeleteEducationRoute } from './routes/DeleteEducationRoute.js';
-import { DeleteHeadlineRoute } from './routes/DeleteHeadlineRoute.js';
-import { DeletePositionRoute } from './routes/DeletePositionRoute.js';
-import { CreateEducationRoute2 } from './routes/education/CreateEducationRoute2.js';
-import { DeleteEducationRoute2 } from './routes/education/DeleteEducationRoute2.js';
+import { CreateEducationRoute } from './routes/education/CreateEducationRoute.js';
+import { DeleteEducationRoute } from './routes/education/DeleteEducationRoute.js';
 import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
-import { UpdateEducationRoute2 } from './routes/education/UpdateEducationRoute2.js';
-import { AddBullet2Route } from './routes/experience/AddBullet2Route.js';
+import { UpdateEducationRoute } from './routes/education/UpdateEducationRoute.js';
+import { AddBulletRoute } from './routes/experience/AddBulletRoute.js';
 import { AddBulletVariantRoute } from './routes/experience/AddBulletVariantRoute.js';
 import { ApproveBulletVariantRoute } from './routes/experience/ApproveBulletVariantRoute.js';
 import { CreateExperienceRoute } from './routes/experience/CreateExperienceRoute.js';
-import { DeleteBullet2Route } from './routes/experience/DeleteBullet2Route.js';
+import { DeleteBulletRoute } from './routes/experience/DeleteBulletRoute.js';
 import { DeleteBulletVariantRoute } from './routes/experience/DeleteBulletVariantRoute.js';
 import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
 import { RejectBulletVariantRoute } from './routes/experience/RejectBulletVariantRoute.js';
-import { UpdateBullet2Route } from './routes/experience/UpdateBullet2Route.js';
+import { UpdateBulletRoute } from './routes/experience/UpdateBulletRoute.js';
 import { UpdateBulletVariantRoute } from './routes/experience/UpdateBulletVariantRoute.js';
-import { UpdateExperienceRoute as UpdateExperienceRoute2 } from './routes/experience/UpdateExperienceRoute.js';
+import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
 import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
-import { GetCurrentUserRoute } from './routes/GetCurrentUserRoute.js';
 import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
 import { GetProfileRoute } from './routes/GetProfileRoute.js';
-import { GetUserRoute } from './routes/GetUserRoute.js';
-import { CreateHeadline2Route } from './routes/headline/CreateHeadline2Route.js';
-import { DeleteHeadline2Route } from './routes/headline/DeleteHeadline2Route.js';
-import { ListHeadlines2Route } from './routes/headline/ListHeadlines2Route.js';
-import { UpdateHeadline2Route } from './routes/headline/UpdateHeadline2Route.js';
+import { CreateHeadlineRoute } from './routes/headline/CreateHeadlineRoute.js';
+import { DeleteHeadlineRoute } from './routes/headline/DeleteHeadlineRoute.js';
+import { ListHeadlinesRoute } from './routes/headline/ListHeadlinesRoute.js';
+import { UpdateHeadlineRoute } from './routes/headline/UpdateHeadlineRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
-import { ListCompaniesRoute } from './routes/ListCompaniesRoute.js';
-import { ListEducationRoute } from './routes/ListEducationRoute.js';
-import { ListHeadlinesRoute } from './routes/ListHeadlinesRoute.js';
 import { ListJobsRoute } from './routes/ListJobsRoute.js';
-import { ReplaceLocationsRoute } from './routes/ReplaceLocationsRoute.js';
-import { AddSkillItemRoute as NewAddSkillItemRoute } from './routes/skill-categories/AddSkillItemRoute.js';
-import { CreateSkillCategoryRoute as NewCreateSkillCategoryRoute } from './routes/skill-categories/CreateSkillCategoryRoute.js';
-import { DeleteSkillCategoryRoute as NewDeleteSkillCategoryRoute } from './routes/skill-categories/DeleteSkillCategoryRoute.js';
-import { DeleteSkillItemRoute as NewDeleteSkillItemRoute } from './routes/skill-categories/DeleteSkillItemRoute.js';
-import { ListSkillCategoriesRoute as NewListSkillCategoriesRoute } from './routes/skill-categories/ListSkillCategoriesRoute.js';
-import { UpdateSkillCategoryRoute as NewUpdateSkillCategoryRoute } from './routes/skill-categories/UpdateSkillCategoryRoute.js';
-import { UpdateSkillItemRoute as NewUpdateSkillItemRoute } from './routes/skill-categories/UpdateSkillItemRoute.js';
+import { AddSkillItemRoute } from './routes/skill-categories/AddSkillItemRoute.js';
+import { CreateSkillCategoryRoute } from './routes/skill-categories/CreateSkillCategoryRoute.js';
+import { DeleteSkillCategoryRoute } from './routes/skill-categories/DeleteSkillCategoryRoute.js';
+import { DeleteSkillItemRoute } from './routes/skill-categories/DeleteSkillItemRoute.js';
+import { ListSkillCategoriesRoute } from './routes/skill-categories/ListSkillCategoriesRoute.js';
+import { UpdateSkillCategoryRoute } from './routes/skill-categories/UpdateSkillCategoryRoute.js';
+import { UpdateSkillItemRoute } from './routes/skill-categories/UpdateSkillItemRoute.js';
 import { ListTagsRoute } from './routes/tag/ListTagsRoute.js';
-import { UpdateBulletRoute } from './routes/UpdateBulletRoute.js';
-import { UpdateCompanyRoute } from './routes/UpdateCompanyRoute.js';
-import { UpdateEducationRoute } from './routes/UpdateEducationRoute.js';
-import { UpdateHeadlineRoute } from './routes/UpdateHeadlineRoute.js';
 import { UpdateJobCompanyRoute } from './routes/UpdateJobCompanyRoute.js';
-import { UpdatePositionRoute } from './routes/UpdatePositionRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
-import { UpdateUserRoute } from './routes/UpdateUserRoute.js';
 
 // --- App ---
 
@@ -103,6 +81,7 @@ const app = new Elysia()
   })
   .use(healthRoutes)
   .use(configRoute(llmAvailable))
+  // Jobs
   .use(container.get(ListJobsRoute).plugin())
   .use(container.get(GetJobRoute).plugin())
   .use(container.get(ChangeJobStatusRoute).plugin())
@@ -115,67 +94,44 @@ const app = new Elysia()
   // Companies
   .use(container.get(GetJobCompanyRoute).plugin())
   .use(container.get(UpdateJobCompanyRoute).plugin())
-  .use(container.get(GetCurrentUserRoute).plugin())
-  .use(container.get(GetUserRoute).plugin())
-  .use(container.get(UpdateUserRoute).plugin())
   // Profile
   .use(container.get(GetProfileRoute).plugin())
   .use(container.get(UpdateProfileRoute).plugin())
-  .use(container.get(ListEducationRoute).plugin())
+  // Education
+  .use(container.get(ListEducationsRoute).plugin())
   .use(container.get(CreateEducationRoute).plugin())
   .use(container.get(UpdateEducationRoute).plugin())
   .use(container.get(DeleteEducationRoute).plugin())
-  // Education (new domain model)
-  .use(container.get(ListEducationsRoute).plugin())
-  .use(container.get(CreateEducationRoute2).plugin())
-  .use(container.get(UpdateEducationRoute2).plugin())
-  .use(container.get(DeleteEducationRoute2).plugin())
+  // Skills
+  .use(container.get(ListSkillCategoriesRoute).plugin())
+  .use(container.get(CreateSkillCategoryRoute).plugin())
+  .use(container.get(UpdateSkillCategoryRoute).plugin())
+  .use(container.get(DeleteSkillCategoryRoute).plugin())
+  .use(container.get(AddSkillItemRoute).plugin())
+  .use(container.get(UpdateSkillItemRoute).plugin())
+  .use(container.get(DeleteSkillItemRoute).plugin())
+  // Archetypes
+  .use(container.get(ListArchetypesRoute).plugin())
+  .use(container.get(CreateArchetypeRoute).plugin())
+  .use(container.get(UpdateArchetypeRoute).plugin())
+  .use(container.get(DeleteArchetypeRoute).plugin())
+  .use(container.get(SetArchetypeContentRoute).plugin())
+  .use(container.get(SetArchetypeTagProfileRoute).plugin())
+  // Headlines
   .use(container.get(ListHeadlinesRoute).plugin())
   .use(container.get(CreateHeadlineRoute).plugin())
   .use(container.get(UpdateHeadlineRoute).plugin())
   .use(container.get(DeleteHeadlineRoute).plugin())
-  // Work Experience
-  .use(container.get(ListCompaniesRoute).plugin())
-  .use(container.get(CreateCompanyRoute).plugin())
-  .use(container.get(UpdateCompanyRoute).plugin())
-  .use(container.get(DeleteCompanyRoute).plugin())
-  .use(container.get(CreatePositionRoute).plugin())
-  .use(container.get(UpdatePositionRoute).plugin())
-  .use(container.get(DeletePositionRoute).plugin())
+  // Tags
+  .use(container.get(ListTagsRoute).plugin())
+  // Experiences
+  .use(container.get(ListExperiencesRoute).plugin())
+  .use(container.get(CreateExperienceRoute).plugin())
+  .use(container.get(UpdateExperienceRoute).plugin())
+  .use(container.get(DeleteExperienceRoute).plugin())
   .use(container.get(AddBulletRoute).plugin())
   .use(container.get(UpdateBulletRoute).plugin())
   .use(container.get(DeleteBulletRoute).plugin())
-  .use(container.get(ReplaceLocationsRoute).plugin())
-  // Skills (new domain model)
-  .use(container.get(NewListSkillCategoriesRoute).plugin())
-  .use(container.get(NewCreateSkillCategoryRoute).plugin())
-  .use(container.get(NewUpdateSkillCategoryRoute).plugin())
-  .use(container.get(NewDeleteSkillCategoryRoute).plugin())
-  .use(container.get(NewAddSkillItemRoute).plugin())
-  .use(container.get(NewUpdateSkillItemRoute).plugin())
-  .use(container.get(NewDeleteSkillItemRoute).plugin())
-  // Archetypes (new domain model — S6)
-  .use(container.get(ListArchetypes2Route).plugin())
-  .use(container.get(CreateArchetype2Route).plugin())
-  .use(container.get(UpdateArchetype2Route).plugin())
-  .use(container.get(DeleteArchetype2Route).plugin())
-  .use(container.get(SetArchetypeContent2Route).plugin())
-  .use(container.get(SetArchetypeTagProfile2Route).plugin())
-  // S2 Headlines (new domain)
-  .use(container.get(ListHeadlines2Route).plugin())
-  .use(container.get(CreateHeadline2Route).plugin())
-  .use(container.get(UpdateHeadline2Route).plugin())
-  .use(container.get(DeleteHeadline2Route).plugin())
-  // Tags
-  .use(container.get(ListTagsRoute).plugin())
-  // Experiences (new domain)
-  .use(container.get(ListExperiencesRoute).plugin())
-  .use(container.get(CreateExperienceRoute).plugin())
-  .use(container.get(UpdateExperienceRoute2).plugin())
-  .use(container.get(DeleteExperienceRoute).plugin())
-  .use(container.get(AddBullet2Route).plugin())
-  .use(container.get(UpdateBullet2Route).plugin())
-  .use(container.get(DeleteBullet2Route).plugin())
   .use(container.get(AddBulletVariantRoute).plugin())
   .use(container.get(UpdateBulletVariantRoute).plugin())
   .use(container.get(DeleteBulletVariantRoute).plugin())

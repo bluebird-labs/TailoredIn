@@ -1,34 +1,22 @@
 import { InjectionToken } from '@needle-di/core';
 import type {
   AddBullet,
-  AddBullet2,
   AddBulletVariant,
   AddSkillItem,
   ApproveBulletVariant,
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
-  CreateArchetype2,
-  CreateCompany,
   CreateEducation,
-  CreateEducation2,
   CreateExperience,
   CreateHeadline,
-  CreateHeadline2,
-  CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
-  DeleteArchetype2,
   DeleteBullet,
-  DeleteBullet2,
   DeleteBulletVariant,
-  DeleteCompany,
   DeleteEducation,
-  DeleteEducation2,
   DeleteExperience,
   DeleteHeadline,
-  DeleteHeadline2,
-  DeletePosition,
   DeleteSkillCategory,
   DeleteSkillItem,
   GenerateCompanyBrief,
@@ -37,53 +25,36 @@ import type {
   GetJob,
   GetJobCompany,
   GetProfile,
-  GetUser,
   IngestJobByUrl,
   IngestScrapedJob,
   JobScraper,
   ListArchetypes,
-  ListArchetypes2,
-  ListCompanies,
   ListEducation,
-  ListEducation2,
   ListExperiences,
   ListHeadlines,
-  ListHeadlines2,
   ListJobs,
   ListSkillCategories,
   ListTags,
   LlmService,
-  ReplaceLocations,
   ResumeContentFactory,
   ResumeRenderer,
   ScrapeAndIngestJobs,
-  SetArchetypeContent2,
-  SetArchetypeEducation,
-  SetArchetypePositions,
-  SetArchetypeSkills,
-  SetArchetypeTagProfile2,
+  SetArchetypeContent,
+  SetArchetypeTagProfile,
   UpdateArchetype,
-  UpdateArchetype2,
   UpdateBullet,
-  UpdateBullet2,
   UpdateBulletVariant,
-  UpdateCompany,
   UpdateEducation,
-  UpdateEducation2,
   UpdateExperience,
   UpdateHeadline,
-  UpdateHeadline2,
   UpdateJobCompany,
-  UpdatePosition,
   UpdateProfile,
   UpdateSkillCategory,
   UpdateSkillItem,
-  UpdateUser,
   WebColorService
 } from '@tailoredin/application';
 import type {
-  ArchetypeConfigRepository,
-  ArchetypeRepository2,
+  ArchetypeRepository,
   CompanyBriefRepository,
   CompanyRepository,
   EducationRepository,
@@ -92,14 +63,9 @@ import type {
   JobElector,
   JobRepository,
   ProfileRepository,
-  ResumeCompanyRepository,
-  ResumeEducationRepository,
-  ResumeHeadlineRepository,
-  ResumeSkillCategoryRepository,
   SkillCategoryRepository,
   SkillRepository,
-  TagRepository,
-  UserRepository
+  TagRepository
 } from '@tailoredin/domain';
 
 export const DI = {
@@ -121,38 +87,11 @@ export const DI = {
   },
 
   Resume: {
-    UserRepository: new InjectionToken<UserRepository>('DI.Resume.UserRepository'),
-    CompanyRepository: new InjectionToken<ResumeCompanyRepository>('DI.Resume.CompanyRepository'),
-    EducationRepository: new InjectionToken<ResumeEducationRepository>('DI.Resume.EducationRepository'),
-    HeadlineRepository: new InjectionToken<ResumeHeadlineRepository>('DI.Resume.HeadlineRepository'),
-    SkillCategoryRepository: new InjectionToken<ResumeSkillCategoryRepository>('DI.Resume.SkillCategoryRepository'),
-    ArchetypeConfigRepository: new InjectionToken<ArchetypeConfigRepository>('DI.Resume.ArchetypeConfigRepository'),
     LlmService: new InjectionToken<LlmService | null>('DI.Resume.LlmService'),
     WebColorService: new InjectionToken<WebColorService>('DI.Resume.WebColorService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
-    GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
-    GetUser: new InjectionToken<GetUser>('DI.Resume.GetUser'),
-    UpdateUser: new InjectionToken<UpdateUser>('DI.Resume.UpdateUser'),
-    ListEducation: new InjectionToken<ListEducation>('DI.Resume.ListEducation'),
-    CreateEducation: new InjectionToken<CreateEducation>('DI.Resume.CreateEducation'),
-    UpdateEducation: new InjectionToken<UpdateEducation>('DI.Resume.UpdateEducation'),
-    DeleteEducation: new InjectionToken<DeleteEducation>('DI.Resume.DeleteEducation'),
-    ListHeadlines: new InjectionToken<ListHeadlines>('DI.Resume.ListHeadlines'),
-    CreateHeadline: new InjectionToken<CreateHeadline>('DI.Resume.CreateHeadline'),
-    UpdateHeadline: new InjectionToken<UpdateHeadline>('DI.Resume.UpdateHeadline'),
-    DeleteHeadline: new InjectionToken<DeleteHeadline>('DI.Resume.DeleteHeadline'),
-    ListCompanies: new InjectionToken<ListCompanies>('DI.Resume.ListCompanies'),
-    CreateCompany: new InjectionToken<CreateCompany>('DI.Resume.CreateCompany'),
-    UpdateCompany: new InjectionToken<UpdateCompany>('DI.Resume.UpdateCompany'),
-    DeleteCompany: new InjectionToken<DeleteCompany>('DI.Resume.DeleteCompany'),
-    CreatePosition: new InjectionToken<CreatePosition>('DI.Resume.CreatePosition'),
-    UpdatePosition: new InjectionToken<UpdatePosition>('DI.Resume.UpdatePosition'),
-    DeletePosition: new InjectionToken<DeletePosition>('DI.Resume.DeletePosition'),
-    AddBullet: new InjectionToken<AddBullet>('DI.Resume.AddBullet'),
-    UpdateBullet: new InjectionToken<UpdateBullet>('DI.Resume.UpdateBullet'),
-    DeleteBullet: new InjectionToken<DeleteBullet>('DI.Resume.DeleteBullet'),
-    ReplaceLocations: new InjectionToken<ReplaceLocations>('DI.Resume.ReplaceLocations')
+    GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume')
   },
 
   Profile: {
@@ -169,10 +108,10 @@ export const DI = {
 
   Headline: {
     Repository: new InjectionToken<HeadlineRepository>('DI.Headline.Repository'),
-    List: new InjectionToken<ListHeadlines2>('DI.Headline.List'),
-    Create: new InjectionToken<CreateHeadline2>('DI.Headline.Create'),
-    Update: new InjectionToken<UpdateHeadline2>('DI.Headline.Update'),
-    Delete: new InjectionToken<DeleteHeadline2>('DI.Headline.Delete')
+    List: new InjectionToken<ListHeadlines>('DI.Headline.List'),
+    Create: new InjectionToken<CreateHeadline>('DI.Headline.Create'),
+    Update: new InjectionToken<UpdateHeadline>('DI.Headline.Update'),
+    Delete: new InjectionToken<DeleteHeadline>('DI.Headline.Delete')
   },
 
   Tag: {
@@ -182,10 +121,10 @@ export const DI = {
 
   Education: {
     Repository: new InjectionToken<EducationRepository>('DI.Education.Repository'),
-    ListEducation: new InjectionToken<ListEducation2>('DI.Education.ListEducation'),
-    CreateEducation: new InjectionToken<CreateEducation2>('DI.Education.CreateEducation'),
-    UpdateEducation: new InjectionToken<UpdateEducation2>('DI.Education.UpdateEducation'),
-    DeleteEducation: new InjectionToken<DeleteEducation2>('DI.Education.DeleteEducation')
+    ListEducation: new InjectionToken<ListEducation>('DI.Education.ListEducation'),
+    CreateEducation: new InjectionToken<CreateEducation>('DI.Education.CreateEducation'),
+    UpdateEducation: new InjectionToken<UpdateEducation>('DI.Education.UpdateEducation'),
+    DeleteEducation: new InjectionToken<DeleteEducation>('DI.Education.DeleteEducation')
   },
 
   SkillCategory: {
@@ -205,9 +144,9 @@ export const DI = {
     Create: new InjectionToken<CreateExperience>('DI.Experience.Create'),
     Update: new InjectionToken<UpdateExperience>('DI.Experience.Update'),
     Delete: new InjectionToken<DeleteExperience>('DI.Experience.Delete'),
-    AddBullet: new InjectionToken<AddBullet2>('DI.Experience.AddBullet'),
-    UpdateBullet: new InjectionToken<UpdateBullet2>('DI.Experience.UpdateBullet'),
-    DeleteBullet: new InjectionToken<DeleteBullet2>('DI.Experience.DeleteBullet'),
+    AddBullet: new InjectionToken<AddBullet>('DI.Experience.AddBullet'),
+    UpdateBullet: new InjectionToken<UpdateBullet>('DI.Experience.UpdateBullet'),
+    DeleteBullet: new InjectionToken<DeleteBullet>('DI.Experience.DeleteBullet'),
     AddVariant: new InjectionToken<AddBulletVariant>('DI.Experience.AddVariant'),
     UpdateVariant: new InjectionToken<UpdateBulletVariant>('DI.Experience.UpdateVariant'),
     DeleteVariant: new InjectionToken<DeleteBulletVariant>('DI.Experience.DeleteVariant'),
@@ -215,23 +154,12 @@ export const DI = {
   },
 
   Archetype: {
-    ConfigRepository: new InjectionToken<ArchetypeConfigRepository>('DI.Archetype.ConfigRepository'),
-    ListArchetypes: new InjectionToken<ListArchetypes>('DI.Archetype.ListArchetypes'),
-    CreateArchetype: new InjectionToken<CreateArchetype>('DI.Archetype.CreateArchetype'),
-    UpdateArchetype: new InjectionToken<UpdateArchetype>('DI.Archetype.UpdateArchetype'),
-    DeleteArchetype: new InjectionToken<DeleteArchetype>('DI.Archetype.DeleteArchetype'),
-    SetPositions: new InjectionToken<SetArchetypePositions>('DI.Archetype.SetPositions'),
-    SetSkills: new InjectionToken<SetArchetypeSkills>('DI.Archetype.SetSkills'),
-    SetEducation: new InjectionToken<SetArchetypeEducation>('DI.Archetype.SetEducation')
-  },
-
-  Archetype2: {
-    Repository: new InjectionToken<ArchetypeRepository2>('DI.Archetype2.Repository'),
-    List: new InjectionToken<ListArchetypes2>('DI.Archetype2.List'),
-    Create: new InjectionToken<CreateArchetype2>('DI.Archetype2.Create'),
-    Update: new InjectionToken<UpdateArchetype2>('DI.Archetype2.Update'),
-    Delete: new InjectionToken<DeleteArchetype2>('DI.Archetype2.Delete'),
-    SetContent: new InjectionToken<SetArchetypeContent2>('DI.Archetype2.SetContent'),
-    SetTagProfile: new InjectionToken<SetArchetypeTagProfile2>('DI.Archetype2.SetTagProfile')
+    Repository: new InjectionToken<ArchetypeRepository>('DI.Archetype.Repository'),
+    List: new InjectionToken<ListArchetypes>('DI.Archetype.List'),
+    Create: new InjectionToken<CreateArchetype>('DI.Archetype.Create'),
+    Update: new InjectionToken<UpdateArchetype>('DI.Archetype.Update'),
+    Delete: new InjectionToken<DeleteArchetype>('DI.Archetype.Delete'),
+    SetContent: new InjectionToken<SetArchetypeContent>('DI.Archetype.SetContent'),
+    SetTagProfile: new InjectionToken<SetArchetypeTagProfile>('DI.Archetype.SetTagProfile')
   }
 };

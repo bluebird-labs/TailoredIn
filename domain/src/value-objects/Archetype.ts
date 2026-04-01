@@ -1,4 +1,4 @@
-export enum Archetype {
+export enum ArchetypeKey {
   HAND_ON_MANAGER = 'hands_on_manager',
   LEADER_MANAGER = 'high_level_manager',
   IC = 'individual_contributor',

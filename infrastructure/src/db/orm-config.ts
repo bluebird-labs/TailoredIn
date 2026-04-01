@@ -7,14 +7,8 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
-import { Archetype } from './entities/archetypes/Archetype.js';
-import { ArchetypeEducation } from './entities/archetypes/ArchetypeEducation.js';
-import { ArchetypePosition } from './entities/archetypes/ArchetypePosition.js';
-import { ArchetypePositionBullet } from './entities/archetypes/ArchetypePositionBullet.js';
-import { ArchetypeSkillCategory } from './entities/archetypes/ArchetypeSkillCategory.js';
-import { ArchetypeSkillItem } from './entities/archetypes/ArchetypeSkillItem.js';
+import { ArchetypeOrm } from './entities/archetypes/ArchetypeOrm.js';
 import { ArchetypeTagWeight } from './entities/archetypes/ArchetypeTagWeight.js';
-import { ArchetypeV2 } from './entities/archetypes/ArchetypeV2.js';
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
@@ -25,19 +19,10 @@ import { Headline as OrmHeadline } from './entities/headline/Headline.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
 import { Profile } from './entities/profile/Profile.js';
-import { ResumeBullet } from './entities/resume/ResumeBullet.js';
-import { ResumeCompany } from './entities/resume/ResumeCompany.js';
-import { ResumeCompanyLocation } from './entities/resume/ResumeCompanyLocation.js';
-import { ResumeEducation } from './entities/resume/ResumeEducation.js';
-import { ResumeHeadline } from './entities/resume/ResumeHeadline.js';
-import { ResumePosition } from './entities/resume/ResumePosition.js';
-import { ResumeSkillCategory } from './entities/resume/ResumeSkillCategory.js';
-import { ResumeSkillItem } from './entities/resume/ResumeSkillItem.js';
 import { Skill } from './entities/skills/Skill.js';
 import { SkillCategory as OrmSkillCategory } from './entities/skills/SkillCategory.js';
 import { SkillItem as OrmSkillItem } from './entities/skills/SkillItem.js';
 import { Tag as OrmTag } from './entities/tag/Tag.js';
-import { User } from './entities/users/User.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -65,22 +50,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       Skill,
       Job,
       JobStatusUpdate,
-      User,
-      ResumeCompany,
-      ResumeCompanyLocation,
-      ResumeBullet,
-      ResumePosition,
-      ResumeEducation,
-      ResumeSkillCategory,
-      ResumeSkillItem,
-      ResumeHeadline,
-      Archetype,
-      ArchetypeEducation,
-      ArchetypeSkillCategory,
-      ArchetypeSkillItem,
-      ArchetypePosition,
-      ArchetypePositionBullet,
-      ArchetypeV2,
+      ArchetypeOrm,
       ArchetypeTagWeight,
       OrmHeadline,
       OrmTag,

@@ -1,4 +1,4 @@
-import { Archetype } from '../value-objects/Archetype.js';
+import { ArchetypeKey } from '../value-objects/Archetype.js';
 import { TailoringScore } from '../value-objects/TailoringScore.js';
 
 /**
@@ -12,13 +12,13 @@ export class TailoringStrategyService {
    * Maps a job archetype to the resume template archetype used for generation.
    * Currently all archetypes default to LEAD_IC template — extend as templates are added.
    */
-  public resolveTemplateArchetype(archetype: Archetype): Archetype {
+  public resolveTemplateArchetype(archetype: ArchetypeKey): ArchetypeKey {
     switch (archetype) {
-      case Archetype.IC:
-      case Archetype.LEAD_IC:
-        return Archetype.LEAD_IC;
+      case ArchetypeKey.IC:
+      case ArchetypeKey.LEAD_IC:
+        return ArchetypeKey.LEAD_IC;
       default:
-        return Archetype.LEAD_IC;
+        return ArchetypeKey.LEAD_IC;
     }
   }
 

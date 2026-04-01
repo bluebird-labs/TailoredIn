@@ -1,10 +1,5 @@
 export type { ApiErrorDto } from './ApiErrorDto.js';
-export type {
-  ArchetypeConfigDto,
-  ArchetypePositionBulletDto,
-  ArchetypePositionDto
-} from './ArchetypeConfigDto.js';
-export type * from './ArchetypeDto2.js';
+export type * from './ArchetypeDto.js';
 export type { CompanyBriefDto } from './CompanyBriefDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export type { EducationDto } from './EducationDto.js';
@@ -24,17 +19,6 @@ export type {
   ResumePersonalDto,
   ResumeSkillDto
 } from './ResumeContentDto.js';
-export type {
-  ResumeBulletDto,
-  ResumeCompanyDto,
-  ResumeEducationEntryDto,
-  ResumeHeadlineDto,
-  ResumeLocationDto,
-  ResumePositionDto,
-  ResumeSkillCategoryDto,
-  ResumeSkillItemDto,
-  UserDto
-} from './ResumeDataDto.js';
 export type { ResumeOutputDto } from './ResumeOutputDto.js';
 export type { ScrapeResultDto } from './ScrapeResultDto.js';
 export type { SkillCategoryDto, SkillItemDto } from './SkillCategoryDto.js';

@@ -1,4 +1,4 @@
-import { Collection, type Ref } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
 import { Entity, ManyToMany, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';

@@ -2,34 +2,22 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
   AddBullet,
-  AddBullet2,
   AddBulletVariant,
   AddSkillItem,
   ApproveBulletVariant,
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
-  CreateArchetype2,
-  CreateCompany,
   CreateEducation,
-  CreateEducation2,
   CreateExperience,
   CreateHeadline,
-  CreateHeadline2,
-  CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
-  DeleteArchetype2,
   DeleteBullet,
-  DeleteBullet2,
   DeleteBulletVariant,
-  DeleteCompany,
   DeleteEducation,
-  DeleteEducation2,
   DeleteExperience,
   DeleteHeadline,
-  DeleteHeadline2,
-  DeletePosition,
   DeleteSkillCategory,
   DeleteSkillItem,
   GenerateCompanyBrief,
@@ -38,43 +26,27 @@ import {
   GetJob,
   GetJobCompany,
   GetProfile,
-  GetUser,
   IngestJobByUrl,
   IngestScrapedJob,
   ListArchetypes,
-  ListArchetypes2,
-  ListCompanies,
   ListEducation,
-  ListEducation2,
   ListExperiences,
   ListHeadlines,
-  ListHeadlines2,
   ListJobs,
   ListSkillCategories,
   ListTags,
-  ReplaceLocations,
-  SetArchetypeContent2,
-  SetArchetypeEducation,
-  SetArchetypePositions,
-  SetArchetypeSkills,
-  SetArchetypeTagProfile2,
+  SetArchetypeContent,
+  SetArchetypeTagProfile,
   UpdateArchetype,
-  UpdateArchetype2,
   UpdateBullet,
-  UpdateBullet2,
   UpdateBulletVariant,
-  UpdateCompany,
   UpdateEducation,
-  UpdateEducation2,
   UpdateExperience,
   UpdateHeadline,
-  UpdateHeadline2,
   UpdateJobCompany,
-  UpdatePosition,
   UpdateProfile,
   UpdateSkillCategory,
-  UpdateSkillItem,
-  UpdateUser
+  UpdateSkillItem
 } from '@tailoredin/application';
 import { env, envBool, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
@@ -87,8 +59,7 @@ import {
   PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   PlaywrightJobScraper,
   PlaywrightWebColorService,
-  PostgresArchetypeConfigRepository,
-  PostgresArchetypeRepository2,
+  PostgresArchetypeRepository,
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
@@ -96,14 +67,9 @@ import {
   PostgresHeadlineRepository,
   PostgresJobRepository,
   PostgresProfileRepository,
-  PostgresResumeCompanyRepository,
-  PostgresResumeEducationRepository,
-  PostgresResumeHeadlineRepository,
-  PostgresResumeSkillCategoryRepository,
   PostgresSkillCategoryRepository,
   PostgresSkillRepository,
   PostgresTagRepository,
-  PostgresUserRepository,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 
@@ -184,13 +150,7 @@ container.bind({
   useFactory: () => new UpdateJobCompany(container.get(DI.Job.CompanyRepository))
 });
 
-// Resume repositories + services
-container.bind({ provide: DI.Resume.UserRepository, useClass: PostgresUserRepository });
-container.bind({ provide: DI.Resume.CompanyRepository, useClass: PostgresResumeCompanyRepository });
-container.bind({ provide: DI.Resume.EducationRepository, useClass: PostgresResumeEducationRepository });
-container.bind({ provide: DI.Resume.HeadlineRepository, useClass: PostgresResumeHeadlineRepository });
-container.bind({ provide: DI.Resume.SkillCategoryRepository, useClass: PostgresResumeSkillCategoryRepository });
-container.bind({ provide: DI.Resume.ArchetypeConfigRepository, useClass: PostgresArchetypeConfigRepository });
+// Resume services
 const openAiApiKey = envOptional('OPENAI_API_KEY');
 const openAiProject = envOptional('OPENAI_PROJECT_ID');
 export const llmAvailable = !!(openAiApiKey && openAiProject);
@@ -207,22 +167,21 @@ container.bind({
   provide: DI.Resume.ContentFactory,
   useFactory: () =>
     new DatabaseResumeContentFactory(
-      container.get(DI.Resume.UserRepository),
-      container.get(DI.Resume.HeadlineRepository),
-      container.get(DI.Resume.ArchetypeConfigRepository),
-      container.get(DI.Resume.CompanyRepository),
-      container.get(DI.Resume.EducationRepository),
-      container.get(DI.Resume.SkillCategoryRepository)
+      container.get(DI.Profile.Repository),
+      container.get(DI.Headline.Repository),
+      container.get(DI.Archetype.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.Education.Repository),
+      container.get(DI.SkillCategory.Repository)
     )
 });
-
-// Resume use cases
 container.bind({
   provide: DI.Resume.GenerateResume,
   useFactory: () =>
     new GenerateResume(
       container.get(DI.Job.Repository),
-      container.get(DI.Resume.UserRepository),
+      container.get(DI.Profile.Repository),
+      container.get(DI.Archetype.Repository),
       container.get(DI.Resume.LlmService),
       container.get(DI.Resume.WebColorService),
       container.get(DI.Resume.Renderer),
@@ -246,16 +205,6 @@ container.bind({
   useFactory: () => new GetCompanyBrief(container.get(DI.Job.Repository), container.get(DI.CompanyBrief.Repository))
 });
 
-// User use cases
-container.bind({
-  provide: DI.Resume.GetUser,
-  useFactory: () => new GetUser(container.get(DI.Resume.UserRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateUser,
-  useFactory: () => new UpdateUser(container.get(DI.Resume.UserRepository))
-});
-
 // Profile
 container.bind({ provide: DI.Profile.Repository, useClass: PostgresProfileRepository });
 container.bind({
@@ -267,79 +216,43 @@ container.bind({
   useFactory: () => new UpdateProfile(container.get(DI.Profile.Repository))
 });
 
-// Education use cases
-container.bind({
-  provide: DI.Resume.ListEducation,
-  useFactory: () => new ListEducation(container.get(DI.Resume.EducationRepository))
-});
-container.bind({
-  provide: DI.Resume.CreateEducation,
-  useFactory: () => new CreateEducation(container.get(DI.Resume.EducationRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateEducation,
-  useFactory: () => new UpdateEducation(container.get(DI.Resume.EducationRepository))
-});
-container.bind({
-  provide: DI.Resume.DeleteEducation,
-  useFactory: () => new DeleteEducation(container.get(DI.Resume.EducationRepository))
-});
-
-// Education (new domain model)
+// Education
 container.bind({ provide: DI.Education.Repository, useClass: PostgresEducationRepository });
 container.bind({
   provide: DI.Education.ListEducation,
-  useFactory: () => new ListEducation2(container.get(DI.Education.Repository))
+  useFactory: () => new ListEducation(container.get(DI.Education.Repository))
 });
 container.bind({
   provide: DI.Education.CreateEducation,
-  useFactory: () => new CreateEducation2(container.get(DI.Education.Repository))
+  useFactory: () => new CreateEducation(container.get(DI.Education.Repository))
 });
 container.bind({
   provide: DI.Education.UpdateEducation,
-  useFactory: () => new UpdateEducation2(container.get(DI.Education.Repository))
+  useFactory: () => new UpdateEducation(container.get(DI.Education.Repository))
 });
 container.bind({
   provide: DI.Education.DeleteEducation,
-  useFactory: () => new DeleteEducation2(container.get(DI.Education.Repository))
+  useFactory: () => new DeleteEducation(container.get(DI.Education.Repository))
 });
 
-// Headline use cases
-container.bind({
-  provide: DI.Resume.ListHeadlines,
-  useFactory: () => new ListHeadlines(container.get(DI.Resume.HeadlineRepository))
-});
-container.bind({
-  provide: DI.Resume.CreateHeadline,
-  useFactory: () => new CreateHeadline(container.get(DI.Resume.HeadlineRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateHeadline,
-  useFactory: () => new UpdateHeadline(container.get(DI.Resume.HeadlineRepository))
-});
-container.bind({
-  provide: DI.Resume.DeleteHeadline,
-  useFactory: () => new DeleteHeadline(container.get(DI.Resume.HeadlineRepository))
-});
-
-// S2 Headlines (new domain model)
+// Headlines
 container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
 container.bind({ provide: DI.Tag.Repository, useClass: PostgresTagRepository });
 container.bind({
   provide: DI.Headline.List,
-  useFactory: () => new ListHeadlines2(container.get(DI.Headline.Repository))
+  useFactory: () => new ListHeadlines(container.get(DI.Headline.Repository))
 });
 container.bind({
   provide: DI.Headline.Create,
-  useFactory: () => new CreateHeadline2(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
+  useFactory: () => new CreateHeadline(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
 });
 container.bind({
   provide: DI.Headline.Update,
-  useFactory: () => new UpdateHeadline2(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
+  useFactory: () => new UpdateHeadline(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
 });
 container.bind({
   provide: DI.Headline.Delete,
-  useFactory: () => new DeleteHeadline2(container.get(DI.Headline.Repository))
+  useFactory: () => new DeleteHeadline(container.get(DI.Headline.Repository))
 });
 
 // Tags
@@ -348,53 +261,7 @@ container.bind({
   useFactory: () => new ListTags(container.get(DI.Tag.Repository))
 });
 
-// Work Experience use cases
-container.bind({
-  provide: DI.Resume.ListCompanies,
-  useFactory: () => new ListCompanies(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.CreateCompany,
-  useFactory: () => new CreateCompany(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateCompany,
-  useFactory: () => new UpdateCompany(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.DeleteCompany,
-  useFactory: () => new DeleteCompany(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.CreatePosition,
-  useFactory: () => new CreatePosition(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdatePosition,
-  useFactory: () => new UpdatePosition(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.DeletePosition,
-  useFactory: () => new DeletePosition(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.AddBullet,
-  useFactory: () => new AddBullet(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateBullet,
-  useFactory: () => new UpdateBullet(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.DeleteBullet,
-  useFactory: () => new DeleteBullet(container.get(DI.Resume.CompanyRepository))
-});
-container.bind({
-  provide: DI.Resume.ReplaceLocations,
-  useFactory: () => new ReplaceLocations(container.get(DI.Resume.CompanyRepository))
-});
-
-// Experience (new domain model)
+// Experience
 container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
 container.bind({
   provide: DI.Experience.List,
@@ -414,15 +281,15 @@ container.bind({
 });
 container.bind({
   provide: DI.Experience.AddBullet,
-  useFactory: () => new AddBullet2(container.get(DI.Experience.Repository))
+  useFactory: () => new AddBullet(container.get(DI.Experience.Repository))
 });
 container.bind({
   provide: DI.Experience.UpdateBullet,
-  useFactory: () => new UpdateBullet2(container.get(DI.Experience.Repository))
+  useFactory: () => new UpdateBullet(container.get(DI.Experience.Repository))
 });
 container.bind({
   provide: DI.Experience.DeleteBullet,
-  useFactory: () => new DeleteBullet2(container.get(DI.Experience.Repository))
+  useFactory: () => new DeleteBullet(container.get(DI.Experience.Repository))
 });
 container.bind({
   provide: DI.Experience.AddVariant,
@@ -441,7 +308,7 @@ container.bind({
   useFactory: () => new ApproveBulletVariant(container.get(DI.Experience.Repository))
 });
 
-// SkillCategory use cases (new domain model)
+// SkillCategory
 container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
 container.bind({
   provide: DI.SkillCategory.ListSkillCategories,
@@ -472,62 +339,31 @@ container.bind({
   useFactory: () => new DeleteSkillItem(container.get(DI.SkillCategory.Repository))
 });
 
-// Archetype use cases
-container.bind({ provide: DI.Archetype.ConfigRepository, useClass: PostgresArchetypeConfigRepository });
+// Archetype
+container.bind({ provide: DI.Archetype.Repository, useClass: PostgresArchetypeRepository });
 container.bind({
-  provide: DI.Archetype.ListArchetypes,
-  useFactory: () => new ListArchetypes(container.get(DI.Archetype.ConfigRepository))
+  provide: DI.Archetype.List,
+  useFactory: () => new ListArchetypes(container.get(DI.Archetype.Repository))
 });
 container.bind({
-  provide: DI.Archetype.CreateArchetype,
-  useFactory: () => new CreateArchetype(container.get(DI.Archetype.ConfigRepository))
+  provide: DI.Archetype.Create,
+  useFactory: () => new CreateArchetype(container.get(DI.Archetype.Repository))
 });
 container.bind({
-  provide: DI.Archetype.UpdateArchetype,
-  useFactory: () => new UpdateArchetype(container.get(DI.Archetype.ConfigRepository))
+  provide: DI.Archetype.Update,
+  useFactory: () => new UpdateArchetype(container.get(DI.Archetype.Repository))
 });
 container.bind({
-  provide: DI.Archetype.DeleteArchetype,
-  useFactory: () => new DeleteArchetype(container.get(DI.Archetype.ConfigRepository))
+  provide: DI.Archetype.Delete,
+  useFactory: () => new DeleteArchetype(container.get(DI.Archetype.Repository))
 });
 container.bind({
-  provide: DI.Archetype.SetPositions,
-  useFactory: () => new SetArchetypePositions(container.get(DI.Archetype.ConfigRepository))
+  provide: DI.Archetype.SetContent,
+  useFactory: () => new SetArchetypeContent(container.get(DI.Archetype.Repository))
 });
 container.bind({
-  provide: DI.Archetype.SetSkills,
-  useFactory: () => new SetArchetypeSkills(container.get(DI.Archetype.ConfigRepository))
-});
-container.bind({
-  provide: DI.Archetype.SetEducation,
-  useFactory: () => new SetArchetypeEducation(container.get(DI.Archetype.ConfigRepository))
-});
-
-// Archetype2 use cases (new domain model — S6)
-container.bind({ provide: DI.Archetype2.Repository, useClass: PostgresArchetypeRepository2 });
-container.bind({
-  provide: DI.Archetype2.List,
-  useFactory: () => new ListArchetypes2(container.get(DI.Archetype2.Repository))
-});
-container.bind({
-  provide: DI.Archetype2.Create,
-  useFactory: () => new CreateArchetype2(container.get(DI.Archetype2.Repository))
-});
-container.bind({
-  provide: DI.Archetype2.Update,
-  useFactory: () => new UpdateArchetype2(container.get(DI.Archetype2.Repository))
-});
-container.bind({
-  provide: DI.Archetype2.Delete,
-  useFactory: () => new DeleteArchetype2(container.get(DI.Archetype2.Repository))
-});
-container.bind({
-  provide: DI.Archetype2.SetContent,
-  useFactory: () => new SetArchetypeContent2(container.get(DI.Archetype2.Repository))
-});
-container.bind({
-  provide: DI.Archetype2.SetTagProfile,
-  useFactory: () => new SetArchetypeTagProfile2(container.get(DI.Archetype2.Repository))
+  provide: DI.Archetype.SetTagProfile,
+  useFactory: () => new SetArchetypeTagProfile(container.get(DI.Archetype.Repository))
 });
 
 export { container };

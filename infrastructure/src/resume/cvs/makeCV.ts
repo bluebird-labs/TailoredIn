@@ -1,11 +1,11 @@
-import { Archetype } from '@tailoredin/domain';
+import { ArchetypeKey } from '@tailoredin/domain';
 import type { BrilliantCVContent } from '../../brilliant-cv/types.js';
 import { CVConfigParser } from './CVConfigParser.js';
 import { NerdCVConfig } from './NerdCVConfig.js';
 import type { ResumeConfig } from './types.js';
 
 export type MakeCVInput = {
-  archetype: Archetype;
+  archetype: ArchetypeKey;
   awesome_color: string;
   keywords: string[];
 };
@@ -16,7 +16,7 @@ export const makeCV = (input: MakeCVInput): BrilliantCVContent => {
   let config: ResumeConfig;
 
   switch (archetype) {
-    case Archetype.NERD:
+    case ArchetypeKey.NERD:
       config = NerdCVConfig;
       break;
     default:

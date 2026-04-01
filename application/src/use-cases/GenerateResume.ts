@@ -1,13 +1,14 @@
 import { Logger } from '@tailoredin/core';
 import {
-  Archetype,
+  ArchetypeKey,
+  type ArchetypeRepository,
   err,
   type JobPosting,
   type JobRepository,
   ok,
+  type ProfileRepository,
   type Result,
-  Resume,
-  type UserRepository
+  Resume
 } from '@tailoredin/domain';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeOutputDto } from '../dtos/ResumeOutputDto.js';
@@ -23,7 +24,8 @@ export class GenerateResume {
 
   public constructor(
     private readonly jobRepository: JobRepository,
-    private readonly userRepository: UserRepository,
+    private readonly profileRepository: ProfileRepository,
+    private readonly archetypeRepository: ArchetypeRepository,
     private readonly llmService: LlmService | null,
     private readonly webColorService: WebColorService,
     private readonly resumeRenderer: ResumeRenderer,
@@ -38,9 +40,10 @@ export class GenerateResume {
       return err(new Error(`Job not found: ${input.jobId}`));
     }
 
-    const user = await this.userRepository.findSingle();
+    const profile = await this.profileRepository.findSingle();
+    const allArchetypes = await this.archetypeRepository.findAll();
 
-    let archetype: Archetype;
+    let archetype: ArchetypeKey;
     let keywords: string[];
     let awesomeColor = DEFAULT_AWESOME_COLOR;
 
@@ -54,12 +57,15 @@ export class GenerateResume {
         jobLocation: job.locationRaw
       });
 
-      archetype = postingInsights.archetype ?? Archetype.LEAD_IC;
+      archetype = postingInsights.archetype ?? ArchetypeKey.LEAD_IC;
+
+      // Find archetype record by key to get its ID
+      const archetypeRecord = allArchetypes.find(a => a.key === archetype) ?? allArchetypes[0];
 
       // Build a preliminary resume to give context to the application insights LLM call.
       const tmpContent = await this.resumeContentFactory.make({
-        userId: user.id.value,
-        archetype,
+        profileId: profile.id.value,
+        archetypeId: archetypeRecord.id.value,
         awesomeColor: DEFAULT_AWESOME_COLOR,
         keywords: []
       });
@@ -91,9 +97,12 @@ export class GenerateResume {
       this.log.info('LLM unavailable — using manual archetype and keywords');
     }
 
+    // Find archetype record by key
+    const archetypeRecord = allArchetypes.find(a => a.key === archetype) ?? allArchetypes[0];
+
     const content = await this.resumeContentFactory.make({
-      userId: user.id.value,
-      archetype,
+      profileId: profile.id.value,
+      archetypeId: archetypeRecord.id.value,
       awesomeColor,
       keywords
     });

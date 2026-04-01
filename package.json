@@ -52,6 +52,7 @@
     "core",
     "api",
     "cli",
-    "web"
+    "web",
+    "e2e"
   ]
 }

@@ -130,9 +130,11 @@ cli/robot → ScrapeAndIngestJobs use case
 **Resume Generation:**
 ```
 PUT /jobs/:id/generate-resume → GenerateResume use case
+  → ProfileRepository.findSingle() + ArchetypeRepository.findAll()
   → LlmService.extractJobPostingInsights() (GPT-4o structured output, skipped if no API key)
   → WebColorService.findPrimaryColor() (Playwright + node-vibrant)
-  → ResumeContentFactory.make() → ResumeRenderer.render() → Typst compile → PDF
+  → DatabaseResumeContentFactory.make() (reads from Profile, Headline, Experience, Education, SkillCategory repos via Archetype content_selection)
+  → ResumeRenderer.render() → Typst compile → PDF
 ```
 
 **Single-URL Job Import:**
@@ -143,7 +145,7 @@ POST /jobs { linkedinUrl } → IngestJobByUrl use case
 ```
 
 ## Database
-PostgreSQL via MikroORM (`infrastructure/src/db/`). Config in `infrastructure/src/db/orm-config.ts`. Entities: `Job`, `Company`, `Skill`, `SkillAffinity`, `JobStatusUpdate`, `User`, `ResumeCompany`, `ResumeEducation`, `ResumeHeadline`, `ResumeSkillCategory`, `ResumeSkillItem`, `Archetype`, `ArchetypePosition`. All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`).
+PostgreSQL via MikroORM (`infrastructure/src/db/`). Config in `infrastructure/src/db/orm-config.ts`. Entities: `Profile`, `Experience`, `Bullet`, `BulletVariant`, `Headline`, `Education`, `SkillCategory`, `SkillItem`, `Tag`, `Archetype`, `ArchetypeTagWeight`, `Job`, `Company`, `CompanyBrief`, `Skill`, `JobStatusUpdate`. All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`).
 
 **Job scoring**: `JobOrmRepository` uses Kysely query builder with skill affinity weights (EXPERT=8, INTEREST=2, AVOID=2) to rank jobs.
 
