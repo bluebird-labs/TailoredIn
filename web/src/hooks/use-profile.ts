@@ -7,7 +7,7 @@ export function useProfile() {
     queryKey: queryKeys.profile.detail(),
     queryFn: async () => {
       const { data } = await api.profile.get();
-      return data;
+      return data?.data ?? null;
     }
   });
 }

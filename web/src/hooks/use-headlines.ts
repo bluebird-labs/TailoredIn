@@ -7,7 +7,7 @@ export function useHeadlines() {
     queryKey: queryKeys.resume.headlines(),
     queryFn: async () => {
       const { data } = await api.headlines.get();
-      return data;
+      return data?.data ?? [];
     }
   });
 }

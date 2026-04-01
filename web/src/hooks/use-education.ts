@@ -29,7 +29,7 @@ export function useEducations() {
     queryKey: queryKeys.educations.list(),
     queryFn: async () => {
       const { data } = await api.educations.get();
-      return data;
+      return data?.data ?? [];
     }
   });
 }

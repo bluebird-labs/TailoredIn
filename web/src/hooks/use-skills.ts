@@ -7,7 +7,7 @@ export function useSkillCategories() {
     queryKey: queryKeys.resume.skillCategories(),
     queryFn: async () => {
       const { data } = await api['skill-categories'].get();
-      return data;
+      return data?.data ?? [];
     }
   });
 }
