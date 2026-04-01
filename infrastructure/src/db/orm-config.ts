@@ -15,6 +15,7 @@ import { ArchetypeSkillCategory } from './entities/archetypes/ArchetypeSkillCate
 import { ArchetypeSkillItem } from './entities/archetypes/ArchetypeSkillItem.js';
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
+import { Education } from './entities/education/Education.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
 import { Profile } from './entities/profile/Profile.js';
@@ -48,12 +49,13 @@ export function createOrmConfig(db: OrmDbConfig) {
 
     entities: [
       BaseEntity,
+      Profile,
+      Education,
       Company,
       CompanyBrief,
       Skill,
       Job,
       JobStatusUpdate,
-      Profile,
       User,
       ResumeCompany,
       ResumeCompanyLocation,

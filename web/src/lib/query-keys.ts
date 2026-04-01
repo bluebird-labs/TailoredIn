@@ -33,5 +33,9 @@ export const queryKeys = {
   config: {
     all: ['config'] as const,
     capabilities: () => [...queryKeys.config.all, 'capabilities'] as const
+  },
+  educations: {
+    all: ['educations'] as const,
+    list: () => [...queryKeys.educations.all, 'list'] as const
   }
 };

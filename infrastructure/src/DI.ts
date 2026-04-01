@@ -7,6 +7,7 @@ import type {
   CreateArchetype,
   CreateCompany,
   CreateEducation,
+  CreateEducation2,
   CreateHeadline,
   CreatePosition,
   CreateSkillCategory,
@@ -14,6 +15,7 @@ import type {
   DeleteBullet,
   DeleteCompany,
   DeleteEducation,
+  DeleteEducation2,
   DeleteHeadline,
   DeletePosition,
   DeleteSkillCategory,
@@ -31,6 +33,7 @@ import type {
   ListArchetypes,
   ListCompanies,
   ListEducation,
+  ListEducation2,
   ListHeadlines,
   ListJobs,
   ListSkillCategories,
@@ -46,6 +49,7 @@ import type {
   UpdateBullet,
   UpdateCompany,
   UpdateEducation,
+  UpdateEducation2,
   UpdateHeadline,
   UpdateJobCompany,
   UpdatePosition,
@@ -59,6 +63,7 @@ import type {
   ArchetypeConfigRepository,
   CompanyBriefRepository,
   CompanyRepository,
+  EducationRepository,
   JobElector,
   JobRepository,
   ProfileRepository,
@@ -145,6 +150,14 @@ export const DI = {
 
   Tag: {
     Repository: new InjectionToken<TagRepository>('DI.Tag.Repository')
+  },
+
+  Education: {
+    Repository: new InjectionToken<EducationRepository>('DI.Education.Repository'),
+    ListEducation: new InjectionToken<ListEducation2>('DI.Education.ListEducation'),
+    CreateEducation: new InjectionToken<CreateEducation2>('DI.Education.CreateEducation'),
+    UpdateEducation: new InjectionToken<UpdateEducation2>('DI.Education.UpdateEducation'),
+    DeleteEducation: new InjectionToken<DeleteEducation2>('DI.Education.DeleteEducation')
   },
 
   Archetype: {

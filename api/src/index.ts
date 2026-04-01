@@ -20,6 +20,10 @@ import { DeleteHeadlineRoute } from './routes/DeleteHeadlineRoute.js';
 import { DeletePositionRoute } from './routes/DeletePositionRoute.js';
 import { DeleteSkillCategoryRoute } from './routes/DeleteSkillCategoryRoute.js';
 import { DeleteSkillItemRoute } from './routes/DeleteSkillItemRoute.js';
+import { CreateEducationRoute2 } from './routes/education/CreateEducationRoute2.js';
+import { DeleteEducationRoute2 } from './routes/education/DeleteEducationRoute2.js';
+import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
+import { UpdateEducationRoute2 } from './routes/education/UpdateEducationRoute2.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
 import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
@@ -105,6 +109,11 @@ const app = new Elysia()
   .use(container.get(CreateEducationRoute).plugin())
   .use(container.get(UpdateEducationRoute).plugin())
   .use(container.get(DeleteEducationRoute).plugin())
+  // Education (new domain model)
+  .use(container.get(ListEducationsRoute).plugin())
+  .use(container.get(CreateEducationRoute2).plugin())
+  .use(container.get(UpdateEducationRoute2).plugin())
+  .use(container.get(DeleteEducationRoute2).plugin())
   .use(container.get(ListHeadlinesRoute).plugin())
   .use(container.get(CreateHeadlineRoute).plugin())
   .use(container.get(UpdateHeadlineRoute).plugin())

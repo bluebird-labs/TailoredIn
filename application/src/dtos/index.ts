@@ -6,6 +6,7 @@ export type {
 } from './ArchetypeConfigDto.js';
 export type { CompanyBriefDto } from './CompanyBriefDto.js';
 export type { CompanyDto } from './CompanyDto.js';
+export type { EducationDto } from './EducationDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
 export type { IngestJobByUrlInput, ManualJobFieldsDto } from './IngestJobByUrlDto.js';
 export type { JobListItemDto } from './JobListItemDto.js';

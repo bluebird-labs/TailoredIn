@@ -5,26 +5,14 @@ import { EducationCard } from '@/components/resume/education/education-card';
 import { EducationFormDialog } from '@/components/resume/education/education-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEducation } from '@/hooks/use-education';
-import { useCurrentUser } from '@/hooks/use-user';
+import { type Education, useEducations } from '@/hooks/use-education';
 
 export const Route = createFileRoute('/resume/education')({
   component: EducationPage
 });
 
-type Education = {
-  id: string;
-  degreeTitle: string;
-  institutionName: string;
-  graduationYear: string;
-  locationLabel: string;
-  ordinal: number;
-};
-
 function EducationPage() {
-  const { data: userData } = useCurrentUser();
-  const userId = (userData as { data?: { id?: string } })?.data?.id;
-  const { data, isLoading } = useEducation(userId);
+  const { data, isLoading } = useEducations();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<Education | undefined>();
 
@@ -48,7 +36,7 @@ function EducationPage() {
           <h1 className="text-2xl font-bold">Education</h1>
           <p className="text-muted-foreground mt-1">Degrees and certifications.</p>
         </div>
-        <Button onClick={handleAdd} disabled={!userId}>
+        <Button onClick={handleAdd}>
           <Plus className="size-4" data-icon="inline-start" />
           Add Entry
         </Button>
@@ -71,7 +59,7 @@ function EducationPage() {
       {!isLoading && entries.length > 0 && (
         <div className="flex flex-col gap-4">
           {entries.map(entry => (
-            <EducationCard key={entry.id} education={entry} userId={userId} onEdit={() => handleEdit(entry)} />
+            <EducationCard key={entry.id} education={entry} onEdit={() => handleEdit(entry)} />
           ))}
         </div>
       )}
@@ -79,7 +67,6 @@ function EducationPage() {
       <EducationFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        userId={userId}
         education={editingEntry}
         nextOrdinal={nextOrdinal}
       />
