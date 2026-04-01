@@ -21,3 +21,18 @@ export async function runMigrations(dbConfig: OrmDbConfig): Promise<void> {
     await orm.close(true);
   }
 }
+
+/**
+ * Run the DatabaseSeeder to populate a fresh database.
+ * Initialises the ORM, runs the root seeder, then closes the connection.
+ */
+export async function runSeeds(dbConfig: OrmDbConfig): Promise<void> {
+  const orm = await MikroORM.init(createOrmConfig(dbConfig));
+  try {
+    const seeder = orm.getSeeder();
+    await seeder.seed('DatabaseSeeder');
+    log.info('Seeds applied.');
+  } finally {
+    await orm.close(true);
+  }
+}

@@ -65,7 +65,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/temp", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts", "!**/routeTree.gen.ts", "!**/.mikroorm-cache/**"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/build", "!**/temp", "!**/*.d.ts", "!**/migrations/**", "!**/*.sql.ts", "!**/routeTree.gen.ts", "!**/.mikroorm-cache/**", "!**/seeds/data/companies.ts", "!**/seeds/data/jobs.ts", "!**/seeds/data/job-status-updates.ts", "!**/seed-types.generated.ts"]
   },
   "overrides": [
     {

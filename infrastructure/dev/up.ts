@@ -12,7 +12,7 @@ import type { OrmDbConfig } from '../src/db/orm-config.js';
 import { resolveDevContext } from './DevContext.js';
 import { assertDockerRunning, composeDown, composeUp, isContainerRunning, waitForPostgres } from './DockerCompose.js';
 import { deleteEnvFile, envFileExists, readPorts, type SessionPorts, writeWorktreeEnv } from './EnvFile.js';
-import { runMigrations } from './MigrationRunner.js';
+import { runMigrations, runSeeds } from './MigrationRunner.js';
 import { findFreePort } from './PortFinder.js';
 
 const log = Logger.create('dev-up');
@@ -107,36 +107,49 @@ try {
   throw e;
 }
 
+// ── Seeds (fresh worktree only) ────────────────────────────────────
+
+if (ctx.mode === 'worktree' && ports) {
+  log.info('Seeding database...');
+  try {
+    await runSeeds(worktreeDbConfig(ports));
+  } catch (e) {
+    teardownWorktree();
+    throw e;
+  }
+}
+
 // ── Done ───────────────────────────────────────────────────────────
 
 done(ports);
 
 // ── Helpers ────────────────────────────────────────────────────────
 
-async function runMigrationsForContext(sessionPorts: SessionPorts | null): Promise<void> {
-  let dbConfig: OrmDbConfig;
+function worktreeDbConfig(sessionPorts: SessionPorts): OrmDbConfig {
+  return {
+    timezone: 'UTC',
+    user: 'postgres',
+    password: 'postgres',
+    dbName: `tailoredin_${ctx.worktreeName}`,
+    schema: 'public',
+    host: 'localhost',
+    port: sessionPorts.db
+  };
+}
 
-  if (ctx.mode === 'worktree' && sessionPorts) {
-    dbConfig = {
-      timezone: 'UTC',
-      user: 'postgres',
-      password: 'postgres',
-      dbName: `tailoredin_${ctx.worktreeName}`,
-      schema: 'public',
-      host: 'localhost',
-      port: sessionPorts.db
-    };
-  } else {
-    dbConfig = {
-      timezone: env('TZ'),
-      user: env('POSTGRES_USER'),
-      password: env('POSTGRES_PASSWORD'),
-      dbName: env('POSTGRES_DB'),
-      schema: env('POSTGRES_SCHEMA'),
-      host: env('POSTGRES_HOST'),
-      port: envInt('POSTGRES_PORT')
-    };
-  }
+async function runMigrationsForContext(sessionPorts: SessionPorts | null): Promise<void> {
+  const dbConfig =
+    ctx.mode === 'worktree' && sessionPorts
+      ? worktreeDbConfig(sessionPorts)
+      : {
+          timezone: env('TZ'),
+          user: env('POSTGRES_USER'),
+          password: env('POSTGRES_PASSWORD'),
+          dbName: env('POSTGRES_DB'),
+          schema: env('POSTGRES_SCHEMA'),
+          host: env('POSTGRES_HOST'),
+          port: envInt('POSTGRES_PORT')
+        };
 
   await runMigrations(dbConfig);
 }
