@@ -3,7 +3,6 @@ export { DI } from './DI.js';
 export type { OrmDbConfig } from './db/orm-config.js';
 // ORM config
 export { createOrmConfig, getOrmConfig } from './db/orm-config.js';
-export { PostgresArchetypeConfigRepository } from './repositories/PostgresArchetypeConfigRepository.js';
 export { PostgresArchetypeRepository2 } from './repositories/PostgresArchetypeRepository2.js';
 export { PostgresCompanyBriefRepository } from './repositories/PostgresCompanyBriefRepository.js';
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
@@ -13,14 +12,9 @@ export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepos
 // Repositories
 export { PostgresJobRepository } from './repositories/PostgresJobRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
-export { PostgresResumeCompanyRepository } from './repositories/PostgresResumeCompanyRepository.js';
-export { PostgresResumeEducationRepository } from './repositories/PostgresResumeEducationRepository.js';
-export { PostgresResumeHeadlineRepository } from './repositories/PostgresResumeHeadlineRepository.js';
-export { PostgresResumeSkillCategoryRepository } from './repositories/PostgresResumeSkillCategoryRepository.js';
 export { PostgresSkillCategoryRepository } from './repositories/PostgresSkillCategoryRepository.js';
 export { PostgresSkillRepository } from './repositories/PostgresSkillRepository.js';
 export { PostgresTagRepository } from './repositories/PostgresTagRepository.js';
-export { PostgresUserRepository } from './repositories/PostgresUserRepository.js';
 // Legacy CV generation (used by cli/cvs)
 export { generateCV } from './resume/generateCV.js';
 export { TYPST_DIR } from './resume/TYPST_DIR.js';
