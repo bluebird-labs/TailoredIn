@@ -1,4 +1,4 @@
-import { type EducationRepository, type Result, err, ok } from '@tailoredin/domain';
+import { type Education, type EducationRepository, err, ok, type Result } from '@tailoredin/domain';
 import type { EducationDto } from '../../dtos/EducationDto.js';
 
 export type UpdateEducation2Input = {
@@ -15,7 +15,7 @@ export class UpdateEducation2 {
   public constructor(private readonly educationRepository: EducationRepository) {}
 
   public async execute(input: UpdateEducation2Input): Promise<Result<EducationDto, Error>> {
-    let education;
+    let education: Education;
     try {
       education = await this.educationRepository.findByIdOrFail(input.educationId);
     } catch {
