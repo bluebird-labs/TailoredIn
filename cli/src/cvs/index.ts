@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
 import { Logger } from '@tailoredin/core';
+import { ArchetypeKey } from '@tailoredin/domain';
 import { generateCV, TYPST_DIR, TypstFileGenerator } from '@tailoredin/infrastructure';
 import { format } from 'date-fns';
 import Yargs from 'yargs';
@@ -23,7 +24,7 @@ Yargs(hideBin(process.argv))
           alias: ['a'],
           type: 'string',
           demandOption: true,
-          choices: Object.values(Archetype),
+          choices: Object.values(ArchetypeKey),
           description: 'The archetype of the CV to generate'
         },
         theme: {
@@ -62,7 +63,7 @@ Yargs(hideBin(process.argv))
       const awesomeColor = (args.main_color as string) || (args.theme as string);
 
       const cvContent = generateCV({
-        archetype: args.archetype as Archetype,
+        archetype: args.archetype as ArchetypeKey,
         awesomeColor,
         companyName: args.company_name as string,
         keywords: args.keywords as string[]
