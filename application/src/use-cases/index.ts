@@ -69,6 +69,8 @@ export type { ListJobsInput } from './ListJobs.js';
 export { ListJobs } from './ListJobs.js';
 export type { ListSkillCategoriesInput } from './ListSkillCategories.js';
 export { ListSkillCategories } from './ListSkillCategories.js';
+export type { ListTagsInput } from './tag/ListTags.js';
+export { ListTags } from './tag/ListTags.js';
 export type { ReplaceLocationsInput } from './ReplaceLocations.js';
 export { ReplaceLocations } from './ReplaceLocations.js';
 export { ScrapeAndIngestJobs } from './ScrapeAndIngestJobs.js';
