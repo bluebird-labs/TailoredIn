@@ -7,6 +7,7 @@ export type {
 export type { CompanyBriefDto } from './CompanyBriefDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export type { EducationDto } from './EducationDto.js';
+export type { BulletDto, BulletVariantDto, ExperienceDto } from './ExperienceDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
 export type { HeadlineDto } from './HeadlineDto.js';
 export type { IngestJobByUrlInput, ManualJobFieldsDto } from './IngestJobByUrlDto.js';

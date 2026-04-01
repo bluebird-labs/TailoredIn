@@ -1,5 +1,5 @@
-import { ApprovalStatus } from '../value-objects/ApprovalStatus.js';
 import { Entity } from '../Entity.js';
+import { ApprovalStatus } from '../value-objects/ApprovalStatus.js';
 import { BulletId } from '../value-objects/BulletId.js';
 import { TagSet } from '../value-objects/TagSet.js';
 import type { BulletVariantSource } from './BulletVariant.js';
@@ -40,12 +40,7 @@ export class Bullet extends Entity<BulletId> {
     this.updatedAt = props.updatedAt;
   }
 
-  public addVariant(props: {
-    text: string;
-    angle: string;
-    tags: TagSet;
-    source: BulletVariantSource;
-  }): BulletVariant {
+  public addVariant(props: { text: string; angle: string; tags: TagSet; source: BulletVariantSource }): BulletVariant {
     const variant = BulletVariant.create({ bulletId: this.id.value, ...props });
     this.variants.push(variant);
     this.updatedAt = new Date();
