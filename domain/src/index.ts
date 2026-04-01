@@ -7,6 +7,8 @@ export { TailoringStrategyService } from './domain-services/TailoringStrategySer
 export { Entity } from './Entity.js';
 export type { ArchetypeConfigCreateProps } from './entities/ArchetypeConfig.js';
 export { ArchetypeConfig } from './entities/ArchetypeConfig.js';
+export type { BulletCreateProps } from './entities/Bullet.js';
+export { Bullet } from './entities/Bullet.js';
 export type { BulletVariantCreateProps, BulletVariantSource } from './entities/BulletVariant.js';
 export { BulletVariant } from './entities/BulletVariant.js';
 export type { ArchetypePositionCreateProps } from './entities/ArchetypePosition.js';
