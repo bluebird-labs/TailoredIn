@@ -101,11 +101,11 @@ graph TD
 
 Each worktree runs `bun dev:up` for independent Docker + port allocation. UI testing happens at the local URL printed by `dev:up`.
 
-### Wave 1 — Foundation ← START HERE
+### Wave 1 — Foundation ✅
 
-| Session | Slice | Branch | Worktree |
-|---|---|---|---|
-| 1 | **S0** (Foundation) | `feat/dr-s0-foundation` | `.claude/worktrees/dr-s0-foundation` |
+| Session | Slice | Branch | Worktree | Status |
+|---|---|---|---|---|
+| 1 | **S0** (Foundation) | `feat/dr-s0-foundation` | `.claude/worktrees/dr-s0-foundation` | ✅ merged (#28) |
 
 **Verify:**
 - [ ] `cd domain && bun test` — all VO/entity tests pass (TagSet, TagProfile, Tag)
@@ -113,14 +113,14 @@ Each worktree runs `bun dev:up` for independent Docker + port allocation. UI tes
 - [ ] `bun dev:up && cd infrastructure && bun run db:migration:up` — migration applies
 - [ ] Connect to DB, verify all 17 tables exist: `profiles`, `experiences`, `bullets`, `bullet_variants`, `bullet_tags`, `bullet_variant_tags`, `tags`, `projects`, `project_tags`, `headlines`, `headline_tags`, `educations`, `skill_categories`, `skill_items`, `archetypes_v2`, `archetype_tag_weights`, `job_postings`
 
-### Wave 2 — Profile, Headlines, Education, Skills (4 parallel)
+### Wave 2 — Profile, Headlines, Education, Skills (4 parallel) ← CURRENT
 
-| Session | Slice | Branch | Worktree |
-|---|---|---|---|
-| 1 | **S1** (Profile) | `feat/dr-s1-profile` | `.claude/worktrees/dr-s1-profile` |
-| 2 | **S2** (Headlines) | `feat/dr-s2-headlines` | `.claude/worktrees/dr-s2-headlines` |
-| 3 | **S3** (Education) | `feat/dr-s3-education` | `.claude/worktrees/dr-s3-education` |
-| 4 | **S4** (Skills) | `feat/dr-s4-skills` | `.claude/worktrees/dr-s4-skills` |
+| Session | Slice | Branch | Worktree | Status |
+|---|---|---|---|---|
+| 1 | **S1** (Profile) | `feat/dr-s1-profile` | `.claude/worktrees/dr-s1-profile` | ✅ merged (#29) |
+| 2 | **S2** (Headlines) | `feat/dr-s2-headlines` | `.claude/worktrees/dr-s2-headlines` | ⏳ launched |
+| 3 | **S3** (Education) | `feat/dr-s3-education` | `.claude/worktrees/dr-s3-education` | ⏳ launched |
+| 4 | **S4** (Skills) | `feat/dr-s4-skills` | `.claude/worktrees/dr-s4-skills` | ⏳ launched |
 
 **S1 UI Testing:**
 - [ ] Open `/resume/profile` — form loads
