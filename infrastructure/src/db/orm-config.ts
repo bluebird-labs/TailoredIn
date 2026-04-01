@@ -8,7 +8,7 @@ import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
 import { ArchetypeTagWeight } from './entities/archetypes/ArchetypeTagWeight.js';
-import { ArchetypeV2 } from './entities/archetypes/ArchetypeV2.js';
+import { ArchetypeOrm } from './entities/archetypes/ArchetypeOrm.js';
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
@@ -50,7 +50,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       Skill,
       Job,
       JobStatusUpdate,
-      ArchetypeV2,
+      ArchetypeOrm,
       ArchetypeTagWeight,
       OrmHeadline,
       OrmTag,

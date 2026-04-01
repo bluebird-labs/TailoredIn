@@ -9,7 +9,7 @@ import {
   TagProfile
 } from '@tailoredin/domain';
 import { ArchetypeTagWeight } from '../db/entities/archetypes/ArchetypeTagWeight.js';
-import { ArchetypeV2 } from '../db/entities/archetypes/ArchetypeV2.js';
+import { ArchetypeOrm } from '../db/entities/archetypes/ArchetypeOrm.js';
 import { Tag as OrmTag } from '../db/entities/tag/Tag.js';
 
 @injectable()
@@ -17,17 +17,17 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainArchetype> {
-    const orm = await this.orm.em.findOneOrFail(ArchetypeV2, id);
+    const orm = await this.orm.em.findOneOrFail(ArchetypeOrm, id);
     return this.toDomain(orm);
   }
 
   public async findAll(): Promise<DomainArchetype[]> {
-    const ormEntities = await this.orm.em.find(ArchetypeV2, {}, { orderBy: { createdAt: 'ASC' } });
+    const ormEntities = await this.orm.em.find(ArchetypeOrm, {}, { orderBy: { createdAt: 'ASC' } });
     return Promise.all(ormEntities.map(e => this.toDomain(e)));
   }
 
   public async save(archetype: DomainArchetype): Promise<void> {
-    const existing = await this.orm.em.findOne(ArchetypeV2, archetype.id.value);
+    const existing = await this.orm.em.findOne(ArchetypeOrm, archetype.id.value);
     const contentJson = this.serializeContentSelection(archetype.contentSelection);
 
     if (existing) {
@@ -38,7 +38,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
       existing.updatedAt = archetype.updatedAt;
       this.orm.em.persist(existing);
     } else {
-      const orm = new ArchetypeV2({
+      const orm = new ArchetypeOrm({
         id: archetype.id.value,
         profileId: archetype.profileId,
         key: archetype.key,
@@ -57,7 +57,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    const orm = await this.orm.em.findOneOrFail(ArchetypeV2, id);
+    const orm = await this.orm.em.findOneOrFail(ArchetypeOrm, id);
     // Tag weights cascade-delete via FK
     this.orm.em.remove(orm);
     await this.orm.em.flush();
@@ -81,7 +81,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
     }
   }
 
-  private async toDomain(orm: ArchetypeV2): Promise<DomainArchetype> {
+  private async toDomain(orm: ArchetypeOrm): Promise<DomainArchetype> {
     // Load tag weights + their dimensions
     const weights = await this.orm.em.find(ArchetypeTagWeight, { archetypeId: orm.id });
     const tagIds = weights.map(w => w.tagId);

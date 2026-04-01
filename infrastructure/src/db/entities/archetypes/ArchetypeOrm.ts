@@ -2,7 +2,7 @@ import { Entity, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 
-export type ArchetypeV2Props = {
+export type ArchetypeOrmProps = {
   id: string;
   profileId: string;
   key: string;
@@ -14,7 +14,7 @@ export type ArchetypeV2Props = {
 };
 
 @Entity({ tableName: 'archetypes' })
-export class ArchetypeV2 extends BaseEntity {
+export class ArchetypeOrm extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
@@ -33,7 +33,7 @@ export class ArchetypeV2 extends BaseEntity {
   @Property({ name: 'content_selection', type: 'json' })
   public contentSelection: Record<string, unknown>;
 
-  public constructor(props: ArchetypeV2Props) {
+  public constructor(props: ArchetypeOrmProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.profileId = props.profileId;
