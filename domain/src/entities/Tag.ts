@@ -3,7 +3,7 @@ import { TagId } from '../value-objects/TagId.js';
 
 export enum TagDimension {
   ROLE = 'ROLE',
-  SKILL = 'SKILL',
+  SKILL = 'SKILL'
 }
 
 export type TagCreateProps = {
@@ -41,7 +41,7 @@ export class Tag extends AggregateRoot<TagId> {
       id: TagId.generate(),
       name: Tag.normalize(props.name),
       dimension: props.dimension,
-      createdAt: new Date(),
+      createdAt: new Date()
     });
   }
 }

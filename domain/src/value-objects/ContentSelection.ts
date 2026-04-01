@@ -30,7 +30,7 @@ export class ContentSelection {
       projectIds: [],
       educationIds: [],
       skillCategoryIds: [],
-      skillItemIds: [],
+      skillItemIds: []
     });
   }
 }

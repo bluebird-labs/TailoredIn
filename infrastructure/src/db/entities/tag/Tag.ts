@@ -1,4 +1,4 @@
-import { Entity, Enum, Property } from '@mikro-orm/decorators/es';
+import { Entity, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity as MikroOrmBaseEntity } from '@mikro-orm/postgresql';
 import { UuidPrimaryKey } from '../../helpers.js';
 

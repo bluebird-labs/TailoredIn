@@ -135,7 +135,7 @@ export const DI = {
   },
 
   Tag: {
-    Repository: new InjectionToken<TagRepository>('DI.Tag.Repository'),
+    Repository: new InjectionToken<TagRepository>('DI.Tag.Repository')
   },
 
   Archetype: {

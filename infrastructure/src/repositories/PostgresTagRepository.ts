@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import { Tag as DomainTag, TagDimension, TagId, type TagRepository } from '@tailoredin/domain';
+import { Tag as DomainTag, type TagDimension, TagId, type TagRepository } from '@tailoredin/domain';
 import { Tag as OrmTag } from '../db/entities/tag/Tag.js';
 
 @injectable()
@@ -39,7 +39,7 @@ export class PostgresTagRepository implements TagRepository {
       id: tag.id.value,
       name: tag.name,
       dimension: tag.dimension,
-      createdAt: tag.createdAt,
+      createdAt: tag.createdAt
     });
     this.orm.em.persist(orm);
     await this.orm.em.flush();
@@ -56,7 +56,7 @@ export class PostgresTagRepository implements TagRepository {
       id: new TagId(orm.id),
       name: orm.name,
       dimension: orm.dimension as TagDimension,
-      createdAt: orm.createdAt,
+      createdAt: orm.createdAt
     });
   }
 }
