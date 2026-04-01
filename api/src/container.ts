@@ -375,36 +375,6 @@ container.bind({
   useFactory: () => new ReplaceLocations(container.get(DI.Resume.CompanyRepository))
 });
 
-// Skills use cases
-container.bind({
-  provide: DI.Resume.ListSkillCategories,
-  useFactory: () => new ListSkillCategories(container.get(DI.Resume.SkillCategoryRepository))
-});
-container.bind({
-  provide: DI.Resume.CreateSkillCategory,
-  useFactory: () => new CreateSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateSkillCategory,
-  useFactory: () => new UpdateSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
-});
-container.bind({
-  provide: DI.Resume.DeleteSkillCategory,
-  useFactory: () => new DeleteSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
-});
-container.bind({
-  provide: DI.Resume.AddSkillItem,
-  useFactory: () => new AddSkillItem(container.get(DI.Resume.SkillCategoryRepository))
-});
-container.bind({
-  provide: DI.Resume.UpdateSkillItem,
-  useFactory: () => new UpdateSkillItem(container.get(DI.Resume.SkillCategoryRepository))
-});
-container.bind({
-  provide: DI.Resume.DeleteSkillItem,
-  useFactory: () => new DeleteSkillItem(container.get(DI.Resume.SkillCategoryRepository))
-});
-
 // SkillCategory use cases (new domain model)
 container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
 container.bind({

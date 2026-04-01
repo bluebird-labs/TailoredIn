@@ -133,14 +133,7 @@ export const DI = {
     AddBullet: new InjectionToken<AddBullet>('DI.Resume.AddBullet'),
     UpdateBullet: new InjectionToken<UpdateBullet>('DI.Resume.UpdateBullet'),
     DeleteBullet: new InjectionToken<DeleteBullet>('DI.Resume.DeleteBullet'),
-    ReplaceLocations: new InjectionToken<ReplaceLocations>('DI.Resume.ReplaceLocations'),
-    ListSkillCategories: new InjectionToken<ListSkillCategories>('DI.Resume.ListSkillCategories'),
-    CreateSkillCategory: new InjectionToken<CreateSkillCategory>('DI.Resume.CreateSkillCategory'),
-    UpdateSkillCategory: new InjectionToken<UpdateSkillCategory>('DI.Resume.UpdateSkillCategory'),
-    DeleteSkillCategory: new InjectionToken<DeleteSkillCategory>('DI.Resume.DeleteSkillCategory'),
-    AddSkillItem: new InjectionToken<AddSkillItem>('DI.Resume.AddSkillItem'),
-    UpdateSkillItem: new InjectionToken<UpdateSkillItem>('DI.Resume.UpdateSkillItem'),
-    DeleteSkillItem: new InjectionToken<DeleteSkillItem>('DI.Resume.DeleteSkillItem')
+    ReplaceLocations: new InjectionToken<ReplaceLocations>('DI.Resume.ReplaceLocations')
   },
 
   Profile: {
