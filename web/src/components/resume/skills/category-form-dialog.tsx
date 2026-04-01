@@ -10,14 +10,14 @@ import { Label } from '@/components/ui/label';
 import { useCreateSkillCategory, useUpdateSkillCategory } from '@/hooks/use-skills';
 
 const categorySchema = z.object({
-  categoryName: z.string().min(1, 'Required')
+  name: z.string().min(1, 'Required')
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 type Category = {
   id: string;
-  categoryName: string;
+  name: string;
   ordinal: number;
 };
 
@@ -40,12 +40,12 @@ export function CategoryFormDialog({ open, onOpenChange, category, nextOrdinal }
     formState: { errors }
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
-    defaultValues: { categoryName: '' }
+    defaultValues: { name: '' }
   });
 
   useEffect(() => {
     if (open) {
-      reset({ categoryName: category?.categoryName ?? '' });
+      reset({ name: category?.name ?? '' });
     }
   }, [open, category, reset]);
 
@@ -54,7 +54,7 @@ export function CategoryFormDialog({ open, onOpenChange, category, nextOrdinal }
   function onSubmit(data: CategoryFormData) {
     if (isEditing) {
       updateCategory.mutate(
-        { id: category.id, category_name: data.categoryName },
+        { id: category.id, name: data.name },
         {
           onSuccess: () => {
             toast.success('Category updated');
@@ -64,7 +64,7 @@ export function CategoryFormDialog({ open, onOpenChange, category, nextOrdinal }
       );
     } else {
       createCategory.mutate(
-        { category_name: data.categoryName, ordinal: nextOrdinal },
+        { name: data.name, ordinal: nextOrdinal },
         {
           onSuccess: () => {
             toast.success('Category created');
@@ -83,9 +83,9 @@ export function CategoryFormDialog({ open, onOpenChange, category, nextOrdinal }
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="categoryName">Category Name</Label>
-            <Input id="categoryName" {...register('categoryName')} placeholder="Languages & Frameworks" />
-            {errors.categoryName && <p className="text-xs text-destructive">{errors.categoryName.message}</p>}
+            <Label htmlFor="name">Category Name</Label>
+            <Input id="name" {...register('name')} placeholder="Languages & Frameworks" />
+            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
           <DialogFooter>
             <Button type="submit" disabled={isPending}>

@@ -11,7 +11,7 @@ import { useAddSkillItem, useDeleteSkillItem, useUpdateSkillItem } from '@/hooks
 
 type SkillItem = {
   id: string;
-  skillName: string;
+  name: string;
   ordinal: number;
 };
 
@@ -32,7 +32,7 @@ export function SkillItemList({ categoryId, items }: SkillItemListProps) {
     const name = newName.trim();
     if (!name) return;
     const ordinal = sorted.length > 0 ? Math.max(...sorted.map(i => i.ordinal)) + 1 : 0;
-    addItem.mutate({ categoryId, skill_name: name, ordinal }, { onSuccess: () => setNewName('') });
+    addItem.mutate({ categoryId, name, ordinal }, { onSuccess: () => setNewName('') });
   }
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -49,22 +49,19 @@ export function SkillItemList({ categoryId, items }: SkillItemListProps) {
     for (let i = 0; i < reordered.length; i++) {
       const item = reordered[i];
       if (item.ordinal !== i) {
-        updateItem.mutate({ categoryId, itemId: item.id, ordinal: i });
+        updateItem.mutate({ itemId: item.id, ordinal: i });
       }
     }
   }
 
   function handleDelete() {
     if (!deleteTarget) return;
-    deleteItem.mutate(
-      { categoryId, itemId: deleteTarget.id },
-      {
-        onSuccess: () => {
-          toast.success(`${deleteTarget.skillName} removed`);
-          setDeleteTarget(null);
-        }
+    deleteItem.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        toast.success(`${deleteTarget.name} removed`);
+        setDeleteTarget(null);
       }
-    );
+    });
   }
 
   return (
@@ -73,7 +70,7 @@ export function SkillItemList({ categoryId, items }: SkillItemListProps) {
         {sorted.map(item => (
           <SortableItem key={item.id} id={item.id} className="py-0.5">
             <Badge variant="secondary" className="gap-1 pr-1">
-              {item.skillName}
+              {item.name}
               <button
                 type="button"
                 className="text-muted-foreground hover:text-foreground"
@@ -103,7 +100,7 @@ export function SkillItemList({ categoryId, items }: SkillItemListProps) {
         open={!!deleteTarget}
         onOpenChange={open => !open && setDeleteTarget(null)}
         title="Remove Skill"
-        description={`Remove "${deleteTarget?.skillName}" from this category?`}
+        description={`Remove "${deleteTarget?.name}" from this category?`}
         onConfirm={handleDelete}
         isPending={deleteItem.isPending}
       />

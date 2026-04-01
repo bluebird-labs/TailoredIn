@@ -9,13 +9,13 @@ import { SkillItemList } from './skill-item-list';
 
 type SkillItem = {
   id: string;
-  skillName: string;
+  name: string;
   ordinal: number;
 };
 
 type SkillCategory = {
   id: string;
-  categoryName: string;
+  name: string;
   ordinal: number;
   items: SkillItem[];
 };
@@ -32,7 +32,7 @@ export function SkillCategoryCard({ category, onEdit }: SkillCategoryCardProps) 
   function handleDelete() {
     deleteCategory.mutate(category.id, {
       onSuccess: () => {
-        toast.success(`${category.categoryName} deleted`);
+        toast.success(`${category.name} deleted`);
         setShowDelete(false);
       }
     });
@@ -42,7 +42,7 @@ export function SkillCategoryCard({ category, onEdit }: SkillCategoryCardProps) 
     <>
       <Card>
         <CardHeader>
-          <CardTitle>{category.categoryName}</CardTitle>
+          <CardTitle>{category.name}</CardTitle>
           <CardAction>
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="icon-xs" onClick={onEdit}>
@@ -67,7 +67,7 @@ export function SkillCategoryCard({ category, onEdit }: SkillCategoryCardProps) 
       <ConfirmDeleteDialog
         open={showDelete}
         onOpenChange={setShowDelete}
-        title={`Delete ${category.categoryName}?`}
+        title={`Delete ${category.name}?`}
         description="This will permanently remove the category and all its skills."
         onConfirm={handleDelete}
         isPending={deleteCategory.isPending}
