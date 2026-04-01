@@ -207,12 +207,12 @@ container.bind({
   provide: DI.Resume.ContentFactory,
   useFactory: () =>
     new DatabaseResumeContentFactory(
-      container.get(DI.Resume.UserRepository),
-      container.get(DI.Resume.HeadlineRepository),
-      container.get(DI.Resume.ArchetypeConfigRepository),
-      container.get(DI.Resume.CompanyRepository),
-      container.get(DI.Resume.EducationRepository),
-      container.get(DI.Resume.SkillCategoryRepository)
+      container.get(DI.Profile.Repository),
+      container.get(DI.Headline.Repository),
+      container.get(DI.Archetype2.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.Education.Repository),
+      container.get(DI.SkillCategory.Repository)
     )
 });
 
@@ -222,7 +222,8 @@ container.bind({
   useFactory: () =>
     new GenerateResume(
       container.get(DI.Job.Repository),
-      container.get(DI.Resume.UserRepository),
+      container.get(DI.Profile.Repository),
+      container.get(DI.Archetype2.Repository),
       container.get(DI.Resume.LlmService),
       container.get(DI.Resume.WebColorService),
       container.get(DI.Resume.Renderer),

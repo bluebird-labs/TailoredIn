@@ -1,9 +1,8 @@
-import type { Archetype } from '@tailoredin/domain';
 import type { ResumeContentDto } from '../dtos/ResumeContentDto.js';
 
 export type MakeResumeContentInput = {
-  userId: string;
-  archetype: Archetype;
+  profileId: string;
+  archetypeId: string;
   awesomeColor: string;
   keywords: string[];
 };
