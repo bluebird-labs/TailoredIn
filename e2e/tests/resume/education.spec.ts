@@ -39,7 +39,8 @@ test.describe('Education CRUD', () => {
     await page.getByRole('button', { name: 'Delete' }).click();
 
     await expect(page.getByText('M.A. Philosophy deleted')).toBeVisible();
-    await expect(page.getByText('M.A. Philosophy')).not.toBeVisible();
+    // Verify the card is gone (use exact match to avoid matching the toast text)
+    await expect(page.locator('[class*="card"]').filter({ hasText: 'M.A. Philosophy' })).not.toBeVisible();
   });
 
   test('persists education entries across page reload', async ({ page }) => {
