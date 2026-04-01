@@ -2,15 +2,19 @@ import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container, llmAvailable } from './container.js';
 import { AddBulletRoute } from './routes/AddBulletRoute.js';
+import { CreateArchetype2Route } from './routes/archetype2/CreateArchetype2Route.js';
+import { DeleteArchetype2Route } from './routes/archetype2/DeleteArchetype2Route.js';
+import { ListArchetypes2Route } from './routes/archetype2/ListArchetypes2Route.js';
+import { SetArchetypeContent2Route } from './routes/archetype2/SetArchetypeContent2Route.js';
+import { SetArchetypeTagProfile2Route } from './routes/archetype2/SetArchetypeTagProfile2Route.js';
+import { UpdateArchetype2Route } from './routes/archetype2/UpdateArchetype2Route.js';
 import { BulkChangeJobStatusRoute } from './routes/BulkChangeJobStatusRoute.js';
 import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
-import { CreateArchetypeRoute } from './routes/CreateArchetypeRoute.js';
 import { CreateCompanyRoute } from './routes/CreateCompanyRoute.js';
 import { CreateEducationRoute } from './routes/CreateEducationRoute.js';
 import { CreateHeadlineRoute } from './routes/CreateHeadlineRoute.js';
 import { CreatePositionRoute } from './routes/CreatePositionRoute.js';
-import { DeleteArchetypeRoute } from './routes/DeleteArchetypeRoute.js';
 import { DeleteBulletRoute } from './routes/DeleteBulletRoute.js';
 import { DeleteCompanyRoute } from './routes/DeleteCompanyRoute.js';
 import { DeleteEducationRoute } from './routes/DeleteEducationRoute.js';
@@ -46,15 +50,11 @@ import { ListHeadlines2Route } from './routes/headline/ListHeadlines2Route.js';
 import { UpdateHeadline2Route } from './routes/headline/UpdateHeadline2Route.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
-import { ListArchetypesRoute } from './routes/ListArchetypesRoute.js';
 import { ListCompaniesRoute } from './routes/ListCompaniesRoute.js';
 import { ListEducationRoute } from './routes/ListEducationRoute.js';
 import { ListHeadlinesRoute } from './routes/ListHeadlinesRoute.js';
 import { ListJobsRoute } from './routes/ListJobsRoute.js';
 import { ReplaceLocationsRoute } from './routes/ReplaceLocationsRoute.js';
-import { SetArchetypeEducationRoute } from './routes/SetArchetypeEducationRoute.js';
-import { SetArchetypePositionsRoute } from './routes/SetArchetypePositionsRoute.js';
-import { SetArchetypeSkillsRoute } from './routes/SetArchetypeSkillsRoute.js';
 import { AddSkillItemRoute as NewAddSkillItemRoute } from './routes/skill-categories/AddSkillItemRoute.js';
 import { CreateSkillCategoryRoute as NewCreateSkillCategoryRoute } from './routes/skill-categories/CreateSkillCategoryRoute.js';
 import { DeleteSkillCategoryRoute as NewDeleteSkillCategoryRoute } from './routes/skill-categories/DeleteSkillCategoryRoute.js';
@@ -63,7 +63,6 @@ import { ListSkillCategoriesRoute as NewListSkillCategoriesRoute } from './route
 import { UpdateSkillCategoryRoute as NewUpdateSkillCategoryRoute } from './routes/skill-categories/UpdateSkillCategoryRoute.js';
 import { UpdateSkillItemRoute as NewUpdateSkillItemRoute } from './routes/skill-categories/UpdateSkillItemRoute.js';
 import { ListTagsRoute } from './routes/tag/ListTagsRoute.js';
-import { UpdateArchetypeRoute } from './routes/UpdateArchetypeRoute.js';
 import { UpdateBulletRoute } from './routes/UpdateBulletRoute.js';
 import { UpdateCompanyRoute } from './routes/UpdateCompanyRoute.js';
 import { UpdateEducationRoute } from './routes/UpdateEducationRoute.js';
@@ -155,14 +154,13 @@ const app = new Elysia()
   .use(container.get(NewAddSkillItemRoute).plugin())
   .use(container.get(NewUpdateSkillItemRoute).plugin())
   .use(container.get(NewDeleteSkillItemRoute).plugin())
-  // Archetypes
-  .use(container.get(ListArchetypesRoute).plugin())
-  .use(container.get(CreateArchetypeRoute).plugin())
-  .use(container.get(UpdateArchetypeRoute).plugin())
-  .use(container.get(DeleteArchetypeRoute).plugin())
-  .use(container.get(SetArchetypePositionsRoute).plugin())
-  .use(container.get(SetArchetypeSkillsRoute).plugin())
-  .use(container.get(SetArchetypeEducationRoute).plugin())
+  // Archetypes (new domain model — S6)
+  .use(container.get(ListArchetypes2Route).plugin())
+  .use(container.get(CreateArchetype2Route).plugin())
+  .use(container.get(UpdateArchetype2Route).plugin())
+  .use(container.get(DeleteArchetype2Route).plugin())
+  .use(container.get(SetArchetypeContent2Route).plugin())
+  .use(container.get(SetArchetypeTagProfile2Route).plugin())
   // S2 Headlines (new domain)
   .use(container.get(ListHeadlines2Route).plugin())
   .use(container.get(CreateHeadline2Route).plugin())

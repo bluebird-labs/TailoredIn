@@ -9,6 +9,7 @@ import {
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
+  CreateArchetype2,
   CreateCompany,
   CreateEducation,
   CreateEducation2,
@@ -18,6 +19,7 @@ import {
   CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
+  DeleteArchetype2,
   DeleteBullet,
   DeleteBullet2,
   DeleteBulletVariant,
@@ -40,6 +42,7 @@ import {
   IngestJobByUrl,
   IngestScrapedJob,
   ListArchetypes,
+  ListArchetypes2,
   ListCompanies,
   ListEducation,
   ListEducation2,
@@ -50,10 +53,13 @@ import {
   ListSkillCategories,
   ListTags,
   ReplaceLocations,
+  SetArchetypeContent2,
   SetArchetypeEducation,
   SetArchetypePositions,
   SetArchetypeSkills,
+  SetArchetypeTagProfile2,
   UpdateArchetype,
+  UpdateArchetype2,
   UpdateBullet,
   UpdateBullet2,
   UpdateBulletVariant,
@@ -82,6 +88,7 @@ import {
   PlaywrightJobScraper,
   PlaywrightWebColorService,
   PostgresArchetypeConfigRepository,
+  PostgresArchetypeRepository2,
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
@@ -494,6 +501,33 @@ container.bind({
 container.bind({
   provide: DI.Archetype.SetEducation,
   useFactory: () => new SetArchetypeEducation(container.get(DI.Archetype.ConfigRepository))
+});
+
+// Archetype2 use cases (new domain model — S6)
+container.bind({ provide: DI.Archetype2.Repository, useClass: PostgresArchetypeRepository2 });
+container.bind({
+  provide: DI.Archetype2.List,
+  useFactory: () => new ListArchetypes2(container.get(DI.Archetype2.Repository))
+});
+container.bind({
+  provide: DI.Archetype2.Create,
+  useFactory: () => new CreateArchetype2(container.get(DI.Archetype2.Repository))
+});
+container.bind({
+  provide: DI.Archetype2.Update,
+  useFactory: () => new UpdateArchetype2(container.get(DI.Archetype2.Repository))
+});
+container.bind({
+  provide: DI.Archetype2.Delete,
+  useFactory: () => new DeleteArchetype2(container.get(DI.Archetype2.Repository))
+});
+container.bind({
+  provide: DI.Archetype2.SetContent,
+  useFactory: () => new SetArchetypeContent2(container.get(DI.Archetype2.Repository))
+});
+container.bind({
+  provide: DI.Archetype2.SetTagProfile,
+  useFactory: () => new SetArchetypeTagProfile2(container.get(DI.Archetype2.Repository))
 });
 
 export { container };
