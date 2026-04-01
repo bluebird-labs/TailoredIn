@@ -15,11 +15,7 @@ export function useSkillCategories() {
 export function useCreateSkillCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
-      name: string;
-      ordinal: number;
-      items?: { name: string; ordinal: number }[];
-    }) => {
+    mutationFn: async (input: { name: string; ordinal: number; items?: { name: string; ordinal: number }[] }) => {
       const { data } = await api['skill-categories'].post(input);
       return data;
     },
@@ -56,15 +52,7 @@ export function useDeleteSkillCategory() {
 export function useAddSkillItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      categoryId,
-      name,
-      ordinal
-    }: {
-      categoryId: string;
-      name: string;
-      ordinal: number;
-    }) => {
+    mutationFn: async ({ categoryId, name, ordinal }: { categoryId: string; name: string; ordinal: number }) => {
       const { data } = await api['skill-categories']({ id: categoryId }).items.post({ name, ordinal });
       return data;
     },
@@ -77,14 +65,7 @@ export function useAddSkillItem() {
 export function useUpdateSkillItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      itemId,
-      ...body
-    }: {
-      itemId: string;
-      name?: string;
-      ordinal?: number;
-    }) => {
+    mutationFn: async ({ itemId, ...body }: { itemId: string; name?: string; ordinal?: number }) => {
       await api['skill-items']({ id: itemId }).put(body);
     },
     onSuccess: () => {
