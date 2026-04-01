@@ -1,23 +1,23 @@
-import { err, ok, type Result, type ResumeSkillCategory, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import { err, ok, type Result, type SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 
 export type UpdateSkillCategoryInput = {
   categoryId: string;
-  categoryName?: string;
+  name?: string;
   ordinal?: number;
 };
 
 export class UpdateSkillCategory {
-  public constructor(private readonly skillCategoryRepository: ResumeSkillCategoryRepository) {}
+  public constructor(private readonly skillCategoryRepository: SkillCategoryRepository) {}
 
   public async execute(input: UpdateSkillCategoryInput): Promise<Result<void, Error>> {
-    let category: ResumeSkillCategory;
+    let category: SkillCategory;
     try {
       category = await this.skillCategoryRepository.findByIdOrFail(input.categoryId);
     } catch {
       return err(new Error(`Skill category not found: ${input.categoryId}`));
     }
 
-    if (input.categoryName !== undefined) category.categoryName = input.categoryName;
+    if (input.name !== undefined) category.name = input.name;
     if (input.ordinal !== undefined) category.ordinal = input.ordinal;
     category.updatedAt = new Date();
 
