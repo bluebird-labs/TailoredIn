@@ -12,24 +12,24 @@ import type {
   LlmGenerateCompanyBriefInput,
   LlmService
 } from '@tailoredin/application';
-import { Archetype, SkillName } from '@tailoredin/domain';
+import { ArchetypeKey, SkillName } from '@tailoredin/domain';
 import OpenAI from 'openai';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 
-const archetypeDetails: Record<Archetype, string> = {
-  [Archetype.HAND_ON_MANAGER]:
+const archetypeDetails: Record<ArchetypeKey, string> = {
+  [ArchetypeKey.HAND_ON_MANAGER]:
     'An engineering manager who is expected to be hands-on and spend a significant part of their time coding',
-  [Archetype.LEADER_MANAGER]:
+  [ArchetypeKey.LEADER_MANAGER]:
     'A senior engineering manager or director who focuses on managing teams rather than coding',
-  [Archetype.IC]: 'An engineer who is not expected to manage individuals and spends their whole time coding',
-  [Archetype.LEAD_IC]: 'An experienced engineer who demonstrates leadership and guides teams',
-  [Archetype.NERD]: 'A highly technical engineer focused on deep, cutting-edge technical work or research'
+  [ArchetypeKey.IC]: 'An engineer who is not expected to manage individuals and spends their whole time coding',
+  [ArchetypeKey.LEAD_IC]: 'An experienced engineer who demonstrates leadership and guides teams',
+  [ArchetypeKey.NERD]: 'A highly technical engineer focused on deep, cutting-edge technical work or research'
 };
 
 const PostingInsightsSchema = z.strictObject({
   website: z.string().nullable().describe("The company's website or null if not confident"),
-  archetype: z.nativeEnum(Archetype).describe('The closest matching position archetype')
+  archetype: z.nativeEnum(ArchetypeKey).describe('The closest matching position archetype')
 });
 
 const CompanyBriefSchema = z.strictObject({
@@ -78,7 +78,7 @@ export class OpenAiLlmService implements LlmService {
       response_format: zodResponseFormat(PostingInsightsSchema, 'insights')
     });
 
-    return completion.choices[0].message.parsed ?? { website: null, archetype: Archetype.IC };
+    return completion.choices[0].message.parsed ?? { website: null, archetype: ArchetypeKey.IC };
   }
 
   public async extractApplicationInsights(input: ExtractApplicationInsightsInput): Promise<ApplicationInsightsDto> {

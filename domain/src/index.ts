@@ -5,8 +5,8 @@ export type { DomainEvent } from './DomainEvent.js';
 export { JobElectionService } from './domain-services/JobElectionService.js';
 export { TailoringStrategyService } from './domain-services/TailoringStrategyService.js';
 export { Entity } from './Entity.js';
-export type { Archetype2CreateProps } from './entities/Archetype2.js';
-export { Archetype2 } from './entities/Archetype2.js';
+export type { ArchetypeCreateProps } from './entities/Archetype.js';
+export { Archetype } from './entities/Archetype.js';
 export type { BulletCreateProps } from './entities/Bullet.js';
 export { Bullet } from './entities/Bullet.js';
 export type { BulletVariantCreateProps, BulletVariantSource } from './entities/BulletVariant.js';
@@ -43,7 +43,7 @@ export { JobScrapedEvent } from './events/JobScrapedEvent.js';
 export { JobStatusChangedEvent } from './events/JobStatusChangedEvent.js';
 export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
 // Ports — repository interfaces
-export type { ArchetypeRepository2 } from './ports/ArchetypeRepository2.js';
+export type { ArchetypeRepository } from './ports/ArchetypeRepository.js';
 export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { EducationRepository } from './ports/EducationRepository.js';
@@ -67,7 +67,7 @@ export { ValueObject } from './ValueObject.js';
 // Value objects — new domain model
 export { ApprovalStatus } from './value-objects/ApprovalStatus.js';
 // Value objects — domain
-export { Archetype, JobTitle } from './value-objects/Archetype.js';
+export { ArchetypeKey, JobTitle } from './value-objects/Archetype.js';
 // Value objects — IDs (new domain model)
 export { ArchetypeId } from './value-objects/ArchetypeId.js';
 export { BulletId } from './value-objects/BulletId.js';

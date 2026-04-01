@@ -1,7 +1,7 @@
-import type { Archetype } from '@tailoredin/domain';
+import type { ArchetypeKey } from '@tailoredin/domain';
 
 export type GenerateResumeDto = {
   jobId: string;
-  archetype?: Archetype;
+  archetype?: ArchetypeKey;
   keywords?: string[];
 };

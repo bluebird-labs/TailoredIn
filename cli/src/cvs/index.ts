@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
 import { Logger } from '@tailoredin/core';
-import { Archetype } from '@tailoredin/domain';
+import { ArchetypeKey } from '@tailoredin/domain';
 import { generateCV, TYPST_DIR, TypstFileGenerator } from '@tailoredin/infrastructure';
 import { format } from 'date-fns';
 import Yargs from 'yargs';

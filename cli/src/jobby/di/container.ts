@@ -9,7 +9,7 @@ import {
   OPENAI_CONFIG,
   OpenAiLlmService,
   PlaywrightWebColorService,
-  PostgresArchetypeRepository2,
+  PostgresArchetypeRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
   PostgresExperienceRepository,
@@ -51,7 +51,7 @@ if (openAiApiKey && openAiProject) {
 }
 container.bind({ provide: DI.Profile.Repository, useClass: PostgresProfileRepository });
 container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
-container.bind({ provide: DI.Archetype2.Repository, useClass: PostgresArchetypeRepository2 });
+container.bind({ provide: DI.Archetype.Repository, useClass: PostgresArchetypeRepository });
 container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
 container.bind({ provide: DI.Education.Repository, useClass: PostgresEducationRepository });
 container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
@@ -63,7 +63,7 @@ container.bind({
     new DatabaseResumeContentFactory(
       container.get(DI.Profile.Repository),
       container.get(DI.Headline.Repository),
-      container.get(DI.Archetype2.Repository),
+      container.get(DI.Archetype.Repository),
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.SkillCategory.Repository)

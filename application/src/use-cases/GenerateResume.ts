@@ -1,7 +1,7 @@
 import { Logger } from '@tailoredin/core';
 import {
-  Archetype,
-  type ArchetypeRepository2,
+  ArchetypeKey,
+  type ArchetypeRepository,
   err,
   type JobPosting,
   type JobRepository,
@@ -25,7 +25,7 @@ export class GenerateResume {
   public constructor(
     private readonly jobRepository: JobRepository,
     private readonly profileRepository: ProfileRepository,
-    private readonly archetypeRepository: ArchetypeRepository2,
+    private readonly archetypeRepository: ArchetypeRepository,
     private readonly llmService: LlmService | null,
     private readonly webColorService: WebColorService,
     private readonly resumeRenderer: ResumeRenderer,
@@ -43,7 +43,7 @@ export class GenerateResume {
     const profile = await this.profileRepository.findSingle();
     const allArchetypes = await this.archetypeRepository.findAll();
 
-    let archetype: Archetype;
+    let archetype: ArchetypeKey;
     let keywords: string[];
     let awesomeColor = DEFAULT_AWESOME_COLOR;
 
@@ -57,7 +57,7 @@ export class GenerateResume {
         jobLocation: job.locationRaw
       });
 
-      archetype = postingInsights.archetype ?? Archetype.LEAD_IC;
+      archetype = postingInsights.archetype ?? ArchetypeKey.LEAD_IC;
 
       // Find archetype record by key to get its ID
       const archetypeRecord = allArchetypes.find(a => a.key === archetype) ?? allArchetypes[0];

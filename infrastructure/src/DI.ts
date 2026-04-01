@@ -1,22 +1,22 @@
 import { InjectionToken } from '@needle-di/core';
 import type {
-  AddBullet2,
+  AddBullet,
   AddBulletVariant,
   AddSkillItem,
   ApproveBulletVariant,
   BulkChangeJobStatus,
   ChangeJobStatus,
-  CreateArchetype2,
-  CreateEducation2,
+  CreateArchetype,
+  CreateEducation,
   CreateExperience,
-  CreateHeadline2,
+  CreateHeadline,
   CreateSkillCategory,
-  DeleteArchetype2,
-  DeleteBullet2,
+  DeleteArchetype,
+  DeleteBullet,
   DeleteBulletVariant,
-  DeleteEducation2,
+  DeleteEducation,
   DeleteExperience,
-  DeleteHeadline2,
+  DeleteHeadline,
   DeleteSkillCategory,
   DeleteSkillItem,
   GenerateCompanyBrief,
@@ -28,10 +28,10 @@ import type {
   IngestJobByUrl,
   IngestScrapedJob,
   JobScraper,
-  ListArchetypes2,
-  ListEducation2,
+  ListArchetypes,
+  ListEducation,
   ListExperiences,
-  ListHeadlines2,
+  ListHeadlines,
   ListJobs,
   ListSkillCategories,
   ListTags,
@@ -39,14 +39,14 @@ import type {
   ResumeContentFactory,
   ResumeRenderer,
   ScrapeAndIngestJobs,
-  SetArchetypeContent2,
-  SetArchetypeTagProfile2,
-  UpdateArchetype2,
-  UpdateBullet2,
+  SetArchetypeContent,
+  SetArchetypeTagProfile,
+  UpdateArchetype,
+  UpdateBullet,
   UpdateBulletVariant,
-  UpdateEducation2,
+  UpdateEducation,
   UpdateExperience,
-  UpdateHeadline2,
+  UpdateHeadline,
   UpdateJobCompany,
   UpdateProfile,
   UpdateSkillCategory,
@@ -54,7 +54,7 @@ import type {
   WebColorService
 } from '@tailoredin/application';
 import type {
-  ArchetypeRepository2,
+  ArchetypeRepository,
   CompanyBriefRepository,
   CompanyRepository,
   EducationRepository,
@@ -108,10 +108,10 @@ export const DI = {
 
   Headline: {
     Repository: new InjectionToken<HeadlineRepository>('DI.Headline.Repository'),
-    List: new InjectionToken<ListHeadlines2>('DI.Headline.List'),
-    Create: new InjectionToken<CreateHeadline2>('DI.Headline.Create'),
-    Update: new InjectionToken<UpdateHeadline2>('DI.Headline.Update'),
-    Delete: new InjectionToken<DeleteHeadline2>('DI.Headline.Delete')
+    List: new InjectionToken<ListHeadlines>('DI.Headline.List'),
+    Create: new InjectionToken<CreateHeadline>('DI.Headline.Create'),
+    Update: new InjectionToken<UpdateHeadline>('DI.Headline.Update'),
+    Delete: new InjectionToken<DeleteHeadline>('DI.Headline.Delete')
   },
 
   Tag: {
@@ -121,10 +121,10 @@ export const DI = {
 
   Education: {
     Repository: new InjectionToken<EducationRepository>('DI.Education.Repository'),
-    ListEducation: new InjectionToken<ListEducation2>('DI.Education.ListEducation'),
-    CreateEducation: new InjectionToken<CreateEducation2>('DI.Education.CreateEducation'),
-    UpdateEducation: new InjectionToken<UpdateEducation2>('DI.Education.UpdateEducation'),
-    DeleteEducation: new InjectionToken<DeleteEducation2>('DI.Education.DeleteEducation')
+    ListEducation: new InjectionToken<ListEducation>('DI.Education.ListEducation'),
+    CreateEducation: new InjectionToken<CreateEducation>('DI.Education.CreateEducation'),
+    UpdateEducation: new InjectionToken<UpdateEducation>('DI.Education.UpdateEducation'),
+    DeleteEducation: new InjectionToken<DeleteEducation>('DI.Education.DeleteEducation')
   },
 
   SkillCategory: {
@@ -144,22 +144,22 @@ export const DI = {
     Create: new InjectionToken<CreateExperience>('DI.Experience.Create'),
     Update: new InjectionToken<UpdateExperience>('DI.Experience.Update'),
     Delete: new InjectionToken<DeleteExperience>('DI.Experience.Delete'),
-    AddBullet: new InjectionToken<AddBullet2>('DI.Experience.AddBullet'),
-    UpdateBullet: new InjectionToken<UpdateBullet2>('DI.Experience.UpdateBullet'),
-    DeleteBullet: new InjectionToken<DeleteBullet2>('DI.Experience.DeleteBullet'),
+    AddBullet: new InjectionToken<AddBullet>('DI.Experience.AddBullet'),
+    UpdateBullet: new InjectionToken<UpdateBullet>('DI.Experience.UpdateBullet'),
+    DeleteBullet: new InjectionToken<DeleteBullet>('DI.Experience.DeleteBullet'),
     AddVariant: new InjectionToken<AddBulletVariant>('DI.Experience.AddVariant'),
     UpdateVariant: new InjectionToken<UpdateBulletVariant>('DI.Experience.UpdateVariant'),
     DeleteVariant: new InjectionToken<DeleteBulletVariant>('DI.Experience.DeleteVariant'),
     ApproveVariant: new InjectionToken<ApproveBulletVariant>('DI.Experience.ApproveVariant')
   },
 
-  Archetype2: {
-    Repository: new InjectionToken<ArchetypeRepository2>('DI.Archetype2.Repository'),
-    List: new InjectionToken<ListArchetypes2>('DI.Archetype2.List'),
-    Create: new InjectionToken<CreateArchetype2>('DI.Archetype2.Create'),
-    Update: new InjectionToken<UpdateArchetype2>('DI.Archetype2.Update'),
-    Delete: new InjectionToken<DeleteArchetype2>('DI.Archetype2.Delete'),
-    SetContent: new InjectionToken<SetArchetypeContent2>('DI.Archetype2.SetContent'),
-    SetTagProfile: new InjectionToken<SetArchetypeTagProfile2>('DI.Archetype2.SetTagProfile')
+  Archetype: {
+    Repository: new InjectionToken<ArchetypeRepository>('DI.Archetype.Repository'),
+    List: new InjectionToken<ListArchetypes>('DI.Archetype.List'),
+    Create: new InjectionToken<CreateArchetype>('DI.Archetype.Create'),
+    Update: new InjectionToken<UpdateArchetype>('DI.Archetype.Update'),
+    Delete: new InjectionToken<DeleteArchetype>('DI.Archetype.Delete'),
+    SetContent: new InjectionToken<SetArchetypeContent>('DI.Archetype.SetContent'),
+    SetTagProfile: new InjectionToken<SetArchetypeTagProfile>('DI.Archetype.SetTagProfile')
   }
 };

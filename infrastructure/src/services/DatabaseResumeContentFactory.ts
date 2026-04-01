@@ -1,7 +1,7 @@
 import type { MakeResumeContentInput, ResumeContentDto, ResumeContentFactory } from '@tailoredin/application';
 import { StringUtil } from '@tailoredin/core';
 import type {
-  ArchetypeRepository2,
+  ArchetypeRepository,
   EducationRepository,
   ExperienceRepository,
   HeadlineRepository,
@@ -14,7 +14,7 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
   public constructor(
     private readonly profileRepo: ProfileRepository,
     private readonly headlineRepo: HeadlineRepository,
-    private readonly archetypeRepo: ArchetypeRepository2,
+    private readonly archetypeRepo: ArchetypeRepository,
     private readonly experienceRepo: ExperienceRepository,
     private readonly educationRepo: EducationRepository,
     private readonly skillCategoryRepo: SkillCategoryRepository

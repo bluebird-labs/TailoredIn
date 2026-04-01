@@ -1,11 +1,11 @@
-import type { Archetype } from '@tailoredin/domain';
+import type { ArchetypeKey } from '@tailoredin/domain';
 import type { BrilliantCVContent } from '../brilliant-cv/types.js';
 import { makeCV } from './cvs/makeCV.js';
 
 export type GenerateCVInput = {
   awesomeColor: string;
   companyName: string;
-  archetype: Archetype;
+  archetype: ArchetypeKey;
   keywords: string[];
 };
 

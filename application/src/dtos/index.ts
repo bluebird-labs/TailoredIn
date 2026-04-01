@@ -1,5 +1,5 @@
 export type { ApiErrorDto } from './ApiErrorDto.js';
-export type * from './ArchetypeDto2.js';
+export type * from './ArchetypeDto.js';
 export type { CompanyBriefDto } from './CompanyBriefDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export type { EducationDto } from './EducationDto.js';

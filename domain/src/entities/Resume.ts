@@ -1,18 +1,18 @@
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ResumeGeneratedEvent } from '../events/ResumeGeneratedEvent.js';
-import type { Archetype } from '../value-objects/Archetype.js';
+import type { ArchetypeKey } from '../value-objects/Archetype.js';
 import { ResumeId } from '../value-objects/ResumeId.js';
 
 export type ResumeCreateProps = {
   jobId: string;
-  archetype: Archetype;
+  archetype: ArchetypeKey;
   keywords: string[];
   outputPath: string;
 };
 
 export class Resume extends AggregateRoot<ResumeId> {
   public readonly jobId: string;
-  public readonly archetype: Archetype;
+  public readonly archetype: ArchetypeKey;
   public readonly keywords: string[];
   public readonly outputPath: string;
   public readonly generatedAt: Date;
@@ -20,7 +20,7 @@ export class Resume extends AggregateRoot<ResumeId> {
   public constructor(props: {
     id: ResumeId;
     jobId: string;
-    archetype: Archetype;
+    archetype: ArchetypeKey;
     keywords: string[];
     outputPath: string;
     generatedAt: Date;

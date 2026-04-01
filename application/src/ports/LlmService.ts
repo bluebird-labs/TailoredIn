@@ -1,9 +1,9 @@
-import type { Archetype } from '@tailoredin/domain';
+import type { ArchetypeKey } from '@tailoredin/domain';
 import type { ResumeContentDto } from '../dtos/ResumeContentDto.js';
 
 export type JobPostingInsightsDto = {
   website: string | null;
-  archetype: Archetype;
+  archetype: ArchetypeKey;
 };
 
 export type ApplicationInsightsDto = {
@@ -23,7 +23,7 @@ export type ExtractApplicationInsightsInput = {
   companyName: string;
   jobTitle: string;
   jobLocation: string;
-  archetype: Archetype;
+  archetype: ArchetypeKey;
   resumeContent: ResumeContentDto;
 };
 
