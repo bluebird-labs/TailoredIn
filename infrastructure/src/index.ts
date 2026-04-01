@@ -13,6 +13,7 @@ export { PostgresResumeEducationRepository } from './repositories/PostgresResume
 export { PostgresResumeHeadlineRepository } from './repositories/PostgresResumeHeadlineRepository.js';
 export { PostgresResumeSkillCategoryRepository } from './repositories/PostgresResumeSkillCategoryRepository.js';
 export { PostgresSkillRepository } from './repositories/PostgresSkillRepository.js';
+export { PostgresTagRepository } from './repositories/PostgresTagRepository.js';
 export { PostgresUserRepository } from './repositories/PostgresUserRepository.js';
 // Legacy CV generation (used by cli/cvs)
 export { generateCV } from './resume/generateCV.js';

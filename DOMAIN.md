@@ -2,411 +2,319 @@
 
 ```mermaid
 ---
-title: TailoredIn — Domain Entities & Relationships
+title: TailoredIn — Domain Entities & Relationships (v2 — Domain Rethink)
 ---
 
 classDiagram
     direction TB
 
     %% ──────────────────────────────────────────────
-    %%  Job Discovery Subdomain
+    %%  Profile Subdomain
     %% ──────────────────────────────────────────────
 
-    class Company {
+    class Profile {
         <<AggregateRoot>>
-        +CompanyId id
-        +string name
-        +string linkedinLink
-        +string? website
-        +string? logoUrl
-        +boolean ignored
-        +BusinessType? businessType
-        +Industry? industry
-        +CompanyStage? stage
-    }
-
-    class CompanyBrief {
-        <<AggregateRoot>>
-        +CompanyBriefId id
-        +string companyId
-        +string productOverview
-        +string techStack
-        +string culture
-        +string recentNews
-        +string keyPeople
-        +refresh()
-    }
-
-    class JobPosting {
-        <<AggregateRoot>>
-        +JobId id
-        +string companyId
-        +JobStatus status
-        +string linkedinId
-        +string title
-        +string locationRaw
-        +string description
-        +number? salaryLow
-        +number? salaryHigh
-        +number? applicantsCount
-        +JobScores? scores
-        +changeStatus()
-        +retire()
-        +score()
-    }
-
-    class Skill {
-        <<Entity>>
-        +SkillId id
-        +string name
-        +string key
-        +SkillAffinity affinity
-        +string[] variants
-    }
-
-    class Resume {
-        <<AggregateRoot>>
-        +ResumeId id
-        +string jobId
-        +Archetype archetype
-        +string[] keywords
-        +string outputPath
-    }
-
-    Company "1" --> "*" JobPosting : has
-    Company "1" --> "0..1" CompanyBrief : has
-    JobPosting "1" --> "0..1" Resume : generates
-    JobPosting ..> Skill : scores reference
-
-    %% ──────────────────────────────────────────────
-    %%  Resume / Profile Subdomain
-    %% ──────────────────────────────────────────────
-
-    class User {
-        <<Entity>>
-        +UserId id
+        +ProfileId id
         +string email
         +string firstName
         +string lastName
-        +string? phoneNumber
-        +string? githubHandle
-        +string? linkedinHandle
-        +string? locationLabel
+        +string? phone
+        +string? location
+        +string? linkedinUrl
+        +string? githubUrl
+        +string? websiteUrl
+        +fullName()
     }
 
-    class ResumeHeadline {
-        <<Entity>>
-        +ResumeHeadlineId id
-        +string userId
-        +string headlineLabel
-        +string summaryText
-    }
-
-    class ResumeEducation {
-        <<Entity>>
-        +ResumeEducationId id
-        +string userId
-        +string degreeTitle
-        +string institutionName
-        +string graduationYear
-        +string locationLabel
-        +number ordinal
-    }
-
-    class ResumeCompany {
+    class Experience {
         <<AggregateRoot>>
-        +ResumeCompanyId id
-        +string userId
-        +string companyName
-        +string? companyMention
-        +string businessDomain
-        +ResumeLocation[] locations
-        +addPosition()
-        +removePosition()
-    }
-
-    class ResumePosition {
-        <<Entity>>
-        +ResumePositionId id
-        +string resumeCompanyId
+        +ExperienceId id
+        +string profileId
         +string title
+        +string companyName
+        +string? companyWebsite
+        +string location
         +string startDate
         +string endDate
         +string? summary
         +number ordinal
         +addBullet()
+        +removeBullet()
+        +findBulletOrFail()
     }
 
-    class ResumeBullet {
+    class Bullet {
         <<Entity>>
-        +ResumeBulletId id
-        +string resumePositionId
+        +BulletId id
+        +string experienceId
         +string content
         +number ordinal
+        +TagSet tags
+        +addVariant()
+        +removeVariant()
+        +approvedVariants()
+        +updateTags()
     }
 
-    class ResumeSkillCategory {
+    class BulletVariant {
+        <<Entity>>
+        +BulletVariantId id
+        +string bulletId
+        +string text
+        +string angle
+        +TagSet tags
+        +BulletVariantSource source
+        +ApprovalStatus approvalStatus
+        +approve()
+        +reject()
+    }
+
+    class Project {
         <<AggregateRoot>>
-        +ResumeSkillCategoryId id
-        +string userId
-        +string categoryName
+        +ProjectId id
+        +string profileId
+        +string name
+        +string? description
+        +string? url
+        +string startDate
+        +string? endDate
+        +number ordinal
+        +TagSet tags
+        +updateTags()
+    }
+
+    class Headline {
+        <<AggregateRoot>>
+        +HeadlineId id
+        +string profileId
+        +string label
+        +string summaryText
+        +string[] roleTags
+        +updateRoleTags()
+    }
+
+    class Education {
+        <<AggregateRoot>>
+        +EducationId id
+        +string profileId
+        +string degreeTitle
+        +string institutionName
+        +number graduationYear
+        +string? location
+        +string? honors
+        +number ordinal
+    }
+
+    class SkillCategory {
+        <<AggregateRoot>>
+        +SkillCategoryId id
+        +string profileId
+        +string name
         +number ordinal
         +addItem()
+        +removeItem()
     }
 
-    class ResumeSkillItem {
+    class SkillItem {
         <<Entity>>
-        +ResumeSkillItemId id
-        +string categoryId
-        +string skillName
+        +SkillItemId id
+        +string skillCategoryId
+        +string name
         +number ordinal
     }
 
-    User "1" --> "*" ResumeHeadline : has
-    User "1" --> "*" ResumeEducation : has
-    User "1" --> "*" ResumeCompany : has
-    User "1" --> "*" ResumeSkillCategory : has
-    ResumeCompany "1" --> "*" ResumePosition : has
-    ResumePosition "1" --> "*" ResumeBullet : has
-    ResumeSkillCategory "1" --> "*" ResumeSkillItem : has
+    Profile "1" --> "*" Experience : has
+    Profile "1" --> "*" Project : has
+    Profile "1" --> "*" Headline : has
+    Profile "1" --> "*" Education : has
+    Profile "1" --> "*" SkillCategory : has
+    Experience "1" --> "*" Bullet : contains
+    Bullet "1" --> "*" BulletVariant : has
+    SkillCategory "1" --> "*" SkillItem : contains
 
     %% ──────────────────────────────────────────────
-    %%  Archetype / Tailoring Subdomain
+    %%  Tagging Subdomain
     %% ──────────────────────────────────────────────
 
-    class ArchetypeConfig {
+    class Tag {
         <<AggregateRoot>>
-        +ArchetypeConfigId id
-        +string userId
-        +Archetype archetypeKey
-        +string archetypeLabel
+        +TagId id
+        +string name
+        +TagDimension dimension
+        +normalize()
+    }
+
+    class TagSet {
+        <<ValueObject>>
+        +string[] roleTags
+        +string[] skillTags
+        +isEmpty()
+        +merge()
+        +equals()
+    }
+
+    class TagProfile {
+        <<ValueObject>>
+        +Map~string number~ roleWeights
+        +Map~string number~ skillWeights
+        +overlapWith()
+    }
+
+    Bullet *-- TagSet : tagged-with
+    BulletVariant *-- TagSet : tagged-with
+    Project *-- TagSet : tagged-with
+    Headline ..> Tag : role tags reference
+
+    %% ──────────────────────────────────────────────
+    %%  Archetype Subdomain
+    %% ──────────────────────────────────────────────
+
+    class Archetype {
+        <<AggregateRoot>>
+        +ArchetypeId id
+        +string profileId
+        +string key
+        +string label
         +string headlineId
-        +string[] socialNetworks
-        +replacePositions()
-        +replaceEducationSelections()
-        +replaceSkillSelections()
+        +TagProfile tagProfile
+        +ContentSelection contentSelection
+        +updateTagProfile()
+        +replaceContentSelection()
     }
 
-    class ArchetypePosition {
-        <<Entity>>
-        +ArchetypePositionId id
+    class ContentSelection {
+        <<ValueObject>>
+        +ExperienceSelection[] experienceSelections
+        +string[] projectIds
+        +string[] educationIds
+        +string[] skillCategoryIds
+        +string[] skillItemIds
+    }
+
+    class ExperienceSelection {
+        <<ValueObject>>
+        +string experienceId
+        +string[] bulletVariantIds
+    }
+
+    Profile "1" --> "*" Archetype : has
+    Archetype --> Headline : selects
+    Archetype *-- TagProfile : defines
+    Archetype *-- ContentSelection : curates
+    ContentSelection *-- ExperienceSelection
+    ContentSelection ..> Experience : includes
+    ContentSelection ..> Project : includes
+    ContentSelection ..> Education : includes
+    ContentSelection ..> SkillCategory : includes
+    ContentSelection ..> SkillItem : includes
+    ExperienceSelection ..> BulletVariant : picks
+
+    %% ──────────────────────────────────────────────
+    %%  Job Subdomain
+    %% ──────────────────────────────────────────────
+
+    class JobPosting {
+        <<AggregateRoot>>
+        +JobPostingId id
+        +string linkedinUrl
+        +string title
+        +string companyName
+        +string? companyWebsite
+        +string? companyLogo
+        +string? companyIndustry
+        +string? companySize
+        +string? location
+        +string? salary
+        +string description
+        +JobRequirements requirements
+        +ArchetypeMatch[] archetypeMatches
+        +setRequirements()
+        +setArchetypeMatches()
+    }
+
+    class JobRequirements {
+        <<ValueObject>>
+        +string[] skillTags
+        +string[] roleTags
+        +string? senioritySignal
+    }
+
+    class ArchetypeMatch {
+        <<ValueObject>>
         +string archetypeId
-        +string resumePositionId
-        +string? jobTitle
-        +string displayCompanyName
-        +string locationLabel
-        +number ordinal
-        +ArchetypePositionBulletRef[] bullets
+        +string archetypeKey
+        +number tagOverlap
+        +string reasoning
+        +SuggestedTuning suggestedTuning
     }
 
-    User "1" --> "*" ArchetypeConfig : has
-    ArchetypeConfig "1" --> "*" ArchetypePosition : has
-    ArchetypeConfig --> ResumeHeadline : references
-    ArchetypePosition ..> ResumePosition : selects from
-    ArchetypeConfig ..> ResumeEducation : selects from
-    ArchetypeConfig ..> ResumeSkillCategory : selects from
-    ArchetypeConfig ..> ResumeSkillItem : selects from
+    class SuggestedTuning {
+        <<ValueObject>>
+        +SwapVariant[] swapVariants
+        +string[] emphasize
+    }
+
+    JobPosting *-- JobRequirements : extracted-from
+    JobPosting *-- ArchetypeMatch : matched-against
+    ArchetypeMatch *-- SuggestedTuning
+    ArchetypeMatch ..> Archetype : scores against
 
     %% ──────────────────────────────────────────────
     %%  Enums
     %% ──────────────────────────────────────────────
 
-    class JobStatus {
+    class ApprovalStatus {
         <<enumeration>>
-        NEW
-        LATER
-        APPLIED
-        RECRUITER_SCREEN
-        TECHNICAL_SCREEN
-        HM_SCREEN
-        ON_SITE
-        OFFER
+        PENDING
+        APPROVED
         REJECTED
-        NO_NEWS
-        UNFIT
-        EXPIRED
-        LOW_SALARY
-        RETIRED
-        DUPLICATE
-        HIGH_APPLICANTS
-        LOCATION_UNFIT
-        POSTED_TOO_LONG_AGO
     }
 
-    class Archetype {
+    class TagDimension {
         <<enumeration>>
-        HANDS_ON_MANAGER
-        LEADER_MANAGER
-        IC
-        LEAD_IC
-        NERD
+        ROLE
+        SKILL
     }
 
-    class SkillAffinity {
+    class BulletVariantSource {
         <<enumeration>>
-        EXPERT
-        INTEREST
-        AVOID
+        llm
+        manual
     }
 
-    class BusinessType {
-        <<enumeration>>
-        B2B
-        B2C
-        B2B2C
-        B2G
-        D2C
-        MARKETPLACE
-        PLATFORM
-    }
-
-    class Industry {
-        <<enumeration>>
-        AUTOMOBILE
-        SECURITY
-        FINANCE
-        HEALTHCARE
-        EDUCATION
-        E_COMMERCE
-        ...24 total
-    }
-
-    class CompanyStage {
-        <<enumeration>>
-        SEED
-        SERIES_A
-        SERIES_B
-        SERIES_C
-        SERIES_D_PLUS
-        GROWTH
-        PUBLIC
-        BOOTSTRAPPED
-        ACQUIRED
-    }
-
-    JobPosting --> JobStatus
-    JobPosting ..> SkillAffinity : scores keyed by
-    Company --> BusinessType
-    Company --> Industry
-    Company --> CompanyStage
-    ArchetypeConfig --> Archetype
-    Resume --> Archetype
-    Skill --> SkillAffinity
-
-    %% ──────────────────────────────────────────────
-    %%  Value Objects
-    %% ──────────────────────────────────────────────
-
-    class ResumeLocation {
-        <<ValueObject>>
-        +string label
-        +number ordinal
-    }
-
-    class TailoringScore {
-        <<ValueObject>>
-        +number matched
-        +number total
-        +ratio()
-        +percentage()
-    }
-
-    class ArchetypePositionBulletRef {
-        <<ValueObject>>
-        +string bulletId
-        +number ordinal
-    }
-
-    class ArchetypeEducationSelection {
-        <<ValueObject>>
-        +string educationId
-        +number ordinal
-    }
-
-    class ArchetypeSkillCategorySelection {
-        <<ValueObject>>
-        +string categoryId
-        +number ordinal
-    }
-
-    class ArchetypeSkillItemSelection {
-        <<ValueObject>>
-        +string itemId
-        +number ordinal
-    }
-
-    ResumeCompany *-- ResumeLocation
-    ArchetypePosition *-- ArchetypePositionBulletRef
-    ArchetypeConfig *-- ArchetypeEducationSelection
-    ArchetypeConfig *-- ArchetypeSkillCategorySelection
-    ArchetypeConfig *-- ArchetypeSkillItemSelection
-
-    %% ──────────────────────────────────────────────
-    %%  Domain Events
-    %% ──────────────────────────────────────────────
-
-    class JobStatusChangedEvent {
-        <<DomainEvent>>
-        +string jobId
-        +JobStatus oldStatus
-        +JobStatus newStatus
-    }
-
-    class ResumeGeneratedEvent {
-        <<DomainEvent>>
-        +string resumeId
-        +string jobId
-        +string outputPath
-    }
-
-    class JobScrapedEvent {
-        <<DomainEvent>>
-        +string linkedinId
-        +string companyName
-    }
-
-    JobPosting ..> JobStatusChangedEvent : publishes
-    Resume ..> ResumeGeneratedEvent : publishes
-    JobPosting ..> JobScrapedEvent : publishes
+    BulletVariant --> ApprovalStatus
+    BulletVariant --> BulletVariantSource
+    Tag --> TagDimension
 
     %% ──────────────────────────────────────────────
     %%  Apply Styles
     %% ──────────────────────────────────────────────
 
-    style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style CompanyBrief fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Project fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style SkillCategory fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Tag fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Archetype fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobPosting fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style Resume fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style ResumeCompany fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style ResumeSkillCategory fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style ArchetypeConfig fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
 
-    style User fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style Skill fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style ResumeHeadline fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style ResumeEducation fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style ResumePosition fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style ResumeBullet fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style ResumeSkillItem fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style ArchetypePosition fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style Bullet fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style BulletVariant fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style SkillItem fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
 
-    style ResumeLocation fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style TailoringScore fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style ArchetypePositionBulletRef fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style ArchetypeEducationSelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style ArchetypeSkillCategorySelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style ArchetypeSkillItemSelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style TagSet fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style TagProfile fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ContentSelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ExperienceSelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style JobRequirements fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ArchetypeMatch fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style SuggestedTuning fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
 
-    style JobStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style Archetype fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style SkillAffinity fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-
-    style JobStatusChangedEvent fill:#be123c,stroke:#881337,color:#ffe4e6,stroke-width:1px
-    style ResumeGeneratedEvent fill:#be123c,stroke:#881337,color:#ffe4e6,stroke-width:1px
-    style JobScrapedEvent fill:#be123c,stroke:#881337,color:#ffe4e6,stroke-width:1px
+    style ApprovalStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style TagDimension fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style BulletVariantSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
 ```
 
 ### Legend
@@ -417,4 +325,12 @@ classDiagram
 | **Blue** | Entity |
 | **Green** | Value Object |
 | **Amber** | Enumeration |
-| **Rose** (dashed) | Domain Event |
+
+### Subdomains
+
+| Subdomain | Aggregates | Purpose |
+|---|---|---|
+| **Profile** | Profile, Experience, Project, Headline, Education, SkillCategory | The engineer's story — work history, projects, skills, education |
+| **Tagging** | Tag | Classification system — role tags (how you contributed) and skill tags (what tech/domains) |
+| **Archetype** | Archetype | Resume personas — curated content selections with weighted tag profiles |
+| **Job** | JobPosting | Opportunity matching — scraped jobs with extracted requirements and archetype match scores |

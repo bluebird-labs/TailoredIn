@@ -36,6 +36,8 @@ export { ResumeSkillItem } from './entities/ResumeSkillItem.js';
 export type { SkillCreateProps, SkillRefreshProps } from './entities/Skill.js';
 export { Skill } from './entities/Skill.js';
 // Entities — resume data
+export type { TagCreateProps } from './entities/Tag.js';
+export { Tag, TagDimension } from './entities/Tag.js';
 export type { UserCreateProps } from './entities/User.js';
 export { User } from './entities/User.js';
 // Events
@@ -59,14 +61,19 @@ export type { ResumeEducationRepository } from './ports/ResumeEducationRepositor
 export type { ResumeHeadlineRepository } from './ports/ResumeHeadlineRepository.js';
 export type { ResumeSkillCategoryRepository } from './ports/ResumeSkillCategoryRepository.js';
 export type { SkillRefreshOutput, SkillRepository } from './ports/SkillRepository.js';
+export type { TagRepository } from './ports/TagRepository.js';
 export type { UserRepository } from './ports/UserRepository.js';
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
 export { ValueObject } from './ValueObject.js';
+// Value objects — new domain model
+export { ApprovalStatus } from './value-objects/ApprovalStatus.js';
 // Value objects — domain
 export { Archetype, JobTitle } from './value-objects/Archetype.js';
-// Value objects — IDs
+// Value objects — IDs (existing)
 export { ArchetypeConfigId } from './value-objects/ArchetypeConfigId.js';
+// Value objects — IDs (new domain model)
+export { ArchetypeId } from './value-objects/ArchetypeId.js';
 export { ArchetypePositionBulletRef } from './value-objects/ArchetypePositionBulletRef.js';
 export { ArchetypePositionId } from './value-objects/ArchetypePositionId.js';
 export {
@@ -74,13 +81,23 @@ export {
   ArchetypeSkillCategorySelection,
   ArchetypeSkillItemSelection
 } from './value-objects/ArchetypeSelections.js';
+export { BulletId } from './value-objects/BulletId.js';
+export { BulletVariantId } from './value-objects/BulletVariantId.js';
 export { BusinessType } from './value-objects/BusinessType.js';
 export { CompanyBriefId } from './value-objects/CompanyBriefId.js';
 export { CompanyId } from './value-objects/CompanyId.js';
 export { CompanyStage } from './value-objects/CompanyStage.js';
+export type { ExperienceSelection } from './value-objects/ContentSelection.js';
+export { ContentSelection } from './value-objects/ContentSelection.js';
+export { EducationId } from './value-objects/EducationId.js';
+export { ExperienceId } from './value-objects/ExperienceId.js';
+export { HeadlineId } from './value-objects/HeadlineId.js';
 export { Industry } from './value-objects/Industry.js';
 export { JobId } from './value-objects/JobId.js';
+export { JobPostingId } from './value-objects/JobPostingId.js';
 export { DISCARDED_JOB_STATUSES, IN_PROCESS_JOB_STATUSES, JobStatus } from './value-objects/JobStatus.js';
+export { ProfileId } from './value-objects/ProfileId.js';
+export { ProjectId } from './value-objects/ProjectId.js';
 export { ResumeBulletId } from './value-objects/ResumeBulletId.js';
 export { ResumeCompanyId } from './value-objects/ResumeCompanyId.js';
 export { ResumeEducationId } from './value-objects/ResumeEducationId.js';
@@ -91,7 +108,12 @@ export { ResumePositionId } from './value-objects/ResumePositionId.js';
 export { ResumeSkillCategoryId } from './value-objects/ResumeSkillCategoryId.js';
 export { ResumeSkillItemId } from './value-objects/ResumeSkillItemId.js';
 export { SkillAffinity } from './value-objects/SkillAffinity.js';
+export { SkillCategoryId } from './value-objects/SkillCategoryId.js';
 export { SkillId } from './value-objects/SkillId.js';
+export { SkillItemId } from './value-objects/SkillItemId.js';
 export { SkillName } from './value-objects/SkillName.js';
+export { TagId } from './value-objects/TagId.js';
+export { TagProfile } from './value-objects/TagProfile.js';
+export { TagSet } from './value-objects/TagSet.js';
 export { TailoringScore } from './value-objects/TailoringScore.js';
 export { UserId } from './value-objects/UserId.js';
