@@ -2,41 +2,37 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 
-function educationApi(userId: string) {
-  return api.users({ userId }).resume.education;
-}
-
-export function useEducation(userId: string | undefined) {
+export function useEducations() {
   return useQuery({
-    queryKey: queryKeys.resume.education(),
+    queryKey: queryKeys.educations.list(),
     queryFn: async () => {
-      const { data } = await educationApi(userId!).get();
+      const { data } = await api.educations.get();
       return data;
-    },
-    enabled: !!userId
+    }
   });
 }
 
-export function useCreateEducation(userId: string | undefined) {
+export function useCreateEducation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: {
       degree_title: string;
       institution_name: string;
-      graduation_year: string;
-      location_label: string;
+      graduation_year: number;
+      location: string | null;
+      honors: string | null;
       ordinal: number;
     }) => {
-      const { data } = await educationApi(userId!).post(input);
+      const { data } = await api.educations.post(input);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.education() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.educations.all });
     }
   });
 }
 
-export function useUpdateEducation(userId: string | undefined) {
+export function useUpdateEducation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
@@ -46,27 +42,28 @@ export function useUpdateEducation(userId: string | undefined) {
       id: string;
       degree_title: string;
       institution_name: string;
-      graduation_year: string;
-      location_label: string;
+      graduation_year: number;
+      location: string | null;
+      honors: string | null;
       ordinal: number;
     }) => {
-      const { data } = await educationApi(userId!)({ id }).put(body);
+      const { data } = await api.educations({ id }).put(body);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.education() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.educations.all });
     }
   });
 }
 
-export function useDeleteEducation(userId: string | undefined) {
+export function useDeleteEducation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      await educationApi(userId!)({ id }).delete();
+      await api.educations({ id }).delete();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.education() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.educations.all });
     }
   });
 }
