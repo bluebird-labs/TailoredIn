@@ -8,8 +8,8 @@ import {
   type TagDimension,
   TagProfile
 } from '@tailoredin/domain';
-import { ArchetypeTagWeight } from '../db/entities/archetypes/ArchetypeTagWeight.js';
 import { ArchetypeOrm } from '../db/entities/archetypes/ArchetypeOrm.js';
+import { ArchetypeTagWeight } from '../db/entities/archetypes/ArchetypeTagWeight.js';
 import { Tag as OrmTag } from '../db/entities/tag/Tag.js';
 
 @injectable()

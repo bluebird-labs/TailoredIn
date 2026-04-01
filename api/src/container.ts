@@ -35,7 +35,6 @@ import {
   ListJobs,
   ListSkillCategories,
   ListTags,
-  ScrapeAndIngestJobs,
   SetArchetypeContent,
   SetArchetypeTagProfile,
   UpdateArchetype,
