@@ -1,19 +1,18 @@
-import { err, ok, type Result, type ResumeSkillCategory, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import { err, ok, type Result, type SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 
 export type DeleteSkillItemInput = {
-  categoryId: string;
   itemId: string;
 };
 
 export class DeleteSkillItem {
-  public constructor(private readonly skillCategoryRepository: ResumeSkillCategoryRepository) {}
+  public constructor(private readonly skillCategoryRepository: SkillCategoryRepository) {}
 
   public async execute(input: DeleteSkillItemInput): Promise<Result<void, Error>> {
-    let category: ResumeSkillCategory;
+    let category: SkillCategory;
     try {
-      category = await this.skillCategoryRepository.findByIdOrFail(input.categoryId);
+      category = await this.skillCategoryRepository.findByItemIdOrFail(input.itemId);
     } catch {
-      return err(new Error(`Skill category not found: ${input.categoryId}`));
+      return err(new Error(`Skill item not found: ${input.itemId}`));
     }
 
     try {

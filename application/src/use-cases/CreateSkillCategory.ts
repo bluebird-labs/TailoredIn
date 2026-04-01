@@ -1,32 +1,31 @@
-import { ResumeSkillCategory, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
-import type { ResumeSkillCategoryDto } from '../dtos/ResumeDataDto.js';
+import { SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
+import type { SkillCategoryDto } from '../dtos/SkillCategoryDto.js';
 
 export type CreateSkillCategoryInput = {
-  userId: string;
-  categoryName: string;
+  profileId: string;
+  name: string;
   ordinal: number;
-  items?: { skillName: string; ordinal: number }[];
+  items?: { name: string; ordinal: number }[];
 };
 
 export class CreateSkillCategory {
-  public constructor(private readonly skillCategoryRepository: ResumeSkillCategoryRepository) {}
+  public constructor(private readonly skillCategoryRepository: SkillCategoryRepository) {}
 
-  public async execute(input: CreateSkillCategoryInput): Promise<ResumeSkillCategoryDto> {
-    const category = ResumeSkillCategory.create({
-      userId: input.userId,
-      categoryName: input.categoryName,
-      ordinal: input.ordinal,
-      items: []
+  public async execute(input: CreateSkillCategoryInput): Promise<SkillCategoryDto> {
+    const category = SkillCategory.create({
+      profileId: input.profileId,
+      name: input.name,
+      ordinal: input.ordinal
     });
     for (const item of input.items ?? []) {
-      category.addItem({ skillName: item.skillName, ordinal: item.ordinal });
+      category.addItem({ name: item.name, ordinal: item.ordinal });
     }
     await this.skillCategoryRepository.save(category);
     return {
       id: category.id.value,
-      categoryName: category.categoryName,
+      name: category.name,
       ordinal: category.ordinal,
-      items: category.items.map(i => ({ id: i.id.value, skillName: i.skillName, ordinal: i.ordinal }))
+      items: category.items.map(i => ({ id: i.id.value, name: i.name, ordinal: i.ordinal }))
     };
   }
 }

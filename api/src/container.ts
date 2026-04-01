@@ -81,6 +81,7 @@ import {
   PostgresResumeEducationRepository,
   PostgresResumeHeadlineRepository,
   PostgresResumeSkillCategoryRepository,
+  PostgresSkillCategoryRepository,
   PostgresSkillRepository,
   PostgresTagRepository,
   PostgresUserRepository,
@@ -374,34 +375,35 @@ container.bind({
   useFactory: () => new ReplaceLocations(container.get(DI.Resume.CompanyRepository))
 });
 
-// Skills use cases
+// SkillCategory use cases (new domain model)
+container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
 container.bind({
-  provide: DI.Resume.ListSkillCategories,
-  useFactory: () => new ListSkillCategories(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.ListSkillCategories,
+  useFactory: () => new ListSkillCategories(container.get(DI.SkillCategory.Repository))
 });
 container.bind({
-  provide: DI.Resume.CreateSkillCategory,
-  useFactory: () => new CreateSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.CreateSkillCategory,
+  useFactory: () => new CreateSkillCategory(container.get(DI.SkillCategory.Repository))
 });
 container.bind({
-  provide: DI.Resume.UpdateSkillCategory,
-  useFactory: () => new UpdateSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.UpdateSkillCategory,
+  useFactory: () => new UpdateSkillCategory(container.get(DI.SkillCategory.Repository))
 });
 container.bind({
-  provide: DI.Resume.DeleteSkillCategory,
-  useFactory: () => new DeleteSkillCategory(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.DeleteSkillCategory,
+  useFactory: () => new DeleteSkillCategory(container.get(DI.SkillCategory.Repository))
 });
 container.bind({
-  provide: DI.Resume.AddSkillItem,
-  useFactory: () => new AddSkillItem(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.AddSkillItem,
+  useFactory: () => new AddSkillItem(container.get(DI.SkillCategory.Repository))
 });
 container.bind({
-  provide: DI.Resume.UpdateSkillItem,
-  useFactory: () => new UpdateSkillItem(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.UpdateSkillItem,
+  useFactory: () => new UpdateSkillItem(container.get(DI.SkillCategory.Repository))
 });
 container.bind({
-  provide: DI.Resume.DeleteSkillItem,
-  useFactory: () => new DeleteSkillItem(container.get(DI.Resume.SkillCategoryRepository))
+  provide: DI.SkillCategory.DeleteSkillItem,
+  useFactory: () => new DeleteSkillItem(container.get(DI.SkillCategory.Repository))
 });
 
 // Archetype use cases

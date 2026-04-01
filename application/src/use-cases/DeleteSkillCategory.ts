@@ -1,9 +1,9 @@
-import { err, ok, type Result, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import { err, ok, type Result, type SkillCategoryRepository } from '@tailoredin/domain';
 
 export type DeleteSkillCategoryInput = { categoryId: string };
 
 export class DeleteSkillCategory {
-  public constructor(private readonly skillCategoryRepository: ResumeSkillCategoryRepository) {}
+  public constructor(private readonly skillCategoryRepository: SkillCategoryRepository) {}
 
   public async execute(input: DeleteSkillCategoryInput): Promise<Result<void, Error>> {
     try {

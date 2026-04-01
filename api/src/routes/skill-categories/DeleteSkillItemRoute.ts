@@ -5,16 +5,13 @@ import { Elysia, t } from 'elysia';
 
 @injectable()
 export class DeleteSkillItemRoute {
-  public constructor(private readonly deleteSkillItem: DeleteSkillItem = inject(DI.Resume.DeleteSkillItem)) {}
+  public constructor(private readonly deleteSkillItem: DeleteSkillItem = inject(DI.SkillCategory.DeleteSkillItem)) {}
 
   public plugin() {
     return new Elysia().delete(
-      '/resume/skills/:id/items/:itemId',
+      '/skill-items/:id',
       async ({ params, set }) => {
-        const result = await this.deleteSkillItem.execute({
-          categoryId: params.id,
-          itemId: params.itemId
-        });
+        const result = await this.deleteSkillItem.execute({ itemId: params.id });
         if (!result.isOk) {
           set.status = 404;
           return { error: { code: 'NOT_FOUND', message: result.error.message } };
@@ -23,7 +20,7 @@ export class DeleteSkillItemRoute {
         return;
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }), itemId: t.String({ format: 'uuid' }) })
+        params: t.Object({ id: t.String({ format: 'uuid' }) })
       }
     );
   }

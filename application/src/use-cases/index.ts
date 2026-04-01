@@ -74,7 +74,6 @@ export type { ListHeadlinesInput } from './ListHeadlines.js';
 export { ListHeadlines } from './ListHeadlines.js';
 export type { ListJobsInput } from './ListJobs.js';
 export { ListJobs } from './ListJobs.js';
-export type { ListSkillCategoriesInput } from './ListSkillCategories.js';
 export { ListSkillCategories } from './ListSkillCategories.js';
 export type { ReplaceLocationsInput } from './ReplaceLocations.js';
 export { ReplaceLocations } from './ReplaceLocations.js';

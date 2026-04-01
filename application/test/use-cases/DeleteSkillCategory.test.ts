@@ -1,15 +1,16 @@
 import { describe, expect, test } from 'bun:test';
-import { ResumeSkillCategory, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import { SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 import { DeleteSkillCategory } from '../../src/use-cases/DeleteSkillCategory.js';
 
-function createMockSkillCategoryRepository(
-  overrides: Partial<ResumeSkillCategoryRepository> = {}
-): ResumeSkillCategoryRepository {
+function createMockSkillCategoryRepository(overrides: Partial<SkillCategoryRepository> = {}): SkillCategoryRepository {
   return {
     findByIdOrFail: async () => {
       throw new Error('not found');
     },
-    findAllByUserId: async () => [],
+    findByItemIdOrFail: async () => {
+      throw new Error('not found');
+    },
+    findAll: async () => [],
     save: async () => {},
     delete: async () => {},
     ...overrides
@@ -28,11 +29,10 @@ describe('DeleteSkillCategory', () => {
   });
 
   test('deletes', async () => {
-    const category = ResumeSkillCategory.create({
-      userId: 'user-1',
-      categoryName: 'Backend',
-      ordinal: 0,
-      items: []
+    const category = SkillCategory.create({
+      profileId: 'profile-1',
+      name: 'Backend',
+      ordinal: 0
     });
     let deletedId: string | null = null;
     const repo = createMockSkillCategoryRepository({

@@ -15,9 +15,9 @@ export const Route = createFileRoute('/resume/skills')({
 
 type SkillCategory = {
   id: string;
-  categoryName: string;
+  name: string;
   ordinal: number;
-  items: { id: string; skillName: string; ordinal: number }[];
+  items: { id: string; name: string; ordinal: number }[];
 };
 
 function SkillsPage() {

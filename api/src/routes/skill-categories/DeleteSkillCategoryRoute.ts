@@ -6,12 +6,12 @@ import { Elysia, t } from 'elysia';
 @injectable()
 export class DeleteSkillCategoryRoute {
   public constructor(
-    private readonly deleteSkillCategory: DeleteSkillCategory = inject(DI.Resume.DeleteSkillCategory)
+    private readonly deleteSkillCategory: DeleteSkillCategory = inject(DI.SkillCategory.DeleteSkillCategory)
   ) {}
 
   public plugin() {
     return new Elysia().delete(
-      '/resume/skills/:id',
+      '/skill-categories/:id',
       async ({ params, set }) => {
         const result = await this.deleteSkillCategory.execute({ categoryId: params.id });
         if (!result.isOk) {

@@ -11,9 +11,9 @@ import { useSetArchetypeSkills } from '@/hooks/use-archetypes';
 
 type SkillCategory = {
   id: string;
-  categoryName: string;
+  name: string;
   ordinal: number;
-  items: { id: string; skillName: string; ordinal: number }[];
+  items: { id: string; name: string; ordinal: number }[];
 };
 
 type CategorySelection = { categoryId: string; ordinal: number };
@@ -131,7 +131,7 @@ export function SkillsSection({ archetypeId, categorySelections, itemSelections,
                     <div className="flex items-center gap-2">
                       <Checkbox checked={catChecked} onCheckedChange={() => toggleCategory(category.id)} />
                       <Label className="font-medium cursor-pointer" onClick={() => toggleCategory(category.id)}>
-                        {category.categoryName}
+                        {category.name}
                       </Label>
                     </div>
                     {catChecked && sortedItems.length > 0 && (
@@ -140,7 +140,7 @@ export function SkillsSection({ archetypeId, categorySelections, itemSelections,
                           <div key={item.id} className="flex items-center gap-2">
                             <Checkbox checked={isItemChecked(item.id)} onCheckedChange={() => toggleItem(item.id)} />
                             <Label className="font-normal cursor-pointer" onClick={() => toggleItem(item.id)}>
-                              {item.skillName}
+                              {item.name}
                             </Label>
                           </div>
                         ))}
@@ -161,7 +161,7 @@ export function SkillsSection({ archetypeId, categorySelections, itemSelections,
                       if (!cat) return null;
                       return (
                         <SortableItem key={sel.categoryId} id={sel.categoryId}>
-                          <span className="text-sm">{cat.categoryName}</span>
+                          <span className="text-sm">{cat.name}</span>
                         </SortableItem>
                       );
                     })}

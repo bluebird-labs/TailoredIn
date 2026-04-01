@@ -29,6 +29,8 @@ import { ResumePosition } from './entities/resume/ResumePosition.js';
 import { ResumeSkillCategory } from './entities/resume/ResumeSkillCategory.js';
 import { ResumeSkillItem } from './entities/resume/ResumeSkillItem.js';
 import { Skill } from './entities/skills/Skill.js';
+import { SkillCategory as OrmSkillCategory } from './entities/skills/SkillCategory.js';
+import { SkillItem as OrmSkillItem } from './entities/skills/SkillItem.js';
 import { Tag as OrmTag } from './entities/tag/Tag.js';
 import { User } from './entities/users/User.js';
 
@@ -74,7 +76,9 @@ export function createOrmConfig(db: OrmDbConfig) {
       ArchetypePosition,
       ArchetypePositionBullet,
       OrmHeadline,
-      OrmTag
+      OrmTag,
+      OrmSkillCategory,
+      OrmSkillItem
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

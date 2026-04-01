@@ -35,4 +35,5 @@ export type {
 } from './ResumeDataDto.js';
 export type { ResumeOutputDto } from './ResumeOutputDto.js';
 export type { ScrapeResultDto } from './ScrapeResultDto.js';
+export type { SkillCategoryDto, SkillItemDto } from './SkillCategoryDto.js';
 export type { TagDto } from './TagDto.js';

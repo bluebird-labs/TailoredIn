@@ -73,9 +73,9 @@ function ArchetypeDetailPage() {
   }>;
   const categories = (skillsResponse?.data ?? []) as Array<{
     id: string;
-    categoryName: string;
+    name: string;
     ordinal: number;
-    items: { id: string; skillName: string; ordinal: number }[];
+    items: { id: string; name: string; ordinal: number }[];
   }>;
   const education = (educationResponse?.data ?? []) as Array<{
     id: string;

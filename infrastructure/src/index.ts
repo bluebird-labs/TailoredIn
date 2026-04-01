@@ -15,6 +15,7 @@ export { PostgresResumeCompanyRepository } from './repositories/PostgresResumeCo
 export { PostgresResumeEducationRepository } from './repositories/PostgresResumeEducationRepository.js';
 export { PostgresResumeHeadlineRepository } from './repositories/PostgresResumeHeadlineRepository.js';
 export { PostgresResumeSkillCategoryRepository } from './repositories/PostgresResumeSkillCategoryRepository.js';
+export { PostgresSkillCategoryRepository } from './repositories/PostgresSkillCategoryRepository.js';
 export { PostgresSkillRepository } from './repositories/PostgresSkillRepository.js';
 export { PostgresTagRepository } from './repositories/PostgresTagRepository.js';
 export { PostgresUserRepository } from './repositories/PostgresUserRepository.js';

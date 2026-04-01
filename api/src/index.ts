@@ -2,7 +2,6 @@ import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container, llmAvailable } from './container.js';
 import { AddBulletRoute } from './routes/AddBulletRoute.js';
-import { AddSkillItemRoute } from './routes/AddSkillItemRoute.js';
 import { BulkChangeJobStatusRoute } from './routes/BulkChangeJobStatusRoute.js';
 import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
@@ -11,15 +10,12 @@ import { CreateCompanyRoute } from './routes/CreateCompanyRoute.js';
 import { CreateEducationRoute } from './routes/CreateEducationRoute.js';
 import { CreateHeadlineRoute } from './routes/CreateHeadlineRoute.js';
 import { CreatePositionRoute } from './routes/CreatePositionRoute.js';
-import { CreateSkillCategoryRoute } from './routes/CreateSkillCategoryRoute.js';
 import { DeleteArchetypeRoute } from './routes/DeleteArchetypeRoute.js';
 import { DeleteBulletRoute } from './routes/DeleteBulletRoute.js';
 import { DeleteCompanyRoute } from './routes/DeleteCompanyRoute.js';
 import { DeleteEducationRoute } from './routes/DeleteEducationRoute.js';
 import { DeleteHeadlineRoute } from './routes/DeleteHeadlineRoute.js';
 import { DeletePositionRoute } from './routes/DeletePositionRoute.js';
-import { DeleteSkillCategoryRoute } from './routes/DeleteSkillCategoryRoute.js';
-import { DeleteSkillItemRoute } from './routes/DeleteSkillItemRoute.js';
 import { CreateEducationRoute2 } from './routes/education/CreateEducationRoute2.js';
 import { DeleteEducationRoute2 } from './routes/education/DeleteEducationRoute2.js';
 import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
@@ -43,11 +39,17 @@ import { ListCompaniesRoute } from './routes/ListCompaniesRoute.js';
 import { ListEducationRoute } from './routes/ListEducationRoute.js';
 import { ListHeadlinesRoute } from './routes/ListHeadlinesRoute.js';
 import { ListJobsRoute } from './routes/ListJobsRoute.js';
-import { ListSkillCategoriesRoute } from './routes/ListSkillCategoriesRoute.js';
 import { ReplaceLocationsRoute } from './routes/ReplaceLocationsRoute.js';
 import { SetArchetypeEducationRoute } from './routes/SetArchetypeEducationRoute.js';
 import { SetArchetypePositionsRoute } from './routes/SetArchetypePositionsRoute.js';
 import { SetArchetypeSkillsRoute } from './routes/SetArchetypeSkillsRoute.js';
+import { AddSkillItemRoute as NewAddSkillItemRoute } from './routes/skill-categories/AddSkillItemRoute.js';
+import { CreateSkillCategoryRoute as NewCreateSkillCategoryRoute } from './routes/skill-categories/CreateSkillCategoryRoute.js';
+import { DeleteSkillCategoryRoute as NewDeleteSkillCategoryRoute } from './routes/skill-categories/DeleteSkillCategoryRoute.js';
+import { DeleteSkillItemRoute as NewDeleteSkillItemRoute } from './routes/skill-categories/DeleteSkillItemRoute.js';
+import { ListSkillCategoriesRoute as NewListSkillCategoriesRoute } from './routes/skill-categories/ListSkillCategoriesRoute.js';
+import { UpdateSkillCategoryRoute as NewUpdateSkillCategoryRoute } from './routes/skill-categories/UpdateSkillCategoryRoute.js';
+import { UpdateSkillItemRoute as NewUpdateSkillItemRoute } from './routes/skill-categories/UpdateSkillItemRoute.js';
 import { ListTagsRoute } from './routes/tag/ListTagsRoute.js';
 import { UpdateArchetypeRoute } from './routes/UpdateArchetypeRoute.js';
 import { UpdateBulletRoute } from './routes/UpdateBulletRoute.js';
@@ -57,8 +59,6 @@ import { UpdateHeadlineRoute } from './routes/UpdateHeadlineRoute.js';
 import { UpdateJobCompanyRoute } from './routes/UpdateJobCompanyRoute.js';
 import { UpdatePositionRoute } from './routes/UpdatePositionRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
-import { UpdateSkillCategoryRoute } from './routes/UpdateSkillCategoryRoute.js';
-import { UpdateSkillItemRoute } from './routes/UpdateSkillItemRoute.js';
 import { UpdateUserRoute } from './routes/UpdateUserRoute.js';
 
 // --- App ---
@@ -135,14 +135,14 @@ const app = new Elysia()
   .use(container.get(UpdateBulletRoute).plugin())
   .use(container.get(DeleteBulletRoute).plugin())
   .use(container.get(ReplaceLocationsRoute).plugin())
-  // Skills
-  .use(container.get(ListSkillCategoriesRoute).plugin())
-  .use(container.get(CreateSkillCategoryRoute).plugin())
-  .use(container.get(UpdateSkillCategoryRoute).plugin())
-  .use(container.get(DeleteSkillCategoryRoute).plugin())
-  .use(container.get(AddSkillItemRoute).plugin())
-  .use(container.get(UpdateSkillItemRoute).plugin())
-  .use(container.get(DeleteSkillItemRoute).plugin())
+  // Skills (new domain model)
+  .use(container.get(NewListSkillCategoriesRoute).plugin())
+  .use(container.get(NewCreateSkillCategoryRoute).plugin())
+  .use(container.get(NewUpdateSkillCategoryRoute).plugin())
+  .use(container.get(NewDeleteSkillCategoryRoute).plugin())
+  .use(container.get(NewAddSkillItemRoute).plugin())
+  .use(container.get(NewUpdateSkillItemRoute).plugin())
+  .use(container.get(NewDeleteSkillItemRoute).plugin())
   // Archetypes
   .use(container.get(ListArchetypesRoute).plugin())
   .use(container.get(CreateArchetypeRoute).plugin())

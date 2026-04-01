@@ -5,15 +5,15 @@ import { Elysia, t } from 'elysia';
 
 @injectable()
 export class AddSkillItemRoute {
-  public constructor(private readonly addSkillItem: AddSkillItem = inject(DI.Resume.AddSkillItem)) {}
+  public constructor(private readonly addSkillItem: AddSkillItem = inject(DI.SkillCategory.AddSkillItem)) {}
 
   public plugin() {
     return new Elysia().post(
-      '/resume/skills/:id/items',
+      '/skill-categories/:id/items',
       async ({ params, body, set }) => {
         const result = await this.addSkillItem.execute({
           categoryId: params.id,
-          skillName: body.skill_name,
+          name: body.name,
           ordinal: body.ordinal
         });
         if (!result.isOk) {
@@ -26,7 +26,7 @@ export class AddSkillItemRoute {
       {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
         body: t.Object({
-          skill_name: t.String({ minLength: 1 }),
+          name: t.String({ minLength: 1 }),
           ordinal: t.Integer({ minimum: 0 })
         })
       }

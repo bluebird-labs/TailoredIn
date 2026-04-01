@@ -77,6 +77,7 @@ import type {
   ResumeEducationRepository,
   ResumeHeadlineRepository,
   ResumeSkillCategoryRepository,
+  SkillCategoryRepository,
   SkillRepository,
   TagRepository,
   UserRepository
@@ -132,14 +133,7 @@ export const DI = {
     AddBullet: new InjectionToken<AddBullet>('DI.Resume.AddBullet'),
     UpdateBullet: new InjectionToken<UpdateBullet>('DI.Resume.UpdateBullet'),
     DeleteBullet: new InjectionToken<DeleteBullet>('DI.Resume.DeleteBullet'),
-    ReplaceLocations: new InjectionToken<ReplaceLocations>('DI.Resume.ReplaceLocations'),
-    ListSkillCategories: new InjectionToken<ListSkillCategories>('DI.Resume.ListSkillCategories'),
-    CreateSkillCategory: new InjectionToken<CreateSkillCategory>('DI.Resume.CreateSkillCategory'),
-    UpdateSkillCategory: new InjectionToken<UpdateSkillCategory>('DI.Resume.UpdateSkillCategory'),
-    DeleteSkillCategory: new InjectionToken<DeleteSkillCategory>('DI.Resume.DeleteSkillCategory'),
-    AddSkillItem: new InjectionToken<AddSkillItem>('DI.Resume.AddSkillItem'),
-    UpdateSkillItem: new InjectionToken<UpdateSkillItem>('DI.Resume.UpdateSkillItem'),
-    DeleteSkillItem: new InjectionToken<DeleteSkillItem>('DI.Resume.DeleteSkillItem')
+    ReplaceLocations: new InjectionToken<ReplaceLocations>('DI.Resume.ReplaceLocations')
   },
 
   Profile: {
@@ -173,6 +167,17 @@ export const DI = {
     CreateEducation: new InjectionToken<CreateEducation2>('DI.Education.CreateEducation'),
     UpdateEducation: new InjectionToken<UpdateEducation2>('DI.Education.UpdateEducation'),
     DeleteEducation: new InjectionToken<DeleteEducation2>('DI.Education.DeleteEducation')
+  },
+
+  SkillCategory: {
+    Repository: new InjectionToken<SkillCategoryRepository>('DI.SkillCategory.Repository'),
+    ListSkillCategories: new InjectionToken<ListSkillCategories>('DI.SkillCategory.ListSkillCategories'),
+    CreateSkillCategory: new InjectionToken<CreateSkillCategory>('DI.SkillCategory.CreateSkillCategory'),
+    UpdateSkillCategory: new InjectionToken<UpdateSkillCategory>('DI.SkillCategory.UpdateSkillCategory'),
+    DeleteSkillCategory: new InjectionToken<DeleteSkillCategory>('DI.SkillCategory.DeleteSkillCategory'),
+    AddSkillItem: new InjectionToken<AddSkillItem>('DI.SkillCategory.AddSkillItem'),
+    UpdateSkillItem: new InjectionToken<UpdateSkillItem>('DI.SkillCategory.UpdateSkillItem'),
+    DeleteSkillItem: new InjectionToken<DeleteSkillItem>('DI.SkillCategory.DeleteSkillItem')
   },
 
   Archetype: {

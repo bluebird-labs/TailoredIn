@@ -1,15 +1,16 @@
 import { describe, expect, test } from 'bun:test';
-import { ResumeSkillCategory, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import { SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 import { UpdateSkillCategory } from '../../src/use-cases/UpdateSkillCategory.js';
 
-function createMockSkillCategoryRepository(
-  overrides: Partial<ResumeSkillCategoryRepository> = {}
-): ResumeSkillCategoryRepository {
+function createMockSkillCategoryRepository(overrides: Partial<SkillCategoryRepository> = {}): SkillCategoryRepository {
   return {
     findByIdOrFail: async () => {
       throw new Error('not found');
     },
-    findAllByUserId: async () => [],
+    findByItemIdOrFail: async () => {
+      throw new Error('not found');
+    },
+    findAll: async () => [],
     save: async () => {},
     delete: async () => {},
     ...overrides
@@ -17,11 +18,10 @@ function createMockSkillCategoryRepository(
 }
 
 function makeCategory() {
-  return ResumeSkillCategory.create({
-    userId: 'user-1',
-    categoryName: 'Backend',
-    ordinal: 0,
-    items: []
+  return SkillCategory.create({
+    profileId: 'profile-1',
+    name: 'Backend',
+    ordinal: 0
   });
 }
 
@@ -48,12 +48,12 @@ describe('UpdateSkillCategory', () => {
     const uc = new UpdateSkillCategory(repo);
     const result = await uc.execute({
       categoryId: category.id.value,
-      categoryName: 'Frontend',
+      name: 'Frontend',
       ordinal: 5
     });
 
     expect(result.isOk).toBe(true);
-    expect(category.categoryName).toBe('Frontend');
+    expect(category.name).toBe('Frontend');
     expect(category.ordinal).toBe(5);
     expect(saved).toBe(true);
   });

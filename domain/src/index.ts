@@ -42,6 +42,10 @@ export type { ResumeSkillItemCreateProps } from './entities/ResumeSkillItem.js';
 export { ResumeSkillItem } from './entities/ResumeSkillItem.js';
 export type { SkillCreateProps, SkillRefreshProps } from './entities/Skill.js';
 export { Skill } from './entities/Skill.js';
+export type { SkillCategoryCreateProps } from './entities/SkillCategory.js';
+export { SkillCategory } from './entities/SkillCategory.js';
+export type { SkillItemCreateProps } from './entities/SkillItem.js';
+export { SkillItem } from './entities/SkillItem.js';
 export type { TagCreateProps } from './entities/Tag.js';
 export { Tag, TagDimension } from './entities/Tag.js';
 export type { UserCreateProps } from './entities/User.js';
@@ -69,6 +73,7 @@ export type { ResumeCompanyRepository } from './ports/ResumeCompanyRepository.js
 export type { ResumeEducationRepository } from './ports/ResumeEducationRepository.js';
 export type { ResumeHeadlineRepository } from './ports/ResumeHeadlineRepository.js';
 export type { ResumeSkillCategoryRepository } from './ports/ResumeSkillCategoryRepository.js';
+export type { SkillCategoryRepository } from './ports/SkillCategoryRepository.js';
 export type { SkillRefreshOutput, SkillRepository } from './ports/SkillRepository.js';
 export type { TagRepository } from './ports/TagRepository.js';
 export type { UserRepository } from './ports/UserRepository.js';

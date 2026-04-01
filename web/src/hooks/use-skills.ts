@@ -4,9 +4,9 @@ import { queryKeys } from '@/lib/query-keys';
 
 export function useSkillCategories() {
   return useQuery({
-    queryKey: queryKeys.resume.skills(),
+    queryKey: queryKeys.resume.skillCategories(),
     queryFn: async () => {
-      const { data } = await api.resume.skills.get();
+      const { data } = await api['skill-categories'].get();
       return data;
     }
   });
@@ -15,16 +15,12 @@ export function useSkillCategories() {
 export function useCreateSkillCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
-      category_name: string;
-      ordinal: number;
-      items?: { skill_name: string; ordinal: number }[];
-    }) => {
-      const { data } = await api.resume.skills.post(input);
+    mutationFn: async (input: { name: string; ordinal: number; items?: { name: string; ordinal: number }[] }) => {
+      const { data } = await api['skill-categories'].post(input);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skills() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skillCategories() });
     }
   });
 }
@@ -32,11 +28,11 @@ export function useCreateSkillCategory() {
 export function useUpdateSkillCategory() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...body }: { id: string; category_name?: string; ordinal?: number }) => {
-      await api.resume.skills({ id }).put(body);
+    mutationFn: async ({ id, ...body }: { id: string; name?: string; ordinal?: number }) => {
+      await api['skill-categories']({ id }).put(body);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skills() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skillCategories() });
     }
   });
 }
@@ -45,10 +41,10 @@ export function useDeleteSkillCategory() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.resume.skills({ id }).delete();
+      await api['skill-categories']({ id }).delete();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skills() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skillCategories() });
     }
   });
 }
@@ -56,20 +52,12 @@ export function useDeleteSkillCategory() {
 export function useAddSkillItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      categoryId,
-      skill_name,
-      ordinal
-    }: {
-      categoryId: string;
-      skill_name: string;
-      ordinal: number;
-    }) => {
-      const { data } = await api.resume.skills({ id: categoryId }).items.post({ skill_name, ordinal });
+    mutationFn: async ({ categoryId, name, ordinal }: { categoryId: string; name: string; ordinal: number }) => {
+      const { data } = await api['skill-categories']({ id: categoryId }).items.post({ name, ordinal });
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skills() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skillCategories() });
     }
   });
 }
@@ -77,20 +65,11 @@ export function useAddSkillItem() {
 export function useUpdateSkillItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      categoryId,
-      itemId,
-      ...body
-    }: {
-      categoryId: string;
-      itemId: string;
-      skill_name?: string;
-      ordinal?: number;
-    }) => {
-      await api.resume.skills({ id: categoryId }).items({ itemId }).put(body);
+    mutationFn: async ({ itemId, ...body }: { itemId: string; name?: string; ordinal?: number }) => {
+      await api['skill-items']({ id: itemId }).put(body);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skills() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skillCategories() });
     }
   });
 }
@@ -98,11 +77,11 @@ export function useUpdateSkillItem() {
 export function useDeleteSkillItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ categoryId, itemId }: { categoryId: string; itemId: string }) => {
-      await api.resume.skills({ id: categoryId }).items({ itemId }).delete();
+    mutationFn: async (itemId: string) => {
+      await api['skill-items']({ id: itemId }).delete();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skills() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.skillCategories() });
     }
   });
 }
