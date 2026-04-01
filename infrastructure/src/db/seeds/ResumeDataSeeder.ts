@@ -130,6 +130,26 @@ export class ResumeDataSeeder extends Seeder {
       });
     }
 
+    // Skill categories + items (new domain model — skill_categories / skill_items tables)
+    const profileRows = await em.getConnection().execute<[{ id: string }]>('SELECT id FROM profiles LIMIT 1');
+    if (profileRows.length > 0) {
+      const profileId = profileRows[0].id;
+      for (let ci = 0; ci < skillCategoryDefs.length; ci++) {
+        const [catName, skillNames] = skillCategoryDefs[ci];
+        const [catRow] = await em.getConnection().execute<[{ id: string }]>(
+          `INSERT INTO skill_categories (id, profile_id, name, ordinal)
+           VALUES (gen_random_uuid(), '${profileId}', '${catName.replace(/'/g, "''")}', ${ci})
+           RETURNING id`
+        );
+        for (let si = 0; si < skillNames.length; si++) {
+          await em.getConnection().execute(
+            `INSERT INTO skill_items (id, skill_category_id, name, ordinal)
+             VALUES (gen_random_uuid(), '${catRow.id}', '${skillNames[si].replace(/'/g, "''")}', ${si})`
+          );
+        }
+      }
+    }
+
     // Headline
     const headline = ResumeHeadline.create({ user, ...headlineData });
     em.persist(headline);
