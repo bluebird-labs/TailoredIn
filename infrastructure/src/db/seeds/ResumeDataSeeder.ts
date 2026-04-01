@@ -130,10 +130,12 @@ export class ResumeDataSeeder extends Seeder {
       });
     }
 
-    // Skill categories + items (new domain model — skill_categories / skill_items tables)
+    // ── New domain model tables (profile already created above) ──
     const profileRows = await em.getConnection().execute<[{ id: string }]>('SELECT id FROM profiles LIMIT 1');
     if (profileRows.length > 0) {
       const profileId = profileRows[0].id;
+
+      // Skill categories + items → skill_categories / skill_items
       for (let ci = 0; ci < skillCategoryDefs.length; ci++) {
         const [catName, skillNames] = skillCategoryDefs[ci];
         const [catRow] = await em.getConnection().execute<[{ id: string }]>(
@@ -148,6 +150,21 @@ export class ResumeDataSeeder extends Seeder {
           );
         }
       }
+
+      // Education → educations table
+      for (let ei = 0; ei < educationDefs.length; ei++) {
+        const def = educationDefs[ei];
+        await em.getConnection().execute(
+          `INSERT INTO educations (id, profile_id, degree_title, institution_name, graduation_year, location, honors, ordinal)
+           VALUES (gen_random_uuid(), '${profileId}', '${def.degreeTitle.replace(/'/g, "''")}', '${def.institutionName.replace(/'/g, "''")}', ${parseInt(def.graduationYear, 10)}, '${(def.locationLabel ?? '').replace(/'/g, "''")}', NULL, ${ei})`
+        );
+      }
+
+      // Headlines → headlines table
+      await em.getConnection().execute(
+        `INSERT INTO headlines (id, profile_id, label, summary_text)
+         VALUES (gen_random_uuid(), '${profileId}', '${headlineData.headlineLabel.replace(/'/g, "''")}', '${headlineData.summaryText.replace(/'/g, "''")}')`
+      );
     }
 
     // Headline
