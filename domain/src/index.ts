@@ -17,6 +17,9 @@ export type { CompanyBriefCreateProps, CompanyBriefSections } from './entities/C
 export { CompanyBrief } from './entities/CompanyBrief.js';
 export type { EducationCreateProps } from './entities/Education.js';
 export { Education } from './entities/Education.js';
+// Entities — resume data
+export type { HeadlineCreateProps } from './entities/Headline.js';
+export { Headline } from './entities/Headline.js';
 export type { JobPostingCreateProps } from './entities/JobPosting.js';
 export { JobPosting } from './entities/JobPosting.js';
 export type { ProfileCreateProps } from './entities/Profile.js';
@@ -39,7 +42,6 @@ export type { ResumeSkillItemCreateProps } from './entities/ResumeSkillItem.js';
 export { ResumeSkillItem } from './entities/ResumeSkillItem.js';
 export type { SkillCreateProps, SkillRefreshProps } from './entities/Skill.js';
 export { Skill } from './entities/Skill.js';
-// Entities — resume data
 export type { TagCreateProps } from './entities/Tag.js';
 export { Tag, TagDimension } from './entities/Tag.js';
 export type { UserCreateProps } from './entities/User.js';
@@ -53,6 +55,7 @@ export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepositor
 export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { EducationRepository } from './ports/EducationRepository.js';
+export type { HeadlineRepository } from './ports/HeadlineRepository.js';
 export type { JobElector } from './ports/JobElector.js';
 export type {
   FindPaginatedParams,

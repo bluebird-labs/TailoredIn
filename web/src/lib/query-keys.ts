@@ -37,5 +37,9 @@ export const queryKeys = {
   educations: {
     all: ['educations'] as const,
     list: () => [...queryKeys.educations.all, 'list'] as const
+  },
+  tags: {
+    all: ['tags'] as const,
+    byDimension: (dimension: string) => ['tags', dimension] as const
   }
 };

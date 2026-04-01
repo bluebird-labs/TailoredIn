@@ -9,6 +9,7 @@ import type {
   CreateEducation,
   CreateEducation2,
   CreateHeadline,
+  CreateHeadline2,
   CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
@@ -17,6 +18,7 @@ import type {
   DeleteEducation,
   DeleteEducation2,
   DeleteHeadline,
+  DeleteHeadline2,
   DeletePosition,
   DeleteSkillCategory,
   DeleteSkillItem,
@@ -35,8 +37,10 @@ import type {
   ListEducation,
   ListEducation2,
   ListHeadlines,
+  ListHeadlines2,
   ListJobs,
   ListSkillCategories,
+  ListTags,
   LlmService,
   ReplaceLocations,
   ResumeContentFactory,
@@ -51,6 +55,7 @@ import type {
   UpdateEducation,
   UpdateEducation2,
   UpdateHeadline,
+  UpdateHeadline2,
   UpdateJobCompany,
   UpdatePosition,
   UpdateProfile,
@@ -64,6 +69,7 @@ import type {
   CompanyBriefRepository,
   CompanyRepository,
   EducationRepository,
+  HeadlineRepository,
   JobElector,
   JobRepository,
   ProfileRepository,
@@ -148,8 +154,17 @@ export const DI = {
     GetCompanyBrief: new InjectionToken<GetCompanyBrief>('DI.CompanyBrief.GetCompanyBrief')
   },
 
+  Headline: {
+    Repository: new InjectionToken<HeadlineRepository>('DI.Headline.Repository'),
+    List: new InjectionToken<ListHeadlines2>('DI.Headline.List'),
+    Create: new InjectionToken<CreateHeadline2>('DI.Headline.Create'),
+    Update: new InjectionToken<UpdateHeadline2>('DI.Headline.Update'),
+    Delete: new InjectionToken<DeleteHeadline2>('DI.Headline.Delete')
+  },
+
   Tag: {
-    Repository: new InjectionToken<TagRepository>('DI.Tag.Repository')
+    Repository: new InjectionToken<TagRepository>('DI.Tag.Repository'),
+    List: new InjectionToken<ListTags>('DI.Tag.List')
   },
 
   Education: {

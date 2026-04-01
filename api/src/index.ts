@@ -32,6 +32,10 @@ import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
 import { GetProfileRoute } from './routes/GetProfileRoute.js';
 import { GetUserRoute } from './routes/GetUserRoute.js';
+import { CreateHeadline2Route } from './routes/headline/CreateHeadline2Route.js';
+import { DeleteHeadline2Route } from './routes/headline/DeleteHeadline2Route.js';
+import { ListHeadlines2Route } from './routes/headline/ListHeadlines2Route.js';
+import { UpdateHeadline2Route } from './routes/headline/UpdateHeadline2Route.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
 import { ListArchetypesRoute } from './routes/ListArchetypesRoute.js';
@@ -44,6 +48,7 @@ import { ReplaceLocationsRoute } from './routes/ReplaceLocationsRoute.js';
 import { SetArchetypeEducationRoute } from './routes/SetArchetypeEducationRoute.js';
 import { SetArchetypePositionsRoute } from './routes/SetArchetypePositionsRoute.js';
 import { SetArchetypeSkillsRoute } from './routes/SetArchetypeSkillsRoute.js';
+import { ListTagsRoute } from './routes/tag/ListTagsRoute.js';
 import { UpdateArchetypeRoute } from './routes/UpdateArchetypeRoute.js';
 import { UpdateBulletRoute } from './routes/UpdateBulletRoute.js';
 import { UpdateCompanyRoute } from './routes/UpdateCompanyRoute.js';
@@ -146,6 +151,13 @@ const app = new Elysia()
   .use(container.get(SetArchetypePositionsRoute).plugin())
   .use(container.get(SetArchetypeSkillsRoute).plugin())
   .use(container.get(SetArchetypeEducationRoute).plugin())
+  // S2 Headlines (new domain)
+  .use(container.get(ListHeadlines2Route).plugin())
+  .use(container.get(CreateHeadline2Route).plugin())
+  .use(container.get(UpdateHeadline2Route).plugin())
+  .use(container.get(DeleteHeadline2Route).plugin())
+  // Tags
+  .use(container.get(ListTagsRoute).plugin())
   // @ts-expect-error Elysia type instantiation depth exceeded with many chained routes
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };

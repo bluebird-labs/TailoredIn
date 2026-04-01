@@ -23,7 +23,7 @@ function ArchetypeDetailPage() {
   const userId = userResponse?.data?.id;
 
   const { data: archetypesResponse, isLoading: archetypesLoading } = useArchetypes();
-  const { data: headlinesResponse } = useHeadlines(userId);
+  const { data: headlinesResponse } = useHeadlines();
   const { data: companiesResponse } = useCompanies();
   const { data: skillsResponse } = useSkillCategories();
   const { data: educationResponse } = useEducation(userId);
@@ -53,7 +53,7 @@ function ArchetypeDetailPage() {
   }>;
 
   const archetype = archetypes.find(a => a.id === archetypeId);
-  const headlines = (headlinesResponse?.data ?? []) as { id: string; headlineLabel: string }[];
+  const headlines = (headlinesResponse?.data ?? []) as { id: string; label: string }[];
   const companies = (companiesResponse?.data ?? []) as Array<{
     id: string;
     companyName: string;
