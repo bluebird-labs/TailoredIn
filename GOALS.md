@@ -165,12 +165,12 @@ Each worktree runs `bun up` for independent Docker + port allocation. UI testing
 - [ ] Delete experience — cascades everything
 - [ ] Edit experience fields, save, reload — persists
 
-### Wave 4 — Archetypes + LLM (2 parallel)
+### Wave 4 — Archetypes ✅
 
-| Session | Slice | Branch | Worktree |
-|---|---|---|---|
-| 1 | **S6** (Archetypes) | `feat/dr-s6-archetypes` | `.claude/worktrees/dr-s6-archetypes` |
-| 2 | **S7** (LLM Enrichment) | `feat/dr-s7-llm` | `.claude/worktrees/dr-s7-llm` |
+| Session | Slice | Branch | Worktree | Status |
+|---|---|---|---|---|
+| 1 | **S6** (Archetypes) | `feat/dr-s6-archetypes` | `.claude/worktrees/dr-s6-archetypes` | ✅ merged (#35) |
+| ~~2~~ | ~~**S7** (LLM Enrichment)~~ | | | deferred |
 
 **S6 UI Testing:**
 - [ ] Open `/archetypes/` — list loads
