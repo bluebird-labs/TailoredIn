@@ -32,7 +32,7 @@ test.describe('Education CRUD', () => {
     await expect(page.getByText('Education added')).toBeVisible();
 
     // Find the card with the degree title and click the delete (second) button
-    const card = page.locator('[class*="card"]').filter({ hasText: 'M.A. Philosophy' });
+    const card = page.locator('[data-slot="card"]').filter({ hasText: 'M.A. Philosophy' });
     await card.getByRole('button').nth(1).click();
 
     await expect(page.getByText('Delete M.A. Philosophy?')).toBeVisible();
@@ -40,7 +40,7 @@ test.describe('Education CRUD', () => {
 
     await expect(page.getByText('M.A. Philosophy deleted')).toBeVisible();
     // Verify the card is gone (use exact match to avoid matching the toast text)
-    await expect(page.locator('[class*="card"]').filter({ hasText: 'M.A. Philosophy' })).not.toBeVisible();
+    await expect(page.locator('[data-slot="card"]').filter({ hasText: 'M.A. Philosophy' })).not.toBeVisible();
   });
 
   test('persists education entries across page reload', async ({ page }) => {

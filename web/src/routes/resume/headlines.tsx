@@ -24,6 +24,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useHeadlines } from '@/hooks/use-headlines';
+import { useProfile } from '@/hooks/use-profile';
 import { useTags } from '@/hooks/use-tags';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
@@ -32,7 +33,6 @@ export const Route = createFileRoute('/resume/headlines')({
   component: HeadlinesPage
 });
 
-const PROFILE_ID = '00000000-0000-0000-0000-000000000001';
 
 const headlineSchema = z.object({
   label: z.string().min(1, 'Label is required'),
@@ -52,6 +52,7 @@ type Headline = {
 
 function HeadlinesPage() {
   const queryClient = useQueryClient();
+  const { data: profile } = useProfile();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHeadline, setEditingHeadline] = useState<Headline | null>(null);
@@ -88,7 +89,7 @@ function HeadlinesPage() {
   const createMutation = useMutation({
     mutationFn: async (values: HeadlineFormValues) => {
       return api.headlines.post({
-        profile_id: PROFILE_ID,
+        profile_id: profile!.id,
         label: values.label,
         summary_text: values.summaryText,
         role_tag_ids: selectedTags.map(t => t.id)

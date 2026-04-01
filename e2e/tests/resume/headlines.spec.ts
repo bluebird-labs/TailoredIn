@@ -1,9 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-// Skipped: Headlines page has a known bug — the v2 ListHeadlines2 API returns
-// { data: [...] } but the component expects a raw array. The page crashes with
-// "headlines.map is not a function". Re-enable after the headlines hook is fixed.
-test.describe.skip('Headlines CRUD', () => {
+test.describe('Headlines CRUD', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/resume/headlines');
     await expect(page.getByRole('heading', { name: 'Headlines' })).toBeVisible();
