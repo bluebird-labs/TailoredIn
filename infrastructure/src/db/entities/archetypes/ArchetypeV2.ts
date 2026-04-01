@@ -13,7 +13,7 @@ export type ArchetypeV2Props = {
   updatedAt: Date;
 };
 
-@Entity({ tableName: 'archetypes_v2' })
+@Entity({ tableName: 'archetypes' })
 export class ArchetypeV2 extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;

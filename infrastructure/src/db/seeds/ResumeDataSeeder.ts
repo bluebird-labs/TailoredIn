@@ -260,7 +260,7 @@ export class ResumeDataSeeder extends Seeder {
       };
 
       await conn.execute(
-        `INSERT INTO archetypes_v2 (id, profile_id, key, label, headline_id, content_selection)
+        `INSERT INTO archetypes (id, profile_id, key, label, headline_id, content_selection)
          VALUES (gen_random_uuid(), '${profileId}', '${esc(def.archetypeKey)}', '${esc(def.archetypeLabel)}',
                  '${newHeadlineId}', '${JSON.stringify(contentSelection).replace(/'/g, "''")}'::jsonb)`
       );
