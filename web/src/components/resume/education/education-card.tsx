@@ -1,11 +1,11 @@
 import { Award, GraduationCap, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { Education } from '@/routes/resume/education';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDeleteEducation } from '@/hooks/use-education';
+import type { Education } from '@/routes/resume/education';
 
 type EducationCardProps = {
   education: Education;

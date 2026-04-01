@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import type { Education } from '@/routes/resume/education';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateEducation, useUpdateEducation } from '@/hooks/use-education';
+import type { Education } from '@/routes/resume/education';
 
 const educationSchema = z.object({
   degreeTitle: z.string().min(1, 'Required'),
