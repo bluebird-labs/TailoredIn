@@ -29,8 +29,7 @@ export async function runMigrations(dbConfig: OrmDbConfig): Promise<void> {
 export async function runSeeds(dbConfig: OrmDbConfig): Promise<void> {
   const orm = await MikroORM.init(createOrmConfig(dbConfig));
   try {
-    const seeder = orm.getSeeder();
-    await seeder.seed('DatabaseSeeder');
+    await orm.seeder.seed('DatabaseSeeder');
     log.info('Seeds applied.');
   } finally {
     await orm.close(true);
