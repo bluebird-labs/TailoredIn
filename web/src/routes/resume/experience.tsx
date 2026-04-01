@@ -165,7 +165,16 @@ function ExperiencePage() {
     formState: { errors, isSubmitting }
   } = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceSchema),
-    defaultValues: { title: '', companyName: '', companyWebsite: '', location: '', startDate: '', endDate: '', summary: '', ordinal: 0 }
+    defaultValues: {
+      title: '',
+      companyName: '',
+      companyWebsite: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      summary: '',
+      ordinal: 0
+    }
   });
 
   useEffect(() => {
@@ -181,7 +190,16 @@ function ExperiencePage() {
         ordinal: editingExperience.ordinal
       });
     } else {
-      reset({ title: '', companyName: '', companyWebsite: '', location: '', startDate: '', endDate: '', summary: '', ordinal: 0 });
+      reset({
+        title: '',
+        companyName: '',
+        companyWebsite: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        summary: '',
+        ordinal: 0
+      });
     }
   }, [editingExperience, reset]);
 
@@ -232,7 +250,12 @@ function ExperiencePage() {
 
       {!isLoading &&
         experiences.map(exp => (
-          <ExperienceCard key={exp.id} experience={exp} onEdit={() => openEdit(exp)} onDelete={() => setDeleteTarget(exp)} />
+          <ExperienceCard
+            key={exp.id}
+            experience={exp}
+            onEdit={() => openEdit(exp)}
+            onDelete={() => setDeleteTarget(exp)}
+          />
         ))}
 
       {/* Create / Edit Dialog */}
@@ -537,9 +560,7 @@ function BulletRow({ bullet, experienceId }: { bullet: Bullet; experienceId: str
       {/* Variant toggle + list */}
       {showVariants && (
         <div className="ml-4 space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">
-            Variants ({bullet.variants.length})
-          </p>
+          <p className="text-xs font-medium text-muted-foreground">Variants ({bullet.variants.length})</p>
           {bullet.variants.map(variant => (
             <VariantRow key={variant.id} variant={variant} bulletId={bullet.id} experienceId={experienceId} />
           ))}
@@ -549,11 +570,7 @@ function BulletRow({ bullet, experienceId }: { bullet: Bullet; experienceId: str
       {/* Add variant button / inline form */}
       <div className="ml-4">
         {addingVariant ? (
-          <AddVariantForm
-            experienceId={experienceId}
-            bulletId={bullet.id}
-            onClose={() => setAddingVariant(false)}
-          />
+          <AddVariantForm experienceId={experienceId} bulletId={bullet.id} onClose={() => setAddingVariant(false)} />
         ) : (
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setAddingVariant(true)}>
             <Plus className="mr-1 h-3 w-3" />
@@ -567,19 +584,13 @@ function BulletRow({ bullet, experienceId }: { bullet: Bullet; experienceId: str
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Bullet</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this bullet and all its variants?
-            </DialogDescription>
+            <DialogDescription>Are you sure you want to delete this bullet and all its variants?</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDelete(false)}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-            >
+            <Button variant="destructive" onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending}>
               {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
@@ -643,9 +654,7 @@ function VariantRow({
           <Badge variant="secondary" className="text-xs">
             {variant.angle}
           </Badge>
-          <Badge className={`text-xs ${APPROVAL_BADGE[variant.approvalStatus] ?? ''}`}>
-            {variant.approvalStatus}
-          </Badge>
+          <Badge className={`text-xs ${APPROVAL_BADGE[variant.approvalStatus] ?? ''}`}>{variant.approvalStatus}</Badge>
           <Badge variant="outline" className="text-xs">
             {variant.source}
           </Badge>
@@ -736,7 +745,12 @@ function AddVariantForm({
     <div className="flex flex-col gap-2 rounded border p-2 bg-muted/20">
       <Input value={text} onChange={e => setText(e.target.value)} placeholder="Variant text..." />
       <div className="flex gap-2">
-        <Input value={angle} onChange={e => setAngle(e.target.value)} placeholder="Angle (e.g. leadership)" className="flex-1" />
+        <Input
+          value={angle}
+          onChange={e => setAngle(e.target.value)}
+          placeholder="Angle (e.g. leadership)"
+          className="flex-1"
+        />
         <Button
           size="sm"
           onClick={() => addMutation.mutate()}
