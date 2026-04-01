@@ -8,6 +8,7 @@ import type {
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
+  CreateArchetype2,
   CreateCompany,
   CreateEducation,
   CreateEducation2,
@@ -17,6 +18,7 @@ import type {
   CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
+  DeleteArchetype2,
   DeleteBullet,
   DeleteBullet2,
   DeleteBulletVariant,
@@ -40,6 +42,7 @@ import type {
   IngestScrapedJob,
   JobScraper,
   ListArchetypes,
+  ListArchetypes2,
   ListCompanies,
   ListEducation,
   ListEducation2,
@@ -54,10 +57,13 @@ import type {
   ResumeContentFactory,
   ResumeRenderer,
   ScrapeAndIngestJobs,
+  SetArchetypeContent2,
   SetArchetypeEducation,
   SetArchetypePositions,
   SetArchetypeSkills,
+  SetArchetypeTagProfile2,
   UpdateArchetype,
+  UpdateArchetype2,
   UpdateBullet,
   UpdateBullet2,
   UpdateBulletVariant,
@@ -77,6 +83,7 @@ import type {
 } from '@tailoredin/application';
 import type {
   ArchetypeConfigRepository,
+  ArchetypeRepository2,
   CompanyBriefRepository,
   CompanyRepository,
   EducationRepository,
@@ -216,5 +223,15 @@ export const DI = {
     SetPositions: new InjectionToken<SetArchetypePositions>('DI.Archetype.SetPositions'),
     SetSkills: new InjectionToken<SetArchetypeSkills>('DI.Archetype.SetSkills'),
     SetEducation: new InjectionToken<SetArchetypeEducation>('DI.Archetype.SetEducation')
+  },
+
+  Archetype2: {
+    Repository: new InjectionToken<ArchetypeRepository2>('DI.Archetype2.Repository'),
+    List: new InjectionToken<ListArchetypes2>('DI.Archetype2.List'),
+    Create: new InjectionToken<CreateArchetype2>('DI.Archetype2.Create'),
+    Update: new InjectionToken<UpdateArchetype2>('DI.Archetype2.Update'),
+    Delete: new InjectionToken<DeleteArchetype2>('DI.Archetype2.Delete'),
+    SetContent: new InjectionToken<SetArchetypeContent2>('DI.Archetype2.SetContent'),
+    SetTagProfile: new InjectionToken<SetArchetypeTagProfile2>('DI.Archetype2.SetTagProfile')
   }
 };
