@@ -30,3 +30,6 @@ infrastructure/temp/
 
 # Database backups
 backups/
+
+# E2E test artifacts
+e2e/.server-state.json
