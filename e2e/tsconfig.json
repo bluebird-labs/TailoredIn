@@ -7,11 +7,7 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "rootDir": ".",
-    "paths": {
-      "@tailoredin/infrastructure/*": ["../infrastructure/src/*"],
-      "@tailoredin/infrastructure": ["../infrastructure/src/index.ts"]
-    }
+    "rootDir": "."
   },
   "include": ["**/*.ts"]
 }

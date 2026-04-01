@@ -1,14 +1,4 @@
 import { defineConfig, devices } from '@playwright/test';
-import { readServerState } from './support/server-state.js';
-
-function getBaseURL(): string {
-  try {
-    const state = readServerState();
-    return `http://localhost:${state.webPort}`;
-  } catch {
-    return 'http://localhost:5173';
-  }
-}
 
 export default defineConfig({
   testDir: './tests',
@@ -24,7 +14,7 @@ export default defineConfig({
   globalTeardown: './support/global-teardown.ts',
 
   use: {
-    baseURL: getBaseURL(),
+    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure'
   },

@@ -90,13 +90,12 @@ export default async function globalSetup(_config: FullConfig): Promise<() => Pr
   await viteServer.listen();
   console.log(`[e2e] Vite ready at http://localhost:${webPort}`);
 
-  // 5. Write state for playwright.config.ts and global-teardown.ts
-  writeServerState({
-    webPort,
-    apiPort,
-    dbPort,
-    containerId: container.getId()
-  });
+  // 5. Expose baseURL to playwright.config.ts (config is parsed before globalSetup,
+  // but Playwright re-evaluates process.env for worker config after setup completes)
+  process.env.E2E_BASE_URL = `http://localhost:${webPort}`;
+
+  // Write state for global-teardown.ts logging
+  writeServerState({ webPort, apiPort, dbPort });
 
   // Return teardown function
   return async () => {

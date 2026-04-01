@@ -7,7 +7,6 @@ export type ServerState = {
   webPort: number;
   apiPort: number;
   dbPort: number;
-  containerId: string;
 };
 
 export function writeServerState(state: ServerState): void {
