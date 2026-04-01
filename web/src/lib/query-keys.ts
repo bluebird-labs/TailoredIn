@@ -14,7 +14,7 @@ export const queryKeys = {
     all: ['resume'] as const,
     companies: () => [...queryKeys.resume.all, 'companies'] as const,
     education: () => [...queryKeys.resume.all, 'education'] as const,
-    skills: () => [...queryKeys.resume.all, 'skills'] as const,
+    skillCategories: () => [...queryKeys.resume.all, 'skill-categories'] as const,
     headlines: () => [...queryKeys.resume.all, 'headlines'] as const
   },
   profile: {
