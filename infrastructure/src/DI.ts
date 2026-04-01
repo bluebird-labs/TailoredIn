@@ -64,6 +64,7 @@ import type {
   ResumeHeadlineRepository,
   ResumeSkillCategoryRepository,
   SkillRepository,
+  TagRepository,
   UserRepository
 } from '@tailoredin/domain';
 
@@ -131,6 +132,10 @@ export const DI = {
     Repository: new InjectionToken<CompanyBriefRepository>('DI.CompanyBrief.Repository'),
     GenerateCompanyBrief: new InjectionToken<GenerateCompanyBrief>('DI.CompanyBrief.GenerateCompanyBrief'),
     GetCompanyBrief: new InjectionToken<GetCompanyBrief>('DI.CompanyBrief.GetCompanyBrief')
+  },
+
+  Tag: {
+    Repository: new InjectionToken<TagRepository>('DI.Tag.Repository'),
   },
 
   Archetype: {
