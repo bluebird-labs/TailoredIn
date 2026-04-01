@@ -32,7 +32,6 @@ import {
   useUpdateArchetype
 } from '@/hooks/use-archetypes';
 import { useHeadlines } from '@/hooks/use-headlines';
-import { useCurrentUser } from '@/hooks/use-user';
 
 export const Route = createFileRoute('/archetypes/')({
   component: ArchetypesPage
@@ -60,17 +59,15 @@ type Archetype = {
 };
 
 function ArchetypesPage() {
-  const { data: userResponse } = useCurrentUser();
-  const userId = userResponse?.data?.id;
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingArchetype, setEditingArchetype] = useState<Archetype | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Archetype | null>(null);
 
   const { data: archetypesResponse, isLoading } = useArchetypes();
-  const { data: headlinesResponse } = useHeadlines(userId);
+  const { data: headlinesResponse } = useHeadlines();
 
   const archetypes = (archetypesResponse?.data ?? []) as Archetype[];
-  const headlines = (headlinesResponse?.data ?? []) as { id: string; headlineLabel: string }[];
+  const headlines = (headlinesResponse?.data ?? []) as { id: string; label: string }[];
 
   const {
     register,
@@ -323,7 +320,7 @@ function ArchetypesPage() {
                     <SelectContent>
                       {headlines.map(h => (
                         <SelectItem key={h.id} value={h.id}>
-                          {h.headlineLabel}
+                          {h.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
