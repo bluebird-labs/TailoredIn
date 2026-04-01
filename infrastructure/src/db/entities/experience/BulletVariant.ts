@@ -5,7 +5,7 @@ import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
 import { Tag } from '../tag/Tag.js';
 import { Bullet } from './Bullet.js';
 
-export type BulletVariantProps = {
+type BulletVariantProps = {
   id: string;
   bullet: RefOrEntity<Bullet>;
   text: string;

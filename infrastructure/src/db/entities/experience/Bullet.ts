@@ -6,7 +6,7 @@ import { Tag } from '../tag/Tag.js';
 import { BulletVariant } from './BulletVariant.js';
 import { Experience } from './Experience.js';
 
-export type BulletProps = {
+type BulletProps = {
   id: string;
   experience: RefOrEntity<Experience>;
   content: string;

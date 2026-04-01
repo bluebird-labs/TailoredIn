@@ -5,7 +5,7 @@ import { UuidPrimaryKey } from '../../helpers.js';
 import { Profile } from '../profile/Profile.js';
 import { Bullet } from './Bullet.js';
 
-export type ExperienceProps = {
+type ExperienceProps = {
   id: string;
   profile: Ref<Profile> | Profile;
   title: string;
