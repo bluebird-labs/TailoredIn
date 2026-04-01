@@ -36,7 +36,7 @@ module.exports = {
       name: 'infrastructure-no-entrypoints',
       severity: 'error',
       comment: 'infrastructure must not depend on api, cli, or web.',
-      from: { path: '^infrastructure/' },
+      from: { path: '^infrastructure/', pathNot: '^infrastructure/dev/e2e-' },
       to: { path: '^(api|cli|web)/' }
     },
 
