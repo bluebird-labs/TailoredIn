@@ -1,4 +1,3 @@
-import { type Reference, wrap } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import {
@@ -23,8 +22,10 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
 
   public async findByItemIdOrFail(itemId: string): Promise<DomainSkillCategory> {
     const ormItem = await this.orm.em.findOneOrFail(OrmSkillItem, itemId, { populate: ['category'] });
-    const catRef = ormItem.category as string | Reference<OrmSkillCategory> | OrmSkillCategory;
-    const categoryId = typeof catRef === 'string' ? catRef : (wrap(catRef).getPrimaryKey() as string);
+    const [row] = await this.orm.em
+      .getConnection()
+      .execute<[{ skill_category_id: string }]>(`SELECT skill_category_id FROM skill_items WHERE id = '${itemId}'`);
+    const categoryId = row.skill_category_id;
     return this.findByIdOrFail(categoryId);
   }
 
@@ -110,8 +111,11 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
   }
 
   private async toDomain(orm: OrmSkillCategory): Promise<DomainSkillCategory> {
-    const ref = orm.profile as string | Reference<Profile> | Profile;
-    const profileId = typeof ref === 'string' ? ref : (wrap(ref).getPrimaryKey() as string);
+    // Extract profile_id from the raw FK column — avoids MikroORM Reference/proxy issues
+    const [row] = await this.orm.em
+      .getConnection()
+      .execute<[{ profile_id: string }]>(`SELECT profile_id FROM skill_categories WHERE id = '${orm.id}'`);
+    const profileId = row.profile_id;
 
     const ormItems = await this.orm.em.find(OrmSkillItem, { category: orm.id }, { orderBy: { ordinal: 'ASC' } });
 
