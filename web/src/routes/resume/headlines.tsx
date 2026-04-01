@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import {
   Dialog,
   DialogContent,
@@ -18,10 +20,11 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useHeadlines } from '@/hooks/use-headlines';
-import { useCurrentUser } from '@/hooks/use-user';
+import { useTags } from '@/hooks/use-tags';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 
@@ -29,31 +32,38 @@ export const Route = createFileRoute('/resume/headlines')({
   component: HeadlinesPage
 });
 
+const PROFILE_ID = '00000000-0000-0000-0000-000000000001';
+
 const headlineSchema = z.object({
-  headlineLabel: z.string().min(1, 'Label is required'),
+  label: z.string().min(1, 'Label is required'),
   summaryText: z.string().min(1, 'Summary is required')
 });
 
 type HeadlineFormValues = z.infer<typeof headlineSchema>;
 
+type RoleTag = { id: string; name: string };
+
 type Headline = {
   id: string;
-  headlineLabel: string;
+  label: string;
   summaryText: string;
+  roleTags: RoleTag[];
 };
 
 function HeadlinesPage() {
-  const { data: userResponse } = useCurrentUser();
-  const userId = userResponse?.data?.id;
   const queryClient = useQueryClient();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHeadline, setEditingHeadline] = useState<Headline | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Headline | null>(null);
+  const [selectedTags, setSelectedTags] = useState<RoleTag[]>([]);
+  const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
-  const { data: headlinesResponse, isLoading } = useHeadlines(userId);
+  const { data: headlinesResponse, isLoading } = useHeadlines();
+  const { data: tagsResponse } = useTags('ROLE');
 
-  const headlines = headlinesResponse?.data ?? [];
+  const headlines = (headlinesResponse ?? []) as Headline[];
+  const availableTags = (tagsResponse ?? []) as RoleTag[];
 
   const {
     register,
@@ -62,22 +72,26 @@ function HeadlinesPage() {
     formState: { errors, isSubmitting }
   } = useForm<HeadlineFormValues>({
     resolver: zodResolver(headlineSchema),
-    defaultValues: { headlineLabel: '', summaryText: '' }
+    defaultValues: { label: '', summaryText: '' }
   });
 
   useEffect(() => {
     if (editingHeadline) {
-      reset({ headlineLabel: editingHeadline.headlineLabel, summaryText: editingHeadline.summaryText });
+      reset({ label: editingHeadline.label, summaryText: editingHeadline.summaryText });
+      setSelectedTags(editingHeadline.roleTags ?? []);
     } else {
-      reset({ headlineLabel: '', summaryText: '' });
+      reset({ label: '', summaryText: '' });
+      setSelectedTags([]);
     }
   }, [editingHeadline, reset]);
 
   const createMutation = useMutation({
     mutationFn: async (values: HeadlineFormValues) => {
-      return api.users({ userId: userId! }).resume.headlines.post({
-        headline_label: values.headlineLabel,
-        summary_text: values.summaryText
+      return api.headlines.post({
+        profile_id: PROFILE_ID,
+        label: values.label,
+        summary_text: values.summaryText,
+        role_tag_ids: selectedTags.map(t => t.id)
       });
     },
     onSuccess: () => {
@@ -92,9 +106,10 @@ function HeadlinesPage() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: HeadlineFormValues }) => {
-      return api.users({ userId: userId! }).resume.headlines({ id }).put({
-        headline_label: values.headlineLabel,
-        summary_text: values.summaryText
+      return api.headlines({ id }).put({
+        label: values.label,
+        summary_text: values.summaryText,
+        role_tag_ids: selectedTags.map(t => t.id)
       });
     },
     onSuccess: () => {
@@ -110,7 +125,7 @@ function HeadlinesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return api.users({ userId: userId! }).resume.headlines({ id }).delete();
+      return api.headlines({ id }).delete();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.resume.headlines() });
@@ -140,6 +155,19 @@ function HeadlinesPage() {
     }
   }
 
+  function removeTag(tagId: string) {
+    setSelectedTags(prev => prev.filter(t => t.id !== tagId));
+  }
+
+  function addTag(tag: RoleTag) {
+    if (!selectedTags.some(t => t.id === tag.id)) {
+      setSelectedTags(prev => [...prev, tag]);
+    }
+    setTagPopoverOpen(false);
+  }
+
+  const unselectedTags = availableTags.filter(t => !selectedTags.some(s => s.id === t.id));
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Headlines</h1>
@@ -159,6 +187,7 @@ function HeadlinesPage() {
               <TableRow>
                 <TableHead>Label</TableHead>
                 <TableHead>Summary</TableHead>
+                <TableHead>Role Tags</TableHead>
                 <TableHead className="w-[100px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -173,21 +202,33 @@ function HeadlinesPage() {
                       <Skeleton className="h-5 w-64" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton className="h-5 w-24" />
+                    </TableCell>
+                    <TableCell>
                       <Skeleton className="h-5 w-16" />
                     </TableCell>
                   </TableRow>
                 ))
               ) : headlines.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                     No headlines yet. Add your first headline.
                   </TableCell>
                 </TableRow>
               ) : (
                 headlines.map((headline: Headline) => (
                   <TableRow key={headline.id}>
-                    <TableCell className="font-medium">{headline.headlineLabel}</TableCell>
+                    <TableCell className="font-medium">{headline.label}</TableCell>
                     <TableCell className="max-w-xs truncate text-muted-foreground">{headline.summaryText}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {headline.roleTags?.map(tag => (
+                          <Badge key={tag.id} variant="secondary">
+                            {tag.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
                         <Button variant="ghost" size="icon-sm" onClick={() => openEdit(headline)}>
@@ -219,15 +260,15 @@ function HeadlinesPage() {
             <DialogTitle>{editingHeadline ? 'Edit Headline' : 'Add Headline'}</DialogTitle>
             <DialogDescription>
               {editingHeadline
-                ? 'Update the headline label and summary text.'
+                ? 'Update the headline label, summary text, and role tags.'
                 : 'Create a new headline for your resume.'}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="headlineLabel">Label</Label>
-              <Input id="headlineLabel" placeholder='e.g. "Full-Stack Engineer"' {...register('headlineLabel')} />
-              {errors.headlineLabel && <p className="text-sm text-destructive">{errors.headlineLabel.message}</p>}
+              <Label htmlFor="label">Label</Label>
+              <Input id="label" placeholder='e.g. "Full-Stack Engineer"' {...register('label')} />
+              {errors.label && <p className="text-sm text-destructive">{errors.label.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="summaryText">Summary</Label>
@@ -238,6 +279,49 @@ function HeadlinesPage() {
                 {...register('summaryText')}
               />
               {errors.summaryText && <p className="text-sm text-destructive">{errors.summaryText.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>Role Tags</Label>
+              <div className="flex flex-wrap gap-1">
+                {selectedTags.map(tag => (
+                  <Badge key={tag.id} variant="secondary" className="gap-1 pr-1">
+                    {tag.name}
+                    <button
+                      type="button"
+                      className="ml-0.5 rounded-full hover:bg-muted-foreground/20"
+                      onClick={() => removeTag(tag.id)}
+                    >
+                      <X className="h-3 w-3" />
+                      <span className="sr-only">Remove {tag.name}</span>
+                    </button>
+                  </Badge>
+                ))}
+                <Popover open={tagPopoverOpen} onOpenChange={open => setTagPopoverOpen(open)}>
+                  <PopoverTrigger
+                    render={
+                      <Button type="button" variant="outline" size="sm" className="h-5 gap-1 text-xs">
+                        Add Tag
+                        <ChevronsUpDown className="h-3 w-3 opacity-50" />
+                      </Button>
+                    }
+                  />
+                  <PopoverContent className="w-48 p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search tags..." />
+                      <CommandList>
+                        <CommandEmpty>No tags found.</CommandEmpty>
+                        <CommandGroup>
+                          {unselectedTags.map(tag => (
+                            <CommandItem key={tag.id} value={tag.name} onSelect={() => addTag(tag)}>
+                              {tag.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
@@ -257,7 +341,7 @@ function HeadlinesPage() {
           <DialogHeader>
             <DialogTitle>Delete Headline</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{deleteTarget?.headlineLabel}"? This action cannot be undone.
+              Are you sure you want to delete "{deleteTarget?.label}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
