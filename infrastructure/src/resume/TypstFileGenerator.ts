@@ -1,6 +1,7 @@
 import FS from 'node:fs/promises';
 import Path from 'node:path';
 import type { BrilliantCVContent } from '../brilliant-cv/types.js';
+import type { TemplateLayoutConfig } from './TemplateLayoutConfig.js';
 
 /** Escape characters that have special meaning in Typst content brackets [...]. */
 const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>/g, '\\>');
@@ -9,15 +10,23 @@ const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>
 const escapeToml = (str: string): string => str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 export class TypstFileGenerator {
-  public static async generate(content: BrilliantCVContent, workDir: string): Promise<void> {
+  public static async generate(
+    content: BrilliantCVContent,
+    workDir: string,
+    layoutConfig: TemplateLayoutConfig
+  ): Promise<void> {
     await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
 
     await Promise.all([
-      FS.writeFile(Path.join(workDir, 'metadata.toml'), TypstFileGenerator.buildMetadataToml(content), 'utf8'),
-      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(), 'utf8'),
+      FS.writeFile(
+        Path.join(workDir, 'metadata.toml'),
+        TypstFileGenerator.buildMetadataToml(content, layoutConfig),
+        'utf8'
+      ),
+      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(layoutConfig), 'utf8'),
       FS.writeFile(
         Path.join(workDir, 'modules_en', 'professional.typ'),
-        TypstFileGenerator.buildProfessionalTyp(content),
+        TypstFileGenerator.buildProfessionalTyp(content, layoutConfig),
         'utf8'
       ),
       FS.writeFile(Path.join(workDir, 'modules_en', 'skills.typ'), TypstFileGenerator.buildSkillsTyp(content), 'utf8'),
@@ -29,7 +38,7 @@ export class TypstFileGenerator {
     ]);
   }
 
-  private static buildMetadataToml(content: BrilliantCVContent): string {
+  private static buildMetadataToml(content: BrilliantCVContent, layoutConfig: TemplateLayoutConfig): string {
     const { personal, awesome_color, keywords } = content;
     const keywordsList = keywords.map(k => `"${escapeToml(k)}"`).join(', ');
 
@@ -37,9 +46,9 @@ export class TypstFileGenerator {
 
 [layout]
   awesome_color = "${awesome_color}"
-  before_section_skip = "1pt"
-  before_entry_skip = "1pt"
-  before_entry_description_skip = "1pt"
+  before_section_skip = "${layoutConfig.beforeSectionSkip}"
+  before_entry_skip = "${layoutConfig.beforeEntrySkip}"
+  before_entry_description_skip = "${layoutConfig.beforeEntryDescriptionSkip}"
   paper_size = "us-letter"
   [layout.fonts]
     regular_fonts = ["Source Sans 3"]
@@ -74,18 +83,21 @@ export class TypstFileGenerator {
 `;
   }
 
-  private static buildCvTyp(): string {
+  private static buildCvTyp(layoutConfig: TemplateLayoutConfig): string {
+    const includes = layoutConfig.sectionOrder.map(section => `#include "modules_en/${section}.typ"`).join('\n');
+
     return `#import "@preview/brilliant-cv:3.3.0": cv
 #let metadata = toml("./metadata.toml")
+#set text(size: ${layoutConfig.bodyFontSize})
+#set par(leading: ${layoutConfig.lineSpacing})
+#set page(margin: ${layoutConfig.pageMargin})
 #show: cv.with(metadata)
 
-#include "modules_en/professional.typ"
-#include "modules_en/skills.typ"
-#include "modules_en/education.typ"
+${includes}
 `;
   }
 
-  private static buildProfessionalTyp(content: BrilliantCVContent): string {
+  private static buildProfessionalTyp(content: BrilliantCVContent, layoutConfig: TemplateLayoutConfig): string {
     const lines: string[] = [
       `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-entry`,
       ``,
@@ -94,14 +106,18 @@ export class TypstFileGenerator {
     ];
 
     for (const exp of content.experience) {
+      const highlights = exp.highlights.slice(0, layoutConfig.maxBulletsPerEntry);
+
       lines.push(`#cv-entry(`);
       lines.push(`  title: [${escapeTypst(exp.title)}],`);
       lines.push(`  society: [${exp.society}],`); // NOT escaped — may contain #smallcaps[...]
       lines.push(`  date: [${exp.date}],`);
       lines.push(`  location: [${escapeTypst(exp.location)}],`);
       lines.push(`  description: list(`);
-      lines.push(`    [_${escapeTypst(exp.summary)}_],`);
-      for (const h of exp.highlights) {
+      if (layoutConfig.showEntrySummary) {
+        lines.push(`    [_${escapeTypst(exp.summary)}_],`);
+      }
+      for (const h of highlights) {
         lines.push(`    [${escapeTypst(h)}],`);
       }
       lines.push(`  ),`);
