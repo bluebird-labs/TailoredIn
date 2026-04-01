@@ -8,8 +8,11 @@ export class SetArchetypeContent2 {
   public constructor(private readonly repo: ArchetypeRepository2) {}
   public async execute(input: SetArchetypeContent2Input): Promise<Result<ArchetypeDto2, Error>> {
     let archetype: Archetype2;
-    try { archetype = await this.repo.findByIdOrFail(input.archetypeId); }
-    catch { return err(new Error(`Archetype not found: ${input.archetypeId}`)); }
+    try {
+      archetype = await this.repo.findByIdOrFail(input.archetypeId);
+    } catch {
+      return err(new Error(`Archetype not found: ${input.archetypeId}`));
+    }
     archetype.replaceContentSelection(new ContentSelection(input.contentSelection));
     await this.repo.save(archetype);
     return ok(toArchetypeDto2(archetype));
