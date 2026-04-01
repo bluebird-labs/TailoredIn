@@ -7,7 +7,7 @@ export function useTags(dimension?: string) {
     queryKey: dimension ? queryKeys.tags.byDimension(dimension) : queryKeys.tags.all,
     queryFn: async () => {
       const { data } = await api.tags.get({ query: { dimension } });
-      return data;
+      return data?.data ?? [];
     }
   });
 }
