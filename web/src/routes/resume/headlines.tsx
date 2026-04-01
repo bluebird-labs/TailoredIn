@@ -33,7 +33,6 @@ export const Route = createFileRoute('/resume/headlines')({
   component: HeadlinesPage
 });
 
-
 const headlineSchema = z.object({
   label: z.string().min(1, 'Label is required'),
   summaryText: z.string().min(1, 'Summary is required')

@@ -2,22 +2,29 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
   AddBullet,
+  AddBullet2,
+  AddBulletVariant,
   AddSkillItem,
+  ApproveBulletVariant,
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
   CreateCompany,
   CreateEducation,
   CreateEducation2,
+  CreateExperience,
   CreateHeadline,
   CreateHeadline2,
   CreatePosition,
   CreateSkillCategory,
   DeleteArchetype,
   DeleteBullet,
+  DeleteBullet2,
+  DeleteBulletVariant,
   DeleteCompany,
   DeleteEducation,
   DeleteEducation2,
+  DeleteExperience,
   DeleteHeadline,
   DeleteHeadline2,
   DeletePosition,
@@ -36,6 +43,7 @@ import {
   ListCompanies,
   ListEducation,
   ListEducation2,
+  ListExperiences,
   ListHeadlines,
   ListHeadlines2,
   ListJobs,
@@ -47,9 +55,12 @@ import {
   SetArchetypeSkills,
   UpdateArchetype,
   UpdateBullet,
+  UpdateBullet2,
+  UpdateBulletVariant,
   UpdateCompany,
   UpdateEducation,
   UpdateEducation2,
+  UpdateExperience,
   UpdateHeadline,
   UpdateHeadline2,
   UpdateJobCompany,
@@ -74,6 +85,7 @@ import {
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
+  PostgresExperienceRepository,
   PostgresHeadlineRepository,
   PostgresJobRepository,
   PostgresProfileRepository,
@@ -373,6 +385,53 @@ container.bind({
 container.bind({
   provide: DI.Resume.ReplaceLocations,
   useFactory: () => new ReplaceLocations(container.get(DI.Resume.CompanyRepository))
+});
+
+// Experience (new domain model)
+container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
+container.bind({
+  provide: DI.Experience.List,
+  useFactory: () => new ListExperiences(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.Create,
+  useFactory: () => new CreateExperience(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.Update,
+  useFactory: () => new UpdateExperience(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.Delete,
+  useFactory: () => new DeleteExperience(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.AddBullet,
+  useFactory: () => new AddBullet2(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.UpdateBullet,
+  useFactory: () => new UpdateBullet2(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.DeleteBullet,
+  useFactory: () => new DeleteBullet2(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.AddVariant,
+  useFactory: () => new AddBulletVariant(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.UpdateVariant,
+  useFactory: () => new UpdateBulletVariant(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.DeleteVariant,
+  useFactory: () => new DeleteBulletVariant(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.ApproveVariant,
+  useFactory: () => new ApproveBulletVariant(container.get(DI.Experience.Repository))
 });
 
 // SkillCategory use cases (new domain model)

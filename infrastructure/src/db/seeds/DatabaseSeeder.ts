@@ -16,6 +16,7 @@ export class DatabaseSeeder extends Seeder {
         archetype_skill_categories, archetype_skill_items, archetypes,
         resume_bullets, resume_positions, resume_company_locations, resume_companies,
         resume_skill_items, resume_skill_categories, resume_education, resume_headlines,
+        bullet_variant_tags, bullet_variants, bullet_tags, bullets, experiences,
         headline_tags, headlines, educations, skill_items, skill_categories, profiles,
         users,
         job_status_updates, jobs, companies,

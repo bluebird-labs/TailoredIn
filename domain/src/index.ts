@@ -9,6 +9,10 @@ export type { ArchetypeConfigCreateProps } from './entities/ArchetypeConfig.js';
 export { ArchetypeConfig } from './entities/ArchetypeConfig.js';
 export type { ArchetypePositionCreateProps } from './entities/ArchetypePosition.js';
 export { ArchetypePosition } from './entities/ArchetypePosition.js';
+export type { BulletCreateProps } from './entities/Bullet.js';
+export { Bullet } from './entities/Bullet.js';
+export type { BulletVariantCreateProps, BulletVariantSource } from './entities/BulletVariant.js';
+export { BulletVariant } from './entities/BulletVariant.js';
 // Entities — job discovery
 export type { CompanyCreateProps } from './entities/Company.js';
 export { Company } from './entities/Company.js';
@@ -17,6 +21,8 @@ export type { CompanyBriefCreateProps, CompanyBriefSections } from './entities/C
 export { CompanyBrief } from './entities/CompanyBrief.js';
 export type { EducationCreateProps } from './entities/Education.js';
 export { Education } from './entities/Education.js';
+export type { ExperienceCreateProps } from './entities/Experience.js';
+export { Experience } from './entities/Experience.js';
 // Entities — resume data
 export type { HeadlineCreateProps } from './entities/Headline.js';
 export { Headline } from './entities/Headline.js';
@@ -59,6 +65,7 @@ export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepositor
 export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { EducationRepository } from './ports/EducationRepository.js';
+export type { ExperienceRepository } from './ports/ExperienceRepository.js';
 export type { HeadlineRepository } from './ports/HeadlineRepository.js';
 export type { JobElector } from './ports/JobElector.js';
 export type {

@@ -16,6 +16,9 @@ import { ArchetypeSkillItem } from './entities/archetypes/ArchetypeSkillItem.js'
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
+import { Bullet as OrmBullet } from './entities/experience/Bullet.js';
+import { BulletVariant as OrmBulletVariant } from './entities/experience/BulletVariant.js';
+import { Experience as OrmExperience } from './entities/experience/Experience.js';
 import { Headline as OrmHeadline } from './entities/headline/Headline.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
@@ -78,7 +81,10 @@ export function createOrmConfig(db: OrmDbConfig) {
       OrmHeadline,
       OrmTag,
       OrmSkillCategory,
-      OrmSkillItem
+      OrmSkillItem,
+      OrmExperience,
+      OrmBullet,
+      OrmBulletVariant
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
