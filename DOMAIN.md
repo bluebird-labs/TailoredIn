@@ -2,7 +2,7 @@
 
 ```mermaid
 ---
-title: TailoredIn — Domain Entities & Relationships (v2 — Domain Rethink)
+title: TailoredIn — Domain Entities & Relationships
 ---
 
 classDiagram
