@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import {
   type Headline,
-  HeadlineId,
   type HeadlineRepository,
   Tag,
   TagDimension,

@@ -33,7 +33,6 @@ describe('Headline', () => {
   });
 
   test('updates mutable fields', () => {
-    const before = new Date(Date.now() - 1000);
     const headline = Headline.create({
       profileId: 'profile-3',
       label: 'Engineer',
