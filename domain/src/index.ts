@@ -17,6 +17,8 @@ export type { CompanyBriefCreateProps, CompanyBriefSections } from './entities/C
 export { CompanyBrief } from './entities/CompanyBrief.js';
 export type { JobPostingCreateProps } from './entities/JobPosting.js';
 export { JobPosting } from './entities/JobPosting.js';
+export type { ProfileCreateProps } from './entities/Profile.js';
+export { Profile } from './entities/Profile.js';
 export type { ResumeCreateProps } from './entities/Resume.js';
 export { Resume } from './entities/Resume.js';
 export type { ResumeBulletCreateProps } from './entities/ResumeBullet.js';
@@ -56,6 +58,7 @@ export type {
   PaginatedResult,
   UpsertJobProps
 } from './ports/JobRepository.js';
+export type { ProfileRepository } from './ports/ProfileRepository.js';
 export type { ResumeCompanyRepository } from './ports/ResumeCompanyRepository.js';
 export type { ResumeEducationRepository } from './ports/ResumeEducationRepository.js';
 export type { ResumeHeadlineRepository } from './ports/ResumeHeadlineRepository.js';

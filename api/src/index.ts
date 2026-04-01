@@ -26,6 +26,7 @@ import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
 import { GetCurrentUserRoute } from './routes/GetCurrentUserRoute.js';
 import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
 import { GetJobRoute } from './routes/GetJobRoute.js';
+import { GetProfileRoute } from './routes/GetProfileRoute.js';
 import { GetUserRoute } from './routes/GetUserRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
@@ -46,6 +47,7 @@ import { UpdateEducationRoute } from './routes/UpdateEducationRoute.js';
 import { UpdateHeadlineRoute } from './routes/UpdateHeadlineRoute.js';
 import { UpdateJobCompanyRoute } from './routes/UpdateJobCompanyRoute.js';
 import { UpdatePositionRoute } from './routes/UpdatePositionRoute.js';
+import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 import { UpdateSkillCategoryRoute } from './routes/UpdateSkillCategoryRoute.js';
 import { UpdateSkillItemRoute } from './routes/UpdateSkillItemRoute.js';
 import { UpdateUserRoute } from './routes/UpdateUserRoute.js';
@@ -96,6 +98,9 @@ const app = new Elysia()
   .use(container.get(GetCurrentUserRoute).plugin())
   .use(container.get(GetUserRoute).plugin())
   .use(container.get(UpdateUserRoute).plugin())
+  // Profile
+  .use(container.get(GetProfileRoute).plugin())
+  .use(container.get(UpdateProfileRoute).plugin())
   .use(container.get(ListEducationRoute).plugin())
   .use(container.get(CreateEducationRoute).plugin())
   .use(container.get(UpdateEducationRoute).plugin())

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCurrentUser } from '@/hooks/use-user';
+import { useProfile } from '@/hooks/use-profile';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 
@@ -22,37 +22,40 @@ const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
-  phoneNumber: z.string().optional().default(''),
-  githubHandle: z.string().optional().default(''),
-  linkedinHandle: z.string().optional().default(''),
-  locationLabel: z.string().optional().default('')
+  phone: z.string().optional().default(''),
+  location: z.string().optional().default(''),
+  linkedinUrl: z.string().optional().default(''),
+  githubUrl: z.string().optional().default(''),
+  websiteUrl: z.string().optional().default('')
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-function toFormValues(user: {
+function toFormValues(profile: {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: string | null;
-  githubHandle: string | null;
-  linkedinHandle: string | null;
-  locationLabel: string | null;
+  phone: string | null;
+  location: string | null;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  websiteUrl: string | null;
 }): ProfileFormValues {
   return {
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    phoneNumber: user.phoneNumber ?? '',
-    githubHandle: user.githubHandle ?? '',
-    linkedinHandle: user.linkedinHandle ?? '',
-    locationLabel: user.locationLabel ?? ''
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    email: profile.email,
+    phone: profile.phone ?? '',
+    location: profile.location ?? '',
+    linkedinUrl: profile.linkedinUrl ?? '',
+    githubUrl: profile.githubUrl ?? '',
+    websiteUrl: profile.websiteUrl ?? ''
   };
 }
 
 function ProfilePage() {
-  const { data: userResponse, isLoading } = useCurrentUser();
-  const user = userResponse?.data;
+  const { data: profileResponse, isLoading } = useProfile();
+  const profile = profileResponse?.data;
   const queryClient = useQueryClient();
 
   const {
@@ -62,24 +65,24 @@ function ProfilePage() {
     formState: { errors, isDirty, isSubmitting }
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    values: user ? toFormValues(user) : undefined
+    values: profile ? toFormValues(profile) : undefined
   });
 
   const updateMutation = useMutation({
     mutationFn: async (values: ProfileFormValues) => {
-      if (!user) return;
-      return api.users({ userId: user.id }).put({
+      return api.profile.put({
         first_name: values.firstName,
         last_name: values.lastName,
         email: values.email,
-        phone_number: values.phoneNumber || null,
-        github_handle: values.githubHandle || null,
-        linkedin_handle: values.linkedinHandle || null,
-        location_label: values.locationLabel || null
+        phone: values.phone || null,
+        location: values.location || null,
+        linkedin_url: values.linkedinUrl || null,
+        github_url: values.githubUrl || null,
+        website_url: values.websiteUrl || null
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
       toast.success('Profile updated');
     },
     onError: () => {
@@ -101,6 +104,7 @@ function ProfilePage() {
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
+            <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <div className="grid grid-cols-2 gap-4">
@@ -145,24 +149,29 @@ function ProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone number</Label>
-              <Input id="phoneNumber" {...register('phoneNumber')} placeholder="Optional" />
+              <Label htmlFor="phone">Phone number</Label>
+              <Input id="phone" {...register('phone')} placeholder="Optional" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input id="location" {...register('location')} placeholder="Optional" />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="githubHandle">GitHub handle</Label>
-                <Input id="githubHandle" {...register('githubHandle')} placeholder="Optional" />
+                <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
+                <Input id="linkedinUrl" {...register('linkedinUrl')} placeholder="Optional" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="linkedinHandle">LinkedIn handle</Label>
-                <Input id="linkedinHandle" {...register('linkedinHandle')} placeholder="Optional" />
+                <Label htmlFor="githubUrl">GitHub URL</Label>
+                <Input id="githubUrl" {...register('githubUrl')} placeholder="Optional" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="locationLabel">Location</Label>
-              <Input id="locationLabel" {...register('locationLabel')} placeholder="Optional" />
+              <Label htmlFor="websiteUrl">Website URL</Label>
+              <Input id="websiteUrl" {...register('websiteUrl')} placeholder="Optional" />
             </div>
 
             <Separator />

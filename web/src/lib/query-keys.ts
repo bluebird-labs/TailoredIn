@@ -17,6 +17,10 @@ export const queryKeys = {
     skills: () => [...queryKeys.resume.all, 'skills'] as const,
     headlines: () => [...queryKeys.resume.all, 'headlines'] as const
   },
+  profile: {
+    all: ['profile'] as const,
+    detail: () => [...queryKeys.profile.all, 'detail'] as const
+  },
   user: {
     all: ['user'] as const,
     profile: () => [...queryKeys.user.all, 'profile'] as const
