@@ -38,15 +38,15 @@ export class JobDataSeeder extends Seeder {
   }
 }
 
-async function batchInsert(
+async function batchInsert<T extends object>(
   connection: ReturnType<EntityManager['getConnection']>,
   table: string,
-  rows: Record<string, unknown>[],
+  rows: T[],
   batchSize: number
 ): Promise<void> {
   if (rows.length === 0) return;
 
-  const columns = Object.keys(rows[0]);
+  const columns = Object.keys(rows[0]) as (keyof T & string)[];
   const colList = columns.map(c => `"${c}"`).join(', ');
 
   for (let offset = 0; offset < rows.length; offset += batchSize) {

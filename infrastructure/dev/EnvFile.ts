@@ -5,7 +5,7 @@ const ENV_FILE = '.env';
 
 export type SessionPorts = { db: number; api: number; web: number };
 
-export function envFilePath(): string {
+function envFilePath(): string {
   return resolve(ENV_FILE);
 }
 
