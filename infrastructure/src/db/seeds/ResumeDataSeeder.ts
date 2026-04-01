@@ -33,14 +33,18 @@ export class ResumeDataSeeder extends Seeder {
     em.persist(user);
     await em.flush();
 
-    // Profile (new domain model — required for skill_categories FK)
-    const existingProfile = await em.getConnection().execute<[{ id: string }]>('SELECT id FROM profiles LIMIT 1');
-    if (!existingProfile.length) {
-      await em.getConnection().execute(`
-        INSERT INTO profiles (email, first_name, last_name)
-        SELECT email, first_name, last_name FROM users LIMIT 1
-      `);
-    }
+    // Profile (new domain model — anchor for all new table FKs)
+    const esc = (s: string) => s.replace(/'/g, "''");
+    const conn = em.getConnection();
+    const [profileRow] = await conn.execute<[{ id: string }]>(
+      `INSERT INTO profiles (email, first_name, last_name, phone, location, linkedin_url, github_url, website_url)
+       VALUES ('${esc(userData.email)}', '${esc(userData.firstName)}', '${esc(userData.lastName)}',
+               '${userData.phoneNumber}', '${esc(userData.locationLabel)}',
+               'https://linkedin.com/in/${userData.linkedinHandle}',
+               'https://github.com/${userData.githubHandle}', NULL)
+       RETURNING id`
+    );
+    const profileId = profileRow.id;
 
     // Companies + positions + locations
     const companies: Record<CompanyKey, ResumeCompany> = {} as Record<CompanyKey, ResumeCompany>;
@@ -130,51 +134,136 @@ export class ResumeDataSeeder extends Seeder {
       });
     }
 
-    // ── New domain model tables (profile already created above) ──
-    const profileRows = await em.getConnection().execute<[{ id: string }]>('SELECT id FROM profiles LIMIT 1');
-    if (profileRows.length > 0) {
-      const profileId = profileRows[0].id;
+    // ── New domain model tables (profile created above) ──
 
-      // Skill categories + items → skill_categories / skill_items
-      for (let ci = 0; ci < skillCategoryDefs.length; ci++) {
-        const [catName, skillNames] = skillCategoryDefs[ci];
-        const [catRow] = await em.getConnection().execute<[{ id: string }]>(
-          `INSERT INTO skill_categories (id, profile_id, name, ordinal)
-           VALUES (gen_random_uuid(), '${profileId}', '${catName.replace(/'/g, "''")}', ${ci})
+    // Skill categories + items — tracking IDs for content_selection
+    const skillCatIds: Record<string, string> = {};
+    const skillItemIdsByCategory: Record<string, string[]> = {};
+    for (let ci = 0; ci < skillCategoryDefs.length; ci++) {
+      const [catName, skillNames] = skillCategoryDefs[ci];
+      const [catRow] = await conn.execute<[{ id: string }]>(
+        `INSERT INTO skill_categories (id, profile_id, name, ordinal)
+         VALUES (gen_random_uuid(), '${profileId}', '${esc(catName)}', ${ci})
+         RETURNING id`
+      );
+      skillCatIds[catName] = catRow.id;
+      skillItemIdsByCategory[catName] = [];
+      for (let si = 0; si < skillNames.length; si++) {
+        const [itemRow] = await conn.execute<[{ id: string }]>(
+          `INSERT INTO skill_items (id, skill_category_id, name, ordinal)
+           VALUES (gen_random_uuid(), '${catRow.id}', '${esc(skillNames[si])}', ${si})
            RETURNING id`
         );
-        for (let si = 0; si < skillNames.length; si++) {
-          await em.getConnection().execute(
-            `INSERT INTO skill_items (id, skill_category_id, name, ordinal)
-             VALUES (gen_random_uuid(), '${catRow.id}', '${skillNames[si].replace(/'/g, "''")}', ${si})`
+        skillItemIdsByCategory[catName].push(itemRow.id);
+      }
+    }
+
+    // Education — tracking IDs
+    const eduIds: string[] = [];
+    for (let ei = 0; ei < educationDefs.length; ei++) {
+      const def = educationDefs[ei];
+      const [eduRow] = await conn.execute<[{ id: string }]>(
+        `INSERT INTO educations (id, profile_id, degree_title, institution_name, graduation_year, location, honors, ordinal)
+         VALUES (gen_random_uuid(), '${profileId}', '${esc(def.degreeTitle)}', '${esc(def.institutionName)}',
+                 ${Number.parseInt(def.graduationYear, 10)}, '${esc(def.locationLabel)}', NULL, ${ei})
+         RETURNING id`
+      );
+      eduIds.push(eduRow.id);
+    }
+
+    // Headlines — tracking IDs
+    const [headlineRow] = await conn.execute<[{ id: string }]>(
+      `INSERT INTO headlines (id, profile_id, label, summary_text)
+       VALUES (gen_random_uuid(), '${profileId}', '${esc(headlineData.headlineLabel)}', '${esc(headlineData.summaryText)}')
+       RETURNING id`
+    );
+    const newHeadlineId = headlineRow.id;
+
+    // Experiences — real titles from Lead IC archetype, Volvo gets 2 positions (8 total)
+    const leadIcPositions = archetypeDefs[0].positions;
+    const experienceIdMap = new Map<string, string>(); // "companyKey:positionIndex" → experience ID
+
+    for (let pi = 0; pi < leadIcPositions.length; pi++) {
+      const posDef = leadIcPositions[pi];
+      const compDef = companyDefs[posDef.companyKey];
+      const [expRow] = await conn.execute<[{ id: string }]>(
+        `INSERT INTO experiences (id, profile_id, title, company_name, company_website, location, start_date, end_date, summary, ordinal)
+         VALUES (gen_random_uuid(), '${profileId}', '${esc(posDef.jobTitle)}', '${esc(compDef.companyName)}',
+                 ${compDef.websiteUrl ? `'${compDef.websiteUrl}'` : 'NULL'}, '${esc(posDef.locationLabel)}',
+                 '${posDef.startDate}', '${posDef.endDate}', '${esc(posDef.roleSummary)}', ${pi})
+         RETURNING id`
+      );
+      experienceIdMap.set(`${posDef.companyKey}:${posDef.positionIndex}`, expRow.id);
+    }
+
+    // Bullets — assign to experiences; for Volvo split by position index
+    const bulletPositionMap = new Map<CompanyKey, Map<number, number>>();
+    for (const posDef of leadIcPositions) {
+      if (!bulletPositionMap.has(posDef.companyKey)) {
+        bulletPositionMap.set(posDef.companyKey, new Map());
+      }
+      for (const bi of posDef.bulletIndices) {
+        bulletPositionMap.get(posDef.companyKey)!.set(bi, posDef.positionIndex);
+      }
+    }
+
+    for (const [companyKey, texts] of Object.entries(bulletDefs) as [CompanyKey, string[]][]) {
+      const posMap = bulletPositionMap.get(companyKey) ?? new Map();
+      const grouped = new Map<number, { idx: number; text: string }[]>();
+      for (let i = 0; i < texts.length; i++) {
+        const posIdx = posMap.get(i) ?? 0;
+        if (!grouped.has(posIdx)) grouped.set(posIdx, []);
+        grouped.get(posIdx)!.push({ idx: i, text: texts[i] });
+      }
+      for (const [posIdx, group] of grouped) {
+        const expId = experienceIdMap.get(`${companyKey}:${posIdx}`);
+        if (!expId) continue;
+        for (let bi = 0; bi < group.length; bi++) {
+          await conn.execute(
+            `INSERT INTO bullets (id, experience_id, content, ordinal)
+             VALUES (gen_random_uuid(), '${expId}', '${esc(group[bi].text)}', ${bi})`
           );
         }
       }
+    }
 
-      // Education → educations table
-      for (let ei = 0; ei < educationDefs.length; ei++) {
-        const def = educationDefs[ei];
-        await em.getConnection().execute(
-          `INSERT INTO educations (id, profile_id, degree_title, institution_name, graduation_year, location, honors, ordinal)
-           VALUES (gen_random_uuid(), '${profileId}', '${def.degreeTitle.replace(/'/g, "''")}', '${def.institutionName.replace(/'/g, "''")}', ${parseInt(def.graduationYear, 10)}, '${(def.locationLabel ?? '').replace(/'/g, "''")}', NULL, ${ei})`
-        );
+    // Archetypes (archetypes_v2) — 2 archetypes with content_selection JSONB
+    for (const def of archetypeDefs) {
+      const experienceSelections = def.positions.map(posDef => ({
+        experienceId: experienceIdMap.get(`${posDef.companyKey}:${posDef.positionIndex}`)!,
+        bulletVariantIds: [] as string[]
+      }));
+
+      const selectedEduIds = def.educationIndices.map(i => eduIds[i]);
+      const allSkillCatIds = Object.values(skillCatIds);
+
+      const selectedSkillItemIds: string[] = [];
+      for (const [catName, itemIds] of Object.entries(skillItemIdsByCategory)) {
+        if (catName === 'interests' && def.interestItemOverrides) {
+          const interestNames = skillCategoryDefs.find(([n]) => n === 'interests')![1];
+          for (let i = 0; i < interestNames.length; i++) {
+            if (def.interestItemOverrides.includes(interestNames[i])) {
+              selectedSkillItemIds.push(itemIds[i]);
+            }
+          }
+        } else {
+          selectedSkillItemIds.push(...itemIds);
+        }
       }
 
-      // Headlines → headlines table
-      await em.getConnection().execute(
-        `INSERT INTO headlines (id, profile_id, label, summary_text)
-         VALUES (gen_random_uuid(), '${profileId}', '${headlineData.headlineLabel.replace(/'/g, "''")}', '${headlineData.summaryText.replace(/'/g, "''")}')`
+      const contentSelection = {
+        experienceSelections,
+        projectIds: [],
+        educationIds: selectedEduIds,
+        skillCategoryIds: allSkillCatIds,
+        skillItemIds: selectedSkillItemIds
+      };
+
+      await conn.execute(
+        `INSERT INTO archetypes_v2 (id, profile_id, key, label, headline_id, content_selection)
+         VALUES (gen_random_uuid(), '${profileId}', '${esc(def.archetypeKey)}', '${esc(def.archetypeLabel)}',
+                 '${newHeadlineId}', '${JSON.stringify(contentSelection).replace(/'/g, "''")}'::jsonb)`
       );
-
-      // Experiences → experiences table
-      const companyEntries = Object.entries(companyDefs) as [CompanyKey, (typeof companyDefs)[CompanyKey]][];
-      for (let ei = 0; ei < companyEntries.length; ei++) {
-        const [, def] = companyEntries[ei];
-        await em.getConnection().execute(
-          `INSERT INTO experiences (id, profile_id, title, company_name, company_website, location, start_date, end_date, summary, ordinal)
-           VALUES (gen_random_uuid(), '${profileId}', 'Software Engineer', '${def.companyName.replace(/'/g, "''")}', ${def.websiteUrl ? `'${def.websiteUrl}'` : 'NULL'}, '${(def.locations[0] ?? '').replace(/'/g, "''")}', '${def.joinedAt}', '${def.leftAt}', NULL, ${ei})`
-        );
-      }
     }
 
     // Headline
