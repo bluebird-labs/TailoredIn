@@ -22,18 +22,13 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
 
   public async findByItemIdOrFail(itemId: string): Promise<DomainSkillCategory> {
     const ormItem = await this.orm.em.findOneOrFail(OrmSkillItem, itemId, { populate: ['category'] });
-    const categoryId = typeof ormItem.category === 'string'
-      ? ormItem.category
-      : (ormItem.category as { id: string }).id;
+    const categoryId =
+      typeof ormItem.category === 'string' ? ormItem.category : (ormItem.category as { id: string }).id;
     return this.findByIdOrFail(categoryId);
   }
 
   public async findAll(): Promise<DomainSkillCategory[]> {
-    const ormCategories = await this.orm.em.find(
-      OrmSkillCategory,
-      {},
-      { orderBy: { ordinal: 'ASC' } }
-    );
+    const ormCategories = await this.orm.em.find(OrmSkillCategory, {}, { orderBy: { ordinal: 'ASC' } });
     return Promise.all(ormCategories.map(c => this.toDomain(c)));
   }
 
@@ -114,15 +109,9 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
   }
 
   private async toDomain(orm: OrmSkillCategory): Promise<DomainSkillCategory> {
-    const profileId = typeof orm.profile === 'string'
-      ? orm.profile
-      : (orm.profile as { id: string }).id;
+    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
 
-    const ormItems = await this.orm.em.find(
-      OrmSkillItem,
-      { category: orm.id },
-      { orderBy: { ordinal: 'ASC' } }
-    );
+    const ormItems = await this.orm.em.find(OrmSkillItem, { category: orm.id }, { orderBy: { ordinal: 'ASC' } });
 
     const items = ormItems.map(
       i =>
