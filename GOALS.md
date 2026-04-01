@@ -113,14 +113,14 @@ Each worktree runs `bun dev:up` for independent Docker + port allocation. UI tes
 - [ ] `bun dev:up && cd infrastructure && bun run db:migration:up` — migration applies
 - [ ] Connect to DB, verify all 17 tables exist: `profiles`, `experiences`, `bullets`, `bullet_variants`, `bullet_tags`, `bullet_variant_tags`, `tags`, `projects`, `project_tags`, `headlines`, `headline_tags`, `educations`, `skill_categories`, `skill_items`, `archetypes_v2`, `archetype_tag_weights`, `job_postings`
 
-### Wave 2 — Profile, Headlines, Education, Skills (4 parallel) ← CURRENT
+### Wave 2 — Profile, Headlines, Education, Skills (4 parallel) ✅
 
 | Session | Slice | Branch | Worktree | Status |
 |---|---|---|---|---|
 | 1 | **S1** (Profile) | `feat/dr-s1-profile` | `.claude/worktrees/dr-s1-profile` | ✅ merged (#29) |
-| 2 | **S2** (Headlines) | `feat/dr-s2-headlines` | `.claude/worktrees/dr-s2-headlines` | ⏳ launched |
-| 3 | **S3** (Education) | `feat/dr-s3-education` | `.claude/worktrees/dr-s3-education` | ⏳ launched |
-| 4 | **S4** (Skills) | `feat/dr-s4-skills` | `.claude/worktrees/dr-s4-skills` | ⏳ launched |
+| 2 | **S2** (Headlines) | `feat/dr-s2-headlines` | `.claude/worktrees/dr-s2-headlines` | ✅ merged (#31) |
+| 3 | **S3** (Education) | `feat/dr-s3-education` | `.claude/worktrees/dr-s3-education` | ✅ merged (#30) |
+| 4 | **S4** (Skills) | `feat/dr-s4-skills` | `.claude/worktrees/dr-s4-skills` | ✅ merged (#32) |
 
 **S1 UI Testing:**
 - [ ] Open `/resume/profile` — form loads
