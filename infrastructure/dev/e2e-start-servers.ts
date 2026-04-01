@@ -7,14 +7,16 @@
  * Writes server state to e2e/.server-state.json, then keeps running until killed.
  * Prints "E2E_READY <webPort> <apiPort> <dbPort>" to stdout when ready.
  */
-import { existsSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { MikroORM } from '@mikro-orm/postgresql';
+import { Logger } from '@tailoredin/core';
 import { GenericContainer, Wait } from 'testcontainers';
 import { createServer } from 'vite';
 import { createOrmConfig } from '../src/db/orm-config.js';
 import { DatabaseSeeder } from '../src/db/seeds/DatabaseSeeder.js';
 
+const log = Logger.create('e2e');
 const REPO_ROOT = resolve(import.meta.dirname, '../..');
 const STATE_PATH = resolve(REPO_ROOT, 'e2e/.server-state.json');
 
@@ -22,7 +24,7 @@ const apiPort = 18000 + Math.floor(Math.random() * 1000);
 const webPort = 15173 + Math.floor(Math.random() * 1000);
 
 // 1. Start Postgres via Testcontainers
-console.error('[e2e] Starting Postgres container...');
+log.info('Starting Postgres container...');
 const container = await new GenericContainer('postgres:17-alpine')
   .withEnvironment({
     POSTGRES_USER: 'test',
@@ -35,10 +37,10 @@ const container = await new GenericContainer('postgres:17-alpine')
 
 const dbPort = container.getMappedPort(5432);
 const dbHost = container.getHost();
-console.error(`[e2e] Postgres running on ${dbHost}:${dbPort}`);
+log.info(`Postgres running on ${dbHost}:${dbPort}`);
 
 // 2. Run migrations + seeds
-console.error('[e2e] Running migrations and seeds...');
+log.info('Running migrations and seeds...');
 const ormConfig = createOrmConfig({
   timezone: 'UTC',
   user: 'test',
@@ -54,7 +56,7 @@ await orm.seeder.seed(DatabaseSeeder);
 await orm.close(true);
 
 // 3. Start API server
-console.error(`[e2e] Starting API on port ${apiPort}...`);
+log.info(`Starting API on port ${apiPort}...`);
 
 // Set ALL env vars BEFORE importing the API module.
 // api/src/container.ts reads these eagerly via env()/envInt()/envBool().
@@ -73,10 +75,10 @@ process.env.SLOW_MO = '0';
 
 await import('../../api/src/index.js');
 await waitForHealth(`http://localhost:${apiPort}/health`);
-console.error('[e2e] API ready');
+log.info('API ready');
 
 // 4. Start Vite dev server
-console.error(`[e2e] Starting Vite on port ${webPort}...`);
+log.info(`Starting Vite on port ${webPort}...`);
 const viteServer = await createServer({
   root: resolve(REPO_ROOT, 'web'),
   server: {
@@ -90,15 +92,16 @@ const viteServer = await createServer({
   }
 });
 await viteServer.listen();
-console.error(`[e2e] Vite ready at http://localhost:${webPort}`);
+log.info(`Vite ready at http://localhost:${webPort}`);
 
-// 5. Write state + signal readiness
+// 5. Write state + signal readiness (stdout for global-setup.ts, stderr for humans)
 writeFileSync(STATE_PATH, JSON.stringify({ webPort, apiPort, dbPort }, null, 2));
+// biome-ignore lint/suspicious/noConsole: stdout signal parsed by global-setup.ts
 console.log(`E2E_READY ${webPort} ${apiPort} ${dbPort}`);
 
 // Keep alive until killed
 process.on('SIGTERM', async () => {
-  console.error('[e2e] Shutting down...');
+  log.info('Shutting down...');
   await viteServer.close();
   await container.stop();
   process.exit(0);
