@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Check, ChevronDown, ChevronRight, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useExperiences } from '@/hooks/use-experiences';
 import { api } from '@/lib/api';
@@ -69,10 +70,10 @@ const experienceSchema = z.object({
   companyName: z.string().min(1, 'Company name is required'),
   companyWebsite: z.string().optional(),
   location: z.string().min(1, 'Location is required'),
-  startDate: z.string().min(1, 'Start date is required'),
-  endDate: z.string().min(1, 'End date is required'),
+  startDate: z.string().regex(/^\d{4}-\d{2}$/, 'Select month and year'),
+  endDate: z.string().regex(/^\d{4}-\d{2}$/, 'Select month and year'),
   summary: z.string().optional(),
-  ordinal: z.coerce.number().int().min(0)
+  ordinal: z.coerce.number().int().min(0).optional().default(0)
 });
 
 type ExperienceFormValues = z.infer<typeof experienceSchema>;
@@ -99,7 +100,7 @@ function ExperiencePage() {
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Experience | null>(null);
 
-  const experiences = (data ?? []) as Experience[];
+  const experiences = ((data ?? []) as Experience[]).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   // ── Experience CRUD mutations ──
 
@@ -162,6 +163,7 @@ function ExperiencePage() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting }
   } = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceSchema),
@@ -299,13 +301,21 @@ function ExperiencePage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date</Label>
-                <Input id="startDate" placeholder="Jan 2022" {...register('startDate')} />
+                <Label>Start Date</Label>
+                <Controller
+                  name="startDate"
+                  control={control}
+                  render={({ field }) => <MonthYearPicker value={field.value} onChange={field.onChange} />}
+                />
                 {errors.startDate && <p className="text-sm text-destructive">{errors.startDate.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date</Label>
-                <Input id="endDate" placeholder="Present" {...register('endDate')} />
+                <Label>End Date</Label>
+                <Controller
+                  name="endDate"
+                  control={control}
+                  render={({ field }) => <MonthYearPicker value={field.value} onChange={field.onChange} />}
+                />
                 {errors.endDate && <p className="text-sm text-destructive">{errors.endDate.message}</p>}
               </div>
             </div>
@@ -317,10 +327,6 @@ function ExperiencePage() {
                 placeholder="Brief description of the role..."
                 {...register('summary')}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ordinal">Order</Label>
-              <Input id="ordinal" type="number" min={0} {...register('ordinal')} />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>

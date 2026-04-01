@@ -44,10 +44,10 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
       this.orm.em.persist(existing);
       await this.syncItems(category);
     } else {
-      const profileRef = this.orm.em.getReference(Profile, category.profileId);
+      const profile = await this.orm.em.findOneOrFail(Profile, category.profileId);
       const orm = new OrmSkillCategory({
         id: category.id.value,
-        profile: profileRef,
+        profile,
         name: category.name,
         ordinal: category.ordinal,
         createdAt: category.createdAt,

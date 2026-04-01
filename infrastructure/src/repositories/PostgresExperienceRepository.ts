@@ -51,10 +51,10 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       this.orm.em.persist(existing);
       await this.syncBullets(experience);
     } else {
-      const profileRef = this.orm.em.getReference(Profile, experience.profileId);
+      const profile = await this.orm.em.findOneOrFail(Profile, experience.profileId);
       const orm = new OrmExperience({
         id: experience.id.value,
-        profile: profileRef,
+        profile,
         title: experience.title,
         companyName: experience.companyName,
         companyWebsite: experience.companyWebsite,

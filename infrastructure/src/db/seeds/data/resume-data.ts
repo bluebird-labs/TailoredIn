@@ -451,5 +451,231 @@ export const archetypeDefs: ArchetypeDef[] = [
         bulletIndices: [1, 2, 3]
       }
     ]
+  },
+  {
+    archetypeKey: 'individual_contributor',
+    archetypeLabel: 'IC',
+    archetypeDescription:
+      'Pure individual contributor — for mid-to-senior engineer roles emphasizing hands-on coding and system design',
+    socialNetworks: ['GitHub', 'LinkedIn'],
+    educationIndices: [0],
+    interestItemOverrides: null,
+    positions: [
+      {
+        companyKey: 'lantern',
+        positionIndex: 0,
+        jobTitle: 'Staff Software Engineer',
+        displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
+        locationLabel: 'New York, NY',
+        startDate: '2024-09',
+        endDate: '2024-11',
+        roleSummary:
+          'Consulted for an early-stage B2B SaaS startup, addressed stability/performance issues and built a scalable foundation',
+        bulletIndices: [0, 1, 2, 3]
+      },
+      {
+        companyKey: 'brightflow',
+        positionIndex: 0,
+        jobTitle: 'Staff Software Engineer',
+        displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
+        locationLabel: 'New York, NY',
+        startDate: '2023-09',
+        endDate: '2024-06',
+        roleSummary:
+          'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
+        bulletIndices: [0, 1, 2, 3, 4]
+      },
+      {
+        companyKey: 'volvo',
+        positionIndex: 1,
+        jobTitle: 'Senior Software Engineer',
+        displayCompanyName: 'Volvo Cars',
+        locationLabel: 'Stockholm, Sweden',
+        startDate: '2018-01',
+        endDate: '2020-03',
+        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
+        bulletIndices: [8, 9, 10]
+      },
+      {
+        companyKey: 'luxe',
+        positionIndex: 0,
+        jobTitle: 'Lead Software Engineer',
+        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
+        locationLabel: 'San Francisco, CA',
+        startDate: '2016-06',
+        endDate: '2017-12',
+        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
+        bulletIndices: [0, 1]
+      },
+      {
+        companyKey: 'streamnation',
+        positionIndex: 0,
+        jobTitle: 'Software Engineer',
+        displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
+        locationLabel: 'San Francisco, CA',
+        startDate: '2015-12',
+        endDate: '2016-06',
+        roleSummary: 'Participated in both backend and frontend efforts for StreamNation\u2019s multimedia platform',
+        bulletIndices: [0, 1, 2]
+      },
+      {
+        companyKey: 'planorama',
+        positionIndex: 0,
+        jobTitle: 'Lead Software Engineer',
+        displayCompanyName: 'Planorama',
+        locationLabel: 'Paris, France',
+        startDate: '2014-04',
+        endDate: '2015-11',
+        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
+        bulletIndices: [0, 1]
+      },
+      {
+        companyKey: 'luckycart',
+        positionIndex: 0,
+        jobTitle: 'Software Engineer',
+        displayCompanyName: 'LuckyCart',
+        locationLabel: 'Paris, France',
+        startDate: '2012-09',
+        endDate: '2014-04',
+        roleSummary: 'Full-time with Luckycart and executed small side projects',
+        bulletIndices: [1, 2, 3]
+      }
+    ]
+  },
+  {
+    archetypeKey: 'hands_on_manager',
+    archetypeLabel: 'Hands-On Manager',
+    archetypeDescription:
+      'Technical leader who codes and manages — for architect, staff+, and hands-on engineering manager roles',
+    socialNetworks: ['GitHub', 'LinkedIn'],
+    educationIndices: [0],
+    interestItemOverrides: null,
+    positions: [
+      {
+        companyKey: 'lantern',
+        positionIndex: 0,
+        jobTitle: 'Staff Software Engineer',
+        displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
+        locationLabel: 'New York, NY',
+        startDate: '2024-09',
+        endDate: '2024-11',
+        roleSummary:
+          'Consulted for an early-stage B2B SaaS startup preparing for growth, addressed stability/performance issues and built a scalable foundation',
+        bulletIndices: [0, 1, 2, 3]
+      },
+      {
+        companyKey: 'brightflow',
+        positionIndex: 0,
+        jobTitle: 'Staff Software Engineer',
+        displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
+        locationLabel: 'New York, NY',
+        startDate: '2023-09',
+        endDate: '2024-06',
+        roleSummary:
+          'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
+        bulletIndices: [0, 1, 2, 3, 4]
+      },
+      {
+        companyKey: 'volvo',
+        positionIndex: 0,
+        jobTitle: 'Tech Lead Manager',
+        displayCompanyName: 'Volvo Cars',
+        locationLabel: 'New York, NY',
+        startDate: '2020-03',
+        endDate: '2023-04',
+        roleSummary:
+          'Led the Volvo Valet initiative as technical lead and manager, overseeing both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
+        bulletIndices: [0, 1, 2, 3, 4]
+      },
+      {
+        companyKey: 'volvo',
+        positionIndex: 1,
+        jobTitle: 'Senior Software Engineer',
+        displayCompanyName: 'Volvo Cars',
+        locationLabel: 'Stockholm, Sweden',
+        startDate: '2018-01',
+        endDate: '2020-03',
+        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
+        bulletIndices: [8, 9, 10]
+      },
+      {
+        companyKey: 'luxe',
+        positionIndex: 0,
+        jobTitle: 'Lead Software Engineer',
+        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
+        locationLabel: 'San Francisco, CA',
+        startDate: '2016-06',
+        endDate: '2017-12',
+        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
+        bulletIndices: [0, 1]
+      },
+      {
+        companyKey: 'planorama',
+        positionIndex: 0,
+        jobTitle: 'Lead Software Engineer',
+        displayCompanyName: 'Planorama',
+        locationLabel: 'Paris, France',
+        startDate: '2014-04',
+        endDate: '2015-11',
+        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
+        bulletIndices: [0, 1]
+      }
+    ]
+  },
+  {
+    archetypeKey: 'high_level_manager',
+    archetypeLabel: 'VP / Director',
+    archetypeDescription:
+      'Senior engineering leader — for VP, Director, and Head of Engineering roles emphasizing strategy, org building, and business impact',
+    socialNetworks: ['LinkedIn'],
+    educationIndices: [0],
+    interestItemOverrides: null,
+    positions: [
+      {
+        companyKey: 'volvo',
+        positionIndex: 0,
+        jobTitle: 'Tech Lead Manager',
+        displayCompanyName: 'Volvo Cars',
+        locationLabel: 'New York, NY',
+        startDate: '2020-03',
+        endDate: '2023-04',
+        roleSummary:
+          'Led the Volvo Valet initiative end-to-end, overseeing product, engineering, and cross-functional delivery across two web apps, two mobile apps, and a backend platform',
+        bulletIndices: [0, 1, 2, 3, 4]
+      },
+      {
+        companyKey: 'volvo',
+        positionIndex: 1,
+        jobTitle: 'Senior Software Engineer',
+        displayCompanyName: 'Volvo Cars',
+        locationLabel: 'Stockholm, Sweden',
+        startDate: '2018-01',
+        endDate: '2020-03',
+        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
+        bulletIndices: [8, 9, 10]
+      },
+      {
+        companyKey: 'luxe',
+        positionIndex: 0,
+        jobTitle: 'Lead Software Engineer',
+        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
+        locationLabel: 'San Francisco, CA',
+        startDate: '2016-06',
+        endDate: '2017-12',
+        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
+        bulletIndices: [0, 1]
+      },
+      {
+        companyKey: 'planorama',
+        positionIndex: 0,
+        jobTitle: 'Lead Software Engineer',
+        displayCompanyName: 'Planorama',
+        locationLabel: 'Paris, France',
+        startDate: '2014-04',
+        endDate: '2015-11',
+        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
+        bulletIndices: [0, 1]
+      }
+    ]
   }
 ];
