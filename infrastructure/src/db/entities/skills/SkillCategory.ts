@@ -1,13 +1,13 @@
-import { Collection } from '@mikro-orm/core';
+import { Collection, type Ref } from '@mikro-orm/core';
 import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
-import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { UuidPrimaryKey } from '../../helpers.js';
 import { Profile } from '../profile/Profile.js';
 import { SkillItem } from './SkillItem.js';
 
 export type SkillCategoryProps = {
   id: string;
-  profile: RefOrEntity<Profile>;
+  profile: Ref<Profile> | Profile;
   name: string;
   ordinal: number;
   createdAt: Date;
@@ -20,7 +20,7 @@ export class SkillCategory extends BaseEntity {
   public readonly id: string;
 
   @ManyToOne(() => Profile, { lazy: true, name: 'profile_id' })
-  public readonly profile: RefOrEntity<Profile>;
+  public readonly profile: Ref<Profile> | Profile;
 
   @Property({ name: 'name', type: 'text' })
   public name: string;
