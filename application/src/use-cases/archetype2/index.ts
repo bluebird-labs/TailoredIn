@@ -1,0 +1,11 @@
+export type { CreateArchetype2Input } from './CreateArchetype2.js';
+export { CreateArchetype2 } from './CreateArchetype2.js';
+export { ListArchetypes2 } from './ListArchetypes2.js';
+export type { UpdateArchetype2Input } from './UpdateArchetype2.js';
+export { UpdateArchetype2 } from './UpdateArchetype2.js';
+export type { DeleteArchetype2Input } from './DeleteArchetype2.js';
+export { DeleteArchetype2 } from './DeleteArchetype2.js';
+export type { SetArchetypeContent2Input } from './SetArchetypeContent2.js';
+export { SetArchetypeContent2 } from './SetArchetypeContent2.js';
+export type { SetArchetypeTagProfile2Input } from './SetArchetypeTagProfile2.js';
+export { SetArchetypeTagProfile2 } from './SetArchetypeTagProfile2.js';

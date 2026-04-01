@@ -38,3 +38,4 @@ export type { ResumeOutputDto } from './ResumeOutputDto.js';
 export type { ScrapeResultDto } from './ScrapeResultDto.js';
 export type { SkillCategoryDto, SkillItemDto } from './SkillCategoryDto.js';
 export type { TagDto } from './TagDto.js';
+export type * from './ArchetypeDto2.js';

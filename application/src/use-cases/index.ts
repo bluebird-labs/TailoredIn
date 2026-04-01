@@ -129,3 +129,4 @@ export type { UpdateSkillItemInput } from './UpdateSkillItem.js';
 export { UpdateSkillItem } from './UpdateSkillItem.js';
 export type { UpdateUserInput } from './UpdateUser.js';
 export { UpdateUser } from './UpdateUser.js';
+export * from './archetype2/index.js';
