@@ -56,7 +56,6 @@ export function createOrmConfig(db: OrmDbConfig) {
       Skill,
       Job,
       JobStatusUpdate,
-      Profile,
       User,
       ResumeCompany,
       ResumeCompanyLocation,
