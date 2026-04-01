@@ -31,6 +31,16 @@ export class ResumeDataSeeder extends Seeder {
   public async run(em: EntityManager): Promise<void> {
     const user = User.create(userData);
     em.persist(user);
+    await em.flush();
+
+    // Profile (new domain model — required for skill_categories FK)
+    const existingProfile = await em.getConnection().execute<[{ id: string }]>('SELECT id FROM profiles LIMIT 1');
+    if (!existingProfile.length) {
+      await em.getConnection().execute(`
+        INSERT INTO profiles (email, first_name, last_name)
+        SELECT email, first_name, last_name FROM users LIMIT 1
+      `);
+    }
 
     // Companies + positions + locations
     const companies: Record<CompanyKey, ResumeCompany> = {} as Record<CompanyKey, ResumeCompany>;
