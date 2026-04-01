@@ -1,15 +1,16 @@
 import { describe, expect, test } from 'bun:test';
-import type { ResumeSkillCategory, ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import type { SkillCategory, SkillCategoryRepository } from '@tailoredin/domain';
 import { CreateSkillCategory } from '../../src/use-cases/CreateSkillCategory.js';
 
-function createMockSkillCategoryRepository(
-  overrides: Partial<ResumeSkillCategoryRepository> = {}
-): ResumeSkillCategoryRepository {
+function createMockSkillCategoryRepository(overrides: Partial<SkillCategoryRepository> = {}): SkillCategoryRepository {
   return {
     findByIdOrFail: async () => {
       throw new Error('not found');
     },
-    findAllByUserId: async () => [],
+    findByItemIdOrFail: async () => {
+      throw new Error('not found');
+    },
+    findAll: async () => [],
     save: async () => {},
     delete: async () => {},
     ...overrides
@@ -18,7 +19,7 @@ function createMockSkillCategoryRepository(
 
 describe('CreateSkillCategory', () => {
   test('creates category with items and saves', async () => {
-    let saved: ResumeSkillCategory | null = null;
+    let saved: SkillCategory | null = null;
     const repo = createMockSkillCategoryRepository({
       save: async c => {
         saved = c;
@@ -26,21 +27,21 @@ describe('CreateSkillCategory', () => {
     });
     const uc = new CreateSkillCategory(repo);
     const result = await uc.execute({
-      userId: 'user-1',
-      categoryName: 'Backend',
+      profileId: 'profile-1',
+      name: 'Backend',
       ordinal: 0,
       items: [
-        { skillName: 'TypeScript', ordinal: 0 },
-        { skillName: 'Node.js', ordinal: 1 }
+        { name: 'TypeScript', ordinal: 0 },
+        { name: 'Node.js', ordinal: 1 }
       ]
     });
 
     expect(saved).not.toBeNull();
-    expect(result.categoryName).toBe('Backend');
+    expect(result.name).toBe('Backend');
     expect(result.ordinal).toBe(0);
     expect(result.items).toHaveLength(2);
-    expect(result.items[0].skillName).toBe('TypeScript');
-    expect(result.items[1].skillName).toBe('Node.js');
+    expect(result.items[0].name).toBe('TypeScript');
+    expect(result.items[1].name).toBe('Node.js');
     expect(result.id).toBeTruthy();
   });
 });

@@ -1,15 +1,16 @@
 import { describe, expect, test } from 'bun:test';
-import { ResumeSkillCategory, type ResumeSkillCategoryRepository } from '@tailoredin/domain';
+import { SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 import { AddSkillItem } from '../../src/use-cases/AddSkillItem.js';
 
-function createMockSkillCategoryRepository(
-  overrides: Partial<ResumeSkillCategoryRepository> = {}
-): ResumeSkillCategoryRepository {
+function createMockSkillCategoryRepository(overrides: Partial<SkillCategoryRepository> = {}): SkillCategoryRepository {
   return {
     findByIdOrFail: async () => {
       throw new Error('not found');
     },
-    findAllByUserId: async () => [],
+    findByItemIdOrFail: async () => {
+      throw new Error('not found');
+    },
+    findAll: async () => [],
     save: async () => {},
     delete: async () => {},
     ...overrides
@@ -17,11 +18,10 @@ function createMockSkillCategoryRepository(
 }
 
 function makeCategory() {
-  return ResumeSkillCategory.create({
-    userId: 'user-1',
-    categoryName: 'Backend',
-    ordinal: 0,
-    items: []
+  return SkillCategory.create({
+    profileId: 'profile-1',
+    name: 'Backend',
+    ordinal: 0
   });
 }
 
@@ -29,7 +29,7 @@ describe('AddSkillItem', () => {
   test('returns error when category not found', async () => {
     const repo = createMockSkillCategoryRepository();
     const uc = new AddSkillItem(repo);
-    const result = await uc.execute({ categoryId: 'nonexistent', skillName: 'TS', ordinal: 0 });
+    const result = await uc.execute({ categoryId: 'nonexistent', name: 'TS', ordinal: 0 });
     expect(result.isOk).toBe(false);
     if (result.isErr) {
       expect(result.error.message).toContain('Skill category not found');
@@ -42,11 +42,11 @@ describe('AddSkillItem', () => {
       findByIdOrFail: async () => category
     });
     const uc = new AddSkillItem(repo);
-    const result = await uc.execute({ categoryId: category.id.value, skillName: 'TypeScript', ordinal: 2 });
+    const result = await uc.execute({ categoryId: category.id.value, name: 'TypeScript', ordinal: 2 });
 
     expect(result.isOk).toBe(true);
     if (result.isOk) {
-      expect(result.value.skillName).toBe('TypeScript');
+      expect(result.value.name).toBe('TypeScript');
       expect(result.value.ordinal).toBe(2);
       expect(result.value.id).toBeTruthy();
     }
