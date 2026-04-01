@@ -54,8 +54,7 @@ function toFormValues(profile: {
 }
 
 function ProfilePage() {
-  const { data: profileResponse, isLoading } = useProfile();
-  const profile = profileResponse?.data;
+  const { data: profile, isLoading } = useProfile();
   const queryClient = useQueryClient();
 
   const {

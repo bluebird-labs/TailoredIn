@@ -26,7 +26,7 @@ function SkillsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<SkillCategory | undefined>();
 
-  const categories = ([...(data?.data ?? [])] as SkillCategory[]).sort((a, b) => a.ordinal - b.ordinal);
+  const categories = ([...(data ?? [])] as SkillCategory[]).sort((a, b) => a.ordinal - b.ordinal);
 
   const nextOrdinal = categories.length > 0 ? Math.max(...categories.map(c => c.ordinal)) + 1 : 0;
 

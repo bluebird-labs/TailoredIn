@@ -16,7 +16,7 @@ function EducationPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<Education | undefined>();
 
-  const entries = ([...(data?.data ?? [])] as Education[]).sort((a, b) => a.ordinal - b.ordinal);
+  const entries = ([...(data ?? [])] as Education[]).sort((a, b) => a.ordinal - b.ordinal);
   const nextOrdinal = entries.length > 0 ? Math.max(...entries.map(e => e.ordinal)) + 1 : 0;
 
   function handleAdd() {
