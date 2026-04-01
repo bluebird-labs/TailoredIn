@@ -165,6 +165,16 @@ export class ResumeDataSeeder extends Seeder {
         `INSERT INTO headlines (id, profile_id, label, summary_text)
          VALUES (gen_random_uuid(), '${profileId}', '${headlineData.headlineLabel.replace(/'/g, "''")}', '${headlineData.summaryText.replace(/'/g, "''")}')`
       );
+
+      // Experiences → experiences table
+      const companyEntries = Object.entries(companyDefs) as [CompanyKey, (typeof companyDefs)[CompanyKey]][];
+      for (let ei = 0; ei < companyEntries.length; ei++) {
+        const [, def] = companyEntries[ei];
+        await em.getConnection().execute(
+          `INSERT INTO experiences (id, profile_id, title, company_name, company_website, location, start_date, end_date, summary, ordinal)
+           VALUES (gen_random_uuid(), '${profileId}', 'Software Engineer', '${def.companyName.replace(/'/g, "''")}', ${def.websiteUrl ? `'${def.websiteUrl}'` : 'NULL'}, '${(def.locations[0] ?? '').replace(/'/g, "''")}', '${def.joinedAt}', '${def.leftAt}', NULL, ${ei})`
+        );
+      }
     }
 
     // Headline
