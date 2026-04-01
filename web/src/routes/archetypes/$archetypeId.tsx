@@ -53,7 +53,7 @@ function ArchetypeDetailPage() {
   }>;
 
   const archetype = archetypes.find(a => a.id === archetypeId);
-  const headlines = (headlinesResponse?.data ?? []) as { id: string; label: string }[];
+  const headlines = (headlinesResponse ?? []) as { id: string; label: string }[];
   const companies = (companiesResponse?.data ?? []) as Array<{
     id: string;
     companyName: string;
@@ -71,7 +71,7 @@ function ArchetypeDetailPage() {
       bullets: { id: string; content: string; ordinal: number }[];
     }[];
   }>;
-  const categories = (skillsResponse?.data ?? []) as Array<{
+  const categories = (skillsResponse ?? []) as Array<{
     id: string;
     name: string;
     ordinal: number;

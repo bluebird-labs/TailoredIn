@@ -67,7 +67,7 @@ function ArchetypesPage() {
   const { data: headlinesResponse } = useHeadlines();
 
   const archetypes = (archetypesResponse?.data ?? []) as Archetype[];
-  const headlines = (headlinesResponse?.data ?? []) as { id: string; label: string }[];
+  const headlines = (headlinesResponse ?? []) as { id: string; label: string }[];
 
   const {
     register,
