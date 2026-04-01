@@ -8,6 +8,7 @@ import {
   CreateArchetype,
   CreateCompany,
   CreateEducation,
+  CreateEducation2,
   CreateHeadline,
   CreatePosition,
   CreateSkillCategory,
@@ -15,6 +16,7 @@ import {
   DeleteBullet,
   DeleteCompany,
   DeleteEducation,
+  DeleteEducation2,
   DeleteHeadline,
   DeletePosition,
   DeleteSkillCategory,
@@ -31,6 +33,7 @@ import {
   ListArchetypes,
   ListCompanies,
   ListEducation,
+  ListEducation2,
   ListHeadlines,
   ListJobs,
   ListSkillCategories,
@@ -42,6 +45,7 @@ import {
   UpdateBullet,
   UpdateCompany,
   UpdateEducation,
+  UpdateEducation2,
   UpdateHeadline,
   UpdateJobCompany,
   UpdatePosition,
@@ -64,6 +68,7 @@ import {
   PostgresArchetypeConfigRepository,
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
+  PostgresEducationRepository,
   PostgresJobRepository,
   PostgresProfileRepository,
   PostgresResumeCompanyRepository,
@@ -251,6 +256,25 @@ container.bind({
 container.bind({
   provide: DI.Resume.DeleteEducation,
   useFactory: () => new DeleteEducation(container.get(DI.Resume.EducationRepository))
+});
+
+// Education (new domain model)
+container.bind({ provide: DI.Education.Repository, useClass: PostgresEducationRepository });
+container.bind({
+  provide: DI.Education.ListEducation,
+  useFactory: () => new ListEducation2(container.get(DI.Education.Repository))
+});
+container.bind({
+  provide: DI.Education.CreateEducation,
+  useFactory: () => new CreateEducation2(container.get(DI.Education.Repository))
+});
+container.bind({
+  provide: DI.Education.UpdateEducation,
+  useFactory: () => new UpdateEducation2(container.get(DI.Education.Repository))
+});
+container.bind({
+  provide: DI.Education.DeleteEducation,
+  useFactory: () => new DeleteEducation2(container.get(DI.Education.Repository))
 });
 
 // Headline use cases
