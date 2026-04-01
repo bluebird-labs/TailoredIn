@@ -1,11 +1,11 @@
 import { inject, injectable } from '@needle-di/core';
-import type { DeleteArchetype } from '@tailoredin/application';
+import type { DeleteArchetype2 } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
 @injectable()
-export class DeleteArchetypeRoute {
-  public constructor(private readonly deleteArchetype: DeleteArchetype = inject(DI.Archetype.DeleteArchetype)) {}
+export class DeleteArchetype2Route {
+  public constructor(private readonly deleteArchetype: DeleteArchetype2 = inject(DI.Archetype2.Delete)) {}
 
   public plugin() {
     return new Elysia().delete(
@@ -19,9 +19,7 @@ export class DeleteArchetypeRoute {
         set.status = 204;
         return;
       },
-      {
-        params: t.Object({ id: t.String({ format: 'uuid' }) })
-      }
+      { params: t.Object({ id: t.String({ format: 'uuid' }) }) }
     );
   }
 }

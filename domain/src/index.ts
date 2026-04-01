@@ -5,6 +5,8 @@ export type { DomainEvent } from './DomainEvent.js';
 export { JobElectionService } from './domain-services/JobElectionService.js';
 export { TailoringStrategyService } from './domain-services/TailoringStrategyService.js';
 export { Entity } from './Entity.js';
+export type { Archetype2CreateProps } from './entities/Archetype2.js';
+export { Archetype2 } from './entities/Archetype2.js';
 export type { ArchetypeConfigCreateProps } from './entities/ArchetypeConfig.js';
 export { ArchetypeConfig } from './entities/ArchetypeConfig.js';
 export type { ArchetypePositionCreateProps } from './entities/ArchetypePosition.js';
@@ -62,6 +64,7 @@ export { JobStatusChangedEvent } from './events/JobStatusChangedEvent.js';
 export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
 // Ports — repository interfaces
 export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
+export type { ArchetypeRepository2 } from './ports/ArchetypeRepository2.js';
 export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { EducationRepository } from './ports/EducationRepository.js';

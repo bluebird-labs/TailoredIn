@@ -2,11 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
-import { TagInput } from '@/components/shared/tag-input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,89 +19,42 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-  ARCHETYPE_KEY_LABELS,
-  type ArchetypeKey,
-  useArchetypes,
-  useCreateArchetype,
-  useDeleteArchetype,
-  useUpdateArchetype
-} from '@/hooks/use-archetypes';
-import { useHeadlines } from '@/hooks/use-headlines';
+import { useArchetypes, useCreateArchetype, useDeleteArchetype, useUpdateArchetype } from '@/hooks/use-archetypes';
 
-export const Route = createFileRoute('/archetypes/')({
-  component: ArchetypesPage
-});
-
-const ARCHETYPE_KEYS = Object.keys(ARCHETYPE_KEY_LABELS);
+export const Route = createFileRoute('/archetypes/')({ component: ArchetypesPage });
 
 const archetypeSchema = z.object({
-  archetypeKey: z.string().min(1, 'Archetype type is required'),
-  archetypeLabel: z.string().min(1, 'Label is required'),
-  archetypeDescription: z.string().nullable().default(null),
-  headlineId: z.string().min(1, 'Headline is required'),
-  socialNetworks: z.array(z.string()).default([])
+  key: z.string().min(1, 'Key is required'),
+  label: z.string().min(1, 'Label is required')
 });
 
 type ArchetypeFormValues = z.infer<typeof archetypeSchema>;
-
-type Archetype = {
-  id: string;
-  archetypeKey: string;
-  archetypeLabel: string;
-  archetypeDescription: string | null;
-  headlineId: string;
-  socialNetworks: string[];
-};
+type Archetype = { id: string; key: string; label: string; headlineId: string | null };
 
 function ArchetypesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingArchetype, setEditingArchetype] = useState<Archetype | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Archetype | null>(null);
 
-  const { data: archetypesResponse, isLoading } = useArchetypes();
-  const { data: headlinesResponse } = useHeadlines();
-
-  const archetypes = (archetypesResponse?.data ?? []) as Archetype[];
-  const headlines = (headlinesResponse ?? []) as { id: string; label: string }[];
+  const { data: archetypes = [], isLoading } = useArchetypes();
 
   const {
     register,
     handleSubmit,
     reset,
-    control,
     formState: { errors, isSubmitting }
   } = useForm<ArchetypeFormValues>({
     resolver: zodResolver(archetypeSchema),
-    defaultValues: {
-      archetypeKey: '',
-      archetypeLabel: '',
-      archetypeDescription: null,
-      headlineId: '',
-      socialNetworks: []
-    }
+    defaultValues: { key: '', label: '' }
   });
 
   useEffect(() => {
     if (editingArchetype) {
-      reset({
-        archetypeKey: editingArchetype.archetypeKey,
-        archetypeLabel: editingArchetype.archetypeLabel,
-        archetypeDescription: editingArchetype.archetypeDescription,
-        headlineId: editingArchetype.headlineId,
-        socialNetworks: editingArchetype.socialNetworks
-      });
+      reset({ key: editingArchetype.key, label: editingArchetype.label });
     } else {
-      reset({
-        archetypeKey: '',
-        archetypeLabel: '',
-        archetypeDescription: null,
-        headlineId: '',
-        socialNetworks: []
-      });
+      reset({ key: '', label: '' });
     }
   }, [editingArchetype, reset]);
 
@@ -114,22 +66,15 @@ function ArchetypesPage() {
     setEditingArchetype(null);
     setDialogOpen(true);
   }
-
-  function openEdit(archetype: Archetype) {
-    setEditingArchetype(archetype);
+  function openEdit(a: Archetype) {
+    setEditingArchetype(a);
     setDialogOpen(true);
   }
 
   function onSubmit(values: ArchetypeFormValues) {
     if (editingArchetype) {
       updateMutation.mutate(
-        {
-          id: editingArchetype.id,
-          archetype_label: values.archetypeLabel,
-          archetype_description: values.archetypeDescription,
-          headline_id: values.headlineId,
-          social_networks: values.socialNetworks
-        },
+        { id: editingArchetype.id, ...values },
         {
           onSuccess: () => {
             setDialogOpen(false);
@@ -140,22 +85,13 @@ function ArchetypesPage() {
         }
       );
     } else {
-      createMutation.mutate(
-        {
-          archetype_key: values.archetypeKey as ArchetypeKey,
-          archetype_label: values.archetypeLabel,
-          archetype_description: values.archetypeDescription,
-          headline_id: values.headlineId,
-          social_networks: values.socialNetworks
+      createMutation.mutate(values, {
+        onSuccess: () => {
+          setDialogOpen(false);
+          toast.success('Archetype created');
         },
-        {
-          onSuccess: () => {
-            setDialogOpen(false);
-            toast.success('Archetype created');
-          },
-          onError: () => toast.error('Failed to create archetype')
-        }
-      );
+        onError: () => toast.error('Failed to create archetype')
+      });
     }
   }
 
@@ -164,11 +100,10 @@ function ArchetypesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Archetypes</h1>
-          <p className="text-muted-foreground mt-2">Resume archetypes and their configurations.</p>
+          <p className="text-muted-foreground mt-2">Resume personas with tag profiles and content selection.</p>
         </div>
         <Button size="sm" onClick={openAdd}>
-          <Plus className="mr-1 h-4 w-4" />
-          Add Archetype
+          <Plus className="mr-1 h-4 w-4" /> Add Archetype
         </Button>
       </div>
 
@@ -180,9 +115,8 @@ function ArchetypesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Type</TableHead>
+                <TableHead>Key</TableHead>
                 <TableHead>Label</TableHead>
-                <TableHead>Description</TableHead>
                 <TableHead className="w-[120px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -191,13 +125,10 @@ function ArchetypesPage() {
                 [1, 2, 3].map(i => (
                   <TableRow key={i}>
                     <TableCell>
-                      <Skeleton className="h-5 w-20" />
+                      <Skeleton className="h-5 w-24" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-5 w-32" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-48" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-5 w-16" />
@@ -206,36 +137,31 @@ function ArchetypesPage() {
                 ))
               ) : archetypes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
                     No archetypes yet. Add your first archetype.
                   </TableCell>
                 </TableRow>
               ) : (
-                archetypes.map(archetype => (
-                  <TableRow key={archetype.id}>
+                (archetypes as Archetype[]).map(a => (
+                  <TableRow key={a.id}>
                     <TableCell>
-                      <Badge variant="secondary">
-                        {ARCHETYPE_KEY_LABELS[archetype.archetypeKey] ?? archetype.archetypeKey}
-                      </Badge>
+                      <Badge variant="secondary">{a.key}</Badge>
                     </TableCell>
-                    <TableCell className="font-medium">{archetype.archetypeLabel}</TableCell>
-                    <TableCell className="max-w-xs truncate text-muted-foreground">
-                      {archetype.archetypeDescription ?? '—'}
-                    </TableCell>
+                    <TableCell className="font-medium">{a.label}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           nativeButton={false}
-                          render={<Link to="/archetypes/$archetypeId" params={{ archetypeId: archetype.id }} />}
+                          render={<Link to="/archetypes/$archetypeId" params={{ archetypeId: a.id }} />}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon-sm" onClick={() => openEdit(archetype)}>
+                        <Button variant="ghost" size="icon-sm" onClick={() => openEdit(a)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon-sm" onClick={() => setDeleteTarget(archetype)}>
+                        <Button variant="ghost" size="icon-sm" onClick={() => setDeleteTarget(a)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -248,7 +174,6 @@ function ArchetypesPage() {
         </CardContent>
       </Card>
 
-      {/* Add/Edit Dialog */}
       <Dialog
         open={dialogOpen}
         onOpenChange={open => {
@@ -260,87 +185,20 @@ function ArchetypesPage() {
           <DialogHeader>
             <DialogTitle>{editingArchetype ? 'Edit Archetype' : 'Add Archetype'}</DialogTitle>
             <DialogDescription>
-              {editingArchetype
-                ? 'Update the archetype configuration.'
-                : 'Create a new archetype for resume generation.'}
+              {editingArchetype ? 'Update the archetype key and label.' : 'Create a new resume persona.'}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {!editingArchetype && (
-              <div className="space-y-2">
-                <Label htmlFor="archetypeKey">Archetype Type</Label>
-                <Controller
-                  name="archetypeKey"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a type..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ARCHETYPE_KEYS.map(key => (
-                          <SelectItem key={key} value={key}>
-                            {ARCHETYPE_KEY_LABELS[key]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.archetypeKey && <p className="text-sm text-destructive">{errors.archetypeKey.message}</p>}
-              </div>
-            )}
-
             <div className="space-y-2">
-              <Label htmlFor="archetypeLabel">Label</Label>
-              <Input id="archetypeLabel" placeholder='e.g. "Full-Stack Lead"' {...register('archetypeLabel')} />
-              {errors.archetypeLabel && <p className="text-sm text-destructive">{errors.archetypeLabel.message}</p>}
+              <Label htmlFor="key">Key</Label>
+              <Input id="key" placeholder='e.g. "fullstack-lead"' {...register('key')} />
+              {errors.key && <p className="text-sm text-destructive">{errors.key.message}</p>}
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="archetypeDescription">Description</Label>
-              <textarea
-                id="archetypeDescription"
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Optional description..."
-                {...register('archetypeDescription')}
-              />
+              <Label htmlFor="label">Label</Label>
+              <Input id="label" placeholder='e.g. "Full-Stack Lead"' {...register('label')} />
+              {errors.label && <p className="text-sm text-destructive">{errors.label.message}</p>}
             </div>
-
-            <div className="space-y-2">
-              <Label>Headline</Label>
-              <Controller
-                name="headlineId"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a headline..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {headlines.map(h => (
-                        <SelectItem key={h.id} value={h.id}>
-                          {h.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.headlineId && <p className="text-sm text-destructive">{errors.headlineId.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Social Networks</Label>
-              <Controller
-                name="socialNetworks"
-                control={control}
-                render={({ field }) => (
-                  <TagInput value={field.value} onChange={field.onChange} placeholder="e.g. LinkedIn, GitHub..." />
-                )}
-              />
-            </div>
-
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancel
@@ -353,12 +211,11 @@ function ArchetypesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <ConfirmDeleteDialog
         open={!!deleteTarget}
         onOpenChange={open => !open && setDeleteTarget(null)}
-        title={`Delete "${deleteTarget?.archetypeLabel}"`}
-        description="Are you sure? This will remove the archetype and all its position, skill, and education selections. This action cannot be undone."
+        title={`Delete "${deleteTarget?.label}"`}
+        description="This will remove the archetype and all its tag weights and content selection. This cannot be undone."
         onConfirm={() =>
           deleteTarget &&
           deleteMutation.mutate(deleteTarget.id, {

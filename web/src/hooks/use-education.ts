@@ -12,18 +12,6 @@ export type Education = {
   ordinal: number;
 };
 
-/** @deprecated Use useEducations() — kept for archetypes page until S6 rewrites it */
-export function useEducation(userId: string | undefined) {
-  return useQuery({
-    queryKey: queryKeys.resume.education(),
-    queryFn: async () => {
-      const { data } = await api.users({ userId: userId! }).resume.education.get();
-      return data;
-    },
-    enabled: !!userId
-  });
-}
-
 export function useEducations() {
   return useQuery({
     queryKey: queryKeys.educations.list(),

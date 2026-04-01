@@ -29,7 +29,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ARCHETYPE_KEY_LABELS } from '@/hooks/use-archetypes';
+import { useArchetypes } from '@/hooks/use-archetypes';
 import { api } from '@/lib/api';
 import { detectAtsPlatform } from '@/lib/ats-platform';
 import { isDiscardedStatus } from '@/lib/job-views';
@@ -59,7 +59,9 @@ function JobDetailPage() {
   const { jobId } = Route.useParams();
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedArchetype, setSelectedArchetype] = useState('leader_individual_contributor');
+  const { data: archetypesList = [] } = useArchetypes();
+  const archetypesForSelect = archetypesList as { key: string; label: string }[];
+  const [selectedArchetype, setSelectedArchetype] = useState('');
   const [keywordsInput, setKeywordsInput] = useState('');
 
   const { data: configData } = useQuery({
@@ -352,9 +354,9 @@ function JobDetailPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(ARCHETYPE_KEY_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
+                  {archetypesForSelect.map(a => (
+                    <SelectItem key={a.key} value={a.key}>
+                      {a.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

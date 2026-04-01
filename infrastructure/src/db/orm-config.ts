@@ -13,6 +13,8 @@ import { ArchetypePosition } from './entities/archetypes/ArchetypePosition.js';
 import { ArchetypePositionBullet } from './entities/archetypes/ArchetypePositionBullet.js';
 import { ArchetypeSkillCategory } from './entities/archetypes/ArchetypeSkillCategory.js';
 import { ArchetypeSkillItem } from './entities/archetypes/ArchetypeSkillItem.js';
+import { ArchetypeTagWeight } from './entities/archetypes/ArchetypeTagWeight.js';
+import { ArchetypeV2 } from './entities/archetypes/ArchetypeV2.js';
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
@@ -78,6 +80,8 @@ export function createOrmConfig(db: OrmDbConfig) {
       ArchetypeSkillItem,
       ArchetypePosition,
       ArchetypePositionBullet,
+      ArchetypeV2,
+      ArchetypeTagWeight,
       OrmHeadline,
       OrmTag,
       OrmSkillCategory,
