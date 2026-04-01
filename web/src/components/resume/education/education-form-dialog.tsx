@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import type { Education } from '@/routes/resume/education';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -12,33 +13,24 @@ import { useCreateEducation, useUpdateEducation } from '@/hooks/use-education';
 const educationSchema = z.object({
   degreeTitle: z.string().min(1, 'Required'),
   institutionName: z.string().min(1, 'Required'),
-  graduationYear: z.string().length(4, 'Must be 4 digits'),
-  locationLabel: z.string().min(1, 'Required')
+  graduationYear: z.coerce.number().int().min(1900, 'Invalid year').max(2100, 'Invalid year'),
+  location: z.string().optional().default(''),
+  honors: z.string().optional().default('')
 });
 
 type EducationFormData = z.infer<typeof educationSchema>;
 
-type Education = {
-  id: string;
-  degreeTitle: string;
-  institutionName: string;
-  graduationYear: string;
-  locationLabel: string;
-  ordinal: number;
-};
-
 type EducationFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  userId: string | undefined;
   education?: Education;
   nextOrdinal: number;
 };
 
-export function EducationFormDialog({ open, onOpenChange, userId, education, nextOrdinal }: EducationFormDialogProps) {
+export function EducationFormDialog({ open, onOpenChange, education, nextOrdinal }: EducationFormDialogProps) {
   const isEditing = !!education;
-  const createEducation = useCreateEducation(userId);
-  const updateEducation = useUpdateEducation(userId);
+  const createEducation = useCreateEducation();
+  const updateEducation = useUpdateEducation();
 
   const {
     register,
@@ -50,8 +42,9 @@ export function EducationFormDialog({ open, onOpenChange, userId, education, nex
     defaultValues: {
       degreeTitle: '',
       institutionName: '',
-      graduationYear: '',
-      locationLabel: ''
+      graduationYear: undefined as unknown as number,
+      location: '',
+      honors: ''
     }
   });
 
@@ -63,13 +56,15 @@ export function EducationFormDialog({ open, onOpenChange, userId, education, nex
               degreeTitle: education.degreeTitle,
               institutionName: education.institutionName,
               graduationYear: education.graduationYear,
-              locationLabel: education.locationLabel
+              location: education.location ?? '',
+              honors: education.honors ?? ''
             }
           : {
               degreeTitle: '',
               institutionName: '',
-              graduationYear: '',
-              locationLabel: ''
+              graduationYear: undefined as unknown as number,
+              location: '',
+              honors: ''
             }
       );
     }
@@ -78,16 +73,17 @@ export function EducationFormDialog({ open, onOpenChange, userId, education, nex
   const isPending = createEducation.isPending || updateEducation.isPending;
 
   function onSubmit(data: EducationFormData) {
+    const payload = {
+      degree_title: data.degreeTitle,
+      institution_name: data.institutionName,
+      graduation_year: data.graduationYear,
+      location: data.location || null,
+      honors: data.honors || null
+    };
+
     if (isEditing) {
       updateEducation.mutate(
-        {
-          id: education.id,
-          degree_title: data.degreeTitle,
-          institution_name: data.institutionName,
-          graduation_year: data.graduationYear,
-          location_label: data.locationLabel,
-          ordinal: education.ordinal
-        },
+        { id: education.id, ...payload, ordinal: education.ordinal },
         {
           onSuccess: () => {
             toast.success('Education updated');
@@ -97,13 +93,7 @@ export function EducationFormDialog({ open, onOpenChange, userId, education, nex
       );
     } else {
       createEducation.mutate(
-        {
-          degree_title: data.degreeTitle,
-          institution_name: data.institutionName,
-          graduation_year: data.graduationYear,
-          location_label: data.locationLabel,
-          ordinal: nextOrdinal
-        },
+        { ...payload, ordinal: nextOrdinal },
         {
           onSuccess: () => {
             toast.success('Education added');
@@ -136,14 +126,20 @@ export function EducationFormDialog({ open, onOpenChange, userId, education, nex
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="graduationYear">Graduation Year</Label>
-              <Input id="graduationYear" {...register('graduationYear')} placeholder="2018" maxLength={4} />
+              <Input id="graduationYear" type="number" {...register('graduationYear')} placeholder="2018" />
               {errors.graduationYear && <p className="text-xs text-destructive">{errors.graduationYear.message}</p>}
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="locationLabel">Location</Label>
-              <Input id="locationLabel" {...register('locationLabel')} placeholder="Cambridge, MA" />
-              {errors.locationLabel && <p className="text-xs text-destructive">{errors.locationLabel.message}</p>}
+              <Label htmlFor="location">Location</Label>
+              <Input id="location" {...register('location')} placeholder="Cambridge, MA" />
+              {errors.location && <p className="text-xs text-destructive">{errors.location.message}</p>}
             </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="honors">Honors</Label>
+            <Input id="honors" {...register('honors')} placeholder="Magna Cum Laude" />
+            {errors.honors && <p className="text-xs text-destructive">{errors.honors.message}</p>}
           </div>
 
           <DialogFooter>

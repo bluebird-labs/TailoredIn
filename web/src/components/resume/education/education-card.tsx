@@ -1,29 +1,20 @@
-import { GraduationCap, MapPin, Pencil, Trash2 } from 'lucide-react';
+import { Award, GraduationCap, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import type { Education } from '@/routes/resume/education';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDeleteEducation } from '@/hooks/use-education';
 
-type Education = {
-  id: string;
-  degreeTitle: string;
-  institutionName: string;
-  graduationYear: string;
-  locationLabel: string;
-  ordinal: number;
-};
-
 type EducationCardProps = {
   education: Education;
-  userId: string | undefined;
   onEdit: () => void;
 };
 
-export function EducationCard({ education, userId, onEdit }: EducationCardProps) {
+export function EducationCard({ education, onEdit }: EducationCardProps) {
   const [showDelete, setShowDelete] = useState(false);
-  const deleteEducation = useDeleteEducation(userId);
+  const deleteEducation = useDeleteEducation();
 
   function handleDelete() {
     deleteEducation.mutate(education.id, {
@@ -45,10 +36,18 @@ export function EducationCard({ education, userId, onEdit }: EducationCardProps)
             </CardTitle>
             <CardDescription>
               {education.institutionName} &middot; {education.graduationYear}
-              <span className="inline-flex items-center gap-1 ml-2">
-                <MapPin className="size-3" />
-                {education.locationLabel}
-              </span>
+              {education.location && (
+                <span className="inline-flex items-center gap-1 ml-2">
+                  <MapPin className="size-3" />
+                  {education.location}
+                </span>
+              )}
+              {education.honors && (
+                <span className="inline-flex items-center gap-1 ml-2">
+                  <Award className="size-3" />
+                  {education.honors}
+                </span>
+              )}
             </CardDescription>
           </div>
           <CardAction>
