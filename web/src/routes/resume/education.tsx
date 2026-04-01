@@ -5,21 +5,11 @@ import { EducationCard } from '@/components/resume/education/education-card';
 import { EducationFormDialog } from '@/components/resume/education/education-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEducations } from '@/hooks/use-education';
+import { type Education, useEducations } from '@/hooks/use-education';
 
 export const Route = createFileRoute('/resume/education')({
   component: EducationPage
 });
-
-export type Education = {
-  id: string;
-  degreeTitle: string;
-  institutionName: string;
-  graduationYear: number;
-  location: string | null;
-  honors: string | null;
-  ordinal: number;
-};
 
 function EducationPage() {
   const { data, isLoading } = useEducations();

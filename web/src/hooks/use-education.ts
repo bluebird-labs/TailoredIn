@@ -2,6 +2,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 
+export type Education = {
+  id: string;
+  degreeTitle: string;
+  institutionName: string;
+  graduationYear: number;
+  location: string | null;
+  honors: string | null;
+  ordinal: number;
+};
+
 export function useEducations() {
   return useQuery({
     queryKey: queryKeys.educations.list(),

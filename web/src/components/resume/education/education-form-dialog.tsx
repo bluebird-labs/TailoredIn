@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useCreateEducation, useUpdateEducation } from '@/hooks/use-education';
-import type { Education } from '@/routes/resume/education';
+import { type Education, useCreateEducation, useUpdateEducation } from '@/hooks/use-education';
 
 const educationSchema = z.object({
   degreeTitle: z.string().min(1, 'Required'),
