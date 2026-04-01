@@ -33,3 +33,4 @@ export type {
 } from './ResumeDataDto.js';
 export type { ResumeOutputDto } from './ResumeOutputDto.js';
 export type { ScrapeResultDto } from './ScrapeResultDto.js';
+export type { EducationDto } from './EducationDto.js';
