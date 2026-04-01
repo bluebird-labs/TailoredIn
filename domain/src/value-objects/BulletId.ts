@@ -1,0 +1,15 @@
+import { ValueObject } from '../ValueObject.js';
+
+export class BulletId extends ValueObject<{ value: string }> {
+  public constructor(value: string) {
+    super({ value });
+  }
+
+  public get value(): string {
+    return this.props.value;
+  }
+
+  public static generate(): BulletId {
+    return new BulletId(crypto.randomUUID());
+  }
+}
