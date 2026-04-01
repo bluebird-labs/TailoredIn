@@ -10,6 +10,19 @@ import { SkillsSeeder } from './SkillsSeeder.js';
  */
 export class DatabaseSeeder extends Seeder {
   public async run(em: EntityManager): Promise<void> {
+    await em.getConnection().execute(`
+      TRUNCATE
+        archetype_position_bullets, archetype_positions, archetype_educations,
+        archetype_skill_categories, archetype_skill_items, archetypes,
+        resume_bullets, resume_positions, resume_company_locations, resume_companies,
+        resume_skill_items, resume_skill_categories, resume_educations, resume_headlines,
+        skill_items, skill_categories, profiles,
+        users,
+        job_status_updates, jobs, companies,
+        skills
+      CASCADE
+    `);
+
     return this.call(em, [
       SkillsSeeder, // skills (no FK deps)
       ResumeDataSeeder, // user → resume data → archetypes

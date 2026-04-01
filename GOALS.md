@@ -99,7 +99,7 @@ graph TD
 
 ## Parallel Execution Strategy
 
-Each worktree runs `bun dev:up` for independent Docker + port allocation. UI testing happens at the local URL printed by `dev:up`.
+Each worktree runs `bun up` for independent Docker + port allocation. UI testing happens at the local URL printed by `bun up`.
 
 ### Wave 1 — Foundation ✅
 
@@ -110,7 +110,7 @@ Each worktree runs `bun dev:up` for independent Docker + port allocation. UI tes
 **Verify:**
 - [ ] `cd domain && bun test` — all VO/entity tests pass (TagSet, TagProfile, Tag)
 - [ ] `bun run check` — clean
-- [ ] `bun dev:up && cd infrastructure && bun run db:migration:up` — migration applies
+- [ ] `bun up` — migration applies (seeds, servers start)
 - [ ] Connect to DB, verify all 17 tables exist: `profiles`, `experiences`, `bullets`, `bullet_variants`, `bullet_tags`, `bullet_variant_tags`, `tags`, `projects`, `project_tags`, `headlines`, `headline_tags`, `educations`, `skill_categories`, `skill_items`, `archetypes_v2`, `archetype_tag_weights`, `job_postings`
 
 ### Wave 2 — Profile, Headlines, Education, Skills (4 parallel) ✅
@@ -197,7 +197,7 @@ Each worktree runs `bun dev:up` for independent Docker + port allocation. UI tes
 - [ ] `bun run check` — Biome clean
 - [ ] `bun run knip` — no dead code from old entities
 - [ ] `bun run dep:check` — all layer boundaries respected
-- [ ] `bun dev:up && bun run dev` — full app starts
+- [ ] `bun up` — full app starts
 - [ ] Navigate every sidebar link — no broken pages
 - [ ] Existing job pages still work (untouched in this plan)
 

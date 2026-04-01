@@ -62,8 +62,10 @@ bun run knip           # unused files, exports, dependencies
 # Dependency boundary enforcement
 bun run dep:check      # verify no circular deps or cross-layer violations
 
-# Dev (API + web with hot-reload)
-bun run dev                  # runs api:dev + web:dev in parallel
+# Dev environment (one command — installs deps, Docker, migrations, seeds, servers)
+bun up                       # start everything (Ctrl+C to stop servers)
+bun down                     # stop servers + Docker
+bun run dev                  # servers only (skip Docker/migrations/seeds)
 
 # API server
 bun run api                  # start on port 8000
