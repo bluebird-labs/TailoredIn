@@ -7,6 +7,8 @@ export { TailoringStrategyService } from './domain-services/TailoringStrategySer
 export { Entity } from './Entity.js';
 export type { ArchetypeConfigCreateProps } from './entities/ArchetypeConfig.js';
 export { ArchetypeConfig } from './entities/ArchetypeConfig.js';
+export type { Archetype2CreateProps } from './entities/Archetype2.js';
+export { Archetype2 } from './entities/Archetype2.js';
 export type { ArchetypePositionCreateProps } from './entities/ArchetypePosition.js';
 export { ArchetypePosition } from './entities/ArchetypePosition.js';
 export type { BulletCreateProps } from './entities/Bullet.js';
@@ -62,6 +64,7 @@ export { JobStatusChangedEvent } from './events/JobStatusChangedEvent.js';
 export { ResumeGeneratedEvent } from './events/ResumeGeneratedEvent.js';
 // Ports — repository interfaces
 export type { ArchetypeConfigRepository } from './ports/ArchetypeConfigRepository.js';
+export type { ArchetypeRepository2 } from './ports/ArchetypeRepository2.js';
 export type { CompanyBriefRepository } from './ports/CompanyBriefRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { EducationRepository } from './ports/EducationRepository.js';
