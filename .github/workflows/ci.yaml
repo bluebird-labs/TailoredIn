@@ -104,6 +104,28 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - run: bun run dep:check
 
+  test-e2e:
+    name: E2E Tests
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.deps == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bun
+      - name: Install e2e dependencies
+        run: cd e2e && bun install
+      - name: Install Playwright browsers
+        run: cd e2e && bunx playwright install chromium --with-deps
+      - name: Run e2e tests
+        run: bun run test:e2e
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 14
+
   gitleaks:
     name: Secret Scanning
     runs-on: ubuntu-latest
