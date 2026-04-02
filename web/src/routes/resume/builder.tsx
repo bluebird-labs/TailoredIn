@@ -46,12 +46,45 @@ function BuilderPage() {
   const [keywords, setKeywords] = useState('');
   const [generating, setGenerating] = useState(false);
 
-  // Auto-select first headline on load
+  // Auto-select everything on load
   useEffect(() => {
     if (headlines.length > 0 && !selectedHeadlineId) {
       setSelectedHeadlineId(headlines[0].id);
     }
   }, [headlines, selectedHeadlineId]);
+
+  useEffect(() => {
+    if (experiences.length > 0 && selectedExperiences.size === 0) {
+      const map = new Map<string, Set<string>>();
+      for (const exp of experiences) {
+        const variantIds = new Set<string>();
+        for (const bullet of exp.bullets) {
+          for (const v of bullet.variants) {
+            if (v.approvalStatus === 'APPROVED') variantIds.add(v.id);
+          }
+        }
+        map.set(exp.id, variantIds);
+      }
+      setSelectedExperiences(map);
+    }
+  }, [experiences, selectedExperiences.size]);
+
+  useEffect(() => {
+    if (educations.length > 0 && selectedEducationIds.size === 0) {
+      setSelectedEducationIds(new Set(educations.map(e => e.id)));
+    }
+  }, [educations, selectedEducationIds.size]);
+
+  useEffect(() => {
+    if (skillCategories.length > 0 && selectedCategoryIds.size === 0) {
+      setSelectedCategoryIds(new Set(skillCategories.map(c => c.id)));
+      const allItemIds = new Set<string>();
+      for (const cat of skillCategories) {
+        for (const item of cat.items) allItemIds.add(item.id);
+      }
+      setSelectedItemIds(allItemIds);
+    }
+  }, [skillCategories, selectedCategoryIds.size]);
 
   // ── Experience toggle ───────────────────────────────────────────────────
   const toggleExperience = useCallback((exp: Experience) => {
