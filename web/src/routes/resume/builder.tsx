@@ -54,12 +54,21 @@ function BuilderPage() {
 
   useEffect(() => {
     if (experiences.length > 0 && selectedExperiences.size === 0) {
+      // Taper: most recent experience gets more bullets, older ones fewer
+      const bulletCaps = [8, 6, 5, 4, 3, 3, 2, 2, 2];
       const map = new Map<string, Set<string>>();
-      for (const exp of experiences) {
+      for (let i = 0; i < experiences.length; i++) {
+        const exp = experiences[i];
+        const cap = bulletCaps[Math.min(i, bulletCaps.length - 1)];
         const variantIds = new Set<string>();
+        let count = 0;
         for (const bullet of exp.bullets) {
+          if (count >= cap) break;
           for (const v of bullet.variants) {
-            if (v.approvalStatus === 'APPROVED') variantIds.add(v.id);
+            if (v.approvalStatus === 'APPROVED' && count < cap) {
+              variantIds.add(v.id);
+              count++;
+            }
           }
         }
         map.set(exp.id, variantIds);
