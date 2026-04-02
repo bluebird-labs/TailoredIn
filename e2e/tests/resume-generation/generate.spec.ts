@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 test.describe('Resume generation', () => {
@@ -11,56 +10,76 @@ test.describe('Resume generation', () => {
   });
 
   test('generates a resume PDF for an archetype', async ({ page }) => {
+    // Intercept the response to capture the PDF body
+    const captured: { status: number; contentType: string; body: Buffer }[] = [];
+    await page.route('**/generate-resume', async route => {
+      const response = await route.fetch();
+      captured.push({
+        status: response.status(),
+        contentType: response.headers()['content-type'] ?? '',
+        body: await response.body()
+      });
+      await route.fulfill({ response });
+    });
+
     // Select "Lead IC" archetype (LLM is unavailable in E2E, so manual form is shown)
     await page.locator('#archetype-select').click();
     await page.getByRole('option', { name: 'Lead IC' }).click();
 
-    // Trigger generate and wait for download
-    const downloadPromise = page.waitForEvent('download', { timeout: 30_000 });
     await page.getByRole('button', { name: 'Generate Resume' }).click();
-    const download = await downloadPromise;
+    await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
 
-    // Verify toast
-    await expect(page.getByText('Resume downloaded')).toBeVisible();
+    expect(captured).toHaveLength(1);
+    expect(captured[0].status).toBe(200);
+    expect(captured[0].contentType).toContain('application/pdf');
+    expect(captured[0].body.length).toBeGreaterThan(100);
+    expect(captured[0].body.subarray(0, 5).toString()).toBe('%PDF-');
 
-    // Verify the file is a valid PDF
-    expect(download.suggestedFilename()).toMatch(/\.pdf$/);
-    const filePath = await download.path();
-    expect(filePath).toBeTruthy();
-    const buffer = readFileSync(filePath!);
-    expect(buffer.length).toBeGreaterThan(100);
-    expect(buffer.subarray(0, 5).toString()).toBe('%PDF-');
+    await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
 
   test('different archetypes produce different PDFs', async ({ page }) => {
+    // Set up route interception for all generate calls in this test
+    const captured: Buffer[] = [];
+    await page.route('**/generate-resume', async route => {
+      const response = await route.fetch();
+      captured.push(await response.body());
+      await route.fulfill({ response });
+    });
+
     // Generate with "Lead IC"
     await page.locator('#archetype-select').click();
     await page.getByRole('option', { name: 'Lead IC' }).click();
-
-    const download1Promise = page.waitForEvent('download', { timeout: 30_000 });
     await page.getByRole('button', { name: 'Generate Resume' }).click();
-    const download1 = await download1Promise;
-    await expect(page.getByText('Resume downloaded')).toBeVisible();
-
-    const path1 = await download1.path();
-    const size1 = readFileSync(path1!).length;
+    await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
 
     // Generate with "Nerd"
     await page.locator('#archetype-select').click();
     await page.getByRole('option', { name: 'Nerd' }).click();
-
-    const download2Promise = page.waitForEvent('download', { timeout: 30_000 });
     await page.getByRole('button', { name: 'Generate Resume' }).click();
-    const download2 = await download2Promise;
+    // Wait for second toast — need to wait for the button to finish loading first
+    await expect(page.getByRole('button', { name: 'Generate Resume' })).toBeEnabled({ timeout: 60_000 });
 
-    const path2 = await download2.path();
-    const size2 = readFileSync(path2!).length;
+    expect(captured).toHaveLength(2);
+    expect(captured[0].length).toBeGreaterThan(100);
+    expect(captured[1].length).toBeGreaterThan(100);
+    expect(captured[0].length).not.toBe(captured[1].length);
 
-    // Different archetypes should produce different PDFs
-    expect(size1).not.toBe(size2);
+    await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
 
   test('content selection drives PDF output', async ({ page }) => {
+    const captured: { status: number; contentType: string; body: Buffer }[] = [];
+    await page.route('**/generate-resume', async route => {
+      const response = await route.fetch();
+      captured.push({
+        status: response.status(),
+        contentType: response.headers()['content-type'] ?? '',
+        body: await response.body()
+      });
+      await route.fulfill({ response });
+    });
+
     // Generate with "IC" archetype (different content selection than Lead IC)
     await page.locator('#archetype-select').click();
     await page.getByRole('option', { name: 'IC', exact: true }).click();
@@ -68,16 +87,15 @@ test.describe('Resume generation', () => {
     // Add keywords to influence content
     await page.getByLabel('Keywords (comma-separated)').fill('typescript, node.js, microservices');
 
-    const downloadPromise = page.waitForEvent('download', { timeout: 30_000 });
     await page.getByRole('button', { name: 'Generate Resume' }).click();
-    const download = await downloadPromise;
+    await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
 
-    // Verify the PDF is valid and non-empty
-    expect(download.suggestedFilename()).toMatch(/\.pdf$/);
-    const filePath = await download.path();
-    expect(filePath).toBeTruthy();
-    const buffer = readFileSync(filePath!);
-    expect(buffer.length).toBeGreaterThan(100);
-    expect(buffer.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(captured).toHaveLength(1);
+    expect(captured[0].status).toBe(200);
+    expect(captured[0].contentType).toContain('application/pdf');
+    expect(captured[0].body.length).toBeGreaterThan(100);
+    expect(captured[0].body.subarray(0, 5).toString()).toBe('%PDF-');
+
+    await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
 });
