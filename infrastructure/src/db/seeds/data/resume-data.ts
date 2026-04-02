@@ -247,9 +247,9 @@ export const skillCategoryDefs: [string, string[]][] = [
 // ── Headline ────────────────────────────────────────────────────────
 
 export const headlineData = {
-  headlineLabel: 'IC / Lead IC headline',
+  headlineLabel: 'Leader',
   summaryText:
-    'Experienced software engineer with over a decade of designing and building data-intensive products and platforms. Adept at leading high-performing teams, driving technical excellence, and delivering business-focused solutions. Thrive in fast-paced environments with an ownership mindset and a pragmatic approach to problem-solving.'
+    'Engineering leader with 15+ years building high-performing teams and delivering data-intensive products and systems. Focused on technical excellence, engineering efficiency, and the AI and infrastructure foundations that let organizations move fast with confidence.'
 } as const;
 
 // ── Archetypes ──────────────────────────────────────────────────────
