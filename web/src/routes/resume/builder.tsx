@@ -70,7 +70,8 @@ function BuilderPage() {
 
   useEffect(() => {
     if (educations.length > 0 && selectedEducationIds.size === 0) {
-      setSelectedEducationIds(new Set(educations.map(e => e.id)));
+      const bsOnly = educations.filter((e: Education) => e.degreeTitle.startsWith('B.S'));
+      setSelectedEducationIds(new Set(bsOnly.map((e: Education) => e.id)));
     }
   }, [educations, selectedEducationIds.size]);
 
