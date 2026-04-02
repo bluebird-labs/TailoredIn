@@ -51,7 +51,7 @@ export class PlaywrightWebColorService implements WebColorService {
       for (const [name, swatch] of Object.entries(palette)) {
         if (swatch !== null && EnumUtil.is(name, PaletteKey)) {
           const rgb = swatch.rgb as [number, number, number];
-          const isTitle = ColorUtil.meetsWCAGLargeTextContrastRatio(ColorUtil.PURE_WHITE_RGB, rgb);
+          const isTitle = ColorUtil.meetsWCAGNormalTextContrastRatio(ColorUtil.PURE_WHITE_RGB, rgb);
           const isGray = ColorUtil.isRgbGrayish(rgb);
           if (!isGray && isTitle) {
             rgbByKey.set(name as PaletteKey, rgb);
@@ -59,7 +59,13 @@ export class PlaywrightWebColorService implements WebColorService {
         }
       }
 
-      for (const key of [PaletteKey.VIBRANT, PaletteKey.DARK_VIBRANT, PaletteKey.LIGHT_VIBRANT]) {
+      for (const key of [
+        PaletteKey.VIBRANT,
+        PaletteKey.DARK_VIBRANT,
+        PaletteKey.LIGHT_VIBRANT,
+        PaletteKey.DARK_MUTED,
+        PaletteKey.MUTED
+      ]) {
         if (rgbByKey.has(key)) {
           return ColorUtil.rgbTripleToHex(rgbByKey.get(key)!);
         }
