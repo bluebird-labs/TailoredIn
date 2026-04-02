@@ -56,7 +56,7 @@ export class TypstFileGenerator {
   paper_size = "us-letter"
   [layout.fonts]
     regular_fonts = ["Source Sans 3"]
-    header_font = "Roboto"
+    header_font = "Raleway"
   [layout.header]
     header_align = "left"
     display_profile_photo = false
