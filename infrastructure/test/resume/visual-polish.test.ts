@@ -166,3 +166,38 @@ describe('Visual Polish — Page-Fit Validation', () => {
     });
   }
 });
+
+const SNAPSHOT_DIR = Path.join(import.meta.dir, '__snapshots__');
+
+describe('Visual Polish — Snapshot Generation', () => {
+  const shouldUpdate = process.env.UPDATE_SNAPSHOTS === 'true';
+
+  beforeAll(async () => {
+    if (shouldUpdate) {
+      await FS.mkdir(SNAPSHOT_DIR, { recursive: true });
+    }
+  });
+
+  for (const style of STYLES) {
+    for (const volume of VOLUMES) {
+      for (const color of COLORS) {
+        it(`generates snapshot: ${style}-${volume.name}-${color.name}`, async () => {
+          if (!typstAvailable || !shouldUpdate) return;
+
+          const content = buildContent(color.hex, volume.entries, volume.bullets);
+          const { pageCount, tmpDir } = await compileAndCountPages(content, style);
+
+          try {
+            for (let page = 1; page <= pageCount; page++) {
+              const src = Path.join(tmpDir, `page-${page}.png`);
+              const dest = Path.join(SNAPSHOT_DIR, `${style}-${volume.name}-${color.name}-page${page}.png`);
+              await FS.copyFile(src, dest);
+            }
+          } finally {
+            await FS.rm(tmpDir, { recursive: true });
+          }
+        });
+      }
+    }
+  }
+});
