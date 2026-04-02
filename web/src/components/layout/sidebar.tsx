@@ -7,9 +7,7 @@ import {
   GraduationCap,
   Heading,
   Inbox,
-  Layers,
   type LucideIcon,
-  ScrollText,
   Sparkles,
   User,
   Wrench
@@ -44,15 +42,12 @@ const jobsNav: NavItem[] = [
 ];
 
 const resumeNav: NavItem[] = [
+  { label: 'Builder', to: '/resume/builder', icon: FileText },
   { label: 'Profile', to: '/resume/profile', icon: User },
   { label: 'Headlines', to: '/resume/headlines', icon: Heading },
-  { label: 'Experience', to: '/resume/experience', icon: ScrollText },
   { label: 'Skills', to: '/resume/skills', icon: Wrench },
-  { label: 'Education', to: '/resume/education', icon: GraduationCap },
-  { label: 'Builder', to: '/resume/builder', icon: FileText }
+  { label: 'Education', to: '/resume/education', icon: GraduationCap }
 ];
-
-const archetypeNav: NavItem[] = [{ label: 'Archetypes', to: '/archetypes', icon: Layers }];
 
 function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
   const matchRoute = useMatchRoute();
@@ -91,9 +86,8 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup label="Discovery" items={jobsNav} />
         <NavGroup label="Resume" items={resumeNav} />
-        <NavGroup label="Templates" items={archetypeNav} />
+        <NavGroup label="Discovery" items={jobsNav} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

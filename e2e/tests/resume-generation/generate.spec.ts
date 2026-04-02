@@ -1,18 +1,14 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Resume generation', () => {
+test.describe('Resume generation from builder', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/jobs');
-    const firstJobLink = page.locator('table a[href^="/jobs/"]').first();
-    await expect(firstJobLink).toBeVisible();
-    await firstJobLink.click();
-    await expect(page).toHaveURL(/\/jobs\/[0-9a-f-]+$/);
+    await page.goto('/resume/builder');
+    await expect(page.getByRole('heading', { name: 'Sylvain Estevez' })).toBeVisible();
   });
 
-  test('generates a resume PDF for an archetype', async ({ page }) => {
-    // Intercept the response to capture the PDF body
+  test('generates a resume PDF with valid content', async ({ page }) => {
     const captured: { status: number; contentType: string; body: Buffer }[] = [];
-    await page.route('**/generate-resume', async route => {
+    await page.route('**/resumes/generate', async route => {
       const response = await route.fetch();
       captured.push({
         status: response.status(),
@@ -22,11 +18,7 @@ test.describe('Resume generation', () => {
       await route.fulfill({ response });
     });
 
-    // Select "Lead IC" archetype (LLM is unavailable in E2E, so manual form is shown)
-    await page.locator('#archetype-select').click();
-    await page.getByRole('option', { name: 'Lead IC' }).click();
-
-    await page.getByRole('button', { name: 'Generate Resume' }).click();
+    await page.getByRole('button', { name: 'Generate PDF' }).click();
     await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
 
     expect(captured).toHaveLength(1);
@@ -38,63 +30,44 @@ test.describe('Resume generation', () => {
     await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
 
-  test('different archetypes produce different PDFs', async ({ page }) => {
-    // Set up route interception for all generate calls in this test
+  test('hiding bullets produces a different PDF', async ({ page }) => {
     const captured: Buffer[] = [];
-    await page.route('**/generate-resume', async route => {
+    await page.route('**/resumes/generate', async route => {
       const response = await route.fetch();
       captured.push(await response.body());
       await route.fulfill({ response });
     });
 
-    // Generate with "Lead IC"
-    await page.locator('#archetype-select').click();
-    await page.getByRole('option', { name: 'Lead IC' }).click();
-    await page.getByRole('button', { name: 'Generate Resume' }).click();
+    // Generate with default selection
+    await page.getByRole('button', { name: 'Generate PDF' }).click();
     await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
 
-    // Generate with "Nerd"
-    await page.locator('#archetype-select').click();
-    await page.getByRole('option', { name: 'Nerd' }).click();
-    await page.getByRole('button', { name: 'Generate Resume' }).click();
-    // Wait for second toast — need to wait for the button to finish loading first
-    await expect(page.getByRole('button', { name: 'Generate Resume' })).toBeEnabled({ timeout: 60_000 });
+    // Open the first experience modal and hide a bullet
+    const companyBlock = page.locator('.group\\/company').first();
+    await companyBlock.hover();
+    await companyBlock.getByTitle('Edit experience').click();
 
+    const dialogContent = page.locator('[data-slot="dialog-content"]');
+    await expect(dialogContent).toBeVisible();
+
+    // Toggle first visible bullet off
+    const excludeBtn = dialogContent.getByTitle('Exclude from resume').first();
+    if ((await excludeBtn.count()) > 0) {
+      await excludeBtn.click();
+    }
+
+    await page.getByRole('button', { name: 'Done' }).click();
+
+    // Generate again
+    await page.getByRole('button', { name: 'Generate PDF' }).click();
+    // Wait for button to re-enable after second generation
+    await expect(page.getByRole('button', { name: 'Generate PDF' })).toBeEnabled({ timeout: 60_000 });
+
+    // Two PDFs should have been captured and they should differ
     expect(captured).toHaveLength(2);
     expect(captured[0].length).toBeGreaterThan(100);
     expect(captured[1].length).toBeGreaterThan(100);
     expect(captured[0].length).not.toBe(captured[1].length);
-
-    await page.unrouteAll({ behavior: 'ignoreErrors' });
-  });
-
-  test('content selection drives PDF output', async ({ page }) => {
-    const captured: { status: number; contentType: string; body: Buffer }[] = [];
-    await page.route('**/generate-resume', async route => {
-      const response = await route.fetch();
-      captured.push({
-        status: response.status(),
-        contentType: response.headers()['content-type'] ?? '',
-        body: await response.body()
-      });
-      await route.fulfill({ response });
-    });
-
-    // Generate with "IC" archetype (different content selection than Lead IC)
-    await page.locator('#archetype-select').click();
-    await page.getByRole('option', { name: 'IC', exact: true }).click();
-
-    // Add keywords to influence content
-    await page.getByLabel('Keywords (optional)').fill('typescript, node.js, microservices');
-
-    await page.getByRole('button', { name: 'Generate Resume' }).click();
-    await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
-
-    expect(captured).toHaveLength(1);
-    expect(captured[0].status).toBe(200);
-    expect(captured[0].contentType).toContain('application/pdf');
-    expect(captured[0].body.length).toBeGreaterThan(100);
-    expect(captured[0].body.subarray(0, 5).toString()).toBe('%PDF-');
 
     await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
