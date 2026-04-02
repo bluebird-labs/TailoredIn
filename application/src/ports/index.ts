@@ -8,6 +8,10 @@ export type {
   JobPostingInsightsDto,
   LlmService
 } from './LlmService.js';
-export type { MakeResumeContentInput, ResumeContentFactory } from './ResumeContentFactory.js';
+export type {
+  MakeResumeContentFromSelectionInput,
+  MakeResumeContentInput,
+  ResumeContentFactory
+} from './ResumeContentFactory.js';
 export type { RenderResumeInput, ResumeRenderer } from './ResumeRenderer.js';
 export type { ColorPaletteDto, WebColorService } from './WebColorService.js';
