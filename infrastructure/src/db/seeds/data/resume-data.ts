@@ -325,7 +325,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'volvo',
         positionIndex: 0,
-        jobTitle: 'Tech Lead Manager',
+        jobTitle: 'Engineering Manager',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'New York, NY',
         startDate: '2020-03',
@@ -439,7 +439,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'volvo',
         positionIndex: 0,
-        jobTitle: 'Tech Lead Manager',
+        jobTitle: 'Engineering Manager',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'New York, NY',
         startDate: '2020-03',
@@ -655,7 +655,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'volvo',
         positionIndex: 0,
-        jobTitle: 'Tech Lead Manager',
+        jobTitle: 'Engineering Manager',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'New York, NY',
         startDate: '2020-03',
@@ -723,7 +723,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'volvo',
         positionIndex: 0,
-        jobTitle: 'Tech Lead Manager',
+        jobTitle: 'Engineering Manager',
         displayCompanyName: 'Volvo Cars',
         locationLabel: 'New York, NY',
         startDate: '2020-03',
