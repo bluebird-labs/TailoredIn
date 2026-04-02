@@ -4,7 +4,11 @@ import { expect, type Page, test } from '@playwright/test';
 /*  Helper: seed a bullet variant via API (needed for tests 7-11)     */
 /* ------------------------------------------------------------------ */
 
-async function seedVariantViaApi(page: Page): Promise<{ experienceId: string; bulletId: string }> {
+async function seedVariantViaApi(
+  page: Page,
+  variantText = 'E2E test variant',
+  source: 'manual' | 'llm' = 'manual'
+): Promise<{ experienceId: string; bulletId: string; variantText: string }> {
   // Fetch all experiences and find the Stealth Startup one
   const expRes = await page.request.get('/api/experiences');
   const expBody = await expRes.json();
@@ -18,9 +22,9 @@ async function seedVariantViaApi(page: Page): Promise<{ experienceId: string; bu
   const varRes = await page.request.post(`/api/bullets/${bulletId}/variants`, {
     data: {
       experience_id: experienceId,
-      text: 'E2E test variant',
+      text: variantText,
       angle: 'testing',
-      source: 'manual',
+      source,
       role_tags: [],
       skill_tags: []
     }
@@ -33,7 +37,7 @@ async function seedVariantViaApi(page: Page): Promise<{ experienceId: string; bu
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Work Experience' })).toBeVisible();
 
-  return { experienceId, bulletId };
+  return { experienceId, bulletId, variantText };
 }
 
 /* ------------------------------------------------------------------ */
@@ -211,19 +215,19 @@ test.describe('Experience Page', () => {
     // Click the "Add" button (in the inline form, not the gutter)
     await row.locator('div.flex.items-center.gap-2').getByRole('button', { name: 'Add' }).click();
 
-    await expect(page.getByText('Bullet added')).toBeVisible();
+    await expect(page.getByText('Bullet added', { exact: true })).toBeVisible();
     await expect(page.getByText('New bullet added via E2E test')).toBeVisible();
   });
 
   /* 7 — Toggle variants */
   test('toggles variant list visibility', async ({ page }) => {
-    await seedVariantViaApi(page);
+    const { variantText } = await seedVariantViaApi(page, 'Toggle test variant');
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
 
     // The variant toggle pill should show count
-    const togglePill = firstBullet.getByRole('button', { name: /⟳ 1/ });
+    const togglePill = firstBullet.getByRole('button', { name: /⟳/ });
     await expect(togglePill).toBeVisible();
 
     // Click to expand
@@ -232,26 +236,26 @@ test.describe('Experience Page', () => {
     // Variant list with left border should appear
     const variantList = row.locator('div.border-l-2');
     await expect(variantList).toBeVisible();
-    await expect(page.getByText('E2E test variant')).toBeVisible();
+    await expect(page.getByText(variantText)).toBeVisible();
     await expect(page.getByRole('button', { name: '+ Add variant' })).toBeVisible();
 
     // Click pill again to collapse
-    await firstBullet.getByRole('button', { name: /⟳ 1/ }).click();
+    await firstBullet.getByRole('button', { name: /⟳/ }).click();
     await expect(variantList).not.toBeVisible();
   });
 
   /* 8 — Approve variant */
   test('approves a pending variant', async ({ page }) => {
-    await seedVariantViaApi(page);
+    const { variantText } = await seedVariantViaApi(page, 'Approve test variant', 'llm');
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
 
     // Expand variants
-    await firstBullet.getByRole('button', { name: /⟳ 1/ }).click();
+    await firstBullet.getByRole('button', { name: /⟳/ }).click();
 
-    // Assert PENDING badge visible
-    const variantCard = row.locator('div.rounded-\\[6px\\]').filter({ hasText: 'E2E test variant' });
+    // Assert PENDING badge visible (source='llm' creates PENDING variants)
+    const variantCard = row.locator('div.rounded-\\[6px\\]').filter({ hasText: variantText });
     await expect(variantCard.getByText('PENDING')).toBeVisible();
 
     // Click approve
@@ -267,15 +271,15 @@ test.describe('Experience Page', () => {
 
   /* 9 — Reject variant */
   test('rejects a pending variant', async ({ page }) => {
-    await seedVariantViaApi(page);
+    const { variantText } = await seedVariantViaApi(page, 'Reject test variant', 'llm');
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
 
     // Expand variants
-    await firstBullet.getByRole('button', { name: /⟳ 1/ }).click();
+    await firstBullet.getByRole('button', { name: /⟳/ }).click();
 
-    const variantCard = row.locator('div.rounded-\\[6px\\]').filter({ hasText: 'E2E test variant' });
+    const variantCard = row.locator('div.rounded-\\[6px\\]').filter({ hasText: variantText });
 
     // Click reject
     await variantCard.getByRole('button', { name: '✗' }).click();
@@ -286,20 +290,23 @@ test.describe('Experience Page', () => {
 
   /* 10 — Add variant */
   test('adds a variant via the variant list', async ({ page }) => {
-    await seedVariantViaApi(page);
+    const { variantText } = await seedVariantViaApi(page, 'Add-test seed variant');
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
 
-    // Expand variants
-    await firstBullet.getByRole('button', { name: /⟳ 1/ }).click();
-    await expect(page.getByText('E2E test variant')).toBeVisible();
+    // Expand variants and note the current count
+    const togglePill = firstBullet.getByRole('button', { name: /⟳/ });
+    const pillText = await togglePill.textContent();
+    const countBefore = Number(pillText?.match(/\d+/)?.[0] ?? 0);
+    await togglePill.click();
+    await expect(page.getByText(variantText)).toBeVisible();
 
     // Click "+ Add variant"
     await page.getByRole('button', { name: '+ Add variant' }).click();
 
     // Fill variant form
-    await page.getByPlaceholder('Variant text...').fill('Second E2E variant');
+    await page.getByPlaceholder('Variant text...').fill('Newly added variant');
     await page.getByPlaceholder('Angle (e.g. leadership)').fill('scalability');
 
     // Click Add button in the variant add form
@@ -307,31 +314,39 @@ test.describe('Experience Page', () => {
     await variantList.getByRole('button', { name: 'Add' }).click();
 
     await expect(page.getByText('Variant added')).toBeVisible();
-    await expect(page.getByText('Second E2E variant')).toBeVisible();
+    await expect(page.getByText('Newly added variant')).toBeVisible();
 
-    // Pill count should update to 2
-    await expect(firstBullet.getByRole('button', { name: /⟳ 2/ })).toBeVisible();
+    // Pill count should have incremented by 1
+    await expect(firstBullet.getByRole('button', { name: new RegExp(`⟳ ${countBefore + 1}`) })).toBeVisible();
   });
 
   /* 11 — Delete variant */
   test('deletes a variant', async ({ page }) => {
-    await seedVariantViaApi(page);
+    const { variantText } = await seedVariantViaApi(page, 'Delete test variant');
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
 
-    // Expand variants
-    await firstBullet.getByRole('button', { name: /⟳ 1/ }).click();
+    // Expand variants and note count
+    const togglePill = firstBullet.getByRole('button', { name: /⟳/ });
+    const pillText = await togglePill.textContent();
+    const countBefore = Number(pillText?.match(/\d+/)?.[0] ?? 0);
+    await togglePill.click();
 
-    const variantCard = row.locator('div.rounded-\\[6px\\]').filter({ hasText: 'E2E test variant' });
+    const variantCard = row.locator('div.rounded-\\[6px\\]').filter({ hasText: variantText });
 
     // Click del pill
     await variantCard.getByRole('button', { name: 'del' }).click();
 
     await expect(page.getByText('Variant deleted')).toBeVisible();
-    await expect(page.getByText('E2E test variant')).not.toBeVisible();
+    await expect(page.getByText(variantText)).not.toBeVisible();
 
-    // Toggle pill should be gone (no more variants)
-    await expect(firstBullet.getByRole('button', { name: /⟳/ })).not.toBeVisible();
+    // Variant count should have decreased
+    if (countBefore === 1) {
+      // Toggle pill should be gone (no more variants)
+      await expect(firstBullet.getByRole('button', { name: /⟳/ })).not.toBeVisible();
+    } else {
+      await expect(firstBullet.getByRole('button', { name: new RegExp(`⟳ ${countBefore - 1}`) })).toBeVisible();
+    }
   });
 });
