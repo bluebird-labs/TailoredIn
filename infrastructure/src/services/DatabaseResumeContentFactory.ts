@@ -72,8 +72,8 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       last_name: profile.lastName,
       email: profile.email,
       phone: profile.phone ?? '',
-      github: profile.githubUrl ?? '',
-      linkedin: profile.linkedinUrl ?? '',
+      github: extractHandle(profile.githubUrl),
+      linkedin: extractHandle(profile.linkedinUrl),
       location: profile.location ?? '',
       header_quote: headline.summaryText
     };
@@ -159,5 +159,16 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       skills,
       education
     };
+  }
+}
+
+/** Extract the last path segment from a URL, or return the string as-is if not a URL. */
+function extractHandle(url: string | null): string {
+  if (!url) return '';
+  try {
+    const pathname = new URL(url).pathname;
+    return pathname.split('/').filter(Boolean).pop() ?? url;
+  } catch {
+    return url;
   }
 }

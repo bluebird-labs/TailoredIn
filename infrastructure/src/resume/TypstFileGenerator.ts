@@ -95,7 +95,15 @@ export class TypstFileGenerator {
 #set text(size: ${RESUME_LAYOUT.bodyFontSize})
 #set par(leading: ${RESUME_LAYOUT.lineSpacing})
 #set page(margin: ${RESUME_LAYOUT.pageMargin})
-#show: cv.with(metadata)
+// Override personal info icons to use text labels instead of Font Awesome
+#let custom-icons = (
+  github: box(width: 10pt, align(center, text(size: 8pt, "GH"))),
+  email: box(width: 10pt, align(center, text(size: 8pt, "✉"))),
+  linkedin: box(width: 10pt, align(center, text(size: 8pt, "in"))),
+  phone: box(width: 10pt, align(center, text(size: 8pt, "☎"))),
+  location: box(width: 10pt, align(center, text(size: 8pt, "⌂"))),
+)
+#show: cv.with(metadata, custom-icons: custom-icons)
 
 ${includes}
 `;
