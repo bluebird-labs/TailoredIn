@@ -4,10 +4,7 @@ import { expect, type Page, test } from '@playwright/test';
 /*  Helper: seed a bullet variant via API (needed for tests 7-11)     */
 /* ------------------------------------------------------------------ */
 
-async function seedVariantViaApi(
-  page: Page,
-  options: { approvalStatus?: string } = {}
-): Promise<{ experienceId: string; bulletId: string }> {
+async function seedVariantViaApi(page: Page): Promise<{ experienceId: string; bulletId: string }> {
   // Fetch all experiences and find the Stealth Startup one
   const expRes = await page.request.get('/api/experiences');
   const expBody = await expRes.json();
@@ -24,12 +21,13 @@ async function seedVariantViaApi(
       text: 'E2E test variant',
       angle: 'testing',
       source: 'manual',
-      approval_status: options.approvalStatus ?? 'APPROVED',
       role_tags: [],
       skill_tags: []
     }
   });
   expect(varRes.ok()).toBeTruthy();
+  const varBody = await varRes.json();
+  expect(varBody.data).toBeDefined();
 
   // Reload the page so the UI picks up the new variant
   await page.reload();
@@ -67,6 +65,8 @@ function experienceRow(page: Page, companyName: string) {
 /* ------------------------------------------------------------------ */
 
 test.describe('Experience Page', () => {
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/resume/experience');
     await expect(page.getByRole('heading', { name: 'Work Experience' })).toBeVisible();
@@ -242,7 +242,7 @@ test.describe('Experience Page', () => {
 
   /* 8 — Approve variant */
   test('approves a pending variant', async ({ page }) => {
-    await seedVariantViaApi(page, { approvalStatus: 'PENDING' });
+    await seedVariantViaApi(page);
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
@@ -267,7 +267,7 @@ test.describe('Experience Page', () => {
 
   /* 9 — Reject variant */
   test('rejects a pending variant', async ({ page }) => {
-    await seedVariantViaApi(page, { approvalStatus: 'PENDING' });
+    await seedVariantViaApi(page);
 
     const row = experienceRow(page, 'Stealth Startup');
     const firstBullet = row.locator('li').first();
