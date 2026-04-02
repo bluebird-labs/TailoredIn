@@ -16,6 +16,7 @@ import { Route as ResumeSkillsRouteImport } from './routes/resume/skills'
 import { Route as ResumeProfileRouteImport } from './routes/resume/profile'
 import { Route as ResumeHeadlinesRouteImport } from './routes/resume/headlines'
 import { Route as ResumeExperienceRouteImport } from './routes/resume/experience'
+import { Route as ResumeBuilderRouteImport } from './routes/resume/builder'
 import { Route as ResumeEducationRouteImport } from './routes/resume/education'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
@@ -56,6 +57,11 @@ const ResumeExperienceRoute = ResumeExperienceRouteImport.update({
   path: '/resume/experience',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumeBuilderRoute = ResumeBuilderRouteImport.update({
+  id: '/resume/builder',
+  path: '/resume/builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumeEducationRoute = ResumeEducationRouteImport.update({
   id: '/resume/education',
   path: '/resume/education',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/resume/builder': typeof ResumeBuilderRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
   '/resume/headlines': typeof ResumeHeadlinesRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/resume/builder': typeof ResumeBuilderRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
   '/resume/headlines': typeof ResumeHeadlinesRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/resume/builder': typeof ResumeBuilderRoute
   '/resume/education': typeof ResumeEducationRoute
   '/resume/experience': typeof ResumeExperienceRoute
   '/resume/headlines': typeof ResumeHeadlinesRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/archetypes/$archetypeId'
     | '/companies/$companyId'
     | '/jobs/$jobId'
+    | '/resume/builder'
     | '/resume/education'
     | '/resume/experience'
     | '/resume/headlines'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/archetypes/$archetypeId'
     | '/companies/$companyId'
     | '/jobs/$jobId'
+    | '/resume/builder'
     | '/resume/education'
     | '/resume/experience'
     | '/resume/headlines'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/archetypes/$archetypeId'
     | '/companies/$companyId'
     | '/jobs/$jobId'
+    | '/resume/builder'
     | '/resume/education'
     | '/resume/experience'
     | '/resume/headlines'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   ArchetypesArchetypeIdRoute: typeof ArchetypesArchetypeIdRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
+  ResumeBuilderRoute: typeof ResumeBuilderRoute
   ResumeEducationRoute: typeof ResumeEducationRoute
   ResumeExperienceRoute: typeof ResumeExperienceRoute
   ResumeHeadlinesRoute: typeof ResumeHeadlinesRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeExperienceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resume/builder': {
+      id: '/resume/builder'
+      path: '/resume/builder'
+      fullPath: '/resume/builder'
+      preLoaderRoute: typeof ResumeBuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resume/education': {
       id: '/resume/education'
       path: '/resume/education'
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArchetypesArchetypeIdRoute: ArchetypesArchetypeIdRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
+  ResumeBuilderRoute: ResumeBuilderRoute,
   ResumeEducationRoute: ResumeEducationRoute,
   ResumeExperienceRoute: ResumeExperienceRoute,
   ResumeHeadlinesRoute: ResumeHeadlinesRoute,

@@ -18,7 +18,8 @@ export class TypstResumeRenderer implements ResumeRenderer {
     const layoutConfig = TEMPLATE_LAYOUTS[templateStyle];
     const outputDir = Path.resolve(RESUMES_DIR, snakeCase(companyName.toLowerCase()));
     const date = format(new Date(), 'yyyy_MM_dd');
-    const pdfPath = Path.resolve(outputDir, `Sylvain_Estevez_${archetype}_${date}.pdf`);
+    const label = archetype ?? templateStyle;
+    const pdfPath = Path.resolve(outputDir, `Sylvain_Estevez_${label}_${date}.pdf`);
 
     await FS.mkdir(outputDir, { recursive: true });
     await TypstFileGenerator.generate(content, TYPST_DIR, layoutConfig);

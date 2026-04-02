@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { GenerateResume } from '@tailoredin/application';
-import { ArchetypeKey } from '@tailoredin/domain';
+import { TemplateStyle } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
@@ -10,13 +10,20 @@ export class GenerateResumeRoute {
   public constructor(private readonly generateResume: GenerateResume = inject(DI.Resume.GenerateResume)) {}
 
   public plugin() {
-    return new Elysia().put(
-      '/jobs/:id/generate-resume',
-      async ({ params, body, set }) => {
+    return new Elysia().post(
+      '/resumes/generate',
+      async ({ body, set }) => {
         const result = await this.generateResume.execute({
-          jobId: params.id,
-          archetype: body?.archetype as ArchetypeKey | undefined,
-          keywords: body?.keywords
+          headlineId: body.headline_id,
+          experienceSelections: body.experience_selections.map(s => ({
+            experienceId: s.experience_id,
+            bulletVariantIds: s.bullet_variant_ids
+          })),
+          educationIds: body.education_ids,
+          skillCategoryIds: body.skill_category_ids,
+          skillItemIds: body.skill_item_ids,
+          templateStyle: body.template_style as TemplateStyle,
+          keywords: body.keywords
         });
 
         if (!result.isOk) {
@@ -32,13 +39,20 @@ export class GenerateResumeRoute {
         return pdfBuffer;
       },
       {
-        params: t.Object({ id: t.String({ format: 'uuid' }) }),
-        body: t.Optional(
-          t.Object({
-            archetype: t.Optional(t.Enum(ArchetypeKey)),
-            keywords: t.Optional(t.Array(t.String()))
-          })
-        )
+        body: t.Object({
+          headline_id: t.String({ format: 'uuid' }),
+          experience_selections: t.Array(
+            t.Object({
+              experience_id: t.String({ format: 'uuid' }),
+              bullet_variant_ids: t.Array(t.String({ format: 'uuid' }))
+            })
+          ),
+          education_ids: t.Array(t.String({ format: 'uuid' })),
+          skill_category_ids: t.Array(t.String({ format: 'uuid' })),
+          skill_item_ids: t.Array(t.String({ format: 'uuid' })),
+          template_style: t.Enum(TemplateStyle),
+          keywords: t.Optional(t.Array(t.String()))
+        })
       }
     );
   }

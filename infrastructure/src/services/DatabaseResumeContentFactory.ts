@@ -1,4 +1,9 @@
-import type { MakeResumeContentInput, ResumeContentDto, ResumeContentFactory } from '@tailoredin/application';
+import type {
+  MakeResumeContentFromSelectionInput,
+  MakeResumeContentInput,
+  ResumeContentDto,
+  ResumeContentFactory
+} from '@tailoredin/application';
 import { StringUtil } from '@tailoredin/core';
 import type {
   ArchetypeRepository,
@@ -24,18 +29,40 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
     const archetype = await this.archetypeRepo.findByIdOrFail(input.archetypeId);
     const cs = archetype.contentSelection;
 
-    const [profile, allExperiences, allEducation, allCategories] = await Promise.all([
+    const headlines = await this.headlineRepo.findAll();
+    const headlineId = archetype.headlineId
+      ? headlines.find(h => h.id.value === archetype.headlineId)
+        ? archetype.headlineId
+        : headlines[0]?.id.value
+      : headlines[0]?.id.value;
+
+    if (!headlineId) {
+      throw new Error('No headlines found');
+    }
+
+    return this.makeFromSelection({
+      profileId: input.profileId,
+      headlineId,
+      experienceSelections: cs.experienceSelections,
+      educationIds: cs.educationIds,
+      skillCategoryIds: cs.skillCategoryIds,
+      skillItemIds: cs.skillItemIds,
+      awesomeColor: input.awesomeColor,
+      keywords: input.keywords
+    });
+  }
+
+  public async makeFromSelection(input: MakeResumeContentFromSelectionInput): Promise<ResumeContentDto> {
+    const [profile, headlines, allExperiences, allEducation, allCategories] = await Promise.all([
       this.profileRepo.findSingle(),
+      this.headlineRepo.findAll(),
       this.experienceRepo.findAll(),
       this.educationRepo.findAll(),
       this.skillCategoryRepo.findAll()
     ]);
 
-    // Headline — from archetype or fallback to first available
-    const headlines = await this.headlineRepo.findAll();
-    const headline = archetype.headlineId
-      ? (headlines.find(h => h.id.value === archetype.headlineId) ?? headlines[0])
-      : headlines[0];
+    // Headline — find by headlineId or fall back to first
+    const headline = headlines.find(h => h.id.value === input.headlineId) ?? headlines[0];
     if (!headline) {
       throw new Error('No headlines found');
     }
@@ -52,7 +79,7 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       header_quote: headline.summaryText
     };
 
-    // Experience — from content_selection experienceSelections
+    // Experience — from experienceSelections
     const experienceMap = new Map(allExperiences.map(e => [e.id.value, e]));
 
     const variantMap = new Map<string, { text: string; bulletOrdinal: number }>();
@@ -67,7 +94,7 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       }
     }
 
-    const experience = cs.experienceSelections.map(sel => {
+    const experience = input.experienceSelections.map(sel => {
       const exp = experienceMap.get(sel.experienceId);
       if (!exp) {
         throw new Error(`Experience not found: ${sel.experienceId}`);
@@ -92,9 +119,9 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       };
     });
 
-    // Education — from content_selection educationIds
+    // Education — from educationIds
     const educationMap = new Map(allEducation.map(e => [e.id.value, e]));
-    const education = cs.educationIds.map(id => {
+    const education = input.educationIds.map(id => {
       const edu = educationMap.get(id);
       if (!edu) {
         throw new Error(`Education not found: ${id}`);
@@ -107,11 +134,11 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       };
     });
 
-    // Skills — from content_selection skillCategoryIds + skillItemIds
+    // Skills — from skillCategoryIds + skillItemIds (with Typst escaping)
     const categoryMap = new Map(allCategories.map(c => [c.id.value, c]));
-    const selectedItemIds = new Set(cs.skillItemIds);
+    const selectedItemIds = new Set(input.skillItemIds);
 
-    const skills = cs.skillCategoryIds.map(catId => {
+    const skills = input.skillCategoryIds.map(catId => {
       const cat = categoryMap.get(catId);
       if (!cat) {
         throw new Error(`Skill category not found: ${catId}`);

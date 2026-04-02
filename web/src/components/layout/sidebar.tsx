@@ -2,6 +2,7 @@ import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
   Archive,
   Briefcase,
+  FileText,
   GitBranch,
   GraduationCap,
   Heading,
@@ -47,7 +48,8 @@ const resumeNav: NavItem[] = [
   { label: 'Headlines', to: '/resume/headlines', icon: Heading },
   { label: 'Experience', to: '/resume/experience', icon: ScrollText },
   { label: 'Skills', to: '/resume/skills', icon: Wrench },
-  { label: 'Education', to: '/resume/education', icon: GraduationCap }
+  { label: 'Education', to: '/resume/education', icon: GraduationCap },
+  { label: 'Builder', to: '/resume/builder', icon: FileText }
 ];
 
 const archetypeNav: NavItem[] = [{ label: 'Archetypes', to: '/archetypes', icon: Layers }];

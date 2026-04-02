@@ -27,6 +27,7 @@ import { UpdateBulletRoute } from './routes/experience/UpdateBulletRoute.js';
 import { UpdateBulletVariantRoute } from './routes/experience/UpdateBulletVariantRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
+import { GenerateResumeFromJobRoute } from './routes/GenerateResumeFromJobRoute.js';
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
 import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
 import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
@@ -87,6 +88,7 @@ const app = new Elysia()
   .use(container.get(ChangeJobStatusRoute).plugin())
   .use(container.get(BulkChangeJobStatusRoute).plugin())
   .use(container.get(IngestJobByUrlRoute).plugin())
+  .use(container.get(GenerateResumeFromJobRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
   // Company Briefs
   .use(container.get(GetCompanyBriefRoute).plugin())
