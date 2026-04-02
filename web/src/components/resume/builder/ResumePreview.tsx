@@ -1,5 +1,5 @@
-import { Eye, EyeOff, Pencil, RefreshCw } from 'lucide-react';
-import { useCallback } from 'react';
+import { Eye, EyeOff, Plus } from 'lucide-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Experience } from '@/components/resume/experience/types';
 import { formatDateRange } from '@/components/resume/experience/types';
 import type { Education } from '@/hooks/use-education';
@@ -15,30 +15,37 @@ type Profile = {
   githubUrl: string | null;
 };
 
-type Headline = { id: string; summaryText: string };
+type PositionEntry = {
+  exp: Experience;
+  visible: boolean;
+  visibleBullets: { id: string; text: string }[];
+};
 
 type CompanyGroup = {
   company: string;
   dateRange: string;
-  positions: {
-    exp: Experience;
-    visibleBullets: { id: string; text: string }[];
-  }[];
+  hasAnyVisible: boolean;
+  positions: PositionEntry[];
 };
 
 type ResumePreviewProps = {
   profile: Profile;
-  headlines: Headline[];
-  selectedHeadlineId: string;
+  headlineText: string;
   experiences: Experience[];
   visibleBulletVariantIds: Map<string, Set<string>>;
   educations: Education[];
   visibleEducationIds: Set<string>;
   onEditPersonalInfo: () => void;
-  onSwapHeadline: () => void;
+  onHeadlineChange: (text: string) => void;
   onEditCompany: (company: string) => void;
   onToggleEducation: (id: string) => void;
+  onAddExperience: () => void;
+  onEditEducation: (edu: Education) => void;
+  onAddEducation: () => void;
 };
+
+const SECTION =
+  'w-full text-left appearance-none bg-transparent border-0 p-0 font-inherit cursor-pointer rounded-lg transition-all duration-200 ease-out -mx-3 px-3 -my-1 py-1 border-l-[3px] border-l-transparent hover:border-l-[var(--section-accent)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.03)] hover:bg-[var(--section-hover)] hover:scale-[1.005] hover:-translate-y-[1px] focus-visible:outline-2 focus-visible:outline-primary/30';
 
 /** Extract the last path segment from a URL. */
 function extractHandle(url: string | null): string {
@@ -51,25 +58,28 @@ function extractHandle(url: string | null): string {
   }
 }
 
-/** Group consecutive experiences by company. */
+/** Group consecutive experiences by company, preserving date order for both visible and hidden. */
 function groupByCompany(experiences: Experience[], visibleBulletVariantIds: Map<string, Set<string>>): CompanyGroup[] {
   const groups: CompanyGroup[] = [];
 
   for (const exp of experiences) {
+    const isVisible = visibleBulletVariantIds.has(exp.id);
     const variantIds = visibleBulletVariantIds.get(exp.id) ?? new Set();
     const visibleBullets: { id: string; text: string }[] = [];
-    for (const bullet of exp.bullets) {
-      for (const v of bullet.variants) {
-        if (variantIds.has(v.id)) {
-          visibleBullets.push({ id: v.id, text: v.text });
+    if (isVisible) {
+      for (const bullet of exp.bullets) {
+        for (const v of bullet.variants) {
+          if (variantIds.has(v.id)) {
+            visibleBullets.push({ id: v.id, text: v.text });
+          }
         }
       }
     }
 
     const last = groups[groups.length - 1];
     if (last && last.company === exp.companyName) {
-      last.positions.push({ exp, visibleBullets });
-      // Update date range to span first to last position
+      last.positions.push({ exp, visible: isVisible, visibleBullets });
+      if (isVisible) last.hasAnyVisible = true;
       const allExps = last.positions.map(p => p.exp);
       const earliest = allExps[allExps.length - 1];
       const latest = allExps[0];
@@ -78,7 +88,8 @@ function groupByCompany(experiences: Experience[], visibleBulletVariantIds: Map<
       groups.push({
         company: exp.companyName,
         dateRange: formatDateRange(exp.startDate, exp.endDate),
-        positions: [{ exp, visibleBullets }]
+        hasAnyVisible: isVisible,
+        positions: [{ exp, visible: isVisible, visibleBullets }]
       });
     }
   }
@@ -88,39 +99,51 @@ function groupByCompany(experiences: Experience[], visibleBulletVariantIds: Map<
 
 export function ResumePreview({
   profile,
-  headlines,
-  selectedHeadlineId,
+  headlineText,
   experiences,
   visibleBulletVariantIds,
   educations,
   visibleEducationIds,
   onEditPersonalInfo,
-  onSwapHeadline,
+  onHeadlineChange,
   onEditCompany,
-  onToggleEducation
+  onAddExperience,
+  onToggleEducation,
+  onEditEducation,
+  onAddEducation
 }: ResumePreviewProps) {
-  const headline = headlines.find(h => h.id === selectedHeadlineId);
-  const companyGroups = groupByCompany(experiences, visibleBulletVariantIds);
+  const [editingHeadline, setEditingHeadline] = useState(false);
+  const [headlineDraft, setHeadlineDraft] = useState('');
+  const headlineRef = useRef<HTMLTextAreaElement>(null);
+
+  const startEditingHeadline = useCallback(() => {
+    setHeadlineDraft(headlineText);
+    setEditingHeadline(true);
+    setTimeout(() => headlineRef.current?.focus(), 0);
+  }, [headlineText]);
+
+  const commitHeadline = useCallback(() => {
+    setEditingHeadline(false);
+    const trimmed = headlineDraft.trim();
+    if (trimmed !== headlineText) {
+      onHeadlineChange(trimmed);
+    }
+  }, [headlineDraft, headlineText, onHeadlineChange]);
+
+  const companyGroups = useMemo(
+    () => groupByCompany(experiences, visibleBulletVariantIds),
+    [experiences, visibleBulletVariantIds]
+  );
 
   const handleEditCompany = useCallback((company: string) => () => onEditCompany(company), [onEditCompany]);
 
   return (
     <div className="max-w-[680px] mx-auto px-10 py-8">
       {/* ── Personal info header ─────────────────────────────────── */}
-      <div className="mb-1 group/header">
-        <div className="flex justify-between items-start">
-          <h1 className="text-[26px] font-light text-[#333]" style={{ fontFamily: 'Raleway, sans-serif' }}>
-            {profile.firstName} {profile.lastName}
-          </h1>
-          <button
-            type="button"
-            onClick={onEditPersonalInfo}
-            className="opacity-0 group-hover/header:opacity-30 hover:!opacity-60 transition-opacity border border-[#ddd] rounded p-1.5 cursor-pointer"
-            title="Edit personal info"
-          >
-            <Pencil className="w-3.5 h-3.5 text-[#666]" />
-          </button>
-        </div>
+      <button type="button" className={`mb-1 block ${SECTION}`} onClick={onEditPersonalInfo}>
+        <h1 className="text-[26px] font-light text-[#333]" style={{ fontFamily: 'Raleway, sans-serif' }}>
+          {profile.firstName} {profile.lastName}
+        </h1>
         <ContactIconRow
           linkedin={extractHandle(profile.linkedinUrl)}
           email={profile.email}
@@ -128,61 +151,84 @@ export function ResumePreview({
           location={profile.location ?? ''}
           github={extractHandle(profile.githubUrl)}
         />
-      </div>
+      </button>
 
       {/* ── Headline ─────────────────────────────────────────────── */}
-      {headline && (
-        <div className="mt-3 pt-2 border-t border-[#e5e7eb] group/headline">
-          <div className="flex justify-between items-start">
-            <p className="text-[12px] text-[#444] italic leading-relaxed flex-1">{headline.summaryText}</p>
-            <button
-              type="button"
-              onClick={onSwapHeadline}
-              className="opacity-0 group-hover/headline:opacity-30 hover:!opacity-60 transition-opacity ml-3 cursor-pointer shrink-0"
-              title="Swap headline"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-[#666]" />
-            </button>
-          </div>
-        </div>
-      )}
+      <div className={`mt-3 pt-2 border-t border-[#e5e7eb] ${SECTION}`}>
+        {editingHeadline ? (
+          <textarea
+            ref={headlineRef}
+            value={headlineDraft}
+            onChange={e => setHeadlineDraft(e.target.value)}
+            onBlur={commitHeadline}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                commitHeadline();
+              }
+              if (e.key === 'Escape') {
+                setEditingHeadline(false);
+              }
+            }}
+            className="w-full text-[12px] text-[#444] italic leading-relaxed bg-transparent border-0 outline-none resize-none p-0 font-inherit"
+            rows={3}
+          />
+        ) : (
+          <button
+            type="button"
+            className="w-full text-left cursor-pointer bg-transparent border-0 p-0 font-inherit"
+            onClick={startEditingHeadline}
+          >
+            <p className="text-[12px] text-[#444] italic leading-relaxed">
+              {headlineText || 'Click to add a headline...'}
+            </p>
+          </button>
+        )}
+      </div>
 
       {/* ── Experience ───────────────────────────────────────────── */}
       <div className="mt-5">
-        <h2 className="text-[13px] font-bold uppercase tracking-widest text-[#333] border-b-[1.5px] border-[#333] pb-0.5 mb-3">
-          Experience
-        </h2>
+        <div className="flex items-center justify-between border-b-[1.5px] border-[#333] pb-0.5 mb-3">
+          <h2 className="text-[13px] font-bold uppercase tracking-widest text-[#333]">Experience</h2>
+          <button
+            type="button"
+            onClick={onAddExperience}
+            className="p-0.5 rounded cursor-pointer text-[#999] hover:text-[#333] transition-colors"
+            title="Add experience"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
         {companyGroups.map(group => (
-          <div key={group.company} className="mb-4 relative group/company">
-            <button
-              type="button"
-              onClick={handleEditCompany(group.company)}
-              className="absolute top-0 right-0 opacity-0 group-hover/company:opacity-30 hover:!opacity-60 transition-opacity cursor-pointer"
-              title="Edit experience"
-            >
-              <Pencil className="w-3.5 h-3.5 text-[#666]" />
-            </button>
-
+          <button
+            type="button"
+            key={group.company}
+            className={`mb-4 block ${group.hasAnyVisible ? '' : 'text-[#aaa]'} ${SECTION}`}
+            onClick={handleEditCompany(group.company)}
+          >
             <div className="flex justify-between items-baseline">
-              <span className="text-[13px] font-bold text-[#111]">{group.company}</span>
-              <span className="text-[11px] text-[#666]">{group.dateRange}</span>
+              <span className={`text-[13px] font-bold ${group.hasAnyVisible ? 'text-[#111]' : ''}`}>
+                {group.company}
+              </span>
+              <span className={`text-[11px] ${group.hasAnyVisible ? 'text-[#666]' : ''}`}>{group.dateRange}</span>
             </div>
 
-            {group.positions.map(({ exp, visibleBullets }) => (
-              <div key={exp.id} className="mt-2">
-                {group.positions.length > 1 && (
+            {group.positions.map(({ exp, visible, visibleBullets }) => (
+              <div key={exp.id} className={`mt-2 ${!visible ? 'text-[#aaa]' : ''}`}>
+                {group.positions.length > 1 ? (
                   <div className="flex justify-between items-baseline">
-                    <span className="text-[12px] font-semibold text-[#222]">{exp.title}</span>
-                    <span className="text-[10px] text-[#888]">{formatDateRange(exp.startDate, exp.endDate)}</span>
+                    <span className={`text-[12px] font-semibold ${visible ? 'text-[#222]' : ''}`}>{exp.title}</span>
+                    <span className={`text-[10px] ${visible ? 'text-[#888]' : ''}`}>
+                      {formatDateRange(exp.startDate, exp.endDate)}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-baseline">
+                    <span className={`text-[12px] font-semibold ${visible ? 'text-[#222]' : ''}`}>{exp.title}</span>
                   </div>
                 )}
-                {group.positions.length === 1 && (
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-[12px] font-semibold text-[#222]">{exp.title}</span>
-                  </div>
-                )}
-                {exp.summary && <p className="text-[11px] italic text-[#555] mt-0.5">{exp.summary}</p>}
+                {visible && exp.summary && <p className="text-[11px] italic text-[#555] mt-0.5">{exp.summary}</p>}
                 {visibleBullets.length > 0 && (
                   <div className="mt-1">
                     {visibleBullets.map(b => (
@@ -195,46 +241,61 @@ export function ResumePreview({
                 )}
               </div>
             ))}
-          </div>
+          </button>
         ))}
       </div>
 
       {/* ── Education ────────────────────────────────────────────── */}
-      {educations.length > 0 && (
-        <div className="mt-5">
-          <h2 className="text-[13px] font-bold uppercase tracking-widest text-[#333] border-b-[1.5px] border-[#333] pb-0.5 mb-2.5">
-            Education
-          </h2>
+      <div className="mt-5">
+        <div className="flex items-center justify-between border-b-[1.5px] border-[#333] pb-0.5 mb-2.5">
+          <h2 className="text-[13px] font-bold uppercase tracking-widest text-[#333]">Education</h2>
+          <button
+            type="button"
+            onClick={onAddEducation}
+            className="p-0.5 rounded cursor-pointer text-[#999] hover:text-[#333] transition-colors"
+            title="Add education"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
-          {educations.map(edu => {
-            const isVisible = visibleEducationIds.has(edu.id);
-            return (
-              <div
-                key={edu.id}
-                className={`flex items-baseline text-[11px] py-0.5 group/edu ${!isVisible ? 'line-through text-[#aaa]' : ''}`}
+        {educations.map(edu => {
+          const isVisible = visibleEducationIds.has(edu.id);
+          return (
+            <div key={edu.id} className={`flex items-center gap-1 group/edu ${SECTION}`}>
+              <button
+                type="button"
+                className={`flex-1 flex items-baseline text-[11px] py-0.5 text-left bg-transparent border-0 p-0 font-inherit cursor-pointer ${!isVisible ? 'line-through text-[#aaa]' : ''}`}
+                onClick={() => onEditEducation(edu)}
               >
                 <span className="flex-1">
                   <strong>{edu.degreeTitle}</strong> — {edu.institutionName}
                   {edu.location ? `, ${edu.location}` : ''}
                 </span>
                 <span className={`mx-2 ${!isVisible ? 'text-[#bbb]' : 'text-[#666]'}`}>{edu.graduationYear}</span>
-                <button
-                  type="button"
-                  onClick={() => onToggleEducation(edu.id)}
-                  className="opacity-0 group-hover/edu:opacity-50 hover:!opacity-80 transition-opacity cursor-pointer shrink-0"
-                  title={isVisible ? 'Exclude from resume' : 'Include in resume'}
-                >
-                  {isVisible ? (
-                    <Eye className="w-3.5 h-3.5 text-[#666]" />
-                  ) : (
-                    <EyeOff className="w-3.5 h-3.5 text-[#999]" />
-                  )}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              </button>
+              <button
+                type="button"
+                onClick={() => onToggleEducation(edu.id)}
+                className="p-0.5 rounded cursor-pointer opacity-0 group-hover/edu:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
+                title={isVisible ? 'Hide from resume' : 'Show on resume'}
+              >
+                {isVisible ? <Eye className="w-3 h-3 text-[#666]" /> : <EyeOff className="w-3 h-3 text-[#aaa]" />}
+              </button>
+            </div>
+          );
+        })}
+
+        {educations.length === 0 && (
+          <button
+            type="button"
+            onClick={onAddEducation}
+            className="text-[11px] text-[#999] italic cursor-pointer bg-transparent border-0 p-0 hover:text-[#666] transition-colors"
+          >
+            Click to add education...
+          </button>
+        )}
+      </div>
     </div>
   );
 }

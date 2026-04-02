@@ -28,7 +28,16 @@ export function useCreateArchetype() {
 export function useUpdateArchetype() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...body }: { id: string; key: string; label: string; headline_id?: string | null }) => {
+    mutationFn: async ({
+      id,
+      ...body
+    }: {
+      id: string;
+      key: string;
+      label: string;
+      headline_id?: string | null;
+      headline_text?: string;
+    }) => {
       await api.archetypes({ id }).put(body);
     },
     onSuccess: () => {

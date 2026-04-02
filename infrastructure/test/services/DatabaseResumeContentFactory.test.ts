@@ -14,9 +14,6 @@ import {
   Experience,
   ExperienceId,
   type ExperienceRepository,
-  Headline,
-  HeadlineId,
-  type HeadlineRepository,
   Profile,
   ProfileId,
   type ProfileRepository,
@@ -95,16 +92,6 @@ const defaultProfile = new Profile({
   updatedAt: now
 });
 
-const defaultHeadline = new Headline({
-  id: new HeadlineId('headline-1'),
-  profileId: 'profile-1',
-  label: 'Engineer',
-  summaryText: 'A great engineer',
-  roleTags: [],
-  createdAt: now,
-  updatedAt: now
-});
-
 const defaultInput: MakeResumeContentInput = {
   profileId: 'profile-1',
   archetypeId: 'archetype-1',
@@ -120,15 +107,6 @@ function stubProfileRepo(): ProfileRepository {
   };
 }
 
-function stubHeadlineRepo(): HeadlineRepository {
-  return {
-    findByIdOrFail: async () => defaultHeadline,
-    findAll: async () => [defaultHeadline],
-    save: async () => {},
-    delete: async () => {}
-  };
-}
-
 function stubArchetypeRepo(contentSelection: ContentSelection): ArchetypeRepository {
   const archetype = new Archetype({
     id: new ArchetypeId('archetype-1'),
@@ -136,6 +114,7 @@ function stubArchetypeRepo(contentSelection: ContentSelection): ArchetypeReposit
     key: 'test',
     label: 'Test',
     headlineId: 'headline-1',
+    headlineText: 'A great engineer',
     tagProfile: TagProfile.empty(),
     contentSelection,
     createdAt: now,
@@ -190,7 +169,6 @@ function stubSkillCategoryRepo(): SkillCategoryRepository {
 function makeFactory(contentSelection: ContentSelection, experiences: Experience[]): DatabaseResumeContentFactory {
   return new DatabaseResumeContentFactory(
     stubProfileRepo(),
-    stubHeadlineRepo(),
     stubArchetypeRepo(contentSelection),
     stubExperienceRepo(experiences),
     stubEducationRepo(),

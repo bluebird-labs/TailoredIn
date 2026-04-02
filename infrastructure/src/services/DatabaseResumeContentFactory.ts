@@ -9,7 +9,6 @@ import type {
   ArchetypeRepository,
   EducationRepository,
   ExperienceRepository,
-  HeadlineRepository,
   ProfileRepository,
   SkillCategoryRepository
 } from '@tailoredin/domain';
@@ -18,7 +17,6 @@ import { formatDateRange } from '../resume/dateFormatter.js';
 export class DatabaseResumeContentFactory implements ResumeContentFactory {
   public constructor(
     private readonly profileRepo: ProfileRepository,
-    private readonly headlineRepo: HeadlineRepository,
     private readonly archetypeRepo: ArchetypeRepository,
     private readonly experienceRepo: ExperienceRepository,
     private readonly educationRepo: EducationRepository,
@@ -29,20 +27,9 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
     const archetype = await this.archetypeRepo.findByIdOrFail(input.archetypeId);
     const cs = archetype.contentSelection;
 
-    const headlines = await this.headlineRepo.findAll();
-    const headlineId = archetype.headlineId
-      ? headlines.find(h => h.id.value === archetype.headlineId)
-        ? archetype.headlineId
-        : headlines[0]?.id.value
-      : headlines[0]?.id.value;
-
-    if (!headlineId) {
-      throw new Error('No headlines found');
-    }
-
     return this.makeFromSelection({
       profileId: input.profileId,
-      headlineId,
+      headlineText: archetype.headlineText,
       experienceSelections: cs.experienceSelections,
       educationIds: cs.educationIds,
       skillCategoryIds: cs.skillCategoryIds,
@@ -52,19 +39,12 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
   }
 
   public async makeFromSelection(input: MakeResumeContentFromSelectionInput): Promise<ResumeContentDto> {
-    const [profile, headlines, allExperiences, allEducation, allCategories] = await Promise.all([
+    const [profile, allExperiences, allEducation, allCategories] = await Promise.all([
       this.profileRepo.findSingle(),
-      this.headlineRepo.findAll(),
       this.experienceRepo.findAll(),
       this.educationRepo.findAll(),
       this.skillCategoryRepo.findAll()
     ]);
-
-    // Headline — find by headlineId or fall back to first
-    const headline = headlines.find(h => h.id.value === input.headlineId) ?? headlines[0];
-    if (!headline) {
-      throw new Error('No headlines found');
-    }
 
     // Personal
     const personal = {
@@ -75,7 +55,7 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       github: extractHandle(profile.githubUrl),
       linkedin: extractHandle(profile.linkedinUrl),
       location: profile.location ?? '',
-      header_quote: headline.summaryText
+      header_quote: input.headlineText
     };
 
     // Experience — from experienceSelections

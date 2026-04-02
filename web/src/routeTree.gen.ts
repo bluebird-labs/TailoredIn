@@ -13,9 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs/index'
 import { Route as ArchetypesIndexRouteImport } from './routes/archetypes/index'
 import { Route as ResumeSkillsRouteImport } from './routes/resume/skills'
-import { Route as ResumeProfileRouteImport } from './routes/resume/profile'
-import { Route as ResumeHeadlinesRouteImport } from './routes/resume/headlines'
-import { Route as ResumeEducationRouteImport } from './routes/resume/education'
 import { Route as ResumeBuilderRouteImport } from './routes/resume/builder'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
@@ -39,21 +36,6 @@ const ArchetypesIndexRoute = ArchetypesIndexRouteImport.update({
 const ResumeSkillsRoute = ResumeSkillsRouteImport.update({
   id: '/resume/skills',
   path: '/resume/skills',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResumeProfileRoute = ResumeProfileRouteImport.update({
-  id: '/resume/profile',
-  path: '/resume/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResumeHeadlinesRoute = ResumeHeadlinesRouteImport.update({
-  id: '/resume/headlines',
-  path: '/resume/headlines',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResumeEducationRoute = ResumeEducationRouteImport.update({
-  id: '/resume/education',
-  path: '/resume/education',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResumeBuilderRoute = ResumeBuilderRouteImport.update({
@@ -83,9 +65,6 @@ export interface FileRoutesByFullPath {
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/builder': typeof ResumeBuilderRoute
-  '/resume/education': typeof ResumeEducationRoute
-  '/resume/headlines': typeof ResumeHeadlinesRoute
-  '/resume/profile': typeof ResumeProfileRoute
   '/resume/skills': typeof ResumeSkillsRoute
   '/archetypes/': typeof ArchetypesIndexRoute
   '/jobs/': typeof JobsIndexRoute
@@ -96,9 +75,6 @@ export interface FileRoutesByTo {
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/builder': typeof ResumeBuilderRoute
-  '/resume/education': typeof ResumeEducationRoute
-  '/resume/headlines': typeof ResumeHeadlinesRoute
-  '/resume/profile': typeof ResumeProfileRoute
   '/resume/skills': typeof ResumeSkillsRoute
   '/archetypes': typeof ArchetypesIndexRoute
   '/jobs': typeof JobsIndexRoute
@@ -110,9 +86,6 @@ export interface FileRoutesById {
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/builder': typeof ResumeBuilderRoute
-  '/resume/education': typeof ResumeEducationRoute
-  '/resume/headlines': typeof ResumeHeadlinesRoute
-  '/resume/profile': typeof ResumeProfileRoute
   '/resume/skills': typeof ResumeSkillsRoute
   '/archetypes/': typeof ArchetypesIndexRoute
   '/jobs/': typeof JobsIndexRoute
@@ -125,9 +98,6 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/builder'
-    | '/resume/education'
-    | '/resume/headlines'
-    | '/resume/profile'
     | '/resume/skills'
     | '/archetypes/'
     | '/jobs/'
@@ -138,9 +108,6 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/builder'
-    | '/resume/education'
-    | '/resume/headlines'
-    | '/resume/profile'
     | '/resume/skills'
     | '/archetypes'
     | '/jobs'
@@ -151,9 +118,6 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/builder'
-    | '/resume/education'
-    | '/resume/headlines'
-    | '/resume/profile'
     | '/resume/skills'
     | '/archetypes/'
     | '/jobs/'
@@ -165,9 +129,6 @@ export interface RootRouteChildren {
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   ResumeBuilderRoute: typeof ResumeBuilderRoute
-  ResumeEducationRoute: typeof ResumeEducationRoute
-  ResumeHeadlinesRoute: typeof ResumeHeadlinesRoute
-  ResumeProfileRoute: typeof ResumeProfileRoute
   ResumeSkillsRoute: typeof ResumeSkillsRoute
   ArchetypesIndexRoute: typeof ArchetypesIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
@@ -201,27 +162,6 @@ declare module '@tanstack/react-router' {
       path: '/resume/skills'
       fullPath: '/resume/skills'
       preLoaderRoute: typeof ResumeSkillsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resume/profile': {
-      id: '/resume/profile'
-      path: '/resume/profile'
-      fullPath: '/resume/profile'
-      preLoaderRoute: typeof ResumeProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resume/headlines': {
-      id: '/resume/headlines'
-      path: '/resume/headlines'
-      fullPath: '/resume/headlines'
-      preLoaderRoute: typeof ResumeHeadlinesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resume/education': {
-      id: '/resume/education'
-      path: '/resume/education'
-      fullPath: '/resume/education'
-      preLoaderRoute: typeof ResumeEducationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resume/builder': {
@@ -261,9 +201,6 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   ResumeBuilderRoute: ResumeBuilderRoute,
-  ResumeEducationRoute: ResumeEducationRoute,
-  ResumeHeadlinesRoute: ResumeHeadlinesRoute,
-  ResumeProfileRoute: ResumeProfileRoute,
   ResumeSkillsRoute: ResumeSkillsRoute,
   ArchetypesIndexRoute: ArchetypesIndexRoute,
   JobsIndexRoute: JobsIndexRoute,

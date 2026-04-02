@@ -19,7 +19,7 @@ export class GenerateResume {
 
     const content = await this.resumeContentFactory.makeFromSelection({
       profileId: profile.id.value,
-      headlineId: input.headlineId,
+      headlineText: input.headlineText,
       experienceSelections: input.experienceSelections,
       educationIds: input.educationIds,
       skillCategoryIds: input.skillCategoryIds,

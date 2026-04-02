@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Download, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ExperienceEditModal } from '@/components/resume/builder/ExperienceEditModal';
-import { HeadlineSwapModal } from '@/components/resume/builder/HeadlineSwapModal';
+import { ExperienceFormDialog } from '@/components/resume/builder/ExperienceFormDialog';
 import { PersonalInfoModal } from '@/components/resume/builder/PersonalInfoModal';
 import { ResumePreview } from '@/components/resume/builder/ResumePreview';
-import { VersionTabs } from '@/components/resume/builder/VersionTabs';
+import { TAB_COLORS, VersionTabs } from '@/components/resume/builder/VersionTabs';
+import { EducationFormDialog } from '@/components/resume/education/education-form-dialog';
 import type { Experience } from '@/components/resume/experience/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -19,14 +19,11 @@ import {
 import type { Education } from '@/hooks/use-education';
 import { useEducations } from '@/hooks/use-education';
 import { useExperiences } from '@/hooks/use-experiences';
-import { useHeadlines } from '@/hooks/use-headlines';
 import { useProfile } from '@/hooks/use-profile';
 
 export const Route = createFileRoute('/resume/builder')({
   component: BuilderPage
 });
-
-type Headline = { id: string; summaryText: string };
 
 type ContentSelection = {
   experienceSelections: { experienceId: string; bulletVariantIds: string[] }[];
@@ -40,6 +37,7 @@ type Archetype = {
   key: string;
   label: string;
   headlineId: string | null;
+  headlineText: string;
   contentSelection: ContentSelection;
 };
 
@@ -54,7 +52,6 @@ function slugify(str: string): string {
 
 function BuilderPage() {
   const { data: profile, isLoading: profileLoading } = useProfile();
-  const { data: headlinesRaw, isLoading: headlinesLoading } = useHeadlines();
   const { data: experiencesRaw, isLoading: experiencesLoading } = useExperiences();
   const { data: educationsRaw, isLoading: educationsLoading } = useEducations();
   const { data: archetypesRaw, isLoading: archetypesLoading } = useArchetypes();
@@ -64,7 +61,6 @@ function BuilderPage() {
   const deleteArchetype = useDeleteArchetype();
   const setArchetypeContent = useSetArchetypeContent();
 
-  const headlines = (headlinesRaw ?? []) as Headline[];
   const experiences = useMemo(
     () => ((experiencesRaw ?? []) as Experience[]).sort((a, b) => b.startDate.localeCompare(a.startDate)),
     [experiencesRaw]
@@ -72,7 +68,7 @@ function BuilderPage() {
   const educations = (educationsRaw ?? []) as Education[];
   const archetypes = (archetypesRaw ?? []) as Archetype[];
 
-  const isLoading = profileLoading || headlinesLoading || experiencesLoading || educationsLoading || archetypesLoading;
+  const isLoading = profileLoading || experiencesLoading || educationsLoading || archetypesLoading;
 
   // ── Active archetype ──────────────────────────────────────────────────
   const [activeArchetypeId, setActiveArchetypeId] = useState(() => localStorage.getItem(STORAGE_KEY) ?? '');
@@ -93,10 +89,12 @@ function BuilderPage() {
   }, [activeArchetypeId]);
 
   const activeArchetype = archetypes.find(a => a.id === activeArchetypeId);
+  const activeTabIndex = Math.max(
+    0,
+    archetypes.findIndex(a => a.id === activeArchetypeId)
+  );
 
   // ── Derive selections from archetype ──────────────────────────────────
-  const selectedHeadlineId = activeArchetype?.headlineId ?? headlines[0]?.id ?? '';
-
   const visibleBulletVariantIds = useMemo(() => {
     const map = new Map<string, Set<string>>();
     if (!activeArchetype) return map;
@@ -113,9 +111,14 @@ function BuilderPage() {
 
   // ── Modal state ───────────────────────────────────────────────────────
   const [personalInfoModalOpen, setPersonalInfoModalOpen] = useState(false);
-  const [headlineModalOpen, setHeadlineModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<string | null>(null);
+  const [experienceDialogOpen, setExperienceDialogOpen] = useState(false);
+  const [educationDialogOpen, setEducationDialogOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<Education | undefined>();
   const [generating, setGenerating] = useState(false);
+
+  const nextExperienceOrdinal = experiences.length > 0 ? Math.max(...experiences.map(e => e.ordinal)) + 1 : 0;
+  const nextEducationOrdinal = educations.length > 0 ? Math.max(...educations.map(e => e.ordinal)) + 1 : 0;
 
   // ── Auto-save helpers ─────────────────────────────────────────────────
   const saveContent = useCallback(
@@ -169,15 +172,15 @@ function BuilderPage() {
     [activeArchetype, saveContent]
   );
 
-  const handleHeadlineSelect = useCallback(
-    (headlineId: string) => {
+  const handleHeadlineChange = useCallback(
+    (text: string) => {
       if (!activeArchetype) return;
       updateArchetype.mutate(
         {
           id: activeArchetype.id,
           key: activeArchetype.key,
           label: activeArchetype.label,
-          headline_id: headlineId
+          headline_text: text
         },
         {
           onError: () => toast.error('Failed to save headline')
@@ -210,14 +213,12 @@ function BuilderPage() {
                 skill_category_ids: cs.skillCategoryIds,
                 skill_item_ids: cs.skillItemIds
               });
-              if (activeArchetype.headlineId) {
-                updateArchetype.mutate({
-                  id: newId,
-                  key: slugify(label),
-                  label,
-                  headline_id: activeArchetype.headlineId
-                });
-              }
+              updateArchetype.mutate({
+                id: newId,
+                key: slugify(label),
+                label,
+                headline_text: activeArchetype.headlineText
+              });
             }
           }
         }
@@ -231,7 +232,7 @@ function BuilderPage() {
       const arch = archetypes.find(a => a.id === id);
       if (!arch) return;
       updateArchetype.mutate(
-        { id, key: slugify(label), label, headline_id: arch.headlineId },
+        { id, key: slugify(label), label, headline_text: arch.headlineText },
         { onError: () => toast.error('Failed to rename') }
       );
     },
@@ -255,10 +256,7 @@ function BuilderPage() {
 
   // ── Generate handler ──────────────────────────────────────────────────
   const handleGenerate = async () => {
-    if (!selectedHeadlineId) {
-      toast.error('Please select a headline');
-      return;
-    }
+    const headlineText = activeArchetype?.headlineText ?? '';
 
     const experienceSelections = [];
     for (const [expId, variantIds] of visibleBulletVariantIds) {
@@ -271,7 +269,7 @@ function BuilderPage() {
     }
 
     const body = {
-      headline_id: selectedHeadlineId,
+      headline_text: headlineText,
       experience_selections: experienceSelections,
       education_ids: [...visibleEducationIds],
       skill_category_ids: activeArchetype?.contentSelection.skillCategoryIds ?? [],
@@ -315,44 +313,37 @@ function BuilderPage() {
 
   // ── Render ────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-full">
-      {/* Sticky header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-[#e5e7eb] sticky top-0 bg-[#f8f9fa] z-10">
-        <span className="text-[13px] text-[#6b7280] font-medium">Resume Builder</span>
-        <button
-          type="button"
-          disabled={generating}
-          onClick={handleGenerate}
-          className="bg-[#111] text-white px-4 py-2 rounded-md text-[13px] font-medium cursor-pointer hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {generating ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Download className="w-4 h-4" />
-              Generate PDF
-            </>
-          )}
-        </button>
+    <div className="-m-6 flex flex-col min-h-[calc(100vh-1px)]">
+      {/* Sticky header + tabs */}
+      <div className="sticky top-0 z-20">
+        <div className="px-6 py-4 border-b border-border bg-muted/30">
+          <h1 className="text-2xl font-bold">Resume Builder</h1>
+        </div>
+
+        {archetypes.length > 0 && (
+          <VersionTabs
+            archetypes={archetypes}
+            activeId={activeArchetypeId}
+            onSwitch={setActiveArchetypeId}
+            onCreate={handleCreate}
+            onRename={handleRename}
+            onDelete={handleDelete}
+            generating={generating}
+            onGenerate={handleGenerate}
+          />
+        )}
       </div>
 
-      {/* Version tabs */}
-      {archetypes.length > 0 && (
-        <VersionTabs
-          archetypes={archetypes}
-          activeId={activeArchetypeId}
-          onSwitch={setActiveArchetypeId}
-          onCreate={handleCreate}
-          onRename={handleRename}
-          onDelete={handleDelete}
-        />
-      )}
-
       {/* Document area */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div
+        className="flex-1 overflow-y-auto bg-white"
+        style={
+          {
+            '--section-hover': TAB_COLORS[activeTabIndex % TAB_COLORS.length].hoverBg,
+            '--section-accent': TAB_COLORS[activeTabIndex % TAB_COLORS.length].accent
+          } as React.CSSProperties
+        }
+      >
         {isLoading || !profile ? (
           <div className="max-w-[680px] mx-auto px-10 py-8 space-y-4">
             <Skeleton className="h-8 w-64 rounded" />
@@ -365,16 +356,24 @@ function BuilderPage() {
         ) : (
           <ResumePreview
             profile={profile}
-            headlines={headlines}
-            selectedHeadlineId={selectedHeadlineId}
+            headlineText={activeArchetype?.headlineText ?? ''}
             experiences={experiences}
             visibleBulletVariantIds={visibleBulletVariantIds}
             educations={educations}
             visibleEducationIds={visibleEducationIds}
             onEditPersonalInfo={() => setPersonalInfoModalOpen(true)}
-            onSwapHeadline={() => setHeadlineModalOpen(true)}
+            onHeadlineChange={handleHeadlineChange}
             onEditCompany={setEditingCompany}
+            onAddExperience={() => setExperienceDialogOpen(true)}
             onToggleEducation={toggleEducation}
+            onEditEducation={edu => {
+              setEditingEducation(edu);
+              setEducationDialogOpen(true);
+            }}
+            onAddEducation={() => {
+              setEditingEducation(undefined);
+              setEducationDialogOpen(true);
+            }}
           />
         )}
       </div>
@@ -388,14 +387,6 @@ function BuilderPage() {
         />
       )}
 
-      <HeadlineSwapModal
-        open={headlineModalOpen}
-        onClose={() => setHeadlineModalOpen(false)}
-        headlines={headlines}
-        selectedId={selectedHeadlineId}
-        onSelect={handleHeadlineSelect}
-      />
-
       {editingCompany && (
         <ExperienceEditModal
           open={!!editingCompany}
@@ -406,6 +397,19 @@ function BuilderPage() {
           onBulletVisibilityChange={handleBulletVisibilityChange}
         />
       )}
+
+      <ExperienceFormDialog
+        open={experienceDialogOpen}
+        onOpenChange={setExperienceDialogOpen}
+        nextOrdinal={nextExperienceOrdinal}
+      />
+
+      <EducationFormDialog
+        open={educationDialogOpen}
+        onOpenChange={setEducationDialogOpen}
+        education={editingEducation}
+        nextOrdinal={nextEducationOrdinal}
+      />
     </div>
   );
 }

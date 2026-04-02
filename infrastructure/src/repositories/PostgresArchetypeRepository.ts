@@ -34,6 +34,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
       existing.key = archetype.key;
       existing.label = archetype.label;
       existing.headlineId = archetype.headlineId;
+      existing.headlineText = archetype.headlineText;
       existing.contentSelection = contentJson;
       existing.updatedAt = archetype.updatedAt;
       this.orm.em.persist(existing);
@@ -44,6 +45,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
         key: archetype.key,
         label: archetype.label,
         headlineId: archetype.headlineId,
+        headlineText: archetype.headlineText,
         contentSelection: contentJson,
         createdAt: archetype.createdAt,
         updatedAt: archetype.updatedAt
@@ -113,6 +115,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
       key: orm.key,
       label: orm.label,
       headlineId: orm.headlineId,
+      headlineText: orm.headlineText,
       tagProfile: new TagProfile({ roleWeights, skillWeights }),
       contentSelection,
       createdAt: orm.createdAt,

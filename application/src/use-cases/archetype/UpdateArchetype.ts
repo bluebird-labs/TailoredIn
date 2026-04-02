@@ -7,6 +7,7 @@ export type UpdateArchetypeInput = {
   key: string;
   label: string;
   headlineId: string | null;
+  headlineText: string;
 };
 
 export class UpdateArchetype {
@@ -18,7 +19,7 @@ export class UpdateArchetype {
     } catch {
       return err(new Error(`Archetype not found: ${input.archetypeId}`));
     }
-    archetype.updateMetadata(input.key, input.label, input.headlineId);
+    archetype.updateMetadata(input.key, input.label, input.headlineId, input.headlineText);
     await this.repo.save(archetype);
     return ok(toArchetypeDto(archetype));
   }

@@ -9,7 +9,7 @@ export type MakeResumeContentInput = {
 
 export type MakeResumeContentFromSelectionInput = {
   profileId: string;
-  headlineId: string;
+  headlineText: string;
   experienceSelections: ExperienceSelection[];
   educationIds: string[];
   skillCategoryIds: string[];

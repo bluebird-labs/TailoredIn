@@ -7,6 +7,7 @@ export function toArchetypeDto(archetype: Archetype): ArchetypeDto {
     key: archetype.key,
     label: archetype.label,
     headlineId: archetype.headlineId,
+    headlineText: archetype.headlineText,
     tagProfile: {
       roleWeights: Object.fromEntries(archetype.tagProfile.roleWeights),
       skillWeights: Object.fromEntries(archetype.tagProfile.skillWeights)

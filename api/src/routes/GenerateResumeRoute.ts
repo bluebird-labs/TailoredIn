@@ -13,7 +13,7 @@ export class GenerateResumeRoute {
       '/resumes/generate',
       async ({ body, set }) => {
         const result = await this.generateResume.execute({
-          headlineId: body.headline_id,
+          headlineText: body.headline_text,
           experienceSelections: body.experience_selections.map(s => ({
             experienceId: s.experience_id,
             bulletVariantIds: s.bullet_variant_ids
@@ -38,7 +38,7 @@ export class GenerateResumeRoute {
       },
       {
         body: t.Object({
-          headline_id: t.String({ format: 'uuid' }),
+          headline_text: t.String(),
           experience_selections: t.Array(
             t.Object({
               experience_id: t.String({ format: 'uuid' }),

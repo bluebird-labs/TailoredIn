@@ -11,7 +11,6 @@ const RESUME_LAYOUT = {
   lineSpacing: '0.75em',
   pageMargin: '1.5cm',
   sectionOrder: ['professional', 'skills', 'education'] as const,
-  maxBulletsPerEntry: 5,
   showEntrySummary: true
 };
 
@@ -132,7 +131,7 @@ ${includes}
       if (group.positions.length === 1) {
         // Single position — render as before
         const exp = group.positions[0];
-        const highlights = exp.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
+        const highlights = exp.highlights;
 
         lines.push(`#cv-entry(`);
         lines.push(`  title: [${escapeTypst(exp.title)}],`);
@@ -169,7 +168,7 @@ ${includes}
 
         for (let i = 0; i < group.positions.length; i++) {
           const pos = group.positions[i];
-          const highlights = pos.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
+          const highlights = pos.highlights;
 
           if (i > 0) lines.push(`    #v(4pt)`);
           lines.push(`    *${escapeTypst(pos.title)}* #h(1fr) _${pos.date}_`);

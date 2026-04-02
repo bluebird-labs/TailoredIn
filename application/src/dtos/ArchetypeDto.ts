@@ -16,6 +16,7 @@ export type ArchetypeDto = {
   key: string;
   label: string;
   headlineId: string | null;
+  headlineText: string;
   tagProfile: TagProfileDto;
   contentSelection: ContentSelectionDto;
 };

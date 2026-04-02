@@ -14,6 +14,7 @@ export class Archetype extends AggregateRoot<ArchetypeId> {
   public key: string;
   public label: string;
   public headlineId: string | null;
+  public headlineText: string;
   public tagProfile: TagProfile;
   public contentSelection: ContentSelection;
   public readonly createdAt: Date;
@@ -25,6 +26,7 @@ export class Archetype extends AggregateRoot<ArchetypeId> {
     key: string;
     label: string;
     headlineId: string | null;
+    headlineText: string;
     tagProfile: TagProfile;
     contentSelection: ContentSelection;
     createdAt: Date;
@@ -35,16 +37,18 @@ export class Archetype extends AggregateRoot<ArchetypeId> {
     this.key = props.key;
     this.label = props.label;
     this.headlineId = props.headlineId;
+    this.headlineText = props.headlineText;
     this.tagProfile = props.tagProfile;
     this.contentSelection = props.contentSelection;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
 
-  public updateMetadata(key: string, label: string, headlineId: string | null): void {
+  public updateMetadata(key: string, label: string, headlineId: string | null, headlineText: string): void {
     this.key = key;
     this.label = label;
     this.headlineId = headlineId;
+    this.headlineText = headlineText;
     this.updatedAt = new Date();
   }
 
@@ -66,6 +70,7 @@ export class Archetype extends AggregateRoot<ArchetypeId> {
       key: props.key,
       label: props.label,
       headlineId: null,
+      headlineText: '',
       tagProfile: TagProfile.empty(),
       contentSelection: ContentSelection.empty(),
       createdAt: now,

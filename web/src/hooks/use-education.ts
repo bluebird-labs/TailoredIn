@@ -65,15 +65,3 @@ export function useUpdateEducation() {
     }
   });
 }
-
-export function useDeleteEducation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await api.educations({ id }).delete();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.educations.all });
-    }
-  });
-}

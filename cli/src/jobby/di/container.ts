@@ -60,7 +60,6 @@ container.bind({
   useFactory: () =>
     new DatabaseResumeContentFactory(
       container.get(DI.Profile.Repository),
-      container.get(DI.Headline.Repository),
       container.get(DI.Archetype.Repository),
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),

@@ -15,7 +15,8 @@ export class UpdateArchetypeRoute {
           archetypeId: params.id,
           key: body.key,
           label: body.label,
-          headlineId: body.headline_id ?? null
+          headlineId: body.headline_id ?? null,
+          headlineText: body.headline_text ?? ''
         });
         if (!result.isOk) {
           set.status = 404;
@@ -28,7 +29,8 @@ export class UpdateArchetypeRoute {
         body: t.Object({
           key: t.String({ minLength: 1 }),
           label: t.String({ minLength: 1 }),
-          headline_id: t.Optional(t.Nullable(t.String({ format: 'uuid' })))
+          headline_id: t.Optional(t.Nullable(t.String({ format: 'uuid' }))),
+          headline_text: t.Optional(t.String())
         })
       }
     );

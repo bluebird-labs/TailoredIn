@@ -1,24 +1,14 @@
 const THEME_KEY = 'tailoredin-theme';
 const PALETTE_KEY = 'tailoredin-palette';
 
-export type Theme = 'light' | 'dark';
-export type Palette = 'orange' | 'teal' | 'indigo' | 'violet';
-
-export const PALETTES: readonly Palette[] = ['orange', 'teal', 'indigo', 'violet'] as const;
+type Theme = 'light' | 'dark';
+type Palette = 'orange' | 'teal' | 'indigo' | 'violet';
 
 const PALETTE_CLASSES: Record<Palette, string | null> = {
   orange: null,
   teal: 'palette-teal',
   indigo: 'palette-indigo',
   violet: 'palette-violet'
-};
-
-/** Representative primary color for each palette (used by the swatch picker). */
-export const PALETTE_COLORS: Record<Palette, string> = {
-  orange: 'oklch(0.6 0.16 45)',
-  teal: 'oklch(0.55 0.14 170)',
-  indigo: 'oklch(0.55 0.18 265)',
-  violet: 'oklch(0.55 0.18 300)'
 };
 
 // ── Theme (light / dark) ──
@@ -40,13 +30,6 @@ export function getEffectiveTheme(): Theme {
 export function applyTheme(theme: Theme): void {
   document.documentElement.classList.toggle('dark', theme === 'dark');
   localStorage.setItem(THEME_KEY, theme);
-}
-
-export function toggleTheme(): Theme {
-  const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-  const next: Theme = current === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  return next;
 }
 
 // ── Palette ──

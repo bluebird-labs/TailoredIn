@@ -1,23 +1,8 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import {
-  Archive,
-  Briefcase,
-  FileText,
-  GitBranch,
-  GraduationCap,
-  Heading,
-  Inbox,
-  type LucideIcon,
-  Sparkles,
-  User,
-  Wrench
-} from 'lucide-react';
-import { PalettePicker } from '@/components/layout/palette-picker.js';
-import { ThemeToggle } from '@/components/layout/theme-toggle.js';
+import { Archive, Briefcase, FileText, GitBranch, Inbox, type LucideIcon, Sparkles, Wrench } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -43,10 +28,7 @@ const jobsNav: NavItem[] = [
 
 const resumeNav: NavItem[] = [
   { label: 'Builder', to: '/resume/builder', icon: FileText },
-  { label: 'Profile', to: '/resume/profile', icon: User },
-  { label: 'Headlines', to: '/resume/headlines', icon: Heading },
-  { label: 'Skills', to: '/resume/skills', icon: Wrench },
-  { label: 'Education', to: '/resume/education', icon: GraduationCap }
+  { label: 'Skills', to: '/resume/skills', icon: Wrench }
 ];
 
 function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
@@ -89,16 +71,6 @@ export function AppSidebar() {
         <NavGroup label="Resume" items={resumeNav} />
         <NavGroup label="Discovery" items={jobsNav} />
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <PalettePicker />
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <ThemeToggle />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -8,6 +8,7 @@ export type ArchetypeOrmProps = {
   key: string;
   label: string;
   headlineId: string | null;
+  headlineText: string;
   contentSelection: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +31,9 @@ export class ArchetypeOrm extends BaseEntity {
   @Property({ name: 'headline_id', type: 'uuid', nullable: true })
   public headlineId: string | null;
 
+  @Property({ name: 'headline_text', type: 'text', default: '' })
+  public headlineText: string;
+
   @Property({ name: 'content_selection', type: 'json' })
   public contentSelection: Record<string, unknown>;
 
@@ -40,6 +44,7 @@ export class ArchetypeOrm extends BaseEntity {
     this.key = props.key;
     this.label = props.label;
     this.headlineId = props.headlineId;
+    this.headlineText = props.headlineText;
     this.contentSelection = props.contentSelection;
   }
 }

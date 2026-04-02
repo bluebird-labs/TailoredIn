@@ -21,7 +21,7 @@ describe('Archetype', () => {
   test('updateMetadata() updates key, label, headlineId and bumps updatedAt', () => {
     const archetype = Archetype.create({ profileId: 'p-1', key: 'old', label: 'Old' });
     const before = archetype.updatedAt;
-    archetype.updateMetadata('new-key', 'New Label', 'headline-1');
+    archetype.updateMetadata('new-key', 'New Label', 'headline-1', 'A great engineer');
     expect(archetype.key).toBe('new-key');
     expect(archetype.label).toBe('New Label');
     expect(archetype.headlineId).toBe('headline-1');

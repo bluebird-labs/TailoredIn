@@ -1,7 +1,7 @@
 import type { ExperienceSelection } from '@tailoredin/domain';
 
 export type GenerateResumeDto = {
-  headlineId: string;
+  headlineText: string;
   experienceSelections: ExperienceSelection[];
   educationIds: string[];
   skillCategoryIds: string[];
