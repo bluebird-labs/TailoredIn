@@ -301,7 +301,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'lantern',
         positionIndex: 0,
-        jobTitle: 'Software Architecture Consultant',
+        jobTitle: 'Software Architect & Technical Advisor',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
         startDate: '2024-09',
@@ -529,7 +529,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'lantern',
         positionIndex: 0,
-        jobTitle: 'Software Architecture Consultant',
+        jobTitle: 'Software Architect & Technical Advisor',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
         startDate: '2024-09',
@@ -631,7 +631,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'lantern',
         positionIndex: 0,
-        jobTitle: 'Software Architecture Consultant',
+        jobTitle: 'Software Architect & Technical Advisor',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
         startDate: '2024-09',
