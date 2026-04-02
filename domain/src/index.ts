@@ -9,8 +9,6 @@ export type { ArchetypeCreateProps } from './entities/Archetype.js';
 export { Archetype } from './entities/Archetype.js';
 export type { BulletCreateProps } from './entities/Bullet.js';
 export { Bullet } from './entities/Bullet.js';
-export type { BulletVariantCreateProps, BulletVariantSource } from './entities/BulletVariant.js';
-export { BulletVariant } from './entities/BulletVariant.js';
 // Entities — job discovery
 export type { CompanyCreateProps } from './entities/Company.js';
 export { Company } from './entities/Company.js';
@@ -71,7 +69,6 @@ export { ArchetypeKey, JobTitle } from './value-objects/Archetype.js';
 // Value objects — IDs (new domain model)
 export { ArchetypeId } from './value-objects/ArchetypeId.js';
 export { BulletId } from './value-objects/BulletId.js';
-export { BulletVariantId } from './value-objects/BulletVariantId.js';
 export { BusinessType } from './value-objects/BusinessType.js';
 export { CompanyBriefId } from './value-objects/CompanyBriefId.js';
 export { CompanyId } from './value-objects/CompanyId.js';

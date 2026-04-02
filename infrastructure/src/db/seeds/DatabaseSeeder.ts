@@ -13,7 +13,7 @@ export class DatabaseSeeder extends Seeder {
     await em.getConnection().execute(`
       TRUNCATE
         archetype_tag_weights, archetypes,
-        bullet_variant_tags, bullet_variants, bullet_tags, bullets, experiences,
+        bullet_tags, bullets, experiences,
         headline_tags, headlines, educations, skill_items, skill_categories, profiles,
         job_status_updates, jobs, companies,
         skills

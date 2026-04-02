@@ -1,12 +1,8 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import type { BulletVariantSource } from '@tailoredin/domain';
 import {
-  type ApprovalStatus,
   BulletId,
-  BulletVariantId,
   Bullet as DomainBullet,
-  BulletVariant as DomainBulletVariant,
   Experience as DomainExperience,
   ExperienceId,
   type ExperienceRepository,
@@ -14,7 +10,6 @@ import {
   TagSet
 } from '@tailoredin/domain';
 import { Bullet as OrmBullet } from '../db/entities/experience/Bullet.js';
-import { BulletVariant as OrmBulletVariant } from '../db/entities/experience/BulletVariant.js';
 import { Experience as OrmExperience } from '../db/entities/experience/Experience.js';
 import { Profile } from '../db/entities/profile/Profile.js';
 import { Tag as OrmTag } from '../db/entities/tag/Tag.js';
@@ -104,7 +99,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         this.orm.em.persist(ormBullet);
 
         await this.syncBulletTags(bullet);
-        await this.syncVariants(bullet);
       } else {
         // Create new bullet
         const experienceRef = this.orm.em.getReference(OrmExperience, domain.id.value);
@@ -124,30 +118,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
     });
     this.orm.em.persist(ormBullet);
 
-    // Persist bullet tags
     await this.replaceBulletTags(bullet.id.value, bullet.tags);
-
-    // Persist variants
-    for (const variant of bullet.variants) {
-      await this.persistNewVariant(variant, ormBullet);
-    }
-  }
-
-  private async persistNewVariant(variant: DomainBulletVariant, bullet: OrmBullet): Promise<void> {
-    const ormVariant = new OrmBulletVariant({
-      id: variant.id.value,
-      bullet,
-      text: variant.text,
-      angle: variant.angle,
-      source: variant.source,
-      approvalStatus: variant.approvalStatus,
-      createdAt: variant.createdAt,
-      updatedAt: variant.updatedAt
-    });
-    this.orm.em.persist(ormVariant);
-
-    // Persist variant tags
-    await this.replaceVariantTags(variant.id.value, variant.tags);
   }
 
   private async syncBulletTags(bullet: DomainBullet): Promise<void> {
@@ -175,60 +146,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
     }
   }
 
-  private async syncVariants(bullet: DomainBullet): Promise<void> {
-    const existingVariants = await this.orm.em.find(OrmBulletVariant, { bullet: bullet.id.value });
-    const domainVariantIds = new Set(bullet.variants.map(v => v.id.value));
-    const existingVariantIds = new Set(existingVariants.map(v => v.id));
-
-    // Remove deleted variants
-    for (const existing of existingVariants) {
-      if (!domainVariantIds.has(existing.id)) {
-        this.orm.em.remove(existing);
-      }
-    }
-
-    for (const variant of bullet.variants) {
-      if (existingVariantIds.has(variant.id.value)) {
-        // Update existing variant
-        const ormVariant = existingVariants.find(v => v.id === variant.id.value)!;
-        ormVariant.text = variant.text;
-        ormVariant.angle = variant.angle;
-        ormVariant.source = variant.source;
-        ormVariant.approvalStatus = variant.approvalStatus;
-        ormVariant.updatedAt = variant.updatedAt;
-        this.orm.em.persist(ormVariant);
-
-        await this.replaceVariantTags(variant.id.value, variant.tags);
-      } else {
-        // Create new variant
-        const bulletRef = this.orm.em.getReference(OrmBullet, bullet.id.value);
-        await this.persistNewVariant(variant, bulletRef);
-      }
-    }
-  }
-
-  private async replaceVariantTags(variantId: string, tags: TagSet): Promise<void> {
-    const conn = this.orm.em.getConnection();
-    await conn.execute(`DELETE FROM bullet_variant_tags WHERE bullet_variant_id = '${variantId}'`);
-
-    for (const tagName of tags.roleTags) {
-      const tag = await this.orm.em.findOne(OrmTag, { name: tagName, dimension: 'ROLE' });
-      if (tag) {
-        await conn.execute(
-          `INSERT INTO bullet_variant_tags (bullet_variant_id, tag_id) VALUES ('${variantId}', '${tag.id}')`
-        );
-      }
-    }
-    for (const tagName of tags.skillTags) {
-      const tag = await this.orm.em.findOne(OrmTag, { name: tagName, dimension: 'SKILL' });
-      if (tag) {
-        await conn.execute(
-          `INSERT INTO bullet_variant_tags (bullet_variant_id, tag_id) VALUES ('${variantId}', '${tag.id}')`
-        );
-      }
-    }
-  }
-
   private async toDomain(orm: OrmExperience): Promise<DomainExperience> {
     // Extract profile_id via raw SQL to avoid MikroORM proxy issues
     const [row] = await this.orm.em
@@ -241,33 +158,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
     const bullets: DomainBullet[] = [];
     for (const ormBullet of ormBullets) {
-      // Load bullet tags
       const bulletTags = await this.loadBulletTags(ormBullet.id);
-
-      // Load variants
-      const ormVariants = await this.orm.em.find(
-        OrmBulletVariant,
-        { bullet: ormBullet.id },
-        { orderBy: { createdAt: 'ASC' } }
-      );
-
-      const variants: DomainBulletVariant[] = [];
-      for (const ormVariant of ormVariants) {
-        const variantTags = await this.loadVariantTags(ormVariant.id);
-        variants.push(
-          new DomainBulletVariant({
-            id: new BulletVariantId(ormVariant.id),
-            bulletId: ormBullet.id,
-            text: ormVariant.text,
-            angle: ormVariant.angle,
-            tags: variantTags,
-            source: ormVariant.source as BulletVariantSource,
-            approvalStatus: ormVariant.approvalStatus as ApprovalStatus,
-            createdAt: ormVariant.createdAt,
-            updatedAt: ormVariant.updatedAt
-          })
-        );
-      }
 
       bullets.push(
         new DomainBullet({
@@ -276,7 +167,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
           content: ormBullet.content,
           ordinal: ormBullet.ordinal,
           tags: bulletTags,
-          variants,
           createdAt: ormBullet.createdAt,
           updatedAt: ormBullet.updatedAt
         })
@@ -305,15 +195,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       .getConnection()
       .execute<TagRow[]>(
         `SELECT t.id, t.name, t.dimension FROM tags t JOIN bullet_tags bt ON bt.tag_id = t.id WHERE bt.bullet_id = '${bulletId}'`
-      );
-    return this.rowsToTagSet(rows);
-  }
-
-  private async loadVariantTags(variantId: string): Promise<TagSet> {
-    const rows = await this.orm.em
-      .getConnection()
-      .execute<TagRow[]>(
-        `SELECT t.id, t.name, t.dimension FROM tags t JOIN bullet_variant_tags bvt ON bvt.tag_id = t.id WHERE bvt.bullet_variant_id = '${variantId}'`
       );
     return this.rowsToTagSet(rows);
   }

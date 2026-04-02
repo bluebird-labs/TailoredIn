@@ -1,9 +1,7 @@
 import { InjectionToken } from '@needle-di/core';
 import type {
   AddBullet,
-  AddBulletVariant,
   AddSkillItem,
-  ApproveBulletVariant,
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
@@ -13,7 +11,6 @@ import type {
   CreateSkillCategory,
   DeleteArchetype,
   DeleteBullet,
-  DeleteBulletVariant,
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
@@ -44,7 +41,6 @@ import type {
   SetArchetypeTagProfile,
   UpdateArchetype,
   UpdateBullet,
-  UpdateBulletVariant,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
@@ -146,11 +142,7 @@ export const DI = {
     Delete: new InjectionToken<DeleteExperience>('DI.Experience.Delete'),
     AddBullet: new InjectionToken<AddBullet>('DI.Experience.AddBullet'),
     UpdateBullet: new InjectionToken<UpdateBullet>('DI.Experience.UpdateBullet'),
-    DeleteBullet: new InjectionToken<DeleteBullet>('DI.Experience.DeleteBullet'),
-    AddVariant: new InjectionToken<AddBulletVariant>('DI.Experience.AddVariant'),
-    UpdateVariant: new InjectionToken<UpdateBulletVariant>('DI.Experience.UpdateVariant'),
-    DeleteVariant: new InjectionToken<DeleteBulletVariant>('DI.Experience.DeleteVariant'),
-    ApproveVariant: new InjectionToken<ApproveBulletVariant>('DI.Experience.ApproveVariant')
+    DeleteBullet: new InjectionToken<DeleteBullet>('DI.Experience.DeleteBullet')
   },
 
   Archetype: {

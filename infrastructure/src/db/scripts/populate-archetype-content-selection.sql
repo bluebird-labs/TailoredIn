@@ -47,13 +47,13 @@ BEGIN
   -- Positions: lantern:0, brightflow:0, volvo:1, luxe:0, streamnation:0, planorama:0, luckycart:0
   v_ic_cs := jsonb_build_object(
     'experienceSelections', jsonb_build_array(
-      jsonb_build_object('experienceId', v_lantern_id,      'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_brightflow_id,   'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_volvo1_id,       'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_luxe_id,         'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_streamnation_id, 'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_planorama_id,    'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_luckycart_id,    'bulletVariantIds', '[]'::jsonb)
+      jsonb_build_object('experienceId', v_lantern_id,      'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_brightflow_id,   'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_volvo1_id,       'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_luxe_id,         'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_streamnation_id, 'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_planorama_id,    'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_luckycart_id,    'bulletIds', '[]'::jsonb)
     ),
     'projectIds',       '[]'::jsonb,
     'educationIds',     jsonb_build_array(v_edu_bs_id),
@@ -65,12 +65,12 @@ BEGIN
   -- Positions: lantern:0, brightflow:0, volvo:0, volvo:1, luxe:0, planorama:0
   v_hom_cs := jsonb_build_object(
     'experienceSelections', jsonb_build_array(
-      jsonb_build_object('experienceId', v_lantern_id,    'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_brightflow_id, 'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_volvo0_id,     'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_volvo1_id,     'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_luxe_id,       'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_planorama_id,  'bulletVariantIds', '[]'::jsonb)
+      jsonb_build_object('experienceId', v_lantern_id,    'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_brightflow_id, 'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_volvo0_id,     'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_volvo1_id,     'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_luxe_id,       'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_planorama_id,  'bulletIds', '[]'::jsonb)
     ),
     'projectIds',       '[]'::jsonb,
     'educationIds',     jsonb_build_array(v_edu_bs_id),
@@ -82,10 +82,10 @@ BEGIN
   -- Positions: volvo:0, volvo:1, luxe:0, planorama:0
   v_hlm_cs := jsonb_build_object(
     'experienceSelections', jsonb_build_array(
-      jsonb_build_object('experienceId', v_volvo0_id,    'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_volvo1_id,    'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_luxe_id,      'bulletVariantIds', '[]'::jsonb),
-      jsonb_build_object('experienceId', v_planorama_id, 'bulletVariantIds', '[]'::jsonb)
+      jsonb_build_object('experienceId', v_volvo0_id,    'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_volvo1_id,    'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_luxe_id,      'bulletIds', '[]'::jsonb),
+      jsonb_build_object('experienceId', v_planorama_id, 'bulletIds', '[]'::jsonb)
     ),
     'projectIds',       '[]'::jsonb,
     'educationIds',     jsonb_build_array(v_edu_bs_id),

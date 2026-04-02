@@ -16,7 +16,7 @@ export class PreviewResumeRoute {
           headlineText: body.headline_text,
           experienceSelections: body.experience_selections.map(s => ({
             experienceId: s.experience_id,
-            bulletVariantIds: s.bullet_variant_ids
+            bulletIds: s.bullet_ids
           })),
           educationIds: body.education_ids,
           skillCategoryIds: body.skill_category_ids,
@@ -40,7 +40,7 @@ export class PreviewResumeRoute {
           experience_selections: t.Array(
             t.Object({
               experience_id: t.String({ format: 'uuid' }),
-              bullet_variant_ids: t.Array(t.String({ format: 'uuid' }))
+              bullet_ids: t.Array(t.String({ format: 'uuid' }))
             })
           ),
           education_ids: t.Array(t.String({ format: 'uuid' })),

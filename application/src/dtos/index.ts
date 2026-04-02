@@ -4,7 +4,7 @@ export type { BuildResumeOutputDto } from './BuildResumeOutputDto.js';
 export type { CompanyBriefDto } from './CompanyBriefDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export type { EducationDto } from './EducationDto.js';
-export type { BulletDto, BulletVariantDto, ExperienceDto } from './ExperienceDto.js';
+export type { BulletDto, ExperienceDto } from './ExperienceDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
 export type { GenerateResumeFromJobDto } from './GenerateResumeFromJobDto.js';
 export type { HeadlineDto } from './HeadlineDto.js';

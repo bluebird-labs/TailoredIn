@@ -88,8 +88,8 @@ export class ResumeDataSeeder extends Seeder {
       experienceIdMap.set(`${posDef.companyKey}:${posDef.positionIndex}`, expRow.id);
     }
 
-    // Bullets + default variants — assign to experiences; for Volvo split by position index
-    const variantIdsByExperience = new Map<string, string[]>();
+    // Bullets — assign to experiences; for Volvo split by position index
+    const bulletIdsByExperience = new Map<string, string[]>();
     const bulletPositionMap = new Map<CompanyKey, Map<number, number>>();
     for (const posDef of leadIcPositions) {
       if (!bulletPositionMap.has(posDef.companyKey)) {
@@ -113,18 +113,12 @@ export class ResumeDataSeeder extends Seeder {
         if (!expId) continue;
         for (let bi = 0; bi < group.length; bi++) {
           const bulletId = crypto.randomUUID();
-          const variantId = crypto.randomUUID();
           await conn.execute(
             `INSERT INTO bullets (id, experience_id, content, ordinal)
              VALUES ('${bulletId}', '${expId}', '${esc(group[bi].text)}', ${bi})`
           );
-          await conn.execute(
-            `INSERT INTO bullet_variants (id, bullet_id, text, angle, source, approval_status)
-             VALUES ('${variantId}', '${bulletId}', '${esc(group[bi].text)}', 'default', 'manual', 'APPROVED')`
-          );
-          // Track variant IDs per experience for archetype content_selection
-          if (!variantIdsByExperience.has(expId)) variantIdsByExperience.set(expId, []);
-          variantIdsByExperience.get(expId)!.push(variantId);
+          if (!bulletIdsByExperience.has(expId)) bulletIdsByExperience.set(expId, []);
+          bulletIdsByExperience.get(expId)!.push(bulletId);
         }
       }
     }
@@ -135,7 +129,7 @@ export class ResumeDataSeeder extends Seeder {
         const expId = experienceIdMap.get(`${posDef.companyKey}:${posDef.positionIndex}`)!;
         return {
           experienceId: expId,
-          bulletVariantIds: variantIdsByExperience.get(expId) ?? []
+          bulletIds: bulletIdsByExperience.get(expId) ?? []
         };
       });
 

@@ -1,7 +1,7 @@
 import { arrayMove } from '@dnd-kit/sortable';
 import { useQueryClient } from '@tanstack/react-query';
-import { Eye, EyeOff } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { Eye, EyeOff, Plus, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { Bullet, Experience } from '@/components/resume/experience/types';
 import { invalidateExperiences } from '@/components/resume/experience/types';
@@ -18,8 +18,8 @@ type ExperienceEditModalProps = {
   onClose: () => void;
   company: string;
   experiences: Experience[];
-  visibleBulletVariantIds: Map<string, Set<string>>;
-  onBulletVisibilityChange: (expId: string, variantIds: Set<string>) => void;
+  visibleBulletIds: Map<string, Set<string>>;
+  onBulletVisibilityChange: (expId: string, bulletIds: Set<string>) => void;
 };
 
 type PositionDraft = {
@@ -36,12 +36,19 @@ export function ExperienceEditModal({
   onClose,
   company,
   experiences,
-  visibleBulletVariantIds,
+  visibleBulletIds,
   onBulletVisibilityChange
 }: ExperienceEditModalProps) {
   const queryClient = useQueryClient();
   const [positions, setPositions] = useState<PositionDraft[]>([]);
   const [saving, setSaving] = useState(false);
+
+  // Inline editing state
+  const [editingBulletId, setEditingBulletId] = useState<string | null>(null);
+  const [bulletDraft, setBulletDraft] = useState('');
+  const [deletedBulletIds, setDeletedBulletIds] = useState<Set<string>>(new Set());
+  const [newBulletIds, setNewBulletIds] = useState<Set<string>>(new Set());
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Initialize position drafts from experiences
   useEffect(() => {
@@ -56,8 +63,21 @@ export function ExperienceEditModal({
           bullets: [...exp.bullets].sort((a, b) => a.ordinal - b.ordinal)
         }))
       );
+      setEditingBulletId(null);
+      setBulletDraft('');
+      setDeletedBulletIds(new Set());
+      setNewBulletIds(new Set());
     }
   }, [open, experiences]);
+
+  // Auto-focus textarea when entering edit mode
+  useEffect(() => {
+    if (editingBulletId && editTextareaRef.current) {
+      const ta = editTextareaRef.current;
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    }
+  }, [editingBulletId]);
 
   const updatePosition = useCallback((expId: string, field: keyof PositionDraft, value: string) => {
     setPositions(prev => prev.map(p => (p.id === expId ? { ...p, [field]: value } : p)));
@@ -77,42 +97,122 @@ export function ExperienceEditModal({
 
   const toggleBulletVisibility = useCallback(
     (expId: string, bullet: Bullet) => {
-      const currentIds = visibleBulletVariantIds.get(expId) ?? new Set<string>();
+      const currentIds = visibleBulletIds.get(expId) ?? new Set<string>();
       const next = new Set(currentIds);
-      // Find the first approved variant for this bullet
-      const variant = bullet.variants.find(v => v.approvalStatus === 'APPROVED') ?? bullet.variants[0];
-      if (!variant) return;
-      if (next.has(variant.id)) {
-        next.delete(variant.id);
+      if (next.has(bullet.id)) {
+        next.delete(bullet.id);
       } else {
-        next.add(variant.id);
+        next.add(bullet.id);
       }
       onBulletVisibilityChange(expId, next);
     },
-    [visibleBulletVariantIds, onBulletVisibilityChange]
+    [visibleBulletIds, onBulletVisibilityChange]
   );
 
   const isBulletVisible = useCallback(
     (expId: string, bullet: Bullet): boolean => {
-      const ids = visibleBulletVariantIds.get(expId);
+      const ids = visibleBulletIds.get(expId);
       if (!ids) return false;
-      return bullet.variants.some(v => ids.has(v.id));
+      return ids.has(bullet.id);
     },
-    [visibleBulletVariantIds]
+    [visibleBulletIds]
   );
 
-  const getBulletDisplayText = (bullet: Bullet): string => {
-    const approved = bullet.variants.find(v => v.approvalStatus === 'APPROVED');
-    return approved?.text ?? bullet.variants[0]?.text ?? bullet.content;
+  // -- Inline editing --
+
+  const startEditing = (bulletId: string, content: string) => {
+    setEditingBulletId(bulletId);
+    setBulletDraft(content);
   };
 
+  const commitEdit = () => {
+    if (!editingBulletId) return;
+    const trimmed = bulletDraft.trim();
+    if (trimmed) {
+      setPositions(prev =>
+        prev.map(p => ({
+          ...p,
+          bullets: p.bullets.map(b => (b.id === editingBulletId ? { ...b, content: trimmed } : b))
+        }))
+      );
+    }
+    setEditingBulletId(null);
+    setBulletDraft('');
+  };
+
+  const cancelEdit = () => {
+    setEditingBulletId(null);
+    setBulletDraft('');
+  };
+
+  // -- Delete bullet --
+
+  const markDeleted = (bulletId: string) => {
+    // If it's a new bullet that hasn't been saved, just remove it entirely
+    if (newBulletIds.has(bulletId)) {
+      setPositions(prev =>
+        prev.map(p => ({
+          ...p,
+          bullets: p.bullets.filter(b => b.id !== bulletId)
+        }))
+      );
+      setNewBulletIds(prev => {
+        const next = new Set(prev);
+        next.delete(bulletId);
+        return next;
+      });
+      return;
+    }
+    setDeletedBulletIds(prev => new Set(prev).add(bulletId));
+  };
+
+  const unmarkDeleted = (bulletId: string) => {
+    setDeletedBulletIds(prev => {
+      const next = new Set(prev);
+      next.delete(bulletId);
+      return next;
+    });
+  };
+
+  // -- Add bullet --
+
+  const addBullet = (expId: string) => {
+    const tempId = `temp-${crypto.randomUUID()}`;
+    setPositions(prev =>
+      prev.map(p => {
+        if (p.id !== expId) return p;
+        return {
+          ...p,
+          bullets: [
+            ...p.bullets,
+            {
+              id: tempId,
+              content: '',
+              ordinal: p.bullets.length,
+              roleTags: [],
+              skillTags: []
+            }
+          ]
+        };
+      })
+    );
+    setNewBulletIds(prev => new Set(prev).add(tempId));
+    startEditing(tempId, '');
+  };
+
+  // -- Save flow --
+
   const handleSave = async () => {
+    // Commit any in-progress edit
+    if (editingBulletId) commitEdit();
+
     setSaving(true);
     try {
-      // Save position field changes
       for (const pos of positions) {
         const orig = experiences.find(e => e.id === pos.id);
         if (!orig) continue;
+
+        // Save position field changes
         const changed =
           pos.title !== orig.title ||
           pos.location !== orig.location ||
@@ -130,10 +230,40 @@ export function ExperienceEditModal({
           });
         }
 
-        // Save bullet reorder
-        for (let i = 0; i < pos.bullets.length; i++) {
-          const bullet = pos.bullets[i];
-          if (bullet.ordinal !== i) {
+        // Create new bullets
+        for (const bullet of pos.bullets) {
+          if (newBulletIds.has(bullet.id) && !deletedBulletIds.has(bullet.id) && bullet.content.trim()) {
+            await api.experiences({ id: pos.id }).bullets.post({
+              content: bullet.content,
+              ordinal: pos.bullets.indexOf(bullet)
+            });
+          }
+        }
+
+        // Delete marked bullets
+        for (const bulletId of deletedBulletIds) {
+          const belongsToPos = orig.bullets.some(b => b.id === bulletId);
+          if (belongsToPos) {
+            await api.bullets({ id: bulletId }).delete({ experience_id: pos.id });
+            // Remove from visible bullet IDs
+            const currentVisible = visibleBulletIds.get(pos.id);
+            if (currentVisible?.has(bulletId)) {
+              const next = new Set(currentVisible);
+              next.delete(bulletId);
+              onBulletVisibilityChange(pos.id, next);
+            }
+          }
+        }
+
+        // Update existing bullets (content + ordinal changes)
+        const existingBullets = pos.bullets.filter(b => !newBulletIds.has(b.id) && !deletedBulletIds.has(b.id));
+        for (let i = 0; i < existingBullets.length; i++) {
+          const bullet = existingBullets[i];
+          const origBullet = orig.bullets.find(b => b.id === bullet.id);
+          if (!origBullet) continue;
+          const contentChanged = bullet.content !== origBullet.content;
+          const ordinalChanged = i !== origBullet.ordinal;
+          if (contentChanged || ordinalChanged) {
             await api.bullets({ id: bullet.id }).put({
               experience_id: pos.id,
               content: bullet.content,
@@ -214,38 +344,114 @@ export function ExperienceEditModal({
               {/* Bullets */}
               <div className="text-[10px] font-semibold text-[#888] uppercase tracking-wide mb-2">Bullets</div>
               <SortableList
-                items={pos.bullets}
+                items={pos.bullets.filter(b => !deletedBulletIds.has(b.id))}
                 onReorder={(activeId, overId) => handleBulletReorder(pos.id, activeId, overId)}
               >
                 {pos.bullets.map(bullet => {
+                  const isDeleted = deletedBulletIds.has(bullet.id);
+                  const isNew = newBulletIds.has(bullet.id);
+                  const isEditing = editingBulletId === bullet.id;
                   const visible = isBulletVisible(pos.id, bullet);
-                  return (
-                    <SortableItem key={bullet.id} id={bullet.id} className="mb-1">
+
+                  if (isDeleted) {
+                    return (
                       <div
-                        className={`flex items-start gap-2 p-2 rounded-md border border-[#eee] bg-[#fafafa] ${!visible ? 'opacity-40' : ''}`}
+                        key={bullet.id}
+                        className="flex items-start gap-2 p-2 rounded-md border border-red-200 bg-red-50 mb-1"
                       >
-                        <span
-                          className={`flex-1 text-[11px] leading-relaxed ${!visible ? 'line-through text-[#999]' : 'text-[#333]'}`}
-                        >
-                          {getBulletDisplayText(bullet)}
+                        <span className="flex-1 text-[11px] leading-relaxed line-through text-[#999]">
+                          {bullet.content}
                         </span>
                         <button
                           type="button"
-                          onClick={() => toggleBulletVisibility(pos.id, bullet)}
-                          className="shrink-0 cursor-pointer p-0.5"
-                          title={visible ? 'Exclude from resume' : 'Include in resume'}
+                          onClick={() => unmarkDeleted(bullet.id)}
+                          className="shrink-0 text-[10px] text-blue-500 underline cursor-pointer"
                         >
-                          {visible ? (
-                            <Eye className="w-3.5 h-3.5 text-[#666]" />
-                          ) : (
-                            <EyeOff className="w-3.5 h-3.5 text-[#999]" />
-                          )}
+                          Undo
                         </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <SortableItem key={bullet.id} id={bullet.id} className="mb-1">
+                      <div
+                        className={`flex items-start gap-2 p-2 rounded-md border ${
+                          isEditing
+                            ? 'border-blue-500 border-2 shadow-[0_0_0_3px_rgba(59,130,246,0.1)]'
+                            : isNew
+                              ? 'border-green-300 border-l-3 border-l-green-500 bg-green-50'
+                              : 'border-[#eee] bg-[#fafafa]'
+                        } ${!visible && !isEditing ? 'opacity-40' : ''}`}
+                      >
+                        {isEditing ? (
+                          <div className="flex-1">
+                            <textarea
+                              ref={editTextareaRef}
+                              value={bulletDraft}
+                              onChange={e => setBulletDraft(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  commitEdit();
+                                } else if (e.key === 'Escape') {
+                                  cancelEdit();
+                                }
+                              }}
+                              onBlur={commitEdit}
+                              className="w-full text-[11px] leading-relaxed text-[#333] border-none bg-transparent resize-none outline-none font-[inherit] min-h-[36px]"
+                              placeholder="Type your bullet point..."
+                            />
+                            <div className="text-[9px] text-[#999] mt-0.5">Enter to confirm · Esc to cancel</div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className={`flex-1 text-left text-[11px] leading-relaxed cursor-text ${!visible ? 'line-through text-[#999]' : 'text-[#333]'}`}
+                            onClick={() => startEditing(bullet.id, bullet.content)}
+                          >
+                            {bullet.content || <span className="text-[#bbb] italic">Empty bullet</span>}
+                          </button>
+                        )}
+                        {!isEditing && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => toggleBulletVisibility(pos.id, bullet)}
+                              className="shrink-0 cursor-pointer p-0.5"
+                              title={visible ? 'Exclude from resume' : 'Include in resume'}
+                            >
+                              {visible ? (
+                                <Eye className="w-3.5 h-3.5 text-[#666]" />
+                              ) : (
+                                <EyeOff className="w-3.5 h-3.5 text-[#999]" />
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => markDeleted(bullet.id)}
+                              className="shrink-0 cursor-pointer p-0.5 opacity-40 hover:opacity-100 transition-opacity"
+                              title="Delete bullet"
+                            >
+                              <X className="w-3.5 h-3.5 text-red-500" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </SortableItem>
                   );
                 })}
               </SortableList>
+
+              {/* Add bullet button */}
+              <button
+                type="button"
+                onClick={() => addBullet(pos.id)}
+                className="mt-1 w-full py-1.5 border border-dashed border-[#ccc] rounded-md bg-transparent text-[#888] text-[11px] cursor-pointer flex items-center justify-center gap-1 hover:border-[#999] hover:text-[#666] transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add bullet
+              </button>
             </div>
           ))}
         </div>

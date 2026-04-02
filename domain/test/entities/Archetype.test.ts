@@ -42,7 +42,7 @@ describe('Archetype', () => {
   test('replaceContentSelection() replaces selection and bumps updatedAt', () => {
     const archetype = Archetype.create({ profileId: 'p-1', key: 'k', label: 'L' });
     const selection = new ContentSelection({
-      experienceSelections: [{ experienceId: 'exp-1', bulletVariantIds: ['v-1', 'v-2'] }],
+      experienceSelections: [{ experienceId: 'exp-1', bulletIds: ['b-1', 'b-2'] }],
       projectIds: [],
       educationIds: ['edu-1'],
       skillCategoryIds: ['cat-1'],

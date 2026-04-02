@@ -3,23 +3,12 @@ import { queryKeys } from '@/lib/query-keys';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export type BulletVariant = {
-  id: string;
-  text: string;
-  angle: string;
-  source: string;
-  approvalStatus: string;
-  roleTags: { id: string; name: string; dimension: string }[];
-  skillTags: { id: string; name: string; dimension: string }[];
-};
-
 export type Bullet = {
   id: string;
   content: string;
   ordinal: number;
   roleTags: { id: string; name: string; dimension: string }[];
   skillTags: { id: string; name: string; dimension: string }[];
-  variants: BulletVariant[];
 };
 
 export type Experience = {

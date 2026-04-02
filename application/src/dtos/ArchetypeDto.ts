@@ -4,7 +4,7 @@ export type TagProfileDto = {
 };
 
 export type ContentSelectionDto = {
-  experienceSelections: { experienceId: string; bulletVariantIds: string[] }[];
+  experienceSelections: { experienceId: string; bulletIds: string[] }[];
   projectIds: string[];
   educationIds: string[];
   skillCategoryIds: string[];

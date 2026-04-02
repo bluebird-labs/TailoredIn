@@ -102,7 +102,7 @@ export class PostgresArchetypeRepository implements ArchetypeRepository {
     // Deserialize content selection
     const cs = orm.contentSelection as Record<string, unknown>;
     const contentSelection = new ContentSelection({
-      experienceSelections: (cs.experienceSelections as { experienceId: string; bulletVariantIds: string[] }[]) ?? [],
+      experienceSelections: (cs.experienceSelections as { experienceId: string; bulletIds: string[] }[]) ?? [],
       projectIds: (cs.projectIds as string[]) ?? [],
       educationIds: (cs.educationIds as string[]) ?? [],
       skillCategoryIds: (cs.skillCategoryIds as string[]) ?? [],

@@ -15,16 +15,11 @@ import { DeleteEducationRoute } from './routes/education/DeleteEducationRoute.js
 import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
 import { UpdateEducationRoute } from './routes/education/UpdateEducationRoute.js';
 import { AddBulletRoute } from './routes/experience/AddBulletRoute.js';
-import { AddBulletVariantRoute } from './routes/experience/AddBulletVariantRoute.js';
-import { ApproveBulletVariantRoute } from './routes/experience/ApproveBulletVariantRoute.js';
 import { CreateExperienceRoute } from './routes/experience/CreateExperienceRoute.js';
 import { DeleteBulletRoute } from './routes/experience/DeleteBulletRoute.js';
-import { DeleteBulletVariantRoute } from './routes/experience/DeleteBulletVariantRoute.js';
 import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
-import { RejectBulletVariantRoute } from './routes/experience/RejectBulletVariantRoute.js';
 import { UpdateBulletRoute } from './routes/experience/UpdateBulletRoute.js';
-import { UpdateBulletVariantRoute } from './routes/experience/UpdateBulletVariantRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 import { GenerateResumeFromJobRoute } from './routes/GenerateResumeFromJobRoute.js';
@@ -136,12 +131,6 @@ const app = new Elysia()
   .use(container.get(AddBulletRoute).plugin())
   .use(container.get(UpdateBulletRoute).plugin())
   .use(container.get(DeleteBulletRoute).plugin())
-  .use(container.get(AddBulletVariantRoute).plugin())
-  .use(container.get(UpdateBulletVariantRoute).plugin())
-  .use(container.get(DeleteBulletVariantRoute).plugin())
-  .use(container.get(ApproveBulletVariantRoute).plugin())
-  .use(container.get(RejectBulletVariantRoute).plugin())
-  // @ts-expect-error Elysia type instantiation depth exceeded with many chained routes
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
     const message = err.message ?? String(error);

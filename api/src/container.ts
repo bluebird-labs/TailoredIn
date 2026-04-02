@@ -2,9 +2,7 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
   AddBullet,
-  AddBulletVariant,
   AddSkillItem,
-  ApproveBulletVariant,
   BulkChangeJobStatus,
   ChangeJobStatus,
   CreateArchetype,
@@ -14,7 +12,6 @@ import {
   CreateSkillCategory,
   DeleteArchetype,
   DeleteBullet,
-  DeleteBulletVariant,
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
@@ -40,7 +37,6 @@ import {
   SetArchetypeTagProfile,
   UpdateArchetype,
   UpdateBullet,
-  UpdateBulletVariant,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
@@ -296,23 +292,6 @@ container.bind({
   provide: DI.Experience.DeleteBullet,
   useFactory: () => new DeleteBullet(container.get(DI.Experience.Repository))
 });
-container.bind({
-  provide: DI.Experience.AddVariant,
-  useFactory: () => new AddBulletVariant(container.get(DI.Experience.Repository))
-});
-container.bind({
-  provide: DI.Experience.UpdateVariant,
-  useFactory: () => new UpdateBulletVariant(container.get(DI.Experience.Repository))
-});
-container.bind({
-  provide: DI.Experience.DeleteVariant,
-  useFactory: () => new DeleteBulletVariant(container.get(DI.Experience.Repository))
-});
-container.bind({
-  provide: DI.Experience.ApproveVariant,
-  useFactory: () => new ApproveBulletVariant(container.get(DI.Experience.Repository))
-});
-
 // SkillCategory
 container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
 container.bind({
