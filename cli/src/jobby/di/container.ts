@@ -17,6 +17,7 @@ import {
   PostgresProfileRepository,
   PostgresSkillCategoryRepository,
   PostgresSkillRepository,
+  StructuredLlmRouter,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 
@@ -35,6 +36,7 @@ const orm = await MikroORM.init(
 const container = new Container();
 
 container.bind({ provide: MikroORM, useValue: orm });
+container.bind({ provide: DI.Llm.StructuredClient, useClass: StructuredLlmRouter });
 container.bind({ provide: DI.Job.Repository, useClass: PostgresJobRepository });
 container.bind({ provide: DI.Job.CompanyRepository, useClass: PostgresCompanyRepository });
 container.bind({ provide: DI.Job.SkillRepository, useClass: PostgresSkillRepository });

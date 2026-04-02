@@ -14,3 +14,5 @@ export type {
   ResumeContentFactory
 } from './ResumeContentFactory.js';
 export type { RenderResumeInput, ResumeRenderer } from './ResumeRenderer.js';
+export type { StructuredLlmClient, StructuredLlmRequest } from './StructuredLlmClient.js';
+export { LlmProviderKey } from './StructuredLlmClient.js';
