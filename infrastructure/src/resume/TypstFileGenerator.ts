@@ -74,11 +74,11 @@ export class TypstFileGenerator {
   first_name = "${escapeToml(personal.first_name)}"
   last_name = "${escapeToml(personal.last_name)}"
   [personal.info]
-    github = "${personal.github}"
-    email = "${personal.email}"
     linkedin = "${personal.linkedin}"
+    email = "${personal.email}"
     phone = "${personal.phone}"
     location = "${personal.location}"
+    github = "${personal.github}"
 
 [lang.en]
   header_quote = "${escapeToml(personal.header_quote)}"
