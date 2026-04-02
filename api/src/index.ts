@@ -40,6 +40,7 @@ import { UpdateHeadlineRoute } from './routes/headline/UpdateHeadlineRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
 import { ListJobsRoute } from './routes/ListJobsRoute.js';
+import { PreviewResumeRoute } from './routes/PreviewResumeRoute.js';
 import { AddSkillItemRoute } from './routes/skill-categories/AddSkillItemRoute.js';
 import { CreateSkillCategoryRoute } from './routes/skill-categories/CreateSkillCategoryRoute.js';
 import { DeleteSkillCategoryRoute } from './routes/skill-categories/DeleteSkillCategoryRoute.js';
@@ -90,6 +91,7 @@ const app = new Elysia()
   .use(container.get(IngestJobByUrlRoute).plugin())
   .use(container.get(GenerateResumeFromJobRoute).plugin())
   .use(container.get(GenerateResumeRoute).plugin())
+  .use(container.get(PreviewResumeRoute).plugin())
   // Company Briefs
   .use(container.get(GetCompanyBriefRoute).plugin())
   .use(container.get(GenerateCompanyBriefRoute).plugin())
