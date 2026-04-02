@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import FS from 'node:fs/promises';
 import Path from 'node:path';
 import { injectable } from '@needle-di/core';
@@ -10,6 +10,22 @@ import { TypstFileGenerator } from '../resume/TypstFileGenerator.js';
 
 const RESUMES_DIR = Path.resolve(import.meta.dirname, '..', '..', 'resumes');
 
+function typstCompile(cwd: string, pdfPath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('typst', ['compile', 'cv.typ', pdfPath], { cwd, stdio: ['pipe', 'pipe', 'pipe'] });
+    const chunks: Buffer[] = [];
+    proc.stderr.on('data', (chunk: Buffer) => chunks.push(chunk));
+    proc.on('close', code => {
+      if (code !== 0) {
+        reject(new Error(`Typst compilation failed: ${Buffer.concat(chunks).toString()}`));
+      } else {
+        resolve();
+      }
+    });
+    proc.on('error', reject);
+  });
+}
+
 @injectable()
 export class TypstResumeRenderer implements ResumeRenderer {
   public async render(input: RenderResumeInput): Promise<string> {
@@ -20,7 +36,7 @@ export class TypstResumeRenderer implements ResumeRenderer {
 
     await FS.mkdir(outputDir, { recursive: true });
     await TypstFileGenerator.generate(content, TYPST_DIR);
-    execSync(`typst compile cv.typ "${pdfPath}"`, { cwd: TYPST_DIR, stdio: 'pipe' });
+    await typstCompile(TYPST_DIR, pdfPath);
 
     return pdfPath;
   }
