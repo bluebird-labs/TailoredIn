@@ -301,7 +301,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'lantern',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Software Architecture Consultant',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
         startDate: '2024-09',
@@ -313,7 +313,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'brightflow',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Senior Engineering Manager',
         displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
         locationLabel: 'New York, NY',
         startDate: '2023-09',
@@ -427,7 +427,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'brightflow',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Senior Engineering Manager',
         displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
         locationLabel: 'New York, NY',
         startDate: '2023-09',
@@ -529,7 +529,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'lantern',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Software Architecture Consultant',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
         startDate: '2024-09',
@@ -541,7 +541,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'brightflow',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Senior Engineering Manager',
         displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
         locationLabel: 'New York, NY',
         startDate: '2023-09',
@@ -631,7 +631,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'lantern',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Software Architecture Consultant',
         displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
         locationLabel: 'New York, NY',
         startDate: '2024-09',
@@ -643,7 +643,7 @@ export const archetypeDefs: ArchetypeDef[] = [
       {
         companyKey: 'brightflow',
         positionIndex: 0,
-        jobTitle: 'Staff Software Engineer',
+        jobTitle: 'Senior Engineering Manager',
         displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
         locationLabel: 'New York, NY',
         startDate: '2023-09',
