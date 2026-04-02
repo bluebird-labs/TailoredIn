@@ -29,6 +29,16 @@ export type CompanyDef = {
 };
 
 export const companyDefs = {
+  resortpass: {
+    companyName: 'ResortPass',
+    companyMention: null,
+    websiteUrl: 'https://www.resortpass.com/',
+    businessDomain: 'B2C, B2B, Marketplace, Hospitality, Daycation',
+    joinedAt: '2025-03',
+    leftAt: '2026-04',
+    promotedAt: null,
+    locations: ['New York, NY']
+  },
   lantern: {
     companyName: 'Stealth Startup',
     companyMention: 'contract',
@@ -106,6 +116,25 @@ export type CompanyKey = keyof typeof companyDefs;
 // ── Bullets (per company, assigned to first position) ───────────────
 
 export const bulletDefs: Record<CompanyKey, string[]> = {
+  resortpass: [
+    'Built and led a platform team of senior specialists serving a 25-engineer org across product engineering, data, and QA as a horizontal enablement function',
+    'Drove recruiting that landed critical senior hires: Engineering Manager, Senior Engineering Manager, and Staff Engineer',
+    'Partnered with the VP of Engineering to own the platform roadmap, turning org-wide pain points and improvement opportunities into a structured, prioritized execution plan',
+    'Acted as de facto architect org-wide \u2014 reviewed Technical Design Docs, shaped backend decisions, and guided engineers on architecture to maintain technical consistency across all product teams',
+    'Drove test automation adoption org-wide, establishing standards that eliminated manual verification overhead',
+    'Built a developer enablement platform \u2014 CLI with composable skills and commands, AI code review in CI (Claude Code), and Jira integration \u2014 automating the full lifecycle from issue creation and branching through PR feedback and merge; tooling updates distributed to all repos via automated PRs from a central repository',
+    'Embedded automated quality and security gates in every repo (linters, coverage, static analysis, secret detection), raising the engineering baseline for 25 engineers without adding review overhead',
+    'Introduced APM and structured logging org-wide, set up automated service and infra monitors, and wired vulnerability detection directly to Jira \u2014 closing the loop from discovery to remediation without manual triage',
+    'Owned platform architecture on AWS \u2014 service boundaries, data flows, and infrastructure topology \u2014 and designed a compliance-driven environment strategy with a dedicated developer sandbox isolated from staging and production',
+    'Reduced production outages to zero \u2014 the platform had seen 2 in 3 months \u2014 through reliability improvements, proactive seasonal scaling, and FinOps right-sizing',
+    'Established incident response and on-call practices driven by automated monitors, replacing reactive firefighting with a structured detection-escalation-resolution playbook',
+    'Enabled a strategic MSA with a top-tier global hospitality group by building the enterprise compliance posture required for procurement: SOC 2, PCI DSS Service Provider certification, privileged access controls, and audit-ready infrastructure',
+    'Led ResortPass through SOC 2 Type I and II \u2014 partnered with auditors (Latacora) on Type I policy definition, then owned Type II end-to-end: IT processes, compliance tooling, and control monitoring in Vanta',
+    'Led PCI DSS Service Provider compliance from contract negotiation to SAQ-D AOC to unblock a critical MSA, correctly scoping the engagement around Stripe\u2019s card processing delegation',
+    'Deployed StrongDM as the privileged access layer across all production infrastructure, eliminating direct DB/SSH access and generating a full audit trail for compliance and incident investigations',
+    'Built a cost-efficient MLOps platform on Airflow and EKS powering dynamic ranking and personalized recommendations, architected to scale to zero when idle and provision on demand',
+    'Maintained and scaled the analytics platform (CDC, Redshift, ETL) with secure, audited SSH access for reliable BI and ML data availability'
+  ],
   lantern: [
     'Leveraged LLMs (OpenAI, Anthropic), prompt engineering, and Playwright-driven web scraping to equip sales teams with prospect insights',
     'Enabled local development and CI/CD pipelines: containerized Supabase (PostgreSQL) and BullQ (Redis) using Docker, split existing schema (tables, stored procedures) into manageable SQL migrations, implemented unit testing frameworks and GitHub Actions workflows',
@@ -258,6 +287,18 @@ export const archetypeDefs: ArchetypeDef[] = [
     interestItemOverrides: null,
     positions: [
       {
+        companyKey: 'resortpass',
+        positionIndex: 0,
+        jobTitle: 'Head of Platform',
+        displayCompanyName: 'ResortPass',
+        locationLabel: 'New York, NY',
+        startDate: '2025-03',
+        endDate: '2026-04',
+        roleSummary:
+          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
+        bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+      },
+      {
         companyKey: 'lantern',
         positionIndex: 0,
         jobTitle: 'Staff Software Engineer',
@@ -359,6 +400,18 @@ export const archetypeDefs: ArchetypeDef[] = [
     educationIndices: [0],
     interestItemOverrides: ['Golang', 'Rust', 'C#'],
     positions: [
+      {
+        companyKey: 'resortpass',
+        positionIndex: 0,
+        jobTitle: 'Head of Platform',
+        displayCompanyName: 'ResortPass',
+        locationLabel: 'New York, NY',
+        startDate: '2025-03',
+        endDate: '2026-04',
+        roleSummary:
+          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
+        bulletIndices: [5, 6, 7, 8, 9, 15, 16]
+      },
       {
         companyKey: 'lantern',
         positionIndex: 0,
@@ -462,6 +515,18 @@ export const archetypeDefs: ArchetypeDef[] = [
     interestItemOverrides: null,
     positions: [
       {
+        companyKey: 'resortpass',
+        positionIndex: 0,
+        jobTitle: 'Head of Platform',
+        displayCompanyName: 'ResortPass',
+        locationLabel: 'New York, NY',
+        startDate: '2025-03',
+        endDate: '2026-04',
+        roleSummary:
+          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
+        bulletIndices: [5, 6, 7, 8, 9, 15, 16]
+      },
+      {
         companyKey: 'lantern',
         positionIndex: 0,
         jobTitle: 'Staff Software Engineer',
@@ -552,6 +617,18 @@ export const archetypeDefs: ArchetypeDef[] = [
     interestItemOverrides: null,
     positions: [
       {
+        companyKey: 'resortpass',
+        positionIndex: 0,
+        jobTitle: 'Head of Platform',
+        displayCompanyName: 'ResortPass',
+        locationLabel: 'New York, NY',
+        startDate: '2025-03',
+        endDate: '2026-04',
+        roleSummary:
+          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
+        bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+      },
+      {
         companyKey: 'lantern',
         positionIndex: 0,
         jobTitle: 'Staff Software Engineer',
@@ -631,6 +708,18 @@ export const archetypeDefs: ArchetypeDef[] = [
     educationIndices: [0],
     interestItemOverrides: null,
     positions: [
+      {
+        companyKey: 'resortpass',
+        positionIndex: 0,
+        jobTitle: 'Head of Platform',
+        displayCompanyName: 'ResortPass',
+        locationLabel: 'New York, NY',
+        startDate: '2025-03',
+        endDate: '2026-04',
+        roleSummary:
+          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
+        bulletIndices: [0, 1, 2, 3, 10, 11, 12, 13, 14]
+      },
       {
         companyKey: 'volvo',
         positionIndex: 0,
