@@ -18,11 +18,11 @@ export function useCreateExperience() {
     mutationFn: async (input: {
       title: string;
       company_name: string;
-      company_website?: string | null;
+      company_website?: string;
       location: string;
       start_date: string;
       end_date: string;
-      summary?: string | null;
+      summary?: string;
       ordinal: number;
     }) => {
       const { data } = await api.experiences.post(input);

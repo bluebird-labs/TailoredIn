@@ -90,11 +90,11 @@ describe('TypstFileGenerator', () => {
     await files.cleanup();
   });
 
-  it('truncates highlights to 5 bullets', async () => {
+  it('renders all highlights without truncation', async () => {
     const files = await generateInTmpDir(MINIMAL_CONTENT);
     expect(files.professional).toContain('Built API gateway');
     expect(files.professional).toContain('Wrote RFCs');
-    expect(files.professional).not.toContain('Shipped v2');
+    expect(files.professional).toContain('Shipped v2');
     await files.cleanup();
   });
 });

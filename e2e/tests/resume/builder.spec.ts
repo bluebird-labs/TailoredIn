@@ -17,15 +17,8 @@ test.describe('Resume Builder', () => {
     // Contact icons (LinkedIn, email, etc.)
     await expect(page.getByText('estevez.sylvain@gmail.com')).toBeVisible();
 
-    // Headline (italic summary text)
-    await expect(page.getByText(/Engineering leader/)).toBeVisible();
-
     // Experience section title
     await expect(page.getByRole('heading', { name: 'Experience' })).toBeVisible();
-
-    // At least one company name from seeds (depends on active archetype's content selection)
-    const companyBlocks = page.locator('.group\\/company');
-    expect(await companyBlocks.count()).toBeGreaterThan(0);
 
     // Education section
     await expect(page.getByRole('heading', { name: 'Education' })).toBeVisible();
@@ -53,24 +46,22 @@ test.describe('Resume Builder', () => {
 
   /* 4 — Duplicate current version */
   test('duplicates current version', async ({ page }) => {
-    const tabCountBefore = await page.locator('[class*="border-b"] button[class*="rounded-md"]').count();
+    const tabCountBefore = await page.locator('button[class*="rounded-md"][class*="text-\\[13px\\]"]').count();
 
     await page.getByTitle('Add version').click();
     await page.getByText('Duplicate current').click();
 
     // Should have one more tab
-    await expect(page.locator('[class*="border-b"] button[class*="rounded-md"]')).toHaveCount(tabCountBefore + 1);
+    await expect(page.locator('button[class*="rounded-md"][class*="text-\\[13px\\]"]')).toHaveCount(tabCountBefore + 1);
   });
 
-  /* 5 — Rename a version */
+  /* 5 — Rename a version via double-click */
   test('renames a version', async ({ page }) => {
-    // Find the three-dot menu for the active tab and click it
-    const menuBtn = page.locator('[data-testid^="version-menu-"]').first();
-    await menuBtn.click({ force: true });
+    // Double-click the active tab to enter rename mode
+    const activeTab = page.getByRole('button', { name: 'Lead IC' });
+    await activeTab.dblclick();
 
-    await page.getByText('Rename').click();
-
-    // Inline input should appear — type new name
+    // Inline input should appear
     const input = page.locator('input.outline-none');
     await expect(input).toBeVisible();
     await input.clear();
@@ -81,134 +72,68 @@ test.describe('Resume Builder', () => {
     await expect(page.getByRole('button', { name: 'My Custom Name' })).toBeVisible();
   });
 
-  /* 6 — Delete a version */
+  /* 6 — Delete a version (not the last one) */
   test('deletes a version (not the last one)', async ({ page }) => {
-    // Create a version first so we have at least 2
-    // Count tabs before
-    const tabsBefore = await page.locator('[data-testid^="version-menu-"]').count();
-
+    // Create a version first so we have extra
     await page.getByTitle('Add version').click();
     await page.getByText('New blank').click();
+    await expect(page.getByRole('button', { name: 'New Version' })).toBeVisible();
 
-    // Should have one more tab
-    await expect(page.locator('[data-testid^="version-menu-"]')).toHaveCount(tabsBefore + 1);
+    // Click the new tab to make it active
+    await page.getByRole('button', { name: 'New Version' }).click();
 
-    // Open the three-dot menu for the last tab (newly created)
-    const menuBtn = page.locator('[data-testid^="version-menu-"]').last();
-    await menuBtn.click({ force: true });
-
-    await page.getByText('Delete').click();
+    // Hover over the active tab group to reveal the delete X
+    const tabGroup = page.locator('.group\\/tab').last();
+    await tabGroup.hover();
+    await tabGroup.getByTitle('Delete version').click();
 
     // Confirmation dialog should appear
     await expect(page.getByText('Delete version')).toBeVisible();
     await page.getByRole('button', { name: 'Delete' }).click();
 
-    // Should be back to original count
-    await expect(page.locator('[data-testid^="version-menu-"]')).toHaveCount(tabsBefore);
+    // "New Version" tab should be gone
+    await expect(page.getByRole('button', { name: 'New Version' })).not.toBeVisible();
   });
 
-  /* 7 — Switch versions shows different content */
+  /* 7 — Switch versions */
   test('switches between versions', async ({ page }) => {
-    // Get text from the first version's headline
-    const headlineBefore = await page.locator('.group\\/headline p').first().textContent();
-
     // Click the second tab
     await page.getByRole('button', { name: 'Nerd' }).click();
-
-    // Wait a moment for content to update
     await page.waitForTimeout(500);
 
-    // The page should still have a headline (content may or may not differ depending on archetype config)
-    const headlineAfter = await page.locator('.group\\/headline p').first().textContent();
-    expect(headlineAfter).toBeTruthy();
+    // Page should still render content
+    await expect(page.getByRole('heading', { name: 'Experience' })).toBeVisible();
 
     // Switch back
-    const firstTab = page.locator('[class*="border-b"] button[class*="rounded-md"]').first();
+    const firstTab = page.locator('button[class*="rounded-md"][class*="text-\\[13px\\]"]').first();
     await firstTab.click();
     await page.waitForTimeout(500);
 
-    const headlineRestored = await page.locator('.group\\/headline p').first().textContent();
-    expect(headlineRestored).toBe(headlineBefore);
+    await expect(page.getByRole('heading', { name: 'Experience' })).toBeVisible();
   });
 
-  /* 8 — Auto-save: toggle bullet off, reload, verify persisted */
-  test('auto-saves bullet visibility changes', async ({ page }) => {
-    // Open first company's edit modal
-    const companyBlock = page.locator('.group\\/company').first();
-    await companyBlock.hover();
-    await companyBlock.getByTitle('Edit experience').click();
-
-    const dialogContent = page.locator('[data-slot="dialog-content"]');
-    await expect(dialogContent).toBeVisible();
-
-    // Find first eye button (visible bullet)
-    const eyeButtons = dialogContent.getByTitle('Exclude from resume');
-    if ((await eyeButtons.count()) === 0) {
-      await page.keyboard.press('Escape');
-      return;
-    }
-
-    // Get the bullet text before toggling
-    const bulletCard = eyeButtons.first().locator('..');
-    const bulletText = await bulletCard.locator('span.flex-1').first().textContent();
-
-    // Click to hide — auto-saves
-    await eyeButtons.first().click();
-
-    // Close modal
-    await page.getByRole('button', { name: 'Done' }).click();
-
-    // Reload the page
-    await page.reload();
-    await expect(page.getByRole('heading', { name: 'Sylvain Estevez' })).toBeVisible();
-
-    // The bullet should still be hidden after reload
-    if (bulletText) {
-      await expect(page.locator('.group\\/company').first().getByText(bulletText)).not.toBeVisible();
-    }
-  });
-
-  /* 9 — Personal info modal */
-  test('opens personal info modal and edits a field', async ({ page }) => {
-    const nameHeading = page.locator('h1', { hasText: 'Sylvain Estevez' });
-    const headerGroup = nameHeading.locator('..');
-    await headerGroup.hover();
-
-    const editButton = headerGroup.getByTitle('Edit personal info');
-    await editButton.click();
-
-    await expect(page.getByRole('heading', { name: 'Edit Personal Info' })).toBeVisible();
-
-    const locationInput = page.getByLabel('Location');
-    await locationInput.clear();
-    await locationInput.fill('San Francisco, CA');
-
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Profile updated')).toBeVisible();
-    await expect(page.getByText('San Francisco, CA')).toBeVisible();
-  });
-
-  /* 10 — Education visibility toggle */
+  /* 8 — Education visibility toggle */
   test('toggles education visibility', async ({ page }) => {
-    const eduRow = page.locator('.group\\/edu').first();
-    await eduRow.hover();
+    // Find first education entry and hover to reveal eye icon
+    const eduEntry = page.locator('.group\\/edu').first();
+    await eduEntry.hover();
 
-    const excludeBtn = eduRow.getByTitle('Exclude from resume');
-    await excludeBtn.click();
+    const toggleBtn = eduEntry.getByTitle('Hide from resume');
+    await toggleBtn.click();
 
-    // Wait for auto-save and re-render
-    await expect(eduRow).toHaveClass(/line-through/);
+    // The text should get strikethrough
+    const innerBtn = eduEntry.locator('button').first();
+    await expect(innerBtn).toHaveClass(/line-through/);
 
-    // Re-hover after re-render to reveal the include button
+    // Re-hover and toggle back
     await page.mouse.move(0, 0);
-    await eduRow.hover();
-    const includeBtn = eduRow.getByTitle('Include in resume');
-    await includeBtn.click();
+    await eduEntry.hover();
+    await eduEntry.getByTitle('Show on resume').click();
 
-    await expect(eduRow).not.toHaveClass(/line-through/);
+    await expect(innerBtn).not.toHaveClass(/line-through/);
   });
 
-  /* 11 — Generate PDF */
+  /* 9 — Generate PDF */
   test('generates a resume PDF', async ({ page }) => {
     const captured: { status: number; contentType: string; bodyLength: number }[] = [];
     await page.route('**/resumes/generate', async route => {

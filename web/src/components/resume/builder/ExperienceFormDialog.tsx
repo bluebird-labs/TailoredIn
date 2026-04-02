@@ -68,7 +68,7 @@ export function ExperienceFormDialog({ open, onOpenChange, nextOrdinal }: Experi
         location: data.location,
         start_date: data.startDate,
         end_date: data.endDate,
-        summary: data.summary || null,
+        summary: data.summary || undefined,
         ordinal: nextOrdinal
       },
       {

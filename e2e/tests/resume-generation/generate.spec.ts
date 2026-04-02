@@ -42,10 +42,13 @@ test.describe('Resume generation from builder', () => {
     await page.getByRole('button', { name: 'Generate PDF' }).click();
     await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
 
-    // Open the first experience modal and hide a bullet
-    const companyBlock = page.locator('.group\\/company').first();
-    await companyBlock.hover();
-    await companyBlock.getByTitle('Edit experience').click();
+    // Click the first experience company block to open the edit modal
+    // Experience sections are buttons with company names — click the first one with visible bullets
+    const experienceSection = page.locator('button', { hasText: /Experience/ }).first();
+    // Find the first clickable company block inside the experience area
+    const companyButtons = page.locator('button:has(span.font-bold)').filter({ hasText: /\w+/ });
+    const firstCompany = companyButtons.first();
+    await firstCompany.click();
 
     const dialogContent = page.locator('[data-slot="dialog-content"]');
     await expect(dialogContent).toBeVisible();
