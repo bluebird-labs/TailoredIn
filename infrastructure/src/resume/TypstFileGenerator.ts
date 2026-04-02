@@ -113,7 +113,7 @@ ${includes}
     const lines: string[] = [
       `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-entry`,
       ``,
-      `#cv-section("Professional Experience")`,
+      `#cv-section("Experience")`,
       ``
     ];
 
