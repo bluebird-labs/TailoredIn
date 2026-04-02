@@ -20,6 +20,7 @@ import type {
   DeleteSkillCategory,
   DeleteSkillItem,
   GenerateCompanyBrief,
+  GenerateResume,
   GenerateResumeFromJob,
   GetCompanyBrief,
   GetJob,
@@ -91,6 +92,7 @@ export const DI = {
     WebColorService: new InjectionToken<WebColorService>('DI.Resume.WebColorService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
+    GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
     GenerateResumeFromJob: new InjectionToken<GenerateResumeFromJob>('DI.Resume.GenerateResumeFromJob')
   },
 

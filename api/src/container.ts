@@ -21,6 +21,7 @@ import {
   DeleteSkillCategory,
   DeleteSkillItem,
   GenerateCompanyBrief,
+  GenerateResume,
   GenerateResumeFromJob,
   GetCompanyBrief,
   GetJob,
@@ -173,6 +174,15 @@ container.bind({
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.SkillCategory.Repository)
+    )
+});
+container.bind({
+  provide: DI.Resume.GenerateResume,
+  useFactory: () =>
+    new GenerateResume(
+      container.get(DI.Profile.Repository),
+      container.get(DI.Resume.ContentFactory),
+      container.get(DI.Resume.Renderer)
     )
 });
 container.bind({
