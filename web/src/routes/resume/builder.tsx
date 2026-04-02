@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ExperienceEditModal } from '@/components/resume/builder/ExperienceEditModal';
 import { ExperienceFormDialog } from '@/components/resume/builder/ExperienceFormDialog';
+import { HeadlineEditModal } from '@/components/resume/builder/HeadlineEditModal';
 import { PersonalInfoModal } from '@/components/resume/builder/PersonalInfoModal';
 import { ResumePreview } from '@/components/resume/builder/ResumePreview';
 import { TAB_COLORS, VersionTabs } from '@/components/resume/builder/VersionTabs';
@@ -19,12 +20,7 @@ import {
 import type { Education } from '@/hooks/use-education';
 import { useEducations } from '@/hooks/use-education';
 import { useExperiences } from '@/hooks/use-experiences';
-import { usePdfPreview } from '@/hooks/use-pdf-preview';
 import { useProfile } from '@/hooks/use-profile';
-
-const PdfPreviewPanel = lazy(() =>
-  import('@/components/resume/builder/PdfPreviewPanel').then(m => ({ default: m.PdfPreviewPanel }))
-);
 
 export const Route = createFileRoute('/resume/builder')({
   component: BuilderPage
@@ -116,6 +112,7 @@ function BuilderPage() {
 
   // ── Modal state ───────────────────────────────────────────────────────
   const [personalInfoModalOpen, setPersonalInfoModalOpen] = useState(false);
+  const [headlineModalOpen, setHeadlineModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<string | null>(null);
   const [experienceDialogOpen, setExperienceDialogOpen] = useState(false);
   const [educationDialogOpen, setEducationDialogOpen] = useState(false);
@@ -124,21 +121,6 @@ function BuilderPage() {
 
   const nextExperienceOrdinal = experiences.length > 0 ? Math.max(...experiences.map(e => e.ordinal)) + 1 : 0;
   const nextEducationOrdinal = educations.length > 0 ? Math.max(...educations.map(e => e.ordinal)) + 1 : 0;
-
-  // ── PDF preview ─────────────────────────────────────────────────────
-  const pdfSelection = useMemo(() => {
-    if (!activeArchetype) return null;
-    const cs = activeArchetype.contentSelection;
-    return {
-      headlineText: activeArchetype.headlineText,
-      experienceSelections: cs.experienceSelections,
-      educationIds: cs.educationIds,
-      skillCategoryIds: cs.skillCategoryIds,
-      skillItemIds: cs.skillItemIds
-    };
-  }, [activeArchetype]);
-
-  const { pdfData, isCompiling, error: pdfError } = usePdfPreview(pdfSelection);
 
   // ── Auto-save helpers ─────────────────────────────────────────────────
   const saveContent = useCallback(
@@ -354,64 +336,48 @@ function BuilderPage() {
         )}
       </div>
 
-      {/* Document area — two-column grid */}
-      <div className="flex-1 grid grid-cols-2 min-h-0">
-        {/* Left: interactive preview */}
-        <div
-          className="overflow-y-auto bg-white h-full"
-          style={
-            {
-              '--section-hover': TAB_COLORS[activeTabIndex % TAB_COLORS.length].hoverBg,
-              '--section-accent': TAB_COLORS[activeTabIndex % TAB_COLORS.length].accent
-            } as React.CSSProperties
-          }
-        >
-          {isLoading || !profile ? (
-            <div className="max-w-[680px] mx-auto px-10 py-8 space-y-4">
-              <Skeleton className="h-8 w-64 rounded" />
-              <Skeleton className="h-4 w-96 rounded" />
-              <Skeleton className="h-16 w-full rounded" />
-              <Skeleton className="h-6 w-48 rounded" />
-              <Skeleton className="h-32 w-full rounded" />
-              <Skeleton className="h-32 w-full rounded" />
-            </div>
-          ) : (
-            <ResumePreview
-              profile={profile}
-              headlineText={activeArchetype?.headlineText ?? ''}
-              experiences={experiences}
-              visibleBulletVariantIds={visibleBulletVariantIds}
-              educations={educations}
-              visibleEducationIds={visibleEducationIds}
-              onEditPersonalInfo={() => setPersonalInfoModalOpen(true)}
-              onHeadlineChange={handleHeadlineChange}
-              onEditCompany={setEditingCompany}
-              onAddExperience={() => setExperienceDialogOpen(true)}
-              onToggleEducation={toggleEducation}
-              onEditEducation={edu => {
-                setEditingEducation(edu);
-                setEducationDialogOpen(true);
-              }}
-              onAddEducation={() => {
-                setEditingEducation(undefined);
-                setEducationDialogOpen(true);
-              }}
-            />
-          )}
-        </div>
-
-        {/* Right: PDF preview */}
-        <div className="border-l border-border overflow-hidden h-full">
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
-                Loading preview...
-              </div>
-            }
-          >
-            <PdfPreviewPanel pdfData={pdfData} isCompiling={isCompiling} error={pdfError} />
-          </Suspense>
-        </div>
+      {/* Document area */}
+      <div
+        className="flex-1 overflow-y-auto bg-white"
+        style={
+          {
+            '--section-hover': TAB_COLORS[activeTabIndex % TAB_COLORS.length].hoverBg,
+            '--section-accent': TAB_COLORS[activeTabIndex % TAB_COLORS.length].accent
+          } as React.CSSProperties
+        }
+      >
+        {isLoading || !profile ? (
+          <div className="max-w-[680px] mx-auto px-10 py-8 space-y-4">
+            <Skeleton className="h-8 w-64 rounded" />
+            <Skeleton className="h-4 w-96 rounded" />
+            <Skeleton className="h-16 w-full rounded" />
+            <Skeleton className="h-6 w-48 rounded" />
+            <Skeleton className="h-32 w-full rounded" />
+            <Skeleton className="h-32 w-full rounded" />
+          </div>
+        ) : (
+          <ResumePreview
+            profile={profile}
+            headlineText={activeArchetype?.headlineText ?? ''}
+            experiences={experiences}
+            visibleBulletVariantIds={visibleBulletVariantIds}
+            educations={educations}
+            visibleEducationIds={visibleEducationIds}
+            onEditPersonalInfo={() => setPersonalInfoModalOpen(true)}
+            onEditHeadline={() => setHeadlineModalOpen(true)}
+            onEditCompany={setEditingCompany}
+            onAddExperience={() => setExperienceDialogOpen(true)}
+            onToggleEducation={toggleEducation}
+            onEditEducation={edu => {
+              setEditingEducation(edu);
+              setEducationDialogOpen(true);
+            }}
+            onAddEducation={() => {
+              setEditingEducation(undefined);
+              setEducationDialogOpen(true);
+            }}
+          />
+        )}
       </div>
 
       {/* Modals */}
@@ -422,6 +388,13 @@ function BuilderPage() {
           profile={profile}
         />
       )}
+
+      <HeadlineEditModal
+        open={headlineModalOpen}
+        onClose={() => setHeadlineModalOpen(false)}
+        headlineText={activeArchetype?.headlineText ?? ''}
+        onSave={handleHeadlineChange}
+      />
 
       {editingCompany && (
         <ExperienceEditModal

@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Plus } from 'lucide-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { Experience } from '@/components/resume/experience/types';
 import { formatDateRange } from '@/components/resume/experience/types';
 import type { Education } from '@/hooks/use-education';
@@ -36,7 +36,7 @@ type ResumePreviewProps = {
   educations: Education[];
   visibleEducationIds: Set<string>;
   onEditPersonalInfo: () => void;
-  onHeadlineChange: (text: string) => void;
+  onEditHeadline: () => void;
   onEditCompany: (company: string) => void;
   onToggleEducation: (id: string) => void;
   onAddExperience: () => void;
@@ -105,31 +105,13 @@ export function ResumePreview({
   educations,
   visibleEducationIds,
   onEditPersonalInfo,
-  onHeadlineChange,
+  onEditHeadline,
   onEditCompany,
   onAddExperience,
   onToggleEducation,
   onEditEducation,
   onAddEducation
 }: ResumePreviewProps) {
-  const [editingHeadline, setEditingHeadline] = useState(false);
-  const [headlineDraft, setHeadlineDraft] = useState('');
-  const headlineRef = useRef<HTMLTextAreaElement>(null);
-
-  const startEditingHeadline = useCallback(() => {
-    setHeadlineDraft(headlineText);
-    setEditingHeadline(true);
-    setTimeout(() => headlineRef.current?.focus(), 0);
-  }, [headlineText]);
-
-  const commitHeadline = useCallback(() => {
-    setEditingHeadline(false);
-    const trimmed = headlineDraft.trim();
-    if (trimmed !== headlineText) {
-      onHeadlineChange(trimmed);
-    }
-  }, [headlineDraft, headlineText, onHeadlineChange]);
-
   const companyGroups = useMemo(
     () => groupByCompany(experiences, visibleBulletVariantIds),
     [experiences, visibleBulletVariantIds]
@@ -154,37 +136,9 @@ export function ResumePreview({
       </button>
 
       {/* ── Headline ─────────────────────────────────────────────── */}
-      <div className={`mt-3 pt-2 border-t border-[#e5e7eb] ${SECTION}`}>
-        {editingHeadline ? (
-          <textarea
-            ref={headlineRef}
-            value={headlineDraft}
-            onChange={e => setHeadlineDraft(e.target.value)}
-            onBlur={commitHeadline}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                commitHeadline();
-              }
-              if (e.key === 'Escape') {
-                setEditingHeadline(false);
-              }
-            }}
-            className="w-full text-[12px] text-[#444] italic leading-relaxed bg-transparent border-0 outline-none resize-none p-0 font-inherit"
-            rows={3}
-          />
-        ) : (
-          <button
-            type="button"
-            className="w-full text-left cursor-pointer bg-transparent border-0 p-0 font-inherit"
-            onClick={startEditingHeadline}
-          >
-            <p className="text-[12px] text-[#444] italic leading-relaxed">
-              {headlineText || 'Click to add a headline...'}
-            </p>
-          </button>
-        )}
-      </div>
+      <button type="button" className={`mt-3 pt-2 border-t border-[#e5e7eb] block ${SECTION}`} onClick={onEditHeadline}>
+        <p className="text-[12px] text-[#444] italic leading-relaxed">{headlineText || 'Click to add a headline...'}</p>
+      </button>
 
       {/* ── Experience ───────────────────────────────────────────── */}
       <div className="mt-5">
