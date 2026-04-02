@@ -85,7 +85,7 @@ test.describe('Resume generation', () => {
     await page.getByRole('option', { name: 'IC', exact: true }).click();
 
     // Add keywords to influence content
-    await page.getByLabel('Keywords (comma-separated)').fill('typescript, node.js, microservices');
+    await page.getByLabel('Keywords (optional)').fill('typescript, node.js, microservices');
 
     await page.getByRole('button', { name: 'Generate Resume' }).click();
     await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
