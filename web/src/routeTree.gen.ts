@@ -16,8 +16,8 @@ import { Route as ResumeSkillsRouteImport } from './routes/resume/skills'
 import { Route as ResumeProfileRouteImport } from './routes/resume/profile'
 import { Route as ResumeHeadlinesRouteImport } from './routes/resume/headlines'
 import { Route as ResumeExperienceRouteImport } from './routes/resume/experience'
-import { Route as ResumeBuilderRouteImport } from './routes/resume/builder'
 import { Route as ResumeEducationRouteImport } from './routes/resume/education'
+import { Route as ResumeBuilderRouteImport } from './routes/resume/builder'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 import { Route as ArchetypesArchetypeIdRouteImport } from './routes/archetypes/$archetypeId'
@@ -57,14 +57,14 @@ const ResumeExperienceRoute = ResumeExperienceRouteImport.update({
   path: '/resume/experience',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResumeBuilderRoute = ResumeBuilderRouteImport.update({
-  id: '/resume/builder',
-  path: '/resume/builder',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ResumeEducationRoute = ResumeEducationRouteImport.update({
   id: '/resume/education',
   path: '/resume/education',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResumeBuilderRoute = ResumeBuilderRouteImport.update({
+  id: '/resume/builder',
+  path: '/resume/builder',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
@@ -237,18 +237,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeExperienceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resume/builder': {
-      id: '/resume/builder'
-      path: '/resume/builder'
-      fullPath: '/resume/builder'
-      preLoaderRoute: typeof ResumeBuilderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/resume/education': {
       id: '/resume/education'
       path: '/resume/education'
       fullPath: '/resume/education'
       preLoaderRoute: typeof ResumeEducationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resume/builder': {
+      id: '/resume/builder'
+      path: '/resume/builder'
+      fullPath: '/resume/builder'
+      preLoaderRoute: typeof ResumeBuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs/$jobId': {

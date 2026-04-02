@@ -42,7 +42,6 @@ function BuilderPage() {
   const [selectedEducationIds, setSelectedEducationIds] = useState<Set<string>>(new Set());
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(new Set());
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
-  const [templateStyle, setTemplateStyle] = useState<'ic' | 'architect' | 'executive'>('ic');
   const [keywords, setKeywords] = useState('');
   const [generating, setGenerating] = useState(false);
 
@@ -209,7 +208,6 @@ function BuilderPage() {
       education_ids: [...selectedEducationIds],
       skill_category_ids: [...selectedCategoryIds],
       skill_item_ids: [...selectedItemIds],
-      template_style: templateStyle,
       keywords: keywords
         .split(',')
         .map(k => k.trim())
@@ -441,21 +439,6 @@ function BuilderPage() {
 
         {/* Right panel — controls */}
         <div className="w-64 border-l border-[#e5e7eb] p-4 flex flex-col gap-5">
-          <label className="block">
-            <span className="text-[13px] font-semibold text-[#6b7280] uppercase tracking-wide block mb-1.5">
-              Template Style
-            </span>
-            <select
-              value={templateStyle}
-              onChange={e => setTemplateStyle(e.target.value as 'ic' | 'architect' | 'executive')}
-              className="w-full border border-[#e5e7eb] rounded-md px-2.5 py-1.5 text-[13px] text-[#111] bg-white"
-            >
-              <option value="ic">IC</option>
-              <option value="architect">Architect</option>
-              <option value="executive">Executive</option>
-            </select>
-          </label>
-
           <label className="block">
             <span className="text-[13px] font-semibold text-[#6b7280] uppercase tracking-wide block mb-1.5">
               Keywords

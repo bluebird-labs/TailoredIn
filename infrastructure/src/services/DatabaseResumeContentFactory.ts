@@ -47,7 +47,6 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       educationIds: cs.educationIds,
       skillCategoryIds: cs.skillCategoryIds,
       skillItemIds: cs.skillItemIds,
-      awesomeColor: input.awesomeColor,
       keywords: input.keywords
     });
   }
@@ -155,7 +154,6 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
 
     return {
       personal,
-      awesome_color: input.awesomeColor,
       keywords: input.keywords,
       experience,
       skills,

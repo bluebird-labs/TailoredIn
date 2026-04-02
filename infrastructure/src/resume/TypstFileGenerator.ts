@@ -1,7 +1,19 @@
 import FS from 'node:fs/promises';
 import Path from 'node:path';
 import type { BrilliantCVContent } from '../brilliant-cv/types.js';
-import type { TemplateLayoutConfig } from './TemplateLayoutConfig.js';
+
+const RESUME_LAYOUT = {
+  beforeSectionSkip: '4pt',
+  beforeEntrySkip: '3pt',
+  beforeEntryDescriptionSkip: '2pt',
+  bodyFontSize: '10.5pt',
+  headerFontSize: '30pt',
+  lineSpacing: '0.75em',
+  pageMargin: '1.5cm',
+  sectionOrder: ['professional', 'skills', 'education'] as const,
+  maxBulletsPerEntry: 5,
+  showEntrySummary: true
+};
 
 /** Escape characters that have special meaning in Typst content brackets [...]. */
 const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>/g, '\\>');
@@ -10,23 +22,15 @@ const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>
 const escapeToml = (str: string): string => str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 export class TypstFileGenerator {
-  public static async generate(
-    content: BrilliantCVContent,
-    workDir: string,
-    layoutConfig: TemplateLayoutConfig
-  ): Promise<void> {
+  public static async generate(content: BrilliantCVContent, workDir: string): Promise<void> {
     await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
 
     await Promise.all([
-      FS.writeFile(
-        Path.join(workDir, 'metadata.toml'),
-        TypstFileGenerator.buildMetadataToml(content, layoutConfig),
-        'utf8'
-      ),
-      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(layoutConfig), 'utf8'),
+      FS.writeFile(Path.join(workDir, 'metadata.toml'), TypstFileGenerator.buildMetadataToml(content), 'utf8'),
+      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(), 'utf8'),
       FS.writeFile(
         Path.join(workDir, 'modules_en', 'professional.typ'),
-        TypstFileGenerator.buildProfessionalTyp(content, layoutConfig),
+        TypstFileGenerator.buildProfessionalTyp(content),
         'utf8'
       ),
       FS.writeFile(Path.join(workDir, 'modules_en', 'skills.typ'), TypstFileGenerator.buildSkillsTyp(content), 'utf8'),
@@ -38,17 +42,17 @@ export class TypstFileGenerator {
     ]);
   }
 
-  private static buildMetadataToml(content: BrilliantCVContent, layoutConfig: TemplateLayoutConfig): string {
-    const { personal, awesome_color, keywords } = content;
+  private static buildMetadataToml(content: BrilliantCVContent): string {
+    const { personal, keywords } = content;
     const keywordsList = keywords.map(k => `"${escapeToml(k)}"`).join(', ');
 
     return `language = "en"
 
 [layout]
-  awesome_color = "${awesome_color}"
-  before_section_skip = "${layoutConfig.beforeSectionSkip}"
-  before_entry_skip = "${layoutConfig.beforeEntrySkip}"
-  before_entry_description_skip = "${layoutConfig.beforeEntryDescriptionSkip}"
+  awesome_color = "#0395DE"
+  before_section_skip = "${RESUME_LAYOUT.beforeSectionSkip}"
+  before_entry_skip = "${RESUME_LAYOUT.beforeEntrySkip}"
+  before_entry_description_skip = "${RESUME_LAYOUT.beforeEntryDescriptionSkip}"
   paper_size = "us-letter"
   [layout.fonts]
     regular_fonts = ["Source Sans 3"]
@@ -78,26 +82,26 @@ export class TypstFileGenerator {
 
 [lang.en]
   header_quote = "${escapeToml(personal.header_quote)}"
-  cv_footer = "Résumé"
+  cv_footer = "R\u00e9sum\u00e9"
   letter_footer = "Cover letter"
 `;
   }
 
-  private static buildCvTyp(layoutConfig: TemplateLayoutConfig): string {
-    const includes = layoutConfig.sectionOrder.map(section => `#include "modules_en/${section}.typ"`).join('\n');
+  private static buildCvTyp(): string {
+    const includes = RESUME_LAYOUT.sectionOrder.map(section => `#include "modules_en/${section}.typ"`).join('\n');
 
     return `#import "@preview/brilliant-cv:3.3.0": cv
 #let metadata = toml("./metadata.toml")
-#set text(size: ${layoutConfig.bodyFontSize})
-#set par(leading: ${layoutConfig.lineSpacing})
-#set page(margin: ${layoutConfig.pageMargin})
+#set text(size: ${RESUME_LAYOUT.bodyFontSize})
+#set par(leading: ${RESUME_LAYOUT.lineSpacing})
+#set page(margin: ${RESUME_LAYOUT.pageMargin})
 #show: cv.with(metadata)
 
 ${includes}
 `;
   }
 
-  private static buildProfessionalTyp(content: BrilliantCVContent, layoutConfig: TemplateLayoutConfig): string {
+  private static buildProfessionalTyp(content: BrilliantCVContent): string {
     const lines: string[] = [
       `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-entry`,
       ``,
@@ -106,7 +110,7 @@ ${includes}
     ];
 
     for (const exp of content.experience) {
-      const highlights = exp.highlights.slice(0, layoutConfig.maxBulletsPerEntry);
+      const highlights = exp.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
 
       lines.push(`#cv-entry(`);
       lines.push(`  title: [${escapeTypst(exp.title)}],`);
@@ -114,7 +118,7 @@ ${includes}
       lines.push(`  date: [${exp.date}],`);
       lines.push(`  location: [${escapeTypst(exp.location)}],`);
       lines.push(`  description: [`);
-      if (layoutConfig.showEntrySummary && exp.summary) {
+      if (RESUME_LAYOUT.showEntrySummary && exp.summary) {
         lines.push(`    _${escapeTypst(exp.summary)}_`);
         if (highlights.length > 0) lines.push(`    #v(2pt)`);
       }

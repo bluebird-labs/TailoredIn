@@ -13,7 +13,7 @@
     ]
   },
   "permissions": {
-    "defaultMode": "acceptEdits",
+    "defaultMode": "plan",
     "additionalDirectories": [
       "~/Documents"
     ],

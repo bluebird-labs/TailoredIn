@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { GenerateResume } from '@tailoredin/application';
-import { TemplateStyle } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
@@ -22,7 +21,6 @@ export class GenerateResumeRoute {
           educationIds: body.education_ids,
           skillCategoryIds: body.skill_category_ids,
           skillItemIds: body.skill_item_ids,
-          templateStyle: body.template_style as TemplateStyle,
           keywords: body.keywords
         });
 
@@ -50,7 +48,6 @@ export class GenerateResumeRoute {
           education_ids: t.Array(t.String({ format: 'uuid' })),
           skill_category_ids: t.Array(t.String({ format: 'uuid' })),
           skill_item_ids: t.Array(t.String({ format: 'uuid' })),
-          template_style: t.Enum(TemplateStyle),
           keywords: t.Optional(t.Array(t.String()))
         })
       }

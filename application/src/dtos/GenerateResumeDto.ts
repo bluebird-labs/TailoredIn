@@ -1,4 +1,4 @@
-import type { ExperienceSelection, TemplateStyle } from '@tailoredin/domain';
+import type { ExperienceSelection } from '@tailoredin/domain';
 
 export type GenerateResumeDto = {
   headlineId: string;
@@ -6,6 +6,5 @@ export type GenerateResumeDto = {
   educationIds: string[];
   skillCategoryIds: string[];
   skillItemIds: string[];
-  templateStyle: TemplateStyle;
   keywords?: string[];
 };

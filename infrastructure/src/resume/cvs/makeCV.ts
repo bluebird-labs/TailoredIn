@@ -6,7 +6,6 @@ import type { ResumeConfig } from './types.js';
 
 export type MakeCVInput = {
   archetype: ArchetypeKey;
-  awesome_color: string;
   keywords: string[];
 };
 
@@ -36,7 +35,6 @@ export const makeCV = (input: MakeCVInput): BrilliantCVContent => {
       location: 'New York, NY',
       header_quote: data.headline
     },
-    awesome_color: input.awesome_color,
     keywords: input.keywords,
     experience: data.experience,
     skills: data.skills,

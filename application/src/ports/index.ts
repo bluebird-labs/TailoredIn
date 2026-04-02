@@ -14,4 +14,3 @@ export type {
   ResumeContentFactory
 } from './ResumeContentFactory.js';
 export type { RenderResumeInput, ResumeRenderer } from './ResumeRenderer.js';
-export type { ColorPaletteDto, WebColorService } from './WebColorService.js';

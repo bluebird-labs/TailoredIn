@@ -1,6 +1,5 @@
 import { ArchetypeKey } from '../value-objects/Archetype.js';
 import { TailoringScore } from '../value-objects/TailoringScore.js';
-import { TemplateStyle } from '../value-objects/TemplateStyle.js';
 
 /**
  * Selects the resume template archetype to use for a given job archetype,
@@ -20,19 +19,6 @@ export class TailoringStrategyService {
         return ArchetypeKey.LEAD_IC;
       default:
         return ArchetypeKey.LEAD_IC;
-    }
-  }
-
-  public resolveTemplateStyle(archetype: ArchetypeKey): TemplateStyle {
-    switch (archetype) {
-      case ArchetypeKey.IC:
-      case ArchetypeKey.LEAD_IC:
-      case ArchetypeKey.NERD:
-        return TemplateStyle.IC;
-      case ArchetypeKey.HAND_ON_MANAGER:
-        return TemplateStyle.ARCHITECT;
-      case ArchetypeKey.LEADER_MANAGER:
-        return TemplateStyle.EXECUTIVE;
     }
   }
 

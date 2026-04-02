@@ -43,7 +43,6 @@ export type BrilliantCVPersonal = {
 
 export type BrilliantCVContent = {
   personal: BrilliantCVPersonal;
-  awesome_color: string; // hex like "#178FEA" or preset: "skyblue" | "red" | "nephritis" | "concrete" | "darknight"
   keywords: string[];
   experience: BrilliantCVExperience[];
   skills: BrilliantCVSkill[];

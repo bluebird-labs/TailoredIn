@@ -108,7 +108,6 @@ const defaultHeadline = new Headline({
 const defaultInput: MakeResumeContentInput = {
   profileId: 'profile-1',
   archetypeId: 'archetype-1',
-  awesomeColor: '#000000',
   keywords: []
 };
 

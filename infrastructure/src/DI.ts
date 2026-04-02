@@ -51,8 +51,7 @@ import type {
   UpdateJobCompany,
   UpdateProfile,
   UpdateSkillCategory,
-  UpdateSkillItem,
-  WebColorService
+  UpdateSkillItem
 } from '@tailoredin/application';
 import type {
   ArchetypeRepository,
@@ -89,7 +88,6 @@ export const DI = {
 
   Resume: {
     LlmService: new InjectionToken<LlmService | null>('DI.Resume.LlmService'),
-    WebColorService: new InjectionToken<WebColorService>('DI.Resume.WebColorService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
     GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),

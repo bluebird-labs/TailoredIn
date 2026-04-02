@@ -33,7 +33,6 @@ export type ResumeSkillDto = {
 
 export type ResumeContentDto = {
   personal: ResumePersonalDto;
-  awesome_color: string;
   keywords: string[];
   experience: ResumeExperienceDto[];
   skills: ResumeSkillDto[];

@@ -8,7 +8,6 @@ import {
   DI,
   OPENAI_CONFIG,
   OpenAiLlmService,
-  PlaywrightWebColorService,
   PostgresArchetypeRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
@@ -55,7 +54,6 @@ container.bind({ provide: DI.Archetype.Repository, useClass: PostgresArchetypeRe
 container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
 container.bind({ provide: DI.Education.Repository, useClass: PostgresEducationRepository });
 container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
-container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({
   provide: DI.Resume.ContentFactory,

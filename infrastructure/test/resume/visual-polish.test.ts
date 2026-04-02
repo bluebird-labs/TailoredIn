@@ -3,15 +3,8 @@ import { execSync } from 'node:child_process';
 import FS from 'node:fs/promises';
 import OS from 'node:os';
 import Path from 'node:path';
-import { TemplateStyle } from '@tailoredin/domain';
 import type { BrilliantCVContent, BrilliantCVExperience } from '../../src/brilliant-cv/types.js';
 import { TypstFileGenerator } from '../../src/resume/TypstFileGenerator.js';
-import { TEMPLATE_LAYOUTS } from '../../src/resume/templateLayouts.js';
-
-// --- Brand colors ---
-const BRIGHT_VIBRANT = '#FF4500';
-const DARK_CORPORATE = '#1B365D';
-const FALLBACK_SKYBLUE = '#0395DE';
 
 // --- Shared personal block ---
 const PERSONAL = {
@@ -66,10 +59,9 @@ function makeExperience(count: number, bulletsPerEntry: number | number[]): Bril
 }
 
 // --- Content factories ---
-function buildContent(color: string, entries: number, bulletsPerEntry: number | number[]): BrilliantCVContent {
+function buildContent(entries: number, bulletsPerEntry: number | number[]): BrilliantCVContent {
   return {
     personal: PERSONAL,
-    awesome_color: color,
     keywords: ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'Kubernetes'],
     experience: makeExperience(entries, bulletsPerEntry),
     skills: [
@@ -91,14 +83,6 @@ const VOLUMES = [
   { name: 'heavy', entries: 8, bullets: [2, 3, 4, 5, 3, 4, 2, 5] as number | number[] }
 ] as const;
 
-const COLORS = [
-  { name: 'bright-vibrant', hex: BRIGHT_VIBRANT },
-  { name: 'dark-corporate', hex: DARK_CORPORATE },
-  { name: 'fallback', hex: FALLBACK_SKYBLUE }
-] as const;
-
-const STYLES = [TemplateStyle.IC, TemplateStyle.ARCHITECT, TemplateStyle.EXECUTIVE] as const;
-
 // --- Typst availability guard ---
 let typstAvailable = false;
 
@@ -113,14 +97,10 @@ beforeAll(() => {
 });
 
 // --- Compilation helper ---
-async function compileAndCountPages(
-  content: BrilliantCVContent,
-  style: TemplateStyle
-): Promise<{ pageCount: number; tmpDir: string }> {
+async function compileAndCountPages(content: BrilliantCVContent): Promise<{ pageCount: number; tmpDir: string }> {
   const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'visual-polish-'));
-  const layout = TEMPLATE_LAYOUTS[style];
 
-  await TypstFileGenerator.generate(content, tmpDir, layout);
+  await TypstFileGenerator.generate(content, tmpDir);
 
   // Compile to PDF
   execSync('typst compile cv.typ output.pdf', { cwd: tmpDir, stdio: 'pipe' });
@@ -134,34 +114,23 @@ async function compileAndCountPages(
 
 // --- Test matrix ---
 describe('Visual Polish — Page-Fit Validation', () => {
-  for (const style of STYLES) {
-    describe(`${style} template`, () => {
-      for (const volume of VOLUMES) {
-        for (const color of COLORS) {
-          it(`compiles ${volume.name} content with ${color.name} color`, async () => {
-            if (!typstAvailable) return;
+  for (const volume of VOLUMES) {
+    it(`compiles ${volume.name} content`, async () => {
+      if (!typstAvailable) return;
 
-            const content = buildContent(color.hex, volume.entries, volume.bullets);
-            const { pageCount, tmpDir } = await compileAndCountPages(content, style);
+      const content = buildContent(volume.entries, volume.bullets);
+      const { pageCount, tmpDir } = await compileAndCountPages(content);
 
-            try {
-              // All combinations must produce 1-2 pages
-              expect(pageCount).toBeGreaterThanOrEqual(1);
-              expect(pageCount).toBeLessThanOrEqual(2);
+      try {
+        // All combinations must produce 1-2 pages
+        expect(pageCount).toBeGreaterThanOrEqual(1);
+        expect(pageCount).toBeLessThanOrEqual(2);
 
-              // EXECUTIVE with light content should fit on 1 page
-              if (style === TemplateStyle.EXECUTIVE && volume.name === 'light') {
-                expect(pageCount).toBe(1);
-              }
-
-              // Verify PDF exists and has content
-              const pdfStat = await FS.stat(Path.join(tmpDir, 'output.pdf'));
-              expect(pdfStat.size).toBeGreaterThan(0);
-            } finally {
-              await FS.rm(tmpDir, { recursive: true });
-            }
-          });
-        }
+        // Verify PDF exists and has content
+        const pdfStat = await FS.stat(Path.join(tmpDir, 'output.pdf'));
+        expect(pdfStat.size).toBeGreaterThan(0);
+      } finally {
+        await FS.rm(tmpDir, { recursive: true });
       }
     });
   }
@@ -178,26 +147,22 @@ describe('Visual Polish — Snapshot Generation', () => {
     }
   });
 
-  for (const style of STYLES) {
-    for (const volume of VOLUMES) {
-      for (const color of COLORS) {
-        it(`generates snapshot: ${style}-${volume.name}-${color.name}`, async () => {
-          if (!typstAvailable || !shouldUpdate) return;
+  for (const volume of VOLUMES) {
+    it(`generates snapshot: ${volume.name}`, async () => {
+      if (!typstAvailable || !shouldUpdate) return;
 
-          const content = buildContent(color.hex, volume.entries, volume.bullets);
-          const { pageCount, tmpDir } = await compileAndCountPages(content, style);
+      const content = buildContent(volume.entries, volume.bullets);
+      const { pageCount, tmpDir } = await compileAndCountPages(content);
 
-          try {
-            for (let page = 1; page <= pageCount; page++) {
-              const src = Path.join(tmpDir, `page-${page}.png`);
-              const dest = Path.join(SNAPSHOT_DIR, `${style}-${volume.name}-${color.name}-page${page}.png`);
-              await FS.copyFile(src, dest);
-            }
-          } finally {
-            await FS.rm(tmpDir, { recursive: true });
-          }
-        });
+      try {
+        for (let page = 1; page <= pageCount; page++) {
+          const src = Path.join(tmpDir, `page-${page}.png`);
+          const dest = Path.join(SNAPSHOT_DIR, `${volume.name}-page${page}.png`);
+          await FS.copyFile(src, dest);
+        }
+      } finally {
+        await FS.rm(tmpDir, { recursive: true });
       }
-    }
+    });
   }
 });

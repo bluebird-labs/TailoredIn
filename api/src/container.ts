@@ -59,7 +59,6 @@ import {
   OpenAiLlmService,
   PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   PlaywrightJobScraper,
-  PlaywrightWebColorService,
   PostgresArchetypeRepository,
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
@@ -162,7 +161,6 @@ if (llmAvailable) {
 } else {
   container.bind({ provide: DI.Resume.LlmService, useValue: null });
 }
-container.bind({ provide: DI.Resume.WebColorService, useClass: PlaywrightWebColorService });
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({
   provide: DI.Resume.ContentFactory,
@@ -192,8 +190,6 @@ container.bind({
       container.get(DI.Job.Repository),
       container.get(DI.Profile.Repository),
       container.get(DI.Archetype.Repository),
-      container.get(DI.Resume.LlmService),
-      container.get(DI.Resume.WebColorService),
       container.get(DI.Resume.Renderer),
       container.get(DI.Resume.ContentFactory)
     )

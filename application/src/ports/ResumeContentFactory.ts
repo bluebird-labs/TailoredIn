@@ -4,7 +4,6 @@ import type { ResumeContentDto } from '../dtos/ResumeContentDto.js';
 export type MakeResumeContentInput = {
   profileId: string;
   archetypeId: string;
-  awesomeColor: string;
   keywords: string[];
 };
 
@@ -15,7 +14,6 @@ export type MakeResumeContentFromSelectionInput = {
   educationIds: string[];
   skillCategoryIds: string[];
   skillItemIds: string[];
-  awesomeColor: string;
   keywords: string[];
 };
 

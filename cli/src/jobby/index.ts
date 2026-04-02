@@ -3,7 +3,6 @@
 import { Logger } from '@tailoredin/core';
 import { binary, run, subcommands } from 'cmd-ts';
 import { jobsCommands } from './commands/jobs.js';
-import { utilsCommands } from './commands/utils/utils.js';
 
 const log = Logger.create('jobby');
 
@@ -11,8 +10,7 @@ const jobby = subcommands({
   name: 'jobby',
   description: 'CLI for the TailoredIn project.',
   cmds: {
-    jobs: jobsCommands,
-    utils: utilsCommands
+    jobs: jobsCommands
   }
 });
 

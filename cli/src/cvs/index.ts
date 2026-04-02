@@ -4,14 +4,13 @@ import { execSync } from 'node:child_process';
 import * as Fs from 'node:fs/promises';
 import * as Path from 'node:path';
 import { Logger } from '@tailoredin/core';
-import { ArchetypeKey, TailoringStrategyService } from '@tailoredin/domain';
-import { generateCV, TEMPLATE_LAYOUTS, TYPST_DIR, TypstFileGenerator } from '@tailoredin/infrastructure';
+import { ArchetypeKey } from '@tailoredin/domain';
+import { generateCV, TYPST_DIR, TypstFileGenerator } from '@tailoredin/infrastructure';
 import { format } from 'date-fns';
 import Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 const log = Logger.create('cvs');
-const AWESOME_COLOR_PRESETS = ['skyblue', 'red', 'nephritis', 'concrete', 'darknight'] as const;
 const TYPST_CWD = TYPST_DIR;
 
 Yargs(hideBin(process.argv))
@@ -27,14 +26,6 @@ Yargs(hideBin(process.argv))
           choices: Object.values(ArchetypeKey),
           description: 'The archetype of the CV to generate'
         },
-        theme: {
-          alias: ['t'],
-          type: 'string',
-          demandOption: false,
-          choices: AWESOME_COLOR_PRESETS,
-          default: 'skyblue',
-          description: 'The brilliant-cv accent color preset'
-        },
         company_name: {
           alias: ['c'],
           type: 'string',
@@ -49,22 +40,12 @@ Yargs(hideBin(process.argv))
           demandOption: false,
           default: [],
           description: 'Keywords to inject into PDF metadata for ATS matching'
-        },
-        main_color: {
-          alias: ['mc'],
-          type: 'string',
-          demandOption: false,
-          default: '',
-          description: 'Custom hex accent color (overrides --theme), e.g. "#178FEA"'
         }
       });
     },
     async args => {
-      const awesomeColor = (args.main_color as string) || (args.theme as string);
-
       const cvContent = generateCV({
         archetype: args.archetype as ArchetypeKey,
-        awesomeColor,
         companyName: args.company_name as string,
         keywords: args.keywords as string[]
       });
@@ -80,8 +61,7 @@ Yargs(hideBin(process.argv))
       const pdfPath = Path.resolve(outputDir, `Sylvain-Estevez-${date}.pdf`);
 
       await Fs.mkdir(outputDir, { recursive: true });
-      const templateStyle = new TailoringStrategyService().resolveTemplateStyle(args.archetype as ArchetypeKey);
-      await TypstFileGenerator.generate(cvContent, TYPST_CWD, TEMPLATE_LAYOUTS[templateStyle]);
+      await TypstFileGenerator.generate(cvContent, TYPST_CWD);
 
       try {
         execSync(`typst compile cv.typ "${pdfPath}"`, { cwd: TYPST_CWD, stdio: 'pipe' });

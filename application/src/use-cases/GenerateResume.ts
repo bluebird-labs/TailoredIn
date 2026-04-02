@@ -5,8 +5,6 @@ import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeContentFactory } from '../ports/ResumeContentFactory.js';
 import type { ResumeRenderer } from '../ports/ResumeRenderer.js';
 
-const DEFAULT_AWESOME_COLOR = '#0395DE';
-
 export class GenerateResume {
   private readonly log = Logger.create(GenerateResume.name);
 
@@ -26,7 +24,6 @@ export class GenerateResume {
       educationIds: input.educationIds,
       skillCategoryIds: input.skillCategoryIds,
       skillItemIds: input.skillItemIds,
-      awesomeColor: DEFAULT_AWESOME_COLOR,
       keywords: input.keywords ?? []
     });
 
@@ -34,8 +31,7 @@ export class GenerateResume {
 
     const pdfPath = await this.resumeRenderer.render({
       content,
-      companyName: 'Generic',
-      templateStyle: input.templateStyle
+      companyName: 'Generic'
     });
 
     return ok({ pdfPath });
