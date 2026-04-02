@@ -117,29 +117,82 @@ ${includes}
       ``
     ];
 
+    // Group consecutive experiences by company (society)
+    const groups: { society: string; positions: typeof content.experience }[] = [];
     for (const exp of content.experience) {
-      const highlights = exp.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
+      const last = groups[groups.length - 1];
+      if (last && last.society === exp.society) {
+        last.positions.push(exp);
+      } else {
+        groups.push({ society: exp.society, positions: [exp] });
+      }
+    }
 
-      lines.push(`#cv-entry(`);
-      lines.push(`  title: [${escapeTypst(exp.title)}],`);
-      lines.push(`  society: [${exp.society}],`); // NOT escaped — may contain #smallcaps[...]
-      lines.push(`  date: [${exp.date}],`);
-      lines.push(`  location: [${escapeTypst(exp.location)}],`);
-      lines.push(`  description: [`);
-      if (RESUME_LAYOUT.showEntrySummary && exp.summary) {
-        lines.push(`    _${escapeTypst(exp.summary)}_`);
-        if (highlights.length > 0) lines.push(`    #v(2pt)`);
-      }
-      if (highlights.length > 0) {
-        lines.push(`    #list(`);
-        for (const h of highlights) {
-          lines.push(`      [${escapeTypst(h)}],`);
+    for (const group of groups) {
+      if (group.positions.length === 1) {
+        // Single position — render as before
+        const exp = group.positions[0];
+        const highlights = exp.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
+
+        lines.push(`#cv-entry(`);
+        lines.push(`  title: [${escapeTypst(exp.title)}],`);
+        lines.push(`  society: [${exp.society}],`);
+        lines.push(`  date: [${exp.date}],`);
+        lines.push(`  location: [${escapeTypst(exp.location)}],`);
+        lines.push(`  description: [`);
+        if (RESUME_LAYOUT.showEntrySummary && exp.summary) {
+          lines.push(`    _${escapeTypst(exp.summary)}_`);
+          if (highlights.length > 0) lines.push(`    #v(2pt)`);
         }
-        lines.push(`    )`);
+        if (highlights.length > 0) {
+          lines.push(`    #list(`);
+          for (const h of highlights) {
+            lines.push(`      [${escapeTypst(h)}],`);
+          }
+          lines.push(`    )`);
+        }
+        lines.push(`  ],`);
+        lines.push(`)`);
+        lines.push(``);
+      } else {
+        // Multiple positions at same company — group under one header
+        const first = group.positions[0];
+        const last = group.positions[group.positions.length - 1];
+        const locations = [...new Set(group.positions.map(p => p.location))].join(' → ');
+        const dateRange = `${last.date.split(' – ')[0]} – ${first.date.split(' – ')[1]}`;
+
+        lines.push(`#cv-entry(`);
+        lines.push(`  title: [],`);
+        lines.push(`  society: [${group.society}],`);
+        lines.push(`  date: [${dateRange}],`);
+        lines.push(`  location: [${escapeTypst(locations)}],`);
+        lines.push(`  description: [`);
+
+        for (let i = 0; i < group.positions.length; i++) {
+          const pos = group.positions[i];
+          const highlights = pos.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
+
+          if (i > 0) lines.push(`    #v(4pt)`);
+          lines.push(`    *${escapeTypst(pos.title)}* #h(1fr) _${pos.date}_`);
+
+          if (RESUME_LAYOUT.showEntrySummary && pos.summary) {
+            lines.push(`    #v(1pt)`);
+            lines.push(`    _${escapeTypst(pos.summary)}_`);
+          }
+          if (highlights.length > 0) {
+            lines.push(`    #v(2pt)`);
+            lines.push(`    #list(`);
+            for (const h of highlights) {
+              lines.push(`      [${escapeTypst(h)}],`);
+            }
+            lines.push(`    )`);
+          }
+        }
+
+        lines.push(`  ],`);
+        lines.push(`)`);
+        lines.push(``);
       }
-      lines.push(`  ],`);
-      lines.push(`)`);
-      lines.push(``);
     }
 
     return lines.join('\n');
