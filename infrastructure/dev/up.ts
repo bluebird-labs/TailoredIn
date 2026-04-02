@@ -5,8 +5,7 @@
  * 1. Checks if `bun install` is needed (lockfile vs node_modules freshness)
  * 2. Starts PostgreSQL via Docker Compose
  * 3. Runs all pending migrations
- * 4. Truncates + re-seeds the database (always, on main and worktree)
- * 5. Spawns API + web dev servers as child processes
+ * 4. Spawns API + web dev servers as child processes
  *
  * Worktree-aware: on main uses .env (static ports),
  * in a worktree allocates free ports and generates an isolated .env.
@@ -20,7 +19,7 @@ import type { OrmDbConfig } from '../src/db/orm-config.js';
 import { resolveDevContext } from './DevContext.js';
 import { assertDockerRunning, composeDown, composeUp, isContainerRunning, waitForPostgres } from './DockerCompose.js';
 import { deleteEnvFile, envFileExists, readPorts, type SessionPorts, writeWorktreeEnv } from './EnvFile.js';
-import { runMigrations, runSeeds } from './MigrationRunner.js';
+import { runMigrations } from './MigrationRunner.js';
 import { findFreePort } from './PortFinder.js';
 
 const log = Logger.create('up');
@@ -106,16 +105,6 @@ if (isContainerRunning(ctx.containerName)) {
 log.info('Running migrations...');
 try {
   await runMigrationsForContext(ports);
-} catch (e) {
-  if (ctx.mode === 'worktree') teardownWorktree();
-  throw e;
-}
-
-// ── Seeds (always — truncate + re-insert) ─────────────────────────
-
-log.info('Seeding database...');
-try {
-  await runSeedsForContext(ports);
 } catch (e) {
   if (ctx.mode === 'worktree') teardownWorktree();
   throw e;
@@ -223,10 +212,6 @@ function dbConfigForContext(sessionPorts: SessionPorts | null): OrmDbConfig {
 
 async function runMigrationsForContext(sessionPorts: SessionPorts | null): Promise<void> {
   await runMigrations(dbConfigForContext(sessionPorts));
-}
-
-async function runSeedsForContext(sessionPorts: SessionPorts | null): Promise<void> {
-  await runSeeds(dbConfigForContext(sessionPorts));
 }
 
 function teardownWorktree(): void {
