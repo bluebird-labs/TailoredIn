@@ -1,6 +1,6 @@
 import { Logger } from '@tailoredin/core';
 import {
-  ArchetypeKey,
+  type ArchetypeKey,
   type ArchetypeRepository,
   err,
   type JobPosting,
