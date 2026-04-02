@@ -172,7 +172,7 @@ ${includes}
           const highlights = pos.highlights.slice(0, RESUME_LAYOUT.maxBulletsPerEntry);
 
           if (i > 0) lines.push(`    #v(4pt)`);
-          lines.push(`    *${escapeTypst(pos.title)}* · ${escapeTypst(pos.location)} #h(1fr) _${pos.date}_`);
+          lines.push(`    *${escapeTypst(pos.title)}* #h(1fr) _${pos.date}_`);
 
           if (RESUME_LAYOUT.showEntrySummary && pos.summary) {
             lines.push(`    #v(1pt)`);
