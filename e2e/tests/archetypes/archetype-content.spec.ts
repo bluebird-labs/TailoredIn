@@ -21,7 +21,7 @@ test.describe('Archetype content selection', () => {
     await expect(page.getByText('Software Architect & Technical Advisor at Stealth Startup')).toBeVisible();
     await expect(page.getByText('Senior Engineering Manager at Brightflow.ai')).toBeVisible();
     await expect(page.getByText('Engineering Manager at Volvo Cars')).toBeVisible();
-    await expect(page.getByText('Lead Software Engineer at LuckyCart')).toBeVisible();
+    await expect(page.getByText('Software Engineer at LuckyCart')).toBeVisible();
 
     // Education section
     await expect(page.getByText('B.S. in Computer Science')).toBeVisible();
