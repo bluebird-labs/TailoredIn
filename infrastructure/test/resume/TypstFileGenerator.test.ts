@@ -60,9 +60,9 @@ describe('TypstFileGenerator', () => {
     await files.cleanup();
   });
 
-  it('hardcodes awesome_color to #0395DE in metadata.toml', async () => {
+  it('hardcodes awesome_color to #333333 in metadata.toml', async () => {
     const files = await generateInTmpDir(MINIMAL_CONTENT);
-    expect(files.metadata).toContain('awesome_color = "#0395DE"');
+    expect(files.metadata).toContain('awesome_color = "#333333"');
     await files.cleanup();
   });
 
