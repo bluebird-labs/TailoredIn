@@ -18,10 +18,10 @@ test.describe('Archetype content selection', () => {
   test('content selection loads with experience checkboxes and variant pickers', async ({ page }) => {
     // Experiences section
     await expect(page.getByRole('heading', { name: 'Experiences' })).toBeVisible();
-    await expect(page.getByText('Staff Software Engineer at Stealth Startup')).toBeVisible();
-    await expect(page.getByText('Staff Software Engineer at Brightflow.ai')).toBeVisible();
-    await expect(page.getByText('Tech Lead Manager at Volvo Cars')).toBeVisible();
-    await expect(page.getByText('Software Engineer at LuckyCart')).toBeVisible();
+    await expect(page.getByText('Software Architect & Technical Advisor at Stealth Startup')).toBeVisible();
+    await expect(page.getByText('Senior Engineering Manager at Brightflow AI')).toBeVisible();
+    await expect(page.getByText('Engineering Manager at Volvo Cars')).toBeVisible();
+    await expect(page.getByText('Lead Software Engineer at LuckyCart')).toBeVisible();
 
     // Education section
     await expect(page.getByText('B.S. in Computer Science')).toBeVisible();
@@ -39,7 +39,7 @@ test.describe('Archetype content selection', () => {
     // LuckyCart experience is pre-selected in Lead IC seed — uncheck it
     const luckyCartRow = page
       .locator('div')
-      .filter({ hasText: /^Software Engineer at LuckyCart$/ })
+      .filter({ hasText: /Software Engineer at LuckyCart/ })
       .first();
     const luckyCartCheckbox = luckyCartRow.getByRole('checkbox');
     await expect(luckyCartCheckbox).toBeChecked();
@@ -78,7 +78,7 @@ test.describe('Archetype content selection', () => {
     // Uncheck Stealth Startup — bullets should disappear
     const stealthRow = page
       .locator('div')
-      .filter({ hasText: /^Staff Software Engineer at Stealth Startup$/ })
+      .filter({ hasText: /^Software Architect & Technical Advisor at Stealth Startup$/ })
       .first();
     await stealthRow.getByRole('checkbox').uncheck();
 
