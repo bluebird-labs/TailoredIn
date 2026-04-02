@@ -5,8 +5,9 @@ test.describe('Resume Builder', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/resume/builder');
-    // Wait for the page to render with data (name should be visible)
+    // Wait for the page to render with data (name + tabs should be visible)
     await expect(page.getByRole('heading', { name: 'Sylvain Estevez' })).toBeVisible();
+    await expect(page.getByTitle('Add version')).toBeVisible();
   });
 
   /* 1 — Page renders with seeded data */
@@ -77,23 +78,31 @@ test.describe('Resume Builder', () => {
     // Create a version first so we have extra
     await page.getByTitle('Add version').click();
     await page.getByText('New blank').click();
-    await expect(page.getByRole('button', { name: 'New Version' })).toBeVisible();
 
-    // Click the new tab to make it active
-    await page.getByRole('button', { name: 'New Version' }).click();
+    // Wait for the new tab then rename it to something unique
+    const newTab = page.getByRole('button', { name: 'New Version' }).last();
+    await expect(newTab).toBeVisible();
+    await newTab.dblclick();
+    const input = page.locator('input.outline-none');
+    await input.clear();
+    await input.fill('ToDelete');
+    await input.press('Enter');
 
-    // Hover over the "New Version" button to reveal the sibling delete X
-    const newVersionBtn = page.getByRole('button', { name: 'New Version' });
-    await newVersionBtn.hover();
-    // The delete button is a sibling within the same parent div
+    // Click it to make it active
+    const toDeleteBtn = page.getByRole('button', { name: 'ToDelete' });
+    await expect(toDeleteBtn).toBeVisible();
+    await toDeleteBtn.click();
+
+    // Hover to reveal the delete X
+    await toDeleteBtn.hover();
     await page.getByTitle('Delete version').click();
 
-    // Confirmation dialog should appear
+    // Confirmation dialog
     await expect(page.getByText('Delete version')).toBeVisible();
     await page.getByRole('button', { name: 'Delete' }).click();
 
-    // "New Version" tab should be gone
-    await expect(page.getByRole('button', { name: 'New Version' })).not.toBeVisible();
+    // Tab should be gone
+    await expect(page.getByRole('button', { name: 'ToDelete' })).not.toBeVisible();
   });
 
   /* 7 — Switch versions */
