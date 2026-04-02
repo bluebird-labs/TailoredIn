@@ -164,7 +164,7 @@ ${includes}
     ];
 
     for (const edu of content.education) {
-      lines.push(`[*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}]`);
+      lines.push(`*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}`);
       lines.push(``);
     }
 
