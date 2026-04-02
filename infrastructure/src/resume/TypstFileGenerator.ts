@@ -113,14 +113,19 @@ ${includes}
       lines.push(`  society: [${exp.society}],`); // NOT escaped — may contain #smallcaps[...]
       lines.push(`  date: [${exp.date}],`);
       lines.push(`  location: [${escapeTypst(exp.location)}],`);
-      lines.push(`  description: list(`);
-      if (layoutConfig.showEntrySummary) {
-        lines.push(`    [_${escapeTypst(exp.summary)}_],`);
+      lines.push(`  description: [`);
+      if (layoutConfig.showEntrySummary && exp.summary) {
+        lines.push(`    _${escapeTypst(exp.summary)}_`);
+        if (highlights.length > 0) lines.push(`    #v(2pt)`);
       }
-      for (const h of highlights) {
-        lines.push(`    [${escapeTypst(h)}],`);
+      if (highlights.length > 0) {
+        lines.push(`    #list(`);
+        for (const h of highlights) {
+          lines.push(`      [${escapeTypst(h)}],`);
+        }
+        lines.push(`    )`);
       }
-      lines.push(`  ),`);
+      lines.push(`  ],`);
       lines.push(`)`);
       lines.push(``);
     }
