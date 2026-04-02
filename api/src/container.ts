@@ -66,6 +66,7 @@ import {
   PostgresSkillCategoryRepository,
   PostgresSkillRepository,
   PostgresTagRepository,
+  StructuredLlmRouter,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 
@@ -85,6 +86,9 @@ const container = new Container();
 
 // Infrastructure: ORM
 container.bind({ provide: MikroORM, useValue: orm });
+
+// Structured LLM client
+container.bind({ provide: DI.Llm.StructuredClient, useClass: StructuredLlmRouter });
 
 // Job repositories + services
 container.bind({ provide: DI.Job.Repository, useClass: PostgresJobRepository });

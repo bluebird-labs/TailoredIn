@@ -39,6 +39,7 @@ import type {
   ScrapeAndIngestJobs,
   SetArchetypeContent,
   SetArchetypeTagProfile,
+  StructuredLlmClient,
   UpdateArchetype,
   UpdateBullet,
   UpdateEducation,
@@ -65,6 +66,10 @@ import type {
 } from '@tailoredin/domain';
 
 export const DI = {
+  Llm: {
+    StructuredClient: new InjectionToken<StructuredLlmClient>('DI.Llm.StructuredClient')
+  },
+
   Job: {
     Repository: new InjectionToken<JobRepository>('DI.Job.Repository'),
     CompanyRepository: new InjectionToken<CompanyRepository>('DI.Job.CompanyRepository'),

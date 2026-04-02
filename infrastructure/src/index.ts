@@ -25,4 +25,5 @@ export type { OpenAiConfig } from './services/OpenAiLlmService.js';
 export { OPENAI_CONFIG, OpenAiLlmService } from './services/OpenAiLlmService.js';
 export type { PlaywrightJobScraperConfig } from './services/PlaywrightJobScraper.js';
 export { PLAYWRIGHT_JOB_SCRAPER_CONFIG, PlaywrightJobScraper } from './services/PlaywrightJobScraper.js';
+export { StructuredLlmRouter } from './services/structured-llm/index.js';
 export { TypstResumeRenderer } from './services/TypstResumeRenderer.js';
