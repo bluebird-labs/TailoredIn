@@ -249,7 +249,7 @@ export const skillCategoryDefs: [string, string[]][] = [
 export const headlineData = {
   headlineLabel: 'Leader',
   summaryText:
-    'Engineering leader with 14 years building high-performing teams and delivering data-intensive products and systems. Focused on technical excellence, engineering efficiency, and the AI and infrastructure foundations that let organizations move fast with confidence.'
+    'Engineering leader with 15 years building high-performing teams and delivering data-intensive products and systems. Focused on technical excellence, engineering efficiency, and the AI and infrastructure foundations that let organizations move fast with confidence.'
 } as const;
 
 // ── Archetypes ──────────────────────────────────────────────────────
