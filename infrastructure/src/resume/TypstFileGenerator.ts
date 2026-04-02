@@ -157,20 +157,14 @@ ${includes}
 
   private static buildEducationTyp(content: BrilliantCVContent): string {
     const lines: string[] = [
-      `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-entry`,
+      `#import "@preview/brilliant-cv:3.3.0": cv-section`,
       ``,
       `#cv-section("Education")`,
       ``
     ];
 
     for (const edu of content.education) {
-      lines.push(`#cv-entry(`);
-      lines.push(`  title: [${escapeTypst(edu.title)}],`);
-      lines.push(`  society: [${escapeTypst(edu.society)}],`);
-      lines.push(`  date: [${edu.date}],`);
-      lines.push(`  location: [${escapeTypst(edu.location)}],`);
-      lines.push(`  description: list(),`);
-      lines.push(`)`);
+      lines.push(`[*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}]`);
       lines.push(``);
     }
 
