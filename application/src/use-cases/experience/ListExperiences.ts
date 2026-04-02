@@ -1,5 +1,5 @@
-import type { Bullet, BulletVariant, Experience, ExperienceRepository } from '@tailoredin/domain';
-import type { BulletDto, BulletVariantDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
+import type { Bullet, Experience, ExperienceRepository } from '@tailoredin/domain';
+import type { BulletDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
 
 export class ListExperiences {
   public constructor(private readonly experienceRepository: ExperienceRepository) {}
@@ -31,19 +31,6 @@ function toBulletDto(bullet: Bullet): BulletDto {
     content: bullet.content,
     ordinal: bullet.ordinal,
     roleTags: [...bullet.tags.roleTags].map(name => ({ id: '', name, dimension: 'ROLE' })),
-    skillTags: [...bullet.tags.skillTags].map(name => ({ id: '', name, dimension: 'SKILL' })),
-    variants: bullet.variants.map(toVariantDto)
-  };
-}
-
-function toVariantDto(v: BulletVariant): BulletVariantDto {
-  return {
-    id: v.id.value,
-    text: v.text,
-    angle: v.angle,
-    source: v.source,
-    approvalStatus: v.approvalStatus,
-    roleTags: [...v.tags.roleTags].map(name => ({ id: '', name, dimension: 'ROLE' })),
-    skillTags: [...v.tags.skillTags].map(name => ({ id: '', name, dimension: 'SKILL' }))
+    skillTags: [...bullet.tags.skillTags].map(name => ({ id: '', name, dimension: 'SKILL' }))
   };
 }

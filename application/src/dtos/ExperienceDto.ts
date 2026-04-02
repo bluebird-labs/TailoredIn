@@ -1,22 +1,11 @@
 import type { TagDto } from './TagDto.js';
 
-export type BulletVariantDto = {
-  id: string;
-  text: string;
-  angle: string;
-  source: string;
-  approvalStatus: string;
-  roleTags: TagDto[];
-  skillTags: TagDto[];
-};
-
 export type BulletDto = {
   id: string;
   content: string;
   ordinal: number;
   roleTags: TagDto[];
   skillTags: TagDto[];
-  variants: BulletVariantDto[];
 };
 
 export type ExperienceDto = {

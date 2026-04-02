@@ -66,7 +66,7 @@ export function useSetArchetypeContent() {
       ...body
     }: {
       id: string;
-      experience_selections: { experience_id: string; bullet_variant_ids: string[] }[];
+      experience_selections: { experience_id: string; bullet_ids: string[] }[];
       education_ids: string[];
       skill_category_ids: string[];
       skill_item_ids: string[];

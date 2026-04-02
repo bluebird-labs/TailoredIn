@@ -1,14 +1,11 @@
 import { describe, expect, test } from 'bun:test';
 import type { MakeResumeContentInput } from '@tailoredin/application';
 import {
-  ApprovalStatus,
   Archetype,
   ArchetypeId,
   type ArchetypeRepository,
   Bullet,
   BulletId,
-  BulletVariant,
-  BulletVariantId,
   ContentSelection,
   type EducationRepository,
   Experience,
@@ -27,34 +24,13 @@ import { DatabaseResumeContentFactory } from '../../src/services/DatabaseResumeC
 
 const now = new Date();
 
-function makeVariant(id: string, bulletId: string, text: string): BulletVariant {
-  return new BulletVariant({
-    id: new BulletVariantId(id),
-    bulletId,
-    text,
-    angle: 'default',
-    tags: TagSet.empty(),
-    source: 'manual',
-    approvalStatus: ApprovalStatus.APPROVED,
-    createdAt: now,
-    updatedAt: now
-  });
-}
-
-function makeBullet(
-  id: string,
-  experienceId: string,
-  ordinal: number,
-  content: string,
-  variants: BulletVariant[]
-): Bullet {
+function makeBullet(id: string, experienceId: string, ordinal: number, content: string): Bullet {
   return new Bullet({
     id: new BulletId(id),
     experienceId,
     content,
     ordinal,
     tags: TagSet.empty(),
-    variants,
     createdAt: now,
     updatedAt: now
   });
@@ -179,15 +155,13 @@ function makeFactory(contentSelection: ContentSelection, experiences: Experience
 // --- Tests ---
 
 describe('DatabaseResumeContentFactory', () => {
-  test('happy path: selected variants drive highlights', async () => {
-    const v1 = makeVariant('v1', 'b1', 'Led migration to microservices');
-    const v2 = makeVariant('v2', 'b2', 'Reduced deploy time by 40%');
-    const b1 = makeBullet('b1', 'exp-1', 0, 'Original bullet 1', [v1, makeVariant('v1-alt', 'b1', 'Alt variant')]);
-    const b2 = makeBullet('b2', 'exp-1', 1, 'Original bullet 2', [v2]);
+  test('happy path: selected bullets drive highlights', async () => {
+    const b1 = makeBullet('b1', 'exp-1', 0, 'Led migration to microservices');
+    const b2 = makeBullet('b2', 'exp-1', 1, 'Reduced deploy time by 40%');
     const exp = makeExperience('exp-1', [b1, b2]);
 
     const cs = new ContentSelection({
-      experienceSelections: [{ experienceId: 'exp-1', bulletVariantIds: ['v1', 'v2'] }],
+      experienceSelections: [{ experienceId: 'exp-1', bulletIds: ['b1', 'b2'] }],
       projectIds: [],
       educationIds: [],
       skillCategoryIds: [],
@@ -202,14 +176,12 @@ describe('DatabaseResumeContentFactory', () => {
   });
 
   test('selection order is preserved', async () => {
-    const v1 = makeVariant('v1', 'b1', 'First variant');
-    const v2 = makeVariant('v2', 'b2', 'Second variant');
-    const b1 = makeBullet('b1', 'exp-1', 0, 'Bullet 1', [v1]);
-    const b2 = makeBullet('b2', 'exp-1', 1, 'Bullet 2', [v2]);
+    const b1 = makeBullet('b1', 'exp-1', 0, 'First bullet');
+    const b2 = makeBullet('b2', 'exp-1', 1, 'Second bullet');
     const exp = makeExperience('exp-1', [b1, b2]);
 
     const cs = new ContentSelection({
-      experienceSelections: [{ experienceId: 'exp-1', bulletVariantIds: ['v2', 'v1'] }],
+      experienceSelections: [{ experienceId: 'exp-1', bulletIds: ['b2', 'b1'] }],
       projectIds: [],
       educationIds: [],
       skillCategoryIds: [],
@@ -219,17 +191,16 @@ describe('DatabaseResumeContentFactory', () => {
     const factory = makeFactory(cs, [exp]);
     const result = await factory.make(defaultInput);
 
-    expect(result.experience[0].highlights[0]).toBe('Second variant.');
-    expect(result.experience[0].highlights[1]).toBe('First variant.');
+    expect(result.experience[0].highlights[0]).toBe('Second bullet.');
+    expect(result.experience[0].highlights[1]).toBe('First bullet.');
   });
 
-  test('missing variant is skipped silently', async () => {
-    const v1 = makeVariant('v1', 'b1', 'Existing variant');
-    const b1 = makeBullet('b1', 'exp-1', 0, 'Bullet 1', [v1]);
+  test('missing bullet is skipped silently', async () => {
+    const b1 = makeBullet('b1', 'exp-1', 0, 'Existing bullet');
     const exp = makeExperience('exp-1', [b1]);
 
     const cs = new ContentSelection({
-      experienceSelections: [{ experienceId: 'exp-1', bulletVariantIds: ['v1', 'nonexistent-id'] }],
+      experienceSelections: [{ experienceId: 'exp-1', bulletIds: ['b1', 'nonexistent-id'] }],
       projectIds: [],
       educationIds: [],
       skillCategoryIds: [],
@@ -239,16 +210,15 @@ describe('DatabaseResumeContentFactory', () => {
     const factory = makeFactory(cs, [exp]);
     const result = await factory.make(defaultInput);
 
-    expect(result.experience[0].highlights).toEqual(['Existing variant.']);
+    expect(result.experience[0].highlights).toEqual(['Existing bullet.']);
   });
 
-  test('empty bulletVariantIds produces empty highlights but experience still present', async () => {
-    const v1 = makeVariant('v1', 'b1', 'Some variant');
-    const b1 = makeBullet('b1', 'exp-1', 0, 'Bullet 1', [v1]);
+  test('empty bulletIds produces empty highlights but experience still present', async () => {
+    const b1 = makeBullet('b1', 'exp-1', 0, 'Some bullet');
     const exp = makeExperience('exp-1', [b1]);
 
     const cs = new ContentSelection({
-      experienceSelections: [{ experienceId: 'exp-1', bulletVariantIds: [] }],
+      experienceSelections: [{ experienceId: 'exp-1', bulletIds: [] }],
       projectIds: [],
       educationIds: [],
       skillCategoryIds: [],
@@ -264,17 +234,15 @@ describe('DatabaseResumeContentFactory', () => {
   });
 
   test('multiple experiences with different selections', async () => {
-    const v1 = makeVariant('v1', 'b1', 'Variant for exp1');
-    const v2 = makeVariant('v2', 'b2', 'Variant for exp2');
-    const b1 = makeBullet('b1', 'exp-1', 0, 'Bullet 1', [v1]);
-    const b2 = makeBullet('b2', 'exp-2', 0, 'Bullet 2', [v2]);
+    const b1 = makeBullet('b1', 'exp-1', 0, 'Bullet for exp1');
+    const b2 = makeBullet('b2', 'exp-2', 0, 'Bullet for exp2');
     const exp1 = makeExperience('exp-1', [b1]);
     const exp2 = makeExperience('exp-2', [b2]);
 
     const cs = new ContentSelection({
       experienceSelections: [
-        { experienceId: 'exp-1', bulletVariantIds: ['v1'] },
-        { experienceId: 'exp-2', bulletVariantIds: ['v2'] }
+        { experienceId: 'exp-1', bulletIds: ['b1'] },
+        { experienceId: 'exp-2', bulletIds: ['b2'] }
       ],
       projectIds: [],
       educationIds: [],
@@ -286,19 +254,17 @@ describe('DatabaseResumeContentFactory', () => {
     const result = await factory.make(defaultInput);
 
     expect(result.experience).toHaveLength(2);
-    expect(result.experience[0].highlights).toEqual(['Variant for exp1.']);
-    expect(result.experience[1].highlights).toEqual(['Variant for exp2.']);
+    expect(result.experience[0].highlights).toEqual(['Bullet for exp1.']);
+    expect(result.experience[1].highlights).toEqual(['Bullet for exp2.']);
   });
 
   test('trailing period handling: added if missing, not doubled', async () => {
-    const v1 = makeVariant('v1', 'b1', 'No period at end');
-    const v2 = makeVariant('v2', 'b2', 'Already has period.');
-    const b1 = makeBullet('b1', 'exp-1', 0, 'Bullet 1', [v1]);
-    const b2 = makeBullet('b2', 'exp-1', 1, 'Bullet 2', [v2]);
+    const b1 = makeBullet('b1', 'exp-1', 0, 'No period at end');
+    const b2 = makeBullet('b2', 'exp-1', 1, 'Already has period.');
     const exp = makeExperience('exp-1', [b1, b2]);
 
     const cs = new ContentSelection({
-      experienceSelections: [{ experienceId: 'exp-1', bulletVariantIds: ['v1', 'v2'] }],
+      experienceSelections: [{ experienceId: 'exp-1', bulletIds: ['b1', 'b2'] }],
       projectIds: [],
       educationIds: [],
       skillCategoryIds: [],

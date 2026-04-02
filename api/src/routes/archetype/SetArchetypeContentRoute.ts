@@ -16,7 +16,7 @@ export class SetArchetypeContentRoute {
           contentSelection: {
             experienceSelections: body.experience_selections.map(es => ({
               experienceId: es.experience_id,
-              bulletVariantIds: es.bullet_variant_ids
+              bulletIds: es.bullet_ids
             })),
             projectIds: body.project_ids ?? [],
             educationIds: body.education_ids,
@@ -36,7 +36,7 @@ export class SetArchetypeContentRoute {
           experience_selections: t.Array(
             t.Object({
               experience_id: t.String({ format: 'uuid' }),
-              bullet_variant_ids: t.Array(t.String({ format: 'uuid' }))
+              bullet_ids: t.Array(t.String({ format: 'uuid' }))
             })
           ),
           project_ids: t.Optional(t.Array(t.String({ format: 'uuid' }))),

@@ -32,7 +32,7 @@ type Archetype = {
   headlineId: string | null;
   tagProfile: { roleWeights: Record<string, number>; skillWeights: Record<string, number> };
   contentSelection: {
-    experienceSelections: { experienceId: string; bulletVariantIds: string[] }[];
+    experienceSelections: { experienceId: string; bulletIds: string[] }[];
     projectIds: string[];
     educationIds: string[];
     skillCategoryIds: string[];
@@ -264,7 +264,6 @@ type Experience = {
   bullets: {
     id: string;
     content: string;
-    variants: { id: string; text: string; angle: string; approvalStatus: string }[];
   }[];
 };
 
@@ -281,7 +280,7 @@ type SkillCategory = {
   items: { id: string; name: string; ordinal: number }[];
 };
 
-type ExperienceSelection = { experienceId: string; bulletVariantIds: string[] };
+type ExperienceSelection = { experienceId: string; bulletIds: string[] };
 
 function ContentSelectionSection({ archetype }: { archetype: Archetype }) {
   const { data: experiences = [] } = useExperiences();
@@ -313,23 +312,23 @@ function ContentSelectionSection({ archetype }: { archetype: Archetype }) {
     if (isExperienceSelected(expId)) {
       setExpSelections(prev => prev.filter(s => s.experienceId !== expId));
     } else {
-      setExpSelections(prev => [...prev, { experienceId: expId, bulletVariantIds: [] }]);
+      setExpSelections(prev => [...prev, { experienceId: expId, bulletIds: [] }]);
     }
   }
 
-  function isVariantSelected(expId: string, variantId: string) {
+  function isBulletSelected(expId: string, bulletId: string) {
     const sel = expSelections.find(s => s.experienceId === expId);
-    return sel?.bulletVariantIds.includes(variantId) ?? false;
+    return sel?.bulletIds.includes(bulletId) ?? false;
   }
 
-  function toggleVariant(expId: string, variantId: string) {
+  function toggleBullet(expId: string, bulletId: string) {
     setExpSelections(prev =>
       prev.map(s => {
         if (s.experienceId !== expId) return s;
-        const has = s.bulletVariantIds.includes(variantId);
+        const has = s.bulletIds.includes(bulletId);
         return {
           ...s,
-          bulletVariantIds: has ? s.bulletVariantIds.filter(id => id !== variantId) : [...s.bulletVariantIds, variantId]
+          bulletIds: has ? s.bulletIds.filter(id => id !== bulletId) : [...s.bulletIds, bulletId]
         };
       })
     );
@@ -358,7 +357,7 @@ function ContentSelectionSection({ archetype }: { archetype: Archetype }) {
       id: archetype.id,
       experience_selections: expSelections.map(s => ({
         experience_id: s.experienceId,
-        bullet_variant_ids: s.bulletVariantIds
+        bullet_ids: s.bulletIds
       })),
       education_ids: educationIds,
       skill_category_ids: skillCategoryIds,
@@ -386,23 +385,14 @@ function ContentSelectionSection({ archetype }: { archetype: Archetype }) {
                 </div>
 
                 {isExperienceSelected(exp.id) && (
-                  <div className="ml-6 space-y-2">
+                  <div className="ml-6 space-y-1">
                     {exp.bullets.map(bullet => (
-                      <div key={bullet.id} className="space-y-1">
-                        <p className="text-xs text-muted-foreground">{bullet.content}</p>
-                        <div className="ml-4 space-y-1">
-                          {bullet.variants.map(variant => (
-                            <div key={variant.id} className="flex items-center gap-2">
-                              <Checkbox
-                                checked={isVariantSelected(exp.id, variant.id)}
-                                onCheckedChange={() => toggleVariant(exp.id, variant.id)}
-                              />
-                              <span className="text-xs">
-                                {variant.text} ({variant.angle})
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                      <div key={bullet.id} className="flex items-center gap-2">
+                        <Checkbox
+                          checked={isBulletSelected(exp.id, bullet.id)}
+                          onCheckedChange={() => toggleBullet(exp.id, bullet.id)}
+                        />
+                        <span className="text-xs">{bullet.content}</span>
                       </div>
                     ))}
                   </div>

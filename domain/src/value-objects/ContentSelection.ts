@@ -1,6 +1,6 @@
 export type ExperienceSelection = {
   experienceId: string;
-  bulletVariantIds: string[];
+  bulletIds: string[];
 };
 
 export class ContentSelection {

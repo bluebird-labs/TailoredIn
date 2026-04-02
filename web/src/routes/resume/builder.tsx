@@ -27,7 +27,7 @@ export const Route = createFileRoute('/resume/builder')({
 });
 
 type ContentSelection = {
-  experienceSelections: { experienceId: string; bulletVariantIds: string[] }[];
+  experienceSelections: { experienceId: string; bulletIds: string[] }[];
   educationIds: string[];
   skillCategoryIds: string[];
   skillItemIds: string[];
@@ -96,11 +96,11 @@ function BuilderPage() {
   );
 
   // ── Derive selections from archetype ──────────────────────────────────
-  const visibleBulletVariantIds = useMemo(() => {
+  const visibleBulletIds = useMemo(() => {
     const map = new Map<string, Set<string>>();
     if (!activeArchetype) return map;
     for (const es of activeArchetype.contentSelection.experienceSelections) {
-      map.set(es.experienceId, new Set(es.bulletVariantIds));
+      map.set(es.experienceId, new Set(es.bulletIds));
     }
     return map;
   }, [activeArchetype]);
@@ -132,7 +132,7 @@ function BuilderPage() {
           id: activeArchetype.id,
           experience_selections: (patch.experienceSelections ?? cs.experienceSelections).map(es => ({
             experience_id: es.experienceId,
-            bullet_variant_ids: es.bulletVariantIds
+            bullet_ids: es.bulletIds
           })),
           education_ids: patch.educationIds ?? cs.educationIds,
           skill_category_ids: cs.skillCategoryIds,
@@ -148,12 +148,12 @@ function BuilderPage() {
 
   // ── Callbacks ─────────────────────────────────────────────────────────
   const handleBulletVisibilityChange = useCallback(
-    (expId: string, variantIds: Set<string>) => {
+    (expId: string, bulletIds: Set<string>) => {
       if (!activeArchetype) return;
       const cs = activeArchetype.contentSelection;
       const updated = cs.experienceSelections.filter(es => es.experienceId !== expId);
-      if (variantIds.size > 0) {
-        updated.push({ experienceId: expId, bulletVariantIds: [...variantIds] });
+      if (bulletIds.size > 0) {
+        updated.push({ experienceId: expId, bulletIds: [...bulletIds] });
       }
       saveContent({ experienceSelections: updated });
     },
@@ -209,7 +209,7 @@ function BuilderPage() {
                 id: newId,
                 experience_selections: cs.experienceSelections.map(es => ({
                   experience_id: es.experienceId,
-                  bullet_variant_ids: es.bulletVariantIds
+                  bullet_ids: es.bulletIds
                 })),
                 education_ids: cs.educationIds,
                 skill_category_ids: cs.skillCategoryIds,
@@ -261,11 +261,11 @@ function BuilderPage() {
     const headlineText = activeArchetype?.headlineText ?? '';
 
     const experienceSelections = [];
-    for (const [expId, variantIds] of visibleBulletVariantIds) {
-      if (variantIds.size > 0) {
+    for (const [expId, bulletIds] of visibleBulletIds) {
+      if (bulletIds.size > 0) {
         experienceSelections.push({
           experience_id: expId,
-          bullet_variant_ids: [...variantIds]
+          bullet_ids: [...bulletIds]
         });
       }
     }
@@ -360,7 +360,7 @@ function BuilderPage() {
             profile={profile}
             headlineText={activeArchetype?.headlineText ?? ''}
             experiences={experiences}
-            visibleBulletVariantIds={visibleBulletVariantIds}
+            visibleBulletIds={visibleBulletIds}
             educations={educations}
             visibleEducationIds={visibleEducationIds}
             onEditPersonalInfo={() => setPersonalInfoModalOpen(true)}
@@ -402,7 +402,7 @@ function BuilderPage() {
           onClose={() => setEditingCompany(null)}
           company={editingCompany}
           experiences={editingExperiences}
-          visibleBulletVariantIds={visibleBulletVariantIds}
+          visibleBulletIds={visibleBulletIds}
           onBulletVisibilityChange={handleBulletVisibilityChange}
         />
       )}

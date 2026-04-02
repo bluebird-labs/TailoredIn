@@ -32,7 +32,7 @@ type ResumePreviewProps = {
   profile: Profile;
   headlineText: string;
   experiences: Experience[];
-  visibleBulletVariantIds: Map<string, Set<string>>;
+  visibleBulletIds: Map<string, Set<string>>;
   educations: Education[];
   visibleEducationIds: Set<string>;
   onEditPersonalInfo: () => void;
@@ -59,19 +59,17 @@ function extractHandle(url: string | null): string {
 }
 
 /** Group consecutive experiences by company, preserving date order for both visible and hidden. */
-function groupByCompany(experiences: Experience[], visibleBulletVariantIds: Map<string, Set<string>>): CompanyGroup[] {
+function groupByCompany(experiences: Experience[], visibleBulletIds: Map<string, Set<string>>): CompanyGroup[] {
   const groups: CompanyGroup[] = [];
 
   for (const exp of experiences) {
-    const isVisible = visibleBulletVariantIds.has(exp.id);
-    const variantIds = visibleBulletVariantIds.get(exp.id) ?? new Set();
+    const bulletIds = visibleBulletIds.get(exp.id) ?? new Set();
+    const isVisible = bulletIds.size > 0;
     const visibleBullets: { id: string; text: string }[] = [];
     if (isVisible) {
       for (const bullet of exp.bullets) {
-        for (const v of bullet.variants) {
-          if (variantIds.has(v.id)) {
-            visibleBullets.push({ id: v.id, text: v.text });
-          }
+        if (bulletIds.has(bullet.id)) {
+          visibleBullets.push({ id: bullet.id, text: bullet.content });
         }
       }
     }
@@ -101,7 +99,7 @@ export function ResumePreview({
   profile,
   headlineText,
   experiences,
-  visibleBulletVariantIds,
+  visibleBulletIds,
   educations,
   visibleEducationIds,
   onEditPersonalInfo,
@@ -112,10 +110,7 @@ export function ResumePreview({
   onEditEducation,
   onAddEducation
 }: ResumePreviewProps) {
-  const companyGroups = useMemo(
-    () => groupByCompany(experiences, visibleBulletVariantIds),
-    [experiences, visibleBulletVariantIds]
-  );
+  const companyGroups = useMemo(() => groupByCompany(experiences, visibleBulletIds), [experiences, visibleBulletIds]);
 
   const handleEditCompany = useCallback((company: string) => () => onEditCompany(company), [onEditCompany]);
 

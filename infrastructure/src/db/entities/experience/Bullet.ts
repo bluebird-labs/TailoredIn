@@ -1,9 +1,8 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, ManyToMany, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
+import { Entity, ManyToMany, ManyToOne, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
 import { Tag } from '../tag/Tag.js';
-import { BulletVariant } from './BulletVariant.js';
 import { Experience } from './Experience.js';
 
 type BulletProps = {
@@ -35,13 +34,6 @@ export class Bullet extends BaseEntity {
     inverseJoinColumn: 'tag_id'
   })
   public tags = new Collection<Tag>(this);
-
-  @OneToMany(
-    () => BulletVariant,
-    variant => variant.bullet,
-    { lazy: true, orderBy: { createdAt: 'ASC' } }
-  )
-  public readonly variants: Collection<BulletVariant> = new Collection<BulletVariant>(this);
 
   public constructor(props: BulletProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });

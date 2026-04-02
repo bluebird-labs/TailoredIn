@@ -61,15 +61,10 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
     // Experience — from experienceSelections
     const experienceMap = new Map(allExperiences.map(e => [e.id.value, e]));
 
-    const variantMap = new Map<string, { text: string; bulletOrdinal: number }>();
+    const bulletMap = new Map<string, { text: string; ordinal: number }>();
     for (const exp of allExperiences) {
       for (const bullet of exp.bullets) {
-        for (const variant of bullet.variants) {
-          variantMap.set(variant.id.value, {
-            text: variant.text,
-            bulletOrdinal: bullet.ordinal
-          });
-        }
+        bulletMap.set(bullet.id.value, { text: bullet.content, ordinal: bullet.ordinal });
       }
     }
 
@@ -80,8 +75,8 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       }
 
       const highlights: string[] = [];
-      for (const variantId of sel.bulletVariantIds) {
-        const entry = variantMap.get(variantId);
+      for (const bulletId of sel.bulletIds) {
+        const entry = bulletMap.get(bulletId);
         if (!entry) {
           continue;
         }
