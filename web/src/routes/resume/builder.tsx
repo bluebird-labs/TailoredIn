@@ -235,11 +235,29 @@ function BuilderPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Page header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e7eb]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e7eb] sticky top-0 bg-white z-10">
         <div>
           <h1 className="text-xl font-bold text-[#111]">Resume Builder</h1>
           <p className="text-[13px] text-[#6b7280] mt-0.5">Select content and generate a standalone resume</p>
         </div>
+        <button
+          type="button"
+          disabled={generating}
+          onClick={handleGenerate}
+          className="bg-[#111] text-white px-4 py-2 rounded-md text-[13px] font-medium cursor-pointer hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          {generating ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4" />
+              Generate Resume
+            </>
+          )}
+        </button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -441,27 +459,6 @@ function BuilderPage() {
             />
             <p className="text-[11px] text-[#9ca3af] mt-1">Comma-separated keywords for the PDF footer</p>
           </label>
-
-          <div className="mt-auto">
-            <button
-              type="button"
-              disabled={generating}
-              onClick={handleGenerate}
-              className="w-full bg-[#111] text-white px-3.5 py-2 rounded-md text-[13px] font-medium cursor-pointer hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {generating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  Generate Resume
-                </>
-              )}
-            </button>
-          </div>
         </div>
       </div>
     </div>
