@@ -44,58 +44,32 @@ export class GenerateResume {
     const profile = await this.profileRepository.findSingle();
     const allArchetypes = await this.archetypeRepository.findAll();
 
-    let archetype: ArchetypeKey;
-    let keywords: string[];
+    if (!input.archetype) {
+      return err(new Error('Archetype is required'));
+    }
+
+    const archetype: ArchetypeKey = input.archetype;
+    const keywords: string[] = input.keywords ?? [];
     let awesomeColor = DEFAULT_AWESOME_COLOR;
 
+    // Extract company brand color if possible
     if (this.llmService) {
-      this.log.info('Extracting job posting insights...');
+      try {
+        const postingInsights = await this.llmService.extractJobPostingInsights({
+          jobDescription: job.description,
+          companyName: job.companyId,
+          jobTitle: job.title,
+          jobLocation: job.locationRaw
+        });
 
-      const postingInsights = await this.llmService.extractJobPostingInsights({
-        jobDescription: job.description,
-        companyName: job.companyId,
-        jobTitle: job.title,
-        jobLocation: job.locationRaw
-      });
-
-      archetype = postingInsights.archetype ?? ArchetypeKey.LEAD_IC;
-
-      // Find archetype record by key to get its ID
-      const archetypeRecord = allArchetypes.find(a => a.key === archetype) ?? allArchetypes[0];
-
-      // Build a preliminary resume to give context to the application insights LLM call.
-      const tmpContent = await this.resumeContentFactory.make({
-        profileId: profile.id.value,
-        archetypeId: archetypeRecord.id.value,
-        awesomeColor: DEFAULT_AWESOME_COLOR,
-        keywords: []
-      });
-
-      this.log.info('Extracting application insights...');
-
-      const appInsights = await this.llmService.extractApplicationInsights({
-        jobDescription: job.description,
-        companyName: job.companyId,
-        jobTitle: job.title,
-        jobLocation: job.locationRaw,
-        archetype,
-        resumeContent: tmpContent
-      });
-
-      keywords = appInsights.keywords;
-
-      if (postingInsights.website) {
-        this.log.info('Extracting website colors...');
-        const primaryColor = await this.webColorService.findPrimaryColor(postingInsights.website);
-        if (primaryColor) awesomeColor = primaryColor;
+        if (postingInsights.website) {
+          this.log.info('Extracting website colors...');
+          const primaryColor = await this.webColorService.findPrimaryColor(postingInsights.website);
+          if (primaryColor) awesomeColor = primaryColor;
+        }
+      } catch (e) {
+        this.log.warn(`LLM color extraction failed, using default color: ${e}`);
       }
-    } else {
-      if (!input.archetype) {
-        return err(new Error('Archetype is required when LLM is not available'));
-      }
-      archetype = input.archetype;
-      keywords = input.keywords ?? [];
-      this.log.info('LLM unavailable — using manual archetype and keywords');
     }
 
     // Find archetype record by key

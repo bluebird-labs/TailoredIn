@@ -99,18 +99,21 @@ function JobDetailPage() {
   });
 
   const handleGenerateResume = async () => {
+    if (!selectedArchetype) {
+      toast.error('Select an archetype first');
+      return;
+    }
     setIsGenerating(true);
     try {
-      const fetchOptions: RequestInit = { method: 'PUT' };
-      if (!llmAvailable) {
-        const keywords = keywordsInput
-          .split(',')
-          .map(k => k.trim())
-          .filter(Boolean);
-        fetchOptions.headers = { 'Content-Type': 'application/json' };
-        fetchOptions.body = JSON.stringify({ archetype: selectedArchetype, keywords });
-      }
-      const res = await fetch(`/api/jobs/${jobId}/generate-resume`, fetchOptions);
+      const keywords = keywordsInput
+        .split(',')
+        .map(k => k.trim())
+        .filter(Boolean);
+      const res = await fetch(`/api/jobs/${jobId}/generate-resume`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ archetype: selectedArchetype, keywords })
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(err.error ?? `HTTP ${res.status}`);
@@ -331,8 +334,33 @@ function JobDetailPage() {
           </Button>
         )}
 
-        {llmAvailable ? (
-          <Button onClick={handleGenerateResume} disabled={isGenerating} variant="default">
+        <div className="flex items-end gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="archetype-select">Archetype</Label>
+            <Select value={selectedArchetype} onValueChange={v => v && setSelectedArchetype(v)}>
+              <SelectTrigger id="archetype-select" className="w-[180px]">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {archetypesForSelect.map(a => (
+                  <SelectItem key={a.key} value={a.key}>
+                    {a.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="keywords-input">Keywords (optional)</Label>
+            <Input
+              id="keywords-input"
+              value={keywordsInput}
+              onChange={e => setKeywordsInput(e.target.value)}
+              placeholder="react, typescript, aws..."
+              className="w-[260px]"
+            />
+          </div>
+          <Button onClick={handleGenerateResume} disabled={isGenerating || !selectedArchetype} variant="default">
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -345,48 +373,7 @@ function JobDetailPage() {
               </>
             )}
           </Button>
-        ) : (
-          <div className="flex items-end gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="archetype-select">Archetype</Label>
-              <Select value={selectedArchetype} onValueChange={v => v && setSelectedArchetype(v)}>
-                <SelectTrigger id="archetype-select" className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {archetypesForSelect.map(a => (
-                    <SelectItem key={a.key} value={a.key}>
-                      {a.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="keywords-input">Keywords (comma-separated)</Label>
-              <Input
-                id="keywords-input"
-                value={keywordsInput}
-                onChange={e => setKeywordsInput(e.target.value)}
-                placeholder="react, typescript, aws..."
-                className="w-[260px]"
-              />
-            </div>
-            <Button onClick={handleGenerateResume} disabled={isGenerating} variant="default">
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Download className="mr-2 h-4 w-4" />
-                  Generate Resume
-                </>
-              )}
-            </Button>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Company Brief */}
