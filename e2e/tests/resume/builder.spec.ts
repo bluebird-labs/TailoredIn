@@ -82,10 +82,11 @@ test.describe('Resume Builder', () => {
     // Click the new tab to make it active
     await page.getByRole('button', { name: 'New Version' }).click();
 
-    // Hover over the active tab group to reveal the delete X
-    const tabGroup = page.locator('.group\\/tab').last();
-    await tabGroup.hover();
-    await tabGroup.getByTitle('Delete version').click();
+    // Hover over the "New Version" button to reveal the sibling delete X
+    const newVersionBtn = page.getByRole('button', { name: 'New Version' });
+    await newVersionBtn.hover();
+    // The delete button is a sibling within the same parent div
+    await page.getByTitle('Delete version').click();
 
     // Confirmation dialog should appear
     await expect(page.getByText('Delete version')).toBeVisible();
