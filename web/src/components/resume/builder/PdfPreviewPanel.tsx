@@ -1,5 +1,5 @@
 import { Download, FileWarning, Loader2 } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -14,6 +14,10 @@ export function PdfPreviewPanel({ pdfData, isCompiling, error }: PdfPreviewPanel
   const [pageCount, setPageCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTopRef = useRef(0);
+
+  // Memoize file prop to avoid unnecessary reloads; copy the buffer so the
+  // worker's postMessage transfer doesn't detach the original ArrayBuffer.
+  const file = useMemo(() => (pdfData ? { data: pdfData.slice() } : null), [pdfData]);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     setPageCount(numPages);
@@ -86,9 +90,9 @@ export function PdfPreviewPanel({ pdfData, isCompiling, error }: PdfPreviewPanel
           </div>
         )}
 
-        {pdfData && (
+        {file && (
           <div className="flex flex-col items-center gap-4 py-4">
-            <Document file={{ data: pdfData }} onLoadSuccess={onDocumentLoadSuccess} loading={null}>
+            <Document file={file} onLoadSuccess={onDocumentLoadSuccess} loading={null}>
               {Array.from({ length: pageCount }, (_, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: PDF pages are inherently ordered by index
                 <div key={i} className="shadow-md rounded-sm overflow-hidden mb-4 last:mb-0">
