@@ -138,6 +138,8 @@ ${includes}
   }
 
   private static buildSkillsTyp(content: BrilliantCVContent): string {
+    if (content.skills.length === 0) return '';
+
     const lines: string[] = [
       `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-skill, h-bar`,
       ``,
@@ -156,15 +158,14 @@ ${includes}
   }
 
   private static buildEducationTyp(content: BrilliantCVContent): string {
-    const lines: string[] = [
-      `#import "@preview/brilliant-cv:3.3.0": cv-section`,
-      ``,
-      `#cv-section("Education")`,
-      ``
-    ];
+    if (content.education.length === 0) return '';
+
+    const lines: string[] = [`#import "@preview/brilliant-cv:3.3.0": cv-section`, ``, `#cv-section("Education")`, ``];
 
     for (const edu of content.education) {
-      lines.push(`*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}`);
+      lines.push(
+        `*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}`
+      );
       lines.push(``);
     }
 

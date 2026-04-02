@@ -74,17 +74,6 @@ function BuilderPage() {
     }
   }, [educations, selectedEducationIds.size]);
 
-  useEffect(() => {
-    if (skillCategories.length > 0 && selectedCategoryIds.size === 0) {
-      setSelectedCategoryIds(new Set(skillCategories.map(c => c.id)));
-      const allItemIds = new Set<string>();
-      for (const cat of skillCategories) {
-        for (const item of cat.items) allItemIds.add(item.id);
-      }
-      setSelectedItemIds(allItemIds);
-    }
-  }, [skillCategories, selectedCategoryIds.size]);
-
   // ── Experience toggle ───────────────────────────────────────────────────
   const toggleExperience = useCallback((exp: Experience) => {
     setSelectedExperiences(prev => {
