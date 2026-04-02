@@ -63,4 +63,72 @@ export namespace ColorUtil {
 
   export const rgbTripleToHex = ([r, g, b]: RGBTriple): string =>
     `#${[r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')}`;
+
+  const rgbToHsl = ([rRaw, gRaw, bRaw]: RGBTriple): [number, number, number] => {
+    const r = rRaw / 255;
+    const g = gRaw / 255;
+    const b = bRaw / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+
+    if (max === min) return [0, 0, l];
+
+    const d = max - min;
+    const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    let h: number;
+
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else h = ((r - g) / d + 4) / 6;
+
+    return [h, s, l];
+  };
+
+  const hslToRgb = ([h, s, l]: [number, number, number]): RGBTriple => {
+    if (s === 0) {
+      const v = Math.round(l * 255);
+      return [v, v, v];
+    }
+
+    const hue2rgb = (p: number, q: number, t: number) => {
+      let tt = t;
+      if (tt < 0) tt += 1;
+      if (tt > 1) tt -= 1;
+      if (tt < 1 / 6) return p + (q - p) * 6 * tt;
+      if (tt < 1 / 2) return q;
+      if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
+      return p;
+    };
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+
+    return [
+      Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+      Math.round(hue2rgb(p, q, h) * 255),
+      Math.round(hue2rgb(p, q, h - 1 / 3) * 255)
+    ];
+  };
+
+  export const darkenForContrast = (
+    rgb: RGBTriple,
+    backgroundRgb: RGBTriple,
+    targetRatio: number
+  ): RGBTriple | null => {
+    if (getRgbContrastRatio(backgroundRgb, rgb) >= targetRatio) {
+      return rgb;
+    }
+
+    const [h, s, l] = rgbToHsl(rgb);
+
+    for (let newL = l; newL >= 0; newL -= 0.01) {
+      const candidate = hslToRgb([h, s, newL]);
+      if (getRgbContrastRatio(backgroundRgb, candidate) >= targetRatio) {
+        return candidate;
+      }
+    }
+
+    return null;
+  };
 }

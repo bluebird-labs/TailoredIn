@@ -18,7 +18,7 @@ import type { ResumeContentFactory } from '../ports/ResumeContentFactory.js';
 import type { ResumeRenderer } from '../ports/ResumeRenderer.js';
 import type { WebColorService } from '../ports/WebColorService.js';
 
-const DEFAULT_AWESOME_COLOR = '#178FEA';
+const DEFAULT_AWESOME_COLOR = '#0395DE';
 
 export class GenerateResume {
   private readonly log = Logger.create(GenerateResume.name);
