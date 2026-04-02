@@ -1,19 +1,21 @@
 import { readFileSync } from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
-import type { GenerateResume } from '@tailoredin/application';
+import type { GenerateResumeFromJob } from '@tailoredin/application';
 import { ArchetypeKey } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
 @injectable()
-export class GenerateResumeRoute {
-  public constructor(private readonly generateResume: GenerateResume = inject(DI.Resume.GenerateResume)) {}
+export class GenerateResumeFromJobRoute {
+  public constructor(
+    private readonly generateResumeFromJob: GenerateResumeFromJob = inject(DI.Resume.GenerateResumeFromJob)
+  ) {}
 
   public plugin() {
     return new Elysia().put(
       '/jobs/:id/generate-resume',
       async ({ params, body, set }) => {
-        const result = await this.generateResume.execute({
+        const result = await this.generateResumeFromJob.execute({
           jobId: params.id,
           archetype: body?.archetype as ArchetypeKey | undefined,
           keywords: body?.keywords

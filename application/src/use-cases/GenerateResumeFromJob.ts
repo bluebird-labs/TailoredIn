@@ -11,7 +11,7 @@ import {
   Resume,
   TailoringStrategyService
 } from '@tailoredin/domain';
-import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
+import type { GenerateResumeFromJobDto } from '../dtos/GenerateResumeFromJobDto.js';
 import type { ResumeOutputDto } from '../dtos/ResumeOutputDto.js';
 import type { LlmService } from '../ports/LlmService.js';
 import type { ResumeContentFactory } from '../ports/ResumeContentFactory.js';
@@ -20,8 +20,8 @@ import type { WebColorService } from '../ports/WebColorService.js';
 
 const DEFAULT_AWESOME_COLOR = '#0395DE';
 
-export class GenerateResume {
-  private readonly log = Logger.create(GenerateResume.name);
+export class GenerateResumeFromJob {
+  private readonly log = Logger.create(GenerateResumeFromJob.name);
 
   public constructor(
     private readonly jobRepository: JobRepository,
@@ -33,7 +33,7 @@ export class GenerateResume {
     private readonly resumeContentFactory: ResumeContentFactory
   ) {}
 
-  public async execute(input: GenerateResumeDto): Promise<Result<ResumeOutputDto, Error>> {
+  public async execute(input: GenerateResumeFromJobDto): Promise<Result<ResumeOutputDto, Error>> {
     let job: JobPosting;
     try {
       job = await this.jobRepository.findByIdOrFail(input.jobId);
