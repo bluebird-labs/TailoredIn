@@ -35,6 +35,8 @@ export type { GenerateCompanyBriefInput } from './GenerateCompanyBrief.js';
 export { GenerateCompanyBrief } from './GenerateCompanyBrief.js';
 export { GenerateResume } from './GenerateResume.js';
 export { GenerateResumeFromJob } from './GenerateResumeFromJob.js';
+export type { GenerateResumeMarkdownOutput } from './GenerateResumeMarkdown.js';
+export { GenerateResumeMarkdown } from './GenerateResumeMarkdown.js';
 export type { GetCompanyBriefInput } from './GetCompanyBrief.js';
 export { GetCompanyBrief } from './GetCompanyBrief.js';
 export type { GetJobInput, GetJobOutput } from './GetJob.js';
