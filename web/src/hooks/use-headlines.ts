@@ -10,7 +10,12 @@ export function useHeadlines() {
     queryKey: queryKeys.resume.headlines(),
     queryFn: async () => {
       const { data } = await api.headlines.get();
-      return (data?.data ?? []) as { id: string; label: string; summaryText: string; roleTags: { id: string; name: string; dimension: string }[] }[];
+      return (data?.data ?? []) as {
+        id: string;
+        label: string;
+        summaryText: string;
+        roleTags: { id: string; name: string; dimension: string }[];
+      }[];
     }
   });
 }

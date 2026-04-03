@@ -3,12 +3,12 @@ import { queryKeys } from '@/lib/query-keys';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export type Bullet = {
+export type Accomplishment = {
   id: string;
-  content: string;
+  title: string;
+  narrative: string;
+  skillTags: string[];
   ordinal: number;
-  roleTags: { id: string; name: string; dimension: string }[];
-  skillTags: { id: string; name: string; dimension: string }[];
 };
 
 export type Experience = {
@@ -21,7 +21,7 @@ export type Experience = {
   endDate: string;
   summary: string | null;
   ordinal: number;
-  bullets: Bullet[];
+  accomplishments: Accomplishment[];
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────

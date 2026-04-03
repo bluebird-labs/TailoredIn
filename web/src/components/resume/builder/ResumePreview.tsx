@@ -63,13 +63,13 @@ function groupByCompany(experiences: Experience[], visibleBulletIds: Map<string,
   const groups: CompanyGroup[] = [];
 
   for (const exp of experiences) {
-    const bulletIds = visibleBulletIds.get(exp.id) ?? new Set();
-    const isVisible = bulletIds.size > 0;
+    const accomplishmentIds = visibleBulletIds.get(exp.id) ?? new Set();
+    const isVisible = accomplishmentIds.size > 0;
     const visibleBullets: { id: string; text: string }[] = [];
     if (isVisible) {
-      for (const bullet of exp.bullets) {
-        if (bulletIds.has(bullet.id)) {
-          visibleBullets.push({ id: bullet.id, text: bullet.content });
+      for (const acc of exp.accomplishments) {
+        if (accomplishmentIds.has(acc.id)) {
+          visibleBullets.push({ id: acc.id, text: acc.title });
         }
       }
     }

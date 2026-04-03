@@ -24,10 +24,16 @@ export class AddAccomplishment {
       title: input.title,
       narrative: input.narrative,
       skillTags: input.skillTags,
-      ordinal: input.ordinal,
+      ordinal: input.ordinal
     });
     await this.experienceRepository.save(experience);
 
-    return ok({ id: acc.id.value, title: acc.title, narrative: acc.narrative, skillTags: acc.skillTags, ordinal: acc.ordinal });
+    return ok({
+      id: acc.id.value,
+      title: acc.title,
+      narrative: acc.narrative,
+      skillTags: acc.skillTags,
+      ordinal: acc.ordinal
+    });
   }
 }

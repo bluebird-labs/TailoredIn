@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
 import { Upload, Wand2 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -73,12 +73,7 @@ export function FactoryInputStep({ onGenerated }: Props) {
 
         <span className="text-muted-foreground text-xs">or</span>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={extract.isPending}
-        >
+        <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={extract.isPending}>
           <Upload className="h-3 w-3 mr-1" />
           {extract.isPending ? 'Extracting...' : 'Upload JD (PDF)'}
         </Button>

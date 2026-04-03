@@ -7,7 +7,7 @@ export class ExtractTextRoute {
   public plugin() {
     return new Elysia().post(
       '/factory/extract-text',
-      async ({ body, set }) => {
+      async ({ body }) => {
         const file = body.file as File;
         const buffer = Buffer.from(await file.arrayBuffer());
         const name = file.name.toLowerCase();
@@ -26,7 +26,7 @@ export class ExtractTextRoute {
         return { data: { text: text.trim() } };
       },
       {
-        body: t.Object({ file: t.File() }),
+        body: t.Object({ file: t.File() })
       }
     );
   }

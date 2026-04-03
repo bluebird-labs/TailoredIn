@@ -95,7 +95,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
       narrative: props.narrative ?? null,
       accomplishments: [],
       createdAt: now,
-      updatedAt: now,
+      updatedAt: now
     });
   }
 }

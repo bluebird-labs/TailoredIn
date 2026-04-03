@@ -22,7 +22,7 @@ export function toExperienceDto(exp: Experience): ExperienceDto {
     summary: exp.summary,
     narrative: exp.narrative,
     ordinal: exp.ordinal,
-    accomplishments: exp.accomplishments.map(toAccomplishmentDto),
+    accomplishments: exp.accomplishments.map(toAccomplishmentDto)
   };
 }
 
@@ -32,6 +32,6 @@ function toAccomplishmentDto(accomplishment: Accomplishment): AccomplishmentDto 
     title: accomplishment.title,
     narrative: accomplishment.narrative,
     skillTags: accomplishment.skillTags,
-    ordinal: accomplishment.ordinal,
+    ordinal: accomplishment.ordinal
   };
 }

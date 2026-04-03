@@ -49,12 +49,12 @@ function mockTailoringService(proposal: LlmProposal): ResumeTailoringService {
 }
 
 describe('CreateTailoredResume', () => {
-  test('maps rankedBulletIds → bulletIds and rankedSkillIds → skillItemIds in content selection', async () => {
+  test('maps selectedAccomplishmentIds and rankedSkillIds → skillItemIds in content selection', async () => {
     const proposal = new LlmProposal({
       headlineOptions: ['New Headline', 'Alt Headline'],
-      rankedExperiences: [
-        { experienceId: 'exp-1', rankedBulletIds: ['b-3', 'b-1', 'b-2'] },
-        { experienceId: 'exp-2', rankedBulletIds: ['b-5', 'b-4'] }
+      selectedExperiences: [
+        { experienceId: 'exp-1', selectedAccomplishmentIds: ['b-3', 'b-1', 'b-2'] },
+        { experienceId: 'exp-2', selectedAccomplishmentIds: ['b-5', 'b-4'] }
       ],
       generatedExperiences: [],
       rankedSkillIds: ['skill-z', 'skill-a'],
@@ -78,16 +78,16 @@ describe('CreateTailoredResume', () => {
     const cs = saved!.contentSelection;
     expect(cs.experienceSelections).toHaveLength(2);
     expect(cs.experienceSelections[0]!.experienceId).toBe('exp-1');
-    expect(cs.experienceSelections[0]!.bulletIds).toEqual(['b-3', 'b-1', 'b-2']);
+    expect(cs.experienceSelections[0]!.accomplishmentIds).toEqual(['b-3', 'b-1', 'b-2']);
     expect(cs.experienceSelections[1]!.experienceId).toBe('exp-2');
-    expect(cs.experienceSelections[1]!.bulletIds).toEqual(['b-5', 'b-4']);
+    expect(cs.experienceSelections[1]!.accomplishmentIds).toEqual(['b-5', 'b-4']);
     expect(cs.skillItemIds).toEqual(['skill-z', 'skill-a']);
   });
 
   test('sets headlineText to headlineOptions[0]', async () => {
     const proposal = new LlmProposal({
       headlineOptions: ['Senior TypeScript Engineer', 'Lead Developer'],
-      rankedExperiences: [],
+      selectedExperiences: [],
       generatedExperiences: [],
       rankedSkillIds: [],
       assessment: ''
@@ -111,7 +111,7 @@ describe('CreateTailoredResume', () => {
   test('falls back to profile headlineText when headlineOptions is empty', async () => {
     const proposal = new LlmProposal({
       headlineOptions: [],
-      rankedExperiences: [],
+      selectedExperiences: [],
       generatedExperiences: [],
       rankedSkillIds: [],
       assessment: ''

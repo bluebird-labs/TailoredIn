@@ -77,7 +77,7 @@ export class SuggestBullets {
         title: exp.title,
         content: b.narrative,
         roleTags: [] as string[],
-        skillTags: b.skillTags,
+        skillTags: b.skillTags
       }))
     );
 

@@ -1,8 +1,8 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import {
-  Accomplishment as DomainAccomplishment,
   AccomplishmentId,
+  Accomplishment as DomainAccomplishment,
   Experience as DomainExperience,
   ExperienceId,
   type ExperienceRepository
@@ -101,10 +101,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
     }
   }
 
-  private persistNewAccomplishment(
-    acc: DomainAccomplishment,
-    experience: OrmExperience
-  ): void {
+  private persistNewAccomplishment(acc: DomainAccomplishment, experience: OrmExperience): void {
     const ormAcc = new OrmAccomplishment({
       id: acc.id.value,
       experience,
@@ -130,17 +127,18 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       { orderBy: { ordinal: 'ASC' } }
     );
 
-    const accomplishments: DomainAccomplishment[] = ormAccomplishments.map(a =>
-      new DomainAccomplishment({
-        id: new AccomplishmentId(a.id),
-        experienceId: orm.id,
-        title: a.title,
-        narrative: a.narrative,
-        skillTags: a.skillTags,
-        ordinal: a.ordinal,
-        createdAt: a.createdAt,
-        updatedAt: a.updatedAt
-      })
+    const accomplishments: DomainAccomplishment[] = ormAccomplishments.map(
+      a =>
+        new DomainAccomplishment({
+          id: new AccomplishmentId(a.id),
+          experienceId: orm.id,
+          title: a.title,
+          narrative: a.narrative,
+          skillTags: a.skillTags,
+          ordinal: a.ordinal,
+          createdAt: a.createdAt,
+          updatedAt: a.updatedAt
+        })
     );
 
     return new DomainExperience({

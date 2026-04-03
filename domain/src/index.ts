@@ -62,12 +62,12 @@ export type { TagRepository } from './ports/TagRepository.js';
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
 export { ValueObject } from './ValueObject.js';
+// Value objects — IDs
+export { AccomplishmentId } from './value-objects/AccomplishmentId.js';
 // Value objects — new domain model
 export { ApprovalStatus } from './value-objects/ApprovalStatus.js';
 // Value objects — legacy (kept for LlmService archetype field)
 export { ArchetypeKey, JobTitle } from './value-objects/Archetype.js';
-// Value objects — IDs
-export { AccomplishmentId } from './value-objects/AccomplishmentId.js';
 export { BusinessType } from './value-objects/BusinessType.js';
 export { CompanyBriefId } from './value-objects/CompanyBriefId.js';
 export { CompanyId } from './value-objects/CompanyId.js';

@@ -8,12 +8,7 @@ type AnyRouteSegment = any;
 export function useAddAccomplishment(experienceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
-      title: string;
-      narrative: string;
-      skill_tags: string[];
-      ordinal: number;
-    }) => {
+    mutationFn: async (input: { title: string; narrative: string; skill_tags: string[]; ordinal: number }) => {
       const segment = api.experiences({ id: experienceId, experienceId } as AnyRouteSegment)
         .accomplishments as AnyRouteSegment;
       const { data, error } = await segment.post(input);

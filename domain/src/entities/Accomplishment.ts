@@ -52,7 +52,7 @@ export class Accomplishment extends Entity<AccomplishmentId> {
       id: AccomplishmentId.generate(),
       ...props,
       createdAt: now,
-      updatedAt: now,
+      updatedAt: now
     });
   }
 }

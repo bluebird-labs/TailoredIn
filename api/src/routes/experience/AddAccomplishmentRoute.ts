@@ -5,9 +5,7 @@ import { Elysia, t } from 'elysia';
 
 @injectable()
 export class AddAccomplishmentRoute {
-  public constructor(
-    private readonly addAccomplishment: AddAccomplishment = inject(DI.Experience.AddAccomplishment)
-  ) {}
+  public constructor(private readonly addAccomplishment: AddAccomplishment = inject(DI.Experience.AddAccomplishment)) {}
 
   public plugin() {
     return new Elysia().post(

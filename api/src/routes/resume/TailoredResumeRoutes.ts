@@ -18,12 +18,12 @@ function serializeResume(resume: {
   jdContent: string;
   llmProposals: {
     headlineOptions: string[];
-    rankedExperiences: Array<{ experienceId: string; rankedBulletIds: string[] }>;
+    selectedExperiences: Array<{ experienceId: string; selectedAccomplishmentIds: string[] }>;
     rankedSkillIds: string[];
     assessment: string;
   };
   contentSelection: {
-    experienceSelections: Array<{ experienceId: string; bulletIds: string[] }>;
+    experienceSelections: Array<{ experienceId: string; accomplishmentIds: string[] }>;
     projectIds: string[];
     educationIds: string[];
     skillCategoryIds: string[];
@@ -41,7 +41,7 @@ function serializeResume(resume: {
     jdContent: resume.jdContent,
     llmProposals: {
       headlineOptions: resume.llmProposals.headlineOptions,
-      rankedExperiences: resume.llmProposals.rankedExperiences,
+      selectedExperiences: resume.llmProposals.selectedExperiences,
       rankedSkillIds: resume.llmProposals.rankedSkillIds,
       assessment: resume.llmProposals.assessment
     },

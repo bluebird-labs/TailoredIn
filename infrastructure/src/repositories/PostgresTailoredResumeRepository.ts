@@ -68,8 +68,8 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
     const proposals = orm.llmProposals as Record<string, unknown>;
     const llmProposals = new LlmProposal({
       headlineOptions: (proposals.headlineOptions as string[]) ?? [],
-      rankedExperiences:
-        (proposals.rankedExperiences as Array<{ experienceId: string; rankedBulletIds: string[] }>) ?? [],
+      selectedExperiences:
+        (proposals.selectedExperiences as Array<{ experienceId: string; selectedAccomplishmentIds: string[] }>) ?? [],
       generatedExperiences: (proposals.generatedExperiences as GeneratedExperience[]) ?? [],
       rankedSkillIds: (proposals.rankedSkillIds as string[]) ?? [],
       assessment: (proposals.assessment as string) ?? ''
@@ -77,7 +77,7 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
 
     const cs = orm.contentSelection as Record<string, unknown>;
     const contentSelection = new ContentSelection({
-      experienceSelections: (cs.experienceSelections as { experienceId: string; bulletIds: string[] }[]) ?? [],
+      experienceSelections: (cs.experienceSelections as { experienceId: string; accomplishmentIds: string[] }[]) ?? [],
       projectIds: (cs.projectIds as string[]) ?? [],
       educationIds: (cs.educationIds as string[]) ?? [],
       skillCategoryIds: (cs.skillCategoryIds as string[]) ?? [],
@@ -107,7 +107,7 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
   private serializeLlmProposal(proposal: LlmProposal): Record<string, unknown> {
     return {
       headlineOptions: proposal.headlineOptions,
-      rankedExperiences: proposal.rankedExperiences,
+      selectedExperiences: proposal.selectedExperiences,
       generatedExperiences: proposal.generatedExperiences,
       rankedSkillIds: proposal.rankedSkillIds,
       assessment: proposal.assessment

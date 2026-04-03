@@ -1,10 +1,10 @@
+export type { AccomplishmentDto } from './AccomplishmentDto.js';
 export type { ApiErrorDto } from './ApiErrorDto.js';
 export type { BuildResumeOutputDto } from './BuildResumeOutputDto.js';
 export type { CompanyBriefDto } from './CompanyBriefDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export type { ContentSelectionDto } from './ContentSelectionDto.js';
 export type { EducationDto } from './EducationDto.js';
-export type { AccomplishmentDto } from './AccomplishmentDto.js';
 export type { ExperienceDto } from './ExperienceDto.js';
 export type { GenerateResumeDto } from './GenerateResumeDto.js';
 export type { HeadlineDto } from './HeadlineDto.js';

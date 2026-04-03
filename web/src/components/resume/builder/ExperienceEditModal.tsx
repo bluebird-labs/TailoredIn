@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Eye, EyeOff, Plus, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import type { Bullet, Experience } from '@/components/resume/experience/types';
+import type { Accomplishment, Experience } from '@/components/resume/experience/types';
 import { invalidateExperiences } from '@/components/resume/experience/types';
 import { SortableItem, SortableList } from '@/components/shared/sortable-list';
 import { Button } from '@/components/ui/button';
@@ -13,13 +13,16 @@ import { Label } from '@/components/ui/label';
 import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import { api } from '@/lib/api';
 
+// biome-ignore lint/suspicious/noExplicitAny: Eden Treaty merges inconsistent route param names (:id vs :experienceId) causing union type conflicts
+type AnyRouteSegment = any;
+
 type ExperienceEditModalProps = {
   open: boolean;
   onClose: () => void;
   company: string;
   experiences: Experience[];
   visibleBulletIds: Map<string, Set<string>>;
-  onBulletVisibilityChange: (expId: string, bulletIds: Set<string>) => void;
+  onBulletVisibilityChange: (expId: string, accomplishmentIds: Set<string>) => void;
 };
 
 type PositionDraft = {
@@ -29,7 +32,7 @@ type PositionDraft = {
   startDate: string;
   endDate: string;
   summary: string | null;
-  bullets: Bullet[];
+  accomplishments: Accomplishment[];
 };
 
 export function ExperienceEditModal({
@@ -45,10 +48,10 @@ export function ExperienceEditModal({
   const [saving, setSaving] = useState(false);
 
   // Inline editing state
-  const [editingBulletId, setEditingBulletId] = useState<string | null>(null);
-  const [bulletDraft, setBulletDraft] = useState('');
-  const [deletedBulletIds, setDeletedBulletIds] = useState<Set<string>>(new Set());
-  const [newBulletIds, setNewBulletIds] = useState<Set<string>>(new Set());
+  const [editingAccomplishmentId, setEditingAccomplishmentId] = useState<string | null>(null);
+  const [accomplishmentDraft, setAccomplishmentDraft] = useState('');
+  const [deletedAccomplishmentIds, setDeletedAccomplishmentIds] = useState<Set<string>>(new Set());
+  const [newAccomplishmentIds, setNewAccomplishmentIds] = useState<Set<string>>(new Set());
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Summary inline editing state
@@ -67,26 +70,26 @@ export function ExperienceEditModal({
           startDate: exp.startDate,
           endDate: exp.endDate,
           summary: exp.summary,
-          bullets: [...exp.bullets].sort((a, b) => a.ordinal - b.ordinal)
+          accomplishments: [...exp.accomplishments].sort((a, b) => a.ordinal - b.ordinal)
         }))
       );
-      setEditingBulletId(null);
-      setBulletDraft('');
+      setEditingAccomplishmentId(null);
+      setAccomplishmentDraft('');
       setEditingSummaryExpId(null);
       setSummaryDraft('');
-      setDeletedBulletIds(new Set());
-      setNewBulletIds(new Set());
+      setDeletedAccomplishmentIds(new Set());
+      setNewAccomplishmentIds(new Set());
     }
   }, [open, experiences]);
 
   // Auto-focus textarea when entering edit mode
   useEffect(() => {
-    if (editingBulletId && editTextareaRef.current) {
+    if (editingAccomplishmentId && editTextareaRef.current) {
       const ta = editTextareaRef.current;
       ta.focus();
       ta.setSelectionRange(ta.value.length, ta.value.length);
     }
-  }, [editingBulletId]);
+  }, [editingAccomplishmentId]);
 
   useEffect(() => {
     if (editingSummaryExpId && summaryTextareaRef.current) {
@@ -100,66 +103,66 @@ export function ExperienceEditModal({
     setPositions(prev => prev.map(p => (p.id === expId ? { ...p, [field]: value } : p)));
   }, []);
 
-  const handleBulletReorder = useCallback((expId: string, activeId: string, overId: string) => {
+  const handleAccomplishmentReorder = useCallback((expId: string, activeId: string, overId: string) => {
     setPositions(prev =>
       prev.map(p => {
         if (p.id !== expId) return p;
-        const oldIndex = p.bullets.findIndex(b => b.id === activeId);
-        const newIndex = p.bullets.findIndex(b => b.id === overId);
+        const oldIndex = p.accomplishments.findIndex(a => a.id === activeId);
+        const newIndex = p.accomplishments.findIndex(a => a.id === overId);
         if (oldIndex === -1 || newIndex === -1) return p;
-        return { ...p, bullets: arrayMove(p.bullets, oldIndex, newIndex) };
+        return { ...p, accomplishments: arrayMove(p.accomplishments, oldIndex, newIndex) };
       })
     );
   }, []);
 
-  const toggleBulletVisibility = useCallback(
-    (expId: string, bullet: Bullet) => {
+  const toggleAccomplishmentVisibility = useCallback(
+    (expId: string, acc: Accomplishment) => {
       const currentIds = visibleBulletIds.get(expId) ?? new Set<string>();
       const next = new Set(currentIds);
-      if (next.has(bullet.id)) {
-        next.delete(bullet.id);
+      if (next.has(acc.id)) {
+        next.delete(acc.id);
       } else {
-        next.add(bullet.id);
+        next.add(acc.id);
       }
       onBulletVisibilityChange(expId, next);
     },
     [visibleBulletIds, onBulletVisibilityChange]
   );
 
-  const isBulletVisible = useCallback(
-    (expId: string, bullet: Bullet): boolean => {
+  const isAccomplishmentVisible = useCallback(
+    (expId: string, acc: Accomplishment): boolean => {
       const ids = visibleBulletIds.get(expId);
       if (!ids) return false;
-      return ids.has(bullet.id);
+      return ids.has(acc.id);
     },
     [visibleBulletIds]
   );
 
   // -- Inline editing --
 
-  const startEditing = (bulletId: string, content: string) => {
-    setEditingBulletId(bulletId);
-    setBulletDraft(content);
+  const startEditing = (accId: string, title: string) => {
+    setEditingAccomplishmentId(accId);
+    setAccomplishmentDraft(title);
   };
 
   const commitEdit = () => {
-    if (!editingBulletId) return;
-    const trimmed = bulletDraft.trim();
+    if (!editingAccomplishmentId) return;
+    const trimmed = accomplishmentDraft.trim();
     if (trimmed) {
       setPositions(prev =>
         prev.map(p => ({
           ...p,
-          bullets: p.bullets.map(b => (b.id === editingBulletId ? { ...b, content: trimmed } : b))
+          accomplishments: p.accomplishments.map(a => (a.id === editingAccomplishmentId ? { ...a, title: trimmed } : a))
         }))
       );
     }
-    setEditingBulletId(null);
-    setBulletDraft('');
+    setEditingAccomplishmentId(null);
+    setAccomplishmentDraft('');
   };
 
   const cancelEdit = () => {
-    setEditingBulletId(null);
-    setBulletDraft('');
+    setEditingAccomplishmentId(null);
+    setAccomplishmentDraft('');
   };
 
   // -- Summary inline editing --
@@ -182,58 +185,58 @@ export function ExperienceEditModal({
     setSummaryDraft('');
   };
 
-  // -- Delete bullet --
+  // -- Delete accomplishment --
 
-  const markDeleted = (bulletId: string) => {
-    // If it's a new bullet that hasn't been saved, just remove it entirely
-    if (newBulletIds.has(bulletId)) {
+  const markDeleted = (accId: string) => {
+    // If it's a new accomplishment that hasn't been saved, just remove it entirely
+    if (newAccomplishmentIds.has(accId)) {
       setPositions(prev =>
         prev.map(p => ({
           ...p,
-          bullets: p.bullets.filter(b => b.id !== bulletId)
+          accomplishments: p.accomplishments.filter(a => a.id !== accId)
         }))
       );
-      setNewBulletIds(prev => {
+      setNewAccomplishmentIds(prev => {
         const next = new Set(prev);
-        next.delete(bulletId);
+        next.delete(accId);
         return next;
       });
       return;
     }
-    setDeletedBulletIds(prev => new Set(prev).add(bulletId));
+    setDeletedAccomplishmentIds(prev => new Set(prev).add(accId));
   };
 
-  const unmarkDeleted = (bulletId: string) => {
-    setDeletedBulletIds(prev => {
+  const unmarkDeleted = (accId: string) => {
+    setDeletedAccomplishmentIds(prev => {
       const next = new Set(prev);
-      next.delete(bulletId);
+      next.delete(accId);
       return next;
     });
   };
 
-  // -- Add bullet --
+  // -- Add accomplishment --
 
-  const addBullet = (expId: string) => {
+  const addAccomplishment = (expId: string) => {
     const tempId = `temp-${crypto.randomUUID()}`;
     setPositions(prev =>
       prev.map(p => {
         if (p.id !== expId) return p;
         return {
           ...p,
-          bullets: [
-            ...p.bullets,
+          accomplishments: [
+            ...p.accomplishments,
             {
               id: tempId,
-              content: '',
-              ordinal: p.bullets.length,
-              roleTags: [],
-              skillTags: []
+              title: '',
+              narrative: '',
+              skillTags: [],
+              ordinal: p.accomplishments.length
             }
           ]
         };
       })
     );
-    setNewBulletIds(prev => new Set(prev).add(tempId));
+    setNewAccomplishmentIds(prev => new Set(prev).add(tempId));
     startEditing(tempId, '');
   };
 
@@ -241,7 +244,7 @@ export function ExperienceEditModal({
 
   const handleSave = async () => {
     // Commit any in-progress edits
-    if (editingBulletId) commitEdit();
+    if (editingAccomplishmentId) commitEdit();
     if (editingSummaryExpId) commitSummaryEdit();
 
     setSaving(true);
@@ -257,8 +260,10 @@ export function ExperienceEditModal({
           pos.startDate !== orig.startDate ||
           pos.endDate !== orig.endDate ||
           pos.summary !== orig.summary;
+        const expSegment = api.experiences({ id: pos.id, experienceId: pos.id } as AnyRouteSegment);
+
         if (changed) {
-          await api.experiences({ id: pos.id }).put({
+          await (expSegment as AnyRouteSegment).put({
             title: pos.title,
             company_name: company,
             location: pos.location,
@@ -269,43 +274,48 @@ export function ExperienceEditModal({
           });
         }
 
-        // Create new bullets
-        for (const bullet of pos.bullets) {
-          if (newBulletIds.has(bullet.id) && !deletedBulletIds.has(bullet.id) && bullet.content.trim()) {
-            await api.experiences({ id: pos.id }).bullets.post({
-              content: bullet.content,
-              ordinal: pos.bullets.indexOf(bullet)
+        const accSegment = (expSegment as AnyRouteSegment).accomplishments as AnyRouteSegment;
+
+        // Create new accomplishments
+        for (const acc of pos.accomplishments) {
+          if (newAccomplishmentIds.has(acc.id) && !deletedAccomplishmentIds.has(acc.id) && acc.title.trim()) {
+            await accSegment.post({
+              title: acc.title,
+              narrative: acc.narrative || acc.title,
+              skill_tags: acc.skillTags,
+              ordinal: pos.accomplishments.indexOf(acc)
             });
           }
         }
 
-        // Delete marked bullets
-        for (const bulletId of deletedBulletIds) {
-          const belongsToPos = orig.bullets.some(b => b.id === bulletId);
+        // Delete marked accomplishments
+        for (const accId of deletedAccomplishmentIds) {
+          const belongsToPos = orig.accomplishments.some(a => a.id === accId);
           if (belongsToPos) {
-            await api.bullets({ id: bulletId }).delete({ experience_id: pos.id });
-            // Remove from visible bullet IDs
+            await accSegment({ accomplishmentId: accId }).delete();
+            // Remove from visible accomplishment IDs
             const currentVisible = visibleBulletIds.get(pos.id);
-            if (currentVisible?.has(bulletId)) {
+            if (currentVisible?.has(accId)) {
               const next = new Set(currentVisible);
-              next.delete(bulletId);
+              next.delete(accId);
               onBulletVisibilityChange(pos.id, next);
             }
           }
         }
 
-        // Update existing bullets (content + ordinal changes)
-        const existingBullets = pos.bullets.filter(b => !newBulletIds.has(b.id) && !deletedBulletIds.has(b.id));
-        for (let i = 0; i < existingBullets.length; i++) {
-          const bullet = existingBullets[i];
-          const origBullet = orig.bullets.find(b => b.id === bullet.id);
-          if (!origBullet) continue;
-          const contentChanged = bullet.content !== origBullet.content;
-          const ordinalChanged = i !== origBullet.ordinal;
-          if (contentChanged || ordinalChanged) {
-            await api.bullets({ id: bullet.id }).put({
-              experience_id: pos.id,
-              content: bullet.content,
+        // Update existing accomplishments (title + ordinal changes)
+        const existingAccomplishments = pos.accomplishments.filter(
+          a => !newAccomplishmentIds.has(a.id) && !deletedAccomplishmentIds.has(a.id)
+        );
+        for (let i = 0; i < existingAccomplishments.length; i++) {
+          const acc = existingAccomplishments[i];
+          const origAcc = orig.accomplishments.find(a => a.id === acc.id);
+          if (!origAcc) continue;
+          const titleChanged = acc.title !== origAcc.title;
+          const ordinalChanged = i !== origAcc.ordinal;
+          if (titleChanged || ordinalChanged) {
+            await accSegment({ accomplishmentId: acc.id }).put({
+              title: acc.title,
               ordinal: i
             });
           }
@@ -418,30 +428,28 @@ export function ExperienceEditModal({
                 )}
               </div>
 
-              {/* Bullets */}
-              <div className="text-[10px] font-semibold text-[#888] uppercase tracking-wide mb-2">Bullets</div>
+              {/* Accomplishments */}
+              <div className="text-[10px] font-semibold text-[#888] uppercase tracking-wide mb-2">Accomplishments</div>
               <SortableList
-                items={pos.bullets.filter(b => !deletedBulletIds.has(b.id))}
-                onReorder={(activeId, overId) => handleBulletReorder(pos.id, activeId, overId)}
+                items={pos.accomplishments.filter(a => !deletedAccomplishmentIds.has(a.id))}
+                onReorder={(activeId, overId) => handleAccomplishmentReorder(pos.id, activeId, overId)}
               >
-                {pos.bullets.map(bullet => {
-                  const isDeleted = deletedBulletIds.has(bullet.id);
-                  const isNew = newBulletIds.has(bullet.id);
-                  const isEditing = editingBulletId === bullet.id;
-                  const visible = isBulletVisible(pos.id, bullet);
+                {pos.accomplishments.map(acc => {
+                  const isDeleted = deletedAccomplishmentIds.has(acc.id);
+                  const isNew = newAccomplishmentIds.has(acc.id);
+                  const isEditing = editingAccomplishmentId === acc.id;
+                  const visible = isAccomplishmentVisible(pos.id, acc);
 
                   if (isDeleted) {
                     return (
                       <div
-                        key={bullet.id}
+                        key={acc.id}
                         className="flex items-start gap-2 p-2 rounded-md border border-red-200 bg-red-50 mb-1"
                       >
-                        <span className="flex-1 text-[11px] leading-relaxed line-through text-[#999]">
-                          {bullet.content}
-                        </span>
+                        <span className="flex-1 text-[11px] leading-relaxed line-through text-[#999]">{acc.title}</span>
                         <button
                           type="button"
-                          onClick={() => unmarkDeleted(bullet.id)}
+                          onClick={() => unmarkDeleted(acc.id)}
                           className="shrink-0 text-[10px] text-blue-500 underline cursor-pointer"
                         >
                           Undo
@@ -451,7 +459,7 @@ export function ExperienceEditModal({
                   }
 
                   return (
-                    <SortableItem key={bullet.id} id={bullet.id} className="mb-1">
+                    <SortableItem key={acc.id} id={acc.id} className="mb-1">
                       <div
                         className={`flex items-start gap-2 p-2 rounded-md border ${
                           isEditing
@@ -465,8 +473,8 @@ export function ExperienceEditModal({
                           <div className="flex-1">
                             <textarea
                               ref={editTextareaRef}
-                              value={bulletDraft}
-                              onChange={e => setBulletDraft(e.target.value)}
+                              value={accomplishmentDraft}
+                              onChange={e => setAccomplishmentDraft(e.target.value)}
                               onKeyDown={e => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                   e.preventDefault();
@@ -477,7 +485,7 @@ export function ExperienceEditModal({
                               }}
                               onBlur={commitEdit}
                               className="w-full text-[11px] leading-relaxed text-[#333] border-none bg-transparent resize-none outline-none font-[inherit] min-h-[36px]"
-                              placeholder="Type your bullet point..."
+                              placeholder="Type your accomplishment title..."
                             />
                             <div className="text-[9px] text-[#999] mt-0.5">Enter to confirm · Esc to cancel</div>
                           </div>
@@ -485,16 +493,16 @@ export function ExperienceEditModal({
                           <button
                             type="button"
                             className={`flex-1 text-left text-[11px] leading-relaxed cursor-text ${!visible ? 'line-through text-[#999]' : 'text-[#333]'}`}
-                            onClick={() => startEditing(bullet.id, bullet.content)}
+                            onClick={() => startEditing(acc.id, acc.title)}
                           >
-                            {bullet.content || <span className="text-[#bbb] italic">Empty bullet</span>}
+                            {acc.title || <span className="text-[#bbb] italic">Empty accomplishment</span>}
                           </button>
                         )}
                         {!isEditing && (
                           <>
                             <button
                               type="button"
-                              onClick={() => toggleBulletVisibility(pos.id, bullet)}
+                              onClick={() => toggleAccomplishmentVisibility(pos.id, acc)}
                               className="shrink-0 cursor-pointer p-0.5"
                               title={visible ? 'Exclude from resume' : 'Include in resume'}
                             >
@@ -506,9 +514,9 @@ export function ExperienceEditModal({
                             </button>
                             <button
                               type="button"
-                              onClick={() => markDeleted(bullet.id)}
+                              onClick={() => markDeleted(acc.id)}
                               className="shrink-0 cursor-pointer p-0.5 opacity-40 hover:opacity-100 transition-opacity"
-                              title="Delete bullet"
+                              title="Delete accomplishment"
                             >
                               <X className="w-3.5 h-3.5 text-red-500" />
                             </button>
@@ -520,14 +528,14 @@ export function ExperienceEditModal({
                 })}
               </SortableList>
 
-              {/* Add bullet button */}
+              {/* Add accomplishment button */}
               <button
                 type="button"
-                onClick={() => addBullet(pos.id)}
+                onClick={() => addAccomplishment(pos.id)}
                 className="mt-1 w-full py-1.5 border border-dashed border-[#ccc] rounded-md bg-transparent text-[#888] text-[11px] cursor-pointer flex items-center justify-center gap-1 hover:border-[#999] hover:text-[#666] transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Add bullet
+                Add accomplishment
               </button>
             </div>
           ))}

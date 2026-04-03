@@ -8,7 +8,7 @@ describe('Accomplishment', () => {
       title: 'Billing sharding',
       narrative: 'Led the migration of billing engine to hash-based sharding.',
       skillTags: ['distributed-systems', 'performance'],
-      ordinal: 0,
+      ordinal: 0
     });
     expect(a.id.value).toBeString();
     expect(a.title).toBe('Billing sharding');
@@ -22,7 +22,7 @@ describe('Accomplishment', () => {
       title: 'Old',
       narrative: 'Old narrative',
       skillTags: [],
-      ordinal: 0,
+      ordinal: 0
     });
     const before = a.updatedAt;
     a.update({ title: 'New', narrative: 'New narrative', skillTags: ['leadership'] });
@@ -38,7 +38,7 @@ describe('Accomplishment', () => {
       title: 'Original',
       narrative: 'Original narrative',
       skillTags: ['a'],
-      ordinal: 0,
+      ordinal: 0
     });
     a.update({ title: 'New title' });
     expect(a.title).toBe('New title');

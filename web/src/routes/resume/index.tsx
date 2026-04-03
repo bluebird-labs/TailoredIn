@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
+import { FactoryInputStep } from '@/components/factory/FactoryInputStep';
+import { FactoryReviewStep } from '@/components/factory/FactoryReviewStep';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExperienceTab } from '@/components/wardrobe/ExperienceTab';
 import { HeadlineTab } from '@/components/wardrobe/HeadlineTab';
 import { SkillsTab } from '@/components/wardrobe/SkillsTab';
-import { FactoryInputStep } from '@/components/factory/FactoryInputStep';
-import { FactoryReviewStep } from '@/components/factory/FactoryReviewStep';
 
 const searchSchema = z.object({
   tab: z.enum(['wardrobe', 'factory']).optional().catch('wardrobe')
@@ -25,9 +25,7 @@ function ResumePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Resume</h1>
-        <p className="text-muted-foreground text-sm">
-          Build your wardrobe, then generate tailored resumes.
-        </p>
+        <p className="text-muted-foreground text-sm">Build your wardrobe, then generate tailored resumes.</p>
       </div>
 
       <Tabs defaultValue={tab ?? 'wardrobe'}>

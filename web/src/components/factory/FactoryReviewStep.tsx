@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { ArrowLeft, Download } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { useTailoredResume, useUpdateTailoredResume, useGenerateTailoredResumePdf } from '@/hooks/use-tailored-resume';
+import { useGenerateTailoredResumePdf, useTailoredResume, useUpdateTailoredResume } from '@/hooks/use-tailored-resume';
 
 type Props = {
   resumeId: string;
@@ -19,7 +19,7 @@ export function FactoryReviewStep({ resumeId, onReset }: Props) {
   if (!resume) return <div className="text-sm text-destructive">Resume not found.</div>;
 
   const headlineOptions = resume.llmProposals?.headlineOptions ?? [];
-  const rankedExperiences = resume.llmProposals?.rankedExperiences ?? [];
+  const rankedExperiences = resume.llmProposals?.selectedExperiences ?? [];
   const assessment = resume.llmProposals?.assessment;
   const activeHeadline = selectedHeadline ?? resume.headlineText ?? headlineOptions[0] ?? '';
 
@@ -37,7 +37,7 @@ export function FactoryReviewStep({ resumeId, onReset }: Props) {
         content_selection: {
           experience_selections: contentSelection.experienceSelections.map(es => ({
             experience_id: es.experienceId,
-            accomplishment_ids: es.bulletIds
+            accomplishment_ids: es.accomplishmentIds
           })),
           project_ids: contentSelection.projectIds,
           education_ids: contentSelection.educationIds,
@@ -68,7 +68,9 @@ export function FactoryReviewStep({ resumeId, onReset }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">Review Generated Resume</h2>
-          <p className="text-sm text-muted-foreground">Select a headline, review the fit assessment, then download your PDF.</p>
+          <p className="text-sm text-muted-foreground">
+            Select a headline, review the fit assessment, then download your PDF.
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={onReset}>
@@ -105,9 +107,9 @@ export function FactoryReviewStep({ resumeId, onReset }: Props) {
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Choose a Headline</p>
           </div>
           <div className="p-3 space-y-2">
-            {headlineOptions.map((option, i) => (
+            {headlineOptions.map(option => (
               <button
-                key={i}
+                key={option}
                 type="button"
                 onClick={() => setSelectedHeadline(option)}
                 className={`w-full text-left px-3 py-2 rounded-md border text-sm transition-colors ${
@@ -137,7 +139,8 @@ export function FactoryReviewStep({ resumeId, onReset }: Props) {
                 <div>
                   <p className="text-xs font-mono text-muted-foreground">{exp.experienceId}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {exp.rankedBulletIds.length} bullet{exp.rankedBulletIds.length !== 1 ? 's' : ''} selected
+                    {exp.selectedAccomplishmentIds.length} accomplishment
+                    {exp.selectedAccomplishmentIds.length !== 1 ? 's' : ''} selected
                   </p>
                 </div>
               </div>

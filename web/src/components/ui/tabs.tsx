@@ -8,19 +8,13 @@ function TabsList({ className, ...props }: TabsPrimitive.List.Props) {
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
-      className={cn(
-        'inline-flex items-center justify-center rounded-lg border border-border bg-muted p-1',
-        className
-      )}
+      className={cn('inline-flex items-center justify-center rounded-lg border border-border bg-muted p-1', className)}
       {...props}
     />
   );
 }
 
-function TabsTrigger({
-  className,
-  ...props
-}: TabsPrimitive.Tab.Props) {
+function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
   return (
     <TabsPrimitive.Tab
       data-slot="tabs-trigger"
@@ -33,10 +27,7 @@ function TabsTrigger({
   );
 }
 
-function TabsContent({
-  className,
-  ...props
-}: TabsPrimitive.Panel.Props) {
+function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
   return (
     <TabsPrimitive.Panel
       data-slot="tabs-content"
@@ -49,4 +40,4 @@ function TabsContent({
   );
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsContent, TabsList, TabsTrigger };
