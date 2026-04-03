@@ -10,7 +10,7 @@ import { BaseEntity } from './BaseEntity.js';
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
-import { Bullet as OrmBullet } from './entities/experience/Bullet.js';
+import { Accomplishment as OrmAccomplishment } from './entities/experience/Accomplishment.js';
 import { Experience as OrmExperience } from './entities/experience/Experience.js';
 import { Headline as OrmHeadline } from './entities/headline/Headline.js';
 import { Job } from './entities/jobs/Job.js';
@@ -54,7 +54,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       OrmSkillCategory,
       OrmSkillItem,
       OrmExperience,
-      OrmBullet,
+      OrmAccomplishment,
       ResumeProfileOrm,
       TailoredResumeOrm
     ],

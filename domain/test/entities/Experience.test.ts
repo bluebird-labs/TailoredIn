@@ -15,38 +15,38 @@ describe('Experience', () => {
       ordinal: 0
     });
 
-  test('creates with empty bullets', () => {
+  test('creates with empty accomplishments', () => {
     const exp = makeExperience();
     expect(exp.title).toBe('Staff Engineer');
     expect(exp.companyName).toBe('Acme Corp');
-    expect(exp.bullets).toEqual([]);
+    expect(exp.accomplishments).toEqual([]);
   });
 
-  test('adds a bullet', () => {
+  test('adds an accomplishment', () => {
     const exp = makeExperience();
-    const bullet = exp.addBullet({ content: 'Built the thing', ordinal: 0 });
-    expect(exp.bullets).toHaveLength(1);
-    expect(bullet.content).toBe('Built the thing');
-    expect(bullet.experienceId).toBe(exp.id.value);
+    const accomplishment = exp.addAccomplishment({ title: 'T', narrative: 'N', skillTags: [], ordinal: 0 });
+    expect(exp.accomplishments).toHaveLength(1);
+    expect(accomplishment.title).toBe('T');
+    expect(accomplishment.experienceId).toBe(exp.id.value);
   });
 
-  test('removes a bullet and its variants', () => {
+  test('removes an accomplishment', () => {
     const exp = makeExperience();
-    const bullet = exp.addBullet({ content: 'Built the thing', ordinal: 0 });
-    exp.removeBullet(bullet.id.value);
-    expect(exp.bullets).toHaveLength(0);
+    const accomplishment = exp.addAccomplishment({ title: 'T', narrative: 'N', skillTags: [], ordinal: 0 });
+    exp.removeAccomplishment(accomplishment.id.value);
+    expect(exp.accomplishments).toHaveLength(0);
   });
 
-  test('finds bullet or fails', () => {
+  test('finds accomplishment or fails', () => {
     const exp = makeExperience();
-    const bullet = exp.addBullet({ content: 'Built the thing', ordinal: 0 });
-    const found = exp.findBulletOrFail(bullet.id.value);
-    expect(found.id.equals(bullet.id)).toBe(true);
+    const accomplishment = exp.addAccomplishment({ title: 'T', narrative: 'N', skillTags: [], ordinal: 0 });
+    const found = exp.findAccomplishmentOrFail(accomplishment.id.value);
+    expect(found.id.equals(accomplishment.id)).toBe(true);
   });
 
-  test('throws when removing non-existent bullet', () => {
+  test('throws when removing non-existent accomplishment', () => {
     const exp = makeExperience();
-    expect(() => exp.removeBullet('nonexistent')).toThrow('Bullet not found');
+    expect(() => exp.removeAccomplishment('nonexistent')).toThrow('Accomplishment not found');
   });
 
   test('updates mutable fields', () => {

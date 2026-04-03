@@ -3,7 +3,7 @@ import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 import { Profile } from '../profile/Profile.js';
-import { Bullet } from './Bullet.js';
+import { Accomplishment } from './Accomplishment.js';
 
 type ExperienceProps = {
   id: string;
@@ -57,11 +57,11 @@ export class Experience extends BaseEntity {
   public ordinal: number;
 
   @OneToMany(
-    () => Bullet,
-    bullet => bullet.experience,
+    () => Accomplishment,
+    acc => acc.experience,
     { lazy: true, orderBy: { ordinal: 'ASC' } }
   )
-  public readonly bullets: Collection<Bullet> = new Collection<Bullet>(this);
+  public readonly accomplishments: Collection<Accomplishment> = new Collection<Accomplishment>(this);
 
   public constructor(props: ExperienceProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });

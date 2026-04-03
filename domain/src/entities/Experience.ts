@@ -1,6 +1,6 @@
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ExperienceId } from '../value-objects/ExperienceId.js';
-import { Bullet } from './Bullet.js';
+import { Accomplishment } from './Accomplishment.js';
 
 export type ExperienceCreateProps = {
   profileId: string;
@@ -26,7 +26,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   public summary: string | null;
   public narrative: string | null;
   public ordinal: number;
-  public readonly bullets: Bullet[];
+  public readonly accomplishments: Accomplishment[];
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -42,7 +42,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     summary: string | null;
     narrative: string | null;
     ordinal: number;
-    bullets: Bullet[];
+    accomplishments: Accomplishment[];
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -57,29 +57,34 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.summary = props.summary;
     this.narrative = props.narrative;
     this.ordinal = props.ordinal;
-    this.bullets = props.bullets;
+    this.accomplishments = props.accomplishments;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
 
-  public addBullet(props: { content: string; ordinal: number }): Bullet {
-    const bullet = Bullet.create({ experienceId: this.id.value, ...props });
-    this.bullets.push(bullet);
+  public addAccomplishment(props: {
+    title: string;
+    narrative: string;
+    skillTags: string[];
+    ordinal: number;
+  }): Accomplishment {
+    const accomplishment = Accomplishment.create({ experienceId: this.id.value, ...props });
+    this.accomplishments.push(accomplishment);
     this.updatedAt = new Date();
-    return bullet;
+    return accomplishment;
   }
 
-  public removeBullet(bulletId: string): void {
-    const index = this.bullets.findIndex(b => b.id.value === bulletId);
-    if (index === -1) throw new Error(`Bullet not found: ${bulletId}`);
-    this.bullets.splice(index, 1);
+  public removeAccomplishment(accomplishmentId: string): void {
+    const index = this.accomplishments.findIndex(a => a.id.value === accomplishmentId);
+    if (index === -1) throw new Error(`Accomplishment not found: ${accomplishmentId}`);
+    this.accomplishments.splice(index, 1);
     this.updatedAt = new Date();
   }
 
-  public findBulletOrFail(bulletId: string): Bullet {
-    const bullet = this.bullets.find(b => b.id.value === bulletId);
-    if (!bullet) throw new Error(`Bullet not found: ${bulletId}`);
-    return bullet;
+  public findAccomplishmentOrFail(accomplishmentId: string): Accomplishment {
+    const acc = this.accomplishments.find(a => a.id.value === accomplishmentId);
+    if (!acc) throw new Error(`Accomplishment not found: ${accomplishmentId}`);
+    return acc;
   }
 
   public static create(props: ExperienceCreateProps): Experience {
@@ -88,7 +93,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
       id: ExperienceId.generate(),
       ...props,
       narrative: props.narrative ?? null,
-      bullets: [],
+      accomplishments: [],
       createdAt: now,
       updatedAt: now
     });

@@ -13,25 +13,12 @@ export function useTailoredResume(id: string) {
   });
 }
 
-export function useCreateTailoredResume() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (input: { jd_content: string }) => {
-      const { data } = await api.resumes.tailored.post(input);
-      return data?.data ?? null;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tailoredResumes.all });
-    }
-  });
-}
-
 export function useUpdateTailoredResume(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: {
       content_selection: {
-        experience_selections: { experience_id: string; bullet_ids: string[] }[];
+        experience_selections: { experience_id: string; accomplishment_ids: string[] }[];
         project_ids: string[];
         education_ids: string[];
         skill_category_ids: string[];

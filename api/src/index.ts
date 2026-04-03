@@ -9,13 +9,14 @@ import { CreateEducationRoute } from './routes/education/CreateEducationRoute.js
 import { DeleteEducationRoute } from './routes/education/DeleteEducationRoute.js';
 import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
 import { UpdateEducationRoute } from './routes/education/UpdateEducationRoute.js';
-import { AddBulletRoute } from './routes/experience/AddBulletRoute.js';
+import { AddAccomplishmentRoute } from './routes/experience/AddAccomplishmentRoute.js';
 import { CreateExperienceRoute } from './routes/experience/CreateExperienceRoute.js';
-import { DeleteBulletRoute } from './routes/experience/DeleteBulletRoute.js';
+import { DeleteAccomplishmentRoute } from './routes/experience/DeleteAccomplishmentRoute.js';
 import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
-import { UpdateBulletRoute } from './routes/experience/UpdateBulletRoute.js';
+import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
+import { ExtractTextRoute } from './routes/factory/ExtractTextRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
@@ -123,9 +124,11 @@ const app = new Elysia()
   .use(container.get(CreateExperienceRoute).plugin())
   .use(container.get(UpdateExperienceRoute).plugin())
   .use(container.get(DeleteExperienceRoute).plugin())
-  .use(container.get(AddBulletRoute).plugin())
-  .use(container.get(UpdateBulletRoute).plugin())
-  .use(container.get(DeleteBulletRoute).plugin())
+  .use(container.get(AddAccomplishmentRoute).plugin())
+  .use(container.get(UpdateAccomplishmentRoute).plugin())
+  .use(container.get(DeleteAccomplishmentRoute).plugin())
+  // Factory
+  .use(container.get(ExtractTextRoute).plugin())
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
     const message = err.message ?? String(error);

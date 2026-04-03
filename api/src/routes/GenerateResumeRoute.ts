@@ -16,7 +16,7 @@ export class GenerateResumeRoute {
           headlineText: body.headline_text,
           experienceSelections: body.experience_selections.map(s => ({
             experienceId: s.experience_id,
-            bulletIds: s.bullet_ids
+            accomplishmentIds: s.bullet_ids
           })),
           educationIds: body.education_ids,
           skillCategoryIds: body.skill_category_ids,

@@ -1,5 +1,5 @@
 export type ContentSelectionDto = {
-  experienceSelections: { experienceId: string; bulletIds: string[] }[];
+  experienceSelections: { experienceId: string; accomplishmentIds: string[] }[];
   projectIds: string[];
   educationIds: string[];
   skillCategoryIds: string[];

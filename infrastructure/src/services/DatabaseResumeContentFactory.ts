@@ -44,10 +44,10 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
     // Experience — from experienceSelections
     const experienceMap = new Map(allExperiences.map(e => [e.id.value, e]));
 
-    const bulletMap = new Map<string, { text: string; ordinal: number }>();
+    const accomplishmentMap = new Map<string, { text: string; ordinal: number }>();
     for (const exp of allExperiences) {
-      for (const bullet of exp.bullets) {
-        bulletMap.set(bullet.id.value, { text: bullet.content, ordinal: bullet.ordinal });
+      for (const acc of exp.accomplishments) {
+        accomplishmentMap.set(acc.id.value, { text: acc.title, ordinal: acc.ordinal });
       }
     }
 
@@ -58,8 +58,8 @@ export class DatabaseResumeContentFactory implements ResumeContentFactory {
       }
 
       const highlights: string[] = [];
-      for (const bulletId of sel.bulletIds) {
-        const entry = bulletMap.get(bulletId);
+      for (const accomplishmentId of sel.accomplishmentIds) {
+        const entry = accomplishmentMap.get(accomplishmentId);
         if (!entry) {
           continue;
         }

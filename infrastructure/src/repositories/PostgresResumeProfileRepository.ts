@@ -39,7 +39,7 @@ export class PostgresResumeProfileRepository implements ResumeProfileRepository 
   private toDomain(orm: ResumeProfileOrm): ResumeProfile {
     const cs = orm.contentSelection as Record<string, unknown>;
     const contentSelection = new ContentSelection({
-      experienceSelections: (cs.experienceSelections as { experienceId: string; bulletIds: string[] }[]) ?? [],
+      experienceSelections: (cs.experienceSelections as { experienceId: string; accomplishmentIds: string[] }[]) ?? [],
       projectIds: (cs.projectIds as string[]) ?? [],
       educationIds: (cs.educationIds as string[]) ?? [],
       skillCategoryIds: (cs.skillCategoryIds as string[]) ?? [],

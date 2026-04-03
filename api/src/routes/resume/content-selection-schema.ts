@@ -5,7 +5,7 @@ export const contentSelectionSchema = t.Object({
   experience_selections: t.Array(
     t.Object({
       experience_id: t.String({ format: 'uuid' }),
-      bullet_ids: t.Array(t.String({ format: 'uuid' }))
+      accomplishment_ids: t.Array(t.String({ format: 'uuid' }))
     })
   ),
   project_ids: t.Array(t.String({ format: 'uuid' })),
@@ -15,7 +15,7 @@ export const contentSelectionSchema = t.Object({
 });
 
 export function bodyToContentSelectionDto(body: {
-  experience_selections: Array<{ experience_id: string; bullet_ids: string[] }>;
+  experience_selections: Array<{ experience_id: string; accomplishment_ids: string[] }>;
   project_ids: string[];
   education_ids: string[];
   skill_category_ids: string[];
@@ -24,7 +24,7 @@ export function bodyToContentSelectionDto(body: {
   return {
     experienceSelections: body.experience_selections.map(s => ({
       experienceId: s.experience_id,
-      bulletIds: s.bullet_ids
+      accomplishmentIds: s.accomplishment_ids
     })),
     projectIds: body.project_ids,
     educationIds: body.education_ids,

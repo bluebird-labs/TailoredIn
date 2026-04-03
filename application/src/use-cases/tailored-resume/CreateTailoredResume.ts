@@ -39,9 +39,9 @@ export class CreateTailoredResume {
 
     // Keep a ranked content selection as reference / fallback for base resume rendering
     const contentSelection = new ContentSelection({
-      experienceSelections: llmProposal.rankedExperiences.map(exp => ({
+      experienceSelections: llmProposal.selectedExperiences.map(exp => ({
         experienceId: exp.experienceId,
-        bulletIds: exp.rankedBulletIds
+        accomplishmentIds: exp.selectedAccomplishmentIds
       })),
       projectIds: [],
       educationIds: profile.contentSelection.educationIds,

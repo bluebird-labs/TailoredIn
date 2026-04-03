@@ -1,0 +1,46 @@
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
+import { BaseEntity } from '../../BaseEntity.js';
+import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { Experience } from './Experience.js';
+
+type AccomplishmentProps = {
+  id: string;
+  experience: RefOrEntity<Experience>;
+  title: string;
+  narrative: string;
+  skillTags: string[];
+  ordinal: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+@Entity({ tableName: 'accomplishments' })
+export class Accomplishment extends BaseEntity {
+  @UuidPrimaryKey({ name: 'id' })
+  public readonly id: string;
+
+  @ManyToOne(() => Experience, { lazy: true, name: 'experience_id' })
+  public readonly experience: RefOrEntity<Experience>;
+
+  @Property({ name: 'title', type: 'text' })
+  public title: string;
+
+  @Property({ name: 'narrative', type: 'text' })
+  public narrative: string;
+
+  @Property({ name: 'skill_tags', type: 'json' })
+  public skillTags: string[];
+
+  @Property({ name: 'ordinal', type: 'integer' })
+  public ordinal: number;
+
+  public constructor(props: AccomplishmentProps) {
+    super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
+    this.id = props.id;
+    this.experience = props.experience;
+    this.title = props.title;
+    this.narrative = props.narrative;
+    this.skillTags = props.skillTags;
+    this.ordinal = props.ordinal;
+  }
+}
