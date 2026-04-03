@@ -1,0 +1,38 @@
+language = "en"
+
+[layout]
+  awesome_color = "#3E6B8A"
+  before_section_skip = "4pt"
+  before_entry_skip = "3pt"
+  before_entry_description_skip = "2pt"
+  paper_size = "us-letter"
+  [layout.fonts]
+    regular_fonts = ["Source Sans 3"]
+    header_font = "Raleway"
+  [layout.header]
+    header_align = "left"
+    display_profile_photo = false
+  [layout.entry]
+    display_entry_society_first = true
+    display_logo = false
+  [layout.footer]
+    display_page_counter = false
+    display_footer = false
+
+[inject]
+  injected_keywords_list = []
+
+[personal]
+  first_name = "John"
+  last_name = "Doe"
+  [personal.info]
+    linkedin = "https://linkedin.com/in/johndoe"
+    email = "john@example.com"
+    phone = "+1-555-0100"
+    location = "San Francisco, CA"
+    github = "https://github.com/johndoe"
+
+[lang.en]
+  header_quote = "Software engineer passionate about building great products"
+  cv_footer = "Résumé"
+  letter_footer = "Cover letter"
