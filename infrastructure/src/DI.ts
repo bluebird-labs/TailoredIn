@@ -4,13 +4,11 @@ import type {
   AddSkillItem,
   BulkChangeJobStatus,
   ChangeJobStatus,
-  CreateArchetype,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
   CreateSkillCategory,
   CreateTailoredResume,
-  DeleteArchetype,
   DeleteBullet,
   DeleteEducation,
   DeleteExperience,
@@ -31,7 +29,6 @@ import type {
   IngestJobByUrl,
   IngestScrapedJob,
   JobScraper,
-  ListArchetypes,
   ListEducation,
   ListExperiences,
   ListHeadlines,
@@ -48,7 +45,6 @@ import type {
   StructuredLlmClient,
   SuggestBullets,
   TailoredResumeRepository,
-  UpdateArchetype,
   UpdateBullet,
   UpdateEducation,
   UpdateExperience,
@@ -177,10 +173,6 @@ export const DI = {
   },
 
   Archetype: {
-    List: new InjectionToken<ListArchetypes>('DI.Archetype.List'),
-    Create: new InjectionToken<CreateArchetype>('DI.Archetype.Create'),
-    Update: new InjectionToken<UpdateArchetype>('DI.Archetype.Update'),
-    Delete: new InjectionToken<DeleteArchetype>('DI.Archetype.Delete'),
     SuggestBullets: new InjectionToken<SuggestBullets>('DI.Archetype.SuggestBullets')
   }
 };
