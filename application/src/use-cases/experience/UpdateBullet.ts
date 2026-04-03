@@ -7,6 +7,7 @@ export type UpdateBulletInput = {
   ordinal: number;
 };
 
+// TODO(Task 9): Replace with UpdateAccomplishment use case
 export class UpdateBullet {
   public constructor(private readonly experienceRepository: ExperienceRepository) {}
 
@@ -18,16 +19,14 @@ export class UpdateBullet {
       return err(new Error(`Experience not found: ${input.experienceId}`));
     }
 
-    let bullet: ReturnType<Experience['findBulletOrFail']>;
+    let accomplishment: ReturnType<Experience['findAccomplishmentOrFail']>;
     try {
-      bullet = experience.findBulletOrFail(input.bulletId);
+      accomplishment = experience.findAccomplishmentOrFail(input.bulletId);
     } catch {
-      return err(new Error(`Bullet not found: ${input.bulletId}`));
+      return err(new Error(`Accomplishment not found: ${input.bulletId}`));
     }
 
-    bullet.content = input.content;
-    bullet.ordinal = input.ordinal;
-    bullet.updatedAt = new Date();
+    accomplishment.update({ title: input.content, ordinal: input.ordinal });
 
     await this.experienceRepository.save(experience);
     return ok(undefined);

@@ -1,5 +1,5 @@
-import type { Bullet, Experience, ExperienceRepository } from '@tailoredin/domain';
-import type { BulletDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
+import type { Accomplishment, Experience, ExperienceRepository } from '@tailoredin/domain';
+import type { AccomplishmentDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
 
 export class ListExperiences {
   public constructor(private readonly experienceRepository: ExperienceRepository) {}
@@ -20,17 +20,18 @@ export function toExperienceDto(exp: Experience): ExperienceDto {
     startDate: exp.startDate,
     endDate: exp.endDate,
     summary: exp.summary,
+    narrative: exp.narrative,
     ordinal: exp.ordinal,
-    bullets: exp.bullets.map(toBulletDto)
+    accomplishments: exp.accomplishments.map(toAccomplishmentDto),
   };
 }
 
-function toBulletDto(bullet: Bullet): BulletDto {
+function toAccomplishmentDto(accomplishment: Accomplishment): AccomplishmentDto {
   return {
-    id: bullet.id.value,
-    content: bullet.content,
-    ordinal: bullet.ordinal,
-    roleTags: [...bullet.tags.roleTags].map(name => ({ id: '', name, dimension: 'ROLE' })),
-    skillTags: [...bullet.tags.skillTags].map(name => ({ id: '', name, dimension: 'SKILL' }))
+    id: accomplishment.id.value,
+    title: accomplishment.title,
+    narrative: accomplishment.narrative,
+    skillTags: accomplishment.skillTags,
+    ordinal: accomplishment.ordinal,
   };
 }

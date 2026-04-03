@@ -5,6 +5,7 @@ export type DeleteBulletInput = {
   bulletId: string;
 };
 
+// TODO(Task 9): Replace with DeleteAccomplishment use case
 export class DeleteBullet {
   public constructor(private readonly experienceRepository: ExperienceRepository) {}
 
@@ -17,9 +18,9 @@ export class DeleteBullet {
     }
 
     try {
-      experience.removeBullet(input.bulletId);
+      experience.removeAccomplishment(input.bulletId);
     } catch {
-      return err(new Error(`Bullet not found: ${input.bulletId}`));
+      return err(new Error(`Accomplishment not found: ${input.bulletId}`));
     }
 
     await this.experienceRepository.save(experience);

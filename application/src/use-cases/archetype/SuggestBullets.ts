@@ -70,14 +70,14 @@ export class SuggestBullets {
   public async execute(input: SuggestBulletsInput): Promise<Result<SuggestBulletsOutput, Error>> {
     const experiences = await this.experienceRepo.findAll();
     const allBullets = experiences.flatMap(exp =>
-      exp.bullets.map(b => ({
+      exp.accomplishments.map(b => ({
         bulletId: b.id.value,
         experienceId: exp.id.value,
         company: exp.companyName,
         title: exp.title,
-        content: b.content,
-        roleTags: [...b.tags.roleTags],
-        skillTags: [...b.tags.skillTags]
+        content: b.narrative,
+        roleTags: [] as string[],
+        skillTags: b.skillTags,
       }))
     );
 
