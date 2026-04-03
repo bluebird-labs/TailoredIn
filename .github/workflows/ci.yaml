@@ -82,6 +82,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-bun
+      - name: Install Typst
+        uses: typst-community/setup-typst@v4
       - run: bun run --cwd infrastructure test:integration
 
   knip:

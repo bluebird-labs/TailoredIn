@@ -51,6 +51,7 @@ import {
 import { env, envBool, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
+  BrilliantCvTemplate,
   createOrmConfig,
   DatabaseResumeChestQuery,
   DatabaseResumeContentFactory,
@@ -73,7 +74,8 @@ import {
   PostgresTagRepository,
   PostgresTailoredResumeRepository,
   StructuredLlmRouter,
-  TypstResumeRenderer
+  TypstResumeRenderer,
+  TypstTemplateLayoutAnalyzer
 } from '@tailoredin/infrastructure';
 
 const orm = await MikroORM.init(
@@ -191,13 +193,15 @@ container.bind({
   provide: DI.Resume.ChestQuery,
   useFactory: () => new DatabaseResumeChestQuery(container.get(DI.Experience.Repository))
 });
+container.bind({ provide: DI.Resume.LayoutAnalyzer, useClass: TypstTemplateLayoutAnalyzer });
 container.bind({
   provide: DI.Resume.GenerateResume,
   useFactory: () =>
     new GenerateResume(
       container.get(DI.Profile.Repository),
       container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.Renderer),
+      BrilliantCvTemplate
     )
 });
 container.bind({
@@ -249,7 +253,8 @@ container.bind({
     new GenerateResumeProfilePdf(
       container.get(DI.ResumeProfile.Repository),
       container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.Renderer),
+      BrilliantCvTemplate
     )
 });
 
@@ -283,7 +288,8 @@ container.bind({
     new GenerateTailoredResumePdf(
       container.get(DI.TailoredResume.Repository),
       container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.Renderer),
+      BrilliantCvTemplate
     )
 });
 

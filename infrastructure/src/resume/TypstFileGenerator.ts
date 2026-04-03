@@ -1,20 +1,10 @@
 import FS from 'node:fs/promises';
 import Path from 'node:path';
+import type { ResumeTemplate } from '@tailoredin/domain';
 import type { BrilliantCVContent } from '../brilliant-cv/types.js';
 
 const RESUME_ACCENT_COLOR = '#3E6B8A';
-
-const RESUME_LAYOUT = {
-  beforeSectionSkip: '4pt',
-  beforeEntrySkip: '3pt',
-  beforeEntryDescriptionSkip: '2pt',
-  bodyFontSize: '10.5pt',
-  headerFontSize: '30pt',
-  lineSpacing: '0.75em',
-  pageMargin: '1.5cm',
-  sectionOrder: ['professional', 'skills', 'education'] as const,
-  showEntrySummary: true
-};
+const SHOW_ENTRY_SUMMARY = true;
 
 /** Escape characters that have special meaning in Typst content brackets [...]. */
 const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>/g, '\\>');
@@ -23,13 +13,17 @@ const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>
 const escapeToml = (str: string): string => str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 export class TypstFileGenerator {
-  public static async generate(content: BrilliantCVContent, workDir: string): Promise<void> {
+  public static async generate(content: BrilliantCVContent, workDir: string, template: ResumeTemplate): Promise<void> {
     await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
 
     await Promise.all([
-      FS.writeFile(Path.join(workDir, 'metadata.toml'), TypstFileGenerator.buildMetadataToml(content), 'utf8'),
-      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(), 'utf8'),
-      FS.writeFile(Path.join(workDir, 'helpers.typ'), TypstFileGenerator.buildHelpersTyp(), 'utf8'),
+      FS.writeFile(
+        Path.join(workDir, 'metadata.toml'),
+        TypstFileGenerator.buildMetadataToml(content, template),
+        'utf8'
+      ),
+      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(template), 'utf8'),
+      FS.writeFile(Path.join(workDir, 'helpers.typ'), TypstFileGenerator.buildHelpersTyp(template), 'utf8'),
       FS.writeFile(
         Path.join(workDir, 'modules_en', 'professional.typ'),
         TypstFileGenerator.buildProfessionalTyp(content),
@@ -44,7 +38,48 @@ export class TypstFileGenerator {
     ]);
   }
 
-  private static buildMetadataToml(content: BrilliantCVContent): string {
+  /**
+   * Like generate(), but injects #mark() position markers around every content block.
+   * Used by TypstTemplateLayoutAnalyzer to measure block positions via `typst query`.
+   *
+   * @param content - The resume content (same as render mode)
+   * @param workDir - A TEMP directory — NOT the shared TYPST_DIR — to avoid render conflicts
+   * @param template - Layout constants for the target template
+   */
+  public static async generateForAnalysis(
+    content: BrilliantCVContent,
+    workDir: string,
+    template: ResumeTemplate
+  ): Promise<void> {
+    await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
+
+    await Promise.all([
+      FS.writeFile(
+        Path.join(workDir, 'metadata.toml'),
+        TypstFileGenerator.buildMetadataToml(content, template),
+        'utf8'
+      ),
+      FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildAnalysisCvTyp(template), 'utf8'),
+      FS.writeFile(Path.join(workDir, 'helpers.typ'), TypstFileGenerator.buildAnalysisHelpersTyp(template), 'utf8'),
+      FS.writeFile(
+        Path.join(workDir, 'modules_en', 'professional.typ'),
+        TypstFileGenerator.buildAnalysisProfessionalTyp(content),
+        'utf8'
+      ),
+      FS.writeFile(
+        Path.join(workDir, 'modules_en', 'skills.typ'),
+        TypstFileGenerator.buildAnalysisSkillsTyp(content),
+        'utf8'
+      ),
+      FS.writeFile(
+        Path.join(workDir, 'modules_en', 'education.typ'),
+        TypstFileGenerator.buildAnalysisEducationTyp(content),
+        'utf8'
+      )
+    ]);
+  }
+
+  private static buildMetadataToml(content: BrilliantCVContent, template: ResumeTemplate): string {
     const { personal, keywords } = content;
     const keywordsList = keywords.map(k => `"${escapeToml(k)}"`).join(', ');
 
@@ -52,10 +87,10 @@ export class TypstFileGenerator {
 
 [layout]
   awesome_color = "#1A1A1A"
-  before_section_skip = "${RESUME_LAYOUT.beforeSectionSkip}"
-  before_entry_skip = "${RESUME_LAYOUT.beforeEntrySkip}"
-  before_entry_description_skip = "${RESUME_LAYOUT.beforeEntryDescriptionSkip}"
-  paper_size = "us-letter"
+  before_section_skip = "${template.sectionSpacingPt}pt"
+  before_entry_skip = "${template.entrySpacingPt}pt"
+  before_entry_description_skip = "2pt"
+  paper_size = "${template.pageSize}"
   [layout.fonts]
     regular_fonts = ["IBM Plex Sans"]
     header_font = "IBM Plex Sans"
@@ -88,14 +123,15 @@ export class TypstFileGenerator {
 `;
   }
 
-  private static buildCvTyp(): string {
-    const includes = RESUME_LAYOUT.sectionOrder.map(section => `#include "modules_en/${section}.typ"`).join('\n');
+  private static buildCvTyp(template: ResumeTemplate): string {
+    const sections = ['professional', 'skills', 'education'];
+    const includes = sections.map(s => `#include "modules_en/${s}.typ"`).join('\n');
 
     return `#import "@preview/brilliant-cv:3.3.0": cv
 #let metadata = toml("./metadata.toml")
-#set text(size: ${RESUME_LAYOUT.bodyFontSize})
-#set par(leading: ${RESUME_LAYOUT.lineSpacing})
-#set page(margin: ${RESUME_LAYOUT.pageMargin})
+#set text(size: ${template.bodyFontSizePt}pt)
+#set par(leading: ${template.lineHeightEm}em)
+#set page(margin: ${template.margins.top}cm)
 // Override personal info icons to use text labels instead of Font Awesome
 #let custom-icons = (
   github: box(width: 10pt, align(center, text(size: 8pt, "GH"))),
@@ -110,12 +146,12 @@ ${includes}
 `;
   }
 
-  private static buildHelpersTyp(): string {
+  private static buildHelpersTyp(template: ResumeTemplate): string {
     return `\
 #import "@preview/brilliant-cv:3.3.0": cv-entry, cv-skill, h-bar
 
 #let _accent = rgb("${RESUME_ACCENT_COLOR}")
-#let _section-skip = ${RESUME_LAYOUT.beforeSectionSkip}
+#let _section-skip = ${template.sectionSpacingPt}pt
 
 // Custom cv-section: re-implements brilliant-cv's section header with an accent-colored divider line.
 // The package's built-in cv-section uses a hardcoded black stroke that does not follow awesome_color.
@@ -157,7 +193,7 @@ ${includes}
         lines.push(`  date: [${exp.date}],`);
         lines.push(`  location: [${escapeTypst(exp.location)}],`);
         lines.push(`  description: [`);
-        if (RESUME_LAYOUT.showEntrySummary && exp.summary) {
+        if (SHOW_ENTRY_SUMMARY && exp.summary) {
           lines.push(`    _${escapeTypst(exp.summary)}_`);
           if (highlights.length > 0) lines.push(`    #v(2pt)`);
         }
@@ -191,7 +227,7 @@ ${includes}
           if (i > 0) lines.push(`    #v(4pt)`);
           lines.push(`    *${escapeTypst(pos.title)}* #h(1fr) _${pos.date}_`);
 
-          if (RESUME_LAYOUT.showEntrySummary && pos.summary) {
+          if (SHOW_ENTRY_SUMMARY && pos.summary) {
             lines.push(`    #v(1pt)`);
             lines.push(`    _${escapeTypst(pos.summary)}_`);
           }
@@ -238,6 +274,193 @@ ${includes}
       lines.push(
         `*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}`
       );
+      lines.push(``);
+    }
+
+    return lines.join('\n');
+  }
+
+  private static buildAnalysisHelpersTyp(template: ResumeTemplate): string {
+    return `\
+#import "@preview/brilliant-cv:3.3.0": cv-entry, cv-skill, h-bar
+
+#let _accent = rgb("${RESUME_ACCENT_COLOR}")
+#let _section-skip = ${template.sectionSpacingPt}pt
+
+#let cv-section(title) = {
+  v(_section-skip)
+  block(
+    sticky: true,
+    [#text(size: 16pt, weight: "bold", title)
+    #h(2pt)
+    #box(width: 1fr, line(stroke: 0.9pt + _accent, length: 100%))]
+  )
+}
+
+// === Analysis mode: position tracking ===
+// Each #mark(id) emits a labelled metadata element at its document location.
+// cv.typ then queries all <layout-mark> elements in a context block,
+// resolves their y-positions, and emits a single dictionary as <all-layout-positions>.
+#let mark(id) = [#metadata((id: id)) <layout-mark>]
+`;
+  }
+
+  private static buildAnalysisCvTyp(template: ResumeTemplate): string {
+    const sections = ['professional', 'skills', 'education'];
+    const includes = sections.map(s => `#include "modules_en/${s}.typ"`).join('\n');
+
+    return `#import "@preview/brilliant-cv:3.3.0": cv
+#let cv-metadata = toml("./metadata.toml")
+#set text(size: ${template.bodyFontSizePt}pt)
+#set par(leading: ${template.lineHeightEm}em)
+#set page(margin: ${template.margins.top}cm)
+#let custom-icons = (
+  github: box(width: 10pt, align(center, text(size: 8pt, "GH"))),
+  email: box(width: 10pt, align(center, text(size: 8pt, "✉"))),
+  linkedin: box(width: 10pt, align(center, text(size: 8pt, "in"))),
+  phone: box(width: 10pt, align(center, text(size: 8pt, "☎"))),
+  location: box(width: 10pt, align(center, text(size: 8pt, "⌂"))),
+)
+#show: cv.with(cv-metadata, custom-icons: custom-icons)
+
+${includes}
+
+// Collect all #mark() positions into a single dictionary and emit as queryable metadata.
+// Each mark() emits a <layout-mark> element; here we resolve their document positions.
+#context {
+  let marks = query(<layout-mark>)
+  let result = (:)
+  for m in marks {
+    let pos = m.location().position()
+    result.insert(m.value.id, (page: pos.page, y: pos.y.pt()))
+  }
+  [#metadata(result) <all-layout-positions>]
+}
+`;
+  }
+
+  private static buildAnalysisProfessionalTyp(content: BrilliantCVContent): string {
+    const lines: string[] = [
+      `#import "../helpers.typ": cv-section, cv-entry, mark`,
+      ``,
+      `#cv-section("Experience")`,
+      ``
+    ];
+
+    const groups: { society: string; positions: typeof content.experience }[] = [];
+    for (const exp of content.experience) {
+      const last = groups[groups.length - 1];
+      if (last && last.society === exp.society) {
+        last.positions.push(exp);
+      } else {
+        groups.push({ society: exp.society, positions: [exp] });
+      }
+    }
+
+    for (let gi = 0; gi < groups.length; gi++) {
+      const group = groups[gi];
+
+      lines.push(`#mark("exp-${gi}-company-start")`);
+
+      if (group.positions.length === 1) {
+        const exp = group.positions[0];
+
+        lines.push(`#cv-entry(`);
+        lines.push(`  title: [${escapeTypst(exp.title)}],`);
+        lines.push(`  society: [${exp.society}],`);
+        lines.push(`  date: [${exp.date}],`);
+        lines.push(`  location: [${escapeTypst(exp.location)}],`);
+        lines.push(`  description: [`);
+        lines.push(`    #mark("exp-${gi}-role-0-title-start")`);
+        if (SHOW_ENTRY_SUMMARY && exp.summary) {
+          lines.push(`    _${escapeTypst(exp.summary)}_`);
+        }
+        lines.push(`    #mark("exp-${gi}-role-0-title-end")`);
+        if (exp.highlights.length > 0) {
+          lines.push(`    #v(2pt)`);
+          for (let bi = 0; bi < exp.highlights.length; bi++) {
+            lines.push(`    #mark("exp-${gi}-role-0-bullet-${bi}-start")`);
+            lines.push(`    - ${escapeTypst(exp.highlights[bi])}`);
+            lines.push(`    #mark("exp-${gi}-role-0-bullet-${bi}-end")`);
+          }
+        }
+        lines.push(`  ],`);
+        lines.push(`)`);
+      } else {
+        const first = group.positions[0];
+        const last = group.positions[group.positions.length - 1];
+        const dateRange = `${last.date.split(' – ')[0]} – ${first.date.split(' – ')[1]}`;
+
+        lines.push(`#cv-entry(`);
+        lines.push(`  title: [],`);
+        lines.push(`  society: [${group.society}],`);
+        lines.push(`  date: [${dateRange}],`);
+        lines.push(`  location: [],`);
+        lines.push(`  description: [`);
+
+        for (let ri = 0; ri < group.positions.length; ri++) {
+          const pos = group.positions[ri];
+          if (ri > 0) lines.push(`    #v(4pt)`);
+          lines.push(`    #mark("exp-${gi}-role-${ri}-title-start")`);
+          lines.push(`    *${escapeTypst(pos.title)}* #h(1fr) _${pos.date}_`);
+          if (SHOW_ENTRY_SUMMARY && pos.summary) {
+            lines.push(`    #v(1pt)`);
+            lines.push(`    _${escapeTypst(pos.summary)}_`);
+          }
+          lines.push(`    #mark("exp-${gi}-role-${ri}-title-end")`);
+          if (pos.highlights.length > 0) {
+            lines.push(`    #v(2pt)`);
+            for (let bi = 0; bi < pos.highlights.length; bi++) {
+              lines.push(`    #mark("exp-${gi}-role-${ri}-bullet-${bi}-start")`);
+              lines.push(`    - ${escapeTypst(pos.highlights[bi])}`);
+              lines.push(`    #mark("exp-${gi}-role-${ri}-bullet-${bi}-end")`);
+            }
+          }
+        }
+
+        lines.push(`  ],`);
+        lines.push(`)`);
+      }
+
+      lines.push(`#mark("exp-${gi}-company-end")`);
+      lines.push(``);
+    }
+
+    return lines.join('\n');
+  }
+
+  private static buildAnalysisSkillsTyp(content: BrilliantCVContent): string {
+    const relevant = content.skills.filter(s => s.type !== 'interests');
+    if (relevant.length === 0) return '';
+
+    const lines: string[] = [
+      `#import "../helpers.typ": cv-section, h-bar, mark`,
+      ``,
+      `#cv-section("Areas of Expertise")`,
+      ``
+    ];
+
+    for (let si = 0; si < relevant.length; si++) {
+      lines.push(`#mark("skill-${si}-start")`);
+      lines.push(`#par[${escapeTypst(relevant[si].info)}]`);
+      lines.push(`#mark("skill-${si}-end")`);
+    }
+
+    return lines.join('\n');
+  }
+
+  private static buildAnalysisEducationTyp(content: BrilliantCVContent): string {
+    if (content.education.length === 0) return '';
+
+    const lines: string[] = [`#import "../helpers.typ": cv-section, mark`, ``, `#cv-section("Education")`, ``];
+
+    for (let ei = 0; ei < content.education.length; ei++) {
+      const edu = content.education[ei];
+      lines.push(`#mark("edu-${ei}-start")`);
+      lines.push(
+        `*${escapeTypst(edu.title)}* --- ${escapeTypst(edu.society)}, ${escapeTypst(edu.location)} #h(1fr) ${edu.date}`
+      );
+      lines.push(`#mark("edu-${ei}-end")`);
       lines.push(``);
     }
 

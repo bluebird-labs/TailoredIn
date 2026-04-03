@@ -45,6 +45,7 @@ import type {
   StructuredLlmClient,
   SuggestBullets,
   TailoredResumeRepository,
+  TemplateLayoutAnalyzer,
   UpdateBullet,
   UpdateEducation,
   UpdateExperience,
@@ -96,6 +97,7 @@ export const DI = {
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
     ChestQuery: new InjectionToken<ResumeChestQuery>('DI.Resume.ChestQuery'),
+    LayoutAnalyzer: new InjectionToken<TemplateLayoutAnalyzer>('DI.Resume.LayoutAnalyzer'),
     GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
     GenerateResumeMarkdown: new InjectionToken<GenerateResumeMarkdown>('DI.Resume.GenerateResumeMarkdown'),
     TailoringService: new InjectionToken<ResumeTailoringService>('DI.Resume.TailoringService')

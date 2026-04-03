@@ -1,3 +1,4 @@
+import type { ResumeTemplate } from '@tailoredin/domain';
 import type { ResumeContentFactory } from '../../ports/ResumeContentFactory.js';
 import type { ResumeProfileRepository } from '../../ports/ResumeProfileRepository.js';
 import type { ResumeRenderer } from '../../ports/ResumeRenderer.js';
@@ -14,7 +15,8 @@ export class GenerateResumeProfilePdf {
   public constructor(
     private readonly resumeProfileRepository: ResumeProfileRepository,
     private readonly resumeContentFactory: ResumeContentFactory,
-    private readonly resumeRenderer: ResumeRenderer
+    private readonly resumeRenderer: ResumeRenderer,
+    private readonly template: ResumeTemplate
   ) {}
 
   public async execute(input: GenerateResumeProfilePdfInput): Promise<GenerateResumeProfilePdfOutput> {
@@ -36,7 +38,8 @@ export class GenerateResumeProfilePdf {
 
     const pdfPath = await this.resumeRenderer.render({
       content,
-      companyName: 'Generic'
+      companyName: 'Generic',
+      template: this.template
     });
 
     return { pdfPath };

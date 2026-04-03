@@ -1,5 +1,5 @@
 import { Logger } from '@tailoredin/core';
-import { err, ok, type ProfileRepository, type Result } from '@tailoredin/domain';
+import { err, ok, type ProfileRepository, type Result, type ResumeTemplate } from '@tailoredin/domain';
 import type { BuildResumeOutputDto } from '../dtos/BuildResumeOutputDto.js';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeContentFactory } from '../ports/ResumeContentFactory.js';
@@ -11,7 +11,8 @@ export class GenerateResume {
   public constructor(
     private readonly profileRepository: ProfileRepository,
     private readonly resumeContentFactory: ResumeContentFactory,
-    private readonly resumeRenderer: ResumeRenderer
+    private readonly resumeRenderer: ResumeRenderer,
+    private readonly template: ResumeTemplate
   ) {}
 
   public async execute(input: GenerateResumeDto): Promise<Result<BuildResumeOutputDto, Error>> {
@@ -32,7 +33,8 @@ export class GenerateResume {
 
       const pdfPath = await this.resumeRenderer.render({
         content,
-        companyName: 'Generic'
+        companyName: 'Generic',
+        template: this.template
       });
 
       return ok({ pdfPath });

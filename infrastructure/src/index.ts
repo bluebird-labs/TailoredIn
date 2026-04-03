@@ -26,3 +26,6 @@ export type { PlaywrightJobScraperConfig } from './services/PlaywrightJobScraper
 export { PLAYWRIGHT_JOB_SCRAPER_CONFIG, PlaywrightJobScraper } from './services/PlaywrightJobScraper.js';
 export { StructuredLlmRouter } from './services/structured-llm/index.js';
 export { TypstResumeRenderer } from './services/TypstResumeRenderer.js';
+export { TypstTemplateLayoutAnalyzer } from './services/TypstTemplateLayoutAnalyzer.js';
+export { BrilliantCvTemplate } from './templates/BrilliantCvTemplate.js';
+export { TemplateRegistry } from './templates/TemplateRegistry.js';

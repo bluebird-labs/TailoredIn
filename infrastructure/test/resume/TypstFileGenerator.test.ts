@@ -4,6 +4,7 @@ import OS from 'node:os';
 import Path from 'node:path';
 import type { BrilliantCVContent } from '../../src/brilliant-cv/types.js';
 import { TypstFileGenerator } from '../../src/resume/TypstFileGenerator.js';
+import { BrilliantCvTemplate } from '../../src/templates/BrilliantCvTemplate.js';
 
 const MINIMAL_CONTENT: BrilliantCVContent = {
   personal: {
@@ -40,7 +41,7 @@ const MINIMAL_CONTENT: BrilliantCVContent = {
 
 async function generateInTmpDir(content: BrilliantCVContent) {
   const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
-  await TypstFileGenerator.generate(content, tmpDir);
+  await TypstFileGenerator.generate(content, tmpDir, BrilliantCvTemplate);
   return {
     metadata: await FS.readFile(Path.join(tmpDir, 'metadata.toml'), 'utf8'),
     cv: await FS.readFile(Path.join(tmpDir, 'cv.typ'), 'utf8'),
@@ -143,5 +144,36 @@ describe('module imports', () => {
     expect(files.education).toContain('#import "../helpers.typ"');
     expect(files.education).not.toContain('#import "@preview/brilliant-cv');
     await files.cleanup();
+  });
+});
+
+describe('generateForAnalysis', () => {
+  it('injects mark() calls around experience bullets', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-analysis-'));
+    await TypstFileGenerator.generateForAnalysis(MINIMAL_CONTENT, tmpDir, BrilliantCvTemplate);
+    const professional = await FS.readFile(Path.join(tmpDir, 'modules_en', 'professional.typ'), 'utf8');
+
+    expect(professional).toContain('#mark("exp-0-company-start")');
+    expect(professional).toContain('#mark("exp-0-company-end")');
+    expect(professional).toContain('#mark("exp-0-role-0-bullet-0-start")');
+    expect(professional).toContain('#mark("exp-0-role-0-bullet-5-end")'); // MINIMAL_CONTENT has 6 bullets
+  });
+
+  it('includes the position collection block in cv.typ', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-analysis-'));
+    await TypstFileGenerator.generateForAnalysis(MINIMAL_CONTENT, tmpDir, BrilliantCvTemplate);
+    const cv = await FS.readFile(Path.join(tmpDir, 'cv.typ'), 'utf8');
+
+    expect(cv).toContain('<all-layout-positions>');
+    expect(cv).toContain('query(<layout-mark>)');
+  });
+
+  it('includes mark() in helpers.typ', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-analysis-'));
+    await TypstFileGenerator.generateForAnalysis(MINIMAL_CONTENT, tmpDir, BrilliantCvTemplate);
+    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
+
+    expect(helpers).toContain('#let mark(id)');
+    expect(helpers).toContain('<layout-mark>');
   });
 });
