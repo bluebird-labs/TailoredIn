@@ -35,6 +35,7 @@ import {
   ListTags,
   SetArchetypeContent,
   SetArchetypeTagProfile,
+  SuggestBullets,
   UpdateArchetype,
   UpdateBullet,
   UpdateEducation,
@@ -352,6 +353,10 @@ container.bind({
 container.bind({
   provide: DI.Archetype.SetTagProfile,
   useFactory: () => new SetArchetypeTagProfile(container.get(DI.Archetype.Repository))
+});
+container.bind({
+  provide: DI.Archetype.SuggestBullets,
+  useFactory: () => new SuggestBullets(container.get(DI.Experience.Repository), container.get(DI.Llm.StructuredClient))
 });
 
 export { container };

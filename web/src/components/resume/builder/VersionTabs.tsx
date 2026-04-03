@@ -1,4 +1,4 @@
-import { Copy, Download, Loader2, Plus, X } from 'lucide-react';
+import { Copy, Download, Loader2, Plus, Wand2, X } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import {
   AlertDialog,
@@ -26,6 +26,7 @@ type VersionTabsProps = {
   onDelete: (id: string) => void;
   generating: boolean;
   onGenerate: () => void;
+  onSuggest: () => void;
 };
 
 export const TAB_COLORS = [
@@ -93,7 +94,8 @@ export function VersionTabs({
   onRename,
   onDelete,
   generating,
-  onGenerate
+  onGenerate,
+  onSuggest
 }: VersionTabsProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -209,6 +211,16 @@ export function VersionTabs({
 
         {/* Spacer */}
         <div className="flex-1" />
+
+        {/* Tailor to Job button */}
+        <button
+          type="button"
+          onClick={onSuggest}
+          className="px-4 py-1.5 rounded-md text-[13px] font-medium cursor-pointer flex items-center gap-2 border border-border text-foreground hover:bg-muted transition-colors"
+        >
+          <Wand2 className="w-4 h-4" />
+          Tailor to Job
+        </button>
 
         {/* Generate PDF button */}
         <button
