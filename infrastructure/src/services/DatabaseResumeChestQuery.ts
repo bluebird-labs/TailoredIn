@@ -12,7 +12,7 @@ import { formatDateRange } from '../resume/dateFormatter.js';
 export class DatabaseResumeChestQuery implements ResumeChestQuery {
   public constructor(private readonly experienceRepo: ExperienceRepository = inject(DI.Experience.Repository)) {}
 
-  public async makeChestMarkdown(profileId: string): Promise<string> {
+  public async makeChestMarkdown(_profileId: string): Promise<string> {
     const allExperiences = await this.experienceRepo.findAll();
     const lines: string[] = [];
 
