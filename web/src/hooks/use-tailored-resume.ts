@@ -31,7 +31,7 @@ export function useUpdateTailoredResume(id: string) {
   return useMutation({
     mutationFn: async (input: {
       content_selection: {
-        experience_selections: { experience_id: string; bullet_ids: string[] }[];
+        experience_selections: { experience_id: string; accomplishment_ids: string[] }[];
         project_ids: string[];
         education_ids: string[];
         skill_category_ids: string[];
