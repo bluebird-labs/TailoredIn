@@ -1,4 +1,4 @@
-import { Copy, Download, Loader2, Plus, Wand2, X } from 'lucide-react';
+import { Copy, Download, FileText, Loader2, Plus, Wand2, X } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import {
   AlertDialog,
@@ -26,6 +26,8 @@ type VersionTabsProps = {
   onDelete: (id: string) => void;
   generating: boolean;
   onGenerate: () => void;
+  generatingMarkdown: boolean;
+  onGenerateMarkdown: () => void;
   onSuggest: () => void;
 };
 
@@ -95,6 +97,8 @@ export function VersionTabs({
   onDelete,
   generating,
   onGenerate,
+  generatingMarkdown,
+  onGenerateMarkdown,
   onSuggest
 }: VersionTabsProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -220,6 +224,26 @@ export function VersionTabs({
         >
           <Wand2 className="w-4 h-4" />
           Tailor to Job
+        </button>
+
+        {/* Generate Markdown button */}
+        <button
+          type="button"
+          disabled={generatingMarkdown}
+          onClick={onGenerateMarkdown}
+          className="px-4 py-1.5 rounded-md text-[13px] font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-border text-foreground hover:bg-muted transition-colors"
+        >
+          {generatingMarkdown ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <FileText className="w-4 h-4" />
+              Generate Markdown
+            </>
+          )}
         </button>
 
         {/* Generate PDF button */}

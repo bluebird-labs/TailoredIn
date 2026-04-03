@@ -124,6 +124,7 @@ function BuilderPage() {
   const [educationDialogOpen, setEducationDialogOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | undefined>();
   const [generating, setGenerating] = useState(false);
+  const [generatingMarkdown, setGeneratingMarkdown] = useState(false);
   const [suggestModalOpen, setSuggestModalOpen] = useState(false);
 
   const nextExperienceOrdinal = experiences.length > 0 ? Math.max(...experiences.map(e => e.ordinal)) + 1 : 0;
@@ -329,6 +330,58 @@ function BuilderPage() {
     }
   };
 
+  // ── Generate Markdown handler ──────────────────────────────────────────
+  const handleGenerateMarkdown = async () => {
+    const headlineText = activeArchetype?.headlineText ?? '';
+
+    const experienceSelections = [];
+    for (const [expId, bulletIds] of visibleBulletIds) {
+      if (bulletIds.size > 0) {
+        experienceSelections.push({
+          experience_id: expId,
+          bullet_ids: [...bulletIds]
+        });
+      }
+    }
+
+    const body = {
+      headline_text: headlineText,
+      experience_selections: experienceSelections,
+      education_ids: [...visibleEducationIds],
+      skill_category_ids: activeArchetype?.contentSelection.skillCategoryIds ?? [],
+      skill_item_ids: activeArchetype?.contentSelection.skillItemIds ?? [],
+      keywords: []
+    };
+
+    setGeneratingMarkdown(true);
+    try {
+      const response = await fetch('/api/resumes/generate-markdown', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err?.error?.message ?? 'Generation failed');
+      }
+
+      const text = await response.text();
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'resume.md';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Markdown resume downloaded');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Generation failed');
+    } finally {
+      setGeneratingMarkdown(false);
+    }
+  };
+
   // ── Experiences for the modal ─────────────────────────────────────────
   const editingExperiences = useMemo(() => {
     if (!editingCompany) return [];
@@ -354,6 +407,8 @@ function BuilderPage() {
             onDelete={handleDelete}
             generating={generating}
             onGenerate={handleGenerate}
+            generatingMarkdown={generatingMarkdown}
+            onGenerateMarkdown={handleGenerateMarkdown}
             onSuggest={() => setSuggestModalOpen(true)}
           />
         )}
