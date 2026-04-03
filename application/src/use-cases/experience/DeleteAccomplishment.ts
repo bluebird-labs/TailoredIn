@@ -1,15 +1,14 @@
 import { type Experience, type ExperienceRepository, err, ok, type Result } from '@tailoredin/domain';
 
-export type DeleteBulletInput = {
+export type DeleteAccomplishmentInput = {
   experienceId: string;
-  bulletId: string;
+  accomplishmentId: string;
 };
 
-// TODO(Task 9): Replace with DeleteAccomplishment use case
-export class DeleteBullet {
+export class DeleteAccomplishment {
   public constructor(private readonly experienceRepository: ExperienceRepository) {}
 
-  public async execute(input: DeleteBulletInput): Promise<Result<void, Error>> {
+  public async execute(input: DeleteAccomplishmentInput): Promise<Result<void, Error>> {
     let experience: Experience;
     try {
       experience = await this.experienceRepository.findByIdOrFail(input.experienceId);
@@ -18,9 +17,9 @@ export class DeleteBullet {
     }
 
     try {
-      experience.removeAccomplishment(input.bulletId);
+      experience.removeAccomplishment(input.accomplishmentId);
     } catch {
-      return err(new Error(`Accomplishment not found: ${input.bulletId}`));
+      return err(new Error(`Accomplishment not found: ${input.accomplishmentId}`));
     }
 
     await this.experienceRepository.save(experience);
