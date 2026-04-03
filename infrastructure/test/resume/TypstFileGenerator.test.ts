@@ -146,3 +146,34 @@ describe('module imports', () => {
     await files.cleanup();
   });
 });
+
+describe('generateForAnalysis', () => {
+  it('injects mark() calls around experience bullets', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-analysis-'));
+    await TypstFileGenerator.generateForAnalysis(MINIMAL_CONTENT, tmpDir, BrilliantCvTemplate);
+    const professional = await FS.readFile(Path.join(tmpDir, 'modules_en', 'professional.typ'), 'utf8');
+
+    expect(professional).toContain('#mark("exp-0-company-start")');
+    expect(professional).toContain('#mark("exp-0-company-end")');
+    expect(professional).toContain('#mark("exp-0-role-0-bullet-0-start")');
+    expect(professional).toContain('#mark("exp-0-role-0-bullet-5-end")'); // MINIMAL_CONTENT has 6 bullets
+  });
+
+  it('includes the state capture element in cv.typ', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-analysis-'));
+    await TypstFileGenerator.generateForAnalysis(MINIMAL_CONTENT, tmpDir, BrilliantCvTemplate);
+    const cv = await FS.readFile(Path.join(tmpDir, 'cv.typ'), 'utf8');
+
+    expect(cv).toContain('<all-layout-positions>');
+    expect(cv).toContain('layout-positions.final()');
+  });
+
+  it('includes mark() in helpers.typ', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-analysis-'));
+    await TypstFileGenerator.generateForAnalysis(MINIMAL_CONTENT, tmpDir, BrilliantCvTemplate);
+    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
+
+    expect(helpers).toContain('#let mark(id)');
+    expect(helpers).toContain('layout-positions');
+  });
+});
