@@ -49,6 +49,7 @@ type Archetype = {
 };
 
 const STORAGE_KEY = 'activeArchetypeId';
+const TEMPLATE_STORAGE_KEY = 'activeTemplateKey';
 
 function slugify(str: string): string {
   return str
@@ -77,8 +78,9 @@ function BuilderPage() {
 
   const isLoading = profileLoading || experiencesLoading || educationsLoading || archetypesLoading;
 
-  // ── Active archetype ──────────────────────────────────────────────────
+  // ── Active archetype + template ─────────────────────────────────────
   const [activeArchetypeId, setActiveArchetypeId] = useState(() => localStorage.getItem(STORAGE_KEY) ?? '');
+  const [templateKey, setTemplateKey] = useState(() => localStorage.getItem(TEMPLATE_STORAGE_KEY) ?? 'brilliant_cv');
 
   // Sync activeArchetypeId to a valid archetype
   useEffect(() => {
@@ -94,6 +96,10 @@ function BuilderPage() {
       localStorage.setItem(STORAGE_KEY, activeArchetypeId);
     }
   }, [activeArchetypeId]);
+
+  useEffect(() => {
+    localStorage.setItem(TEMPLATE_STORAGE_KEY, templateKey);
+  }, [templateKey]);
 
   const activeArchetype = archetypes.find(a => a.id === activeArchetypeId);
   const activeTabIndex = Math.max(
@@ -138,9 +144,10 @@ function BuilderPage() {
       experienceSelections: cs.experienceSelections,
       educationIds: cs.educationIds,
       skillCategoryIds: cs.skillCategoryIds,
-      skillItemIds: cs.skillItemIds
+      skillItemIds: cs.skillItemIds,
+      templateKey
     };
-  }, [activeArchetype]);
+  }, [activeArchetype, templateKey]);
 
   const { pdfData, isCompiling, error: pdfError } = usePdfPreview(pdfSelection);
 
@@ -298,7 +305,8 @@ function BuilderPage() {
       education_ids: [...visibleEducationIds],
       skill_category_ids: activeArchetype?.contentSelection.skillCategoryIds ?? [],
       skill_item_ids: activeArchetype?.contentSelection.skillItemIds ?? [],
-      keywords: []
+      keywords: [],
+      template_key: templateKey
     };
 
     setGenerating(true);
@@ -355,6 +363,8 @@ function BuilderPage() {
             generating={generating}
             onGenerate={handleGenerate}
             onSuggest={() => setSuggestModalOpen(true)}
+            templateKey={templateKey}
+            onTemplateChange={setTemplateKey}
           />
         )}
       </div>

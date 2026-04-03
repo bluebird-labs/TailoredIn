@@ -15,7 +15,7 @@ const RESUME_LAYOUT = {
 };
 
 /** Escape characters that have special meaning in Typst content brackets [...]. */
-const escapeTypst = (str: string): string => str.replace(/</g, '\\<').replace(/>/g, '\\>');
+const escapeTypst = (str: string): string => str.replace(/\$/g, '\\$').replace(/</g, '\\<').replace(/>/g, '\\>');
 
 /** Escape characters that are special in TOML basic strings. */
 const escapeToml = (str: string): string => str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');

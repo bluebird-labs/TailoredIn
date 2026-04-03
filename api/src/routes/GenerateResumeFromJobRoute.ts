@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { inject, injectable } from '@needle-di/core';
 import type { GenerateResumeFromJob } from '@tailoredin/application';
-import { ArchetypeKey } from '@tailoredin/domain';
+import { ArchetypeKey, TemplateKey } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
@@ -18,7 +18,8 @@ export class GenerateResumeFromJobRoute {
         const result = await this.generateResumeFromJob.execute({
           jobId: params.id,
           archetype: body?.archetype as ArchetypeKey | undefined,
-          keywords: body?.keywords
+          keywords: body?.keywords,
+          templateKey: body?.template_key as TemplateKey | undefined
         });
 
         if (!result.isOk) {
@@ -38,7 +39,8 @@ export class GenerateResumeFromJobRoute {
         body: t.Optional(
           t.Object({
             archetype: t.Optional(t.Enum(ArchetypeKey)),
-            keywords: t.Optional(t.Array(t.String()))
+            keywords: t.Optional(t.Array(t.String())),
+            template_key: t.Optional(t.Enum(TemplateKey))
           })
         )
       }

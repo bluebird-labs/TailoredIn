@@ -31,7 +31,8 @@ export class GenerateResume {
 
     const pdfPath = await this.resumeRenderer.render({
       content,
-      companyName: 'Generic'
+      companyName: 'Generic',
+      templateKey: input.templateKey
     });
 
     return ok({ pdfPath });

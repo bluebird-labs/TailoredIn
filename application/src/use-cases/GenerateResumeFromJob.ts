@@ -57,7 +57,8 @@ export class GenerateResumeFromJob {
 
     const pdfPath = await this.resumeRenderer.render({
       content,
-      companyName: job.companyId
+      companyName: job.companyId,
+      templateKey: input.templateKey
     });
 
     const resume = Resume.create({

@@ -6,6 +6,7 @@ type ContentSelection = {
   educationIds: string[];
   skillCategoryIds: string[];
   skillItemIds: string[];
+  templateKey?: string;
 };
 
 type PdfPreviewState = {
@@ -24,13 +25,14 @@ function serializeSelection(sel: ContentSelection): string {
       .map(s => ({ ...s, bulletIds: [...s.bulletIds].sort() })),
     educationIds: [...sel.educationIds].sort(),
     skillCategoryIds: [...sel.skillCategoryIds].sort(),
-    skillItemIds: [...sel.skillItemIds].sort()
+    skillItemIds: [...sel.skillItemIds].sort(),
+    templateKey: sel.templateKey
   };
   return JSON.stringify(sorted);
 }
 
 async function fetchPreview(selection: ContentSelection, signal: AbortSignal): Promise<Uint8Array> {
-  const body = {
+  const body: Record<string, unknown> = {
     headline_text: selection.headlineText,
     experience_selections: selection.experienceSelections.map(s => ({
       experience_id: s.experienceId,
@@ -40,6 +42,9 @@ async function fetchPreview(selection: ContentSelection, signal: AbortSignal): P
     skill_category_ids: selection.skillCategoryIds,
     skill_item_ids: selection.skillItemIds
   };
+  if (selection.templateKey) {
+    body.template_key = selection.templateKey;
+  }
 
   const response = await fetch('/api/resumes/preview', {
     method: 'POST',

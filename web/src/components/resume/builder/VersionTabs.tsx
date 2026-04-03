@@ -11,11 +11,21 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Archetype = {
   id: string;
   label: string;
 };
+
+export const TEMPLATE_OPTIONS = [
+  { value: 'brilliant_cv', label: 'Brilliant CV' },
+  { value: 'typographic', label: 'Typographic' },
+  { value: 'butterick', label: 'Butterick' },
+  { value: 'finely_crafted', label: 'Finely Crafted' },
+  { value: 'executive_single', label: 'Executive (Single)' },
+  { value: 'executive_sidebar', label: 'Executive (Sidebar)' }
+] as const;
 
 type VersionTabsProps = {
   archetypes: Archetype[];
@@ -27,6 +37,8 @@ type VersionTabsProps = {
   generating: boolean;
   onGenerate: () => void;
   onSuggest: () => void;
+  templateKey: string;
+  onTemplateChange: (key: string) => void;
 };
 
 export const TAB_COLORS = [
@@ -95,7 +107,9 @@ export function VersionTabs({
   onDelete,
   generating,
   onGenerate,
-  onSuggest
+  onSuggest,
+  templateKey,
+  onTemplateChange
 }: VersionTabsProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -221,6 +235,20 @@ export function VersionTabs({
           <Wand2 className="w-4 h-4" />
           Tailor to Job
         </button>
+
+        {/* Template selector */}
+        <Select value={templateKey} onValueChange={val => val && onTemplateChange(val)}>
+          <SelectTrigger className="w-[180px] h-8 text-[13px]">
+            <SelectValue placeholder="Template" />
+          </SelectTrigger>
+          <SelectContent>
+            {TEMPLATE_OPTIONS.map(opt => (
+              <SelectItem key={opt.value} value={opt.value} className="text-[13px]">
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {/* Generate PDF button */}
         <button
