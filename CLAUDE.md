@@ -77,6 +77,7 @@ bun run api                  # start on port 8000
 bun run api:dev              # start with --watch
 
 # Web frontend
+bun run web:build            # build for production
 bun run web                  # Vite production preview
 bun run web:dev              # Vite dev server
 
@@ -84,22 +85,32 @@ bun run web:dev              # Vite dev server
 bun run test                 # run all tests across workspaces
 bun run test:coverage        # run tests with coverage report
 bun run api:test             # API workspace tests only
+bun run --cwd infrastructure test:integration  # integration tests (Testcontainers, real Postgres, 60s timeout)
 bun run test:e2e             # Playwright end-to-end tests (headless)
 bun run test:e2e:ui          # Playwright test UI
 bun run test:e2e:headed      # Playwright with visible browser
 
 
-# Typecheck (per-package)
-bun run --cwd <package-dir> typecheck
+# Typecheck
+bun run typecheck                # all packages
+bun run --cwd <package-dir> typecheck  # single package
 
-# MikroORM migrations — run from infrastructure/
+# Run a single test file
+bun test <path/to/test.ts>
+
+# Database
 bun run db:migration:create
 bun run db:migration:up
+bun run db:seed                  # seed the database
 ```
 
 All TypeScript is executed directly by Bun (no compilation step). `typecheck` scripts exist only to surface type errors.
 
 **Test runners**: `bun:test` (unit + integration). Integration tests in `infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `e2e/` use `@playwright/test`.
+
+## Domain Model
+
+See **`DOMAIN.md`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, and their relationships across Profile, Tagging, Archetype, and Job subdomains.
 
 ## Conventions
 
