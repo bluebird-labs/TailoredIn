@@ -33,7 +33,13 @@ export class ResumeProfileRoutes {
         if (!resumeProfile) {
           await this.updateResumeProfile.execute({
             profileId,
-            contentSelection: { experienceSelections: [], projectIds: [], educationIds: [], skillCategoryIds: [], skillItemIds: [] },
+            contentSelection: {
+              experienceSelections: [],
+              projectIds: [],
+              educationIds: [],
+              skillCategoryIds: [],
+              skillItemIds: []
+            },
             headlineText: ''
           });
           resumeProfile = await this.getResumeProfile.execute({ profileId });

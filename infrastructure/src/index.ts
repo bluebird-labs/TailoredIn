@@ -16,6 +16,7 @@ export { PostgresSkillCategoryRepository } from './repositories/PostgresSkillCat
 export { PostgresSkillRepository } from './repositories/PostgresSkillRepository.js';
 export { PostgresTagRepository } from './repositories/PostgresTagRepository.js';
 export { PostgresTailoredResumeRepository } from './repositories/PostgresTailoredResumeRepository.js';
+export { DatabaseResumeChestQuery } from './services/DatabaseResumeChestQuery.js';
 export { DatabaseResumeContentFactory } from './services/DatabaseResumeContentFactory.js';
 export type { OpenAiConfig } from './services/OpenAiLlmService.js';
 // Services

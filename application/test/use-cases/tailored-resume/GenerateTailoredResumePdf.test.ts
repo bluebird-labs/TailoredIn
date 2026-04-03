@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { ContentSelection, LlmProposal, TailoredResume, TailoredResumeId } from '@tailoredin/domain';
+import { ContentSelection, GeneratedContent, LlmProposal, TailoredResume, TailoredResumeId } from '@tailoredin/domain';
 import type { ResumeContentDto } from '../../../src/dtos/ResumeContentDto.js';
 import type { ResumeContentFactory } from '../../../src/ports/ResumeContentFactory.js';
 import type { ResumeRenderer } from '../../../src/ports/ResumeRenderer.js';
@@ -32,6 +32,7 @@ function makeDraftResume(id = 'resume-abc'): TailoredResume {
     jdContent: 'Looking for an engineer',
     llmProposals: LlmProposal.empty(),
     contentSelection: ContentSelection.empty(),
+    generatedContent: GeneratedContent.empty(),
     headlineText: 'Senior Engineer',
     status: 'draft',
     pdfPath: null,
@@ -52,7 +53,8 @@ function mockResumeRepo(resume: TailoredResume | null, onSave?: (r: TailoredResu
 
 function mockContentFactory(): ResumeContentFactory {
   return {
-    makeFromSelection: async () => EMPTY_CONTENT
+    makeFromSelection: async () => EMPTY_CONTENT,
+    makeFromGeneratedContent: async () => EMPTY_CONTENT
   };
 }
 

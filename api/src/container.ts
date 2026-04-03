@@ -52,6 +52,7 @@ import { env, envBool, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
   createOrmConfig,
+  DatabaseResumeChestQuery,
   DatabaseResumeContentFactory,
   DI,
   OPENAI_CONFIG,
@@ -187,6 +188,10 @@ container.bind({
     )
 });
 container.bind({
+  provide: DI.Resume.ChestQuery,
+  useFactory: () => new DatabaseResumeChestQuery(container.get(DI.Experience.Repository))
+});
+container.bind({
   provide: DI.Resume.GenerateResume,
   useFactory: () =>
     new GenerateResume(
@@ -257,7 +262,7 @@ container.bind({
       container.get(DI.ResumeProfile.Repository),
       container.get(DI.TailoredResume.Repository),
       container.get(DI.Resume.TailoringService),
-      container.get(DI.Resume.ContentFactory)
+      container.get(DI.Resume.ChestQuery)
     )
 });
 container.bind({

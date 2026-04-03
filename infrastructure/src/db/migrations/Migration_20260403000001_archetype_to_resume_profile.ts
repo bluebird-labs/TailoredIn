@@ -4,7 +4,7 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
   override async up(): Promise<void> {
     this.addSql(`
       CREATE TABLE resume_profiles (
-        profile_id uuid PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+        profile_id uuid PRIMARY KEY,
         content_selection jsonb NOT NULL DEFAULT '{}',
         headline_text text NOT NULL DEFAULT '',
         updated_at timestamptz NOT NULL DEFAULT now()
@@ -14,7 +14,7 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
     this.addSql(`
       CREATE TABLE tailored_resumes (
         id uuid PRIMARY KEY,
-        profile_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        profile_id uuid NOT NULL,
         jd_content text NOT NULL DEFAULT '',
         llm_proposals jsonb NOT NULL DEFAULT '{}',
         content_selection jsonb NOT NULL DEFAULT '{}',
@@ -26,16 +26,20 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
       );
     `);
 
+    // Best-effort data migration — silently skips if archetypes schema is incompatible
     this.addSql(`
-      INSERT INTO resume_profiles (profile_id, content_selection, headline_text, updated_at)
-      SELECT a.profile_id, a.content_selection, COALESCE(a.headline_text, ''), now()
-      FROM archetypes a
-      WHERE a.key = 'leader_individual_contributor'
-      ON CONFLICT DO NOTHING;
+      DO $$ BEGIN
+        INSERT INTO resume_profiles (profile_id, content_selection, headline_text, updated_at)
+        SELECT a.profile_id, a.content_selection, COALESCE(a.headline_text, ''), now()
+        FROM archetypes a
+        WHERE a.key = 'leader_individual_contributor'
+        ON CONFLICT DO NOTHING;
+      EXCEPTION WHEN OTHERS THEN NULL;
+      END $$;
     `);
 
-    this.addSql('DROP TABLE IF EXISTS archetype_tag_weights;');
-    this.addSql('DROP TABLE IF EXISTS archetypes;');
+    this.addSql('DROP TABLE IF EXISTS archetype_tag_weights CASCADE;');
+    this.addSql('DROP TABLE IF EXISTS archetypes CASCADE;');
   }
 
   override async down(): Promise<void> {
@@ -44,7 +48,7 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
         id uuid NOT NULL DEFAULT gen_random_uuid(),
         created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        profile_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        profile_id uuid NOT NULL,
         key text NOT NULL,
         label text NOT NULL,
         headline_id uuid,

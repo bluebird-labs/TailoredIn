@@ -1,5 +1,5 @@
 import { Logger } from '@tailoredin/core';
-import { ok, type ProfileRepository, type Result } from '@tailoredin/domain';
+import { err, ok, type ProfileRepository, type Result } from '@tailoredin/domain';
 import type { BuildResumeOutputDto } from '../dtos/BuildResumeOutputDto.js';
 import type { GenerateResumeDto } from '../dtos/GenerateResumeDto.js';
 import type { ResumeContentFactory } from '../ports/ResumeContentFactory.js';

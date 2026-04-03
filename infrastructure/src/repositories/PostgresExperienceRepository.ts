@@ -41,6 +41,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       existing.startDate = experience.startDate;
       existing.endDate = experience.endDate;
       existing.summary = experience.summary;
+      existing.narrative = experience.narrative;
       existing.ordinal = experience.ordinal;
       existing.updatedAt = experience.updatedAt;
       this.orm.em.persist(existing);
@@ -57,6 +58,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         startDate: experience.startDate,
         endDate: experience.endDate,
         summary: experience.summary,
+        narrative: experience.narrative,
         ordinal: experience.ordinal,
         createdAt: experience.createdAt,
         updatedAt: experience.updatedAt
@@ -94,6 +96,8 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         // Update existing bullet
         const ormBullet = existingBullets.find(b => b.id === bullet.id.value)!;
         ormBullet.content = bullet.content;
+        ormBullet.verboseDescription = bullet.verboseDescription;
+        ormBullet.status = bullet.status;
         ormBullet.ordinal = bullet.ordinal;
         ormBullet.updatedAt = bullet.updatedAt;
         this.orm.em.persist(ormBullet);
@@ -112,6 +116,8 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       id: bullet.id.value,
       experience,
       content: bullet.content,
+      verboseDescription: bullet.verboseDescription,
+      status: bullet.status,
       ordinal: bullet.ordinal,
       createdAt: bullet.createdAt,
       updatedAt: bullet.updatedAt
@@ -165,6 +171,8 @@ export class PostgresExperienceRepository implements ExperienceRepository {
           id: new BulletId(ormBullet.id),
           experienceId: orm.id,
           content: ormBullet.content,
+          verboseDescription: ormBullet.verboseDescription,
+          status: (ormBullet.status ?? 'active') as import('@tailoredin/domain').BulletStatus,
           ordinal: ormBullet.ordinal,
           tags: bulletTags,
           createdAt: ormBullet.createdAt,
@@ -183,6 +191,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       startDate: orm.startDate,
       endDate: orm.endDate,
       summary: orm.summary,
+      narrative: orm.narrative,
       ordinal: orm.ordinal,
       bullets,
       createdAt: orm.createdAt,

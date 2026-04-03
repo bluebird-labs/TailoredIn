@@ -1,9 +1,8 @@
-import { ContentSelection, TailoredResume } from '@tailoredin/domain';
-import type { ResumeContentFactory } from '../../ports/ResumeContentFactory.js';
+import { ContentSelection, GeneratedContent, TailoredResume } from '@tailoredin/domain';
+import type { ResumeChestQuery } from '../../ports/ResumeChestQuery.js';
 import type { ResumeProfileRepository } from '../../ports/ResumeProfileRepository.js';
 import type { ResumeTailoringService } from '../../ports/ResumeTailoringService.js';
 import type { TailoredResumeRepository } from '../../ports/TailoredResumeRepository.js';
-import { formatResumeAsMarkdown } from '../../services/formatResumeAsMarkdown.js';
 
 export type CreateTailoredResumeInput = {
   profileId: string;
@@ -15,7 +14,7 @@ export class CreateTailoredResume {
     private readonly resumeProfileRepository: ResumeProfileRepository,
     private readonly tailoredResumeRepository: TailoredResumeRepository,
     private readonly resumeTailoringService: ResumeTailoringService,
-    private readonly resumeContentFactory: ResumeContentFactory
+    private readonly resumeChestQuery: ResumeChestQuery
   ) {}
 
   public async execute(input: CreateTailoredResumeInput): Promise<TailoredResume> {
@@ -25,22 +24,20 @@ export class CreateTailoredResume {
       throw new Error(`ResumeProfile not found: ${input.profileId}`);
     }
 
-    // Build markdown from profile's current content selection directly, without a redundant profile fetch
-    const content = await this.resumeContentFactory.makeFromSelection({
-      profileId: profile.profileId,
-      headlineText: profile.headlineText,
-      experienceSelections: profile.contentSelection.experienceSelections,
-      educationIds: profile.contentSelection.educationIds,
-      skillCategoryIds: profile.contentSelection.skillCategoryIds,
-      skillItemIds: profile.contentSelection.skillItemIds,
-      keywords: []
-    });
+    // Build a rich chest markdown from ALL experiences + verbose bullet descriptions
+    const chestMarkdown = await this.resumeChestQuery.makeChestMarkdown(input.profileId);
 
-    const markdown = formatResumeAsMarkdown(content);
+    const llmProposal = await this.resumeTailoringService.tailorFromJd(input.jdContent, chestMarkdown);
 
-    const llmProposal = await this.resumeTailoringService.tailorFromJd(input.jdContent, markdown);
+    // Build generated content from LLM-written bullet texts
+    const generatedContent = new GeneratedContent(
+      llmProposal.generatedExperiences.map(exp => ({
+        experienceId: exp.experienceId,
+        bulletTexts: exp.bulletTexts
+      }))
+    );
 
-    // Build initial content selection from LLM proposals: all ranked bullets selected by default
+    // Keep a ranked content selection as reference / fallback for base resume rendering
     const contentSelection = new ContentSelection({
       experienceSelections: llmProposal.rankedExperiences.map(exp => ({
         experienceId: exp.experienceId,
@@ -61,6 +58,7 @@ export class CreateTailoredResume {
 
     resume.updateProposals(llmProposal);
     resume.replaceContentSelection(contentSelection);
+    resume.updateGeneratedContent(generatedContent);
     resume.updateHeadline(headlineText);
 
     await this.tailoredResumeRepository.save(resume);

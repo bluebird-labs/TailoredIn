@@ -37,6 +37,7 @@ import type {
   ListTags,
   ListTailoredResumes,
   LlmService,
+  ResumeChestQuery,
   ResumeContentFactory,
   ResumeProfileRepository,
   ResumeRenderer,
@@ -94,6 +95,7 @@ export const DI = {
     LlmService: new InjectionToken<LlmService | null>('DI.Resume.LlmService'),
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
+    ChestQuery: new InjectionToken<ResumeChestQuery>('DI.Resume.ChestQuery'),
     GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
     GenerateResumeMarkdown: new InjectionToken<GenerateResumeMarkdown>('DI.Resume.GenerateResumeMarkdown'),
     TailoringService: new InjectionToken<ResumeTailoringService>('DI.Resume.TailoringService')

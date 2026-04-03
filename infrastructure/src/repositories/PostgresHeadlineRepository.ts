@@ -29,6 +29,7 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
     if (existing) {
       existing.label = headline.label;
       existing.summaryText = headline.summaryText;
+      existing.status = headline.status;
       existing.updatedAt = headline.updatedAt;
 
       // Replace role tags
@@ -45,6 +46,7 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
         profileId: headline.profileId,
         label: headline.label,
         summaryText: headline.summaryText,
+        status: headline.status,
         createdAt: headline.createdAt,
         updatedAt: headline.updatedAt
       });
@@ -84,6 +86,7 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
       profileId: orm.profileId,
       label: orm.label,
       summaryText: orm.summaryText,
+      status: (orm.status ?? 'active') as import('@tailoredin/domain').HeadlineStatus,
       roleTags,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt

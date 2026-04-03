@@ -8,6 +8,7 @@ export type TailoredResumeOrmProps = {
   jdContent: string;
   llmProposals: Record<string, unknown>;
   contentSelection: Record<string, unknown>;
+  generatedContent: Record<string, unknown> | null;
   headlineText: string;
   status: string;
   pdfPath: string | null;
@@ -32,6 +33,9 @@ export class TailoredResumeOrm extends BaseEntity {
   @Property({ name: 'content_selection', type: 'json' })
   public contentSelection: Record<string, unknown>;
 
+  @Property({ name: 'generated_content', type: 'json', nullable: true })
+  public generatedContent: Record<string, unknown> | null;
+
   @Property({ name: 'headline_text', type: 'text', default: '' })
   public headlineText: string;
 
@@ -48,6 +52,7 @@ export class TailoredResumeOrm extends BaseEntity {
     this.jdContent = props.jdContent;
     this.llmProposals = props.llmProposals;
     this.contentSelection = props.contentSelection;
+    this.generatedContent = props.generatedContent;
     this.headlineText = props.headlineText;
     this.status = props.status;
     this.pdfPath = props.pdfPath;
