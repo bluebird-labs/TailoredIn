@@ -1,12 +1,6 @@
-import type { TagDto } from './TagDto.js';
+import type { AccomplishmentDto } from './AccomplishmentDto.js';
 
-export type BulletDto = {
-  id: string;
-  content: string;
-  ordinal: number;
-  roleTags: TagDto[];
-  skillTags: TagDto[];
-};
+export type { AccomplishmentDto };
 
 export type ExperienceDto = {
   id: string;
@@ -17,6 +11,7 @@ export type ExperienceDto = {
   startDate: string;
   endDate: string;
   summary: string | null;
+  narrative: string | null;
   ordinal: number;
-  bullets: BulletDto[];
+  accomplishments: AccomplishmentDto[];
 };
