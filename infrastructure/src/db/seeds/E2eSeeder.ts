@@ -17,7 +17,7 @@ export class E2eSeeder extends Seeder {
     await em.getConnection().execute(`
       TRUNCATE
         tailored_resumes, resume_profiles,
-        bullet_tags, bullets, experiences,
+        accomplishments, experiences,
         headline_tags, headlines, educations, skill_items, skill_categories, profiles,
         job_status_updates, jobs, companies,
         skills

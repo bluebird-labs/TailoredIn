@@ -86,8 +86,8 @@ export class ResumeDataSeeder extends Seeder {
       experienceIdMap.set(`${posDef.companyKey}:${posDef.positionIndex}`, expRow.id);
     }
 
-    // Bullets — assign to experiences; for Volvo split by position index
-    const bulletIdsByExperience = new Map<string, string[]>();
+    // Accomplishments — assign to experiences; for Volvo split by position index
+    const accomplishmentIdsByExperience = new Map<string, string[]>();
     const bulletPositionMap = new Map<CompanyKey, Map<number, number>>();
     for (const posDef of leadIcPositions) {
       if (!bulletPositionMap.has(posDef.companyKey)) {
@@ -110,13 +110,15 @@ export class ResumeDataSeeder extends Seeder {
         const expId = experienceIdMap.get(`${companyKey}:${posIdx}`);
         if (!expId) continue;
         for (let bi = 0; bi < group.length; bi++) {
-          const bulletId = crypto.randomUUID();
+          const accomplishmentId = crypto.randomUUID();
+          const narrative = group[bi].text;
+          const title = narrative.length > 60 ? `${narrative.slice(0, 57)}...` : narrative;
           await conn.execute(
-            `INSERT INTO bullets (id, experience_id, content, ordinal)
-             VALUES ('${bulletId}', '${expId}', '${esc(group[bi].text)}', ${bi})`
+            `INSERT INTO accomplishments (id, experience_id, title, narrative, skill_tags, ordinal, created_at, updated_at)
+             VALUES ('${accomplishmentId}', '${expId}', '${esc(title)}', '${esc(narrative)}', '[]'::jsonb, ${bi}, now(), now())`
           );
-          if (!bulletIdsByExperience.has(expId)) bulletIdsByExperience.set(expId, []);
-          bulletIdsByExperience.get(expId)!.push(bulletId);
+          if (!accomplishmentIdsByExperience.has(expId)) accomplishmentIdsByExperience.set(expId, []);
+          accomplishmentIdsByExperience.get(expId)!.push(accomplishmentId);
         }
       }
     }
@@ -128,7 +130,7 @@ export class ResumeDataSeeder extends Seeder {
         const expId = experienceIdMap.get(`${posDef.companyKey}:${posDef.positionIndex}`)!;
         return {
           experienceId: expId,
-          bulletIds: bulletIdsByExperience.get(expId) ?? []
+          accomplishmentIds: accomplishmentIdsByExperience.get(expId) ?? []
         };
       });
 
