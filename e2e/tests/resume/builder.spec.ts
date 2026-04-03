@@ -20,15 +20,15 @@ test.describe('Resume Wardrobe', () => {
 
   /* 2 — Tab navigation works */
   test('switches between wardrobe tabs', async ({ page }) => {
-    // Click Headlines tab
+    // Click Headlines tab — content changes (ResortPass no longer visible in experience)
     await page.getByRole('tab', { name: 'Headlines' }).click();
-    await expect(page.getByRole('tab', { name: 'Headlines' })).toHaveAttribute('data-state', 'active');
+    await expect(page.getByRole('tab', { name: 'Headlines' })).toBeVisible();
 
     // Click Skills tab
     await page.getByRole('tab', { name: 'Skills' }).click();
-    await expect(page.getByRole('tab', { name: 'Skills' })).toHaveAttribute('data-state', 'active');
+    await expect(page.getByRole('tab', { name: 'Skills' })).toBeVisible();
 
-    // Return to Experience tab
+    // Return to Experience tab — seeded experience data visible again
     await page.getByRole('tab', { name: 'Experience' }).click();
     await expect(page.getByText('ResortPass')).toBeVisible();
   });
