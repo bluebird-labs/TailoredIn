@@ -51,7 +51,7 @@ export class TypstFileGenerator {
     return `language = "en"
 
 [layout]
-  awesome_color = "${RESUME_ACCENT_COLOR}"
+  awesome_color = "#1A1A1A"
   before_section_skip = "${RESUME_LAYOUT.beforeSectionSkip}"
   before_entry_skip = "${RESUME_LAYOUT.beforeEntrySkip}"
   before_entry_description_skip = "${RESUME_LAYOUT.beforeEntryDescriptionSkip}"
@@ -80,7 +80,6 @@ export class TypstFileGenerator {
     email = "${personal.email}"
     phone = "${personal.phone}"
     location = "${personal.location}"
-    github = "${personal.github}"
 
 [lang.en]
   header_quote = "${escapeToml(personal.header_quote)}"
@@ -120,11 +119,11 @@ ${includes}
 
 // Custom cv-section: re-implements brilliant-cv's section header with an accent-colored divider line.
 // The package's built-in cv-section uses a hardcoded black stroke that does not follow awesome_color.
-#let cv-section(title, letters: 3) = {
+#let cv-section(title) = {
   v(_section-skip)
   block(
     sticky: true,
-    [#text(size: 16pt, weight: "bold", fill: _accent, title.slice(0, letters))#text(size: 16pt, weight: "bold", title.slice(letters))
+    [#text(size: 16pt, weight: "bold", title)
     #h(2pt)
     #box(width: 1fr, line(stroke: 0.9pt + _accent, length: 100%))]
   )
@@ -216,18 +215,18 @@ ${includes}
   }
 
   private static buildSkillsTyp(content: BrilliantCVContent): string {
-    if (content.skills.length === 0) return '';
+    const relevant = content.skills.filter(s => s.type !== 'interests');
+    if (relevant.length === 0) return '';
 
-    const lines: string[] = [`#import "../helpers.typ": cv-section, cv-skill, h-bar`, ``, `#cv-section("Skills")`, ``];
+    const keywords = relevant.map(s => s.info).join(' #h-bar() ');
 
-    for (const skill of content.skills) {
-      lines.push(`#cv-skill(`);
-      lines.push(`  type: [${escapeTypst(skill.type)}],`);
-      lines.push(`  info: [${escapeTypst(skill.info)}],`);
-      lines.push(`)`);
-    }
-
-    return lines.join('\n');
+    return [
+      `#import "../helpers.typ": cv-section, h-bar`,
+      ``,
+      `#cv-section("Areas of Expertise")`,
+      ``,
+      `#par[${escapeTypst(keywords)}]`
+    ].join('\n');
   }
 
   private static buildEducationTyp(content: BrilliantCVContent): string {

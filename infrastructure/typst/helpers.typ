@@ -5,11 +5,11 @@
 
 // Custom cv-section: re-implements brilliant-cv's section header with an accent-colored divider line.
 // The package's built-in cv-section uses a hardcoded black stroke that does not follow awesome_color.
-#let cv-section(title, letters: 3) = {
+#let cv-section(title) = {
   v(_section-skip)
   block(
     sticky: true,
-    [#text(size: 16pt, weight: "bold", fill: _accent, title.slice(0, letters))#text(size: 16pt, weight: "bold", title.slice(letters))
+    [#text(size: 16pt, weight: "bold", title)
     #h(2pt)
     #box(width: 1fr, line(stroke: 0.9pt + _accent, length: 100%))]
   )
