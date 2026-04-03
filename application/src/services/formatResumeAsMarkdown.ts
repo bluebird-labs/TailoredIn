@@ -75,5 +75,5 @@ export function formatResumeAsMarkdown(content: ResumeContentDto): string {
     }
   }
 
-  return lines.join('\n').trimEnd() + '\n';
+  return `${lines.join('\n').trimEnd()}\n`;
 }

@@ -44,6 +44,7 @@ async function generateInTmpDir(content: BrilliantCVContent) {
   return {
     metadata: await FS.readFile(Path.join(tmpDir, 'metadata.toml'), 'utf8'),
     cv: await FS.readFile(Path.join(tmpDir, 'cv.typ'), 'utf8'),
+    helpers: await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8'),
     professional: await FS.readFile(Path.join(tmpDir, 'modules_en', 'professional.typ'), 'utf8'),
     skills: await FS.readFile(Path.join(tmpDir, 'modules_en', 'skills.typ'), 'utf8'),
     education: await FS.readFile(Path.join(tmpDir, 'modules_en', 'education.typ'), 'utf8'),
@@ -101,30 +102,24 @@ describe('TypstFileGenerator', () => {
 
 describe('helpers.typ', () => {
   it('generates helpers.typ alongside cv.typ', async () => {
-    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
-    await TypstFileGenerator.generate(MINIMAL_CONTENT, tmpDir);
-    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
-    expect(helpers).toContain('#3E6B8A');
-    await FS.rm(tmpDir, { recursive: true });
+    const files = await generateInTmpDir(MINIMAL_CONTENT);
+    expect(files.helpers).toContain('#3E6B8A');
+    await files.cleanup();
   });
 
   it('helpers.typ defines a custom cv-section with accent divider', async () => {
-    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
-    await TypstFileGenerator.generate(MINIMAL_CONTENT, tmpDir);
-    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
-    expect(helpers).toContain('let cv-section');
-    expect(helpers).toContain('stroke: 0.9pt + _accent');
-    await FS.rm(tmpDir, { recursive: true });
+    const files = await generateInTmpDir(MINIMAL_CONTENT);
+    expect(files.helpers).toContain('let cv-section');
+    expect(files.helpers).toContain('stroke: 0.9pt + _accent');
+    await files.cleanup();
   });
 
   it('helpers.typ re-exports cv-entry, cv-skill, h-bar from brilliant-cv', async () => {
-    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
-    await TypstFileGenerator.generate(MINIMAL_CONTENT, tmpDir);
-    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
-    expect(helpers).toContain('cv-entry');
-    expect(helpers).toContain('cv-skill');
-    expect(helpers).toContain('h-bar');
-    await FS.rm(tmpDir, { recursive: true });
+    const files = await generateInTmpDir(MINIMAL_CONTENT);
+    expect(files.helpers).toContain('cv-entry');
+    expect(files.helpers).toContain('cv-skill');
+    expect(files.helpers).toContain('h-bar');
+    await files.cleanup();
   });
 });
 

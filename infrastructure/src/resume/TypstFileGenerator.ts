@@ -133,12 +133,7 @@ ${includes}
   }
 
   private static buildProfessionalTyp(content: BrilliantCVContent): string {
-    const lines: string[] = [
-      `#import "../helpers.typ": cv-section, cv-entry`,
-      ``,
-      `#cv-section("Experience")`,
-      ``
-    ];
+    const lines: string[] = [`#import "../helpers.typ": cv-section, cv-entry`, ``, `#cv-section("Experience")`, ``];
 
     // Group consecutive experiences by company (society)
     const groups: { society: string; positions: typeof content.experience }[] = [];
@@ -223,12 +218,7 @@ ${includes}
   private static buildSkillsTyp(content: BrilliantCVContent): string {
     if (content.skills.length === 0) return '';
 
-    const lines: string[] = [
-      `#import "../helpers.typ": cv-section, cv-skill, h-bar`,
-      ``,
-      `#cv-section("Skills")`,
-      ``
-    ];
+    const lines: string[] = [`#import "../helpers.typ": cv-section, cv-skill, h-bar`, ``, `#cv-section("Skills")`, ``];
 
     for (const skill of content.skills) {
       lines.push(`#cv-skill(`);
