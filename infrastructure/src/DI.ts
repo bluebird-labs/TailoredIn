@@ -19,6 +19,7 @@ import type {
   GenerateCompanyBrief,
   GenerateResume,
   GenerateResumeFromJob,
+  GenerateResumeMarkdown,
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
@@ -93,7 +94,8 @@ export const DI = {
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
     GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
-    GenerateResumeFromJob: new InjectionToken<GenerateResumeFromJob>('DI.Resume.GenerateResumeFromJob')
+    GenerateResumeFromJob: new InjectionToken<GenerateResumeFromJob>('DI.Resume.GenerateResumeFromJob'),
+    GenerateResumeMarkdown: new InjectionToken<GenerateResumeMarkdown>('DI.Resume.GenerateResumeMarkdown')
   },
 
   Profile: {

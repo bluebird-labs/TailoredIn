@@ -20,6 +20,7 @@ import {
   GenerateCompanyBrief,
   GenerateResume,
   GenerateResumeFromJob,
+  GenerateResumeMarkdown,
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
@@ -191,6 +192,14 @@ container.bind({
       container.get(DI.Profile.Repository),
       container.get(DI.Archetype.Repository),
       container.get(DI.Resume.Renderer),
+      container.get(DI.Resume.ContentFactory)
+    )
+});
+container.bind({
+  provide: DI.Resume.GenerateResumeMarkdown,
+  useFactory: () =>
+    new GenerateResumeMarkdown(
+      container.get(DI.Profile.Repository),
       container.get(DI.Resume.ContentFactory)
     )
 });
