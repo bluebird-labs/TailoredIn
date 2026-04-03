@@ -77,9 +77,7 @@ describe('formatResumeAsMarkdown', () => {
 
   it('omits empty summaries', () => {
     const engineerSection = md.split('### Engineer — StartupCo')[1]!.split('---')[0]!;
-    const lines = engineerSection
-      .split('\n')
-      .filter(l => l.trim() !== '' && !l.startsWith('*') && !l.startsWith('-'));
+    const lines = engineerSection.split('\n').filter(l => l.trim() !== '' && !l.startsWith('*') && !l.startsWith('-'));
     expect(lines).toHaveLength(0);
   });
 

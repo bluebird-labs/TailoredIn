@@ -198,10 +198,7 @@ container.bind({
 container.bind({
   provide: DI.Resume.GenerateResumeMarkdown,
   useFactory: () =>
-    new GenerateResumeMarkdown(
-      container.get(DI.Profile.Repository),
-      container.get(DI.Resume.ContentFactory)
-    )
+    new GenerateResumeMarkdown(container.get(DI.Profile.Repository), container.get(DI.Resume.ContentFactory))
 });
 
 // Company Brief
