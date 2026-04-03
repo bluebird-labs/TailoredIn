@@ -1,5 +1,5 @@
 import { ContentSelection, ResumeProfile } from '@tailoredin/domain';
-import type { ContentSelectionDto } from '../../dtos/ArchetypeDto.js';
+import type { ContentSelectionDto } from '../../dtos/ContentSelectionDto.js';
 import type { ResumeProfileRepository } from '../../ports/ResumeProfileRepository.js';
 
 export type UpdateResumeProfileInput = {

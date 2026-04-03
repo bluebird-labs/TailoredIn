@@ -1,6 +1,7 @@
 export type { AddSkillItemInput } from './AddSkillItem.js';
 export { AddSkillItem } from './AddSkillItem.js';
-export * from './archetype/index.js';
+export type { BulletSuggestion, SuggestBulletsInput, SuggestBulletsOutput } from './archetype/SuggestBullets.js';
+export { SuggestBullets } from './archetype/SuggestBullets.js';
 export type { BulkChangeJobStatusInput } from './BulkChangeJobStatus.js';
 export { BulkChangeJobStatus } from './BulkChangeJobStatus.js';
 export type { ChangeJobStatusInput } from './ChangeJobStatus.js';
