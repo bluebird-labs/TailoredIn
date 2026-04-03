@@ -1,19 +1,23 @@
 import { inject, injectable } from '@needle-di/core';
-import type { AddBullet } from '@tailoredin/application';
+import type { AddAccomplishment } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
 @injectable()
-export class AddBulletRoute {
-  public constructor(private readonly addBullet: AddBullet = inject(DI.Experience.AddBullet)) {}
+export class AddAccomplishmentRoute {
+  public constructor(
+    private readonly addAccomplishment: AddAccomplishment = inject(DI.Experience.AddAccomplishment)
+  ) {}
 
   public plugin() {
     return new Elysia().post(
-      '/experiences/:id/bullets',
+      '/experiences/:id/accomplishments',
       async ({ params, body, set }) => {
-        const result = await this.addBullet.execute({
+        const result = await this.addAccomplishment.execute({
           experienceId: params.id,
-          content: body.content,
+          title: body.title,
+          narrative: body.narrative,
+          skillTags: body.skill_tags,
           ordinal: body.ordinal
         });
         if (!result.isOk) {
@@ -26,7 +30,9 @@ export class AddBulletRoute {
       {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
         body: t.Object({
-          content: t.String({ minLength: 1 }),
+          title: t.String({ minLength: 1 }),
+          narrative: t.String({ minLength: 1 }),
+          skill_tags: t.Array(t.String()),
           ordinal: t.Integer({ minimum: 0 })
         })
       }
