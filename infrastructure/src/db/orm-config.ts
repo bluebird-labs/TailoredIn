@@ -7,8 +7,6 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
-import { ArchetypeOrm } from './entities/archetypes/ArchetypeOrm.js';
-import { ArchetypeTagWeight } from './entities/archetypes/ArchetypeTagWeight.js';
 import { Company } from './entities/companies/Company.js';
 import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
@@ -18,10 +16,12 @@ import { Headline as OrmHeadline } from './entities/headline/Headline.js';
 import { Job } from './entities/jobs/Job.js';
 import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
 import { Profile } from './entities/profile/Profile.js';
+import { ResumeProfileOrm } from './entities/resume-profile/ResumeProfileOrm.js';
 import { Skill } from './entities/skills/Skill.js';
 import { SkillCategory as OrmSkillCategory } from './entities/skills/SkillCategory.js';
 import { SkillItem as OrmSkillItem } from './entities/skills/SkillItem.js';
 import { Tag as OrmTag } from './entities/tag/Tag.js';
+import { TailoredResumeOrm } from './entities/tailored-resume/TailoredResumeOrm.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -49,14 +49,14 @@ export function createOrmConfig(db: OrmDbConfig) {
       Skill,
       Job,
       JobStatusUpdate,
-      ArchetypeOrm,
-      ArchetypeTagWeight,
       OrmHeadline,
       OrmTag,
       OrmSkillCategory,
       OrmSkillItem,
       OrmExperience,
-      OrmBullet
+      OrmBullet,
+      ResumeProfileOrm,
+      TailoredResumeOrm
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

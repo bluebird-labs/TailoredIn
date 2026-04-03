@@ -7,7 +7,6 @@ import {
   Briefcase,
   Building2,
   DollarSign,
-  Download,
   ExternalLink,
   FileText,
   Loader2,
@@ -18,18 +17,14 @@ import {
   RotateCcw,
   Sparkles
 } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'sonner';
 import { ClassificationBadge } from '@/components/companies/classification-badge';
 import { JobStatusBadge } from '@/components/jobs/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useArchetypes } from '@/hooks/use-archetypes';
 import { api } from '@/lib/api';
 import { detectAtsPlatform } from '@/lib/ats-platform';
 import { isDiscardedStatus } from '@/lib/job-views';
@@ -58,11 +53,6 @@ const FUNNEL_STATUSES = [
 function JobDetailPage() {
   const { jobId } = Route.useParams();
   const queryClient = useQueryClient();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const { data: archetypesList = [] } = useArchetypes();
-  const archetypesForSelect = archetypesList as { key: string; label: string }[];
-  const [selectedArchetype, setSelectedArchetype] = useState('');
-  const [keywordsInput, setKeywordsInput] = useState('');
 
   const { data: configData } = useQuery({
     queryKey: queryKeys.config.capabilities(),
@@ -97,43 +87,6 @@ function JobDetailPage() {
       toast.error(`Failed to update status: ${err.message}`);
     }
   });
-
-  const handleGenerateResume = async () => {
-    if (!selectedArchetype) {
-      toast.error('Select an archetype first');
-      return;
-    }
-    setIsGenerating(true);
-    try {
-      const keywords = keywordsInput
-        .split(',')
-        .map(k => k.trim())
-        .filter(Boolean);
-      const res = await fetch(`/api/jobs/${jobId}/generate-resume`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ archetype: selectedArchetype, keywords })
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(err.error ?? `HTTP ${res.status}`);
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resume-${jobId.slice(0, 8)}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast.success('Resume downloaded');
-    } catch (err) {
-      toast.error(`Failed to generate resume: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -333,47 +286,6 @@ function JobDetailPage() {
             Reopen
           </Button>
         )}
-
-        <div className="flex items-end gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="archetype-select">Archetype</Label>
-            <Select value={selectedArchetype} onValueChange={v => v && setSelectedArchetype(v)}>
-              <SelectTrigger id="archetype-select" className="w-[180px]">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                {archetypesForSelect.map(a => (
-                  <SelectItem key={a.key} value={a.key}>
-                    {a.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="keywords-input">Keywords (optional)</Label>
-            <Input
-              id="keywords-input"
-              value={keywordsInput}
-              onChange={e => setKeywordsInput(e.target.value)}
-              placeholder="react, typescript, aws..."
-              className="w-[260px]"
-            />
-          </div>
-          <Button onClick={handleGenerateResume} disabled={isGenerating || !selectedArchetype} variant="default">
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                Generate Resume
-              </>
-            )}
-          </Button>
-        </div>
       </div>
 
       {/* Company Brief */}

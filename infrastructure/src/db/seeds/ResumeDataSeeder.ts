@@ -63,13 +63,11 @@ export class ResumeDataSeeder extends Seeder {
       eduIds.push(eduRow.id);
     }
 
-    // Headlines — tracking IDs
-    const [headlineRow] = await conn.execute<[{ id: string }]>(
+    // Headlines
+    await conn.execute(
       `INSERT INTO headlines (id, profile_id, label, summary_text)
-       VALUES (gen_random_uuid(), '${profileId}', '${esc(headlineData.headlineLabel)}', '${esc(headlineData.summaryText)}')
-       RETURNING id`
+       VALUES (gen_random_uuid(), '${profileId}', '${esc(headlineData.headlineLabel)}', '${esc(headlineData.summaryText)}')`
     );
-    const newHeadlineId = headlineRow.id;
 
     // Experiences — real titles from Lead IC archetype, Volvo gets 2 positions (8 total)
     const leadIcPositions = archetypeDefs[0].positions;
@@ -123,9 +121,10 @@ export class ResumeDataSeeder extends Seeder {
       }
     }
 
-    // Archetypes — with content_selection JSONB
-    for (const def of archetypeDefs) {
-      const experienceSelections = def.positions.map(posDef => {
+    // Resume profile — seed from the leader_individual_contributor archetype definition (archetypeDefs[0])
+    const leadIcDef = archetypeDefs[0];
+    {
+      const experienceSelections = leadIcDef.positions.map(posDef => {
         const expId = experienceIdMap.get(`${posDef.companyKey}:${posDef.positionIndex}`)!;
         return {
           experienceId: expId,
@@ -133,15 +132,15 @@ export class ResumeDataSeeder extends Seeder {
         };
       });
 
-      const selectedEduIds = def.educationIndices.map(i => eduIds[i]);
+      const selectedEduIds = leadIcDef.educationIndices.map(i => eduIds[i]);
       const allSkillCatIds = Object.values(skillCatIds);
 
       const selectedSkillItemIds: string[] = [];
       for (const [catName, itemIds] of Object.entries(skillItemIdsByCategory)) {
-        if (catName === 'interests' && def.interestItemOverrides) {
+        if (catName === 'interests' && leadIcDef.interestItemOverrides) {
           const interestNames = skillCategoryDefs.find(([n]) => n === 'interests')![1];
           for (let i = 0; i < interestNames.length; i++) {
-            if (def.interestItemOverrides.includes(interestNames[i])) {
+            if (leadIcDef.interestItemOverrides.includes(interestNames[i])) {
               selectedSkillItemIds.push(itemIds[i]);
             }
           }
@@ -159,9 +158,10 @@ export class ResumeDataSeeder extends Seeder {
       };
 
       await conn.execute(
-        `INSERT INTO archetypes (id, profile_id, key, label, headline_id, content_selection)
-         VALUES (gen_random_uuid(), '${profileId}', '${esc(def.archetypeKey)}', '${esc(def.archetypeLabel)}',
-                 '${newHeadlineId}', '${JSON.stringify(contentSelection).replace(/'/g, "''")}'::jsonb)`
+        `INSERT INTO resume_profiles (profile_id, content_selection, headline_text, updated_at)
+         VALUES ('${profileId}', '${JSON.stringify(contentSelection).replace(/'/g, "''")}'::jsonb,
+                 '${esc(headlineData.summaryText)}', now())
+         ON CONFLICT DO NOTHING`
       );
     }
 
