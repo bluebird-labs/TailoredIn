@@ -9,6 +9,7 @@ import type {
   CreateExperience,
   CreateHeadline,
   CreateSkillCategory,
+  CreateTailoredResume,
   DeleteArchetype,
   DeleteBullet,
   DeleteEducation,
@@ -18,12 +19,15 @@ import type {
   DeleteSkillItem,
   GenerateCompanyBrief,
   GenerateResume,
-  GenerateResumeFromJob,
   GenerateResumeMarkdown,
+  GenerateResumeProfilePdf,
+  GenerateTailoredResumePdf,
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
   GetProfile,
+  GetResumeProfile,
+  GetTailoredResume,
   IngestJobByUrl,
   IngestScrapedJob,
   JobScraper,
@@ -34,14 +38,16 @@ import type {
   ListJobs,
   ListSkillCategories,
   ListTags,
+  ListTailoredResumes,
   LlmService,
   ResumeContentFactory,
+  ResumeProfileRepository,
   ResumeRenderer,
+  ResumeTailoringService,
   ScrapeAndIngestJobs,
-  SetArchetypeContent,
-  SetArchetypeTagProfile,
   StructuredLlmClient,
   SuggestBullets,
+  TailoredResumeRepository,
   UpdateArchetype,
   UpdateBullet,
   UpdateEducation,
@@ -49,11 +55,12 @@ import type {
   UpdateHeadline,
   UpdateJobCompany,
   UpdateProfile,
+  UpdateResumeProfile,
   UpdateSkillCategory,
-  UpdateSkillItem
+  UpdateSkillItem,
+  UpdateTailoredResume
 } from '@tailoredin/application';
 import type {
-  ArchetypeRepository,
   CompanyBriefRepository,
   CompanyRepository,
   EducationRepository,
@@ -94,8 +101,24 @@ export const DI = {
     Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
     ContentFactory: new InjectionToken<ResumeContentFactory>('DI.Resume.ContentFactory'),
     GenerateResume: new InjectionToken<GenerateResume>('DI.Resume.GenerateResume'),
-    GenerateResumeFromJob: new InjectionToken<GenerateResumeFromJob>('DI.Resume.GenerateResumeFromJob'),
-    GenerateResumeMarkdown: new InjectionToken<GenerateResumeMarkdown>('DI.Resume.GenerateResumeMarkdown')
+    GenerateResumeMarkdown: new InjectionToken<GenerateResumeMarkdown>('DI.Resume.GenerateResumeMarkdown'),
+    TailoringService: new InjectionToken<ResumeTailoringService>('DI.Resume.TailoringService')
+  },
+
+  ResumeProfile: {
+    Repository: new InjectionToken<ResumeProfileRepository>('DI.ResumeProfile.Repository'),
+    Get: new InjectionToken<GetResumeProfile>('DI.ResumeProfile.Get'),
+    Update: new InjectionToken<UpdateResumeProfile>('DI.ResumeProfile.Update'),
+    GeneratePdf: new InjectionToken<GenerateResumeProfilePdf>('DI.ResumeProfile.GeneratePdf')
+  },
+
+  TailoredResume: {
+    Repository: new InjectionToken<TailoredResumeRepository>('DI.TailoredResume.Repository'),
+    Create: new InjectionToken<CreateTailoredResume>('DI.TailoredResume.Create'),
+    Get: new InjectionToken<GetTailoredResume>('DI.TailoredResume.Get'),
+    List: new InjectionToken<ListTailoredResumes>('DI.TailoredResume.List'),
+    Update: new InjectionToken<UpdateTailoredResume>('DI.TailoredResume.Update'),
+    GeneratePdf: new InjectionToken<GenerateTailoredResumePdf>('DI.TailoredResume.GeneratePdf')
   },
 
   Profile: {
@@ -154,13 +177,10 @@ export const DI = {
   },
 
   Archetype: {
-    Repository: new InjectionToken<ArchetypeRepository>('DI.Archetype.Repository'),
     List: new InjectionToken<ListArchetypes>('DI.Archetype.List'),
     Create: new InjectionToken<CreateArchetype>('DI.Archetype.Create'),
     Update: new InjectionToken<UpdateArchetype>('DI.Archetype.Update'),
     Delete: new InjectionToken<DeleteArchetype>('DI.Archetype.Delete'),
-    SetContent: new InjectionToken<SetArchetypeContent>('DI.Archetype.SetContent'),
-    SetTagProfile: new InjectionToken<SetArchetypeTagProfile>('DI.Archetype.SetTagProfile'),
     SuggestBullets: new InjectionToken<SuggestBullets>('DI.Archetype.SuggestBullets')
   }
 };

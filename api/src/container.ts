@@ -5,12 +5,11 @@ import {
   AddSkillItem,
   BulkChangeJobStatus,
   ChangeJobStatus,
-  CreateArchetype,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
   CreateSkillCategory,
-  DeleteArchetype,
+  CreateTailoredResume,
   DeleteBullet,
   DeleteEducation,
   DeleteExperience,
@@ -19,33 +18,35 @@ import {
   DeleteSkillItem,
   GenerateCompanyBrief,
   GenerateResume,
-  GenerateResumeFromJob,
   GenerateResumeMarkdown,
+  GenerateResumeProfilePdf,
+  GenerateTailoredResumePdf,
   GetCompanyBrief,
   GetJob,
   GetJobCompany,
   GetProfile,
+  GetResumeProfile,
+  GetTailoredResume,
   IngestJobByUrl,
   IngestScrapedJob,
-  ListArchetypes,
   ListEducation,
   ListExperiences,
   ListHeadlines,
   ListJobs,
   ListSkillCategories,
   ListTags,
-  SetArchetypeContent,
-  SetArchetypeTagProfile,
+  ListTailoredResumes,
   SuggestBullets,
-  UpdateArchetype,
   UpdateBullet,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
   UpdateJobCompany,
   UpdateProfile,
+  UpdateResumeProfile,
   UpdateSkillCategory,
-  UpdateSkillItem
+  UpdateSkillItem,
+  UpdateTailoredResume
 } from '@tailoredin/application';
 import { env, envBool, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
@@ -55,9 +56,9 @@ import {
   DI,
   OPENAI_CONFIG,
   OpenAiLlmService,
+  OpenAiResumeTailoringService,
   PLAYWRIGHT_JOB_SCRAPER_CONFIG,
   PlaywrightJobScraper,
-  PostgresArchetypeRepository,
   PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
@@ -65,9 +66,11 @@ import {
   PostgresHeadlineRepository,
   PostgresJobRepository,
   PostgresProfileRepository,
+  PostgresResumeProfileRepository,
   PostgresSkillCategoryRepository,
   PostgresSkillRepository,
   PostgresTagRepository,
+  PostgresTailoredResumeRepository,
   StructuredLlmRouter,
   TypstResumeRenderer
 } from '@tailoredin/infrastructure';
@@ -160,8 +163,17 @@ export const llmAvailable = !!(openAiApiKey && openAiProject);
 if (llmAvailable) {
   container.bind({ provide: OPENAI_CONFIG, useValue: { apiKey: openAiApiKey, project: openAiProject } });
   container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
+  container.bind({ provide: DI.Resume.TailoringService, useClass: OpenAiResumeTailoringService });
 } else {
   container.bind({ provide: DI.Resume.LlmService, useValue: null });
+  container.bind({
+    provide: DI.Resume.TailoringService,
+    useValue: {
+      tailorFromJd: async () => {
+        throw new Error('OpenAI not configured');
+      }
+    }
+  });
 }
 container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
 container.bind({
@@ -169,7 +181,6 @@ container.bind({
   useFactory: () =>
     new DatabaseResumeContentFactory(
       container.get(DI.Profile.Repository),
-      container.get(DI.Archetype.Repository),
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.SkillCategory.Repository)
@@ -182,17 +193,6 @@ container.bind({
       container.get(DI.Profile.Repository),
       container.get(DI.Resume.ContentFactory),
       container.get(DI.Resume.Renderer)
-    )
-});
-container.bind({
-  provide: DI.Resume.GenerateResumeFromJob,
-  useFactory: () =>
-    new GenerateResumeFromJob(
-      container.get(DI.Job.Repository),
-      container.get(DI.Profile.Repository),
-      container.get(DI.Archetype.Repository),
-      container.get(DI.Resume.Renderer),
-      container.get(DI.Resume.ContentFactory)
     )
 });
 container.bind({
@@ -226,6 +226,60 @@ container.bind({
 container.bind({
   provide: DI.Profile.UpdateProfile,
   useFactory: () => new UpdateProfile(container.get(DI.Profile.Repository))
+});
+
+// ResumeProfile
+container.bind({ provide: DI.ResumeProfile.Repository, useClass: PostgresResumeProfileRepository });
+container.bind({
+  provide: DI.ResumeProfile.Get,
+  useFactory: () => new GetResumeProfile(container.get(DI.ResumeProfile.Repository))
+});
+container.bind({
+  provide: DI.ResumeProfile.Update,
+  useFactory: () => new UpdateResumeProfile(container.get(DI.ResumeProfile.Repository))
+});
+container.bind({
+  provide: DI.ResumeProfile.GeneratePdf,
+  useFactory: () =>
+    new GenerateResumeProfilePdf(
+      container.get(DI.ResumeProfile.Repository),
+      container.get(DI.Resume.ContentFactory),
+      container.get(DI.Resume.Renderer)
+    )
+});
+
+// TailoredResume
+container.bind({ provide: DI.TailoredResume.Repository, useClass: PostgresTailoredResumeRepository });
+container.bind({
+  provide: DI.TailoredResume.Create,
+  useFactory: () =>
+    new CreateTailoredResume(
+      container.get(DI.ResumeProfile.Repository),
+      container.get(DI.TailoredResume.Repository),
+      container.get(DI.Resume.TailoringService),
+      container.get(DI.Resume.ContentFactory)
+    )
+});
+container.bind({
+  provide: DI.TailoredResume.Get,
+  useFactory: () => new GetTailoredResume(container.get(DI.TailoredResume.Repository))
+});
+container.bind({
+  provide: DI.TailoredResume.List,
+  useFactory: () => new ListTailoredResumes(container.get(DI.TailoredResume.Repository))
+});
+container.bind({
+  provide: DI.TailoredResume.Update,
+  useFactory: () => new UpdateTailoredResume(container.get(DI.TailoredResume.Repository))
+});
+container.bind({
+  provide: DI.TailoredResume.GeneratePdf,
+  useFactory: () =>
+    new GenerateTailoredResumePdf(
+      container.get(DI.TailoredResume.Repository),
+      container.get(DI.Resume.ContentFactory),
+      container.get(DI.Resume.Renderer)
+    )
 });
 
 // Education
@@ -334,32 +388,7 @@ container.bind({
   useFactory: () => new DeleteSkillItem(container.get(DI.SkillCategory.Repository))
 });
 
-// Archetype
-container.bind({ provide: DI.Archetype.Repository, useClass: PostgresArchetypeRepository });
-container.bind({
-  provide: DI.Archetype.List,
-  useFactory: () => new ListArchetypes(container.get(DI.Archetype.Repository))
-});
-container.bind({
-  provide: DI.Archetype.Create,
-  useFactory: () => new CreateArchetype(container.get(DI.Archetype.Repository))
-});
-container.bind({
-  provide: DI.Archetype.Update,
-  useFactory: () => new UpdateArchetype(container.get(DI.Archetype.Repository))
-});
-container.bind({
-  provide: DI.Archetype.Delete,
-  useFactory: () => new DeleteArchetype(container.get(DI.Archetype.Repository))
-});
-container.bind({
-  provide: DI.Archetype.SetContent,
-  useFactory: () => new SetArchetypeContent(container.get(DI.Archetype.Repository))
-});
-container.bind({
-  provide: DI.Archetype.SetTagProfile,
-  useFactory: () => new SetArchetypeTagProfile(container.get(DI.Archetype.Repository))
-});
+// Archetype (SuggestBullets remains — no archetype repo needed)
 container.bind({
   provide: DI.Archetype.SuggestBullets,
   useFactory: () => new SuggestBullets(container.get(DI.Experience.Repository), container.get(DI.Llm.StructuredClient))

@@ -12,7 +12,7 @@ export class DatabaseSeeder extends Seeder {
   public async run(em: EntityManager): Promise<void> {
     await em.getConnection().execute(`
       TRUNCATE
-        archetype_tag_weights, archetypes,
+        tailored_resumes, resume_profiles,
         bullet_tags, bullets, experiences,
         headline_tags, headlines, educations, skill_items, skill_categories, profiles,
         job_status_updates, jobs, companies,

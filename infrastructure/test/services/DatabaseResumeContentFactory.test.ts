@@ -1,21 +1,17 @@
 import { describe, expect, test } from 'bun:test';
-import type { MakeResumeContentInput } from '@tailoredin/application';
+import type { MakeResumeContentFromSelectionInput } from '@tailoredin/application';
+import type { ExperienceRepository } from '@tailoredin/domain';
 import {
-  Archetype,
-  ArchetypeId,
-  type ArchetypeRepository,
   Bullet,
   BulletId,
   ContentSelection,
   type EducationRepository,
   Experience,
   ExperienceId,
-  type ExperienceRepository,
   Profile,
   ProfileId,
   type ProfileRepository,
   type SkillCategoryRepository,
-  TagProfile,
   TagSet
 } from '@tailoredin/domain';
 import { DatabaseResumeContentFactory } from '../../src/services/DatabaseResumeContentFactory.js';
@@ -68,39 +64,12 @@ const defaultProfile = new Profile({
   updatedAt: now
 });
 
-const defaultInput: MakeResumeContentInput = {
-  profileId: 'profile-1',
-  archetypeId: 'archetype-1',
-  keywords: []
-};
-
 // --- Stubs ---
 
 function stubProfileRepo(): ProfileRepository {
   return {
     findSingle: async () => defaultProfile,
     save: async () => {}
-  };
-}
-
-function stubArchetypeRepo(contentSelection: ContentSelection): ArchetypeRepository {
-  const archetype = new Archetype({
-    id: new ArchetypeId('archetype-1'),
-    profileId: 'profile-1',
-    key: 'test',
-    label: 'Test',
-    headlineId: 'headline-1',
-    headlineText: 'A great engineer',
-    tagProfile: TagProfile.empty(),
-    contentSelection,
-    createdAt: now,
-    updatedAt: now
-  });
-  return {
-    findByIdOrFail: async () => archetype,
-    findAll: async () => [archetype],
-    save: async () => {},
-    delete: async () => {}
   };
 }
 
@@ -142,14 +111,29 @@ function stubSkillCategoryRepo(): SkillCategoryRepository {
   };
 }
 
-function makeFactory(contentSelection: ContentSelection, experiences: Experience[]): DatabaseResumeContentFactory {
+function makeFactory(experiences: Experience[]): DatabaseResumeContentFactory {
   return new DatabaseResumeContentFactory(
     stubProfileRepo(),
-    stubArchetypeRepo(contentSelection),
     stubExperienceRepo(experiences),
     stubEducationRepo(),
     stubSkillCategoryRepo()
   );
+}
+
+function makeInput(
+  contentSelection: ContentSelection,
+  overrides?: Partial<MakeResumeContentFromSelectionInput>
+): MakeResumeContentFromSelectionInput {
+  return {
+    profileId: 'profile-1',
+    headlineText: 'A great engineer',
+    experienceSelections: contentSelection.experienceSelections,
+    educationIds: contentSelection.educationIds,
+    skillCategoryIds: contentSelection.skillCategoryIds,
+    skillItemIds: contentSelection.skillItemIds,
+    keywords: [],
+    ...overrides
+  };
 }
 
 // --- Tests ---
@@ -168,8 +152,8 @@ describe('DatabaseResumeContentFactory', () => {
       skillItemIds: []
     });
 
-    const factory = makeFactory(cs, [exp]);
-    const result = await factory.make(defaultInput);
+    const factory = makeFactory([exp]);
+    const result = await factory.makeFromSelection(makeInput(cs));
 
     expect(result.experience).toHaveLength(1);
     expect(result.experience[0].highlights).toEqual(['Led migration to microservices.', 'Reduced deploy time by 40%.']);
@@ -188,8 +172,8 @@ describe('DatabaseResumeContentFactory', () => {
       skillItemIds: []
     });
 
-    const factory = makeFactory(cs, [exp]);
-    const result = await factory.make(defaultInput);
+    const factory = makeFactory([exp]);
+    const result = await factory.makeFromSelection(makeInput(cs));
 
     expect(result.experience[0].highlights[0]).toBe('Second bullet.');
     expect(result.experience[0].highlights[1]).toBe('First bullet.');
@@ -207,8 +191,8 @@ describe('DatabaseResumeContentFactory', () => {
       skillItemIds: []
     });
 
-    const factory = makeFactory(cs, [exp]);
-    const result = await factory.make(defaultInput);
+    const factory = makeFactory([exp]);
+    const result = await factory.makeFromSelection(makeInput(cs));
 
     expect(result.experience[0].highlights).toEqual(['Existing bullet.']);
   });
@@ -225,8 +209,8 @@ describe('DatabaseResumeContentFactory', () => {
       skillItemIds: []
     });
 
-    const factory = makeFactory(cs, [exp]);
-    const result = await factory.make(defaultInput);
+    const factory = makeFactory([exp]);
+    const result = await factory.makeFromSelection(makeInput(cs));
 
     expect(result.experience).toHaveLength(1);
     expect(result.experience[0].highlights).toEqual([]);
@@ -250,8 +234,8 @@ describe('DatabaseResumeContentFactory', () => {
       skillItemIds: []
     });
 
-    const factory = makeFactory(cs, [exp1, exp2]);
-    const result = await factory.make(defaultInput);
+    const factory = makeFactory([exp1, exp2]);
+    const result = await factory.makeFromSelection(makeInput(cs));
 
     expect(result.experience).toHaveLength(2);
     expect(result.experience[0].highlights).toEqual(['Bullet for exp1.']);
@@ -271,8 +255,8 @@ describe('DatabaseResumeContentFactory', () => {
       skillItemIds: []
     });
 
-    const factory = makeFactory(cs, [exp]);
-    const result = await factory.make(defaultInput);
+    const factory = makeFactory([exp]);
+    const result = await factory.makeFromSelection(makeInput(cs));
 
     expect(result.experience[0].highlights).toEqual(['No period at end.', 'Already has period.']);
   });

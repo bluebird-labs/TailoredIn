@@ -10,7 +10,6 @@ export type {
 } from './LlmService.js';
 export type {
   MakeResumeContentFromSelectionInput,
-  MakeResumeContentInput,
   ResumeContentFactory
 } from './ResumeContentFactory.js';
 export type { ResumeProfileRepository } from './ResumeProfileRepository.js';

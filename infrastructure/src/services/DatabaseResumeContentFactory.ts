@@ -1,12 +1,10 @@
 import type {
   MakeResumeContentFromSelectionInput,
-  MakeResumeContentInput,
   ResumeContentDto,
   ResumeContentFactory
 } from '@tailoredin/application';
 import { StringUtil } from '@tailoredin/core';
 import type {
-  ArchetypeRepository,
   EducationRepository,
   ExperienceRepository,
   ProfileRepository,
@@ -17,26 +15,10 @@ import { formatDateRange } from '../resume/dateFormatter.js';
 export class DatabaseResumeContentFactory implements ResumeContentFactory {
   public constructor(
     private readonly profileRepo: ProfileRepository,
-    private readonly archetypeRepo: ArchetypeRepository,
     private readonly experienceRepo: ExperienceRepository,
     private readonly educationRepo: EducationRepository,
     private readonly skillCategoryRepo: SkillCategoryRepository
   ) {}
-
-  public async make(input: MakeResumeContentInput): Promise<ResumeContentDto> {
-    const archetype = await this.archetypeRepo.findByIdOrFail(input.archetypeId);
-    const cs = archetype.contentSelection;
-
-    return this.makeFromSelection({
-      profileId: input.profileId,
-      headlineText: archetype.headlineText,
-      experienceSelections: cs.experienceSelections,
-      educationIds: cs.educationIds,
-      skillCategoryIds: cs.skillCategoryIds,
-      skillItemIds: cs.skillItemIds,
-      keywords: input.keywords
-    });
-  }
 
   public async makeFromSelection(input: MakeResumeContentFromSelectionInput): Promise<ResumeContentDto> {
     const [profile, allExperiences, allEducation, allCategories] = await Promise.all([
