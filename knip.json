@@ -16,5 +16,6 @@
   },
   "ignore": ["e2e/**"],
   "ignoreBinaries": ["dot"],
+  "ignoreDependencies": ["cmdk"],
   "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates"]
 }

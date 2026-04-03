@@ -13,18 +13,6 @@ export function useTailoredResume(id: string) {
   });
 }
 
-export function useCreateTailoredResume() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (input: { jd_content: string }) => {
-      const { data } = await api.resumes.tailored.post(input);
-      return data?.data ?? null;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tailoredResumes.all });
-    }
-  });
-}
 
 export function useUpdateTailoredResume(id: string) {
   const queryClient = useQueryClient();
