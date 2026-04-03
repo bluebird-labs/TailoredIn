@@ -74,7 +74,8 @@ import {
   PostgresTagRepository,
   PostgresTailoredResumeRepository,
   StructuredLlmRouter,
-  TypstResumeRenderer
+  TypstResumeRenderer,
+  TypstTemplateLayoutAnalyzer
 } from '@tailoredin/infrastructure';
 
 const orm = await MikroORM.init(
@@ -192,6 +193,7 @@ container.bind({
   provide: DI.Resume.ChestQuery,
   useFactory: () => new DatabaseResumeChestQuery(container.get(DI.Experience.Repository))
 });
+container.bind({ provide: DI.Resume.LayoutAnalyzer, useClass: TypstTemplateLayoutAnalyzer });
 container.bind({
   provide: DI.Resume.GenerateResume,
   useFactory: () =>
