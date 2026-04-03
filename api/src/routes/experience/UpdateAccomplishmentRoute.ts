@@ -11,10 +11,10 @@ export class UpdateAccomplishmentRoute {
 
   public plugin() {
     return new Elysia().put(
-      '/experiences/:experienceId/accomplishments/:accomplishmentId',
+      '/experiences/:id/accomplishments/:accomplishmentId',
       async ({ params, body, set }) => {
         const result = await this.updateAccomplishment.execute({
-          experienceId: params.experienceId,
+          experienceId: params.id,
           accomplishmentId: params.accomplishmentId,
           title: body.title,
           narrative: body.narrative,
@@ -29,7 +29,7 @@ export class UpdateAccomplishmentRoute {
       },
       {
         params: t.Object({
-          experienceId: t.String({ format: 'uuid' }),
+          id: t.String({ format: 'uuid' }),
           accomplishmentId: t.String({ format: 'uuid' })
         }),
         body: t.Object({

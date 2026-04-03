@@ -11,10 +11,10 @@ export class DeleteAccomplishmentRoute {
 
   public plugin() {
     return new Elysia().delete(
-      '/experiences/:experienceId/accomplishments/:accomplishmentId',
+      '/experiences/:id/accomplishments/:accomplishmentId',
       async ({ params, set }) => {
         const result = await this.deleteAccomplishment.execute({
-          experienceId: params.experienceId,
+          experienceId: params.id,
           accomplishmentId: params.accomplishmentId
         });
         if (!result.isOk) {
@@ -26,7 +26,7 @@ export class DeleteAccomplishmentRoute {
       },
       {
         params: t.Object({
-          experienceId: t.String({ format: 'uuid' }),
+          id: t.String({ format: 'uuid' }),
           accomplishmentId: t.String({ format: 'uuid' })
         })
       }
