@@ -1,4 +1,4 @@
-export type { FetchJobDetailsDelegate, JobScraper, ScrapeByUrlResult, ScrapeResultCallback } from './JobScraper.js';
+export type { FetchJobDetailsDelegate, JobScraper, ScrapeByUrlResult } from './JobScraper.js';
 export type {
   ApplicationInsightsDto,
   CompanyBriefSectionsDto,
