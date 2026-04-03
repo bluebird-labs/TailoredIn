@@ -135,6 +135,7 @@ const app = new Elysia()
     const statusCode = err.statusCode ?? 500;
     set.status = statusCode;
     logRequest(request, statusCode, startTimes.get(request));
+    if (statusCode === 500) log.error(error instanceof Error ? error.stack : String(error));
     return {
       error: {
         code: statusCode === 500 ? 'INTERNAL_ERROR' : 'SERVER_ERROR',
