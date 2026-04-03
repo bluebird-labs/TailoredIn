@@ -6,6 +6,7 @@ import { DeleteArchetypeRoute } from './routes/archetype/DeleteArchetypeRoute.js
 import { ListArchetypesRoute } from './routes/archetype/ListArchetypesRoute.js';
 import { SetArchetypeContentRoute } from './routes/archetype/SetArchetypeContentRoute.js';
 import { SetArchetypeTagProfileRoute } from './routes/archetype/SetArchetypeTagProfileRoute.js';
+import { SuggestBulletsRoute } from './routes/archetype/SuggestBulletsRoute.js';
 import { UpdateArchetypeRoute } from './routes/archetype/UpdateArchetypeRoute.js';
 import { BulkChangeJobStatusRoute } from './routes/BulkChangeJobStatusRoute.js';
 import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
@@ -116,6 +117,7 @@ const app = new Elysia()
   .use(container.get(DeleteArchetypeRoute).plugin())
   .use(container.get(SetArchetypeContentRoute).plugin())
   .use(container.get(SetArchetypeTagProfileRoute).plugin())
+  .use(container.get(SuggestBulletsRoute).plugin())
   // Headlines
   .use(container.get(ListHeadlinesRoute).plugin())
   .use(container.get(CreateHeadlineRoute).plugin())
@@ -131,6 +133,7 @@ const app = new Elysia()
   .use(container.get(AddBulletRoute).plugin())
   .use(container.get(UpdateBulletRoute).plugin())
   .use(container.get(DeleteBulletRoute).plugin())
+  // @ts-expect-error Elysia type instantiation too deep with many chained .use() calls
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
     const message = err.message ?? String(error);

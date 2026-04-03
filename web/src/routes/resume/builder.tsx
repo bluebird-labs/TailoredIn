@@ -6,6 +6,7 @@ import { ExperienceFormDialog } from '@/components/resume/builder/ExperienceForm
 import { HeadlineEditModal } from '@/components/resume/builder/HeadlineEditModal';
 import { PersonalInfoModal } from '@/components/resume/builder/PersonalInfoModal';
 import { ResumePreview } from '@/components/resume/builder/ResumePreview';
+import { SuggestBulletsModal } from '@/components/resume/builder/SuggestBulletsModal';
 import { TAB_COLORS, VersionTabs } from '@/components/resume/builder/VersionTabs';
 import { EducationFormDialog } from '@/components/resume/education/education-form-dialog';
 import type { Experience } from '@/components/resume/experience/types';
@@ -123,6 +124,7 @@ function BuilderPage() {
   const [educationDialogOpen, setEducationDialogOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | undefined>();
   const [generating, setGenerating] = useState(false);
+  const [suggestModalOpen, setSuggestModalOpen] = useState(false);
 
   const nextExperienceOrdinal = experiences.length > 0 ? Math.max(...experiences.map(e => e.ordinal)) + 1 : 0;
   const nextEducationOrdinal = educations.length > 0 ? Math.max(...educations.map(e => e.ordinal)) + 1 : 0;
@@ -352,6 +354,7 @@ function BuilderPage() {
             onDelete={handleDelete}
             generating={generating}
             onGenerate={handleGenerate}
+            onSuggest={() => setSuggestModalOpen(true)}
           />
         )}
       </div>
@@ -454,6 +457,59 @@ function BuilderPage() {
         onOpenChange={setEducationDialogOpen}
         education={editingEducation}
         nextOrdinal={nextEducationOrdinal}
+      />
+
+      <SuggestBulletsModal
+        open={suggestModalOpen}
+        onClose={() => setSuggestModalOpen(false)}
+        experiences={experiences}
+        onApply={selections => {
+          if (!activeArchetype) return;
+          const cs = activeArchetype.contentSelection;
+          setArchetypeContent.mutate(
+            {
+              id: activeArchetype.id,
+              experience_selections: selections,
+              education_ids: cs.educationIds,
+              skill_category_ids: cs.skillCategoryIds,
+              skill_item_ids: cs.skillItemIds
+            },
+            {
+              onSuccess: () => toast.success('Bullet selection updated'),
+              onError: () => toast.error('Failed to update selection')
+            }
+          );
+        }}
+        onCreateVersion={selections => {
+          const label = 'Tailored Version';
+          createArchetype.mutate(
+            { key: slugify(label), label },
+            {
+              onSuccess: data => {
+                const newId = (data as { data: { id: string } })?.data?.id;
+                if (!newId) return;
+                setActiveArchetypeId(newId);
+                const cs = activeArchetype?.contentSelection;
+                setArchetypeContent.mutate({
+                  id: newId,
+                  experience_selections: selections,
+                  education_ids: cs?.educationIds ?? [],
+                  skill_category_ids: cs?.skillCategoryIds ?? [],
+                  skill_item_ids: cs?.skillItemIds ?? []
+                });
+                if (activeArchetype) {
+                  updateArchetype.mutate({
+                    id: newId,
+                    key: slugify(label),
+                    label,
+                    headline_text: activeArchetype.headlineText
+                  });
+                }
+                toast.success('New version created with suggested bullets');
+              }
+            }
+          );
+        }}
       />
     </div>
   );

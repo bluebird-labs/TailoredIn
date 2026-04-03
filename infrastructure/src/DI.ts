@@ -40,6 +40,7 @@ import type {
   SetArchetypeContent,
   SetArchetypeTagProfile,
   StructuredLlmClient,
+  SuggestBullets,
   UpdateArchetype,
   UpdateBullet,
   UpdateEducation,
@@ -157,6 +158,7 @@ export const DI = {
     Update: new InjectionToken<UpdateArchetype>('DI.Archetype.Update'),
     Delete: new InjectionToken<DeleteArchetype>('DI.Archetype.Delete'),
     SetContent: new InjectionToken<SetArchetypeContent>('DI.Archetype.SetContent'),
-    SetTagProfile: new InjectionToken<SetArchetypeTagProfile>('DI.Archetype.SetTagProfile')
+    SetTagProfile: new InjectionToken<SetArchetypeTagProfile>('DI.Archetype.SetTagProfile'),
+    SuggestBullets: new InjectionToken<SuggestBullets>('DI.Archetype.SuggestBullets')
   }
 };
