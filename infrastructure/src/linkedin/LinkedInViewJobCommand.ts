@@ -1,11 +1,30 @@
 import * as Url from 'node:url';
 import { Logger, TimeUtil } from '@tailoredin/core';
 import type * as Playwright from 'playwright';
-import type { LinkedInSearchJobsCommandResult } from './LinkedInSearchJobsCommand.js';
 import { LinkedInUrls } from './LinkedInUrls.js';
 
+export type LinkedInJobResult = {
+  jobId: string;
+  jobTitle: string;
+  jobLink: string;
+  applyLink: string | null;
+  location: string;
+  salary: string | null;
+  jobType: string | null;
+  remote: string | null;
+  posted: string | null;
+  jobLevel: string | null;
+  applicants: string | null;
+  description: string;
+  description_html: string;
+  companyName: string;
+  companyLogoUrl: string;
+  companyLink: string;
+  companyWebsite: string | null;
+};
+
 export type LinkedInViewJobCommandResult = {
-  result: LinkedInSearchJobsCommandResult;
+  result: LinkedInJobResult;
   fetchDetails: () => Promise<{ applyLink: string | null; companyWebsite: string | null }>;
 };
 
@@ -48,7 +67,7 @@ export class LinkedInViewJobCommand {
     return match[1];
   }
 
-  private async parseJobDetails(jobId: string): Promise<LinkedInSearchJobsCommandResult> {
+  private async parseJobDetails(jobId: string): Promise<LinkedInJobResult> {
     const jobTitleLocator = this.page.locator('div.job-details-jobs-unified-top-card__job-title > h1 > a');
     const companyNameLocator = this.page.locator('div.job-details-jobs-unified-top-card__company-name > a');
     const locationAndPostedLocator = this.page.locator(

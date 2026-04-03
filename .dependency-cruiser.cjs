@@ -17,36 +17,27 @@ module.exports = {
     {
       name: 'domain-no-workspace-deps',
       severity: 'error',
-      comment: 'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/api/cli/web imports.',
+      comment: 'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/api/web imports.',
       from: { path: '^domain/' },
-      to: { path: '^(application|infrastructure|api|cli|web)/' }
+      to: { path: '^(application|infrastructure|api|web)/' }
     },
 
     // ── application: only domain ──────────────────────────────────────
     {
       name: 'application-no-infra',
       severity: 'error',
-      comment: 'application must not depend on infrastructure, api, cli, or web.',
+      comment: 'application must not depend on infrastructure, api, or web.',
       from: { path: '^application/' },
-      to: { path: '^(infrastructure|api|cli|web)/' }
+      to: { path: '^(infrastructure|api|web)/' }
     },
 
     // ── infrastructure: no api/cli/web ───────────────────────────────
     {
       name: 'infrastructure-no-entrypoints',
       severity: 'error',
-      comment: 'infrastructure must not depend on api, cli, or web.',
+      comment: 'infrastructure must not depend on api or web.',
       from: { path: '^infrastructure/', pathNot: '^infrastructure/dev/e2e-' },
-      to: { path: '^(api|cli|web)/' }
-    },
-
-    // ── api: must not depend on cli ──────────────────────────────────
-    {
-      name: 'api-not-depends-on-cli',
-      severity: 'error',
-      comment: 'api must not depend on cli.',
-      from: { path: '^api/' },
-      to: { path: '^cli/' }
+      to: { path: '^(api|web)/' }
     },
 
     // ── web: only public subpath exports ─────────────────────────────
@@ -86,21 +77,6 @@ module.exports = {
       to: { path: '^core/' }
     },
 
-    // ── web ↔ cli: entry-point packages are isolated ────────────────
-    {
-      name: 'web-not-depends-on-cli',
-      severity: 'error',
-      comment: 'web must not depend on cli.',
-      from: { path: '^web/' },
-      to: { path: '^cli/' }
-    },
-    {
-      name: 'cli-not-depends-on-web',
-      severity: 'error',
-      comment: 'cli must not depend on web.',
-      from: { path: '^cli/' },
-      to: { path: '^web/' }
-    }
   ],
 
   options: {

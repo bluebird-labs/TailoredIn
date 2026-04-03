@@ -1,12 +1,14 @@
 import FS from 'node:fs';
+import Path from 'node:path';
 import { inject, injectable } from '@needle-di/core';
-import type { JobScraper, JobSearchConfigDto, ScrapeByUrlResult, ScrapeResultCallback } from '@tailoredin/application';
+import type { JobScraper, ScrapeByUrlResult } from '@tailoredin/application';
 import { Logger, TimeUtil } from '@tailoredin/core';
 import * as Playwright from 'playwright';
-import { DEFAULT_AUTH_FILE as AUTH_FILE } from '../linkedin/LinkedInExplorer.js';
-import { LinkedInSearchJobsCommand } from '../linkedin/LinkedInSearchJobsCommand.js';
 import { LinkedInUrls } from '../linkedin/LinkedInUrls.js';
 import { LinkedInViewJobCommand } from '../linkedin/LinkedInViewJobCommand.js';
+import { PACKAGE_DIR } from '../linkedin/PACKAGE_DIR.js';
+
+const AUTH_FILE = Path.resolve(PACKAGE_DIR, 'playwright/.auth/linkedin.json');
 
 export const PLAYWRIGHT_JOB_SCRAPER_CONFIG = 'PlaywrightJobScraperConfig';
 
@@ -23,7 +25,6 @@ export class PlaywrightJobScraper implements JobScraper {
   private browser!: Playwright.Browser;
   private browserContext!: Playwright.BrowserContext;
   private page!: Playwright.Page;
-  private searchCommand!: LinkedInSearchJobsCommand;
 
   public constructor(private readonly config = inject(PLAYWRIGHT_JOB_SCRAPER_CONFIG) as PlaywrightJobScraperConfig) {}
 
@@ -41,7 +42,6 @@ export class PlaywrightJobScraper implements JobScraper {
     });
 
     this.page = await this.browserContext.newPage();
-    this.searchCommand = new LinkedInSearchJobsCommand(this.page, this.browserContext);
 
     await this.page.goto(LinkedInUrls.FEED, { waitUntil: 'load' });
 
@@ -80,33 +80,6 @@ export class PlaywrightJobScraper implements JobScraper {
       },
       fetchDetails
     };
-  }
-
-  public async search(config: JobSearchConfigDto, onResult: ScrapeResultCallback): Promise<void> {
-    await this.searchCommand.search(config, async (result, parseDetails) => {
-      await onResult(
-        {
-          jobId: result.jobId,
-          jobTitle: result.jobTitle,
-          jobLink: result.jobLink,
-          applyLink: result.applyLink,
-          location: result.location,
-          salary: result.salary,
-          jobType: result.jobType,
-          remote: result.remote,
-          posted: result.posted,
-          jobLevel: result.jobLevel,
-          applicants: result.applicants,
-          description: result.description,
-          descriptionHtml: result.description_html,
-          companyName: result.companyName,
-          companyLogoUrl: result.companyLogoUrl,
-          companyLink: result.companyLink,
-          companyWebsite: result.companyWebsite
-        },
-        parseDetails
-      );
-    });
   }
 
   private async isLoggedOut(): Promise<boolean> {

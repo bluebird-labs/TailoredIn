@@ -10,7 +10,6 @@
       "entry": ["test-integration/**/*.test.ts", "test-integration/support/**", "dev/e2e-start-servers.ts"]
     },
     "api": {},
-    "cli": {},
     "web": {
       "ignore": ["src/components/ui/**"]
     }

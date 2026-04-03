@@ -22,12 +22,11 @@ domain/          ← Single package: aggregates, value objects, domain services,
 application/     ← Single package: use cases + ports + DTOs (plain classes, no DI framework)
 infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
 api/             ← Elysia HTTP server + DI composition root
-cli/             ← CLI entry points: jobby, cvs, robot
 ```
 
 **Dependency rule (inward only):**
 ```
-api/cli → infrastructure → application → domain → (core)
+api → infrastructure → application → domain → (core)
 ```
 
 ### Layer Details
@@ -36,10 +35,9 @@ api/cli → infrastructure → application → domain → (core)
 |---|---|---|
 | `core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) |
 | `domain/` | `@tailoredin/domain` | Aggregates (JobPosting, Company, Skill, Resume), value objects (JobStatus, Archetype, SkillName), domain services (JobElectionService, TailoringStrategyService), domain events |
-| `application/` | `@tailoredin/application` | Use cases (IngestScrapedJob, ScrapeAndIngestJobs, GetJob, GetTopJob, ChangeJobStatus, GenerateResume), ports (JobRepository, CompanyRepository, JobScraper, LlmService, ResumeRenderer, etc.), DTOs |
+| `application/` | `@tailoredin/application` | Use cases (IngestScrapedJob, IngestJobByUrl, GetJob, ChangeJobStatus, GenerateResume), ports (JobRepository, CompanyRepository, JobScraper, LlmService, ResumeRenderer, etc.), DTOs |
 | `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, OpenAI LLM service, Playwright scraper + web color service, Typst resume renderer, DI tokens |
 | `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root |
-| `cli/` | `@tailoredin/cli` | CLI entry points: `jobby` (job management), `cvs` (resume generation), `robot` (scraping daemon) |
 | `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend. Only imports from `@tailoredin/api/client` (Eden Treaty) |
 
 ## Commands
@@ -75,13 +73,6 @@ bun run api:dev              # start with --watch
 bun run web                  # Vite production preview
 bun run web:dev              # Vite dev server
 
-# Background scraping robot
-bun run robot
-bun run robot:dev
-
-# Resume builder CLI
-bun run cvs gen --archetype nerd --theme skyblue --company_name "Acme" --keywords node typescript
-
 # Typecheck (per-package)
 bun run --cwd <package-dir> typecheck
 
@@ -95,36 +86,31 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 ## Key Design Decisions
 
 ### Plain Application Layer (No DI Framework)
-Use cases are plain TypeScript classes with explicit constructor parameters. The `@needle-di/core` framework (`@injectable`, `inject`, `InjectionToken`) is only used in `infrastructure/` and entry-point composition roots (`api/`, `cli/`). This keeps the application layer framework-agnostic and testable.
+Use cases are plain TypeScript classes with explicit constructor parameters. The `@needle-di/core` framework (`@injectable`, `inject`, `InjectionToken`) is only used in `infrastructure/` and the entry-point composition root (`api/`). This keeps the application layer framework-agnostic and testable.
 
 ### MikroORM Entities as ORM Aggregates
 The ORM entities in `infrastructure/src/db/entities/` are separate from the domain entities in `domain/src/entities/`. The repository implementations in `infrastructure/src/repositories/` map between them.
 
 ### DI Tokens
-DI tokens are defined in `infrastructure/src/DI.ts` as a single `DI` object. Composition roots in `api/` and `cli/` use these tokens to wire up the container.
+DI tokens are defined in `infrastructure/src/DI.ts` as a single `DI` object. The composition root in `api/` uses these tokens to wire up the container.
 
 ### Dependency Injection
-Composition roots (`api/src/index.ts`, `cli/src/*/container.ts`) import DI tokens from `@tailoredin/infrastructure` and wire up all services. Add new services by:
+The composition root (`api/src/index.ts`) imports DI tokens from `@tailoredin/infrastructure` and wires up all services. Add new services by:
 1. Adding a port interface to `application/src/ports/`
 2. Adding an implementation to `infrastructure/src/`
 3. Adding a DI token to `infrastructure/src/DI.ts`
-4. Binding it in the appropriate composition root
+4. Binding it in `api/src/container.ts`
 
 ## Entry Points
 - `api/src/index.ts` — starts Elysia server on port 8000
-- `cli/src/robot/index.ts` — infinite loop: scrape LinkedIn → ingest → sleep 15–30 min
-- `cli/src/jobby/index.ts` — `cmd-ts` CLI for manual job operations (`move`, `retire`)
-- `cli/src/cvs/index.ts` — Yargs `cvs` CLI for generating tailored PDFs
 
 ## Data Flow
 
-**Job Discovery:**
+**Single-URL Job Import:**
 ```
-cli/robot → ScrapeAndIngestJobs use case
-  → PlaywrightJobScraper (infrastructure) → LinkedIn scraping
-  → IngestScrapedJob use case
-    → CompanyRepository.upsertByLinkedinLink() + JobRepository.upsertByLinkedinId()
-    → JobElectionService.elect() (domain) → status: NEW or auto-rejected
+POST /jobs { linkedinUrl } → IngestJobByUrl use case
+  → PlaywrightJobScraper.scrapeByUrl() → scrape single posting
+  → IngestScrapedJob → election + scoring
 ```
 
 **Resume Generation:**
@@ -137,20 +123,13 @@ PUT /jobs/:id/generate-resume → GenerateResume use case
   → ResumeRenderer.render() → Typst compile → PDF
 ```
 
-**Single-URL Job Import:**
-```
-POST /jobs { linkedinUrl } → IngestJobByUrl use case
-  → PlaywrightJobScraper.scrapeByUrl() → scrape single posting
-  → IngestScrapedJob → election + scoring
-```
-
 ## Database
 PostgreSQL via MikroORM (`infrastructure/src/db/`). Config in `infrastructure/src/db/orm-config.ts`. Entities: `Profile`, `Experience`, `Bullet`, `BulletVariant`, `Headline`, `Education`, `SkillCategory`, `SkillItem`, `Tag`, `Archetype`, `ArchetypeTagWeight`, `Job`, `Company`, `CompanyBrief`, `Skill`, `JobStatusUpdate`. All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`).
 
 **Job scoring**: `JobOrmRepository` uses Kysely query builder with skill affinity weights (EXPERT=8, INTEREST=2, AVOID=2) to rank jobs.
 
 ### Job Status Lifecycle
-`JobStatus` enum covers the full funnel: `NEW → APPLIED → RECRUITER_SCREEN → TECHNICAL_SCREEN → ON_SITE → OFFER`. Auto-rejection statuses set by the robot: `RETIRED`, `DUPLICATE`, `HIGH_APPLICANTS`, `LOCATION_UNFIT`, `POSTED_TOO_LONG_AGO`. Manual statuses: `UNFIT`, `EXPIRED`, `LOW_SALARY`.
+`JobStatus` enum covers the full funnel: `NEW → APPLIED → RECRUITER_SCREEN → TECHNICAL_SCREEN → ON_SITE → OFFER`. Auto-rejection statuses: `RETIRED`, `DUPLICATE`, `HIGH_APPLICANTS`, `LOCATION_UNFIT`, `POSTED_TOO_LONG_AGO`. Manual statuses: `UNFIT`, `EXPIRED`, `LOW_SALARY`.
 
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):

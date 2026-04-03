@@ -58,7 +58,6 @@ export { IngestScrapedJob } from './IngestScrapedJob.js';
 export type { ListJobsInput } from './ListJobs.js';
 export { ListJobs } from './ListJobs.js';
 export { ListSkillCategories } from './ListSkillCategories.js';
-export { ScrapeAndIngestJobs } from './ScrapeAndIngestJobs.js';
 export type { ListTagsInput } from './tag/ListTags.js';
 export { ListTags } from './tag/ListTags.js';
 export type { UpdateJobCompanyInput } from './UpdateJobCompany.js';
