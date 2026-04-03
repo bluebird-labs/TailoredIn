@@ -31,4 +31,19 @@ describe('Accomplishment', () => {
     expect(a.skillTags).toEqual(['leadership']);
     expect(a.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
   });
+
+  it('partial update only changes specified fields', () => {
+    const a = Accomplishment.create({
+      experienceId: 'exp-1',
+      title: 'Original',
+      narrative: 'Original narrative',
+      skillTags: ['a'],
+      ordinal: 0,
+    });
+    a.update({ title: 'New title' });
+    expect(a.title).toBe('New title');
+    expect(a.narrative).toBe('Original narrative'); // unchanged
+    expect(a.skillTags).toEqual(['a']); // unchanged
+    expect(a.ordinal).toBe(0); // unchanged
+  });
 });
