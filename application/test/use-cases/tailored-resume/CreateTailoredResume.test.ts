@@ -56,7 +56,6 @@ function mockTailoredResumeRepo(onSave?: (r: TailoredResume) => void): TailoredR
 
 function mockContentFactory(): ResumeContentFactory {
   return {
-    make: async () => EMPTY_CONTENT,
     makeFromSelection: async () => EMPTY_CONTENT
   };
 }
