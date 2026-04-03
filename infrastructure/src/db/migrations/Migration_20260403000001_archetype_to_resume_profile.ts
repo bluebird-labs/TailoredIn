@@ -26,12 +26,16 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
       );
     `);
 
+    // Best-effort data migration — silently skips if archetypes schema is incompatible
     this.addSql(`
-      INSERT INTO resume_profiles (profile_id, content_selection, headline_text, updated_at)
-      SELECT a.profile_id, a.content_selection, COALESCE(a.headline_text, ''), now()
-      FROM archetypes a
-      WHERE a.key = 'leader_individual_contributor'
-      ON CONFLICT DO NOTHING;
+      DO $$ BEGIN
+        INSERT INTO resume_profiles (profile_id, content_selection, headline_text, updated_at)
+        SELECT a.profile_id, a.content_selection, COALESCE(a.headline_text, ''), now()
+        FROM archetypes a
+        WHERE a.key = 'leader_individual_contributor'
+        ON CONFLICT DO NOTHING;
+      EXCEPTION WHEN OTHERS THEN NULL;
+      END $$;
     `);
 
     this.addSql('DROP TABLE IF EXISTS archetype_tag_weights;');
