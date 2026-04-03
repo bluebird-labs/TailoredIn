@@ -48,7 +48,7 @@ export class TypstFileGenerator {
     return `language = "en"
 
 [layout]
-  awesome_color = "#333333"
+  awesome_color = "#3E6B8A"
   before_section_skip = "${RESUME_LAYOUT.beforeSectionSkip}"
   before_entry_skip = "${RESUME_LAYOUT.beforeEntrySkip}"
   before_entry_description_skip = "${RESUME_LAYOUT.beforeEntryDescriptionSkip}"
