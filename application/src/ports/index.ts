@@ -20,3 +20,4 @@ export type { ResumeTailoringService } from './ResumeTailoringService.js';
 export type { StructuredLlmClient, StructuredLlmRequest } from './StructuredLlmClient.js';
 export { LlmProviderKey } from './StructuredLlmClient.js';
 export type { TailoredResumeRepository } from './TailoredResumeRepository.js';
+export type { TemplateLayoutAnalyzer } from './TemplateLayoutAnalyzer.js';
