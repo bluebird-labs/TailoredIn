@@ -5,8 +5,8 @@ import { DI } from '../DI.js';
 import { formatDateRange } from '../resume/dateFormatter.js';
 
 /**
- * Builds a rich markdown document of ALL non-archived experiences + bullets for use as LLM input.
- * Includes verbose descriptions when available so the LLM can generate targeted bullet texts.
+ * Builds a rich markdown document of all experiences and their accomplishment narratives
+ * for use as LLM input. The LLM reads these narratives and generates resume bullets.
  */
 @injectable()
 export class DatabaseResumeChestQuery implements ResumeChestQuery {
@@ -23,25 +23,19 @@ export class DatabaseResumeChestQuery implements ResumeChestQuery {
 
       if (exp.narrative) {
         lines.push('');
-        lines.push('**Narrative:**');
+        lines.push('**Role Narrative:**');
         lines.push(exp.narrative);
       }
 
-      if (exp.summary) {
+      if (exp.accomplishments.length > 0) {
         lines.push('');
-        lines.push(`**Summary:** ${exp.summary}`);
-      }
-
-      const activeBullets = exp.bullets.filter(b => b.status !== 'archived');
-      if (activeBullets.length > 0) {
-        lines.push('');
-        lines.push('**Bullets:**');
-        for (const bullet of activeBullets) {
-          const statusLabel = bullet.status === 'experimental' ? ' *(experimental)*' : '';
-          lines.push(`- [${bullet.id.value}]${statusLabel} ${bullet.content}`);
-          if (bullet.verboseDescription) {
-            lines.push(`  *Verbose:* ${bullet.verboseDescription}`);
+        lines.push('**Accomplishments:**');
+        for (const acc of exp.accomplishments) {
+          lines.push(`### [${acc.id.value}] ${acc.title}`);
+          if (acc.skillTags.length > 0) {
+            lines.push(`*Tags: ${acc.skillTags.join(', ')}*`);
           }
+          lines.push(acc.narrative);
         }
       }
 
