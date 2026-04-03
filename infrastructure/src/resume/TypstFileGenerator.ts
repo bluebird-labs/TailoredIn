@@ -17,7 +17,11 @@ export class TypstFileGenerator {
     await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
 
     await Promise.all([
-      FS.writeFile(Path.join(workDir, 'metadata.toml'), TypstFileGenerator.buildMetadataToml(content, template), 'utf8'),
+      FS.writeFile(
+        Path.join(workDir, 'metadata.toml'),
+        TypstFileGenerator.buildMetadataToml(content, template),
+        'utf8'
+      ),
       FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(template), 'utf8'),
       FS.writeFile(Path.join(workDir, 'helpers.typ'), TypstFileGenerator.buildHelpersTyp(template), 'utf8'),
       FS.writeFile(
@@ -30,7 +34,7 @@ export class TypstFileGenerator {
         Path.join(workDir, 'modules_en', 'education.typ'),
         TypstFileGenerator.buildEducationTyp(content),
         'utf8'
-      ),
+      )
     ]);
   }
 

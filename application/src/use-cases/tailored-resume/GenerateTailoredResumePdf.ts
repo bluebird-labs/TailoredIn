@@ -1,4 +1,4 @@
-import { TailoredResumeId, type ResumeTemplate } from '@tailoredin/domain';
+import { type ResumeTemplate, TailoredResumeId } from '@tailoredin/domain';
 import type { ResumeContentFactory } from '../../ports/ResumeContentFactory.js';
 import type { ResumeRenderer } from '../../ports/ResumeRenderer.js';
 import type { TailoredResumeRepository } from '../../ports/TailoredResumeRepository.js';
