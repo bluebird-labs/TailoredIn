@@ -4,6 +4,7 @@ import OS from 'node:os';
 import Path from 'node:path';
 import type { BrilliantCVContent } from '../../src/brilliant-cv/types.js';
 import { TypstFileGenerator } from '../../src/resume/TypstFileGenerator.js';
+import { BrilliantCvTemplate } from '../../src/templates/BrilliantCvTemplate.js';
 
 const MINIMAL_CONTENT: BrilliantCVContent = {
   personal: {
@@ -40,7 +41,7 @@ const MINIMAL_CONTENT: BrilliantCVContent = {
 
 async function generateInTmpDir(content: BrilliantCVContent) {
   const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
-  await TypstFileGenerator.generate(content, tmpDir);
+  await TypstFileGenerator.generate(content, tmpDir, BrilliantCvTemplate);
   return {
     metadata: await FS.readFile(Path.join(tmpDir, 'metadata.toml'), 'utf8'),
     cv: await FS.readFile(Path.join(tmpDir, 'cv.typ'), 'utf8'),

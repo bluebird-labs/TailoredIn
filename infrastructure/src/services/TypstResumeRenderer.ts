@@ -5,6 +5,7 @@ import { injectable } from '@needle-di/core';
 import type { RenderResumeInput, ResumeRenderer } from '@tailoredin/application';
 import { format } from 'date-fns';
 import { snakeCase } from 'lodash';
+import { BrilliantCvTemplate } from '../templates/BrilliantCvTemplate.js';
 import { TYPST_DIR } from '../resume/TYPST_DIR.js';
 import { TypstFileGenerator } from '../resume/TypstFileGenerator.js';
 
@@ -38,7 +39,7 @@ export class TypstResumeRenderer implements ResumeRenderer {
     const pdfPath = Path.resolve(outputDir, `Sylvain_Estevez_${date}.pdf`);
 
     await FS.mkdir(outputDir, { recursive: true });
-    await TypstFileGenerator.generate(content, TYPST_DIR);
+    await TypstFileGenerator.generate(content, TYPST_DIR, BrilliantCvTemplate);
     await typstCompile(TYPST_DIR, pdfPath);
 
     return pdfPath;
