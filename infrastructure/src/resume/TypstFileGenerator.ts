@@ -57,8 +57,8 @@ export class TypstFileGenerator {
   before_entry_description_skip = "${RESUME_LAYOUT.beforeEntryDescriptionSkip}"
   paper_size = "us-letter"
   [layout.fonts]
-    regular_fonts = ["Source Sans 3"]
-    header_font = "Raleway"
+    regular_fonts = ["IBM Plex Sans"]
+    header_font = "IBM Plex Sans"
   [layout.header]
     header_align = "left"
     display_profile_photo = false

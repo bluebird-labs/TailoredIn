@@ -12,7 +12,10 @@ const RESUMES_DIR = Path.resolve(import.meta.dirname, '..', '..', 'resumes');
 
 function typstCompile(cwd: string, pdfPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const proc = spawn('typst', ['compile', 'cv.typ', pdfPath], { cwd, stdio: ['pipe', 'pipe', 'pipe'] });
+    const proc = spawn('typst', ['compile', '--font-path', './fonts', 'cv.typ', pdfPath], {
+      cwd,
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
     const chunks: Buffer[] = [];
     proc.stderr.on('data', (chunk: Buffer) => chunks.push(chunk));
     proc.on('close', code => {
