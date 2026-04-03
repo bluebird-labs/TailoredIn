@@ -2,6 +2,8 @@ import FS from 'node:fs/promises';
 import Path from 'node:path';
 import type { BrilliantCVContent } from '../brilliant-cv/types.js';
 
+const RESUME_ACCENT_COLOR = '#3E6B8A';
+
 const RESUME_LAYOUT = {
   beforeSectionSkip: '4pt',
   beforeEntrySkip: '3pt',
@@ -48,7 +50,7 @@ export class TypstFileGenerator {
     return `language = "en"
 
 [layout]
-  awesome_color = "#3E6B8A"
+  awesome_color = "${RESUME_ACCENT_COLOR}"
   before_section_skip = "${RESUME_LAYOUT.beforeSectionSkip}"
   before_entry_skip = "${RESUME_LAYOUT.beforeEntrySkip}"
   before_entry_description_skip = "${RESUME_LAYOUT.beforeEntryDescriptionSkip}"
