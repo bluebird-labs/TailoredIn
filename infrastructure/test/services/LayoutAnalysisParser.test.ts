@@ -103,4 +103,26 @@ describe('parseLayoutAnalysis', () => {
     const result = parseLayoutAnalysis(multiPage, SIMPLE_CONTENT, BrilliantCvTemplate);
     expect(result.totalPages).toBe(2);
   });
+
+  it('computes lineCount correctly for a block that spans two pages', () => {
+    // US Letter height = 792pt, lineHeight = 10.5 * 0.75 = 7.875pt
+    // block: page 1, y=700 → page 2, y=50
+    // height = (2-1)*792 + (50-700) = 792 - 650 = 142pt
+    // lineCount = ceil(142 / 7.875) = 19
+    const fixture = JSON.stringify([
+      {
+        'exp-0-company-start': { page: 1, y: 700.0 },
+        'exp-0-company-end': { page: 2, y: 50.0 },
+        'exp-0-role-0-title-start': { page: 1, y: 700.0 },
+        'exp-0-role-0-title-end': { page: 1, y: 715.0 },
+        'exp-0-role-0-bullet-0-start': { page: 2, y: 10.0 },
+        'exp-0-role-0-bullet-0-end': { page: 2, y: 18.0 },
+        'exp-0-role-0-bullet-1-start': { page: 2, y: 20.0 },
+        'exp-0-role-0-bullet-1-end': { page: 2, y: 28.0 },
+      },
+    ]);
+    const result = parseLayoutAnalysis(fixture, SIMPLE_CONTENT, BrilliantCvTemplate);
+    expect(result.experiences[0].company.lineCount).toBe(19);
+    expect(result.experiences[0].company.pageNumbers).toEqual([1, 2]);
+  });
 });

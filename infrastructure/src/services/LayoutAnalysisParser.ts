@@ -23,6 +23,9 @@ export function parseLayoutAnalysis(
 
   const lineHeightPt = template.bodyFontSizePt * template.lineHeightEm;
 
+  // Compute page height in points based on template page size
+  const pageHeightPt = template.pageSize === 'us-letter' ? 792 : 842; // us-letter = 11" * 72, a4 = 297mm / 25.4 * 72
+
   function blockLayout(startKey: string, endKey: string): BlockLayout {
     const start = positions[startKey];
     const end = positions[endKey];
@@ -32,13 +35,14 @@ export function parseLayoutAnalysis(
     }
 
     const pageNumbers = Array.from(
-      new Set(Array.from({ length: end.page - start.page + 1 }, (_, i) => start.page + i)),
-    ).sort((a, b) => a - b);
+      { length: end.page - start.page + 1 },
+      (_, i) => start.page + i,
+    );
 
     const heightPt =
       end.page === start.page
         ? end.y - start.y
-        : end.y + (end.page - start.page) * 792; // approx for multi-page blocks
+        : (end.page - start.page) * pageHeightPt + (end.y - start.y);
     const lineCount = Math.max(1, Math.ceil(heightPt / lineHeightPt));
 
     return { lineCount, pageNumbers };
