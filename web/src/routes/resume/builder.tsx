@@ -174,9 +174,17 @@ function BuilderPage() {
     (expId: string, bulletIds: Set<string>) => {
       if (!activeArchetype) return;
       const cs = activeArchetype.contentSelection;
-      const updated = cs.experienceSelections.filter(es => es.experienceId !== expId);
+      const existingIndex = cs.experienceSelections.findIndex(es => es.experienceId === expId);
+      let updated: typeof cs.experienceSelections;
       if (bulletIds.size > 0) {
-        updated.push({ experienceId: expId, bulletIds: [...bulletIds] });
+        const entry = { experienceId: expId, bulletIds: [...bulletIds] };
+        if (existingIndex >= 0) {
+          updated = cs.experienceSelections.map((es, i) => (i === existingIndex ? entry : es));
+        } else {
+          updated = [...cs.experienceSelections, entry];
+        }
+      } else {
+        updated = cs.experienceSelections.filter(es => es.experienceId !== expId);
       }
       saveContent({ experienceSelections: updated });
     },
