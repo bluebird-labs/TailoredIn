@@ -3,6 +3,8 @@ import { inject, injectable } from '@needle-di/core';
 import type { TailoredResumeRepository } from '@tailoredin/application';
 import {
   ContentSelection,
+  GeneratedContent,
+  type GeneratedExperience,
   LlmProposal,
   TailoredResume,
   TailoredResumeId,
@@ -29,11 +31,15 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
     const existing = await this.orm.em.findOne(TailoredResumeOrm, { id: resume.id.value });
     const llmProposalsJson = this.serializeLlmProposal(resume.llmProposals);
     const contentSelectionJson = this.serializeContentSelection(resume.contentSelection);
+    const generatedContentJson = resume.generatedContent.isEmpty()
+      ? null
+      : { experiences: resume.generatedContent.experiences };
 
     if (existing) {
       existing.jdContent = resume.jdContent;
       existing.llmProposals = llmProposalsJson;
       existing.contentSelection = contentSelectionJson;
+      existing.generatedContent = generatedContentJson;
       existing.headlineText = resume.headlineText;
       existing.status = resume.status;
       existing.pdfPath = resume.pdfPath;
@@ -45,6 +51,7 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
         jdContent: resume.jdContent,
         llmProposals: llmProposalsJson,
         contentSelection: contentSelectionJson,
+        generatedContent: generatedContentJson,
         headlineText: resume.headlineText,
         status: resume.status,
         pdfPath: resume.pdfPath,
@@ -63,6 +70,7 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
       headlineOptions: (proposals.headlineOptions as string[]) ?? [],
       rankedExperiences:
         (proposals.rankedExperiences as Array<{ experienceId: string; rankedBulletIds: string[] }>) ?? [],
+      generatedExperiences: (proposals.generatedExperiences as GeneratedExperience[]) ?? [],
       rankedSkillIds: (proposals.rankedSkillIds as string[]) ?? [],
       assessment: (proposals.assessment as string) ?? ''
     });
@@ -76,12 +84,18 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
       skillItemIds: (cs.skillItemIds as string[]) ?? []
     });
 
+    const gc = orm.generatedContent as Record<string, unknown> | null;
+    const generatedContent = gc
+      ? new GeneratedContent((gc.experiences as GeneratedExperience[]) ?? [])
+      : GeneratedContent.empty();
+
     return new TailoredResume({
       id: new TailoredResumeId(orm.id),
       profileId: orm.profileId,
       jdContent: orm.jdContent,
       llmProposals,
       contentSelection,
+      generatedContent,
       headlineText: orm.headlineText,
       status: orm.status as TailoredResumeStatus,
       pdfPath: orm.pdfPath,
@@ -94,6 +108,7 @@ export class PostgresTailoredResumeRepository implements TailoredResumeRepositor
     return {
       headlineOptions: proposal.headlineOptions,
       rankedExperiences: proposal.rankedExperiences,
+      generatedExperiences: proposal.generatedExperiences,
       rankedSkillIds: proposal.rankedSkillIds,
       assessment: proposal.assessment
     };

@@ -18,6 +18,9 @@ export class Headline extends BaseEntity {
   @Property({ name: 'summary_text', type: 'text' })
   public summaryText: string;
 
+  @Property({ name: 'status', type: 'text', default: 'active' })
+  public status: string;
+
   @ManyToMany(() => Tag, undefined, {
     pivotTable: 'headline_tags',
     joinColumn: 'headline_id',
@@ -30,6 +33,7 @@ export class Headline extends BaseEntity {
     profileId: string;
     label: string;
     summaryText: string;
+    status: string;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -38,5 +42,6 @@ export class Headline extends BaseEntity {
     this.profileId = props.profileId;
     this.label = props.label;
     this.summaryText = props.summaryText;
+    this.status = props.status;
   }
 }

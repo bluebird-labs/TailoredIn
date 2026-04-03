@@ -25,15 +25,26 @@ export class GenerateTailoredResumePdf {
       throw new Error(`TailoredResume not found: ${input.resumeId}`);
     }
 
-    const content = await this.resumeContentFactory.makeFromSelection({
-      profileId: resume.profileId,
-      headlineText: resume.headlineText,
-      experienceSelections: resume.contentSelection.experienceSelections,
-      educationIds: resume.contentSelection.educationIds,
-      skillCategoryIds: resume.contentSelection.skillCategoryIds,
-      skillItemIds: resume.contentSelection.skillItemIds,
-      keywords: []
-    });
+    // Prefer LLM-generated bullet texts from chest when available
+    const content = resume.generatedContent.isEmpty()
+      ? await this.resumeContentFactory.makeFromSelection({
+          profileId: resume.profileId,
+          headlineText: resume.headlineText,
+          experienceSelections: resume.contentSelection.experienceSelections,
+          educationIds: resume.contentSelection.educationIds,
+          skillCategoryIds: resume.contentSelection.skillCategoryIds,
+          skillItemIds: resume.contentSelection.skillItemIds,
+          keywords: []
+        })
+      : await this.resumeContentFactory.makeFromGeneratedContent({
+          profileId: resume.profileId,
+          headlineText: resume.headlineText,
+          generatedContent: resume.generatedContent,
+          educationIds: resume.contentSelection.educationIds,
+          skillCategoryIds: resume.contentSelection.skillCategoryIds,
+          skillItemIds: resume.contentSelection.skillItemIds,
+          keywords: []
+        });
 
     const pdfPath = await this.resumeRenderer.render({
       content,

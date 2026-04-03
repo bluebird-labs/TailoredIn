@@ -1,5 +1,6 @@
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ContentSelection } from '../value-objects/ContentSelection.js';
+import { GeneratedContent } from '../value-objects/GeneratedContent.js';
 import { LlmProposal } from '../value-objects/LlmProposal.js';
 import { TailoredResumeId } from '../value-objects/TailoredResumeId.js';
 
@@ -10,6 +11,7 @@ export class TailoredResume extends AggregateRoot<TailoredResumeId> {
   public jdContent: string;
   public llmProposals: LlmProposal;
   public contentSelection: ContentSelection;
+  public generatedContent: GeneratedContent;
   public headlineText: string;
   public status: TailoredResumeStatus;
   public pdfPath: string | null;
@@ -22,6 +24,7 @@ export class TailoredResume extends AggregateRoot<TailoredResumeId> {
     jdContent: string;
     llmProposals: LlmProposal;
     contentSelection: ContentSelection;
+    generatedContent: GeneratedContent;
     headlineText: string;
     status: TailoredResumeStatus;
     pdfPath: string | null;
@@ -33,6 +36,7 @@ export class TailoredResume extends AggregateRoot<TailoredResumeId> {
     this.jdContent = props.jdContent;
     this.llmProposals = props.llmProposals;
     this.contentSelection = props.contentSelection;
+    this.generatedContent = props.generatedContent;
     this.headlineText = props.headlineText;
     this.status = props.status;
     this.pdfPath = props.pdfPath;
@@ -47,6 +51,11 @@ export class TailoredResume extends AggregateRoot<TailoredResumeId> {
 
   public replaceContentSelection(contentSelection: ContentSelection): void {
     this.contentSelection = contentSelection;
+    this.updatedAt = new Date();
+  }
+
+  public updateGeneratedContent(generatedContent: GeneratedContent): void {
+    this.generatedContent = generatedContent;
     this.updatedAt = new Date();
   }
 
@@ -69,6 +78,7 @@ export class TailoredResume extends AggregateRoot<TailoredResumeId> {
       jdContent: props.jdContent,
       llmProposals: LlmProposal.empty(),
       contentSelection: ContentSelection.empty(),
+      generatedContent: GeneratedContent.empty(),
       headlineText: '',
       status: 'draft',
       pdfPath: null,

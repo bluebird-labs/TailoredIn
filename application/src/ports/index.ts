@@ -8,7 +8,9 @@ export type {
   JobPostingInsightsDto,
   LlmService
 } from './LlmService.js';
+export type { ResumeChestQuery } from './ResumeChestQuery.js';
 export type {
+  MakeResumeContentFromGeneratedInput,
   MakeResumeContentFromSelectionInput,
   ResumeContentFactory
 } from './ResumeContentFactory.js';

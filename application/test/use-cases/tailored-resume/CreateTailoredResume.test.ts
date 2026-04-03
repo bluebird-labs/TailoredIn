@@ -1,30 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { ContentSelection, LlmProposal, ResumeProfile, type TailoredResume } from '@tailoredin/domain';
-import type { ResumeContentDto } from '../../../src/dtos/ResumeContentDto.js';
-import type { ResumeContentFactory } from '../../../src/ports/ResumeContentFactory.js';
+import type { ResumeChestQuery } from '../../../src/ports/ResumeChestQuery.js';
 import type { ResumeProfileRepository } from '../../../src/ports/ResumeProfileRepository.js';
 import type { ResumeTailoringService } from '../../../src/ports/ResumeTailoringService.js';
 import type { TailoredResumeRepository } from '../../../src/ports/TailoredResumeRepository.js';
 import { CreateTailoredResume } from '../../../src/use-cases/tailored-resume/CreateTailoredResume.js';
 
 const NOW = new Date('2025-01-01');
-
-const EMPTY_CONTENT: ResumeContentDto = {
-  personal: {
-    first_name: 'Test',
-    last_name: 'User',
-    email: 'test@example.com',
-    phone: '',
-    location: '',
-    github: '',
-    linkedin: '',
-    header_quote: ''
-  },
-  keywords: [],
-  experience: [],
-  education: [],
-  skills: []
-};
 
 function makeProfile(
   overrides: Partial<{ headlineText: string; contentSelection: ContentSelection }> = {}
@@ -54,9 +36,9 @@ function mockTailoredResumeRepo(onSave?: (r: TailoredResume) => void): TailoredR
   };
 }
 
-function mockContentFactory(): ResumeContentFactory {
+function mockChestQuery(): ResumeChestQuery {
   return {
-    makeFromSelection: async () => EMPTY_CONTENT
+    makeChestMarkdown: async () => '## Experience chest markdown'
   };
 }
 
@@ -74,6 +56,7 @@ describe('CreateTailoredResume', () => {
         { experienceId: 'exp-1', rankedBulletIds: ['b-3', 'b-1', 'b-2'] },
         { experienceId: 'exp-2', rankedBulletIds: ['b-5', 'b-4'] }
       ],
+      generatedExperiences: [],
       rankedSkillIds: ['skill-z', 'skill-a'],
       assessment: 'Good fit'
     });
@@ -85,7 +68,7 @@ describe('CreateTailoredResume', () => {
         saved = r;
       }),
       mockTailoringService(proposal),
-      mockContentFactory()
+      mockChestQuery()
     );
 
     await useCase.execute({ profileId: 'profile-1', jdContent: 'Looking for an engineer' });
@@ -105,6 +88,7 @@ describe('CreateTailoredResume', () => {
     const proposal = new LlmProposal({
       headlineOptions: ['Senior TypeScript Engineer', 'Lead Developer'],
       rankedExperiences: [],
+      generatedExperiences: [],
       rankedSkillIds: [],
       assessment: ''
     });
@@ -116,7 +100,7 @@ describe('CreateTailoredResume', () => {
         saved = r;
       }),
       mockTailoringService(proposal),
-      mockContentFactory()
+      mockChestQuery()
     );
 
     await useCase.execute({ profileId: 'profile-1', jdContent: 'JD text' });
@@ -128,6 +112,7 @@ describe('CreateTailoredResume', () => {
     const proposal = new LlmProposal({
       headlineOptions: [],
       rankedExperiences: [],
+      generatedExperiences: [],
       rankedSkillIds: [],
       assessment: ''
     });
@@ -139,7 +124,7 @@ describe('CreateTailoredResume', () => {
         saved = r;
       }),
       mockTailoringService(proposal),
-      mockContentFactory()
+      mockChestQuery()
     );
 
     await useCase.execute({ profileId: 'profile-1', jdContent: 'JD text' });
@@ -152,7 +137,7 @@ describe('CreateTailoredResume', () => {
       mockProfileRepo(null),
       mockTailoredResumeRepo(),
       mockTailoringService(LlmProposal.empty()),
-      mockContentFactory()
+      mockChestQuery()
     );
 
     expect(useCase.execute({ profileId: 'missing', jdContent: 'JD' })).rejects.toThrow(

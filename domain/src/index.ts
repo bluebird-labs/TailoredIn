@@ -68,6 +68,7 @@ export { ApprovalStatus } from './value-objects/ApprovalStatus.js';
 export { ArchetypeKey, JobTitle } from './value-objects/Archetype.js';
 // Value objects — IDs
 export { BulletId } from './value-objects/BulletId.js';
+export type { BulletStatus } from './value-objects/BulletStatus.js';
 export { BusinessType } from './value-objects/BusinessType.js';
 export { CompanyBriefId } from './value-objects/CompanyBriefId.js';
 export { CompanyId } from './value-objects/CompanyId.js';
@@ -76,7 +77,10 @@ export type { ExperienceSelection } from './value-objects/ContentSelection.js';
 export { ContentSelection } from './value-objects/ContentSelection.js';
 export { EducationId } from './value-objects/EducationId.js';
 export { ExperienceId } from './value-objects/ExperienceId.js';
+export type { GeneratedExperience } from './value-objects/GeneratedContent.js';
+export { GeneratedContent } from './value-objects/GeneratedContent.js';
 export { HeadlineId } from './value-objects/HeadlineId.js';
+export type { HeadlineStatus } from './value-objects/HeadlineStatus.js';
 export { Industry } from './value-objects/Industry.js';
 export { JobId } from './value-objects/JobId.js';
 export { JobPostingId } from './value-objects/JobPostingId.js';
