@@ -1,4 +1,4 @@
-import { TailoredResumeId, type TailoredResume } from '@tailoredin/domain';
+import { type TailoredResume, TailoredResumeId } from '@tailoredin/domain';
 import type { TailoredResumeRepository } from '../../ports/TailoredResumeRepository.js';
 
 export type GetTailoredResumeInput = {

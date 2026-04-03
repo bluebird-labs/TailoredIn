@@ -1,5 +1,5 @@
-import type { ResumeProfileRepository } from '../../ports/ResumeProfileRepository.js';
 import type { ResumeContentFactory } from '../../ports/ResumeContentFactory.js';
+import type { ResumeProfileRepository } from '../../ports/ResumeProfileRepository.js';
 import type { ResumeRenderer } from '../../ports/ResumeRenderer.js';
 
 export type GenerateResumeProfilePdfInput = {
