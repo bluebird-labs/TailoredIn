@@ -4,6 +4,7 @@ import FS from 'node:fs/promises';
 import OS from 'node:os';
 import Path from 'node:path';
 import type { BrilliantCVContent, BrilliantCVExperience } from '../../src/brilliant-cv/types.js';
+import { BrilliantCvTemplate } from '../../src/templates/BrilliantCvTemplate.js';
 import { TypstFileGenerator } from '../../src/resume/TypstFileGenerator.js';
 
 // --- Shared personal block ---
@@ -100,7 +101,7 @@ beforeAll(() => {
 async function compileAndCountPages(content: BrilliantCVContent): Promise<{ pageCount: number; tmpDir: string }> {
   const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'visual-polish-'));
 
-  await TypstFileGenerator.generate(content, tmpDir);
+  await TypstFileGenerator.generate(content, tmpDir, BrilliantCvTemplate);
 
   // Compile to PDF
   execSync('typst compile cv.typ output.pdf', { cwd: tmpDir, stdio: 'pipe' });
