@@ -38,8 +38,8 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
       END $$;
     `);
 
-    this.addSql('DROP TABLE IF EXISTS archetype_tag_weights;');
-    this.addSql('DROP TABLE IF EXISTS archetypes;');
+    this.addSql('DROP TABLE IF EXISTS archetype_tag_weights CASCADE;');
+    this.addSql('DROP TABLE IF EXISTS archetypes CASCADE;');
   }
 
   override async down(): Promise<void> {
