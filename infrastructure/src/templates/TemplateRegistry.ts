@@ -11,5 +11,5 @@ export const TemplateRegistry = {
   },
   getAll(): ResumeTemplate[] {
     return [...registry.values()];
-  },
+  }
 };

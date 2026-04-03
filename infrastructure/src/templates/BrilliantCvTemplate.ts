@@ -13,5 +13,5 @@ export const BrilliantCvTemplate: ResumeTemplate = {
   lineHeightEm: 0.75,
   headerFontSizePt: 30,
   sectionSpacingPt: 4,
-  entrySpacingPt: 3,
+  entrySpacingPt: 3
 };
