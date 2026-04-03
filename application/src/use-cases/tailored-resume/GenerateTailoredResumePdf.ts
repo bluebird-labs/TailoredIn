@@ -5,7 +5,6 @@ import type { TailoredResumeRepository } from '../../ports/TailoredResumeReposit
 
 export type GenerateTailoredResumePdfInput = {
   resumeId: string;
-  outputPath: string;
 };
 
 export type GenerateTailoredResumePdfOutput = {
@@ -41,7 +40,7 @@ export class GenerateTailoredResumePdf {
       companyName: 'Generic'
     });
 
-    resume.finalize(input.outputPath);
+    resume.finalize(pdfPath);
     await this.tailoredResumeRepository.save(resume);
 
     return { pdfPath };

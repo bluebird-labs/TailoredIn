@@ -1,8 +1,9 @@
 import { ContentSelection, TailoredResume } from '@tailoredin/domain';
+import type { ResumeContentFactory } from '../../ports/ResumeContentFactory.js';
 import type { ResumeProfileRepository } from '../../ports/ResumeProfileRepository.js';
 import type { ResumeTailoringService } from '../../ports/ResumeTailoringService.js';
 import type { TailoredResumeRepository } from '../../ports/TailoredResumeRepository.js';
-import type { GenerateResumeMarkdown } from '../GenerateResumeMarkdown.js';
+import { formatResumeAsMarkdown } from '../../services/formatResumeAsMarkdown.js';
 
 export type CreateTailoredResumeInput = {
   profileId: string;
@@ -14,7 +15,7 @@ export class CreateTailoredResume {
     private readonly resumeProfileRepository: ResumeProfileRepository,
     private readonly tailoredResumeRepository: TailoredResumeRepository,
     private readonly resumeTailoringService: ResumeTailoringService,
-    private readonly generateResumeMarkdown: GenerateResumeMarkdown
+    private readonly resumeContentFactory: ResumeContentFactory
   ) {}
 
   public async execute(input: CreateTailoredResumeInput): Promise<TailoredResume> {
@@ -24,8 +25,9 @@ export class CreateTailoredResume {
       throw new Error(`ResumeProfile not found: ${input.profileId}`);
     }
 
-    // Generate raw markdown from the profile's current content selection
-    const markdownResult = await this.generateResumeMarkdown.execute({
+    // Build markdown from profile's current content selection directly, without a redundant profile fetch
+    const content = await this.resumeContentFactory.makeFromSelection({
+      profileId: profile.profileId,
       headlineText: profile.headlineText,
       experienceSelections: profile.contentSelection.experienceSelections,
       educationIds: profile.contentSelection.educationIds,
@@ -34,14 +36,9 @@ export class CreateTailoredResume {
       keywords: []
     });
 
-    if (!markdownResult.isOk) {
-      throw new Error(`Failed to generate resume markdown: ${markdownResult.error.message}`);
-    }
+    const markdown = formatResumeAsMarkdown(content);
 
-    const llmProposal = await this.resumeTailoringService.tailorFromJd(
-      input.jdContent,
-      markdownResult.value.markdown
-    );
+    const llmProposal = await this.resumeTailoringService.tailorFromJd(input.jdContent, markdown);
 
     // Build initial content selection from LLM proposals: all ranked bullets selected by default
     const contentSelection = new ContentSelection({
