@@ -49,5 +49,13 @@ export const queryKeys = {
     all: ['tailoredResumes'] as const,
     list: () => [...queryKeys.tailoredResumes.all, 'list'] as const,
     detail: (id: string) => [...queryKeys.tailoredResumes.all, 'detail', id] as const
+  },
+  accomplishments: {
+    all: ['accomplishments'] as const,
+    byExperience: (experienceId: string) => ['accomplishments', 'experience', experienceId] as const
+  },
+  factory: {
+    all: ['factory'] as const,
+    tailoredResumes: () => [...queryKeys.factory.all, 'tailored-resumes'] as const
   }
 };

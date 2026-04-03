@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Archive, Briefcase, FileText, GitBranch, Inbox, type LucideIcon, Sparkles, Wrench } from 'lucide-react';
+import { BookOpen, type LucideIcon, Sparkles, Wand2, Wrench } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -19,15 +19,9 @@ interface NavItem {
   icon: LucideIcon;
 }
 
-const jobsNav: NavItem[] = [
-  { label: 'Triage', to: '/jobs', search: { view: 'triage' }, icon: Inbox },
-  { label: 'Pipeline', to: '/jobs', search: { view: 'pipeline' }, icon: GitBranch },
-  { label: 'Archive', to: '/jobs', search: { view: 'archive' }, icon: Archive },
-  { label: 'All Jobs', to: '/jobs', search: { view: 'all' }, icon: Briefcase }
-];
-
 const resumeNav: NavItem[] = [
-  { label: 'Builder', to: '/resume/builder', icon: FileText },
+  { label: 'Wardrobe', to: '/resume', search: { tab: 'wardrobe' }, icon: BookOpen },
+  { label: 'Factory', to: '/resume', search: { tab: 'factory' }, icon: Wand2 },
   { label: 'Skills', to: '/resume/skills', icon: Wrench }
 ];
 
@@ -69,7 +63,6 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <NavGroup label="Resume" items={resumeNav} />
-        <NavGroup label="Discovery" items={jobsNav} />
       </SidebarContent>
     </Sidebar>
   );
