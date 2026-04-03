@@ -51,6 +51,7 @@ import {
 import { env, envBool, envInt, envOptional } from '@tailoredin/core';
 import { JobElectionService } from '@tailoredin/domain';
 import {
+  BrilliantCvTemplate,
   createOrmConfig,
   DatabaseResumeChestQuery,
   DatabaseResumeContentFactory,
@@ -197,7 +198,8 @@ container.bind({
     new GenerateResume(
       container.get(DI.Profile.Repository),
       container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.Renderer),
+      BrilliantCvTemplate
     )
 });
 container.bind({
@@ -249,7 +251,8 @@ container.bind({
     new GenerateResumeProfilePdf(
       container.get(DI.ResumeProfile.Repository),
       container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.Renderer),
+      BrilliantCvTemplate
     )
 });
 
@@ -283,7 +286,8 @@ container.bind({
     new GenerateTailoredResumePdf(
       container.get(DI.TailoredResume.Repository),
       container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.Renderer),
+      BrilliantCvTemplate
     )
 });
 

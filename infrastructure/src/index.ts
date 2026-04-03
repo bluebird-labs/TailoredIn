@@ -25,4 +25,5 @@ export { OpenAiResumeTailoringService } from './services/OpenAiResumeTailoringSe
 export type { PlaywrightJobScraperConfig } from './services/PlaywrightJobScraper.js';
 export { PLAYWRIGHT_JOB_SCRAPER_CONFIG, PlaywrightJobScraper } from './services/PlaywrightJobScraper.js';
 export { StructuredLlmRouter } from './services/structured-llm/index.js';
+export { BrilliantCvTemplate } from './templates/BrilliantCvTemplate.js';
 export { TypstResumeRenderer } from './services/TypstResumeRenderer.js';
