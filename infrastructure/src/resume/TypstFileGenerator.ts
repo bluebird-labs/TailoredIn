@@ -49,12 +49,16 @@ export class TypstFileGenerator {
   public static async generateForAnalysis(
     content: BrilliantCVContent,
     workDir: string,
-    template: ResumeTemplate,
+    template: ResumeTemplate
   ): Promise<void> {
     await FS.mkdir(Path.join(workDir, 'modules_en'), { recursive: true });
 
     await Promise.all([
-      FS.writeFile(Path.join(workDir, 'metadata.toml'), TypstFileGenerator.buildMetadataToml(content, template), 'utf8'),
+      FS.writeFile(
+        Path.join(workDir, 'metadata.toml'),
+        TypstFileGenerator.buildMetadataToml(content, template),
+        'utf8'
+      ),
       FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildAnalysisCvTyp(template), 'utf8'),
       FS.writeFile(Path.join(workDir, 'helpers.typ'), TypstFileGenerator.buildAnalysisHelpersTyp(template), 'utf8'),
       FS.writeFile(
@@ -71,7 +75,7 @@ export class TypstFileGenerator {
         Path.join(workDir, 'modules_en', 'education.typ'),
         TypstFileGenerator.buildAnalysisEducationTyp(content),
         'utf8'
-      ),
+      )
     ]);
   }
 
@@ -337,7 +341,7 @@ ${includes}
       `#import "../helpers.typ": cv-section, cv-entry, mark`,
       ``,
       `#cv-section("Experience")`,
-      ``,
+      ``
     ];
 
     const groups: { society: string; positions: typeof content.experience }[] = [];
@@ -430,7 +434,7 @@ ${includes}
       `#import "../helpers.typ": cv-section, h-bar, mark`,
       ``,
       `#cv-section("Areas of Expertise")`,
-      ``,
+      ``
     ];
 
     for (let si = 0; si < relevant.length; si++) {
@@ -445,12 +449,7 @@ ${includes}
   private static buildAnalysisEducationTyp(content: BrilliantCVContent): string {
     if (content.education.length === 0) return '';
 
-    const lines: string[] = [
-      `#import "../helpers.typ": cv-section, mark`,
-      ``,
-      `#cv-section("Education")`,
-      ``,
-    ];
+    const lines: string[] = [`#import "../helpers.typ": cv-section, mark`, ``, `#cv-section("Education")`, ``];
 
     for (let ei = 0; ei < content.education.length; ei++) {
       const edu = content.education[ei];
