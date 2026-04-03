@@ -12,7 +12,7 @@
       }
     ]
   },
-  "permissions": {
+"permissions": {
     "defaultMode": "plan",
     "additionalDirectories": [
       "~/Documents"

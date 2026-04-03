@@ -276,6 +276,119 @@ export type ArchetypeDef = {
   positions: ArchetypePositionDef[];
 };
 
+/**
+ * All positions with all bullets enabled — shared across all archetypes.
+ * The seeder creates experiences from the first archetype's positions (Lead IC),
+ * and only uses companyKey + positionIndex from other archetypes to build content_selection.
+ */
+const allPositions: ArchetypePositionDef[] = [
+  {
+    companyKey: 'resortpass',
+    positionIndex: 0,
+    jobTitle: 'Head of Platform',
+    displayCompanyName: 'ResortPass',
+    locationLabel: 'New York, NY',
+    startDate: '2025-03',
+    endDate: '2026-04',
+    roleSummary:
+      'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
+    bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+  },
+  {
+    companyKey: 'lantern',
+    positionIndex: 0,
+    jobTitle: 'Software Architect & Technical Advisor',
+    displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
+    locationLabel: 'New York, NY',
+    startDate: '2024-09',
+    endDate: '2024-11',
+    roleSummary:
+      'Consulted for an early-stage B2B SaaS startup preparing for growth, addressed stability/performance issues and built a scalable foundation',
+    bulletIndices: [0, 1, 2, 3]
+  },
+  {
+    companyKey: 'brightflow',
+    positionIndex: 0,
+    jobTitle: 'Senior Engineering Manager',
+    displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
+    locationLabel: 'New York, NY',
+    startDate: '2023-09',
+    endDate: '2024-06',
+    roleSummary:
+      'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
+    bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+  },
+  {
+    companyKey: 'volvo',
+    positionIndex: 0,
+    jobTitle: 'Engineering Manager',
+    displayCompanyName: 'Volvo Cars',
+    locationLabel: 'New York, NY',
+    startDate: '2020-03',
+    endDate: '2023-04',
+    roleSummary:
+      'Led the Volvo Valet initiative as technical lead and manager, enabling dealerships to manage bookings, loaner vehicles, and premium services for Volvo owners. Oversaw both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
+    bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7]
+  },
+  {
+    companyKey: 'volvo',
+    positionIndex: 1,
+    jobTitle: 'Senior Software Engineer',
+    displayCompanyName: 'Volvo Cars',
+    locationLabel: 'Stockholm, Sweden',
+    startDate: '2018-01',
+    endDate: '2020-03',
+    roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
+    bulletIndices: [8, 9, 10]
+  },
+  {
+    companyKey: 'luxe',
+    positionIndex: 0,
+    jobTitle: 'Lead Software Engineer',
+    displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
+    locationLabel: 'San Francisco, CA',
+    startDate: '2016-06',
+    endDate: '2017-12',
+    roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
+    bulletIndices: [0, 1, 2]
+  },
+  {
+    companyKey: 'streamnation',
+    positionIndex: 0,
+    jobTitle: 'Software Engineer',
+    displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
+    locationLabel: 'San Francisco, CA',
+    startDate: '2015-12',
+    endDate: '2016-06',
+    roleSummary: 'Participated in both backend and frontend efforts for StreamNation\u2019s multimedia platform',
+    bulletIndices: [0, 1, 2]
+  },
+  {
+    companyKey: 'planorama',
+    positionIndex: 0,
+    jobTitle: 'Lead Software Engineer',
+    displayCompanyName: 'Planorama',
+    locationLabel: 'Paris, France',
+    startDate: '2014-04',
+    endDate: '2015-11',
+    roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
+    bulletIndices: [0, 1, 2, 3]
+  },
+  {
+    companyKey: 'luckycart',
+    positionIndex: 0,
+    jobTitle: 'Software Engineer',
+    displayCompanyName: 'LuckyCart',
+    locationLabel: 'Paris, France',
+    startDate: '2012-09',
+    endDate: '2014-04',
+    roleSummary: 'Full-time with Luckycart and executed small side projects',
+    bulletIndices: [0, 1, 2, 3]
+  }
+];
+
+const allEducationIndices = [0, 1, 2];
+
 export const archetypeDefs: ArchetypeDef[] = [
   {
     archetypeKey: 'leader_individual_contributor',
@@ -283,113 +396,9 @@ export const archetypeDefs: ArchetypeDef[] = [
     archetypeDescription:
       'Experienced engineer who demonstrates leadership and guides teams — for platform, infrastructure, and senior IC roles',
     socialNetworks: ['GitHub', 'LinkedIn'],
-    educationIndices: [0],
+    educationIndices: allEducationIndices,
     interestItemOverrides: null,
-    positions: [
-      {
-        companyKey: 'resortpass',
-        positionIndex: 0,
-        jobTitle: 'Head of Platform',
-        displayCompanyName: 'ResortPass',
-        locationLabel: 'New York, NY',
-        startDate: '2025-03',
-        endDate: '2026-04',
-        roleSummary:
-          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
-        bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-      },
-      {
-        companyKey: 'lantern',
-        positionIndex: 0,
-        jobTitle: 'Software Architect & Technical Advisor',
-        displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
-        locationLabel: 'New York, NY',
-        startDate: '2024-09',
-        endDate: '2024-11',
-        roleSummary:
-          'Consulted for an early-stage B2B SaaS startup preparing for growth, addressed stability/performance issues and built a scalable foundation',
-        bulletIndices: [0, 1, 2, 3]
-      },
-      {
-        companyKey: 'brightflow',
-        positionIndex: 0,
-        jobTitle: 'Senior Engineering Manager',
-        displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
-        locationLabel: 'New York, NY',
-        startDate: '2023-09',
-        endDate: '2024-06',
-        roleSummary:
-          'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 0,
-        jobTitle: 'Engineering Manager',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'New York, NY',
-        startDate: '2020-03',
-        endDate: '2023-04',
-        roleSummary:
-          'Led the Volvo Valet initiative as technical lead and manager, enabling dealerships to manage bookings, loaner vehicles, and premium services for Volvo owners. Oversaw both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 1,
-        jobTitle: 'Senior Software Engineer',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'Stockholm, Sweden',
-        startDate: '2018-01',
-        endDate: '2020-03',
-        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
-        bulletIndices: [8, 9, 10]
-      },
-      {
-        companyKey: 'luxe',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2016-06',
-        endDate: '2017-12',
-        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'streamnation',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2015-12',
-        endDate: '2016-06',
-        roleSummary: 'Participated in both backend and frontend efforts for StreamNation\u2019s multimedia platform',
-        bulletIndices: [0, 1, 2]
-      },
-      {
-        companyKey: 'planorama',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Planorama',
-        locationLabel: 'Paris, France',
-        startDate: '2014-04',
-        endDate: '2015-11',
-        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'luckycart',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'LuckyCart',
-        locationLabel: 'Paris, France',
-        startDate: '2012-09',
-        endDate: '2014-04',
-        roleSummary: 'Full-time with Luckycart and executed small side projects',
-        bulletIndices: [1, 2, 3]
-      }
-    ]
+    positions: allPositions
   },
   {
     archetypeKey: 'nerd',
@@ -397,113 +406,9 @@ export const archetypeDefs: ArchetypeDef[] = [
     archetypeDescription:
       'Highly technical engineer focused on deep, cutting-edge technical work or research — for deep-tech and specialist roles',
     socialNetworks: ['GitHub', 'LinkedIn'],
-    educationIndices: [0],
-    interestItemOverrides: ['Golang', 'Rust', 'C#'],
-    positions: [
-      {
-        companyKey: 'resortpass',
-        positionIndex: 0,
-        jobTitle: 'Head of Platform',
-        displayCompanyName: 'ResortPass',
-        locationLabel: 'New York, NY',
-        startDate: '2025-03',
-        endDate: '2026-04',
-        roleSummary:
-          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
-        bulletIndices: [5, 6, 7, 8, 9, 15, 16]
-      },
-      {
-        companyKey: 'lantern',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
-        locationLabel: 'New York, NY',
-        startDate: '2024-09',
-        endDate: '2024-11',
-        roleSummary:
-          'Consulted for an early-stage B2B SaaS startup scaling for growth, addressed stability/performance issues and built a scalable foundation',
-        bulletIndices: [0, 1, 2, 3]
-      },
-      {
-        companyKey: 'brightflow',
-        positionIndex: 0,
-        jobTitle: 'Senior Engineering Manager',
-        displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
-        locationLabel: 'New York, NY',
-        startDate: '2023-09',
-        endDate: '2024-06',
-        roleSummary:
-          'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 0,
-        jobTitle: 'Engineering Manager',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'New York, NY',
-        startDate: '2020-03',
-        endDate: '2023-04',
-        roleSummary:
-          'Led the Volvo Valet initiative as technical lead and manager, enabling dealerships to manage bookings, loaner vehicles, and premium services for Volvo owners. Oversaw both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 1,
-        jobTitle: 'Senior Software Engineer',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'Stockholm, Sweden',
-        startDate: '2018-01',
-        endDate: '2020-03',
-        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
-        bulletIndices: [8, 9, 10]
-      },
-      {
-        companyKey: 'luxe',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2016-06',
-        endDate: '2017-12',
-        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'streamnation',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2015-12',
-        endDate: '2016-06',
-        roleSummary: 'Participated in both backend and frontend efforts for StreamNation\u2019s multimedia platform',
-        bulletIndices: [0, 1, 2]
-      },
-      {
-        companyKey: 'planorama',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Planorama',
-        locationLabel: 'Paris, France',
-        startDate: '2014-04',
-        endDate: '2015-11',
-        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'luckycart',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'LuckyCart',
-        locationLabel: 'Paris, France',
-        startDate: '2012-09',
-        endDate: '2014-04',
-        roleSummary: 'Full-time with Luckycart and executed small side projects',
-        bulletIndices: [1, 2, 3]
-      }
-    ]
+    educationIndices: allEducationIndices,
+    interestItemOverrides: null,
+    positions: allPositions
   },
   {
     archetypeKey: 'individual_contributor',
@@ -511,101 +416,9 @@ export const archetypeDefs: ArchetypeDef[] = [
     archetypeDescription:
       'Pure individual contributor — for mid-to-senior engineer roles emphasizing hands-on coding and system design',
     socialNetworks: ['GitHub', 'LinkedIn'],
-    educationIndices: [0],
+    educationIndices: allEducationIndices,
     interestItemOverrides: null,
-    positions: [
-      {
-        companyKey: 'resortpass',
-        positionIndex: 0,
-        jobTitle: 'Head of Platform',
-        displayCompanyName: 'ResortPass',
-        locationLabel: 'New York, NY',
-        startDate: '2025-03',
-        endDate: '2026-04',
-        roleSummary:
-          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
-        bulletIndices: [5, 6, 7, 8, 9, 15, 16]
-      },
-      {
-        companyKey: 'lantern',
-        positionIndex: 0,
-        jobTitle: 'Software Architect & Technical Advisor',
-        displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
-        locationLabel: 'New York, NY',
-        startDate: '2024-09',
-        endDate: '2024-11',
-        roleSummary:
-          'Consulted for an early-stage B2B SaaS startup, addressed stability/performance issues and built a scalable foundation',
-        bulletIndices: [0, 1, 2, 3]
-      },
-      {
-        companyKey: 'brightflow',
-        positionIndex: 0,
-        jobTitle: 'Senior Engineering Manager',
-        displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
-        locationLabel: 'New York, NY',
-        startDate: '2023-09',
-        endDate: '2024-06',
-        roleSummary:
-          'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 1,
-        jobTitle: 'Senior Software Engineer',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'Stockholm, Sweden',
-        startDate: '2018-01',
-        endDate: '2020-03',
-        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
-        bulletIndices: [8, 9, 10]
-      },
-      {
-        companyKey: 'luxe',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2016-06',
-        endDate: '2017-12',
-        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'streamnation',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'StreamNation #smallcaps[(defunct)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2015-12',
-        endDate: '2016-06',
-        roleSummary: 'Participated in both backend and frontend efforts for StreamNation\u2019s multimedia platform',
-        bulletIndices: [0, 1, 2]
-      },
-      {
-        companyKey: 'planorama',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Planorama',
-        locationLabel: 'Paris, France',
-        startDate: '2014-04',
-        endDate: '2015-11',
-        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'luckycart',
-        positionIndex: 0,
-        jobTitle: 'Software Engineer',
-        displayCompanyName: 'LuckyCart',
-        locationLabel: 'Paris, France',
-        startDate: '2012-09',
-        endDate: '2014-04',
-        roleSummary: 'Full-time with Luckycart and executed small side projects',
-        bulletIndices: [1, 2, 3]
-      }
-    ]
+    positions: allPositions
   },
   {
     archetypeKey: 'hands_on_manager',
@@ -613,91 +426,9 @@ export const archetypeDefs: ArchetypeDef[] = [
     archetypeDescription:
       'Technical leader who codes and manages — for architect, staff+, and hands-on engineering manager roles',
     socialNetworks: ['GitHub', 'LinkedIn'],
-    educationIndices: [0],
+    educationIndices: allEducationIndices,
     interestItemOverrides: null,
-    positions: [
-      {
-        companyKey: 'resortpass',
-        positionIndex: 0,
-        jobTitle: 'Head of Platform',
-        displayCompanyName: 'ResortPass',
-        locationLabel: 'New York, NY',
-        startDate: '2025-03',
-        endDate: '2026-04',
-        roleSummary:
-          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
-        bulletIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-      },
-      {
-        companyKey: 'lantern',
-        positionIndex: 0,
-        jobTitle: 'Software Architect & Technical Advisor',
-        displayCompanyName: 'Stealth Startup #smallcaps[(contract)]',
-        locationLabel: 'New York, NY',
-        startDate: '2024-09',
-        endDate: '2024-11',
-        roleSummary:
-          'Consulted for an early-stage B2B SaaS startup preparing for growth, addressed stability/performance issues and built a scalable foundation',
-        bulletIndices: [0, 1, 2, 3]
-      },
-      {
-        companyKey: 'brightflow',
-        positionIndex: 0,
-        jobTitle: 'Senior Engineering Manager',
-        displayCompanyName: 'Brightflow.ai #smallcaps[(defunct)]',
-        locationLabel: 'New York, NY',
-        startDate: '2023-09',
-        endDate: '2024-06',
-        roleSummary:
-          'Designed and implemented a data platform for a Fintech startup, focusing on ETL pipelines, data warehousing, and API integrations',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 0,
-        jobTitle: 'Engineering Manager',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'New York, NY',
-        startDate: '2020-03',
-        endDate: '2023-04',
-        roleSummary:
-          'Led the Volvo Valet initiative as technical lead and manager, overseeing both B2B and B2C efforts across two web apps, two mobile apps, and a backend platform',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 1,
-        jobTitle: 'Senior Software Engineer',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'Stockholm, Sweden',
-        startDate: '2018-01',
-        endDate: '2020-03',
-        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
-        bulletIndices: [8, 9, 10]
-      },
-      {
-        companyKey: 'luxe',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2016-06',
-        endDate: '2017-12',
-        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'planorama',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Planorama',
-        locationLabel: 'Paris, France',
-        startDate: '2014-04',
-        endDate: '2015-11',
-        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
-        bulletIndices: [0, 1]
-      }
-    ]
+    positions: allPositions
   },
   {
     archetypeKey: 'high_level_manager',
@@ -705,66 +436,8 @@ export const archetypeDefs: ArchetypeDef[] = [
     archetypeDescription:
       'Senior engineering leader — for VP, Director, and Head of Engineering roles emphasizing strategy, org building, and business impact',
     socialNetworks: ['LinkedIn'],
-    educationIndices: [0],
+    educationIndices: allEducationIndices,
     interestItemOverrides: null,
-    positions: [
-      {
-        companyKey: 'resortpass',
-        positionIndex: 0,
-        jobTitle: 'Head of Platform',
-        displayCompanyName: 'ResortPass',
-        locationLabel: 'New York, NY',
-        startDate: '2025-03',
-        endDate: '2026-04',
-        roleSummary:
-          'Built the enterprise foundation at ResortPass, a two-sided marketplace connecting consumers to daycation experiences at premium hotels and resorts. Owned the structural layer of the platform \u2014 stability, security, compliance, and engineering efficiency',
-        bulletIndices: [0, 1, 2, 3, 10, 11, 12, 13, 14]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 0,
-        jobTitle: 'Engineering Manager',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'New York, NY',
-        startDate: '2020-03',
-        endDate: '2023-04',
-        roleSummary:
-          'Led the Volvo Valet initiative end-to-end, overseeing product, engineering, and cross-functional delivery across two web apps, two mobile apps, and a backend platform',
-        bulletIndices: [0, 1, 2, 3, 4]
-      },
-      {
-        companyKey: 'volvo',
-        positionIndex: 1,
-        jobTitle: 'Senior Software Engineer',
-        displayCompanyName: 'Volvo Cars',
-        locationLabel: 'Stockholm, Sweden',
-        startDate: '2018-01',
-        endDate: '2020-03',
-        roleSummary: 'Delivered three complex software solutions with a key focus on backend, DevOps and data science',
-        bulletIndices: [8, 9, 10]
-      },
-      {
-        companyKey: 'luxe',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Luxe #smallcaps[(acquired by Volvo Cars)]',
-        locationLabel: 'San Francisco, CA',
-        startDate: '2016-06',
-        endDate: '2017-12',
-        roleSummary: 'Powered on-demand valet services and rental car delivery for Luxe, a high-growth startup',
-        bulletIndices: [0, 1]
-      },
-      {
-        companyKey: 'planorama',
-        positionIndex: 0,
-        jobTitle: 'Lead Software Engineer',
-        displayCompanyName: 'Planorama',
-        locationLabel: 'Paris, France',
-        startDate: '2014-04',
-        endDate: '2015-11',
-        roleSummary: 'Accompanied Planorama\u2019s retail management platform through a period of rapid growth',
-        bulletIndices: [0, 1]
-      }
-    ]
+    positions: allPositions
   }
 ];

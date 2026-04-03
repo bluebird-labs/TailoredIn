@@ -32,6 +32,6 @@ language = "en"
     location = "New York, NY"
 
 [lang.en]
-  header_quote = "Head of engineering with 15 years building high-performing teams and delivering data-intensive products and systems. Focused on technical excellence, engineering efficiency, and the AI and infrastructure foundations that steer Series B+ startups towards scability and growth."
+  header_quote = ""
   cv_footer = "Résumé"
   letter_footer = "Cover letter"
