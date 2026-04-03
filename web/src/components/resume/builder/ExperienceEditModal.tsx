@@ -28,6 +28,7 @@ type PositionDraft = {
   location: string;
   startDate: string;
   endDate: string;
+  summary: string | null;
   bullets: Bullet[];
 };
 
@@ -50,6 +51,11 @@ export function ExperienceEditModal({
   const [newBulletIds, setNewBulletIds] = useState<Set<string>>(new Set());
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Summary inline editing state
+  const [editingSummaryExpId, setEditingSummaryExpId] = useState<string | null>(null);
+  const [summaryDraft, setSummaryDraft] = useState('');
+  const summaryTextareaRef = useRef<HTMLTextAreaElement>(null);
+
   // Initialize position drafts from experiences
   useEffect(() => {
     if (open) {
@@ -60,11 +66,14 @@ export function ExperienceEditModal({
           location: exp.location,
           startDate: exp.startDate,
           endDate: exp.endDate,
+          summary: exp.summary,
           bullets: [...exp.bullets].sort((a, b) => a.ordinal - b.ordinal)
         }))
       );
       setEditingBulletId(null);
       setBulletDraft('');
+      setEditingSummaryExpId(null);
+      setSummaryDraft('');
       setDeletedBulletIds(new Set());
       setNewBulletIds(new Set());
     }
@@ -78,6 +87,14 @@ export function ExperienceEditModal({
       ta.setSelectionRange(ta.value.length, ta.value.length);
     }
   }, [editingBulletId]);
+
+  useEffect(() => {
+    if (editingSummaryExpId && summaryTextareaRef.current) {
+      const ta = summaryTextareaRef.current;
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    }
+  }, [editingSummaryExpId]);
 
   const updatePosition = useCallback((expId: string, field: keyof PositionDraft, value: string) => {
     setPositions(prev => prev.map(p => (p.id === expId ? { ...p, [field]: value } : p)));
@@ -145,6 +162,26 @@ export function ExperienceEditModal({
     setBulletDraft('');
   };
 
+  // -- Summary inline editing --
+
+  const startEditingSummary = (expId: string, summary: string | null) => {
+    setEditingSummaryExpId(expId);
+    setSummaryDraft(summary ?? '');
+  };
+
+  const commitSummaryEdit = () => {
+    if (!editingSummaryExpId) return;
+    const trimmed = summaryDraft.trim();
+    setPositions(prev => prev.map(p => (p.id === editingSummaryExpId ? { ...p, summary: trimmed || null } : p)));
+    setEditingSummaryExpId(null);
+    setSummaryDraft('');
+  };
+
+  const cancelSummaryEdit = () => {
+    setEditingSummaryExpId(null);
+    setSummaryDraft('');
+  };
+
   // -- Delete bullet --
 
   const markDeleted = (bulletId: string) => {
@@ -203,8 +240,9 @@ export function ExperienceEditModal({
   // -- Save flow --
 
   const handleSave = async () => {
-    // Commit any in-progress edit
+    // Commit any in-progress edits
     if (editingBulletId) commitEdit();
+    if (editingSummaryExpId) commitSummaryEdit();
 
     setSaving(true);
     try {
@@ -217,7 +255,8 @@ export function ExperienceEditModal({
           pos.title !== orig.title ||
           pos.location !== orig.location ||
           pos.startDate !== orig.startDate ||
-          pos.endDate !== orig.endDate;
+          pos.endDate !== orig.endDate ||
+          pos.summary !== orig.summary;
         if (changed) {
           await api.experiences({ id: pos.id }).put({
             title: pos.title,
@@ -225,7 +264,7 @@ export function ExperienceEditModal({
             location: pos.location,
             start_date: pos.startDate,
             end_date: pos.endDate,
-            summary: orig.summary ?? undefined,
+            summary: pos.summary ?? undefined,
             ordinal: orig.ordinal
           });
         }
@@ -339,6 +378,44 @@ export function ExperienceEditModal({
                     }}
                   />
                 </div>
+              </div>
+
+              {/* Summary */}
+              <div className="text-[10px] font-semibold text-[#888] uppercase tracking-wide mb-1">Summary</div>
+              <div className="mb-3">
+                {editingSummaryExpId === pos.id ? (
+                  <div className="p-2 rounded-md border-2 border-blue-500 shadow-[0_0_0_3px_rgba(59,130,246,0.1)] bg-[#fafafa]">
+                    <textarea
+                      ref={summaryTextareaRef}
+                      value={summaryDraft}
+                      onChange={e => setSummaryDraft(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          commitSummaryEdit();
+                        } else if (e.key === 'Escape') {
+                          cancelSummaryEdit();
+                        }
+                      }}
+                      onBlur={commitSummaryEdit}
+                      className="w-full text-[11px] leading-relaxed text-[#333] border-none bg-transparent resize-none outline-none font-[inherit] min-h-[36px]"
+                      placeholder="Brief summary of this role..."
+                    />
+                    <div className="text-[9px] text-[#999] mt-0.5">Enter to confirm · Esc to cancel</div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="w-full text-left p-2 rounded-md border border-[#eee] bg-[#fafafa] text-[11px] leading-relaxed cursor-text"
+                    onClick={() => startEditingSummary(pos.id, pos.summary)}
+                  >
+                    {pos.summary ? (
+                      <span className="text-[#333]">{pos.summary}</span>
+                    ) : (
+                      <span className="text-[#bbb] italic">No summary — click to add</span>
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* Bullets */}
