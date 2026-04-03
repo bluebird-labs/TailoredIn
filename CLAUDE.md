@@ -31,21 +31,14 @@ api → infrastructure → application → domain → (core)
 
 ### Layer Details
 
-| Layer | Package | Purpose |
-|---|---|---|
-| `core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) |
-| `domain/` | `@tailoredin/domain` | Aggregates (JobPosting, Company, Skill, Resume), value objects (JobStatus, Archetype, SkillName), domain services (JobElectionService, TailoringStrategyService), domain events |
-| `application/` | `@tailoredin/application` | Use cases (IngestScrapedJob, IngestJobByUrl, GetJob, ChangeJobStatus, GenerateResume), ports (JobRepository, CompanyRepository, JobScraper, LlmService, ResumeRenderer, etc.), DTOs |
-| `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, OpenAI LLM service, Playwright scraper + web color service, Typst resume renderer, DI tokens |
-| `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root |
-| `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend. Only imports from `@tailoredin/api/client` (Eden Treaty) |
-
-### Web Layer Details
-
-- **File-based routing** via TanStack Router Vite plugin — routes are auto-generated into `web/src/routeTree.gen.ts` (do not edit manually).
-- **Data fetching** uses TanStack Query; query keys are centralized in `web/src/lib/query-keys.ts`.
-- **Dev proxy**: the Vite dev server proxies `/api/*` to the API on port 8000 (configurable via `API_PORT` env var).
-- **shadcn/ui** components live in `web/src/components/ui/` and are exempt from Biome naming convention rules.
+| Layer | Package | Purpose | Details |
+|---|---|---|---|
+| `core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) | [core/CLAUDE.md](core/CLAUDE.md) |
+| `domain/` | `@tailoredin/domain` | Aggregates, value objects, domain services, domain events | [domain/CLAUDE.md](domain/CLAUDE.md) |
+| `application/` | `@tailoredin/application` | Use cases, ports, DTOs | [application/CLAUDE.md](application/CLAUDE.md) |
+| `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, LLM + scraper + renderer services, DI tokens | [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) |
+| `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root | [api/CLAUDE.md](api/CLAUDE.md) |
+| `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend | [web/CLAUDE.md](web/CLAUDE.md) |
 
 ## Commands
 
@@ -110,7 +103,7 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 
 ## Domain Model
 
-See **`DOMAIN.md`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, and their relationships across Profile, Tagging, Archetype, and Job subdomains.
+See **`DOMAIN.md`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, and their relationships across Profile, Company, Tagging, Job, Resume, and Skill subdomains.
 
 ## Conventions
 
@@ -134,14 +127,7 @@ The composition root (`api/src/index.ts`) imports DI tokens from `@tailoredin/in
 3. Adding a DI token to `infrastructure/src/DI.ts`
 4. Binding it in `api/src/container.ts`
 
-### Typst Resume Template
-
-Located in `infrastructure/typst/`. Built on the **brilliant-cv v3.3.0** package with customizations:
-- `cv.typ` — root template; imports `metadata.toml` + 3 modules (`professional.typ`, `skills.typ`, `education.typ`).
-- `metadata.toml` — layout config (margins, fonts, paper size), personal info, header quote, ATS keyword injection.
-- `helpers.typ` — defines `cv-section()` override with accent-colored divider.
-- Fonts: IBM Plex Sans + Mono OTF files in `infrastructure/typst/fonts/`.
-- The company's primary color is passed in at render time via `WebColorService` and injected into the template.
+See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for the Typst resume template details and database conventions.
 
 ## Entry Points
 - `api/src/index.ts` — starts Elysia server on port 8000
@@ -166,12 +152,7 @@ PUT /jobs/:id/generate-resume → GenerateResume use case
 ```
 
 ## Database
-PostgreSQL via MikroORM (`infrastructure/src/db/`). Config in `infrastructure/src/db/orm-config.ts`. Entities: `Profile`, `Experience`, `Bullet`, `BulletVariant`, `Headline`, `Education`, `SkillCategory`, `SkillItem`, `Tag`, `Archetype`, `ArchetypeTagWeight`, `Job`, `Company`, `CompanyBrief`, `Skill`, `JobStatusUpdate`. All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`).
-
-**Job scoring**: `JobOrmRepository` uses Kysely query builder with skill affinity weights (EXPERT=8, INTEREST=2, AVOID=2) to rank jobs.
-
-### Job Status Lifecycle
-`JobStatus` enum covers the full funnel: `NEW → APPLIED → RECRUITER_SCREEN → TECHNICAL_SCREEN → ON_SITE → OFFER`. Auto-rejection statuses: `RETIRED`, `DUPLICATE`, `HIGH_APPLICANTS`, `LOCATION_UNFIT`, `POSTED_TOO_LONG_AGO`. Manual statuses: `UNFIT`, `EXPIRED`, `LOW_SALARY`.
+PostgreSQL via MikroORM (`infrastructure/src/db/`). All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`). See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for ORM entity list, migration conventions, and job scoring details.
 
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):
