@@ -28,7 +28,7 @@ function contentHash(content: ResumeContentDto): string {
 export class TypstTemplateLayoutAnalyzer implements TemplateLayoutAnalyzer {
   private readonly cache = new Map<string, { promise: Promise<LayoutAnalysis>; insertedAt: number }>();
 
-  public async analyze(template: ResumeTemplate, content: ResumeContentDto): Promise<LayoutAnalysis> {
+  public analyze(template: ResumeTemplate, content: ResumeContentDto): Promise<LayoutAnalysis> {
     const cacheKey = `${template.id}:${contentHash(content)}`;
 
     const cached = this.cache.get(cacheKey);

@@ -1,5 +1,5 @@
-import type { BlockLayout, LayoutAnalysis, ResumeTemplate } from '@tailoredin/domain';
 import type { ResumeContentDto } from '@tailoredin/application';
+import type { BlockLayout, LayoutAnalysis, ResumeTemplate } from '@tailoredin/domain';
 
 type RawPosition = { page: number; y: number };
 type RawPositions = Record<string, RawPosition>;
@@ -16,7 +16,7 @@ type RawPositions = Record<string, RawPosition>;
 export function parseLayoutAnalysis(
   queryOutput: string,
   content: ResumeContentDto,
-  template: ResumeTemplate,
+  template: ResumeTemplate
 ): LayoutAnalysis {
   const parsed = JSON.parse(queryOutput) as [RawPositions];
   const positions = parsed[0];
@@ -34,15 +34,10 @@ export function parseLayoutAnalysis(
       return { lineCount: 0, pageNumbers: [] };
     }
 
-    const pageNumbers = Array.from(
-      { length: end.page - start.page + 1 },
-      (_, i) => start.page + i,
-    );
+    const pageNumbers = Array.from({ length: end.page - start.page + 1 }, (_, i) => start.page + i);
 
     const heightPt =
-      end.page === start.page
-        ? end.y - start.y
-        : (end.page - start.page) * pageHeightPt + (end.y - start.y);
+      end.page === start.page ? end.y - start.y : (end.page - start.page) * pageHeightPt + (end.y - start.y);
     const lineCount = Math.max(1, Math.ceil(heightPt / lineHeightPt));
 
     return { lineCount, pageNumbers };
@@ -66,19 +61,19 @@ export function parseLayoutAnalysis(
       const exp = content.experience[expIdx];
       const title = blockLayout(`exp-${gi}-role-${ri}-title-start`, `exp-${gi}-role-${ri}-title-end`);
       const bullets = exp.highlights.map((_, bi) =>
-        blockLayout(`exp-${gi}-role-${ri}-bullet-${bi}-start`, `exp-${gi}-role-${ri}-bullet-${bi}-end`),
+        blockLayout(`exp-${gi}-role-${ri}-bullet-${bi}-start`, `exp-${gi}-role-${ri}-bullet-${bi}-end`)
       );
       return { title, bullets };
     });
     return { company, roles };
   });
 
-  const relevantSkills = content.skills.filter((s) => s.type !== 'interests');
+  const relevantSkills = content.skills.filter(s => s.type !== 'interests');
   const parsedSkills = relevantSkills.map((_, si) => blockLayout(`skill-${si}-start`, `skill-${si}-end`));
 
   const parsedEducation = content.education.map((_, ei) => blockLayout(`edu-${ei}-start`, `edu-${ei}-end`));
 
-  const allPages = [...new Set(Object.values(positions).map((p) => p.page))].sort((a, b) => a - b);
+  const allPages = [...new Set(Object.values(positions).map(p => p.page))].sort((a, b) => a - b);
 
   // Header: approximated from font sizes since brilliant-cv renders the header
   // from metadata.toml and it cannot be instrumented with markers directly.
@@ -89,10 +84,10 @@ export function parseLayoutAnalysis(
     header: {
       name: { lineCount: nameLinesApprox, pageNumbers: [1] },
       headline: { lineCount: 1, pageNumbers: [1] },
-      infoLine: { lineCount: 1, pageNumbers: [1] },
+      infoLine: { lineCount: 1, pageNumbers: [1] }
     },
     experiences: parsedExperiences,
     education: parsedEducation,
-    skills: parsedSkills,
+    skills: parsedSkills
   };
 }

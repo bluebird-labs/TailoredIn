@@ -298,16 +298,10 @@ ${includes}
 }
 
 // === Analysis mode: position tracking ===
-#let layout-positions = state("layout-positions", (:))
-
-#let mark(id) = context {
-  let pos = here().position()
-  layout-positions.update(prev => {
-    let next = prev
-    next.insert(id, (page: here().page(), y: pos.y.pt()))
-    next
-  })
-}
+// Each #mark(id) emits a labelled metadata element at its document location.
+// cv.typ then queries all <layout-mark> elements in a context block,
+// resolves their y-positions, and emits a single dictionary as <all-layout-positions>.
+#let mark(id) = [#metadata((id: id)) <layout-mark>]
 `;
   }
 
@@ -316,7 +310,7 @@ ${includes}
     const includes = sections.map(s => `#include "modules_en/${s}.typ"`).join('\n');
 
     return `#import "@preview/brilliant-cv:3.3.0": cv
-#let metadata = toml("./metadata.toml")
+#let cv-metadata = toml("./metadata.toml")
 #set text(size: ${template.bodyFontSizePt}pt)
 #set par(leading: ${template.lineHeightEm}em)
 #set page(margin: ${template.margins.top}cm)
@@ -327,12 +321,21 @@ ${includes}
   phone: box(width: 10pt, align(center, text(size: 8pt, "☎"))),
   location: box(width: 10pt, align(center, text(size: 8pt, "⌂"))),
 )
-#show: cv.with(metadata, custom-icons: custom-icons)
+#show: cv.with(cv-metadata, custom-icons: custom-icons)
 
 ${includes}
 
-// Capture all accumulated positions as a single queryable metadata element
-#context metadata(layout-positions.final()) <all-layout-positions>
+// Collect all #mark() positions into a single dictionary and emit as queryable metadata.
+// Each mark() emits a <layout-mark> element; here we resolve their document positions.
+#context {
+  let marks = query(<layout-mark>)
+  let result = (:)
+  for m in marks {
+    let pos = m.location().position()
+    result.insert(m.value.id, (page: pos.page, y: pos.y.pt()))
+  }
+  [#metadata(result) <all-layout-positions>]
+}
 `;
   }
 

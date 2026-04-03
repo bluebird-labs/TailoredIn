@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import type { ResumeContentDto } from '@tailoredin/application';
-import { BrilliantCvTemplate } from '../../src/templates/BrilliantCvTemplate.js';
 import { parseLayoutAnalysis } from '../../src/services/LayoutAnalysisParser.js';
+import { BrilliantCvTemplate } from '../../src/templates/BrilliantCvTemplate.js';
 
 const SIMPLE_CONTENT: ResumeContentDto = {
   personal: {
@@ -12,7 +12,7 @@ const SIMPLE_CONTENT: ResumeContentDto = {
     email: 'jane@example.com',
     phone: '555-0100',
     location: 'New York, NY',
-    header_quote: 'Engineer',
+    header_quote: 'Engineer'
   },
   keywords: [],
   experience: [
@@ -22,11 +22,11 @@ const SIMPLE_CONTENT: ResumeContentDto = {
       date: 'Jan 2020 – Dec 2021',
       location: 'Remote',
       summary: 'Led platform team',
-      highlights: ['Built API gateway', 'Reduced latency 40%'],
-    },
+      highlights: ['Built API gateway', 'Reduced latency 40%']
+    }
   ],
   skills: [{ type: 'Languages', info: 'TypeScript' }],
-  education: [{ title: 'BS CS', society: 'MIT', date: '2016', location: 'Cambridge, MA' }],
+  education: [{ title: 'BS CS', society: 'MIT', date: '2016', location: 'Cambridge, MA' }]
 };
 
 const FAKE_POSITIONS = JSON.stringify([
@@ -42,8 +42,8 @@ const FAKE_POSITIONS = JSON.stringify([
     'skill-0-start': { page: 1, y: 210.0 },
     'skill-0-end': { page: 1, y: 217.875 },
     'edu-0-start': { page: 1, y: 230.0 },
-    'edu-0-end': { page: 1, y: 237.875 },
-  },
+    'edu-0-end': { page: 1, y: 237.875 }
+  }
 ]);
 
 describe('parseLayoutAnalysis', () => {
@@ -97,8 +97,8 @@ describe('parseLayoutAnalysis', () => {
         'exp-0-role-0-bullet-0-start': { page: 2, y: 10.0 },
         'exp-0-role-0-bullet-0-end': { page: 2, y: 18.0 },
         'exp-0-role-0-bullet-1-start': { page: 2, y: 20.0 },
-        'exp-0-role-0-bullet-1-end': { page: 2, y: 28.0 },
-      },
+        'exp-0-role-0-bullet-1-end': { page: 2, y: 28.0 }
+      }
     ]);
     const result = parseLayoutAnalysis(multiPage, SIMPLE_CONTENT, BrilliantCvTemplate);
     expect(result.totalPages).toBe(2);
@@ -118,8 +118,8 @@ describe('parseLayoutAnalysis', () => {
         'exp-0-role-0-bullet-0-start': { page: 2, y: 10.0 },
         'exp-0-role-0-bullet-0-end': { page: 2, y: 18.0 },
         'exp-0-role-0-bullet-1-start': { page: 2, y: 20.0 },
-        'exp-0-role-0-bullet-1-end': { page: 2, y: 28.0 },
-      },
+        'exp-0-role-0-bullet-1-end': { page: 2, y: 28.0 }
+      }
     ]);
     const result = parseLayoutAnalysis(fixture, SIMPLE_CONTENT, BrilliantCvTemplate);
     expect(result.experiences[0].company.lineCount).toBe(19);
