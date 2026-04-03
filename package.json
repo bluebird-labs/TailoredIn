@@ -31,6 +31,7 @@
     "db:migration:create": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:create",
     "db:migration:up": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure migration:up",
     "db:seed": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure seed:run",
+    "db:seed:e2e": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure seed:run:e2e",
     "db:seed:generate-types": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/src/db/generate-seed-types.ts",
     "up": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/dev/up.ts",
     "down": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/dev/down.ts",

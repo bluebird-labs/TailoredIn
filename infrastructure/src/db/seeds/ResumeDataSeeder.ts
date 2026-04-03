@@ -161,7 +161,10 @@ export class ResumeDataSeeder extends Seeder {
         `INSERT INTO resume_profiles (profile_id, content_selection, headline_text, updated_at)
          VALUES ('${profileId}', '${JSON.stringify(contentSelection).replace(/'/g, "''")}'::jsonb,
                  '${esc(headlineData.summaryText)}', now())
-         ON CONFLICT DO NOTHING`
+         ON CONFLICT (profile_id) DO UPDATE SET
+           content_selection = EXCLUDED.content_selection,
+           headline_text = EXCLUDED.headline_text,
+           updated_at = EXCLUDED.updated_at`
       );
     }
 

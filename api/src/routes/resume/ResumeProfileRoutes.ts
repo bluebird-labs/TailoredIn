@@ -27,14 +27,18 @@ export class ResumeProfileRoutes {
 
   public plugin() {
     return new Elysia()
-      .get('/resume/profile', async ({ set }) => {
+      .get('/resume/profile', async () => {
         const profileId = await getProfileId(this.orm);
-        const resumeProfile = await this.getResumeProfile.execute({ profileId });
+        let resumeProfile = await this.getResumeProfile.execute({ profileId });
         if (!resumeProfile) {
-          set.status = 404;
-          return { data: null };
+          await this.updateResumeProfile.execute({
+            profileId,
+            contentSelection: { experienceSelections: [], projectIds: [], educationIds: [], skillCategoryIds: [], skillItemIds: [] },
+            headlineText: ''
+          });
+          resumeProfile = await this.getResumeProfile.execute({ profileId });
         }
-        return { data: serializeResumeProfile(resumeProfile) };
+        return { data: resumeProfile ? serializeResumeProfile(resumeProfile) : null };
       })
       .put(
         '/resume/profile',

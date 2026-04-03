@@ -14,7 +14,7 @@ import { Logger } from '@tailoredin/core';
 import { GenericContainer, Wait } from 'testcontainers';
 import { createServer } from 'vite';
 import { createOrmConfig } from '../src/db/orm-config.js';
-import { DatabaseSeeder } from '../src/db/seeds/DatabaseSeeder.js';
+import { E2eSeeder } from '../src/db/seeds/E2eSeeder.js';
 
 const log = Logger.create('e2e');
 const REPO_ROOT = resolve(import.meta.dirname, '../..');
@@ -52,7 +52,7 @@ const ormConfig = createOrmConfig({
 });
 const orm = await MikroORM.init(ormConfig);
 await orm.migrator.up();
-await orm.seeder.seed(DatabaseSeeder);
+await orm.seeder.seed(E2eSeeder);
 await orm.close(true);
 
 // 3. Start API server

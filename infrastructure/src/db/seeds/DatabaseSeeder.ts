@@ -1,29 +1,20 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
-import { JobDataSeeder } from './JobDataSeeder.js';
-import { ResumeDataSeeder } from './ResumeDataSeeder.js';
 import { SkillsSeeder } from './SkillsSeeder.js';
 
 /**
- * Root seeder that orchestrates all seeders in dependency order.
- * Run via: bunx mikro-orm seeder:run
+ * Production-safe root seeder — run via: bun run db:seed
+ *
+ * Only refreshes reference data that is safe to run against any database:
+ *   - Skills: upserted (no existing data is deleted or overwritten)
+ *
+ * Does NOT touch: profiles, experiences, education, headlines, skill categories,
+ * resume profiles, jobs, or companies.
+ *
+ * For a full fixture seed (E2E tests only), use E2eSeeder.
  */
 export class DatabaseSeeder extends Seeder {
   public async run(em: EntityManager): Promise<void> {
-    await em.getConnection().execute(`
-      TRUNCATE
-        tailored_resumes, resume_profiles,
-        bullet_tags, bullets, experiences,
-        headline_tags, headlines, educations, skill_items, skill_categories, profiles,
-        job_status_updates, jobs, companies,
-        skills
-      CASCADE
-    `);
-
-    return this.call(em, [
-      SkillsSeeder, // skills (no FK deps)
-      ResumeDataSeeder, // user → resume data → archetypes
-      JobDataSeeder // companies → jobs → job_status_updates
-    ]);
+    return this.call(em, [SkillsSeeder]);
   }
 }

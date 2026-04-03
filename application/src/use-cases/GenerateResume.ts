@@ -15,25 +15,29 @@ export class GenerateResume {
   ) {}
 
   public async execute(input: GenerateResumeDto): Promise<Result<BuildResumeOutputDto, Error>> {
-    const profile = await this.profileRepository.findSingle();
+    try {
+      const profile = await this.profileRepository.findSingle();
 
-    const content = await this.resumeContentFactory.makeFromSelection({
-      profileId: profile.id.value,
-      headlineText: input.headlineText,
-      experienceSelections: input.experienceSelections,
-      educationIds: input.educationIds,
-      skillCategoryIds: input.skillCategoryIds,
-      skillItemIds: input.skillItemIds,
-      keywords: input.keywords ?? []
-    });
+      const content = await this.resumeContentFactory.makeFromSelection({
+        profileId: profile.id.value,
+        headlineText: input.headlineText,
+        experienceSelections: input.experienceSelections,
+        educationIds: input.educationIds,
+        skillCategoryIds: input.skillCategoryIds,
+        skillItemIds: input.skillItemIds,
+        keywords: input.keywords ?? []
+      });
 
-    this.log.info('Rendering resume PDF...');
+      this.log.info('Rendering resume PDF...');
 
-    const pdfPath = await this.resumeRenderer.render({
-      content,
-      companyName: 'Generic'
-    });
+      const pdfPath = await this.resumeRenderer.render({
+        content,
+        companyName: 'Generic'
+      });
 
-    return ok({ pdfPath });
+      return ok({ pdfPath });
+    } catch (e) {
+      return err(e instanceof Error ? e : new Error(String(e)));
+    }
   }
 }

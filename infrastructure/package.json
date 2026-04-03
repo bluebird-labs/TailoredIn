@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "migration:create": "bunx mikro-orm migration:create",
     "migration:up": "bunx mikro-orm migration:up",
-    "seed:run": "bunx mikro-orm seeder:run"
+    "seed:run": "bunx mikro-orm seeder:run",
+    "seed:run:e2e": "bunx mikro-orm seeder:run --class=E2eSeeder"
   },
   "mikro-orm": {
     "configPaths": [
