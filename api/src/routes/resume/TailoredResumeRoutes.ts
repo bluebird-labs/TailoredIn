@@ -1,7 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import type {
-  ContentSelectionDto,
   CreateTailoredResume,
   GenerateTailoredResumePdf,
   GetTailoredResume,
@@ -11,38 +10,7 @@ import type {
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 import { getProfileId } from '../../helpers/profile-id.js';
-
-const contentSelectionSchema = t.Object({
-  experience_selections: t.Array(
-    t.Object({
-      experience_id: t.String({ format: 'uuid' }),
-      bullet_ids: t.Array(t.String({ format: 'uuid' }))
-    })
-  ),
-  project_ids: t.Array(t.String({ format: 'uuid' })),
-  education_ids: t.Array(t.String({ format: 'uuid' })),
-  skill_category_ids: t.Array(t.String({ format: 'uuid' })),
-  skill_item_ids: t.Array(t.String({ format: 'uuid' }))
-});
-
-function bodyToContentSelectionDto(body: {
-  experience_selections: Array<{ experience_id: string; bullet_ids: string[] }>;
-  project_ids: string[];
-  education_ids: string[];
-  skill_category_ids: string[];
-  skill_item_ids: string[];
-}): ContentSelectionDto {
-  return {
-    experienceSelections: body.experience_selections.map(s => ({
-      experienceId: s.experience_id,
-      bulletIds: s.bullet_ids
-    })),
-    projectIds: body.project_ids,
-    educationIds: body.education_ids,
-    skillCategoryIds: body.skill_category_ids,
-    skillItemIds: body.skill_item_ids
-  };
-}
+import { bodyToContentSelectionDto, contentSelectionSchema } from './content-selection-schema.js';
 
 function serializeResume(resume: {
   id: { value: string };
@@ -129,9 +97,10 @@ export class TailoredResumeRoutes {
       )
       .get(
         '/resumes/tailored/:id',
-        async ({ params }) => {
+        async ({ params, set }) => {
           const resume = await this.getTailoredResume.execute({ resumeId: params.id });
           if (!resume) {
+            set.status = 404;
             return { data: null };
           }
           return { data: serializeResume(resume) };
@@ -142,14 +111,18 @@ export class TailoredResumeRoutes {
       )
       .put(
         '/resumes/tailored/:id',
-        async ({ params, body }) => {
+        async ({ params, body, set }) => {
           await this.updateTailoredResume.execute({
             resumeId: params.id,
             contentSelection: bodyToContentSelectionDto(body.content_selection),
             headlineText: body.headline_text
           });
           const resume = await this.getTailoredResume.execute({ resumeId: params.id });
-          return { data: resume ? serializeResume(resume) : null };
+          if (!resume) {
+            set.status = 404;
+            return { data: null };
+          }
+          return { data: serializeResume(resume) };
         },
         {
           params: t.Object({ id: t.String({ format: 'uuid' }) }),
@@ -161,9 +134,8 @@ export class TailoredResumeRoutes {
       )
       .post(
         '/resumes/tailored/:id/generate-pdf',
-        async ({ params, set }) => {
+        async ({ params }) => {
           const result = await this.generateTailoredResumePdf.execute({ resumeId: params.id });
-          set.status = 201;
           return { data: { pdfPath: result.pdfPath } };
         },
         {

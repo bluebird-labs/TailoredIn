@@ -1,44 +1,18 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import type {
-  ContentSelectionDto,
-  GenerateResumeProfilePdf,
-  GetResumeProfile,
-  UpdateResumeProfile
-} from '@tailoredin/application';
+import type { GenerateResumeProfilePdf, GetResumeProfile, UpdateResumeProfile } from '@tailoredin/application';
+import type { ResumeProfile } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 import { getProfileId } from '../../helpers/profile-id.js';
+import { bodyToContentSelectionDto, contentSelectionSchema } from './content-selection-schema.js';
 
-const contentSelectionSchema = t.Object({
-  experience_selections: t.Array(
-    t.Object({
-      experience_id: t.String({ format: 'uuid' }),
-      bullet_ids: t.Array(t.String({ format: 'uuid' }))
-    })
-  ),
-  project_ids: t.Array(t.String({ format: 'uuid' })),
-  education_ids: t.Array(t.String({ format: 'uuid' })),
-  skill_category_ids: t.Array(t.String({ format: 'uuid' })),
-  skill_item_ids: t.Array(t.String({ format: 'uuid' }))
-});
-
-function bodyToContentSelectionDto(body: {
-  experience_selections: Array<{ experience_id: string; bullet_ids: string[] }>;
-  project_ids: string[];
-  education_ids: string[];
-  skill_category_ids: string[];
-  skill_item_ids: string[];
-}): ContentSelectionDto {
+function serializeResumeProfile(profile: ResumeProfile) {
   return {
-    experienceSelections: body.experience_selections.map(s => ({
-      experienceId: s.experience_id,
-      bulletIds: s.bullet_ids
-    })),
-    projectIds: body.project_ids,
-    educationIds: body.education_ids,
-    skillCategoryIds: body.skill_category_ids,
-    skillItemIds: body.skill_item_ids
+    profileId: profile.profileId,
+    contentSelection: profile.contentSelection,
+    headlineText: profile.headlineText,
+    updatedAt: profile.updatedAt
   };
 }
 
@@ -53,10 +27,14 @@ export class ResumeProfileRoutes {
 
   public plugin() {
     return new Elysia()
-      .get('/resume/profile', async () => {
+      .get('/resume/profile', async ({ set }) => {
         const profileId = await getProfileId(this.orm);
         const resumeProfile = await this.getResumeProfile.execute({ profileId });
-        return { data: resumeProfile };
+        if (!resumeProfile) {
+          set.status = 404;
+          return { data: null };
+        }
+        return { data: serializeResumeProfile(resumeProfile) };
       })
       .put(
         '/resume/profile',
@@ -68,7 +46,7 @@ export class ResumeProfileRoutes {
             headlineText: body.headline_text
           });
           const resumeProfile = await this.getResumeProfile.execute({ profileId });
-          return { data: resumeProfile };
+          return { data: resumeProfile ? serializeResumeProfile(resumeProfile) : null };
         },
         {
           body: t.Object({
@@ -77,10 +55,9 @@ export class ResumeProfileRoutes {
           })
         }
       )
-      .post('/resume/profile/generate-pdf', async ({ set }) => {
+      .post('/resume/profile/generate-pdf', async () => {
         const profileId = await getProfileId(this.orm);
         const result = await this.generateResumeProfilePdf.execute({ profileId });
-        set.status = 201;
         return { data: { pdfPath: result.pdfPath } };
       });
   }
