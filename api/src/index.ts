@@ -16,6 +16,7 @@ import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
 import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
+import { ExtractTextRoute } from './routes/factory/ExtractTextRoute.js';
 import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
 
 import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
@@ -126,6 +127,8 @@ const app = new Elysia()
   .use(container.get(AddAccomplishmentRoute).plugin())
   .use(container.get(UpdateAccomplishmentRoute).plugin())
   .use(container.get(DeleteAccomplishmentRoute).plugin())
+  // Factory
+  .use(container.get(ExtractTextRoute).plugin())
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
     const message = err.message ?? String(error);
