@@ -98,3 +98,55 @@ describe('TypstFileGenerator', () => {
     await files.cleanup();
   });
 });
+
+describe('helpers.typ', () => {
+  it('generates helpers.typ alongside cv.typ', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
+    await TypstFileGenerator.generate(MINIMAL_CONTENT, tmpDir);
+    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
+    expect(helpers).toContain('#3E6B8A');
+    await FS.rm(tmpDir, { recursive: true });
+  });
+
+  it('helpers.typ defines a custom cv-section with accent divider', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
+    await TypstFileGenerator.generate(MINIMAL_CONTENT, tmpDir);
+    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
+    expect(helpers).toContain('let cv-section');
+    expect(helpers).toContain('stroke: 0.9pt + _accent');
+    await FS.rm(tmpDir, { recursive: true });
+  });
+
+  it('helpers.typ re-exports cv-entry, cv-skill, h-bar from brilliant-cv', async () => {
+    const tmpDir = await FS.mkdtemp(Path.join(OS.tmpdir(), 'typst-gen-'));
+    await TypstFileGenerator.generate(MINIMAL_CONTENT, tmpDir);
+    const helpers = await FS.readFile(Path.join(tmpDir, 'helpers.typ'), 'utf8');
+    expect(helpers).toContain('cv-entry');
+    expect(helpers).toContain('cv-skill');
+    expect(helpers).toContain('h-bar');
+    await FS.rm(tmpDir, { recursive: true });
+  });
+});
+
+describe('module imports', () => {
+  it('professional.typ imports cv-section from helpers.typ', async () => {
+    const files = await generateInTmpDir(MINIMAL_CONTENT);
+    expect(files.professional).toContain('#import "../helpers.typ"');
+    expect(files.professional).not.toContain('#import "@preview/brilliant-cv');
+    await files.cleanup();
+  });
+
+  it('skills.typ imports cv-section from helpers.typ', async () => {
+    const files = await generateInTmpDir(MINIMAL_CONTENT);
+    expect(files.skills).toContain('#import "../helpers.typ"');
+    expect(files.skills).not.toContain('#import "@preview/brilliant-cv');
+    await files.cleanup();
+  });
+
+  it('education.typ imports cv-section from helpers.typ', async () => {
+    const files = await generateInTmpDir(MINIMAL_CONTENT);
+    expect(files.education).toContain('#import "../helpers.typ"');
+    expect(files.education).not.toContain('#import "@preview/brilliant-cv');
+    await files.cleanup();
+  });
+});

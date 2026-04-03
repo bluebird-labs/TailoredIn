@@ -29,6 +29,7 @@ export class TypstFileGenerator {
     await Promise.all([
       FS.writeFile(Path.join(workDir, 'metadata.toml'), TypstFileGenerator.buildMetadataToml(content), 'utf8'),
       FS.writeFile(Path.join(workDir, 'cv.typ'), TypstFileGenerator.buildCvTyp(), 'utf8'),
+      FS.writeFile(Path.join(workDir, 'helpers.typ'), TypstFileGenerator.buildHelpersTyp(), 'utf8'),
       FS.writeFile(
         Path.join(workDir, 'modules_en', 'professional.typ'),
         TypstFileGenerator.buildProfessionalTyp(content),
@@ -110,9 +111,30 @@ ${includes}
 `;
   }
 
+  private static buildHelpersTyp(): string {
+    return `\
+#import "@preview/brilliant-cv:3.3.0": cv-entry, cv-skill, h-bar
+
+#let _accent = rgb("${RESUME_ACCENT_COLOR}")
+#let _section-skip = ${RESUME_LAYOUT.beforeSectionSkip}
+
+// Custom cv-section: re-implements brilliant-cv's section header with an accent-colored divider line.
+// The package's built-in cv-section uses a hardcoded black stroke that does not follow awesome_color.
+#let cv-section(title, letters: 3) = {
+  v(_section-skip)
+  block(
+    sticky: true,
+    [#text(size: 16pt, weight: "bold", fill: _accent, title.slice(0, letters))#text(size: 16pt, weight: "bold", title.slice(letters))
+    #h(2pt)
+    #box(width: 1fr, line(stroke: 0.9pt + _accent, length: 100%))]
+  )
+}
+`;
+  }
+
   private static buildProfessionalTyp(content: BrilliantCVContent): string {
     const lines: string[] = [
-      `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-entry`,
+      `#import "../helpers.typ": cv-section, cv-entry`,
       ``,
       `#cv-section("Experience")`,
       ``
@@ -202,7 +224,7 @@ ${includes}
     if (content.skills.length === 0) return '';
 
     const lines: string[] = [
-      `#import "@preview/brilliant-cv:3.3.0": cv-section, cv-skill, h-bar`,
+      `#import "../helpers.typ": cv-section, cv-skill, h-bar`,
       ``,
       `#cv-section("Skills")`,
       ``
@@ -221,7 +243,7 @@ ${includes}
   private static buildEducationTyp(content: BrilliantCVContent): string {
     if (content.education.length === 0) return '';
 
-    const lines: string[] = [`#import "@preview/brilliant-cv:3.3.0": cv-section`, ``, `#cv-section("Education")`, ``];
+    const lines: string[] = [`#import "../helpers.typ": cv-section`, ``, `#cv-section("Education")`, ``];
 
     for (const edu of content.education) {
       lines.push(
