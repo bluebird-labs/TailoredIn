@@ -4,7 +4,7 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
   override async up(): Promise<void> {
     this.addSql(`
       CREATE TABLE resume_profiles (
-        profile_id uuid PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+        profile_id uuid PRIMARY KEY,
         content_selection jsonb NOT NULL DEFAULT '{}',
         headline_text text NOT NULL DEFAULT '',
         updated_at timestamptz NOT NULL DEFAULT now()
@@ -14,7 +14,7 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
     this.addSql(`
       CREATE TABLE tailored_resumes (
         id uuid PRIMARY KEY,
-        profile_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        profile_id uuid NOT NULL,
         jd_content text NOT NULL DEFAULT '',
         llm_proposals jsonb NOT NULL DEFAULT '{}',
         content_selection jsonb NOT NULL DEFAULT '{}',
@@ -44,7 +44,7 @@ export class Migration_20260403000001_archetype_to_resume_profile extends Migrat
         id uuid NOT NULL DEFAULT gen_random_uuid(),
         created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        profile_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        profile_id uuid NOT NULL,
         key text NOT NULL,
         label text NOT NULL,
         headline_id uuid,
