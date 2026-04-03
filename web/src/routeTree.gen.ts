@@ -11,12 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs/index'
-import { Route as ArchetypesIndexRouteImport } from './routes/archetypes/index'
 import { Route as ResumeSkillsRouteImport } from './routes/resume/skills'
 import { Route as ResumeBuilderRouteImport } from './routes/resume/builder'
 import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
-import { Route as ArchetypesArchetypeIdRouteImport } from './routes/archetypes/$archetypeId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -26,11 +24,6 @@ const IndexRoute = IndexRouteImport.update({
 const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArchetypesIndexRoute = ArchetypesIndexRouteImport.update({
-  id: '/archetypes/',
-  path: '/archetypes/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResumeSkillsRoute = ResumeSkillsRouteImport.update({
@@ -53,84 +46,65 @@ const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
   path: '/companies/$companyId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArchetypesArchetypeIdRoute = ArchetypesArchetypeIdRouteImport.update({
-  id: '/archetypes/$archetypeId',
-  path: '/archetypes/$archetypeId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/builder': typeof ResumeBuilderRoute
   '/resume/skills': typeof ResumeSkillsRoute
-  '/archetypes/': typeof ArchetypesIndexRoute
   '/jobs/': typeof JobsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/builder': typeof ResumeBuilderRoute
   '/resume/skills': typeof ResumeSkillsRoute
-  '/archetypes': typeof ArchetypesIndexRoute
   '/jobs': typeof JobsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/archetypes/$archetypeId': typeof ArchetypesArchetypeIdRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/resume/builder': typeof ResumeBuilderRoute
   '/resume/skills': typeof ResumeSkillsRoute
-  '/archetypes/': typeof ArchetypesIndexRoute
   '/jobs/': typeof JobsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/archetypes/$archetypeId'
     | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/builder'
     | '/resume/skills'
-    | '/archetypes/'
     | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/archetypes/$archetypeId'
     | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/builder'
     | '/resume/skills'
-    | '/archetypes'
     | '/jobs'
   id:
     | '__root__'
     | '/'
-    | '/archetypes/$archetypeId'
     | '/companies/$companyId'
     | '/jobs/$jobId'
     | '/resume/builder'
     | '/resume/skills'
-    | '/archetypes/'
     | '/jobs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ArchetypesArchetypeIdRoute: typeof ArchetypesArchetypeIdRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   ResumeBuilderRoute: typeof ResumeBuilderRoute
   ResumeSkillsRoute: typeof ResumeSkillsRoute
-  ArchetypesIndexRoute: typeof ArchetypesIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
 }
 
@@ -148,13 +122,6 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs/'
       preLoaderRoute: typeof JobsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/archetypes/': {
-      id: '/archetypes/'
-      path: '/archetypes'
-      fullPath: '/archetypes/'
-      preLoaderRoute: typeof ArchetypesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resume/skills': {
@@ -185,24 +152,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompaniesCompanyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/archetypes/$archetypeId': {
-      id: '/archetypes/$archetypeId'
-      path: '/archetypes/$archetypeId'
-      fullPath: '/archetypes/$archetypeId'
-      preLoaderRoute: typeof ArchetypesArchetypeIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ArchetypesArchetypeIdRoute: ArchetypesArchetypeIdRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   ResumeBuilderRoute: ResumeBuilderRoute,
   ResumeSkillsRoute: ResumeSkillsRoute,
-  ArchetypesIndexRoute: ArchetypesIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
 }
 export const routeTree = rootRouteImport
