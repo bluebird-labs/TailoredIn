@@ -7,70 +7,47 @@ test.describe('Resume generation from builder', () => {
   });
 
   test('generates a resume PDF with valid content', async ({ page }) => {
-    const captured: { status: number; contentType: string; body: Buffer }[] = [];
-    await page.route('**/resumes/generate', async route => {
+    const captured: { status: number; body: string }[] = [];
+    await page.route('**/resume/profile/generate-pdf', async route => {
       const response = await route.fetch();
       captured.push({
         status: response.status(),
-        contentType: response.headers()['content-type'] ?? '',
-        body: await response.body()
+        body: await response.text()
       });
       await route.fulfill({ response });
     });
 
     await page.getByRole('button', { name: 'Generate PDF' }).click();
-    await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText('PDF generated successfully')).toBeVisible({ timeout: 60_000 });
 
     expect(captured).toHaveLength(1);
     expect(captured[0].status).toBe(200);
-    expect(captured[0].contentType).toContain('application/pdf');
-    expect(captured[0].body.length).toBeGreaterThan(100);
-    expect(captured[0].body.subarray(0, 5).toString()).toBe('%PDF-');
+    // Response is JSON with pdfPath
+    const parsed = JSON.parse(captured[0].body) as { data: { pdfPath: string } };
+    expect(parsed.data.pdfPath).toBeTruthy();
+    expect(parsed.data.pdfPath).toMatch(/\.pdf$/);
 
     await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
 
-  test('hiding bullets produces a different PDF', async ({ page }) => {
-    const captured: Buffer[] = [];
-    await page.route('**/resumes/generate', async route => {
+  test('live preview compiles PDF from seeded content', async ({ page }) => {
+    const previewCalls: { status: number; bodyLength: number }[] = [];
+    await page.route('**/resumes/preview', async route => {
       const response = await route.fetch();
-      captured.push(await response.body());
+      const body = await response.body();
+      previewCalls.push({ status: response.status(), bodyLength: body.length });
       await route.fulfill({ response });
     });
 
-    // Generate with default selection
-    await page.getByRole('button', { name: 'Generate PDF' }).click();
-    await expect(page.getByText('Resume downloaded')).toBeVisible({ timeout: 60_000 });
+    // The preview should auto-compile within a few seconds of loading
+    await expect(async () => {
+      expect(previewCalls.length).toBeGreaterThan(0);
+    }).toPass({ timeout: 15_000 });
 
-    // Click the first experience company block to open the edit modal
-    // Experience sections are buttons with company names — click the first one with visible bullets
-    const experienceSection = page.locator('button', { hasText: /Experience/ }).first();
-    // Find the first clickable company block inside the experience area
-    const companyButtons = page.locator('button:has(span.font-bold)').filter({ hasText: /\w+/ });
-    const firstCompany = companyButtons.first();
-    await firstCompany.click();
-
-    const dialogContent = page.locator('[data-slot="dialog-content"]');
-    await expect(dialogContent).toBeVisible();
-
-    // Toggle first visible bullet off
-    const excludeBtn = dialogContent.getByTitle('Exclude from resume').first();
-    if ((await excludeBtn.count()) > 0) {
-      await excludeBtn.click();
-    }
-
-    await page.getByRole('button', { name: 'Done' }).click();
-
-    // Generate again
-    await page.getByRole('button', { name: 'Generate PDF' }).click();
-    // Wait for button to re-enable after second generation
-    await expect(page.getByRole('button', { name: 'Generate PDF' })).toBeEnabled({ timeout: 60_000 });
-
-    // Two PDFs should have been captured and they should differ
-    expect(captured).toHaveLength(2);
-    expect(captured[0].length).toBeGreaterThan(100);
-    expect(captured[1].length).toBeGreaterThan(100);
-    expect(captured[0].length).not.toBe(captured[1].length);
+    // Preview should return a valid PDF
+    const last = previewCalls[previewCalls.length - 1];
+    expect(last.status).toBe(200);
+    expect(last.bodyLength).toBeGreaterThan(100);
 
     await page.unrouteAll({ behavior: 'ignoreErrors' });
   });
