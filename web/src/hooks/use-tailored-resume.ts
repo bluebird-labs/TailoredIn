@@ -13,7 +13,6 @@ export function useTailoredResume(id: string) {
   });
 }
 
-
 export function useUpdateTailoredResume(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
