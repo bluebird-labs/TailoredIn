@@ -98,3 +98,5 @@ export { TagId } from './value-objects/TagId.js';
 export { TagSet } from './value-objects/TagSet.js';
 export { TailoredResumeId } from './value-objects/TailoredResumeId.js';
 export { TailoringScore } from './value-objects/TailoringScore.js';
+export type { LayoutAnalysis, BlockLayout } from './value-objects/LayoutAnalysis.js';
+export type { ResumeTemplate } from './value-objects/ResumeTemplate.js';
