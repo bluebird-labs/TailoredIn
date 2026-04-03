@@ -61,9 +61,9 @@ describe('TypstFileGenerator', () => {
     await files.cleanup();
   });
 
-  it('sets awesome_color to #3E6B8A (Corporate Polished steel blue) in metadata.toml', async () => {
+  it('sets awesome_color to #1A1A1A (near-black) in metadata.toml', async () => {
     const files = await generateInTmpDir(MINIMAL_CONTENT);
-    expect(files.metadata).toContain('awesome_color = "#3E6B8A"');
+    expect(files.metadata).toContain('awesome_color = "#1A1A1A"');
     await files.cleanup();
   });
 
