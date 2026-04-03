@@ -42,6 +42,13 @@ api/cli → infrastructure → application → domain → (core)
 | `cli/` | `@tailoredin/cli` | CLI entry points: `jobby` (job management), `cvs` (resume generation), `robot` (scraping daemon) |
 | `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend. Only imports from `@tailoredin/api/client` (Eden Treaty) |
 
+### Web Layer Details
+
+- **File-based routing** via TanStack Router Vite plugin — routes are auto-generated into `web/src/routeTree.gen.ts` (do not edit manually).
+- **Data fetching** uses TanStack Query; query keys are centralized in `web/src/lib/query-keys.ts`.
+- **Dev proxy**: the Vite dev server proxies `/api/*` to the API on port 8000 (configurable via `API_PORT` env var).
+- **shadcn/ui** components live in `web/src/components/ui/` and are exempt from Biome naming convention rules.
+
 ## Commands
 
 All commands are run from the repo root via `bun run <script>`.
@@ -80,7 +87,18 @@ bun run robot
 bun run robot:dev
 
 # Resume builder CLI
-bun run cvs gen --archetype nerd --theme skyblue --company_name "Acme" --keywords node typescript
+# Flags: --archetype/-a (required, ArchetypeKey enum), --company_name/-c (required), --keywords/-k (optional array)
+# Output: ../../Resumes/<company>/Sylvain-Estevez-YYYY-MM-DD.pdf — opened in macOS Preview
+bun run cvs gen --archetype nerd --company_name "Acme" --keywords node typescript
+
+# Testing
+bun run test                 # run all tests across workspaces
+bun run test:coverage        # run tests with coverage report
+bun run api:test             # API workspace tests only
+bun run cli:test             # CLI workspace tests only
+bun run test:e2e             # Playwright end-to-end tests (headless)
+bun run test:e2e:ui          # Playwright test UI
+bun run test:e2e:headed      # Playwright with visible browser
 
 # Typecheck (per-package)
 bun run --cwd <package-dir> typecheck
@@ -91,6 +109,12 @@ bun run db:migration:up
 ```
 
 All TypeScript is executed directly by Bun (no compilation step). `typecheck` scripts exist only to surface type errors.
+
+**Test runners**: `bun:test` (unit + integration). Integration tests in `infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `e2e/` use `@playwright/test`.
+
+## Conventions
+
+See **`CONVENTIONS.md`** for detailed coding standards: OOP-first design, DI patterns, naming conventions, API response envelope format, pagination/sorting/filtering, and error handling. This is the primary reference for code style decisions.
 
 ## Key Design Decisions
 
@@ -109,6 +133,15 @@ Composition roots (`api/src/index.ts`, `cli/src/*/container.ts`) import DI token
 2. Adding an implementation to `infrastructure/src/`
 3. Adding a DI token to `infrastructure/src/DI.ts`
 4. Binding it in the appropriate composition root
+
+### Typst Resume Template
+
+Located in `infrastructure/typst/`. Built on the **brilliant-cv v3.3.0** package with customizations:
+- `cv.typ` — root template; imports `metadata.toml` + 3 modules (`professional.typ`, `skills.typ`, `education.typ`).
+- `metadata.toml` — layout config (margins, fonts, paper size), personal info, header quote, ATS keyword injection.
+- `helpers.typ` — defines `cv-section()` override with accent-colored divider.
+- Fonts: IBM Plex Sans + Mono OTF files in `infrastructure/typst/fonts/`.
+- The company's primary color is passed in at render time via `WebColorService` and injected into the template.
 
 ## Entry Points
 - `api/src/index.ts` — starts Elysia server on port 8000
@@ -165,7 +198,7 @@ Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config
 
 ## Tooling Notes
 
-- **Biome 2.x** handles all linting and formatting (replaces ESLint + Prettier). Config at root `biome.json`.
+- **Biome 2.x** handles all linting and formatting (replaces ESLint + Prettier). Config at root `biome.json`. Line width is **120 characters**.
 - **Knip** detects dead code, unused exports, and unused dependencies. Config at `knip.json`. Run `bun run knip`.
 - **dependency-cruiser** enforces Onion Architecture boundaries. Run `bun run dep:check`. Config at `.dependency-cruiser.cjs`.
 - **mise** manages Bun and Typst versions (pinned in `.mise.toml`). Run `mise install` after cloning.

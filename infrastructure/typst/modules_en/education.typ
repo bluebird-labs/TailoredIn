@@ -2,6 +2,8 @@
 
 #cv-section("Education")
 
-*Bachelor of Science in Computer Science* --- University of California, Berkeley, Berkeley, CA #h(1fr) May 2018
+*B.S. in Computer Science* --- AFPA Créteil, Paris, France #h(1fr) 2012
 
-*Advanced TypeScript Certificate* --- Coursera, Online #h(1fr) Aug 2021
+*Certification in Modern Management Techniques* --- CNFDI Paris, Paris, France #h(1fr) 2008
+
+*High School Diploma in Electronics* --- Lycée de la Mare Carrée, Moissy-Cramayel, France #h(1fr) 2003

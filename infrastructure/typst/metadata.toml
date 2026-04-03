@@ -7,8 +7,8 @@ language = "en"
   before_entry_description_skip = "2pt"
   paper_size = "us-letter"
   [layout.fonts]
-    regular_fonts = ["Source Sans 3"]
-    header_font = "Raleway"
+    regular_fonts = ["IBM Plex Sans"]
+    header_font = "IBM Plex Sans"
   [layout.header]
     header_align = "left"
     display_profile_photo = false
@@ -23,16 +23,16 @@ language = "en"
   injected_keywords_list = []
 
 [personal]
-  first_name = "John"
-  last_name = "Doe"
+  first_name = "Sylvain"
+  last_name = "Estevez"
   [personal.info]
-    linkedin = "https://linkedin.com/in/johndoe"
-    email = "john@example.com"
-    phone = "+1-555-0100"
-    location = "San Francisco, CA"
-    github = "https://github.com/johndoe"
+    linkedin = "sylvain-estevez"
+    email = "estevez.sylvain@gmail.com"
+    phone = "+1 415 619 7821"
+    location = "New York, NY"
+    github = "SylvainEstevez"
 
 [lang.en]
-  header_quote = "Software engineer passionate about building great products"
+  header_quote = "Head of engineering with 15 years building high-performing teams and delivering data-intensive products and systems. Focused on technical excellence, engineering efficiency, and the AI and infrastructure foundations that steer Series B+ startups towards scability and growth."
   cv_footer = "Résumé"
   letter_footer = "Cover letter"
