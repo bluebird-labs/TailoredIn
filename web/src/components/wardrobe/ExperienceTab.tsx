@@ -73,7 +73,8 @@ function ExperienceCard({
       location: experience.location,
       start_date: experience.startDate,
       end_date: experience.endDate,
-      summary: narrative,
+      summary: experience.summary ?? undefined,
+      narrative: narrative,
       ordinal: experience.ordinal
     });
     queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });

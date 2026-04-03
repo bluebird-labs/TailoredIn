@@ -20,6 +20,7 @@ export class UpdateExperienceRoute {
           startDate: body.start_date,
           endDate: body.end_date,
           summary: body.summary ?? null,
+          narrative: body.narrative ?? null,
           ordinal: body.ordinal
         });
         if (!result.isOk) {
@@ -38,6 +39,7 @@ export class UpdateExperienceRoute {
           start_date: t.String({ minLength: 1 }),
           end_date: t.String({ minLength: 1 }),
           summary: t.Optional(t.String()),
+          narrative: t.Optional(t.String()),
           ordinal: t.Integer({ minimum: 0 })
         })
       }
