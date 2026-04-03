@@ -61,7 +61,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       this.orm.em.persist(orm);
 
       for (const acc of experience.accomplishments) {
-        await this.persistNewAccomplishment(acc, orm);
+        this.persistNewAccomplishment(acc, orm);
       }
     }
 
@@ -96,15 +96,15 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         this.orm.em.persist(ormAcc);
       } else {
         const expRef = this.orm.em.getReference(OrmExperience, domain.id.value);
-        await this.persistNewAccomplishment(acc, expRef);
+        this.persistNewAccomplishment(acc, expRef);
       }
     }
   }
 
-  private async persistNewAccomplishment(
+  private persistNewAccomplishment(
     acc: DomainAccomplishment,
     experience: OrmExperience
-  ): Promise<void> {
+  ): void {
     const ormAcc = new OrmAccomplishment({
       id: acc.id.value,
       experience,
@@ -121,9 +121,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   private async toDomain(orm: OrmExperience): Promise<DomainExperience> {
     const [row] = await this.orm.em
       .getConnection()
-      .execute<[{ profile_id: string }]>(
-        `SELECT profile_id FROM experiences WHERE id = '${orm.id}'`
-      );
+      .execute<[{ profile_id: string }]>('SELECT profile_id FROM experiences WHERE id = ?', [orm.id]);
     const profileId = row.profile_id;
 
     const ormAccomplishments = await this.orm.em.find(
