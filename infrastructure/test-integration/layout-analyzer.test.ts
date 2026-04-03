@@ -60,6 +60,8 @@ describe('TypstTemplateLayoutAnalyzer integration', () => {
 
   it('returns lineCount>0 for a short single-line bullet', async () => {
     const result = await analyzer.analyze(BrilliantCvTemplate, ONE_LINER_CONTENT);
+    // lineCount reflects the mark height spanning the full list-item (not raw text lines),
+    // so the value is template-dependent and > 0 is the stable bound here.
     expect(result.experiences[0].roles[0].bullets[0].lineCount).toBeGreaterThan(0);
   }, 60_000);
 
