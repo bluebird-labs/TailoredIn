@@ -30,3 +30,5 @@ export type { UpdateProfileInput } from './UpdateProfile.js';
 export { UpdateProfile } from './UpdateProfile.js';
 export type { EnrichCompanyDataInput } from './company/EnrichCompanyData.js';
 export { EnrichCompanyData } from './company/EnrichCompanyData.js';
+export type { CreateCompanyInput } from './company/CreateCompany.js';
+export { CreateCompany } from './company/CreateCompany.js';
