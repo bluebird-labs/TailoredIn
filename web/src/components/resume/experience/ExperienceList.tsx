@@ -7,7 +7,7 @@ import { type Experience, useExperiences } from '@/hooks/use-experiences';
 import { ExperienceCard } from './ExperienceCard.js';
 import { ExperienceFormModal } from './ExperienceFormModal.js';
 
-type ModalState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; experience: Experience };
+type ModalState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; experienceId: string };
 
 export function ExperienceList() {
   const { data: experiences = [], isLoading } = useExperiences();
@@ -20,6 +20,12 @@ export function ExperienceList() {
   if (isLoading) return <LoadingSkeleton variant="list" count={3} />;
 
   const modalOpen = modalState.mode !== 'closed';
+
+  // Resolve the live experience from query data so the modal always has fresh data
+  const editingExperience =
+    modalState.mode === 'edit'
+      ? (experiences as Experience[]).find(e => e.id === modalState.experienceId)
+      : undefined;
 
   return (
     <>
@@ -35,7 +41,7 @@ export function ExperienceList() {
             <ExperienceCard
               key={exp.id}
               experience={exp}
-              onEdit={() => setModalState({ mode: 'edit', experience: exp })}
+              onEdit={() => setModalState({ mode: 'edit', experienceId: exp.id })}
             />
           ))}
 
@@ -51,7 +57,7 @@ export function ExperienceList() {
         </div>
       )}
 
-      {modalState.mode !== 'closed' && (
+      {modalState.mode !== 'closed' && editingExperience !== null && (
         <ExperienceFormModal
           open={modalOpen}
           onOpenChange={next => {
@@ -60,7 +66,7 @@ export function ExperienceList() {
           modalMode={
             modalState.mode === 'create'
               ? { mode: 'create', experienceCount: experiences.length }
-              : { mode: 'edit', experience: modalState.experience }
+              : { mode: 'edit', experience: editingExperience! }
           }
           onAccomplishmentDirtyChange={handleAccomplishmentDirtyChange}
         />
