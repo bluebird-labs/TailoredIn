@@ -8,8 +8,8 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "test": "bun test test/",
-    "test:coverage": "bun test test/ --coverage",
+    "test": "echo 'No unit tests — use test:integration for repository tests'",
+    "test:coverage": "echo 'No unit tests'",
     "test:integration": "bun test test-integration/ --timeout 60000",
     "typecheck": "tsc --noEmit",
     "migration:create": "bunx mikro-orm migration:create",
