@@ -1,5 +1,7 @@
 // DI tokens
 export { DI } from './DI.js';
+// Services
+export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
 // ORM config
 export { createOrmConfig } from './db/orm-config.js';
 // Repositories
