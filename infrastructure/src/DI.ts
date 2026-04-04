@@ -1,6 +1,8 @@
 import { InjectionToken } from '@needle-di/core';
 import type {
   AddAccomplishment,
+  CompanyDataProvider,
+  CreateCompany,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
@@ -8,6 +10,7 @@ import type {
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
+  EnrichCompanyData,
   GetProfile,
   ListEducation,
   ListExperiences,
@@ -61,6 +64,9 @@ export const DI = {
   },
 
   Company: {
-    Repository: new InjectionToken<CompanyRepository>('DI.Company.Repository')
+    Repository: new InjectionToken<CompanyRepository>('DI.Company.Repository'),
+    DataProvider: new InjectionToken<CompanyDataProvider>('DI.Company.DataProvider'),
+    Enrich: new InjectionToken<EnrichCompanyData>('DI.Company.Enrich'),
+    Create: new InjectionToken<CreateCompany>('DI.Company.Create')
   }
 };

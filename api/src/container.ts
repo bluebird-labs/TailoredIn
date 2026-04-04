@@ -2,6 +2,7 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
   AddAccomplishment,
+  CreateCompany,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
@@ -9,6 +10,7 @@ import {
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
+  EnrichCompanyData,
   GetProfile,
   ListEducation,
   ListExperiences,
@@ -21,6 +23,7 @@ import {
 } from '@tailoredin/application';
 import { env, envInt } from '@tailoredin/core';
 import {
+  ClaudeCliCompanyDataProvider,
   createOrmConfig,
   DI,
   PostgresCompanyRepository,
@@ -129,5 +132,14 @@ container.bind({
 
 // Company
 container.bind({ provide: DI.Company.Repository, useClass: PostgresCompanyRepository });
+container.bind({ provide: DI.Company.DataProvider, useClass: ClaudeCliCompanyDataProvider });
+container.bind({
+  provide: DI.Company.Enrich,
+  useFactory: () => new EnrichCompanyData(container.get(DI.Company.DataProvider))
+});
+container.bind({
+  provide: DI.Company.Create,
+  useFactory: () => new CreateCompany(container.get(DI.Company.Repository))
+});
 
 export { container };
