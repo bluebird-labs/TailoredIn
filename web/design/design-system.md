@@ -6,9 +6,9 @@ TailoredIn is a personal job-search pipeline and resume-tailoring tool. The web 
 
 ## Design Direction
 
-**Personality:** Warm & approachable — friendly, slightly playful, inviting. In the space of Notion and Todoist rather than Linear or Vercel. Rounded corners, softer colors, subtle personality touches.
+**Personality:** Sharp & vibrant — confident, distinctive amber identity. Crisp like Linear but warm instead of cold. Rounded corners and rich amber tones create a precision tool with personality.
 
-**Why this matters:** This is a personal tool used daily during a job search — a process that's inherently stressful. The UI should feel like a calm, organized workspace, not a corporate dashboard.
+**Why this matters:** This is a personal tool used daily during a job search — a process that's inherently stressful. The UI should feel like a focused, high-quality workspace that you enjoy opening, not a bland corporate dashboard.
 
 ## Color System
 
@@ -18,63 +18,63 @@ All colors use OKLch (perceptually uniform). The palette centers on a **Warm Amb
 
 | Token | Value | Usage |
 |---|---|---|
-| `--background` | `oklch(0.975 0.008 80)` | Page background — warm off-white |
-| `--foreground` | `oklch(0.22 0.02 80)` | Primary text |
-| `--card` | `oklch(1 0.005 80)` | Card surfaces — near-white with warmth |
-| `--card-foreground` | `oklch(0.22 0.02 80)` | Card text |
-| `--popover` | `oklch(1 0.005 80)` | Popover surfaces |
-| `--popover-foreground` | `oklch(0.22 0.02 80)` | Popover text |
-| `--primary` | `oklch(0.60 0.16 45)` | Primary amber accent — buttons, active states |
+| `--background` | `oklch(0.97 0.012 55)` | Page background — warm amber-tinted |
+| `--foreground` | `oklch(0.16 0.03 50)` | Primary text — dark warm |
+| `--card` | `oklch(0.995 0.008 55)` | Card surfaces |
+| `--card-foreground` | `oklch(0.16 0.03 50)` | Card text |
+| `--popover` | `oklch(0.995 0.008 55)` | Popover surfaces |
+| `--popover-foreground` | `oklch(0.16 0.03 50)` | Popover text |
+| `--primary` | `oklch(0.58 0.17 45)` | Primary amber accent |
 | `--primary-foreground` | `oklch(1 0 0)` | Text on primary |
-| `--secondary` | `oklch(0.95 0.015 80)` | Secondary surfaces — warm light gray |
-| `--secondary-foreground` | `oklch(0.35 0.02 80)` | Text on secondary |
-| `--muted` | `oklch(0.94 0.01 80)` | Muted backgrounds |
-| `--muted-foreground` | `oklch(0.55 0.015 80)` | Muted text — descriptions, metadata |
-| `--accent` | `oklch(0.94 0.03 45)` | Amber tint — highlighted tags, active tab bg |
-| `--accent-foreground` | `oklch(0.45 0.10 45)` | Text on accent — amber-toned |
+| `--secondary` | `oklch(0.93 0.025 55)` | Secondary surfaces |
+| `--secondary-foreground` | `oklch(0.30 0.04 50)` | Text on secondary |
+| `--muted` | `oklch(0.92 0.02 55)` | Muted backgrounds |
+| `--muted-foreground` | `oklch(0.45 0.05 50)` | Muted text |
+| `--accent` | `oklch(0.90 0.06 45)` | Amber tint |
+| `--accent-foreground` | `oklch(0.36 0.10 45)` | Text on accent |
 | `--destructive` | `oklch(0.577 0.245 27.325)` | Destructive red (unchanged) |
-| `--border` | `oklch(0.93 0.008 80)` | Borders — warm gray |
-| `--input` | `oklch(0.93 0.008 80)` | Input borders |
-| `--ring` | `oklch(0.65 0.12 45)` | Focus ring — amber |
-| `--sidebar` | `oklch(0.22 0.025 50)` | Dark warm sidebar background |
-| `--sidebar-foreground` | `oklch(0.62 0.02 50)` | Sidebar inactive text |
-| `--sidebar-primary` | `oklch(0.88 0.07 50)` | Sidebar logo / active item text — warm amber |
-| `--sidebar-primary-foreground` | `oklch(0.22 0.025 50)` | Inverse for sidebar badges |
-| `--sidebar-accent` | `oklch(0.30 0.04 50)` | Sidebar active item background |
-| `--sidebar-accent-foreground` | `oklch(0.88 0.06 50)` | Sidebar active item text |
-| `--sidebar-border` | `oklch(0.30 0.02 50)` | Sidebar internal dividers |
-| `--sidebar-ring` | `oklch(0.50 0.06 50)` | Sidebar focus ring |
+| `--border` | `oklch(0.85 0.035 50)` | Borders — visible, warm |
+| `--input` | `oklch(0.85 0.035 50)` | Input borders |
+| `--ring` | `oklch(0.60 0.15 45)` | Focus ring |
+| `--sidebar` | `oklch(0.20 0.035 50)` | Dark warm sidebar |
+| `--sidebar-foreground` | `oklch(0.60 0.04 50)` | Sidebar inactive text |
+| `--sidebar-primary` | `oklch(0.82 0.12 45)` | Sidebar logo / active — golden |
+| `--sidebar-primary-foreground` | `oklch(0.20 0.035 50)` | Inverse |
+| `--sidebar-accent` | `oklch(0.30 0.06 45)` | Sidebar active item bg |
+| `--sidebar-accent-foreground` | `oklch(0.90 0.08 45)` | Sidebar active item text |
+| `--sidebar-border` | `oklch(0.30 0.04 50)` | Sidebar dividers |
+| `--sidebar-ring` | `oklch(0.50 0.08 45)` | Sidebar focus ring |
 
 ### Dark Mode (`.dark`)
 
 | Token | Value | Usage |
 |---|---|---|
-| `--background` | `oklch(0.16 0.01 80)` | Page background — deep warm gray (not pure black) |
-| `--foreground` | `oklch(0.92 0.01 80)` | Primary text |
-| `--card` | `oklch(0.20 0.01 80)` | Card surfaces |
-| `--card-foreground` | `oklch(0.90 0.01 80)` | Card text |
-| `--popover` | `oklch(0.20 0.01 80)` | Popover surfaces |
-| `--popover-foreground` | `oklch(0.90 0.01 80)` | Popover text |
-| `--primary` | `oklch(0.70 0.12 45)` | Primary amber — slightly brighter for dark bg |
-| `--primary-foreground` | `oklch(0.16 0.01 80)` | Text on primary |
-| `--secondary` | `oklch(0.24 0.01 80)` | Secondary surfaces |
-| `--secondary-foreground` | `oklch(0.85 0.01 80)` | Text on secondary |
-| `--muted` | `oklch(0.24 0.01 80)` | Muted backgrounds |
-| `--muted-foreground` | `oklch(0.58 0.01 80)` | Muted text |
-| `--accent` | `oklch(0.28 0.05 45)` | Amber tint on dark |
-| `--accent-foreground` | `oklch(0.75 0.08 45)` | Amber-toned text on dark accent |
+| `--background` | `oklch(0.15 0.015 50)` | Deep warm gray |
+| `--foreground` | `oklch(0.93 0.015 55)` | Primary text |
+| `--card` | `oklch(0.20 0.02 50)` | Card surfaces |
+| `--card-foreground` | `oklch(0.93 0.015 55)` | Card text |
+| `--popover` | `oklch(0.20 0.02 50)` | Popover surfaces |
+| `--popover-foreground` | `oklch(0.93 0.015 55)` | Popover text |
+| `--primary` | `oklch(0.70 0.14 45)` | Primary amber — brighter |
+| `--primary-foreground` | `oklch(0.15 0.015 50)` | Text on primary |
+| `--secondary` | `oklch(0.23 0.02 50)` | Secondary surfaces |
+| `--secondary-foreground` | `oklch(0.86 0.02 55)` | Text on secondary |
+| `--muted` | `oklch(0.23 0.02 50)` | Muted backgrounds |
+| `--muted-foreground` | `oklch(0.55 0.04 50)` | Muted text |
+| `--accent` | `oklch(0.30 0.07 45)` | Amber tint on dark |
+| `--accent-foreground` | `oklch(0.78 0.10 45)` | Amber text on dark accent |
 | `--destructive` | `oklch(0.704 0.191 22.216)` | Destructive red (unchanged) |
-| `--border` | `oklch(0.26 0.008 80)` | Borders |
-| `--input` | `oklch(0.28 0.01 80)` | Input borders |
-| `--ring` | `oklch(0.70 0.10 45)` | Focus ring — amber |
-| `--sidebar` | `oklch(0.19 0.02 50)` | Sidebar — slightly different shade from content |
-| `--sidebar-foreground` | `oklch(0.55 0.02 50)` | Sidebar inactive text |
-| `--sidebar-primary` | `oklch(0.82 0.08 50)` | Sidebar logo / active text |
-| `--sidebar-primary-foreground` | `oklch(0.19 0.02 50)` | Inverse |
-| `--sidebar-accent` | `oklch(0.26 0.035 50)` | Sidebar active item bg |
-| `--sidebar-accent-foreground` | `oklch(0.82 0.07 50)` | Sidebar active item text |
-| `--sidebar-border` | `oklch(0.24 0.015 50)` | Sidebar border / right edge |
-| `--sidebar-ring` | `oklch(0.45 0.05 50)` | Sidebar focus ring |
+| `--border` | `oklch(0.30 0.03 50)` | Borders |
+| `--input` | `oklch(0.30 0.03 50)` | Input borders |
+| `--ring` | `oklch(0.70 0.12 45)` | Focus ring |
+| `--sidebar` | `oklch(0.17 0.03 50)` | Sidebar |
+| `--sidebar-foreground` | `oklch(0.58 0.04 50)` | Sidebar inactive text |
+| `--sidebar-primary` | `oklch(0.80 0.12 45)` | Sidebar active text |
+| `--sidebar-primary-foreground` | `oklch(0.17 0.03 50)` | Inverse |
+| `--sidebar-accent` | `oklch(0.26 0.05 45)` | Sidebar active bg |
+| `--sidebar-accent-foreground` | `oklch(0.85 0.09 45)` | Sidebar active text |
+| `--sidebar-border` | `oklch(0.25 0.03 50)` | Sidebar border |
+| `--sidebar-ring` | `oklch(0.48 0.07 45)` | Sidebar focus ring |
 
 ### Chart Colors
 
@@ -82,11 +82,11 @@ Five-step amber-to-neutral scale for data visualization:
 
 | Token | Light | Dark |
 |---|---|---|
-| `--chart-1` | `oklch(0.60 0.16 45)` | `oklch(0.70 0.12 45)` |
-| `--chart-2` | `oklch(0.70 0.12 45)` | `oklch(0.60 0.10 45)` |
-| `--chart-3` | `oklch(0.55 0.08 60)` | `oklch(0.50 0.06 60)` |
-| `--chart-4` | `oklch(0.65 0.04 80)` | `oklch(0.45 0.03 80)` |
-| `--chart-5` | `oklch(0.80 0.02 80)` | `oklch(0.35 0.02 80)` |
+| `--chart-1` | `oklch(0.58 0.17 45)` | `oklch(0.70 0.14 45)` |
+| `--chart-2` | `oklch(0.68 0.14 45)` | `oklch(0.60 0.12 45)` |
+| `--chart-3` | `oklch(0.52 0.10 55)` | `oklch(0.50 0.08 55)` |
+| `--chart-4` | `oklch(0.62 0.06 55)` | `oklch(0.45 0.05 55)` |
+| `--chart-5` | `oklch(0.78 0.04 55)` | `oklch(0.35 0.04 55)` |
 
 ## Typography
 
@@ -173,6 +173,14 @@ Five-step amber-to-neutral scale for data visualization:
 - Focus ring: amber (`--ring`)
 - Labels: 13px, 400 weight, `--foreground`
 - Helper text: 12px, `--muted-foreground`
+
+### Modal Forms
+
+- Use `FormModal` shared component for create/edit with 3+ fields
+- Max width: `sm:max-w-lg` (512px)
+- Content area: `max-h-[60vh]` with overflow scroll
+- Footer: Save (primary) + Cancel (ghost), same styling as SaveBar
+- Dirty-cancel: triggers ConfirmDialog with discard warning
 
 ### Dark Mode Toggle
 
