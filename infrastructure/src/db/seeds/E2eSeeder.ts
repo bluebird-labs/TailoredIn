@@ -44,7 +44,7 @@ export class E2eSeeder extends Seeder {
 
     // Experiences
     await conn.execute(`
-      INSERT INTO experiences (id, profile_id, title, company_name, company_website, location, start_date, end_date, summary, narrative, ordinal, created_at, updated_at)
+      INSERT INTO experiences (id, profile_id, title, company_name, company_website, location, start_date, end_date, summary, ordinal, created_at, updated_at)
       VALUES
         (
           'bbbbbbbb-0000-4000-8000-000000000001',
@@ -56,7 +56,6 @@ export class E2eSeeder extends Seeder {
           '2022-01',
           '2024-06',
           'Led platform engineering efforts',
-          'Built and maintained the core platform services used by 200+ engineers.',
           0,
           NOW(), NOW()
         ),
@@ -70,7 +69,6 @@ export class E2eSeeder extends Seeder {
           '2020-03',
           '2022-01',
           'Full-stack development',
-          'Shipped the initial product from zero to launch.',
           1,
           NOW(), NOW()
         ),
@@ -84,7 +82,6 @@ export class E2eSeeder extends Seeder {
           '2019-01',
           '2020-02',
           'Quality assurance',
-          NULL,
           2,
           NOW(), NOW()
         )
