@@ -1,16 +1,27 @@
 # TODOS
 > List of features, improvements and bugs to look at in this project
 
-## feat: Profile tab & about section
+## feat: Profile revision
 
-In the left nav, we should have a profile tab allows the user to manage their profile information.
+In this session we are revisitng the Profile across all layers.
 
-In order to drive the generation of headlines later we'll also add a new "about" section: a narrative text for the user to fill, medium sized text with detailed writing from the user. The text will also be used to infer the user's tone later, and more globally define their profesional identity.
+- the Profile tab should allow editing all fields
+- a new "about" section must be added: a narrative text for the user to fill, medium sized text with detailed writing from the user. The text will be used to infer the user's tone later, and more globally define their professional identity
+- name should be first name + last name, not just one single field
 
-## feat: UI / UX revistion
+AC:
+- all checks pass
+- new e2e tests are added
+- all fields can be edited and saved
 
-the concept of wardrobe completely disappers and each tab is focused on one aggregate.
+## feat: 
 
-- the web site should open to the profile page
-- experience => experiences: lists all experiences with all informations (not just title, company) and accomplishments. The current UI is good but the tab should only show experiences
-- headlines and education can stay however right now clicking them does nothing
+## chore: Populate database from MD file
+
+In this task you will take the content of PROFILE.md and create a database migration to insert / update the data for the unique profile.
+
+- About goes to the profile about data as is
+- info should be self explanatory
+- education too
+- for experiences beyond the obvious location / dates / title / comoany name, you will create one accomplishment per bullet point and generate a short title for each based on the content
+
