@@ -6,6 +6,8 @@ export type { EmptyStateProps } from './EmptyState.js';
 export { EmptyState } from './EmptyState.js';
 export type { FieldErrorProps } from './FieldError.js';
 export { FieldError } from './FieldError.js';
+export type { FormModalProps } from './FormModal.js';
+export { FormModal } from './FormModal.js';
 export type { LoadingSkeletonProps, SkeletonVariant } from './LoadingSkeleton.js';
 export { LoadingSkeleton } from './LoadingSkeleton.js';
 export type { SaveBarProps } from './SaveBar.js';
