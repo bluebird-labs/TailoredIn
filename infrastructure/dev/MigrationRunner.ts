@@ -5,7 +5,7 @@ import { backupDatabase } from './DatabaseBackup.js';
 
 const log = Logger.create('migration-runner');
 
-export type MigrationOptions = {
+type MigrationOptions = {
   dbConfig: OrmDbConfig;
   containerName: string;
   repoRoot: string;
