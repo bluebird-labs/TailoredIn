@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,7 @@ interface ConfirmDialogProps {
   readonly confirmVariant?: 'destructive' | 'default';
   readonly onConfirm: () => void | Promise<void>;
   readonly onCancel?: () => void;
-  readonly trigger: ReactNode;
+  readonly trigger: ReactElement;
 }
 
 function ConfirmDialog({
@@ -32,7 +32,7 @@ function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>{trigger}</AlertDialogTrigger>
+      <AlertDialogTrigger render={trigger} />
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

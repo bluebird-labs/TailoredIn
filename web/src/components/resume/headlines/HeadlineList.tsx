@@ -83,7 +83,7 @@ function HeadlineCard({ headline, onDirtyChange }: HeadlineCardProps) {
         </div>
         <ConfirmDialog
           title="Delete headline?"
-          description="This headline variant will be permanently removed."
+          description="This headline will be permanently removed."
           onConfirm={() => del.mutate(headline.id)}
           trigger={
             <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
@@ -137,13 +137,7 @@ export function HeadlineList({ onDirtyChange }: HeadlineListProps) {
   if (isLoading) return <LoadingSkeleton variant="list" count={3} />;
 
   if ((headlines as Headline[]).length === 0 && !adding) {
-    return (
-      <EmptyState
-        message="No headline variants yet."
-        actionLabel="Add headline variant"
-        onAction={() => setAdding(true)}
-      />
-    );
+    return <EmptyState message="No headlines yet." actionLabel="Add headline" onAction={() => setAdding(true)} />;
   }
 
   return (
@@ -192,7 +186,7 @@ export function HeadlineList({ onDirtyChange }: HeadlineListProps) {
       ) : (
         <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setAdding(true)}>
           <Plus className="h-3 w-3 mr-1" />
-          Add headline variant
+          Add headline
         </Button>
       )}
     </div>
