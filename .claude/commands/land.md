@@ -1,6 +1,6 @@
 ---
-allowed-tools: Bash(git rebase:*), Bash(git push:*), Bash(git status:*), Bash(git log:*), Bash(git branch:*), Bash(git diff:*), Bash(gh pr create:*), Bash(gh pr merge:*), Bash(gh pr checks:*), Bash(gh pr view:*)
-description: Rebase on main, create PR, wait for CI green, then merge
+allowed-tools: Bash(git rebase:*), Bash(git push:*), Bash(git status:*), Bash(git log:*), Bash(git branch:*), Bash(git diff:*), Bash(git checkout:*), Bash(git merge:*), Bash(gh pr create:*), Bash(gh pr merge:*), Bash(gh pr checks:*), Bash(gh pr view:*)
+description: Rebase on main and land via PR (remote) or local merge
 ---
 
 ## Context
@@ -11,7 +11,17 @@ description: Rebase on main, create PR, wait for CI green, then merge
 
 ## Your task
 
-Land the current branch into main. Follow these steps exactly:
+Land the current branch into main. First, ask the user:
+
+> **How do you want to land this branch?**
+> - **Remote (PR)** — Create/update PR, wait for CI, squash-merge via GitHub
+> - **Local** — Rebase on main, merge locally, push main directly
+
+Then follow the matching flow exactly.
+
+---
+
+### Remote flow
 
 1. **Rebase on latest main:**
    ```
@@ -45,3 +55,34 @@ Land the current branch into main. Follow these steps exactly:
    ```
 
 6. **Report completion** with the merged PR URL.
+
+---
+
+### Local flow
+
+1. **Rebase on latest main:**
+   ```
+   git fetch origin main
+   git rebase origin/main
+   ```
+   If rebase conflicts occur, STOP and ask for help.
+
+2. **Switch to main and fast-forward merge:**
+   ```
+   git checkout main
+   git merge <feature-branch> --ff-only
+   ```
+   `--ff-only` ensures a clean fast-forward after rebase. If it fails, STOP and ask for help.
+
+3. **Push main:**
+   ```
+   git push origin main
+   ```
+
+4. **Delete the feature branch** (local + remote):
+   ```
+   git branch -d <feature-branch>
+   git push origin --delete <feature-branch>
+   ```
+
+5. **Report completion** with the branch name and latest commit hash.
