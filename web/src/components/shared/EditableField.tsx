@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -44,7 +45,7 @@ type EditableFieldProps = TextFieldProps | TextareaFieldProps | SelectFieldProps
 function EditableField(props: EditableFieldProps) {
   const { label, required, error, isDirty, disabled, className, type } = props;
 
-  const fieldId = label.toLowerCase().replace(/\s+/g, '-');
+  const fieldId = useId();
 
   return (
     <div
