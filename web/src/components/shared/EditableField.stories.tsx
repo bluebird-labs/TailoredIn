@@ -72,3 +72,26 @@ export const Disabled: Story = {
     disabled: true
   }
 };
+
+export const FormGroup: Story = {
+  args: {
+    type: 'text',
+    label: 'Full name',
+    value: 'Sylvain Estevez',
+    onChange: () => {}
+  },
+  render: () => (
+    <div className="max-w-lg space-y-4">
+      <EditableField type="text" label="Full name" value="Sylvain Estevez" onChange={() => {}} required />
+      <EditableField type="text" label="Headline" value="Full Stack Engineer" onChange={() => {}} isDirty />
+      <EditableField
+        type="textarea"
+        label="Summary"
+        value="Passionate engineer with 8 years of experience building scalable web applications..."
+        onChange={() => {}}
+        placeholder="Write a brief professional summary"
+      />
+      <EditableField type="text" label="Location" value="Paris, France" onChange={() => {}} />
+    </div>
+  )
+};
