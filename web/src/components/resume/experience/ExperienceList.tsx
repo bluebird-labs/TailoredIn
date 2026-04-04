@@ -31,7 +31,7 @@ type Experience = {
   accomplishments: AccomplishmentDto[];
 };
 
-export function ExperienceTab() {
+export function ExperienceList() {
   const { data: experiences = [], isLoading } = useExperiences();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 

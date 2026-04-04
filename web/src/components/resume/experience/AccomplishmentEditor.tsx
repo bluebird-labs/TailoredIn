@@ -22,7 +22,7 @@ export function AccomplishmentEditor({ experienceId, accomplishment }: Props) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(accomplishment.title);
   const [narrative, setNarrative] = useState(accomplishment.narrative);
-  const [tagInput, setTagInput] = useState(accomplishment.skillTags.join(', '));
+  const [tagInput, setTagInput] = useState((accomplishment.skillTags ?? []).join(', '));
 
   const update = useUpdateAccomplishment(experienceId);
   const del = useDeleteAccomplishment(experienceId);
@@ -82,7 +82,7 @@ export function AccomplishmentEditor({ experienceId, accomplishment }: Props) {
       <div className="bg-muted/30 px-3 py-2 border-b flex items-center justify-between">
         <span className="font-medium text-sm">{accomplishment.title || 'Untitled'}</span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {accomplishment.skillTags.map(tag => (
+          {(accomplishment.skillTags ?? []).map(tag => (
             <Badge key={tag} variant="secondary" className="text-xs">
               {tag}
             </Badge>
