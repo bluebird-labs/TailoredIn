@@ -2,6 +2,7 @@
 
 ## Info
 - Linkedin: https://www.linkedin.com/in/sylvain-estevez/
+- Email: estevez.sylvain@gmail.com
 - Location: New York, NY
 - Phone: (415) 619 7821
 - GitHub: https://github.com/SylvainEstevez

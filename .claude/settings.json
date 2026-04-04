@@ -20,15 +20,6 @@
     "allow": [
       "EnterPlanMode",
       "WebFetch"
-    ],
-    "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(sudo:*)",
-      "Read(**/.env)",
-      "Read(**/.env.*)",
-      "Read(**/secrets/**)",
-      "Read(~/.ssh/**)",
-      "Read(~/.aws/**)"
     ]
   }
 }
