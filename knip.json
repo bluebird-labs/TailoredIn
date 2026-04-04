@@ -13,6 +13,7 @@
     },
     "api": {},
     "web": {
+      "entry": ["test/**/*.ts", "src/hooks/test/**/*.ts", "src/components/shared/index.ts", "src/hooks/use-dirty-tracking.ts", "src/hooks/use-nav-guard.ts"],
       "ignore": ["src/components/ui/**"]
     }
   },
