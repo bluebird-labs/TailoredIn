@@ -26,6 +26,21 @@ domain/src/
 └── Result.ts
 ```
 
+## Keeping the diagram in sync
+
+**`domain/DOMAIN.mmd` is the source of truth for the domain model.** Whenever you add, remove, or rename an aggregate, entity, value object, enum, domain service, or domain event — update `DOMAIN.mmd` in the same commit. The diagram must always reflect the code.
+
+Color legend:
+
+| Color | Type |
+|-------|------|
+| Indigo | Aggregate Root |
+| Blue | Entity |
+| Green | Value Object |
+| Amber | Enumeration / Type |
+| Purple | Domain Service |
+| Pink | Domain Event |
+
 ## AggregateRoot vs Entity vs ValueObject
 
 | Base class | When to use | Identity |
