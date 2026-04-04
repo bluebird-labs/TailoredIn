@@ -56,7 +56,7 @@ const dbConfig = {
 };
 
 log.info('Running migrations...');
-await runMigrations(dbConfig);
+await runMigrations({ dbConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
 
 log.info('Running seeds...');
 await runSeeds(dbConfig);

@@ -15,4 +15,4 @@ requireWorktree(ctx);
 
 const session = await readSession();
 log.info(`Running migrations on ${session.dbName}...`);
-await runMigrations(toOrmConfig(session));
+await runMigrations({ dbConfig: toOrmConfig(session), containerName: session.containerName, repoRoot: ctx.repoRoot });

@@ -93,7 +93,7 @@ const ormConfig = toOrmConfig(session);
 
 log.info('Running migrations...');
 try {
-  await runMigrations(ormConfig);
+  await runMigrations({ dbConfig: ormConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
 } catch (e) {
   teardown();
   throw e;
