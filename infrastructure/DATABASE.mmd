@@ -1,0 +1,233 @@
+---
+title: TailoredIn — Database ERD (PostgreSQL)
+---
+
+erDiagram
+
+    %% ──────────────────────────────────────────────
+    %%  Profile Subdomain
+    %% ──────────────────────────────────────────────
+
+    profiles {
+        uuid id PK
+        text email
+        text first_name
+        text last_name
+        text phone "nullable"
+        text location "nullable"
+        text linkedin_url "nullable"
+        text github_url "nullable"
+        text website_url "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    experiences {
+        uuid id PK
+        uuid profile_id FK
+        text title
+        text company_name
+        text company_website "nullable"
+        text location
+        text start_date
+        text end_date
+        text summary "nullable"
+        text narrative "nullable"
+        integer ordinal
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    accomplishments {
+        uuid id PK
+        uuid experience_id FK
+        text title
+        text narrative
+        json skill_tags
+        integer ordinal
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    educations {
+        uuid id PK
+        uuid profile_id FK
+        text degree_title
+        text institution_name
+        integer graduation_year
+        text location "nullable"
+        text honors "nullable"
+        integer ordinal
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ──────────────────────────────────────────────
+    %%  Skill Subdomain
+    %% ──────────────────────────────────────────────
+
+    skill_categories {
+        uuid id PK
+        uuid profile_id FK
+        text name
+        integer ordinal
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    skill_items {
+        uuid id PK
+        uuid skill_category_id FK
+        text name
+        integer ordinal
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    skills {
+        uuid id PK
+        text name
+        text key UK "unique"
+        skill_affinity affinity "default: expert"
+        text[] variants
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ──────────────────────────────────────────────
+    %%  Company & Job Subdomain
+    %% ──────────────────────────────────────────────
+
+    companies {
+        uuid id PK
+        text name
+        text website "nullable"
+        text logo_url "nullable"
+        text linkedin_link UK "unique"
+        boolean ignored "default: false"
+        text business_type "nullable"
+        text industry "nullable"
+        text stage "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    company_briefs {
+        uuid id PK
+        uuid company_id FK
+        text product_overview
+        text tech_stack
+        text culture
+        text recent_news
+        text key_people
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    jobs {
+        uuid id PK
+        uuid company_id FK
+        job_status status "default: new"
+        text apply_link "nullable"
+        text linkedin_id UK "unique"
+        text title
+        text linkedin_link
+        text type "nullable"
+        text level "nullable"
+        text remote "nullable"
+        timestamp posted_at "nullable"
+        boolean is_repost "nullable"
+        text location_raw
+        integer salary_low "nullable"
+        integer salary_high "nullable"
+        text salary_raw "nullable"
+        text description
+        text description_html
+        integer applicants_count "nullable"
+        tsvector description_fts "generated, indexed"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    job_status_updates {
+        uuid id PK
+        uuid job_id FK
+        job_status status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ──────────────────────────────────────────────
+    %%  Tagging Subdomain
+    %% ──────────────────────────────────────────────
+
+    headlines {
+        uuid id PK
+        uuid profile_id FK
+        text label
+        text summary_text
+        text status "default: active"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    tags {
+        uuid id PK
+        text name
+        text dimension
+        timestamp created_at
+    }
+
+    headline_tags {
+        uuid headline_id FK
+        uuid tag_id FK
+    }
+
+    %% ──────────────────────────────────────────────
+    %%  Resume Subdomain
+    %% ──────────────────────────────────────────────
+
+    tailored_resumes {
+        uuid id PK
+        uuid profile_id FK
+        text jd_content
+        json llm_proposals
+        json content_selection
+        json generated_content "nullable"
+        text headline_text "default: empty"
+        text status "default: draft"
+        text pdf_path "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    resume_profiles {
+        uuid profile_id PK
+        json content_selection
+        text headline_text "default: empty"
+        timestamp updated_at
+    }
+
+    %% ──────────────────────────────────────────────
+    %%  Relationships
+    %% ──────────────────────────────────────────────
+
+    profiles ||--o{ experiences : "has"
+    profiles ||--o{ educations : "has"
+    profiles ||--o{ skill_categories : "has"
+    profiles ||--o{ headlines : "has"
+    profiles ||--o{ tailored_resumes : "has"
+    profiles ||--o| resume_profiles : "has"
+
+    experiences ||--o{ accomplishments : "has"
+
+    skill_categories ||--o{ skill_items : "contains"
+
+    companies ||--o{ jobs : "posts"
+    companies ||--o| company_briefs : "has"
+
+    jobs ||--o{ job_status_updates : "tracks"
+
+    headlines }o--o{ tags : "tagged with"
+    headlines ||--o{ headline_tags : "has"
+    tags ||--o{ headline_tags : "has"
