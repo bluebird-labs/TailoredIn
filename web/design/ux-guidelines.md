@@ -38,6 +38,26 @@ Saving is explicit and scoped to the domain aggregate boundary:
 - Required fields are marked with `*` next to the label
 - Validation runs client-side before the API call; API errors are also displayed inline if they map to specific fields
 
+### Modal Forms (High Data Density)
+
+Prefer modals over inline editing when creating or editing entities with **3 or more fields**. Modals provide focused context, prevent accidental navigation, and keep the list/parent view visible behind the overlay.
+
+**When to use modals:**
+- Creating a new entity (experience, education, company)
+- Editing an entity with high field count where inline editing would be disorienting
+
+**When NOT to use modals:**
+- Single-field edits (use inline EditableField)
+- Profile-level fields that are always visible (use page-level always-editable pattern)
+
+**Modal behavior:**
+- Use the `FormModal` shared component
+- Footer: Save (primary, disabled until dirty) + Cancel (ghost)
+- Cancel with dirty fields triggers `ConfirmDialog`: "You have unsaved changes. Discard?"
+- Close (X) and overlay click behave identically to Cancel
+- Validation fires on save attempt only — same rules as inline forms
+- Content scrolls if form exceeds viewport height (`max-h-[60vh]`)
+
 ---
 
 ## 2. Loading, Empty & Error States
