@@ -28,3 +28,5 @@ export type { UpdateHeadlineInput } from './headline/UpdateHeadline.js';
 export { UpdateHeadline } from './headline/UpdateHeadline.js';
 export type { UpdateProfileInput } from './UpdateProfile.js';
 export { UpdateProfile } from './UpdateProfile.js';
+export type { EnrichCompanyDataInput } from './company/EnrichCompanyData.js';
+export { EnrichCompanyData } from './company/EnrichCompanyData.js';
