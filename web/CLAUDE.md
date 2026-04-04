@@ -92,3 +92,19 @@ export const queryKeys = {
 Invalidate at the right level of specificity:
 - `queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all })` — invalidates all experience queries
 - `queryClient.invalidateQueries({ queryKey: queryKeys.experiences.detail(id) })` — single experience only
+
+## Design System
+
+All UI must follow `docs/superpowers/specs/2026-03-30-web-frontend-design-system.md`. Key rules:
+- **No bold (700) or semibold (600)** — max weight is `font-medium` (500)
+- **No hardcoded colors** — use design tokens (`primary`, `accent`, `muted`, etc.)
+- **No shadows on cards/inputs** — use borders only
+- **Inline editing pattern** — each data field edits in-place (pencil icon on hover → field transforms to input). No global Edit buttons or full-page mode swaps.
+- **Typography scale**: h1=22px/medium, h2=18px/medium, h3=15px/medium, body=14px/regular
+
+## Domain Model as Source of Truth
+
+`domain/DOMAIN.mmd` defines all entities, fields, and relationships. The UI must reflect this model:
+- Entity fields shown in the UI must match the domain model exactly
+- Adding or removing fields in the UI requires verifying against `DOMAIN.mmd` first
+- When building forms or display components, consult `DOMAIN.mmd` for the canonical field list

@@ -37,8 +37,8 @@ export function AccomplishmentEditor({ experienceId, accomplishment }: Props) {
 
   if (editing) {
     return (
-      <div className="border border-indigo-300 rounded-lg overflow-hidden">
-        <div className="bg-indigo-50 px-3 py-2 border-b border-indigo-200 flex gap-2">
+      <div className="border border-primary/30 rounded-lg overflow-hidden">
+        <div className="bg-accent px-3 py-2 border-b border-primary/20 flex gap-2">
           <Input
             value={title}
             onChange={e => setTitle(e.target.value)}
@@ -56,7 +56,7 @@ export function AccomplishmentEditor({ experienceId, accomplishment }: Props) {
           <textarea
             value={narrative}
             onChange={e => setNarrative(e.target.value)}
-            className="w-full text-sm min-h-24 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="w-full text-sm min-h-24 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             placeholder="Describe what you did, why, and the outcome in detail..."
           />
         </div>
