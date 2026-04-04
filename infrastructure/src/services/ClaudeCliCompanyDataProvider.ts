@@ -1,7 +1,7 @@
 import { injectable } from '@needle-di/core';
-import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '@tailoredin/application';
 import { EnumUtil, Logger } from '@tailoredin/core';
+import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
 
 @injectable()
 export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
@@ -40,7 +40,10 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
       website: typeof data.website === 'string' ? data.website : null,
       logoUrl: typeof data.logoUrl === 'string' ? data.logoUrl : null,
       linkedinLink: typeof data.linkedinLink === 'string' ? data.linkedinLink : null,
-      businessType: typeof data.businessType === 'string' && EnumUtil.is(data.businessType, BusinessType) ? data.businessType : null,
+      businessType:
+        typeof data.businessType === 'string' && EnumUtil.is(data.businessType, BusinessType)
+          ? data.businessType
+          : null,
       industry: typeof data.industry === 'string' && EnumUtil.is(data.industry, Industry) ? data.industry : null,
       stage: typeof data.stage === 'string' && EnumUtil.is(data.stage, CompanyStage) ? data.stage : null
     };

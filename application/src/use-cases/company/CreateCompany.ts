@@ -1,5 +1,5 @@
-import { Company, type CompanyRepository } from '@tailoredin/domain';
 import type { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import { Company, type CompanyRepository } from '@tailoredin/domain';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 

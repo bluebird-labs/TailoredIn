@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { BusinessType, Industry, CompanyStage } from '@tailoredin/domain';
+import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
 import { ClaudeCliCompanyDataProvider } from '../../src/services/ClaudeCliCompanyDataProvider.js';
 
 describe('ClaudeCliCompanyDataProvider', () => {

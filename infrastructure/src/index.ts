@@ -1,7 +1,5 @@
 // DI tokens
 export { DI } from './DI.js';
-// Services
-export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
 // ORM config
 export { createOrmConfig } from './db/orm-config.js';
 // Repositories
@@ -10,3 +8,5 @@ export { PostgresEducationRepository } from './repositories/PostgresEducationRep
 export { PostgresExperienceRepository } from './repositories/PostgresExperienceRepository.js';
 export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
+// Services
+export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
