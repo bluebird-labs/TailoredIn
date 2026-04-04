@@ -169,6 +169,8 @@ Five-step amber-to-neutral scale for data visualization:
 
 ### Form Inputs
 
+- Background: `--card` (elevated surface, visually distinct from page `--background`)
+- Disabled background: `--muted`
 - Border: `--input`, 8px radius
 - Focus ring: amber (`--ring`)
 - Labels: 13px, 400 weight, `--foreground`
