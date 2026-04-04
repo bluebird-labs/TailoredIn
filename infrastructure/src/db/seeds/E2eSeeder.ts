@@ -73,6 +73,20 @@ export class E2eSeeder extends Seeder {
           'Shipped the initial product from zero to launch.',
           1,
           NOW(), NOW()
+        ),
+        (
+          'bbbbbbbb-0000-4000-8000-000000000003',
+          'aaaaaaaa-0000-4000-8000-000000000001',
+          'QA Analyst',
+          'ScratchCorp',
+          NULL,
+          'Austin, TX',
+          '2019-01',
+          '2020-02',
+          'Quality assurance',
+          NULL,
+          2,
+          NOW(), NOW()
         )
     `);
 
