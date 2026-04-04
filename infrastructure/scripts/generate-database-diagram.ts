@@ -19,25 +19,14 @@ const OUTPUT_PATH = resolve(import.meta.dirname, '../DATABASE.mmd');
 /** Tables to exclude from the diagram. */
 const EXCLUDED_TABLES = new Set(['mikro_orm_migrations']);
 
-/** Subdomain grouping — order determines output order. */
-const SUBDOMAIN_GROUPS: [label: string, tables: string[]][] = [
-  ['Profile Subdomain', ['profiles', 'experiences', 'accomplishments', 'educations']],
-  ['Skill Subdomain', ['skill_categories', 'skill_items', 'skills']],
-  ['Company & Job Subdomain', ['companies', 'company_briefs', 'jobs', 'job_status_updates']],
-  ['Tagging Subdomain', ['headlines', 'tags', 'headline_tags']],
-  ['Resume Subdomain', ['tailored_resumes', 'resume_profiles']]
-];
-
-/** Custom relationship labels (default is "has"). */
-const RELATIONSHIP_LABELS: Record<string, string> = {
-  'companies->jobs': 'posts',
-  'jobs->job_status_updates': 'tracks',
-  'skill_categories->skill_items': 'contains'
-};
-
-/** Many-to-many relationships to emit as shorthand (in addition to junction table). */
-const M2M_RELATIONSHIPS: { left: string; right: string; label: string }[] = [
-  { left: 'headlines', right: 'tags', label: 'tagged with' }
+/** Color palette for connected-component groups (fill, stroke). Cycles if more groups than colors. */
+const GROUP_COLORS: [fill: string, stroke: string][] = [
+  ['#dae8fc', '#6c8ebf'], // blue
+  ['#d5e8d4', '#82b366'], // green
+  ['#fff2cc', '#d6b656'], // amber
+  ['#f8cecc', '#b85450'], // red
+  ['#e1d5e7', '#9673a6'], // purple
+  ['#ffe6cc', '#d79b00'] // orange
 ];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -169,6 +158,19 @@ try {
     }
   }
 
+  // Auto-detect M2M pairs from junction tables
+  const m2mPairs: { left: string; right: string }[] = [];
+  for (const jt of junctionTables) {
+    const targets = foreignKeys.filter(fk => fk.from_table === jt).map(fk => fk.to_table);
+    const uniqueTargets = [...new Set(targets)];
+    if (uniqueTargets.length === 2) {
+      m2mPairs.push({ left: uniqueTargets[0], right: uniqueTargets[1] });
+    }
+  }
+
+  // Group tables by FK connectivity (connected components)
+  const groups = findConnectedComponents(tableNames, foreignKeys);
+
   // Build diagram
   const output = buildDiagram(
     tableNames,
@@ -179,7 +181,9 @@ try {
     indexedColumns,
     enumTypes,
     foreignKeys,
-    junctionTables
+    junctionTables,
+    groups,
+    m2mPairs
   );
 
   writeFileSync(OUTPUT_PATH, output);
@@ -301,6 +305,44 @@ function formatColumnAnnotation(
   return { constraint, comment: parts.length > 0 ? `"${parts.join(', ')}"` : '' };
 }
 
+function findConnectedComponents(tableNames: string[], foreignKeys: ForeignKeyInfo[]): string[][] {
+  const tableSet = new Set(tableNames);
+  const adjacency = new Map<string, Set<string>>();
+  for (const t of tableNames) adjacency.set(t, new Set());
+
+  for (const fk of foreignKeys) {
+    if (!tableSet.has(fk.from_table) || !tableSet.has(fk.to_table)) continue;
+    adjacency.get(fk.from_table)!.add(fk.to_table);
+    adjacency.get(fk.to_table)!.add(fk.from_table);
+  }
+
+  const visited = new Set<string>();
+  const components: string[][] = [];
+
+  for (const table of tableNames) {
+    if (visited.has(table)) continue;
+    const component: string[] = [];
+    const queue = [table];
+    visited.add(table);
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      component.push(current);
+      for (const neighbor of adjacency.get(current)!) {
+        if (!visited.has(neighbor)) {
+          visited.add(neighbor);
+          queue.push(neighbor);
+        }
+      }
+    }
+    component.sort();
+    components.push(component);
+  }
+
+  // Sort components: larger groups first, then alphabetically by first table
+  components.sort((a, b) => b.length - a.length || a[0].localeCompare(b[0]));
+  return components;
+}
+
 function buildDiagram(
   tableNames: string[],
   columns: ColumnInfo[],
@@ -310,38 +352,24 @@ function buildDiagram(
   indexedColumns: Map<string, Set<string>>,
   enumTypes: Set<string>,
   foreignKeys: ForeignKeyInfo[],
-  junctionTables: Set<string>
+  junctionTables: Set<string>,
+  groups: string[][],
+  m2mPairs: { left: string; right: string }[]
 ): string {
   const lines: string[] = ['---', 'title: TailoredIn \u2014 Database ERD (PostgreSQL)', '---', '', 'erDiagram'];
 
   const tableSet = new Set(tableNames);
-  const emittedTables = new Set<string>();
 
-  // Emit tables grouped by subdomain
-  for (const [label, tables] of SUBDOMAIN_GROUPS) {
-    const validTables = tables.filter(t => tableSet.has(t));
-    if (validTables.length === 0) continue;
+  // Emit tables grouped by connected component
+  for (let i = 0; i < groups.length; i++) {
+    const group = groups[i];
+    const label = groups.length === 1 ? 'Tables' : group.length === 1 ? 'Standalone' : `Group ${i + 1}`;
 
     lines.push('');
     lines.push(sectionHeader(label));
     lines.push('');
 
-    for (const tableName of validTables) {
-      emittedTables.add(tableName);
-      lines.push(
-        ...emitTable(tableName, columns, pkColumns, ukColumns, fkColumns, indexedColumns, enumTypes, junctionTables)
-      );
-      lines.push('');
-    }
-  }
-
-  // Emit any remaining tables not in a group
-  const ungrouped = tableNames.filter(t => !emittedTables.has(t));
-  if (ungrouped.length > 0) {
-    lines.push('');
-    lines.push(sectionHeader('Other'));
-    lines.push('');
-    for (const tableName of ungrouped) {
+    for (const tableName of group) {
       lines.push(
         ...emitTable(tableName, columns, pkColumns, ukColumns, fkColumns, indexedColumns, enumTypes, junctionTables)
       );
@@ -368,16 +396,26 @@ function buildDiagram(
     const isOneToOne = isUnique || isPk;
 
     const cardinality = isOneToOne ? '||--o|' : '||--o{';
-    const labelKey = `${fk.to_table}->${fk.from_table}`;
-    const label = RELATIONSHIP_LABELS[labelKey] ?? 'has';
-
-    lines.push(`    ${fk.to_table} ${cardinality} ${fk.from_table} : "${label}"`);
+    lines.push(`    ${fk.to_table} ${cardinality} ${fk.from_table} : "has"`);
   }
 
-  // Many-to-many shorthand relationships
-  for (const m2m of M2M_RELATIONSHIPS) {
-    lines.push('');
-    lines.push(`    ${m2m.left} }o--o{ ${m2m.right} : "${m2m.label}"`);
+  // Auto-detected many-to-many relationships
+  for (const m2m of m2mPairs) {
+    lines.push(`    ${m2m.left} }o--o{ ${m2m.right} : "many-to-many"`);
+  }
+
+  // Color-code tables by group
+  lines.push('');
+  lines.push(sectionHeader('Styles'));
+  lines.push('');
+
+  for (let i = 0; i < groups.length; i++) {
+    const [fill, stroke] = GROUP_COLORS[i % GROUP_COLORS.length];
+    const className = `group${i}`;
+    lines.push(`    classDef ${className} fill:${fill},stroke:${stroke},stroke-width:2px`);
+    for (const tableName of groups[i]) {
+      lines.push(`    class ${tableName} ${className}`);
+    }
   }
 
   return `${lines.join('\n')}\n`;

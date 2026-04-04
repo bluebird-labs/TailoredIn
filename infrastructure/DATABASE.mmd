@@ -5,39 +5,8 @@ title: TailoredIn — Database ERD (PostgreSQL)
 erDiagram
 
     %% ──────────────────────────────────────────────
-    %%  Profile Subdomain
+    %%  Group 1
     %% ──────────────────────────────────────────────
-
-    profiles {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        text email
-        text first_name
-        text last_name
-        text phone "nullable"
-        text location "nullable"
-        text linkedin_url "nullable"
-        text github_url "nullable"
-        text website_url "nullable"
-        text about "nullable"
-    }
-
-    experiences {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid profile_id FK
-        text title
-        text company_name
-        text company_website "nullable"
-        text location "default: empty"
-        text start_date
-        text end_date
-        text summary "nullable"
-        integer ordinal "default: 0"
-        text narrative "nullable"
-    }
 
     accomplishments {
         uuid id PK
@@ -62,9 +31,50 @@ erDiagram
         integer ordinal "default: 0"
     }
 
+    experiences {
+        uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+        uuid profile_id FK
+        text title
+        text company_name
+        text company_website "nullable"
+        text location "default: empty"
+        text start_date
+        text end_date
+        text summary "nullable"
+        integer ordinal "default: 0"
+        text narrative "nullable"
+    }
+
+    headlines {
+        uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+        uuid profile_id FK
+        text label
+        text summary_text
+        text status "default: active"
+    }
+
+    profiles {
+        uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+        text email
+        text first_name
+        text last_name
+        text phone "nullable"
+        text location "nullable"
+        text linkedin_url "nullable"
+        text github_url "nullable"
+        text website_url "nullable"
+        text about "nullable"
+    }
+
 
     %% ──────────────────────────────────────────────
-    %%  Company & Job Subdomain
+    %%  Standalone
     %% ──────────────────────────────────────────────
 
     companies {
@@ -80,21 +90,6 @@ erDiagram
         text stage "nullable"
     }
 
-
-    %% ──────────────────────────────────────────────
-    %%  Tagging Subdomain
-    %% ──────────────────────────────────────────────
-
-    headlines {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid profile_id FK
-        text label
-        text summary_text
-        text status "default: active"
-    }
-
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
@@ -104,4 +99,15 @@ erDiagram
     profiles ||--o{ educations : "has"
     experiences ||--o{ accomplishments : "has"
 
-    headlines }o--o{ tags : "tagged with"
+    %% ──────────────────────────────────────────────
+    %%  Styles
+    %% ──────────────────────────────────────────────
+
+    classDef group0 fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px
+    class accomplishments group0
+    class educations group0
+    class experiences group0
+    class headlines group0
+    class profiles group0
+    classDef group1 fill:#d5e8d4,stroke:#82b366,stroke-width:2px
+    class companies group1

@@ -14,6 +14,8 @@
     "web": "bun run --cwd web preview",
     "web:dev": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd web dev",
     "web:build": "bun run --cwd web build",
+    "web:storybook": "bun run --cwd web storybook",
+    "web:storybook:build": "bun run --cwd web storybook:build",
     "check": "biome check domain application infrastructure core api web",
     "check:fix": "biome check --write domain application infrastructure core api web",
     "format": "biome format --write domain application infrastructure core api web",
