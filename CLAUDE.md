@@ -103,7 +103,7 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 
 ## Domain Model
 
-See **`DOMAIN.md`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, and their relationships across Profile, Company, Tagging, Job, Resume, and Skill subdomains.
+See **`domain/DOMAIN.mmd`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, domain services, domain events, and their relationships across Profile, Company, Tagging, Job, Resume, and Skill subdomains.
 
 ## Conventions
 
