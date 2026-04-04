@@ -51,7 +51,6 @@ describe('PostgresExperienceRepository — accomplishments', () => {
     exp.addAccomplishment({
       title: 'Billing sharding',
       narrative: 'Led hash-based sharding migration, reducing P99 by 40%.',
-      skillTags: ['distributed-systems', 'performance'],
       ordinal: 0
     });
 
@@ -60,7 +59,6 @@ describe('PostgresExperienceRepository — accomplishments', () => {
     const loaded = await repo.findByIdOrFail(exp.id.value);
     expect(loaded.accomplishments).toHaveLength(1);
     expect(loaded.accomplishments[0].title).toBe('Billing sharding');
-    expect(loaded.accomplishments[0].skillTags).toContain('distributed-systems');
   });
 
   it('deletes accomplishment on save', async () => {
@@ -76,7 +74,7 @@ describe('PostgresExperienceRepository — accomplishments', () => {
       summary: null,
       ordinal: 1
     });
-    exp.addAccomplishment({ title: 'A', narrative: 'N', skillTags: [], ordinal: 0 });
+    exp.addAccomplishment({ title: 'A', narrative: 'N', ordinal: 0 });
     await repo.save(exp);
 
     exp.removeAccomplishment(exp.accomplishments[0].id.value);

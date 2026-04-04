@@ -44,19 +44,15 @@ export class Migration_20260412000000_purge_job_skill_tag_resume extends Migrati
     this.addSql('ALTER TABLE "companies" DROP COLUMN IF EXISTS "ignored";');
     this.addSql('ALTER TABLE "companies" ALTER COLUMN "linkedin_link" DROP NOT NULL;');
 
-    // Drop the unique constraint on linkedin_link so NULLs are allowed
-    this.addSql('ALTER TABLE "companies" DROP CONSTRAINT IF EXISTS "companies_linkedin_link_key";');
-    // Re-add as a partial unique index (unique among non-null values)
-    this.addSql('CREATE UNIQUE INDEX "companies_linkedin_link_unique" ON "companies" ("linkedin_link") WHERE "linkedin_link" IS NOT NULL;');
+    // Keep the unique constraint — Postgres allows multiple NULLs with UNIQUE
+    // No change needed: companies_linkedin_link_key remains intact
   }
 
   override async down(): Promise<void> {
     // Reverse column changes on kept tables
     this.addSql('ALTER TABLE "accomplishments" ADD COLUMN "skill_tags" jsonb NOT NULL DEFAULT \'[]\';');
     this.addSql('ALTER TABLE "companies" ADD COLUMN "ignored" boolean NOT NULL DEFAULT false;');
-    this.addSql('DROP INDEX IF EXISTS "companies_linkedin_link_unique";');
     this.addSql('ALTER TABLE "companies" ALTER COLUMN "linkedin_link" SET NOT NULL;');
-    this.addSql('ALTER TABLE "companies" ADD CONSTRAINT "companies_linkedin_link_key" UNIQUE ("linkedin_link");');
 
     // Note: dropped tables and types would need full recreation — not implemented.
     // Use a database backup to restore if needed.
