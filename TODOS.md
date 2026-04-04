@@ -1,18 +1,15 @@
 # TODOS
 > List of features, improvements and bugs to look at in this project
 
-## feat: Profile revision
+## feat: experiences revisit
 
-In this session we are revisitng the Profile across all layers.
+The current page in Experiences lists all experiences correctly however it's missing lots of needed UI:
+- we should be able to add experiences
+- we should be able to edit all details of all experiences, including dates, roles, company names
+- right now clicking "Add acconplishment" does not work: it should open a modal
+- each experience should be able to save itself (no global save)
 
-- the Profile tab should allow editing all fields
-- a new "about" section must be added: a narrative text for the user to fill, medium sized text with detailed writing from the user. The text will be used to infer the user's tone later, and more globally define their professional identity
-- name should be first name + last name, not just one single field
-
-AC:
-- all checks pass
-- new e2e tests are added
-- all fields can be edited and saved
+Make sure you create a consistent UI / UX.
 
 ## feat: phone number format
 
