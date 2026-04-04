@@ -11,7 +11,6 @@ export type ExperienceCreateProps = {
   startDate: string;
   endDate: string;
   summary: string | null;
-  narrative?: string | null;
   ordinal: number;
 };
 
@@ -24,7 +23,6 @@ export class Experience extends AggregateRoot<ExperienceId> {
   public startDate: string;
   public endDate: string;
   public summary: string | null;
-  public narrative: string | null;
   public ordinal: number;
   public readonly accomplishments: Accomplishment[];
   public readonly createdAt: Date;
@@ -40,7 +38,6 @@ export class Experience extends AggregateRoot<ExperienceId> {
     startDate: string;
     endDate: string;
     summary: string | null;
-    narrative: string | null;
     ordinal: number;
     accomplishments: Accomplishment[];
     createdAt: Date;
@@ -55,7 +52,6 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.startDate = props.startDate;
     this.endDate = props.endDate;
     this.summary = props.summary;
-    this.narrative = props.narrative;
     this.ordinal = props.ordinal;
     this.accomplishments = props.accomplishments;
     this.createdAt = props.createdAt;
@@ -87,7 +83,6 @@ export class Experience extends AggregateRoot<ExperienceId> {
     return new Experience({
       id: ExperienceId.generate(),
       ...props,
-      narrative: props.narrative ?? null,
       accomplishments: [],
       createdAt: now,
       updatedAt: now

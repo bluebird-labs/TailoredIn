@@ -20,7 +20,6 @@ export function toExperienceDto(exp: Experience): ExperienceDto {
     startDate: exp.startDate,
     endDate: exp.endDate,
     summary: exp.summary,
-    narrative: exp.narrative,
     ordinal: exp.ordinal,
     accomplishments: exp.accomplishments.map(toAccomplishmentDto)
   };

@@ -11,7 +11,6 @@ export type ExperienceDto = {
   startDate: string;
   endDate: string;
   summary: string | null;
-  narrative: string | null;
   ordinal: number;
   accomplishments: AccomplishmentDto[];
 };

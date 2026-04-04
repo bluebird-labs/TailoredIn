@@ -14,7 +14,6 @@ export type Experience = {
   startDate: string;
   endDate: string;
   summary: string | null;
-  narrative: string | null;
   ordinal: number;
   accomplishments: AccomplishmentDto[];
 };
@@ -72,7 +71,6 @@ export function useUpdateExperience() {
       start_date: string;
       end_date: string;
       summary?: string;
-      narrative?: string;
       ordinal: number;
     }) => {
       const segment = api.experiences as AnyRouteSegment;

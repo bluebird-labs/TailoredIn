@@ -15,7 +15,6 @@ type ExperienceProps = {
   startDate: string;
   endDate: string;
   summary: string | null;
-  narrative: string | null;
   ordinal: number;
   createdAt: Date;
   updatedAt: Date;
@@ -50,9 +49,6 @@ export class Experience extends BaseEntity {
   @Property({ name: 'summary', type: 'text', nullable: true })
   public summary: string | null;
 
-  @Property({ name: 'narrative', type: 'text', nullable: true })
-  public narrative: string | null;
-
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
@@ -74,7 +70,6 @@ export class Experience extends BaseEntity {
     this.startDate = props.startDate;
     this.endDate = props.endDate;
     this.summary = props.summary;
-    this.narrative = props.narrative;
     this.ordinal = props.ordinal;
   }
 }

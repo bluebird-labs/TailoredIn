@@ -36,7 +36,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       existing.startDate = experience.startDate;
       existing.endDate = experience.endDate;
       existing.summary = experience.summary;
-      existing.narrative = experience.narrative;
       existing.ordinal = experience.ordinal;
       existing.updatedAt = experience.updatedAt;
       this.orm.em.persist(existing);
@@ -53,7 +52,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         startDate: experience.startDate,
         endDate: experience.endDate,
         summary: experience.summary,
-        narrative: experience.narrative,
         ordinal: experience.ordinal,
         createdAt: experience.createdAt,
         updatedAt: experience.updatedAt
@@ -148,7 +146,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       startDate: orm.startDate,
       endDate: orm.endDate,
       summary: orm.summary,
-      narrative: orm.narrative,
       ordinal: orm.ordinal,
       accomplishments,
       createdAt: orm.createdAt,

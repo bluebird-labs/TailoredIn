@@ -68,7 +68,6 @@ interface ExperienceFormState {
   startDate: string;
   endDate: string;
   summary: string;
-  narrative: string;
 }
 
 function validateExperience(values: ExperienceFormState): ValidationErrors<ExperienceFormState> {

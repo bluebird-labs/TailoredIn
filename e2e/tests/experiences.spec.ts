@@ -24,13 +24,9 @@ test.describe('Experiences Page', () => {
     await expect(startupCard.getByText('1 accomplishments')).toBeVisible();
   });
 
-  test('expand experience shows narrative and accomplishments', async ({ page }) => {
+  test('expand experience shows accomplishments', async ({ page }) => {
     // Click Acme Corp to expand
     await page.getByText('Acme Corp').click();
-
-    // Narrative section should appear
-    await expect(page.getByText('Role Narrative')).toBeVisible();
-    await expect(page.locator('textarea').first()).toBeVisible();
 
     // Accomplishments should appear
     await expect(page.getByText('Migrated to Kubernetes')).toBeVisible();

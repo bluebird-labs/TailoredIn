@@ -28,8 +28,7 @@ function emptyState(): ExperienceFormState {
     location: '',
     startDate: '',
     endDate: '',
-    summary: '',
-    narrative: ''
+    summary: ''
   };
 }
 
@@ -41,8 +40,7 @@ function stateFromExperience(exp: Experience): ExperienceFormState {
     location: exp.location,
     startDate: exp.startDate,
     endDate: exp.endDate,
-    summary: exp.summary ?? '',
-    narrative: exp.narrative ?? ''
+    summary: exp.summary ?? ''
   };
 }
 
@@ -97,7 +95,6 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
           start_date: current.startDate.trim(),
           end_date: current.endDate.trim(),
           summary: current.summary.trim() || undefined,
-          narrative: current.narrative.trim() || undefined,
           ordinal: experience.ordinal
         },
         {
@@ -202,17 +199,6 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
         rows={2}
         disabled={isSaving}
         placeholder="Brief role summary..."
-      />
-
-      <EditableField
-        type="textarea"
-        label="Narrative"
-        value={current.narrative}
-        onChange={v => setField('narrative', v)}
-        isDirty={isDirtyField('narrative')}
-        rows={3}
-        disabled={isSaving}
-        placeholder="Overall context for this role — scope, team, why it mattered..."
       />
 
       {experience && (

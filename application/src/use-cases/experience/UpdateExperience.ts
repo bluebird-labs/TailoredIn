@@ -11,7 +11,6 @@ export type UpdateExperienceInput = {
   startDate: string;
   endDate: string;
   summary: string | null;
-  narrative?: string | null;
   ordinal: number;
 };
 
@@ -33,7 +32,6 @@ export class UpdateExperience {
     experience.startDate = input.startDate;
     experience.endDate = input.endDate;
     experience.summary = input.summary;
-    if (input.narrative !== undefined) experience.narrative = input.narrative;
     experience.ordinal = input.ordinal;
     experience.updatedAt = new Date();
 
