@@ -15,7 +15,7 @@ type SkillCategory = {
   items: { id: string; name: string; ordinal: number }[];
 };
 
-export function SkillsTab() {
+export function SkillCategoriesPanel() {
   const { data, isLoading } = useSkillCategories();
   const updateCategory = useUpdateSkillCategory();
   const [dialogOpen, setDialogOpen] = useState(false);
