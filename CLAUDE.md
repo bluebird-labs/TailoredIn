@@ -46,62 +46,77 @@ api → infrastructure → application → domain → (core)
 
 All commands are run from the repo root via `bun run <script>`.
 
+### Primary commands
+
 ```bash
-# Install dependencies
-bun install
+bun up                 # start everything: install, Docker, migrate, seed, API + web servers
+bun down               # stop servers + Docker
+bun fresh              # restart everything (down + up)
+bun verify             # full project health check (typecheck → lint → deps → knip → tests → integration → E2E)
+```
 
-# Linting / formatting (Biome, runs across all packages)
-bun run check          # check without fixing
-bun run check:fix      # lint + format with auto-fix
-bun run format         # format only
-bun run lint           # lint only
+### Quality checks (run individually or via `bun verify`)
 
-# Dead code detection
-bun run knip           # unused files, exports, dependencies
+```bash
+bun run typecheck      # type-check all packages
+bun run check          # Biome lint + format check
+bun run check:fix      # Biome lint + format with auto-fix
+bun run dep:check      # dependency-cruiser architecture boundary enforcement
+bun run knip           # dead code / unused export detection
+```
 
-# Dependency boundary enforcement
-bun run dep:check      # verify no circular deps or cross-layer violations
+### Testing
 
-# Dev environment (one command — installs deps, Docker, migrations, seeds, servers)
-bun up                       # start everything (Ctrl+C to stop servers)
-bun down                     # stop servers + Docker
-bun run dev                  # servers only (skip Docker/migrations/seeds)
-
-# API server
-bun run api                  # start on port 8000
-bun run api:dev              # start with --watch
-
-# Web frontend
-bun run web:build            # build for production
-bun run web                  # Vite production preview
-bun run web:dev              # Vite dev server
-
-# Testing
-bun run test                 # run all tests across workspaces
-bun run test:coverage        # run tests with coverage report
-bun run api:test             # API workspace tests only
+```bash
+bun run test                 # unit tests across all workspaces
+bun run test:coverage        # unit tests with coverage report
 bun run --cwd infrastructure test:integration  # integration tests (Testcontainers, real Postgres, 60s timeout)
-bun run test:e2e             # Playwright end-to-end tests (headless)
+bun run test:e2e             # Playwright E2E tests (headless)
 bun run test:e2e:ui          # Playwright test UI
 bun run test:e2e:headed      # Playwright with visible browser
+bun test <path/to/test.ts>   # run a single test file
+```
 
+### Database
 
-# Typecheck
-bun run typecheck                # all packages
-bun run --cwd <package-dir> typecheck  # single package
+```bash
+bun run db:migration:create  # create a new migration
+bun run db:migration:up      # run pending migrations
+bun run db:seed              # seed the database
+```
 
-# Run a single test file
-bun test <path/to/test.ts>
+### Diagrams
 
-# Database
-bun run db:migration:create
-bun run db:migration:up
-bun run db:seed                  # seed the database
+```bash
+bun run domain:diagram       # regenerate domain/DOMAIN.mmd
+bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running)
+```
+
+### Dev servers (for manual use — prefer `bun up`)
+
+```bash
+bun run dev            # API + web dev servers in parallel (skip Docker/migrations/seeds)
+bun run api:dev        # API server with --watch
+bun run web:dev        # Vite dev server
 ```
 
 All TypeScript is executed directly by Bun (no compilation step). `typecheck` scripts exist only to surface type errors.
 
 **Test runners**: `bun:test` (unit + integration). Integration tests in `infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `e2e/` use `@playwright/test`.
+
+## Session Hygiene
+
+### Unstaged files
+Before ending a session, run `git status`. If there are unstaged or untracked files, ask the user what to do with each (commit, stash, or discard). Never leave files dangling silently.
+
+### Destructive migrations
+**Never run `db:migration:up` without asking first.** When asking, read the migration file and explicitly state whether it includes data deletion (DROP TABLE, DROP COLUMN, DELETE, TRUNCATE). Show the destructive SQL if present.
+
+### Session-end checklist
+1. `bun verify` — all checks must pass
+2. `bun run domain:diagram && bun run db:diagram` — regenerate diagrams
+3. Commit any diagram changes
+4. `git status` — resolve any remaining unstaged/untracked files with the user
 
 ## Domain Model
 
@@ -143,6 +158,8 @@ Single `.env` at the repo root (gitignored; see `.env.example`):
 POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SCHEMA
 ```
 Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config`.
+
+`NODE_ENV=development` is set in `.env` (loaded automatically by Bun). `NODE_ENV=test` is set in `.env.test` (loaded automatically by `bun test`, overriding `.env`). Production deployments override at the platform level.
 
 ## Tooling Notes
 

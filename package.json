@@ -37,6 +37,8 @@
     "db:diagram": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/scripts/generate-database-diagram.ts",
     "up": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/dev/up.ts",
     "down": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/dev/down.ts",
+    "fresh": "bun down && bun up",
+    "verify": "bun run scripts/verify.ts",
     "test:e2e": "bun run --cwd e2e test",
     "test:e2e:ui": "bun run --cwd e2e test:ui",
     "test:e2e:headed": "bun run --cwd e2e test:headed"
