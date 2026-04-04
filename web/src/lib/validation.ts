@@ -63,6 +63,7 @@ function validateEducation(values: EducationFormState): ValidationErrors<Educati
 interface ExperienceFormState {
   title: string;
   companyName: string;
+  companyWebsite: string;
   location: string;
   startDate: string;
   endDate: string;
