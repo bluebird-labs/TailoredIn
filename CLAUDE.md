@@ -47,25 +47,52 @@ web → api → infrastructure → application → domain → (core)
 
 ## Commands
 
-All commands are run from the repo root via `bun run <script>`.
+All commands are run from the repo root. Commands are scoped by context:
 
-### Primary commands
+- **`dev:*`** — main branch only (reads `.env`, guarded)
+- **`wt:*`** — worktree only (uses `.wt-session.json`, no `.env`)
+- **`e2e:*`** — runs anywhere (Testcontainers, fully ephemeral)
+- **Context-free** — `verify`, `check`, `typecheck`, `test`, etc.
+
+### dev: commands (main branch only)
 
 ```bash
-bun up                 # start everything: install, Docker, migrate, seed, API + web servers
-bun down               # stop servers + Docker
-bun fresh              # restart everything (down + up)
-bun verify             # full project health check (typecheck → lint → dep:check → knip → test:coverage → test:integration → test:e2e)
+bun dev:up                 # start everything: install, Docker, migrate, seed, API + web servers
+bun dev:down               # stop servers + Docker (preserves volume)
+bun dev:fresh              # restart everything (down + up)
+bun dev:migration:create   # create a new migration
+bun dev:migration:up       # run pending migrations
+bun dev:seed               # seed the database
+bun dev:diagram            # regenerate infrastructure/DATABASE.mmd (needs DB running)
+```
+
+### wt: commands (worktree only)
+
+```bash
+bun wt:up                  # start isolated env: allocate ports, Docker, migrate, seed, servers
+bun wt:down                # stop servers + Docker + remove volume + delete session
+bun wt:fresh               # restart everything (down + up)
+bun wt:migration:up        # run pending migrations in worktree DB
+bun wt:seed                # seed the worktree database
+```
+
+### e2e: commands (anywhere)
+
+```bash
+bun e2e:test               # Playwright E2E tests (headless, Testcontainers)
+bun e2e:test:ui            # Playwright test UI
+bun e2e:test:headed        # Playwright with visible browser
 ```
 
 ### Quality checks (run individually or via `bun verify`)
 
 ```bash
-bun run typecheck      # type-check all packages
-bun run check          # Biome lint + format check
-bun run check:fix      # Biome lint + format with auto-fix
-bun run dep:check      # dependency-cruiser architecture boundary enforcement
-bun run knip           # dead code / unused export detection
+bun verify                 # full project health check (typecheck → lint → dep:check → knip → test:coverage → test:integration → e2e:test)
+bun run typecheck          # type-check all packages
+bun run check              # Biome lint + format check
+bun run check:fix          # Biome lint + format with auto-fix
+bun run dep:check          # dependency-cruiser architecture boundary enforcement
+bun run knip               # dead code / unused export detection
 ```
 
 ### Testing
@@ -74,28 +101,17 @@ bun run knip           # dead code / unused export detection
 bun run test                 # unit tests across all workspaces
 bun run test:coverage        # unit tests with coverage report
 bun run --cwd infrastructure test:integration  # integration tests (Testcontainers, real Postgres, 60s timeout)
-bun run test:e2e             # Playwright E2E tests (headless)
-bun run test:e2e:ui          # Playwright test UI
-bun run test:e2e:headed      # Playwright with visible browser
 bun test <path/to/test.ts>   # run a single test file
-```
-
-### Database
-
-```bash
-bun run db:migration:create  # create a new migration
-bun run db:migration:up      # run pending migrations
-bun run db:seed              # seed the database
 ```
 
 ### Diagrams
 
 ```bash
 bun run domain:diagram       # regenerate domain/DOMAIN.mmd
-bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running)
+bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running, main only)
 ```
 
-### Dev servers (for manual use — prefer `bun up`)
+### Dev servers (for manual use — prefer `dev:up` / `wt:up`)
 
 ```bash
 bun run dev            # API + web dev servers in parallel (skip Docker/migrations/seeds)

@@ -35,12 +35,11 @@ export function composeUp(ctx: DevContext): void {
 }
 
 /**
- * Stop services. In worktree mode, removes volumes (-v) since they're ephemeral.
- * On main, preserves the named volume.
+ * Stop services. Pass `removeVolumes: true` to also remove Docker volumes (worktree teardown).
  */
-export function composeDown(ctx: DevContext): void {
+export function composeDown(ctx: DevContext, removeVolumes: boolean): void {
   const args = [...composeArgs(ctx), 'down'];
-  if (ctx.mode === 'worktree') args.push('-v');
+  if (removeVolumes) args.push('-v');
 
   log.info(`Stopping: ${args.join(' ')}`);
   const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit' });

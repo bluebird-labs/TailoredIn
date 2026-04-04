@@ -12,7 +12,7 @@ const steps = [
 	{ name: "knip (dead code)", cmd: ["bun", "run", "knip"] },
 	{ name: "test:coverage (unit tests)", cmd: ["bun", "run", "test:coverage"] },
 	{ name: "test:integration (Testcontainers)", cmd: ["bun", "run", "--cwd", "infrastructure", "test:integration"] },
-	{ name: "test:e2e (Playwright)", cmd: ["bun", "run", "test:e2e"] },
+	{ name: "e2e:test (Playwright)", cmd: ["bun", "run", "e2e:test"] },
 ];
 
 const total = steps.length;
