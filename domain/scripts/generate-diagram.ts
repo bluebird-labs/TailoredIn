@@ -1,59 +1,35 @@
 #!/usr/bin/env bun
 /**
  * Generates domain/DOMAIN.mmd — a Mermaid class diagram of the domain model.
- * Scans domain/src/ TypeScript source files and infers aggregates, entities,
- * value objects, enums, domain services, and domain events from code patterns.
+ *
+ * Fully code-driven: no hardcoded object names.
+ *   - **Inclusion** is determined by the barrel (`domain/src/index.ts`).
+ *     Only symbols exported there appear in the diagram.
+ *   - **Subdomain grouping** is inferred from foreign-key properties
+ *     (`fooId: string` → belongs to Foo's subdomain).
+ *   - **Enum/type placement** follows their referencing entities: if every
+ *     referencing entity lives in one subdomain the enum goes there too,
+ *     otherwise it lands in a shared "Enums & Types" section.
  *
  * Run: bun run domain:diagram
  */
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 
-// ─── Configuration ─────────────────────────────────────��─────────────────────
+// ─── Configuration ──────────────────────────────────────────────────────────
 
 const DOMAIN_SRC = resolve(import.meta.dirname, '../src');
+const BARREL_PATH = resolve(DOMAIN_SRC, 'index.ts');
 const OUTPUT_PATH = resolve(import.meta.dirname, '../DOMAIN.mmd');
 
 const SCAN_DIRS = ['entities', 'value-objects', 'domain-services', 'events'] as const;
 type SourceDir = (typeof SCAN_DIRS)[number];
-
-/** Classes/types to exclude entirely from the diagram. */
-const EXCLUDED = new Set([
-  'ResumeTemplate',
-  'LayoutAnalysis',
-  'BlockLayout',
-  'SkillName',
-  'ApprovalStatus',
-  'GeneratedExperience',
-  'TailoringScore'
-]);
 
 /** Properties to exclude (noise / boilerplate). */
 const EXCLUDED_PROPS = new Set(['createdAt', 'updatedAt', 'eventName', 'occurredAt']);
 
 /** Methods to exclude (factories / boilerplate). */
 const EXCLUDED_METHODS = new Set(['create', 'empty', 'constructor']);
-
-/**
- * Subdomain grouping — order determines output order.
- * Relationships are placed in the section of the FIRST class that appears.
- */
-const SUBDOMAIN_GROUPS: [label: string, members: string[]][] = [
-  ['Profile Subdomain', ['Profile', 'Experience', 'Accomplishment', 'Headline', 'Education']],
-  ['Company Subdomain', ['Company']]
-];
-
-/**
- * Hardcoded relationships that cannot be inferred from code patterns.
- * These are placed in the section of the first class mentioned.
- */
-const MANUAL_RELATIONSHIPS: string[] = [];
-
-/** Relationship labels by target→source pair. Default is "has". */
-const RELATIONSHIP_LABELS: Record<string, string> = {};
-
-/** Name aliases for ID properties that don't directly match class names. */
-const ID_ALIASES: Record<string, string> = {};
 
 /** Color legend per stereotype. */
 const STYLES: Record<string, { fill: string; stroke: string; color: string; width: string }> = {
@@ -66,7 +42,7 @@ const STYLES: Record<string, { fill: string; stroke: string; color: string; widt
   DomainEvent: { fill: '#be185d', stroke: '#831843', color: '#fce7f3', width: '1px' }
 };
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 type Stereotype = 'AggregateRoot' | 'Entity' | 'ValueObject' | 'enumeration' | 'type' | 'DomainService' | 'DomainEvent';
 
@@ -83,10 +59,41 @@ type ClassInfo = {
 };
 type DiagramItem = ClassInfo | EnumInfo | TypeAliasInfo;
 
+// ─── Barrel Parsing ─────────────────────────────────────────────────────────
+
+/** Names that are infrastructure / non-diagram even when barrel-exported. */
+const BARREL_IGNORE_SUFFIXES = ['Id', 'Repository', 'CreateProps'];
+const BARREL_IGNORE_EXACT = new Set(['AggregateRoot', 'Entity', 'ValueObject', 'DomainEvent', 'Result', 'ok', 'err']);
+
+function parseBarrelExports(barrelPath: string): Set<string> {
+  const source = readFileSync(barrelPath, 'utf-8');
+  const names = new Set<string>();
+
+  // Match: export { Name } from '...'  and  export type { Name1, Name2 } from '...'
+  const re = /export\s+(?:type\s+)?\{\s*([^}]+)\}\s+from/g;
+  for (const match of source.matchAll(re)) {
+    for (const raw of match[1].split(',')) {
+      const name = raw.trim();
+      if (name) names.add(name);
+    }
+  }
+
+  // Filter out non-diagram names
+  const diagramNames = new Set<string>();
+  for (const name of names) {
+    if (BARREL_IGNORE_EXACT.has(name)) continue;
+    if (BARREL_IGNORE_SUFFIXES.some(s => name.endsWith(s))) continue;
+    diagramNames.add(name);
+  }
+
+  return diagramNames;
+}
+
 // ─── Scanning & Parsing ─────────────────────────────────────────────────────
 
 function scanDir(dir: SourceDir): string[] {
   const fullPath = resolve(DOMAIN_SRC, dir);
+  if (!existsSync(fullPath)) return [];
   return readdirSync(fullPath)
     .filter(f => f.endsWith('.ts'))
     .map(f => resolve(fullPath, f));
@@ -108,7 +115,6 @@ function parseFile(filePath: string, sourceDir: SourceDir): DiagramItem[] {
   const enumRe = /export\s+enum\s+(\w+)\s*\{([^}]+)\}/g;
   for (const match of source.matchAll(enumRe)) {
     const name = match[1];
-    if (EXCLUDED.has(name)) continue;
     const members = match[2]
       .split(',')
       .map(m => m.split('=')[0].trim())
@@ -120,17 +126,19 @@ function parseFile(filePath: string, sourceDir: SourceDir): DiagramItem[] {
   const unionTypeRe = /export\s+type\s+(\w+)\s*=\s*((?:'[^']+'\s*\|\s*)*'[^']+')\s*;/g;
   for (const match of source.matchAll(unionTypeRe)) {
     const name = match[1];
-    if (EXCLUDED.has(name)) continue;
     const members = match[2].split('|').map(m => m.trim().replace(/'/g, ''));
     items.push({ name, members, stereotype: 'type' });
   }
 
   // Parse object type aliases: export type Foo = { ... };
-  const objTypeRe = /export\s+type\s+(\w+)\s*=\s*\{([^}]+)\}/g;
-  for (const match of source.matchAll(objTypeRe)) {
+  // Use balanced-brace extraction to handle nested objects.
+  const objTypeHeaderRe = /export\s+type\s+(\w+)\s*=\s*\{/g;
+  for (const match of source.matchAll(objTypeHeaderRe)) {
     const name = match[1];
-    if (EXCLUDED.has(name) || name.endsWith('Props') || name.endsWith('Sections')) continue;
-    const properties = parseTypeProperties(match[2]);
+    if (name.endsWith('Props') || name.endsWith('Sections')) continue;
+    const body = extractBalancedBraces(source, match.index + match[0].length);
+    if (!body) continue;
+    const properties = parseTopLevelTypeProperties(body);
     if (properties.length > 0) {
       items.push({
         name,
@@ -146,8 +154,6 @@ function parseFile(filePath: string, sourceDir: SourceDir): DiagramItem[] {
   const classRe = /export\s+class\s+(\w+)(?:\s+extends\s+(\w+)(?:<(\w+)>)?)?(?:\s+implements\s+(\w+))?/g;
   for (const match of source.matchAll(classRe)) {
     const name = match[1];
-    if (EXCLUDED.has(name)) continue;
-
     const extendsBase = match[2] ?? null;
     const typeParam = match[3] ?? null;
     const implementsIface = match[4] ?? null;
@@ -157,7 +163,6 @@ function parseFile(filePath: string, sourceDir: SourceDir): DiagramItem[] {
 
     let properties: PropertyInfo[];
     if (stereotype === 'DomainEvent') {
-      // Domain events define properties in the constructor parameter list
       properties = parseConstructorProperties(source);
     } else {
       properties = parseClassProperties(source);
@@ -206,7 +211,6 @@ function parseClassProperties(source: string): PropertyInfo[] {
   return props;
 }
 
-/** Parse constructor-defined readonly properties (used by domain events). */
 function parseConstructorProperties(source: string): PropertyInfo[] {
   const props: PropertyInfo[] = [];
   const ctorRe = /public\s+constructor\s*\(\s*([\s\S]*?)\)/;
@@ -225,16 +229,64 @@ function parseConstructorProperties(source: string): PropertyInfo[] {
   return props;
 }
 
-function parseTypeProperties(body: string): PropertyInfo[] {
+/** Extract the body between balanced braces, starting right after the opening `{`. */
+function extractBalancedBraces(source: string, startAfterOpen: number): string | null {
+  let depth = 1;
+  let i = startAfterOpen;
+  while (i < source.length && depth > 0) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}') depth--;
+    i++;
+  }
+  if (depth !== 0) return null;
+  return source.slice(startAfterOpen, i - 1);
+}
+
+/** Parse only top-level properties from a type body (skip nested object contents). */
+function parseTopLevelTypeProperties(body: string): PropertyInfo[] {
   const props: PropertyInfo[] = [];
-  const propRe = /(\w+)\s*:\s*(.+)/g;
-  for (const match of body.matchAll(propRe)) {
-    const name = match[1];
-    if (EXCLUDED_PROPS.has(name)) continue;
-    const rawType = match[2].replace(/;/g, '').trim();
-    const nullable = rawType.includes('| null');
-    const type = formatType(rawType);
-    props.push({ name, type, nullable });
+  let i = 0;
+  while (i < body.length) {
+    // Skip whitespace and comments
+    if (body[i] === '/' && body[i + 1] === '*') {
+      const end = body.indexOf('*/', i + 2);
+      i = end === -1 ? body.length : end + 2;
+      continue;
+    }
+    if (body[i] === '/' && body[i + 1] === '/') {
+      const end = body.indexOf('\n', i);
+      i = end === -1 ? body.length : end + 1;
+      continue;
+    }
+
+    // Try to match a property: name: type;
+    const propMatch = body.slice(i).match(/^(\w+)\s*:\s*/);
+    if (propMatch) {
+      const name = propMatch[1];
+      i += propMatch[0].length;
+
+      // Read the type, handling nested braces
+      let typeStr = '';
+      let depth = 0;
+      while (i < body.length) {
+        if (body[i] === '{') depth++;
+        else if (body[i] === '}') depth--;
+        if (depth === 0 && (body[i] === ';' || body[i] === '\n')) break;
+        if (depth < 0) break;
+        typeStr += body[i];
+        i++;
+      }
+      i++; // skip the semicolon/newline
+
+      typeStr = typeStr.trim();
+      if (!EXCLUDED_PROPS.has(name) && typeStr) {
+        const nullable = typeStr.includes('| null');
+        const type = formatType(typeStr);
+        props.push({ name, type, nullable });
+      }
+    } else {
+      i++;
+    }
   }
   return props;
 }
@@ -264,25 +316,158 @@ function parseGetters(source: string): MethodInfo[] {
 function formatType(rawType: string): string {
   let t = rawType.replace(/\s*\|\s*null/g, '').trim();
   t = t.replace(/Array<([^>]+)>/g, '$1[]');
-  // Drop inline object type to a simpler display
-  if (t.startsWith('{') || t.includes('{ ')) t = 'object[]';
+  if (t.startsWith('{') || t.includes('{ ')) t = 'object';
+  // Union literal types like 'us-letter' | 'a4' → string
+  if (/^'[^']+'\s*(\|\s*'[^']+')+$/.test(t)) t = 'string';
   return t;
 }
 
-// ─── Relationship Inference ──────────────────────────────────────────────────
+// ─── Subdomain Inference ────────────────────────────────────────────────────
+
+type SubdomainGroup = { label: string; members: string[] };
+
+/**
+ * Infer subdomain grouping from foreign-key properties.
+ *
+ * 1. AggregateRoots with no `fooId` FK to another aggregate are subdomain roots.
+ * 2. Aggregates/entities with `fooId: string` belong to Foo's subdomain.
+ * 3. Transitive: Accomplishment.experienceId → Experience → Profile subdomain.
+ * 4. Enums/types go to the subdomain that exclusively references them, or shared.
+ */
+function inferSubdomains(allItems: Map<string, DiagramItem>): {
+  subdomains: SubdomainGroup[];
+  sharedEnumsTypes: string[];
+  ungrouped: string[];
+} {
+  const aggregateNames = new Set<string>();
+  const entityNames = new Set<string>();
+
+  for (const [name, item] of allItems) {
+    if (item.stereotype === 'AggregateRoot') aggregateNames.add(name);
+    else if (item.stereotype === 'Entity') entityNames.add(name);
+  }
+
+  // Build FK parent map: childName → parentAggregateName
+  const fkParent = new Map<string, string>();
+  for (const [name, item] of allItems) {
+    if (!isClassInfo(item)) continue;
+    if (item.stereotype !== 'AggregateRoot' && item.stereotype !== 'Entity') continue;
+
+    for (const prop of item.properties) {
+      if (!prop.name.endsWith('Id') || prop.type !== 'string') continue;
+      const refName = prop.name.replace(/Id$/, '');
+      const matchedAggregate = [...aggregateNames].find(a => a.toLowerCase() === refName.toLowerCase());
+      if (matchedAggregate && matchedAggregate !== name) {
+        fkParent.set(name, matchedAggregate);
+        break; // Use the first FK as the subdomain assignment
+      }
+    }
+  }
+
+  // Resolve transitive chains to find the subdomain root
+  function resolveRoot(name: string, visited = new Set<string>()): string {
+    if (visited.has(name)) return name; // cycle guard
+    visited.add(name);
+    const parent = fkParent.get(name);
+    if (!parent) return name;
+    return resolveRoot(parent, visited);
+  }
+
+  // Group aggregates/entities by their subdomain root
+  const subdomainMembers = new Map<string, Set<string>>();
+  for (const name of [...aggregateNames, ...entityNames]) {
+    const root = resolveRoot(name);
+    if (!subdomainMembers.has(root)) subdomainMembers.set(root, new Set());
+    subdomainMembers.get(root)!.add(name);
+  }
+
+  // Determine which subdomain(s) reference each enum/type
+  const enumTypeNames = new Set<string>();
+  for (const [name, item] of allItems) {
+    if (item.stereotype === 'enumeration' || item.stereotype === 'type') {
+      enumTypeNames.add(name);
+    }
+  }
+
+  // For ValueObject class items (parsed from object type aliases), treat them like types for placement
+  const voClassNames = new Set<string>();
+  for (const [name, item] of allItems) {
+    if (item.stereotype === 'ValueObject') voClassNames.add(name);
+  }
+
+  const referencedBy = new Map<string, Set<string>>(); // enumOrTypeName → set of subdomain roots
+  for (const [name, item] of allItems) {
+    if (!isClassInfo(item)) continue;
+    const root = resolveRoot(name);
+    for (const prop of item.properties) {
+      const baseType = prop.type.replace(/\[\]$/, '');
+      if (enumTypeNames.has(baseType) || voClassNames.has(baseType)) {
+        if (!referencedBy.has(baseType)) referencedBy.set(baseType, new Set());
+        referencedBy.get(baseType)!.add(root);
+      }
+    }
+  }
+
+  // Build subdomain groups with enum/type placement
+  const placedItems = new Set<string>();
+  const subdomains: SubdomainGroup[] = [];
+
+  // Sort subdomain roots: largest group first for stable output
+  const sortedRoots = [...subdomainMembers.entries()].sort((a, b) => b[1].size - a[1].size);
+
+  for (const [root, members] of sortedRoots) {
+    // Order: root first, then by name
+    const ordered = [root, ...[...members].filter(m => m !== root).sort()];
+
+    // Find enums/types exclusively referenced by this subdomain
+    const subdomainEnums: string[] = [];
+    for (const [etName, refs] of referencedBy) {
+      if (placedItems.has(etName)) continue;
+      if (refs.size === 1 && refs.has(root)) {
+        subdomainEnums.push(etName);
+      }
+    }
+    subdomainEnums.sort();
+
+    const allMembers = [...ordered, ...subdomainEnums];
+    for (const m of allMembers) placedItems.add(m);
+
+    subdomains.push({ label: `${root} Subdomain`, members: allMembers });
+  }
+
+  // Shared enums/types: referenced by multiple subdomains
+  const sharedEnumsTypes: string[] = [];
+  for (const name of [...enumTypeNames, ...voClassNames]) {
+    if (!placedItems.has(name)) {
+      sharedEnumsTypes.push(name);
+      placedItems.add(name);
+    }
+  }
+  sharedEnumsTypes.sort();
+
+  // Ungrouped: anything remaining (domain services, events, etc.)
+  const ungrouped: string[] = [];
+  for (const name of allItems.keys()) {
+    if (!placedItems.has(name)) {
+      ungrouped.push(name);
+    }
+  }
+  ungrouped.sort();
+
+  return { subdomains, sharedEnumsTypes, ungrouped };
+}
+
+// ─── Relationship Inference ─────────────────────────────────────────────────
 
 function inferRelationships(allItems: Map<string, DiagramItem>): string[] {
   const lines: string[] = [];
   const seen = new Set<string>();
 
-  // Build sets by stereotype for lookups
   const aggregateNames = new Set<string>();
   const entityNames = new Set<string>();
   const voClassNames = new Set<string>();
   const enumNames = new Set<string>();
   const typeNames = new Set<string>();
-
-  // Track composition targets — if A *-- B exists, suppress A --> B
   const compositionTargets = new Set<string>();
 
   for (const [name, item] of allItems) {
@@ -349,29 +534,17 @@ function inferRelationships(allItems: Map<string, DiagramItem>): string[] {
       // Association: fooId string field → Foo aggregate
       if (prop.name.endsWith('Id') && prop.type === 'string') {
         const refName = prop.name.replace(/Id$/, '');
-        // Check alias first, then case-insensitive match
-        const aliased = ID_ALIASES[refName];
-        const matchedAggregate =
-          (aliased && aggregateNames.has(aliased) ? aliased : null) ??
-          [...aggregateNames].find(a => a.toLowerCase() === refName.toLowerCase());
+        const matchedAggregate = [...aggregateNames].find(a => a.toLowerCase() === refName.toLowerCase());
         if (matchedAggregate && matchedAggregate !== name) {
-          // Skip for value objects (e.g., ExperienceSelection.experienceId)
-          // and domain events (e.g., ResumeGeneratedEvent.resumeId)
           if (item.stereotype === 'ValueObject' || item.stereotype === 'DomainEvent') continue;
 
-          // Skip if there's already a composition from the same parent to this class
           const composKey = `${matchedAggregate}→${name}`;
           if (compositionTargets.has(composKey)) continue;
 
           const key = `${matchedAggregate}→${name}`;
           if (!seen.has(key)) {
             seen.add(key);
-            const label = RELATIONSHIP_LABELS[`${name}→${matchedAggregate}`] ?? 'has';
-            if (name === 'CompanyBrief') {
-              lines.push(`${matchedAggregate} "1" --> "0..1" ${name} : ${label}`);
-            } else {
-              lines.push(`${matchedAggregate} "1" --> "*" ${name} : ${label}`);
-            }
+            lines.push(`${matchedAggregate} "1" --> "*" ${name} : has`);
           }
         }
       }
@@ -385,7 +558,7 @@ function isClassInfo(item: DiagramItem): item is ClassInfo {
   return 'properties' in item && Array.isArray(item.properties) && 'idType' in item;
 }
 
-// ─── Mermaid Emission ────────────────────────────────────────────────────────
+// ─── Mermaid Emission ───────────────────────────────────────────────────────
 
 function emitClassBlock(item: DiagramItem): string {
   const lines: string[] = [];
@@ -436,7 +609,7 @@ function sectionHeader(label: string): string {
   return [`    %% ${bar}`, `    %%  ${label}`, `    %% ${bar}`].join('\n');
 }
 
-// ─── Diagram Assembly ────────────────────────────────────────────────────────
+// ─── Diagram Assembly ───────────────────────────────────────────────────────
 
 function generateDiagram(allItems: Map<string, DiagramItem>): string {
   const output: string[] = [
@@ -449,27 +622,15 @@ function generateDiagram(allItems: Map<string, DiagramItem>): string {
   ];
 
   const styleLines: string[] = [];
-
-  // Infer all relationships once
   const inferredRels = inferRelationships(allItems);
-  const allRels = [...inferredRels, ...MANUAL_RELATIONSHIPS];
-
-  // Track which relationships have been emitted to avoid duplicates
   const emittedRels = new Set<string>();
   const emittedNames = new Set<string>();
 
-  // Helper: find relationships where at least one party is in the given set
-  function relsBelongingTo(names: string[]): string[] {
-    return allRels.filter(rel => {
-      if (emittedRels.has(rel)) return false;
-      return names.some(n => new RegExp(`\\b${n}\\b`).test(rel));
-    });
-  }
+  const { subdomains, sharedEnumsTypes, ungrouped } = inferSubdomains(allItems);
 
-  // Emit subdomain sections
-  for (const [label, members] of SUBDOMAIN_GROUPS) {
-    const items = members.filter(m => allItems.has(m));
-    if (items.length === 0) continue;
+  function emitSection(label: string, memberNames: string[]) {
+    const items = memberNames.filter(m => allItems.has(m));
+    if (items.length === 0) return;
 
     output.push('');
     output.push(sectionHeader(label));
@@ -483,9 +644,10 @@ function generateDiagram(allItems: Map<string, DiagramItem>): string {
       emittedNames.add(memberName);
     }
 
-    // Place relationships where both parties have been emitted
-    const sectionRels = relsBelongingTo(items).filter(rel => {
-      // Only emit if all referenced diagram items have been emitted
+    // Place relationships where all referenced items have been emitted
+    const sectionRels = inferredRels.filter(rel => {
+      if (emittedRels.has(rel)) return false;
+      if (!items.some(n => new RegExp(`\\b${n}\\b`).test(rel))) return false;
       const referencedItems = [...allItems.keys()].filter(n => new RegExp(`\\b${n}\\b`).test(rel));
       return referencedItems.every(n => emittedNames.has(n));
     });
@@ -495,80 +657,35 @@ function generateDiagram(allItems: Map<string, DiagramItem>): string {
     }
   }
 
-  // Enums & Types section
-  const enumItems = [...allItems.entries()].filter(
-    ([name, item]) => !emittedNames.has(name) && (item.stereotype === 'enumeration' || item.stereotype === 'type')
-  );
-  if (enumItems.length > 0) {
-    output.push('');
-    output.push(sectionHeader('Enums & Types'));
-    output.push('');
-    for (const [name, item] of enumItems) {
-      output.push(emitClassBlock(item));
-      output.push('');
-      styleLines.push(getStyleLine(item));
-      emittedNames.add(name);
-    }
-    // Emit enum relationships now that enums are defined
-    const enumRels = allRels.filter(rel => {
-      if (emittedRels.has(rel)) return false;
-      const referencedItems = [...allItems.keys()].filter(n => new RegExp(`\\b${n}\\b`).test(rel));
-      return referencedItems.every(n => emittedNames.has(n));
-    });
-    for (const rel of enumRels) {
-      output.push(`    ${rel}`);
-      emittedRels.add(rel);
-    }
+  // Emit subdomain sections
+  for (const { label, members } of subdomains) {
+    emitSection(label, members);
   }
 
-  // Domain Services section
-  const serviceItems = [...allItems.entries()].filter(
-    ([name, item]) => !emittedNames.has(name) && item.stereotype === 'DomainService'
-  );
-  if (serviceItems.length > 0) {
-    output.push('');
-    output.push(sectionHeader('Domain Services'));
-    output.push('');
-    for (const [name, item] of serviceItems) {
-      output.push(emitClassBlock(item));
-      output.push('');
-      styleLines.push(getStyleLine(item));
-      emittedNames.add(name);
-    }
-    const serviceRels = allRels.filter(rel => {
-      if (emittedRels.has(rel)) return false;
-      const referencedItems = [...allItems.keys()].filter(n => new RegExp(`\\b${n}\\b`).test(rel));
-      return referencedItems.every(n => emittedNames.has(n));
-    });
-    for (const rel of serviceRels) {
-      output.push(`    ${rel}`);
-      emittedRels.add(rel);
-    }
+  // Shared enums/types
+  if (sharedEnumsTypes.length > 0) {
+    emitSection('Enums & Types', sharedEnumsTypes);
   }
 
-  // Domain Events section
-  const eventItems = [...allItems.entries()].filter(
-    ([name, item]) => !emittedNames.has(name) && item.stereotype === 'DomainEvent'
-  );
-  if (eventItems.length > 0) {
-    output.push('');
-    output.push(sectionHeader('Domain Events'));
-    output.push('');
-    for (const [name, item] of eventItems) {
-      output.push(emitClassBlock(item));
-      output.push('');
-      styleLines.push(getStyleLine(item));
-      emittedNames.add(name);
-    }
-    const eventRels = allRels.filter(rel => {
-      if (emittedRels.has(rel)) return false;
-      const referencedItems = [...allItems.keys()].filter(n => new RegExp(`\\b${n}\\b`).test(rel));
-      return referencedItems.every(n => emittedNames.has(n));
-    });
-    for (const rel of eventRels) {
-      output.push(`    ${rel}`);
-      emittedRels.add(rel);
-    }
+  // Domain Services (auto-detected, no hardcoded names)
+  const serviceNames = [...allItems.entries()]
+    .filter(([name, item]) => !emittedNames.has(name) && item.stereotype === 'DomainService')
+    .map(([name]) => name);
+  if (serviceNames.length > 0) {
+    emitSection('Domain Services', serviceNames);
+  }
+
+  // Domain Events (auto-detected)
+  const eventNames = [...allItems.entries()]
+    .filter(([name, item]) => !emittedNames.has(name) && item.stereotype === 'DomainEvent')
+    .map(([name]) => name);
+  if (eventNames.length > 0) {
+    emitSection('Domain Events', eventNames);
+  }
+
+  // Ungrouped catch-all
+  if (ungrouped.length > 0) {
+    emitSection('Ungrouped (needs classification)', ungrouped);
   }
 
   // Style block
@@ -580,8 +697,9 @@ function generateDiagram(allItems: Map<string, DiagramItem>): string {
   return `${output.join('\n')}\n`;
 }
 
-// ─── Main ────────────────────────────────────────────────────────────────────
+// ─── Main ───────────────────────────────────────────────────────────────────
 
+const barrelExports = parseBarrelExports(BARREL_PATH);
 const allItems = new Map<string, DiagramItem>();
 
 for (const dir of SCAN_DIRS) {
@@ -589,13 +707,16 @@ for (const dir of SCAN_DIRS) {
   for (const file of files) {
     const items = parseFile(file, dir);
     for (const item of items) {
-      allItems.set(item.name, item);
+      // Only include items exported from the barrel
+      if (barrelExports.has(item.name)) {
+        allItems.set(item.name, item);
+      }
     }
   }
 }
 
-const output = generateDiagram(allItems);
-writeFileSync(OUTPUT_PATH, output);
+const diagramOutput = generateDiagram(allItems);
+writeFileSync(OUTPUT_PATH, diagramOutput);
 
 const counts = { aggregates: 0, entities: 0, valueObjects: 0, enums: 0, services: 0, events: 0, types: 0 };
 for (const item of allItems.values()) {

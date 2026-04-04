@@ -1,5 +1,5 @@
 ---
-title: TailoredIn — Domain Model (Post-Purge)
+title: TailoredIn — Domain Entities & Relationships
 ---
 
 classDiagram
@@ -23,6 +23,28 @@ classDiagram
         +fullName()
     }
 
+    class Accomplishment {
+        <<Entity>>
+        +AccomplishmentId id
+        +string experienceId
+        +string title
+        +string narrative
+        +number ordinal
+        +update()
+    }
+
+    class Education {
+        <<AggregateRoot>>
+        +EducationId id
+        +string profileId
+        +string degreeTitle
+        +string institutionName
+        +number graduationYear
+        +string? location
+        +string? honors
+        +number ordinal
+    }
+
     class Experience {
         <<AggregateRoot>>
         +ExperienceId id
@@ -42,16 +64,6 @@ classDiagram
         +findAccomplishmentOrFail()
     }
 
-    class Accomplishment {
-        <<Entity>>
-        +AccomplishmentId id
-        +string experienceId
-        +string title
-        +string narrative
-        +number ordinal
-        +update()
-    }
-
     class Headline {
         <<AggregateRoot>>
         +HeadlineId id
@@ -60,21 +72,9 @@ classDiagram
         +string summaryText
     }
 
-    class Education {
-        <<AggregateRoot>>
-        +EducationId id
-        +string profileId
-        +string degreeTitle
-        +string institutionName
-        +number graduationYear
-        +string? location
-        +string? honors
-        +number ordinal
-    }
-
     Profile "1" --> "*" Headline : has
-    Profile "1" --> "*" Experience : has
     Profile "1" --> "*" Education : has
+    Profile "1" --> "*" Experience : has
     Experience "1" *-- "*" Accomplishment : contains
 
     %% ──────────────────────────────────────────────
@@ -97,47 +97,18 @@ classDiagram
         +setStage()
     }
 
-    %% ──────────────────────────────────────────────
-    %%  Resume Subdomain (types only — kept for future rebuild)
-    %% ──────────────────────────��───────────────────
-
-    class ResumeTemplate {
-        <<type>>
-        +string id
-        +string pageSize
-        +Margins margins
-        +number bodyFontSizePt
-        +number lineHeightEm
-        +number headerFontSizePt
-        +number sectionSpacingPt
-        +number entrySpacingPt
+    class BusinessType {
+        <<enumeration>>
+        B2B · B2C · B2B2C
+        B2G · D2C · MARKETPLACE
+        PLATFORM
     }
-
-    class LayoutAnalysis {
-        <<type>>
-        +number totalPages
-        +HeaderLayout header
-        +ExperienceLayout[] experiences
-        +BlockLayout[] education
-        +BlockLayout[] skills
-    }
-
-    %% ──────────────────────────────────────────────
-    %%  Enums & Types
-    %% ──────────────────────────────────────────────
 
     class CompanyStage {
         <<enumeration>>
         SEED · SERIES_A · SERIES_B
         SERIES_C · SERIES_D_PLUS · GROWTH
         PUBLIC · BOOTSTRAPPED · ACQUIRED
-    }
-
-    class BusinessType {
-        <<enumeration>>
-        B2B · B2C · B2B2C
-        B2G · D2C · MARKETPLACE
-        PLATFORM
     }
 
     class Industry {
@@ -157,17 +128,51 @@ classDiagram
     Company --> CompanyStage
 
     %% ──────────────────────────────────────────────
+    %%  Enums & Types
+    %% ──────────────────────────────────────────────
+
+    class BlockLayout {
+        <<ValueObject>>
+        +number lineCount
+        +number[] pageNumbers
+    }
+
+    class LayoutAnalysis {
+        <<ValueObject>>
+        +number totalPages
+        +object header
+        +object experiences
+        +BlockLayout[] education
+        +BlockLayout[] skills
+    }
+
+    class ResumeTemplate {
+        <<ValueObject>>
+        +string id
+        +string pageSize
+        +object margins
+        +number bodyFontSizePt
+        +number lineHeightEm
+        +number headerFontSizePt
+        +number sectionSpacingPt
+        +number entrySpacingPt
+    }
+
+    LayoutAnalysis "1" *-- "*" BlockLayout : contains
+
+    %% ──────────────────────────────────────────────
     %%  Apply Styles
     %% ──────────────────────────────────────────────
 
     style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style ResumeTemplate fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style LayoutAnalysis fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ResumeTemplate fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
