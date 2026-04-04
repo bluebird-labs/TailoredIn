@@ -1,11 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Check, Pencil, X } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { EditableField } from '@/components/shared/EditableField.js';
+import { EmptyState } from '@/components/shared/EmptyState.js';
+import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { SaveBar } from '@/components/shared/SaveBar.js';
+import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
+import { useNavGuard } from '@/hooks/use-nav-guard.js';
 import { useProfile, useUpdateProfile } from '@/hooks/use-profile';
+import { hasErrors, type ProfileFormState, type ValidationErrors, validateProfile } from '@/lib/validation.js';
 
 export const Route = createFileRoute('/profile/')({
   component: ProfilePage
@@ -13,278 +16,193 @@ export const Route = createFileRoute('/profile/')({
 
 function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
+  const updateProfile = useUpdateProfile();
+  const [errors, setErrors] = useState<ValidationErrors<ProfileFormState>>({});
 
-  if (isLoading) return <div className="text-sm text-muted-foreground">Loading...</div>;
-  if (!profile) return <div className="text-sm text-muted-foreground">No profile found.</div>;
+  const savedState = useMemo<ProfileFormState | null>(
+    () =>
+      profile
+        ? {
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            email: profile.email,
+            phone: profile.phone ?? '',
+            location: profile.location ?? '',
+            linkedinUrl: profile.linkedinUrl ?? '',
+            githubUrl: profile.githubUrl ?? '',
+            websiteUrl: profile.websiteUrl ?? '',
+            about: profile.about ?? ''
+          }
+        : null,
+    [profile]
+  );
+
+  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(
+    savedState ?? {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      location: '',
+      linkedinUrl: '',
+      githubUrl: '',
+      websiteUrl: '',
+      about: ''
+    }
+  );
+
+  useNavGuard({ isDirty });
+
+  function handleSave() {
+    const validationErrors = validateProfile(current);
+    setErrors(validationErrors);
+    if (hasErrors(validationErrors)) return;
+
+    updateProfile.mutate(
+      {
+        email: current.email.trim(),
+        first_name: current.firstName.trim(),
+        last_name: current.lastName.trim(),
+        about: current.about.trim() || null,
+        phone: current.phone.trim() || null,
+        location: current.location.trim() || null,
+        linkedin_url: current.linkedinUrl.trim() || null,
+        github_url: current.githubUrl.trim() || null,
+        website_url: current.websiteUrl.trim() || null
+      },
+      {
+        onSuccess: () => {
+          setErrors({});
+          toast.success('Changes saved');
+        },
+        onError: () => toast.error('Failed to save. Please try again.')
+      }
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="page-heading">Profile</h1>
+          <p className="text-muted-foreground text-sm">Your professional identity.</p>
+        </div>
+        <div className="max-w-lg">
+          <LoadingSkeleton variant="form" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="page-heading">Profile</h1>
+          <p className="text-muted-foreground text-sm">Your professional identity.</p>
+        </div>
+        <EmptyState message="No profile found." />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-medium">Profile</h1>
+        <h1 className="page-heading">Profile</h1>
         <p className="text-muted-foreground text-sm">Your professional identity.</p>
       </div>
 
-      <div className="space-y-6 max-w-lg">
-        <div className="grid gap-4">
-          <NameField firstName={profile.firstName} lastName={profile.lastName} profile={profile} />
-          <ProfileField label="Email" value={profile.email} fieldKey="email" profile={profile} />
-          <ProfileField label="Phone" value={profile.phone} fieldKey="phone" profile={profile} />
-          <ProfileField label="Location" value={profile.location} fieldKey="location" profile={profile} />
-          <ProfileField label="LinkedIn" value={profile.linkedinUrl} fieldKey="linkedinUrl" profile={profile} />
-          <ProfileField label="GitHub" value={profile.githubUrl} fieldKey="githubUrl" profile={profile} />
-          <ProfileField label="Website" value={profile.websiteUrl} fieldKey="websiteUrl" profile={profile} />
-        </div>
-
-        <AboutField about={profile.about} profile={profile} />
-      </div>
-    </div>
-  );
-}
-
-type ProfileData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  about: string | null;
-  phone: string | null;
-  location: string | null;
-  linkedinUrl: string | null;
-  githubUrl: string | null;
-  websiteUrl: string | null;
-};
-
-function buildUpdatePayload(profile: ProfileData, overrides: Partial<ProfileData>) {
-  const merged = { ...profile, ...overrides };
-  return {
-    email: merged.email,
-    first_name: merged.firstName,
-    last_name: merged.lastName,
-    about: merged.about || null,
-    phone: merged.phone || null,
-    location: merged.location || null,
-    linkedin_url: merged.linkedinUrl || null,
-    github_url: merged.githubUrl || null,
-    website_url: merged.websiteUrl || null
-  };
-}
-
-function NameField({ firstName, lastName, profile }: { firstName: string; lastName: string; profile: ProfileData }) {
-  const [editing, setEditing] = useState(false);
-  const [first, setFirst] = useState(firstName);
-  const [last, setLast] = useState(lastName);
-  const updateProfile = useUpdateProfile();
-
-  function handleSave() {
-    if (!first.trim() || !last.trim()) {
-      toast.error('First name and last name are required');
-      return;
-    }
-    updateProfile.mutate(buildUpdatePayload(profile, { firstName: first.trim(), lastName: last.trim() }), {
-      onSuccess: () => setEditing(false),
-      onError: () => toast.error('Failed to update profile')
-    });
-  }
-
-  function handleCancel() {
-    setFirst(firstName);
-    setLast(lastName);
-    setEditing(false);
-  }
-
-  if (editing) {
-    return (
-      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</p>
-        <div className="grid grid-cols-2 gap-2">
-          <Input value={first} onChange={e => setFirst(e.target.value)} placeholder="First name" className="text-sm" />
-          <Input value={last} onChange={e => setLast(e.target.value)} placeholder="Last name" className="text-sm" />
-        </div>
-        <div className="flex gap-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-7 w-7"
-            onClick={handleSave}
+      <div className="space-y-4 max-w-lg">
+        <div className="grid grid-cols-2 gap-4">
+          <EditableField
+            type="text"
+            label="First Name"
+            required
+            value={current.firstName}
+            onChange={v => setField('firstName', v)}
+            isDirty={isDirtyField('firstName')}
+            error={errors.firstName}
             disabled={updateProfile.isPending}
-            aria-label="Save Name"
-          >
-            <Check className="h-3 w-3" />
-          </Button>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel} aria-label="Cancel Name">
-            <X className="h-3 w-3" />
-          </Button>
+          />
+          <EditableField
+            type="text"
+            label="Last Name"
+            required
+            value={current.lastName}
+            onChange={v => setField('lastName', v)}
+            isDirty={isDirtyField('lastName')}
+            error={errors.lastName}
+            disabled={updateProfile.isPending}
+          />
         </div>
-      </div>
-    );
-  }
 
-  return (
-    <div className="flex items-start justify-between gap-2 group">
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</p>
-        <p className="text-sm mt-0.5">
-          {firstName} {lastName}
-        </p>
-      </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={() => setEditing(true)}
-        aria-label="Edit Name"
-      >
-        <Pencil className="h-3 w-3" />
-      </Button>
-    </div>
-  );
-}
-
-function ProfileField({
-  label,
-  value,
-  fieldKey,
-  profile
-}: {
-  label: string;
-  value: string | null | undefined;
-  fieldKey: string;
-  profile: ProfileData;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value ?? '');
-  const updateProfile = useUpdateProfile();
-
-  function handleSave() {
-    if (fieldKey === 'email' && !draft.trim()) {
-      toast.error('Email is required');
-      return;
-    }
-    updateProfile.mutate(buildUpdatePayload(profile, { [fieldKey]: draft.trim() || null }), {
-      onSuccess: () => setEditing(false),
-      onError: () => toast.error('Failed to update profile')
-    });
-  }
-
-  function handleCancel() {
-    setDraft(value ?? '');
-    setEditing(false);
-  }
-
-  if (editing) {
-    return (
-      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
-        <Input
-          value={draft}
-          onChange={e => setDraft(e.target.value)}
-          className="text-sm"
-          type={fieldKey === 'email' ? 'email' : 'text'}
+        <EditableField
+          type="text"
+          label="Email"
+          required
+          value={current.email}
+          onChange={v => setField('email', v)}
+          isDirty={isDirtyField('email')}
+          error={errors.email}
+          disabled={updateProfile.isPending}
         />
-        <div className="flex gap-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-7 w-7"
-            onClick={handleSave}
-            disabled={updateProfile.isPending}
-            aria-label={`Save ${label}`}
-          >
-            <Check className="h-3 w-3" />
-          </Button>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel} aria-label={`Cancel ${label}`}>
-            <X className="h-3 w-3" />
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex items-start justify-between gap-2 group">
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
-        <p className="text-sm mt-0.5">{value || <span className="italic text-muted-foreground">Not set</span>}</p>
-      </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={() => setEditing(true)}
-        aria-label={`Edit ${label}`}
-      >
-        <Pencil className="h-3 w-3" />
-      </Button>
-    </div>
-  );
-}
-
-function AboutField({ about, profile }: { about: string | null; profile: ProfileData }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(about ?? '');
-  const updateProfile = useUpdateProfile();
-
-  function handleSave() {
-    updateProfile.mutate(buildUpdatePayload(profile, { about: draft.trim() || null }), {
-      onSuccess: () => setEditing(false),
-      onError: () => toast.error('Failed to update profile')
-    });
-  }
-
-  function handleCancel() {
-    setDraft(about ?? '');
-    setEditing(false);
-  }
-
-  if (editing) {
-    return (
-      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">About</p>
-        <p className="text-xs text-muted-foreground">
-          A narrative description of your professional identity. This will be used to infer your tone.
-        </p>
-        <Textarea
+        <EditableField
+          type="text"
+          label="Phone"
+          value={current.phone}
+          onChange={v => setField('phone', v)}
+          isDirty={isDirtyField('phone')}
+          disabled={updateProfile.isPending}
+        />
+        <EditableField
+          type="text"
+          label="Location"
+          value={current.location}
+          onChange={v => setField('location', v)}
+          isDirty={isDirtyField('location')}
+          disabled={updateProfile.isPending}
+        />
+        <EditableField
+          type="text"
+          label="LinkedIn"
+          value={current.linkedinUrl}
+          onChange={v => setField('linkedinUrl', v)}
+          isDirty={isDirtyField('linkedinUrl')}
+          placeholder="https://linkedin.com/in/..."
+          disabled={updateProfile.isPending}
+        />
+        <EditableField
+          type="text"
+          label="GitHub"
+          value={current.githubUrl}
+          onChange={v => setField('githubUrl', v)}
+          isDirty={isDirtyField('githubUrl')}
+          placeholder="https://github.com/..."
+          disabled={updateProfile.isPending}
+        />
+        <EditableField
+          type="text"
+          label="Website"
+          value={current.websiteUrl}
+          onChange={v => setField('websiteUrl', v)}
+          isDirty={isDirtyField('websiteUrl')}
+          placeholder="https://..."
+          disabled={updateProfile.isPending}
+        />
+        <EditableField
+          type="textarea"
+          label="About"
+          value={current.about}
+          onChange={v => setField('about', v)}
+          isDirty={isDirtyField('about')}
           rows={5}
-          value={draft}
-          onChange={e => setDraft(e.target.value)}
-          placeholder="Tell us about yourself..."
-          className="text-sm resize-none"
+          placeholder="A narrative description of your professional identity..."
+          disabled={updateProfile.isPending}
         />
-        <div className="flex gap-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-7 w-7"
-            onClick={handleSave}
-            disabled={updateProfile.isPending}
-            aria-label="Save About"
-          >
-            <Check className="h-3 w-3" />
-          </Button>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel} aria-label="Cancel About">
-            <X className="h-3 w-3" />
-          </Button>
-        </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="flex items-start justify-between gap-2 group">
-      <div className="flex-1">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">About</p>
-        <p className="text-sm mt-0.5 whitespace-pre-wrap">
-          {about || <span className="italic text-muted-foreground">Not set</span>}
-        </p>
-      </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={() => setEditing(true)}
-        aria-label="Edit About"
-      >
-        <Pencil className="h-3 w-3" />
-      </Button>
+      <SaveBar dirtyCount={dirtyCount} onSave={handleSave} onDiscard={reset} isSaving={updateProfile.isPending} />
     </div>
   );
 }

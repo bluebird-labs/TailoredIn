@@ -1,12 +1,14 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { EditableField } from '@/components/shared/EditableField.js';
+import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { SaveBar } from '@/components/shared/SaveBar.js';
 import { Button } from '@/components/ui/button';
 import { useAddAccomplishment } from '@/hooks/use-accomplishments';
-import { useExperiences } from '@/hooks/use-experiences';
-import { api } from '@/lib/api';
-import { queryKeys } from '@/lib/query-keys';
+import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
+import { useExperiences, useUpdateExperience } from '@/hooks/use-experiences';
+import { type ExperienceFormState, hasErrors, type ValidationErrors, validateExperience } from '@/lib/validation.js';
 import { AccomplishmentEditor } from './AccomplishmentEditor.js';
 
 type AccomplishmentDto = {
@@ -30,11 +32,15 @@ type Experience = {
   accomplishments: AccomplishmentDto[];
 };
 
-export function ExperienceList() {
+interface ExperienceListProps {
+  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
+}
+
+export function ExperienceList({ onDirtyChange }: ExperienceListProps) {
   const { data: experiences = [], isLoading } = useExperiences();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  if (isLoading) return <div className="text-sm text-muted-foreground">Loading...</div>;
+  if (isLoading) return <LoadingSkeleton variant="list" count={3} />;
 
   return (
     <div className="space-y-3">
@@ -44,6 +50,7 @@ export function ExperienceList() {
           experience={exp}
           expanded={expandedId === exp.id}
           onToggle={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
+          onDirtyChange={onDirtyChange}
         />
       ))}
     </div>
@@ -53,40 +60,69 @@ export function ExperienceList() {
 function ExperienceCard({
   experience,
   expanded,
-  onToggle
+  onToggle,
+  onDirtyChange
 }: {
-  experience: Experience;
-  expanded: boolean;
-  onToggle: () => void;
+  readonly experience: Experience;
+  readonly expanded: boolean;
+  readonly onToggle: () => void;
+  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
 }) {
-  const queryClient = useQueryClient();
-  const [narrative, setNarrative] = useState(experience.narrative ?? '');
+  const updateExperience = useUpdateExperience();
   const addAccomplishment = useAddAccomplishment(experience.id);
+  const [errors, setErrors] = useState<ValidationErrors<ExperienceFormState>>({});
 
-  async function saveNarrative() {
-    // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty merges inconsistent route param names causing union type conflicts
-    const segment = api.experiences({ id: experience.id, experienceId: experience.id } as any) as any;
-    await segment.put({
+  const savedState = useMemo(
+    () => ({
       title: experience.title,
-      company_name: experience.companyName,
-      company_website: experience.companyWebsite ?? undefined,
+      companyName: experience.companyName,
       location: experience.location,
-      start_date: experience.startDate,
-      end_date: experience.endDate,
-      summary: experience.summary ?? undefined,
-      narrative: narrative,
-      ordinal: experience.ordinal
-    });
-    queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
-    toast.success('Narrative saved');
+      startDate: experience.startDate,
+      endDate: experience.endDate,
+      summary: experience.summary ?? '',
+      narrative: experience.narrative ?? ''
+    }),
+    [experience]
+  );
+
+  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
+
+  useEffect(() => {
+    onDirtyChange(experience.id, isDirty);
+  }, [experience.id, isDirty, onDirtyChange]);
+
+  function handleSave() {
+    const validationErrors = validateExperience(current);
+    setErrors(validationErrors);
+    if (hasErrors(validationErrors)) return;
+
+    updateExperience.mutate(
+      {
+        id: experience.id,
+        title: current.title.trim(),
+        company_name: current.companyName.trim(),
+        company_website: experience.companyWebsite ?? undefined,
+        location: current.location.trim(),
+        start_date: current.startDate.trim(),
+        end_date: current.endDate.trim(),
+        summary: current.summary.trim() || undefined,
+        narrative: current.narrative.trim() || undefined,
+        ordinal: experience.ordinal
+      },
+      {
+        onSuccess: () => {
+          setErrors({});
+          toast.success('Changes saved');
+        },
+        onError: () => toast.error('Failed to save. Please try again.')
+      }
+    );
   }
 
   function handleAddAccomplishment() {
     addAccomplishment.mutate(
       { title: '', narrative: '', ordinal: experience.accomplishments.length },
-      {
-        onError: () => toast.error('Failed to add accomplishment')
-      }
+      { onError: () => toast.error('Failed to add accomplishment') }
     );
   }
 
@@ -109,22 +145,104 @@ function ExperienceCard({
 
       {expanded && (
         <div className="px-4 pb-4 space-y-4 border-t pt-4">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Role Narrative</p>
-            <textarea
-              value={narrative}
-              onChange={e => setNarrative(e.target.value)}
-              onBlur={saveNarrative}
-              className="w-full text-sm min-h-20 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              placeholder="Overall context for this role — scope, team, why it mattered..."
+          <div className="grid grid-cols-2 gap-3">
+            <EditableField
+              type="text"
+              label="Title"
+              required
+              value={current.title}
+              onChange={v => setField('title', v)}
+              isDirty={isDirtyField('title')}
+              error={errors.title}
+              disabled={updateExperience.isPending}
+            />
+            <EditableField
+              type="text"
+              label="Company"
+              required
+              value={current.companyName}
+              onChange={v => setField('companyName', v)}
+              isDirty={isDirtyField('companyName')}
+              error={errors.companyName}
+              disabled={updateExperience.isPending}
             />
           </div>
+
+          <EditableField
+            type="text"
+            label="Location"
+            required
+            value={current.location}
+            onChange={v => setField('location', v)}
+            isDirty={isDirtyField('location')}
+            error={errors.location}
+            disabled={updateExperience.isPending}
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <EditableField
+              type="text"
+              label="Start Date"
+              required
+              value={current.startDate}
+              onChange={v => setField('startDate', v)}
+              isDirty={isDirtyField('startDate')}
+              error={errors.startDate}
+              disabled={updateExperience.isPending}
+              placeholder="e.g. Jan 2023"
+            />
+            <EditableField
+              type="text"
+              label="End Date"
+              required
+              value={current.endDate}
+              onChange={v => setField('endDate', v)}
+              isDirty={isDirtyField('endDate')}
+              error={errors.endDate}
+              disabled={updateExperience.isPending}
+              placeholder="e.g. Present"
+            />
+          </div>
+
+          <EditableField
+            type="textarea"
+            label="Summary"
+            value={current.summary}
+            onChange={v => setField('summary', v)}
+            isDirty={isDirtyField('summary')}
+            rows={2}
+            disabled={updateExperience.isPending}
+            placeholder="Brief role summary..."
+          />
+
+          <EditableField
+            type="textarea"
+            label="Narrative"
+            value={current.narrative}
+            onChange={v => setField('narrative', v)}
+            isDirty={isDirtyField('narrative')}
+            rows={3}
+            disabled={updateExperience.isPending}
+            placeholder="Overall context for this role — scope, team, why it mattered..."
+          />
+
+          <SaveBar
+            dirtyCount={dirtyCount}
+            onSave={handleSave}
+            onDiscard={reset}
+            isSaving={updateExperience.isPending}
+          />
 
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Accomplishments</p>
             <div className="space-y-2">
               {experience.accomplishments.map(acc => (
-                <AccomplishmentEditor key={acc.id} experienceId={experience.id} accomplishment={acc} />
+                <AccomplishmentEditor
+                  key={acc.id}
+                  experienceId={experience.id}
+                  accomplishment={acc}
+                  onDirtyChange={onDirtyChange}
+                />
               ))}
               <Button
                 variant="outline"

@@ -1,11 +1,16 @@
-import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
+import { EditableField } from '@/components/shared/EditableField.js';
+import { EmptyState } from '@/components/shared/EmptyState.js';
+import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { SaveBar } from '@/components/shared/SaveBar.js';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import { useCreateHeadline, useDeleteHeadline, useHeadlines, useUpdateHeadline } from '@/hooks/use-headlines';
 import { useProfile } from '@/hooks/use-profile';
+import { type HeadlineFormState, hasErrors, type ValidationErrors, validateHeadline } from '@/lib/validation.js';
 
 type Headline = {
   id: string;
@@ -13,19 +18,100 @@ type Headline = {
   summaryText: string;
 };
 
-export function HeadlineList() {
+interface HeadlineCardProps {
+  readonly headline: Headline;
+  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
+}
+
+function HeadlineCard({ headline, onDirtyChange }: HeadlineCardProps) {
+  const update = useUpdateHeadline();
+  const del = useDeleteHeadline();
+  const [errors, setErrors] = useState<ValidationErrors<HeadlineFormState>>({});
+
+  const savedState = useMemo(() => ({ label: headline.label, summaryText: headline.summaryText }), [headline]);
+  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
+
+  useEffect(() => {
+    onDirtyChange(headline.id, isDirty);
+  }, [headline.id, isDirty, onDirtyChange]);
+
+  function handleSave() {
+    const validationErrors = validateHeadline(current);
+    setErrors(validationErrors);
+    if (hasErrors(validationErrors)) return;
+
+    update.mutate(
+      { id: headline.id, label: current.label.trim(), summary_text: current.summaryText.trim() },
+      {
+        onSuccess: () => {
+          setErrors({});
+          toast.success('Changes saved');
+        },
+        onError: () => toast.error('Failed to save. Please try again.')
+      }
+    );
+  }
+
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 space-y-3">
+          <EditableField
+            type="text"
+            label="Label"
+            required
+            value={current.label}
+            onChange={v => setField('label', v)}
+            isDirty={isDirtyField('label')}
+            error={errors.label}
+            disabled={update.isPending}
+            placeholder="e.g. Staff Engineer"
+          />
+          <EditableField
+            type="textarea"
+            label="Summary"
+            value={current.summaryText}
+            onChange={v => setField('summaryText', v)}
+            isDirty={isDirtyField('summaryText')}
+            rows={2}
+            disabled={update.isPending}
+            placeholder="1–3 sentence professional summary..."
+          />
+        </div>
+        <ConfirmDialog
+          title="Delete headline?"
+          description="This headline variant will be permanently removed."
+          onConfirm={() => del.mutate(headline.id)}
+          trigger={
+            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          }
+        />
+      </div>
+      <SaveBar dirtyCount={dirtyCount} onSave={handleSave} onDiscard={reset} isSaving={update.isPending} />
+    </div>
+  );
+}
+
+interface HeadlineListProps {
+  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
+}
+
+export function HeadlineList({ onDirtyChange }: HeadlineListProps) {
   const { data: headlines = [], isLoading } = useHeadlines();
   const { data: profile } = useProfile();
   const createHeadline = useCreateHeadline();
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [newSummaryText, setNewSummaryText] = useState('');
+  const [createErrors, setCreateErrors] = useState<ValidationErrors<HeadlineFormState>>({});
 
   function handleAdd() {
-    if (!newLabel.trim()) {
-      toast.error('Label is required');
-      return;
-    }
+    const validationErrors = validateHeadline({ label: newLabel, summaryText: newSummaryText });
+    setCreateErrors(validationErrors);
+    if (hasErrors(validationErrors)) return;
+
     if (!profile?.id) {
       toast.error('Profile not loaded');
       return;
@@ -37,39 +123,65 @@ export function HeadlineList() {
           setAdding(false);
           setNewLabel('');
           setNewSummaryText('');
+          setCreateErrors({});
+          toast.success('Headline created');
         },
         onError: () => toast.error('Failed to create headline')
       }
     );
   }
 
-  if (isLoading) return <div className="text-sm text-muted-foreground">Loading...</div>;
+  if (isLoading) return <LoadingSkeleton variant="list" count={3} />;
+
+  if ((headlines as Headline[]).length === 0 && !adding) {
+    return (
+      <EmptyState
+        message="No headline variants yet."
+        actionLabel="Add headline variant"
+        onAction={() => setAdding(true)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-3">
       {(headlines as Headline[]).map(h => (
-        <HeadlineCard key={h.id} headline={h} />
+        <HeadlineCard key={h.id} headline={h} onDirtyChange={onDirtyChange} />
       ))}
 
       {adding ? (
-        <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-          <Input
+        <div className="border border-primary/30 rounded-lg p-4 space-y-3">
+          <EditableField
+            type="text"
+            label="Label"
+            required
             value={newLabel}
-            onChange={e => setNewLabel(e.target.value)}
+            onChange={setNewLabel}
+            error={createErrors.label}
             placeholder="Headline label (e.g. Staff Engineer)"
-            className="text-sm"
           />
-          <Textarea
+          <EditableField
+            type="textarea"
+            label="Summary"
             value={newSummaryText}
-            onChange={e => setNewSummaryText(e.target.value)}
+            onChange={setNewSummaryText}
+            rows={2}
             placeholder="1–3 sentence professional summary..."
-            className="text-sm min-h-16 resize-none"
           />
           <div className="flex gap-2">
             <Button size="sm" onClick={handleAdd} disabled={createHeadline.isPending}>
               Save
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setAdding(false)}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setAdding(false);
+                setNewLabel('');
+                setNewSummaryText('');
+                setCreateErrors({});
+              }}
+            >
               Cancel
             </Button>
           </div>
@@ -80,69 +192,6 @@ export function HeadlineList() {
           Add headline variant
         </Button>
       )}
-    </div>
-  );
-}
-
-function HeadlineCard({ headline }: { headline: Headline }) {
-  const [editing, setEditing] = useState(false);
-  const [label, setLabel] = useState(headline.label);
-  const [summaryText, setSummaryText] = useState(headline.summaryText);
-  const update = useUpdateHeadline();
-  const del = useDeleteHeadline();
-
-  function handleSave() {
-    update.mutate(
-      { id: headline.id, label, summary_text: summaryText },
-      {
-        onSuccess: () => setEditing(false),
-        onError: () => toast.error('Failed to update headline')
-      }
-    );
-  }
-
-  if (editing) {
-    return (
-      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-        <Input value={label} onChange={e => setLabel(e.target.value)} className="font-medium text-sm" />
-        <Textarea
-          value={summaryText}
-          onChange={e => setSummaryText(e.target.value)}
-          className="text-sm min-h-16 resize-none"
-        />
-        <div className="flex gap-2">
-          <Button size="sm" onClick={handleSave} disabled={update.isPending}>
-            Save
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-lg p-3 flex items-start justify-between gap-2 group">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <span className="font-medium text-sm">{headline.label}</span>
-        </div>
-        <p className="text-sm text-muted-foreground">{headline.summaryText}</p>
-      </div>
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditing(true)}>
-          <Pencil className="h-3 w-3" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7 text-destructive"
-          onClick={() => del.mutate(headline.id)}
-        >
-          <Trash2 className="h-3 w-3" />
-        </Button>
-      </div>
     </div>
   );
 }

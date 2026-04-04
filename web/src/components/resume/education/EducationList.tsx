@@ -1,8 +1,14 @@
-import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
+import { EditableField } from '@/components/shared/EditableField.js';
+import { EmptyState } from '@/components/shared/EmptyState.js';
+import { FormModal } from '@/components/shared/FormModal.js';
+import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { SaveBar } from '@/components/shared/SaveBar.js';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import {
   type Education,
   useCreateEducation,
@@ -10,238 +16,288 @@ import {
   useEducations,
   useUpdateEducation
 } from '@/hooks/use-educations';
-import { useProfile } from '@/hooks/use-profile';
+import { type EducationFormState, hasErrors, type ValidationErrors, validateEducation } from '@/lib/validation.js';
 
-export function EducationList() {
-  const { data: educations = [], isLoading } = useEducations();
-  const { data: profile } = useProfile();
-  const createEducation = useCreateEducation();
-  const [adding, setAdding] = useState(false);
-  const [newDegreeTitle, setNewDegreeTitle] = useState('');
-  const [newInstitutionName, setNewInstitutionName] = useState('');
-  const [newGraduationYear, setNewGraduationYear] = useState('');
-  const [newLocation, setNewLocation] = useState('');
-  const [newHonors, setNewHonors] = useState('');
+interface EducationCardProps {
+  readonly education: Education;
+  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
+}
 
-  function resetForm() {
-    setNewDegreeTitle('');
-    setNewInstitutionName('');
-    setNewGraduationYear('');
-    setNewLocation('');
-    setNewHonors('');
-  }
+function EducationCard({ education, onDirtyChange }: EducationCardProps) {
+  const update = useUpdateEducation();
+  const del = useDeleteEducation();
+  const [errors, setErrors] = useState<ValidationErrors<EducationFormState>>({});
 
-  function handleAdd() {
-    if (!newInstitutionName.trim()) {
-      toast.error('Institution name is required');
-      return;
-    }
-    if (!newDegreeTitle.trim()) {
-      toast.error('Degree title is required');
-      return;
-    }
-    const year = Number.parseInt(newGraduationYear, 10);
-    if (Number.isNaN(year)) {
-      toast.error('Valid graduation year is required');
-      return;
-    }
-    if (!profile?.id) {
-      toast.error('Profile not loaded');
-      return;
-    }
-    createEducation.mutate(
+  const savedState = useMemo(
+    () => ({
+      institutionName: education.institutionName,
+      degreeTitle: education.degreeTitle,
+      graduationYear: String(education.graduationYear),
+      location: education.location ?? '',
+      honors: education.honors ?? ''
+    }),
+    [education]
+  );
+
+  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
+
+  useEffect(() => {
+    onDirtyChange(education.id, isDirty);
+  }, [education.id, isDirty, onDirtyChange]);
+
+  function handleSave() {
+    const validationErrors = validateEducation(current);
+    setErrors(validationErrors);
+    if (hasErrors(validationErrors)) return;
+
+    const year = Number.parseInt(current.graduationYear, 10);
+    update.mutate(
       {
-        degree_title: newDegreeTitle.trim(),
-        institution_name: newInstitutionName.trim(),
+        id: education.id,
+        degree_title: current.degreeTitle.trim(),
+        institution_name: current.institutionName.trim(),
         graduation_year: year,
-        location: newLocation.trim() || null,
-        honors: newHonors.trim() || null,
-        ordinal: (educations as Education[]).length
+        location: current.location.trim() || null,
+        honors: current.honors.trim() || null,
+        ordinal: education.ordinal
       },
       {
         onSuccess: () => {
-          setAdding(false);
-          resetForm();
+          setErrors({});
+          toast.success('Changes saved');
+        },
+        onError: () => toast.error('Failed to save. Please try again.')
+      }
+    );
+  }
+
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 space-y-3">
+          <EditableField
+            type="text"
+            label="Institution"
+            required
+            value={current.institutionName}
+            onChange={v => setField('institutionName', v)}
+            isDirty={isDirtyField('institutionName')}
+            error={errors.institutionName}
+            disabled={update.isPending}
+          />
+          <EditableField
+            type="text"
+            label="Degree"
+            required
+            value={current.degreeTitle}
+            onChange={v => setField('degreeTitle', v)}
+            isDirty={isDirtyField('degreeTitle')}
+            error={errors.degreeTitle}
+            disabled={update.isPending}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <EditableField
+              type="number"
+              label="Graduation Year"
+              required
+              value={current.graduationYear}
+              onChange={v => setField('graduationYear', v)}
+              isDirty={isDirtyField('graduationYear')}
+              error={errors.graduationYear}
+              disabled={update.isPending}
+            />
+            <EditableField
+              type="text"
+              label="Location"
+              value={current.location}
+              onChange={v => setField('location', v)}
+              isDirty={isDirtyField('location')}
+              disabled={update.isPending}
+            />
+          </div>
+          <EditableField
+            type="text"
+            label="Honors"
+            value={current.honors}
+            onChange={v => setField('honors', v)}
+            isDirty={isDirtyField('honors')}
+            disabled={update.isPending}
+            placeholder="e.g. Magna Cum Laude"
+          />
+        </div>
+        <ConfirmDialog
+          title="Delete education?"
+          description="This education entry will be permanently removed."
+          onConfirm={() => del.mutate(education.id)}
+          trigger={
+            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          }
+        />
+      </div>
+      <SaveBar dirtyCount={dirtyCount} onSave={handleSave} onDiscard={reset} isSaving={update.isPending} />
+    </div>
+  );
+}
+
+function CreateEducationModal({
+  open,
+  onOpenChange,
+  educationCount
+}: {
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly educationCount: number;
+}) {
+  const createEducation = useCreateEducation();
+
+  const emptyState: EducationFormState = {
+    institutionName: '',
+    degreeTitle: '',
+    graduationYear: '',
+    location: '',
+    honors: ''
+  };
+
+  const { current, setField, isDirtyField, dirtyCount, reset } = useDirtyTracking(emptyState);
+  const [errors, setErrors] = useState<ValidationErrors<EducationFormState>>({});
+
+  function handleSave() {
+    const validationErrors = validateEducation(current);
+    setErrors(validationErrors);
+    if (hasErrors(validationErrors)) return;
+
+    const year = Number.parseInt(current.graduationYear, 10);
+    createEducation.mutate(
+      {
+        degree_title: current.degreeTitle.trim(),
+        institution_name: current.institutionName.trim(),
+        graduation_year: year,
+        location: current.location.trim() || null,
+        honors: current.honors.trim() || null,
+        ordinal: educationCount
+      },
+      {
+        onSuccess: () => {
+          setErrors({});
+          reset();
+          onOpenChange(false);
+          toast.success('Education created');
         },
         onError: () => toast.error('Failed to create education')
       }
     );
   }
 
-  if (isLoading) return <div className="text-sm text-muted-foreground">Loading...</div>;
+  function handleDiscard() {
+    reset();
+    setErrors({});
+  }
+
+  return (
+    <FormModal
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Add Education"
+      description="Add a new education entry to your profile."
+      dirtyCount={dirtyCount}
+      isSaving={createEducation.isPending}
+      onSave={handleSave}
+      onDiscard={handleDiscard}
+    >
+      <EditableField
+        type="text"
+        label="Institution"
+        required
+        value={current.institutionName}
+        onChange={v => setField('institutionName', v)}
+        isDirty={isDirtyField('institutionName')}
+        error={errors.institutionName}
+        placeholder="e.g. MIT"
+      />
+      <EditableField
+        type="text"
+        label="Degree"
+        required
+        value={current.degreeTitle}
+        onChange={v => setField('degreeTitle', v)}
+        isDirty={isDirtyField('degreeTitle')}
+        error={errors.degreeTitle}
+        placeholder="e.g. B.S. Computer Science"
+      />
+      <EditableField
+        type="number"
+        label="Graduation Year"
+        required
+        value={current.graduationYear}
+        onChange={v => setField('graduationYear', v)}
+        isDirty={isDirtyField('graduationYear')}
+        error={errors.graduationYear}
+      />
+      <EditableField
+        type="text"
+        label="Location"
+        value={current.location}
+        onChange={v => setField('location', v)}
+        isDirty={isDirtyField('location')}
+        placeholder="e.g. Cambridge, MA"
+      />
+      <EditableField
+        type="text"
+        label="Honors"
+        value={current.honors}
+        onChange={v => setField('honors', v)}
+        isDirty={isDirtyField('honors')}
+        placeholder="e.g. Magna Cum Laude"
+      />
+    </FormModal>
+  );
+}
+
+interface EducationListProps {
+  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
+}
+
+export function EducationList({ onDirtyChange }: EducationListProps) {
+  const { data: educations = [], isLoading } = useEducations();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  if (isLoading) return <LoadingSkeleton variant="list" count={2} />;
+
+  if ((educations as Education[]).length === 0 && !modalOpen) {
+    return (
+      <>
+        <EmptyState
+          message="No education entries yet."
+          actionLabel="Add education"
+          onAction={() => setModalOpen(true)}
+        />
+        <CreateEducationModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          educationCount={(educations as Education[]).length}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="space-y-3">
       {(educations as Education[]).map(edu => (
-        <EducationCard key={edu.id} education={edu} />
+        <EducationCard key={edu.id} education={edu} onDirtyChange={onDirtyChange} />
       ))}
 
-      {adding ? (
-        <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-          <Input
-            value={newInstitutionName}
-            onChange={e => setNewInstitutionName(e.target.value)}
-            placeholder="Institution name (e.g. MIT)"
-            className="text-sm"
-          />
-          <Input
-            value={newDegreeTitle}
-            onChange={e => setNewDegreeTitle(e.target.value)}
-            placeholder="Degree title (e.g. B.S. Computer Science)"
-            className="text-sm"
-          />
-          <div className="flex gap-2">
-            <Input
-              value={newGraduationYear}
-              onChange={e => setNewGraduationYear(e.target.value)}
-              placeholder="Graduation year"
-              className="text-sm w-32"
-              type="number"
-            />
-            <Input
-              value={newLocation}
-              onChange={e => setNewLocation(e.target.value)}
-              placeholder="Location (optional)"
-              className="text-sm flex-1"
-            />
-          </div>
-          <Input
-            value={newHonors}
-            onChange={e => setNewHonors(e.target.value)}
-            placeholder="Honors (optional, e.g. Magna Cum Laude)"
-            className="text-sm"
-          />
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleAdd} disabled={createEducation.isPending}>
-              Save
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setAdding(false);
-                resetForm();
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setAdding(true)}>
-          <Plus className="h-3 w-3 mr-1" />
-          Add education
-        </Button>
-      )}
-    </div>
-  );
-}
+      <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setModalOpen(true)}>
+        <Plus className="h-3 w-3 mr-1" />
+        Add education
+      </Button>
 
-function EducationCard({ education }: { education: Education }) {
-  const [editing, setEditing] = useState(false);
-  const [degreeTitle, setDegreeTitle] = useState(education.degreeTitle);
-  const [institutionName, setInstitutionName] = useState(education.institutionName);
-  const [graduationYear, setGraduationYear] = useState(String(education.graduationYear));
-  const [location, setLocation] = useState(education.location ?? '');
-  const [honors, setHonors] = useState(education.honors ?? '');
-  const update = useUpdateEducation();
-  const del = useDeleteEducation();
-
-  function handleSave() {
-    const year = Number.parseInt(graduationYear, 10);
-    if (Number.isNaN(year)) {
-      toast.error('Valid graduation year is required');
-      return;
-    }
-    update.mutate(
-      {
-        id: education.id,
-        degree_title: degreeTitle,
-        institution_name: institutionName,
-        graduation_year: year,
-        location: location.trim() || null,
-        honors: honors.trim() || null,
-        ordinal: education.ordinal
-      },
-      {
-        onSuccess: () => setEditing(false),
-        onError: () => toast.error('Failed to update education')
-      }
-    );
-  }
-
-  if (editing) {
-    return (
-      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
-        <Input
-          value={institutionName}
-          onChange={e => setInstitutionName(e.target.value)}
-          className="font-medium text-sm"
-          placeholder="Institution name"
-        />
-        <Input
-          value={degreeTitle}
-          onChange={e => setDegreeTitle(e.target.value)}
-          className="text-sm"
-          placeholder="Degree title"
-        />
-        <div className="flex gap-2">
-          <Input
-            value={graduationYear}
-            onChange={e => setGraduationYear(e.target.value)}
-            className="text-sm w-32"
-            type="number"
-            placeholder="Year"
-          />
-          <Input
-            value={location}
-            onChange={e => setLocation(e.target.value)}
-            className="text-sm flex-1"
-            placeholder="Location (optional)"
-          />
-        </div>
-        <Input
-          value={honors}
-          onChange={e => setHonors(e.target.value)}
-          className="text-sm"
-          placeholder="Honors (optional)"
-        />
-        <div className="flex gap-2">
-          <Button size="sm" onClick={handleSave} disabled={update.isPending}>
-            Save
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-lg p-3 flex items-start justify-between gap-2 group">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <span className="font-medium text-sm">{education.institutionName}</span>
-          <span className="text-muted-foreground text-xs">{education.graduationYear}</span>
-        </div>
-        <p className="text-sm text-muted-foreground">{education.degreeTitle}</p>
-        {education.honors && <p className="text-xs text-muted-foreground mt-1">{education.honors}</p>}
-        {education.location && <p className="text-xs text-muted-foreground">{education.location}</p>}
-      </div>
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditing(true)}>
-          <Pencil className="h-3 w-3" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7 text-destructive"
-          onClick={() => del.mutate(education.id)}
-        >
-          <Trash2 className="h-3 w-3" />
-        </Button>
-      </div>
+      <CreateEducationModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        educationCount={(educations as Education[]).length}
+      />
     </div>
   );
 }

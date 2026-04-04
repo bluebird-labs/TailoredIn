@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { FieldError } from './FieldError.js';
 
-type FieldType = 'text' | 'textarea' | 'select';
+type FieldType = 'text' | 'number' | 'textarea' | 'select';
 
 interface EditableFieldBaseProps {
   readonly label: string;
@@ -19,6 +19,13 @@ interface EditableFieldBaseProps {
 
 interface TextFieldProps extends EditableFieldBaseProps {
   readonly type: 'text';
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  readonly placeholder?: string;
+}
+
+interface NumberFieldProps extends EditableFieldBaseProps {
+  readonly type: 'number';
   readonly value: string;
   readonly onChange: (value: string) => void;
   readonly placeholder?: string;
@@ -40,7 +47,7 @@ interface SelectFieldProps extends EditableFieldBaseProps {
   readonly options: ReadonlyArray<{ readonly label: string; readonly value: string }>;
 }
 
-type EditableFieldProps = TextFieldProps | TextareaFieldProps | SelectFieldProps;
+type EditableFieldProps = TextFieldProps | NumberFieldProps | TextareaFieldProps | SelectFieldProps;
 
 function EditableField(props: EditableFieldProps) {
   const { label, required, error, isDirty, disabled, className, type } = props;
@@ -60,6 +67,18 @@ function EditableField(props: EditableFieldProps) {
       {type === 'text' && (
         <Input
           id={fieldId}
+          value={props.value}
+          onChange={e => props.onChange(e.target.value)}
+          placeholder={props.placeholder}
+          disabled={disabled}
+          aria-invalid={!!error}
+        />
+      )}
+
+      {type === 'number' && (
+        <Input
+          id={fieldId}
+          type="number"
           value={props.value}
           onChange={e => props.onChange(e.target.value)}
           placeholder={props.placeholder}

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-type DirtyTracking<T extends Record<string, unknown>> = {
+type DirtyTracking<T extends object> = {
   current: T;
   isDirty: boolean;
   dirtyCount: number;
@@ -10,7 +10,7 @@ type DirtyTracking<T extends Record<string, unknown>> = {
   getChanges: () => Partial<T>;
 };
 
-function useDirtyTracking<T extends Record<string, unknown>>(savedState: T): DirtyTracking<T> {
+function useDirtyTracking<T extends object>(savedState: T): DirtyTracking<T> {
   const [current, setCurrent] = useState<T>(savedState);
   const savedRef = useRef(savedState);
 
