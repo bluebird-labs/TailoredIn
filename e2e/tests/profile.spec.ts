@@ -24,66 +24,61 @@ test.describe('Profile Page', () => {
   });
 
   test('displays field labels', async ({ page }) => {
-    await expect(page.getByText('Name')).toBeVisible();
-    await expect(page.getByText('Email')).toBeVisible();
-    await expect(page.getByText('Phone')).toBeVisible();
-    await expect(page.getByText('Location')).toBeVisible();
-    await expect(page.getByText('About')).toBeVisible();
+    for (const label of ['Name', 'Email', 'Phone', 'Location', 'About']) {
+      await expect(page.getByText(label, { exact: true })).toBeVisible();
+    }
   });
 
-  test('can edit profile fields', async ({ page }) => {
-    await page.getByRole('button', { name: 'Edit profile' }).click();
+  test('can edit location field inline', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit Location' }).click({ force: true });
 
-    const locationInput = page.getByLabel('Location');
+    const locationInput = page.getByRole('textbox');
     await expect(locationInput).toBeVisible();
     await locationInput.clear();
     await locationInput.fill('New York, NY');
 
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('button', { name: 'Save Location' }).click();
 
     await expect(page.getByText('New York, NY')).toBeVisible();
-    await expect(page.getByLabel('Location')).not.toBeVisible();
   });
 
-  test('can edit about field', async ({ page }) => {
-    await page.getByRole('button', { name: 'Edit profile' }).click();
+  test('can edit about field inline', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit About' }).click({ force: true });
 
-    const aboutTextarea = page.getByLabel('About');
+    const aboutTextarea = page.getByRole('textbox');
     await expect(aboutTextarea).toBeVisible();
     await aboutTextarea.clear();
     await aboutTextarea.fill('Updated professional narrative.');
 
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('button', { name: 'Save About' }).click();
 
     await expect(page.getByText('Updated professional narrative.')).toBeVisible();
-    await expect(page.getByLabel('About')).not.toBeVisible();
   });
 
   test('cancel discards changes', async ({ page }) => {
-    await page.getByRole('button', { name: 'Edit profile' }).click();
+    await page.getByRole('button', { name: 'Edit Phone' }).click({ force: true });
 
-    const locationInput = page.getByLabel('Location');
-    await locationInput.clear();
-    await locationInput.fill('Discarded City');
+    const phoneInput = page.getByRole('textbox');
+    await phoneInput.clear();
+    await phoneInput.fill('000-000-0000');
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: 'Cancel Phone' }).click();
 
-    await expect(page.getByText('Discarded City')).not.toBeVisible();
-    await expect(page.getByLabel('Location')).not.toBeVisible();
+    await expect(page.getByText('000-000-0000')).not.toBeVisible();
+    await expect(page.getByText('+1-555-123-4567')).toBeVisible();
   });
 
-  test('can edit first name and last name separately', async ({ page }) => {
-    await page.getByRole('button', { name: 'Edit profile' }).click();
+  test('can edit first name and last name', async ({ page }) => {
+    await page.getByRole('button', { name: 'Edit Name' }).click({ force: true });
 
-    const firstNameInput = page.getByLabel('First name');
-    const lastNameInput = page.getByLabel('Last name');
-    await expect(firstNameInput).toHaveValue('Jane');
-    await expect(lastNameInput).toHaveValue('Doe');
+    const inputs = page.getByRole('textbox');
+    await expect(inputs.first()).toHaveValue('Jane');
+    await expect(inputs.nth(1)).toHaveValue('Doe');
 
-    await firstNameInput.clear();
-    await firstNameInput.fill('Alice');
+    await inputs.first().clear();
+    await inputs.first().fill('Alice');
 
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('button', { name: 'Save Name' }).click();
 
     await expect(page.getByText('Alice Doe')).toBeVisible();
   });

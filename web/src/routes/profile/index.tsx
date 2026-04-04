@@ -106,10 +106,11 @@ function NameField({ firstName, lastName, profile }: { firstName: string; lastNa
             className="h-7 w-7"
             onClick={handleSave}
             disabled={updateProfile.isPending}
+            aria-label="Save Name"
           >
             <Check className="h-3 w-3" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel}>
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel} aria-label="Cancel Name">
             <X className="h-3 w-3" />
           </Button>
         </div>
@@ -130,6 +131,7 @@ function NameField({ firstName, lastName, profile }: { firstName: string; lastNa
         variant="ghost"
         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={() => setEditing(true)}
+        aria-label="Edit Name"
       >
         <Pencil className="h-3 w-3" />
       </Button>
@@ -185,10 +187,11 @@ function ProfileField({
             className="h-7 w-7"
             onClick={handleSave}
             disabled={updateProfile.isPending}
+            aria-label={`Save ${label}`}
           >
             <Check className="h-3 w-3" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel}>
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel} aria-label={`Cancel ${label}`}>
             <X className="h-3 w-3" />
           </Button>
         </div>
@@ -207,6 +210,7 @@ function ProfileField({
         variant="ghost"
         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={() => setEditing(true)}
+        aria-label={`Edit ${label}`}
       >
         <Pencil className="h-3 w-3" />
       </Button>
@@ -252,10 +256,11 @@ function AboutField({ about, profile }: { about: string | null; profile: Profile
             className="h-7 w-7"
             onClick={handleSave}
             disabled={updateProfile.isPending}
+            aria-label="Save About"
           >
             <Check className="h-3 w-3" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel}>
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancel} aria-label="Cancel About">
             <X className="h-3 w-3" />
           </Button>
         </div>
@@ -276,6 +281,7 @@ function AboutField({ about, profile }: { about: string | null; profile: Profile
         variant="ghost"
         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={() => setEditing(true)}
+        aria-label="Edit About"
       >
         <Pencil className="h-3 w-3" />
       </Button>
