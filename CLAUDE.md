@@ -19,16 +19,18 @@ Do all work inside that worktree. When implementation is complete and all checks
 Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `core/` package.
 
 ```
-core/          ← Cross-cutting pure utilities (no domain, no framework deps)
+core/            ← Cross-cutting pure utilities (no domain, no framework deps)
 domain/          ← Single package: aggregates, value objects, domain services
 application/     ← Single package: use cases + ports + DTOs (plain classes, no DI framework)
 infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
 api/             ← Elysia HTTP server + DI composition root
+web/             ← React 19 SPA (consumes api/ types via Eden Treaty)
+e2e/             ← Playwright end-to-end tests
 ```
 
 **Dependency rule (inward only):**
 ```
-api → infrastructure → application → domain → (core)
+web → api → infrastructure → application → domain → (core)
 ```
 
 ### Layer Details
@@ -41,6 +43,7 @@ api → infrastructure → application → domain → (core)
 | `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, DI tokens | [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) |
 | `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root | [api/CLAUDE.md](api/CLAUDE.md) |
 | `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend | [web/CLAUDE.md](web/CLAUDE.md) |
+| `e2e/` | `@tailoredin/e2e` | Playwright end-to-end tests | — |
 
 ## Commands
 
@@ -52,7 +55,7 @@ All commands are run from the repo root via `bun run <script>`.
 bun up                 # start everything: install, Docker, migrate, seed, API + web servers
 bun down               # stop servers + Docker
 bun fresh              # restart everything (down + up)
-bun verify             # full project health check (typecheck → lint → deps → knip → tests → integration → E2E)
+bun verify             # full project health check (typecheck → lint → dep:check → knip → test:coverage → test:integration → test:e2e)
 ```
 
 ### Quality checks (run individually or via `bun verify`)
