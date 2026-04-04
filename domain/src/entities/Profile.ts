@@ -5,6 +5,7 @@ export type ProfileCreateProps = {
   email: string;
   firstName: string;
   lastName: string;
+  about: string | null;
   phone: string | null;
   location: string | null;
   linkedinUrl: string | null;
@@ -16,6 +17,7 @@ export class Profile extends AggregateRoot<ProfileId> {
   public email: string;
   public firstName: string;
   public lastName: string;
+  public about: string | null;
   public phone: string | null;
   public githubUrl: string | null;
   public linkedinUrl: string | null;
@@ -29,6 +31,7 @@ export class Profile extends AggregateRoot<ProfileId> {
     email: string;
     firstName: string;
     lastName: string;
+    about: string | null;
     phone: string | null;
     location: string | null;
     linkedinUrl: string | null;
@@ -41,6 +44,7 @@ export class Profile extends AggregateRoot<ProfileId> {
     this.email = props.email;
     this.firstName = props.firstName;
     this.lastName = props.lastName;
+    this.about = props.about;
     this.phone = props.phone;
     this.location = props.location;
     this.linkedinUrl = props.linkedinUrl;

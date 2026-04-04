@@ -3,6 +3,7 @@ export type ProfileDto = {
   email: string;
   firstName: string;
   lastName: string;
+  about: string | null;
   phone: string | null;
   location: string | null;
   linkedinUrl: string | null;

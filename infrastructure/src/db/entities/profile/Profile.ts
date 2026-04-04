@@ -7,6 +7,7 @@ type ProfileProps = {
   email: string;
   firstName: string;
   lastName: string;
+  about: string | null;
   phone: string | null;
   location: string | null;
   linkedinUrl: string | null;
@@ -32,6 +33,9 @@ export class Profile extends BaseEntity {
   @Property({ name: 'last_name', type: 'text' })
   public lastName: string;
 
+  @Property({ name: 'about', type: 'text', nullable: true })
+  public about: string | null;
+
   @Property({ name: 'phone', type: 'text', nullable: true })
   public phone: string | null;
 
@@ -53,6 +57,7 @@ export class Profile extends BaseEntity {
     this.email = props.email;
     this.firstName = props.firstName;
     this.lastName = props.lastName;
+    this.about = props.about;
     this.phone = props.phone;
     this.location = props.location;
     this.linkedinUrl = props.linkedinUrl;
