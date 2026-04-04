@@ -26,10 +26,18 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
   const dateRange = startFormatted && endFormatted ? `${startFormatted} — ${endFormatted}` : '';
 
   return (
-    <button
-      type="button"
+    // biome-ignore lint/a11y/useSemanticElements: cannot use <button> because it contains a nested <button> (delete trigger)
+    <div
+      role="button"
+      tabIndex={0}
       className="group w-full text-left border rounded-[14px] p-4 cursor-pointer transition-colors hover:bg-muted/30"
       onClick={onEdit}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onEdit();
+        }
+      }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -68,6 +76,6 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
           />
         </div>
       </div>
-    </button>
+    </div>
   );
 }
