@@ -2,6 +2,8 @@ import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container } from './container.js';
 import { configRoute } from './routes/ConfigRoute.js';
+import { CreateCompanyRoute } from './routes/company/CreateCompanyRoute.js';
+import { EnrichCompanyRoute } from './routes/company/EnrichCompanyRoute.js';
 import { CreateEducationRoute } from './routes/education/CreateEducationRoute.js';
 import { DeleteEducationRoute } from './routes/education/DeleteEducationRoute.js';
 import { ListEducationsRoute } from './routes/education/ListEducationsRoute.js';
@@ -76,6 +78,9 @@ const app = new Elysia()
   .use(container.get(DeleteAccomplishmentRoute).plugin())
   // Factory
   .use(container.get(ExtractTextRoute).plugin())
+  // Companies
+  .use(container.get(EnrichCompanyRoute).plugin())
+  .use(container.get(CreateCompanyRoute).plugin())
   .onError(({ request, error, set, code }) => {
     const err = error as unknown as { statusCode?: number; message?: string };
     const message = err.message ?? String(error);
