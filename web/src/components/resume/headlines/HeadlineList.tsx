@@ -28,7 +28,10 @@ function HeadlineCard({ headline, onDirtyChange }: HeadlineCardProps) {
   const del = useDeleteHeadline();
   const [errors, setErrors] = useState<ValidationErrors<HeadlineFormState>>({});
 
-  const savedState = useMemo(() => ({ label: headline.label, summaryText: headline.summaryText }), [headline]);
+  const savedState = useMemo(
+    () => ({ label: headline.label, summaryText: headline.summaryText }),
+    [headline.label, headline.summaryText]
+  );
   const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
 
   useEffect(() => {

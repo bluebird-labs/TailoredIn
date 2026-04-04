@@ -18,7 +18,7 @@ export type MigrationOptions = {
 export async function runMigrations({ dbConfig, containerName, repoRoot }: MigrationOptions): Promise<void> {
   const orm = await MikroORM.init(createOrmConfig(dbConfig));
   try {
-    const pending = await orm.migrator.getPendingMigrations();
+    const pending = await orm.migrator.getPending();
     if (pending.length === 0) {
       log.info('No pending migrations.');
       return;

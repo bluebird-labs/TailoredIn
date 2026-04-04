@@ -34,7 +34,7 @@ export function AccomplishmentEditor({ experienceId, accomplishment, onDirtyChan
 
   const savedState = useMemo(
     () => ({ title: accomplishment.title, narrative: accomplishment.narrative }),
-    [accomplishment]
+    [accomplishment.title, accomplishment.narrative]
   );
 
   const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);

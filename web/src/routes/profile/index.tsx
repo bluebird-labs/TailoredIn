@@ -16,40 +16,81 @@ export const Route = createFileRoute('/profile/')({
 
 function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader />
+        <div className="max-w-lg">
+          <LoadingSkeleton variant="form" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="space-y-6">
+        <PageHeader />
+        <EmptyState message="No profile found." />
+      </div>
+    );
+  }
+
+  return <ProfileForm profile={profile} />;
+}
+
+function PageHeader() {
+  return (
+    <div>
+      <h1 className="page-heading">Profile</h1>
+      <p className="text-muted-foreground text-sm">Your professional identity.</p>
+    </div>
+  );
+}
+
+type ProfileData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  about: string | null;
+  phone: string | null;
+  location: string | null;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  websiteUrl: string | null;
+};
+
+function ProfileForm({ profile }: { readonly profile: ProfileData }) {
   const updateProfile = useUpdateProfile();
   const [errors, setErrors] = useState<ValidationErrors<ProfileFormState>>({});
 
-  const savedState = useMemo<ProfileFormState | null>(
-    () =>
-      profile
-        ? {
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            email: profile.email,
-            phone: profile.phone ?? '',
-            location: profile.location ?? '',
-            linkedinUrl: profile.linkedinUrl ?? '',
-            githubUrl: profile.githubUrl ?? '',
-            websiteUrl: profile.websiteUrl ?? '',
-            about: profile.about ?? ''
-          }
-        : null,
-    [profile]
+  const savedState = useMemo<ProfileFormState>(
+    () => ({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      email: profile.email,
+      phone: profile.phone ?? '',
+      location: profile.location ?? '',
+      linkedinUrl: profile.linkedinUrl ?? '',
+      githubUrl: profile.githubUrl ?? '',
+      websiteUrl: profile.websiteUrl ?? '',
+      about: profile.about ?? ''
+    }),
+    [
+      profile.firstName,
+      profile.lastName,
+      profile.email,
+      profile.phone,
+      profile.location,
+      profile.linkedinUrl,
+      profile.githubUrl,
+      profile.websiteUrl,
+      profile.about
+    ]
   );
 
-  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(
-    savedState ?? {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      location: '',
-      linkedinUrl: '',
-      githubUrl: '',
-      websiteUrl: '',
-      about: ''
-    }
-  );
+  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
 
   useNavGuard({ isDirty });
 
@@ -80,38 +121,9 @@ function ProfilePage() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="page-heading">Profile</h1>
-          <p className="text-muted-foreground text-sm">Your professional identity.</p>
-        </div>
-        <div className="max-w-lg">
-          <LoadingSkeleton variant="form" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="page-heading">Profile</h1>
-          <p className="text-muted-foreground text-sm">Your professional identity.</p>
-        </div>
-        <EmptyState message="No profile found." />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="page-heading">Profile</h1>
-        <p className="text-muted-foreground text-sm">Your professional identity.</p>
-      </div>
+      <PageHeader />
 
       <div className="space-y-4 max-w-lg">
         <div className="grid grid-cols-2 gap-4">

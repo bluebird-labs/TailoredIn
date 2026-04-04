@@ -82,7 +82,15 @@ function ExperienceCard({
       summary: experience.summary ?? '',
       narrative: experience.narrative ?? ''
     }),
-    [experience]
+    [
+      experience.title,
+      experience.companyName,
+      experience.location,
+      experience.startDate,
+      experience.endDate,
+      experience.summary,
+      experience.narrative
+    ]
   );
 
   const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);

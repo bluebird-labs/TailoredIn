@@ -18,6 +18,14 @@ import {
 } from '@/hooks/use-educations';
 import { type EducationFormState, hasErrors, type ValidationErrors, validateEducation } from '@/lib/validation.js';
 
+const EMPTY_EDUCATION: EducationFormState = {
+  institutionName: '',
+  degreeTitle: '',
+  graduationYear: '',
+  location: '',
+  honors: ''
+};
+
 interface EducationCardProps {
   readonly education: Education;
   readonly onDirtyChange: (id: string, isDirty: boolean) => void;
@@ -36,7 +44,7 @@ function EducationCard({ education, onDirtyChange }: EducationCardProps) {
       location: education.location ?? '',
       honors: education.honors ?? ''
     }),
-    [education]
+    [education.institutionName, education.degreeTitle, education.graduationYear, education.location, education.honors]
   );
 
   const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
@@ -152,15 +160,7 @@ function CreateEducationModal({
 }) {
   const createEducation = useCreateEducation();
 
-  const emptyState: EducationFormState = {
-    institutionName: '',
-    degreeTitle: '',
-    graduationYear: '',
-    location: '',
-    honors: ''
-  };
-
-  const { current, setField, isDirtyField, dirtyCount, reset } = useDirtyTracking(emptyState);
+  const { current, setField, isDirtyField, dirtyCount, reset } = useDirtyTracking(EMPTY_EDUCATION);
   const [errors, setErrors] = useState<ValidationErrors<EducationFormState>>({});
 
   function handleSave() {
