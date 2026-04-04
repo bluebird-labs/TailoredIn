@@ -1,14 +1,3 @@
-/** Raw experience entry as defined in resume template configs. */
-export type RawExperience = {
-  company: string;
-  position: string;
-  start_date: string;
-  end_date: string;
-  location: string;
-  summary: string;
-  highlights: string[];
-};
-
 export type BrilliantCVExperience = {
   title: string;
   society: string; // may contain Typst markup like #smallcaps[(contract)]

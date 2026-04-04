@@ -32,7 +32,7 @@ export type JobProps = {
   updatedAt: Date;
 };
 
-export type JobCreateProps = Omit<JobProps, 'id' | 'createdAt' | 'updatedAt' | 'companyId'>;
+type JobCreateProps = Omit<JobProps, 'id' | 'createdAt' | 'updatedAt' | 'companyId'>;
 
 @Entity({ tableName: 'jobs', repository: () => JobOrmRepository })
 export class Job extends BaseEntity {

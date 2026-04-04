@@ -1,11 +1,10 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { BookOpen, type LucideIcon, Sparkles, Wand2, Wrench } from 'lucide-react';
+import { BookOpen, Briefcase, type LucideIcon, Sparkles } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -15,44 +14,17 @@ import {
 interface NavItem {
   label: string;
   to: string;
-  search?: Record<string, unknown>;
   icon: LucideIcon;
 }
 
-const resumeNav: NavItem[] = [
-  { label: 'Wardrobe', to: '/resume', search: { tab: 'wardrobe' }, icon: BookOpen },
-  { label: 'Factory', to: '/resume', search: { tab: 'factory' }, icon: Wand2 },
-  { label: 'Skills', to: '/resume/skills', icon: Wrench }
+const appNav: NavItem[] = [
+  { label: 'Resume', to: '/resume', icon: BookOpen },
+  { label: 'Jobs', to: '/jobs', icon: Briefcase }
 ];
 
-function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
+export function AppSidebar() {
   const matchRoute = useMatchRoute();
 
-  function isActive(item: NavItem) {
-    if (!item.search) return !!matchRoute({ to: item.to, fuzzy: true });
-    return !!matchRoute({ to: item.to, fuzzy: true, search: item.search });
-  }
-
-  return (
-    <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map(item => (
-            <SidebarMenuItem key={`${item.to}-${item.label}`}>
-              <SidebarMenuButton render={<Link to={item.to} search={item.search ?? {}} />} isActive={isActive(item)}>
-                <item.icon />
-                <span>{item.label}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  );
-}
-
-export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -62,7 +34,23 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup label="Resume" items={resumeNav} />
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {appNav.map(item => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton
+                    render={<Link to={item.to} />}
+                    isActive={!!matchRoute({ to: item.to, fuzzy: true })}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );

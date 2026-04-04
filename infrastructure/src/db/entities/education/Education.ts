@@ -3,7 +3,7 @@ import { BaseEntity } from '../../BaseEntity.js';
 import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
 import { Profile } from '../profile/Profile.js';
 
-export type EducationProps = {
+type EducationProps = {
   id: string;
   profile: RefOrEntity<Profile>;
   degreeTitle: string;
@@ -16,7 +16,7 @@ export type EducationProps = {
   updatedAt: Date;
 };
 
-export type EducationCreateProps = Omit<EducationProps, 'id' | 'createdAt' | 'updatedAt'>;
+type EducationCreateProps = Omit<EducationProps, 'id' | 'createdAt' | 'updatedAt'>;
 
 @Entity({ tableName: 'educations' })
 export class Education extends BaseEntity {

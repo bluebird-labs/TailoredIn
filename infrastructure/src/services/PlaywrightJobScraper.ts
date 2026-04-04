@@ -12,7 +12,7 @@ const AUTH_FILE = Path.resolve(PACKAGE_DIR, 'playwright/.auth/linkedin.json');
 
 export const PLAYWRIGHT_JOB_SCRAPER_CONFIG = 'PlaywrightJobScraperConfig';
 
-export type PlaywrightJobScraperConfig = {
+type PlaywrightJobScraperConfig = {
   headless: boolean;
   slowMo: number;
   email: string;

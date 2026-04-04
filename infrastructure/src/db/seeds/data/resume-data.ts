@@ -17,7 +17,7 @@ export const userData = {
 
 // ── Companies + Positions ───────────────────────────────────────────
 
-export type CompanyDef = {
+type CompanyDef = {
   companyName: string;
   companyMention: string | null;
   websiteUrl: string | null;
@@ -254,7 +254,7 @@ export const headlineData = {
 
 // ── Archetypes ──────────────────────────────────────────────────────
 
-export type ArchetypePositionDef = {
+type ArchetypePositionDef = {
   companyKey: CompanyKey;
   positionIndex: number;
   jobTitle: string;
@@ -266,7 +266,7 @@ export type ArchetypePositionDef = {
   bulletIndices: number[];
 };
 
-export type ArchetypeDef = {
+type ArchetypeDef = {
   archetypeKey: string;
   archetypeLabel: string;
   archetypeDescription: string;

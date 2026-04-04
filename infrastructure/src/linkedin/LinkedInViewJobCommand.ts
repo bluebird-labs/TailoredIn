@@ -3,7 +3,7 @@ import { Logger, TimeUtil } from '@tailoredin/core';
 import type * as Playwright from 'playwright';
 import { LinkedInUrls } from './LinkedInUrls.js';
 
-export type LinkedInJobResult = {
+type LinkedInJobResult = {
   jobId: string;
   jobTitle: string;
   jobLink: string;
@@ -23,7 +23,7 @@ export type LinkedInJobResult = {
   companyWebsite: string | null;
 };
 
-export type LinkedInViewJobCommandResult = {
+type LinkedInViewJobCommandResult = {
   result: LinkedInJobResult;
   fetchDetails: () => Promise<{ applyLink: string | null; companyWebsite: string | null }>;
 };

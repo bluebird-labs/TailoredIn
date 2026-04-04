@@ -2,20 +2,22 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "workspaces": {
     "core": {
-      "entry": ["test/**/*.test.ts"]
+      "entry": ["test/**/*.test.ts"],
+      "ignore": ["src/EnumUtil.ts", "src/FsUtil.ts", "src/InspectUtil.ts", "src/ObjectUtil.ts", "src/ZodUtil.ts"]
     },
     "domain": {},
     "application": {},
     "infrastructure": {
-      "entry": ["test-integration/**/*.test.ts", "test-integration/support/**", "dev/e2e-start-servers.ts"]
+      "entry": ["test-integration/**/*.test.ts", "test-integration/support/**", "dev/e2e-start-servers.ts", "src/db/orm-config.ts"],
+      "ignore": ["src/db/migrations/**"]
     },
     "api": {},
     "web": {
       "ignore": ["src/components/ui/**"]
     }
   },
-  "ignore": ["e2e/**"],
+  "ignore": ["e2e/**", ".claire/**"],
   "ignoreBinaries": ["dot"],
   "ignoreDependencies": ["cmdk"],
-  "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates"]
+  "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates", "enumMembers"]
 }

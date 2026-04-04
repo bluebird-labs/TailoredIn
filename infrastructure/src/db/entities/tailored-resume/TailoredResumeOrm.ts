@@ -2,7 +2,7 @@ import { Entity, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 
-export type TailoredResumeOrmProps = {
+type TailoredResumeOrmProps = {
   id: string;
   profileId: string;
   jdContent: string;

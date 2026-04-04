@@ -3,7 +3,7 @@ import { BaseEntity } from '../../BaseEntity.js';
 import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
 import { SkillCategory } from './SkillCategory.js';
 
-export type SkillItemProps = {
+type SkillItemProps = {
   id: string;
   category: RefOrEntity<SkillCategory>;
   name: string;

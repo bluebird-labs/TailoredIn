@@ -2,8 +2,9 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Skills smoke', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/resume/skills');
-    await expect(page.getByRole('heading', { name: 'Skills' })).toBeVisible();
+    // /resume/skills redirects to /resume?tab=skills
+    await page.goto('/resume?tab=skills');
+    await expect(page.getByRole('tab', { name: 'Skills' })).toBeVisible();
   });
 
   test('loads seeded skill categories', async ({ page }) => {

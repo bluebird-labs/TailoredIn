@@ -21,8 +21,8 @@ import { resolveDevContext } from './DevContext.js';
 import { assertDockerRunning, composeDown, composeUp, isContainerRunning, waitForPostgres } from './DockerCompose.js';
 import { deleteEnvFile, envFileExists, readPorts, type SessionPorts, writeWorktreeEnv } from './EnvFile.js';
 import { runMigrations } from './MigrationRunner.js';
-import { runSeeds } from './SeedRunner.js';
 import { findFreePort } from './PortFinder.js';
+import { runSeeds } from './SeedRunner.js';
 
 const log = Logger.create('up');
 

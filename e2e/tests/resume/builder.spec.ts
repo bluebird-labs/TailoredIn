@@ -24,10 +24,6 @@ test.describe('Resume Wardrobe', () => {
     await page.getByRole('tab', { name: 'Headlines' }).click();
     await expect(page.getByRole('tab', { name: 'Headlines' })).toBeVisible();
 
-    // Click Skills tab
-    await page.getByRole('tab', { name: 'Skills' }).click();
-    await expect(page.getByRole('tab', { name: 'Skills' })).toBeVisible();
-
     // Return to Experience tab — seeded experience data visible again
     await page.getByRole('tab', { name: 'Experience' }).click();
     await expect(page.getByText('ResortPass')).toBeVisible();

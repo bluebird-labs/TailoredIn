@@ -2,7 +2,7 @@ import { Entity, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { generateUuid, UuidPrimaryKey } from '../../helpers.js';
 
-export type CompanyBriefProps = {
+type CompanyBriefProps = {
   id: string;
   companyId: string;
   productOverview: string;

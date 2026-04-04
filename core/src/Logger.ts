@@ -17,5 +17,3 @@ export namespace Logger {
     });
   }
 }
-
-export type { ILogObj } from 'tslog';
