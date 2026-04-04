@@ -5,7 +5,7 @@ import { UuidPrimaryKey } from '../../helpers.js';
 import { Profile } from '../profile/Profile.js';
 import { SkillItem } from './SkillItem.js';
 
-export type SkillCategoryProps = {
+type SkillCategoryProps = {
   id: string;
   profile: Ref<Profile> | Profile;
   name: string;

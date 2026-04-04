@@ -1,7 +1,7 @@
 import { Entity, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity as MikroOrmBaseEntity } from '@mikro-orm/postgresql';
 
-export type BaseEntityProps = {
+type BaseEntityProps = {
   createdAt: Date;
   updatedAt: Date;
 };

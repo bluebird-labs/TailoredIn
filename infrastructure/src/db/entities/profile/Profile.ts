@@ -2,7 +2,7 @@ import { Entity, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { generateUuid, UuidPrimaryKey } from '../../helpers.js';
 
-export type ProfileProps = {
+type ProfileProps = {
   id: string;
   email: string;
   firstName: string;
@@ -16,7 +16,7 @@ export type ProfileProps = {
   updatedAt: Date;
 };
 
-export type ProfileCreateProps = Omit<ProfileProps, 'id' | 'createdAt' | 'updatedAt'>;
+type ProfileCreateProps = Omit<ProfileProps, 'id' | 'createdAt' | 'updatedAt'>;
 
 @Entity({ tableName: 'profiles' })
 export class Profile extends BaseEntity {

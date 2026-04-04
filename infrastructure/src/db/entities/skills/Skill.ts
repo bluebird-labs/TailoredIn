@@ -16,7 +16,7 @@ export type SkillProps = {
 };
 
 export type SkillCreateProps = Omit<SkillProps, 'id' | 'createdAt' | 'updatedAt' | 'key'>;
-export type SkillRefreshProps = Partial<SkillCreateProps>;
+type SkillRefreshProps = Partial<SkillCreateProps>;
 
 @Entity({ tableName: 'skills', repository: () => SkillOrmRepository })
 export class Skill extends BaseEntity {

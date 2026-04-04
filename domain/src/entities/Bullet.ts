@@ -3,7 +3,7 @@ import { BulletId } from '../value-objects/BulletId.js';
 import type { BulletStatus } from '../value-objects/BulletStatus.js';
 import { TagSet } from '../value-objects/TagSet.js';
 
-export type BulletCreateProps = {
+type BulletCreateProps = {
   experienceId: string;
   content: string;
   ordinal: number;
