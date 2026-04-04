@@ -13,6 +13,8 @@ dist/
 build/
 .idea/
 .superpowers/
+.claire/
+.vscode/
 nimbalyst-local/
 
 # Generated resume PDFs and ephemeral Typst compilation workspace

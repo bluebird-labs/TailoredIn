@@ -12,6 +12,8 @@ git worktree add .claude/worktrees/<name> -b feat/<branch-name>
 
 Do all work inside that worktree. When implementation is complete and all checks pass, run `/land` to rebase on main, open a PR, wait for CI, and merge.
 
+**Always commit `docs/`:** Any files created or modified under `docs/` (specs, design docs, plans) must be included in commits — never leave them as untracked.
+
 ## Architecture: DDD / Onion Architecture
 
 Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `core/` package.
