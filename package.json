@@ -33,6 +33,8 @@
     "db:seed": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure seed:run",
     "db:seed:e2e": "bun --env-file=${BUN_ENV_FILE:-.env} run --cwd infrastructure seed:run:e2e",
     "db:seed:generate-types": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/src/db/generate-seed-types.ts",
+    "domain:diagram": "bun run domain/scripts/generate-diagram.ts",
+    "db:diagram": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/scripts/generate-database-diagram.ts",
     "up": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/dev/up.ts",
     "down": "bun --env-file=${BUN_ENV_FILE:-.env} run infrastructure/dev/down.ts",
     "test:e2e": "bun run --cwd e2e test",

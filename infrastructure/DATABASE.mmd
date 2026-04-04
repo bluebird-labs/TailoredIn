@@ -10,6 +10,8 @@ erDiagram
 
     profiles {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         text email
         text first_name
         text last_name
@@ -18,49 +20,48 @@ erDiagram
         text linkedin_url "nullable"
         text github_url "nullable"
         text website_url "nullable"
-        timestamp created_at
-        timestamp updated_at
     }
 
     experiences {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid profile_id FK
         text title
         text company_name
         text company_website "nullable"
-        text location
+        text location "default: empty"
         text start_date
         text end_date
         text summary "nullable"
+        integer ordinal "default: 0"
         text narrative "nullable"
-        integer ordinal
-        timestamp created_at
-        timestamp updated_at
     }
 
     accomplishments {
         uuid id PK
         uuid experience_id FK
-        text title
-        text narrative
-        json skill_tags
-        integer ordinal
-        timestamp created_at
-        timestamp updated_at
+        text title "default: empty"
+        text narrative "default: empty"
+        json skill_tags "default: []"
+        integer ordinal "default: 0"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     educations {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid profile_id FK
         text degree_title
         text institution_name
         integer graduation_year
         text location "nullable"
         text honors "nullable"
-        integer ordinal
-        timestamp created_at
-        timestamp updated_at
+        integer ordinal "default: 0"
     }
+
 
     %% ──────────────────────────────────────────────
     %%  Skill Subdomain
@@ -68,31 +69,32 @@ erDiagram
 
     skill_categories {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid profile_id FK
         text name
-        integer ordinal
-        timestamp created_at
-        timestamp updated_at
+        integer ordinal "default: 0"
     }
 
     skill_items {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid skill_category_id FK
         text name
-        integer ordinal
-        timestamp created_at
-        timestamp updated_at
+        integer ordinal "default: 0"
     }
 
     skills {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         text name
-        text key UK "unique"
+        text key UK
         skill_affinity affinity "default: expert"
         text[] variants
-        timestamp created_at
-        timestamp updated_at
     }
+
 
     %% ──────────────────────────────────────────────
     %%  Company & Job Subdomain
@@ -100,36 +102,36 @@ erDiagram
 
     companies {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         text name
-        text website "nullable"
         text logo_url "nullable"
-        text linkedin_link UK "unique"
+        text linkedin_link UK
         boolean ignored "default: false"
+        text website "nullable"
         text business_type "nullable"
         text industry "nullable"
         text stage "nullable"
-        timestamp created_at
-        timestamp updated_at
     }
 
     company_briefs {
         uuid id PK
-        uuid company_id FK
+        uuid company_id FK "unique"
         text product_overview
         text tech_stack
         text culture
         text recent_news
         text key_people
-        timestamp created_at
-        timestamp updated_at
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     jobs {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+        text linkedin_id UK
         uuid company_id FK
-        job_status status "default: new"
-        text apply_link "nullable"
-        text linkedin_id UK "unique"
         text title
         text linkedin_link
         text type "nullable"
@@ -144,18 +146,19 @@ erDiagram
         text description
         text description_html
         integer applicants_count "nullable"
-        tsvector description_fts "generated, indexed"
-        timestamp created_at
-        timestamp updated_at
+        tsvector description_fts "nullable, generated, indexed"
+        job_status status "default: new"
+        text apply_link "nullable"
     }
 
     job_status_updates {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid job_id FK
         job_status status
-        timestamp created_at
-        timestamp updated_at
     }
+
 
     %% ──────────────────────────────────────────────
     %%  Tagging Subdomain
@@ -163,25 +166,26 @@ erDiagram
 
     headlines {
         uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid profile_id FK
         text label
         text summary_text
         text status "default: active"
-        timestamp created_at
-        timestamp updated_at
     }
 
     tags {
         uuid id PK
-        text name
-        text dimension
-        timestamp created_at
+        text name UK
+        text dimension UK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
     }
 
     headline_tags {
         uuid headline_id FK
         uuid tag_id FK
     }
+
 
     %% ──────────────────────────────────────────────
     %%  Resume Subdomain
@@ -190,44 +194,40 @@ erDiagram
     tailored_resumes {
         uuid id PK
         uuid profile_id FK
-        text jd_content
-        json llm_proposals
-        json content_selection
-        json generated_content "nullable"
+        text jd_content "default: empty"
+        json llm_proposals "default: {}"
+        json content_selection "default: {}"
         text headline_text "default: empty"
         text status "default: draft"
         text pdf_path "nullable"
-        timestamp created_at
-        timestamp updated_at
+        timestamp created_at "default: now()"
+        timestamp updated_at "default: now()"
+        json generated_content "nullable"
     }
 
     resume_profiles {
         uuid profile_id PK
-        json content_selection
+        json content_selection "default: {}"
         text headline_text "default: empty"
-        timestamp updated_at
+        timestamp updated_at "default: now()"
     }
 
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
 
+    companies ||--o{ jobs : "posts"
+    jobs ||--o{ job_status_updates : "tracks"
+    companies ||--o| company_briefs : "has"
     profiles ||--o{ experiences : "has"
+    profiles ||--o{ headlines : "has"
+    headlines ||--o| headline_tags : "has"
+    tags ||--o| headline_tags : "has"
     profiles ||--o{ educations : "has"
     profiles ||--o{ skill_categories : "has"
-    profiles ||--o{ headlines : "has"
-    profiles ||--o{ tailored_resumes : "has"
+    skill_categories ||--o{ skill_items : "contains"
     profiles ||--o| resume_profiles : "has"
-
+    profiles ||--o{ tailored_resumes : "has"
     experiences ||--o{ accomplishments : "has"
 
-    skill_categories ||--o{ skill_items : "contains"
-
-    companies ||--o{ jobs : "posts"
-    companies ||--o| company_briefs : "has"
-
-    jobs ||--o{ job_status_updates : "tracks"
-
     headlines }o--o{ tags : "tagged with"
-    headlines ||--o{ headline_tags : "has"
-    tags ||--o{ headline_tags : "has"

@@ -16,10 +16,10 @@ classDiagram
         +string firstName
         +string lastName
         +string? phone
-        +string? location
-        +string? linkedinUrl
         +string? githubUrl
+        +string? linkedinUrl
         +string? websiteUrl
+        +string? location
         +fullName()
     }
 
@@ -36,7 +36,7 @@ classDiagram
         +string? summary
         +string? narrative
         +number ordinal
-        +accomplishments Accomplishment[]
+        +Accomplishment[] accomplishments
         +addAccomplishment()
         +removeAccomplishment()
         +findAccomplishmentOrFail()
@@ -66,7 +66,6 @@ classDiagram
     class Education {
         <<AggregateRoot>>
         +EducationId id
-        +string profileId
         +string degreeTitle
         +string institutionName
         +number graduationYear
@@ -81,7 +80,7 @@ classDiagram
         +string profileId
         +string name
         +number ordinal
-        +items SkillItem[]
+        +SkillItem[] items
         +addItem()
         +updateItem()
         +removeItem()
@@ -95,12 +94,11 @@ classDiagram
         +number ordinal
     }
 
-    Profile "1" --> "*" Experience : has
     Profile "1" --> "*" Headline : has
-    Profile "1" --> "*" Education : has
     Profile "1" --> "*" SkillCategory : has
-    Experience "1" *-- "*" Accomplishment : contains
     SkillCategory "1" *-- "*" SkillItem : contains
+    Profile "1" --> "*" Experience : has
+    Experience "1" *-- "*" Accomplishment : contains
 
     %% ──────────────────────────────────────────────
     %%  Company Subdomain
@@ -150,11 +148,10 @@ classDiagram
 
     class TagSet {
         <<ValueObject>>
-        +string[] roleTags
-        +string[] skillTags
+        +roleTags()
+        +skillTags()
         +isEmpty()
         +merge()
-        +empty()
     }
 
     Headline ..> Tag : role tags reference
@@ -166,12 +163,11 @@ classDiagram
     class JobPosting {
         <<AggregateRoot>>
         +JobId id
-        +string companyId
         +JobStatus status
+        +string? applyLink
         +string linkedinId
         +string title
         +string linkedinLink
-        +string? applyLink
         +string? type
         +string? level
         +string? remote
@@ -184,6 +180,7 @@ classDiagram
         +string description
         +string descriptionHtml
         +number? applicantsCount
+        +string companyId
         +isNew()
         +isInProcess()
         +isDiscarded()
@@ -192,12 +189,12 @@ classDiagram
         +hasLessApplicantsThan()
         +isWithinSalaryRange()
         +changeStatus()
+        +retire()
         +setApplyLink()
         +setInitialStatus()
-        +retire()
     }
 
-    JobPosting --> Company : belongs-to
+    Company "1" --> "*" JobPosting : belongs-to
 
     %% ──────────────────────────────────────────────
     %%  Resume Subdomain
@@ -208,6 +205,7 @@ classDiagram
         +ProfileId id
         +string headlineText
         +ContentSelection contentSelection
+        +profileId()
         +updateHeadline()
         +replaceContentSelection()
     }
@@ -247,7 +245,6 @@ classDiagram
         +string[] educationIds
         +string[] skillCategoryIds
         +string[] skillItemIds
-        +empty()
     }
 
     class ExperienceSelection {
@@ -259,26 +256,25 @@ classDiagram
     class LlmProposal {
         <<ValueObject>>
         +string[] headlineOptions
-        +selectedExperiences[]
-        +generatedExperiences[]
+        +object[] selectedExperiences
+        +GeneratedExperience[] generatedExperiences
         +string[] rankedSkillIds
         +string assessment
-        +empty()
     }
 
     class GeneratedContent {
         <<ValueObject>>
-        +experiences GeneratedExperience[]
+        +GeneratedExperience[] experiences
         +isEmpty()
-        +empty()
     }
 
-    ResumeProfile *-- ContentSelection
-    TailoredResume *-- ContentSelection
+    Profile "1" --> "*" TailoredResume : has
     TailoredResume *-- LlmProposal
+    TailoredResume *-- ContentSelection
     TailoredResume *-- GeneratedContent
-    ContentSelection *-- ExperienceSelection
-    Resume --> JobPosting : generated-for
+    ResumeProfile *-- ContentSelection
+    JobPosting "1" --> "*" Resume : generated-for
+    ContentSelection "1" *-- "*" ExperienceSelection : contains
 
     %% ──────────────────────────────────────────────
     %%  Skill Subdomain
@@ -292,8 +288,8 @@ classDiagram
         +SkillAffinity affinity
         +string[] variants
         +refresh()
-        +normalizeName()
     }
+
 
     %% ──────────────────────────────────────────────
     %%  Legacy (exists in code, not owned by Experience)
@@ -312,33 +308,16 @@ classDiagram
         +updateVerboseDescription()
     }
 
-    Bullet *-- TagSet : tagged-with
+    Experience "1" --> "*" Bullet : has
+    Bullet *-- TagSet
 
     %% ──────────────────────────────────────────────
     %%  Enums & Types
     %% ──────────────────────────────────────────────
 
-    class JobStatus {
+    class TagDimension {
         <<enumeration>>
-        NEW · LATER
-        APPLIED · RECRUITER_SCREEN
-        TECHNICAL_SCREEN · HM_SCREEN
-        ON_SITE · OFFER
-        REJECTED · NO_NEWS
-        UNFIT · EXPIRED · LOW_SALARY
-        RETIRED · DUPLICATE
-        HIGH_APPLICANTS · LOCATION_UNFIT
-        POSTED_TOO_LONG_AGO
-    }
-
-    class BulletStatus {
-        <<enumeration>>
-        experimental · active · archived
-    }
-
-    class HeadlineStatus {
-        <<enumeration>>
-        experimental · active · archived
+        ROLE · SKILL
     }
 
     class TailoredResumeStatus {
@@ -346,49 +325,18 @@ classDiagram
         draft · finalized
     }
 
-    class SkillAffinity {
+    class CompanyStage {
         <<enumeration>>
-        EXPERT · INTEREST · AVOID
-    }
-
-    class ArchetypeKey {
-        <<enumeration>>
-        HAND_ON_MANAGER
-        LEADER_MANAGER
-        IC · LEAD_IC · NERD
-    }
-
-    class JobTitle {
-        <<enumeration>>
-        SOFTWARE_ENGINEER
-        SENIOR_ENGINEER · LEAD_ENGINEER
-        STAFF_ENGINEER · PRINCIPAL_ENGINEER
-        TECH_LEAD_MANAGER · CONSULTANT
-        ENGINEERING_MANAGER
-        SENIOR_ENGINEERING_MANAGER
-        DIRECTOR_OF_ENGINEERING
-        HEAD_OF_ENGINEERING
-        VICE_PRESIDENT_OF_ENGINEERING
-    }
-
-    class TagDimension {
-        <<enumeration>>
-        ROLE · SKILL
+        SEED · SERIES_A · SERIES_B
+        SERIES_C · SERIES_D_PLUS · GROWTH
+        PUBLIC · BOOTSTRAPPED · ACQUIRED
     }
 
     class BusinessType {
         <<enumeration>>
         B2B · B2C · B2B2C
-        B2G · D2C
-        MARKETPLACE · PLATFORM
-    }
-
-    class CompanyStage {
-        <<enumeration>>
-        SEED · SERIES_A · SERIES_B
-        SERIES_C · SERIES_D_PLUS
-        GROWTH · PUBLIC
-        BOOTSTRAPPED · ACQUIRED
+        B2G · D2C · MARKETPLACE
+        PLATFORM
     }
 
     class Industry {
@@ -397,36 +345,75 @@ classDiagram
         HEALTHCARE · EDUCATION · E_COMMERCE
         REAL_ESTATE · MEDIA · LOGISTICS
         ENERGY · AGRICULTURE · TRAVEL
-        FOOD · LEGAL · HR · MARKETING
-        SAAS · AI_ML · GAMING · TELECOM
-        INSURANCE · RETAIL
-        CONSTRUCTION · GOVERNMENT
+        FOOD · LEGAL · HR
+        MARKETING · SAAS · AI_ML
+        GAMING · TELECOM · INSURANCE
+        RETAIL · CONSTRUCTION · GOVERNMENT
     }
 
-    JobPosting --> JobStatus
-    TailoredResume --> TailoredResumeStatus
-    Skill --> SkillAffinity
-    Resume --> ArchetypeKey
+    class ArchetypeKey {
+        <<enumeration>>
+        HAND_ON_MANAGER · LEADER_MANAGER · IC
+        LEAD_IC · NERD
+    }
+
+    class JobTitle {
+        <<enumeration>>
+        SOFTWARE_ENGINEER · SENIOR_ENGINEER · LEAD_ENGINEER
+        STAFF_ENGINEER · PRINCIPAL_ENGINEER · TECH_LEAD_MANAGER
+        CONSULTANT · ENGINEERING_MANAGER · SENIOR_ENGINEERING_MANAGER
+        DIRECTOR_OF_ENGINEERING · HEAD_OF_ENGINEERING · VICE_PRESIDENT_OF_ENGINEERING
+    }
+
+    class HeadlineStatus {
+        <<type>>
+        experimental · active · archived
+    }
+
+    class JobStatus {
+        <<enumeration>>
+        NEW · LATER · APPLIED
+        RECRUITER_SCREEN · TECHNICAL_SCREEN · HM_SCREEN
+        ON_SITE · OFFER · REJECTED
+        NO_NEWS · UNFIT · EXPIRED
+        LOW_SALARY · RETIRED · DUPLICATE
+        HIGH_APPLICANTS · LOCATION_UNFIT · POSTED_TOO_LONG_AGO
+    }
+
+    class BulletStatus {
+        <<type>>
+        experimental · active · archived
+    }
+
+    class SkillAffinity {
+        <<enumeration>>
+        EXPERT · INTEREST · AVOID
+    }
+
     Tag --> TagDimension
     Bullet --> BulletStatus
+    TailoredResume --> TailoredResumeStatus
     Headline --> HeadlineStatus
+    JobPosting --> JobStatus
     Company --> BusinessType
-    Company --> CompanyStage
     Company --> Industry
+    Company --> CompanyStage
+    Resume --> ArchetypeKey
+    Skill --> SkillAffinity
 
     %% ──────────────────────────────────────────────
     %%  Domain Services
     %% ──────────────────────────────────────────────
 
-    class JobElectionService {
-        <<DomainService>>
-        +elect(job, company) JobStatus
-    }
-
     class TailoringStrategyService {
         <<DomainService>>
-        +resolveTemplateArchetype(archetype) ArchetypeKey
-        +computeTailoringScore(keywords, jd) TailoringScore
+        +resolveTemplateArchetype()
+        +computeTailoringScore()
+    }
+
+    class JobElectionService {
+        <<DomainService>>
+        +elect()
     }
 
     JobElectionService ..> JobPosting : evaluates
@@ -437,12 +424,10 @@ classDiagram
     %%  Domain Events
     %% ──────────────────────────────────────────────
 
-    class JobStatusChangedEvent {
+    class JobScrapedEvent {
         <<DomainEvent>>
-        +string jobId
-        +JobStatus oldStatus
-        +JobStatus newStatus
-        +Date occurredAt
+        +string linkedinId
+        +string companyName
     }
 
     class ResumeGeneratedEvent {
@@ -450,16 +435,16 @@ classDiagram
         +string resumeId
         +string jobId
         +string outputPath
-        +Date occurredAt
     }
 
-    class JobScrapedEvent {
+    class JobStatusChangedEvent {
         <<DomainEvent>>
-        +string linkedinId
-        +string companyName
-        +Date occurredAt
+        +string jobId
+        +JobStatus oldStatus
+        +JobStatus newStatus
     }
 
+    JobStatusChangedEvent --> JobStatus
     JobPosting ..> JobStatusChangedEvent : emits
     Resume ..> ResumeGeneratedEvent : emits
 
@@ -469,43 +454,38 @@ classDiagram
 
     style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style SkillCategory fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style Tag fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style JobPosting fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style SkillItem fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style CompanyBrief fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Tag fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style TagSet fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style JobPosting fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeProfile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style TailoredResume fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Resume fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-
-    style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style Bullet fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style SkillItem fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style Skill fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-
-    style TagSet fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ContentSelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ExperienceSelection fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style LlmProposal fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style GeneratedContent fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-
-    style JobStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style BulletStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style HeadlineStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style Skill fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style Bullet fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style TagDimension fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style TailoredResumeStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style SkillAffinity fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ArchetypeKey fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobTitle fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style TagDimension fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-
-    style JobElectionService fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:1px
+    style HeadlineStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style BulletStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style SkillAffinity fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style TailoringStrategyService fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:1px
-
-    style JobStatusChangedEvent fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
-    style ResumeGeneratedEvent fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
+    style JobElectionService fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:1px
     style JobScrapedEvent fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
+    style ResumeGeneratedEvent fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
+    style JobStatusChangedEvent fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
