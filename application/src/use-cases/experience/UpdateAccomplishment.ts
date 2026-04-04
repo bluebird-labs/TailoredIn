@@ -5,7 +5,6 @@ export type UpdateAccomplishmentInput = {
   accomplishmentId: string;
   title?: string;
   narrative?: string;
-  skillTags?: string[];
   ordinal?: number;
 };
 
@@ -27,7 +26,7 @@ export class UpdateAccomplishment {
       return err(new Error(`Accomplishment not found: ${input.accomplishmentId}`));
     }
 
-    acc.update({ title: input.title, narrative: input.narrative, skillTags: input.skillTags, ordinal: input.ordinal });
+    acc.update({ title: input.title, narrative: input.narrative, ordinal: input.ordinal });
     await this.experienceRepository.save(experience);
     return ok(undefined);
   }

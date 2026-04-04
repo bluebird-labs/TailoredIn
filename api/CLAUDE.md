@@ -19,21 +19,21 @@ One file per logical endpoint (`<VerbNoun>Route.ts`). Each is an `@injectable()`
 
 ```typescript
 @injectable()
-export class GetJobRoute {
+export class GetExperienceRoute {
   public constructor(
-    @inject(DI.Job.GetJob) private readonly getJob: GetJob,
+    @inject(DI.Experience.GetExperience) private readonly getExperience: GetExperience,
   ) {}
 
   public plugin(): Elysia {
-    return new Elysia().get('/jobs/:id', async ({ params }) => {
-      const result = await this.getJob.execute({ jobId: params.id });
+    return new Elysia().get('/experiences/:id', async ({ params }) => {
+      const result = await this.getExperience.execute({ experienceId: params.id });
       return { data: result };
     });
   }
 }
 ```
 
-Related endpoints are grouped into a route module (e.g., `TailoredResumeRoutes.ts`) instead of individual files.
+Related endpoints are grouped into a route module (e.g., `ExperienceRoutes.ts`) instead of individual files.
 
 ## Response envelope
 
@@ -54,10 +54,9 @@ HTTP status codes carry the signal — no `success: boolean` fields.
 Map `Result` errors to HTTP status codes:
 
 ```typescript
-const result = await this.changeStatus.execute(input);
+const result = await this.updateExperience.execute(input);
 if (!result.ok) {
   if (result.error === 'NOT_FOUND') throw new NotFoundError();
-  if (result.error === 'INVALID_TRANSITION') return error(422, { code: 'INVALID_TRANSITION', ... });
 }
 return { data: result.value };
 ```
@@ -67,14 +66,14 @@ return { data: result.value };
 ```typescript
 // Use cases: plain class, useFactory
 container.bind({
-  provide: DI.Job.GetJob,
-  useFactory: () => new GetJob(container.get(DI.Job.Repository)),
+  provide: DI.Experience.GetExperience,
+  useFactory: () => new GetExperience(container.get(DI.Experience.Repository)),
 });
 
 // Infrastructure services: class with DI, useClass
 container.bind({
-  provide: DI.Job.Repository,
-  useClass: PostgresJobRepository,
+  provide: DI.Experience.Repository,
+  useClass: PostgresExperienceRepository,
 });
 ```
 
@@ -93,6 +92,6 @@ The web layer consumes this via `edenTreaty<App>(baseUrl)`. Adding new routes au
 In `src/index.ts`, resolve routes from the container:
 
 ```typescript
-app.use(container.get(GetJobRoute).plugin());
-app.use(container.get(TailoredResumeRoutes).plugin());
+app.use(container.get(ExperienceRoutes).plugin());
+app.use(container.get(HeadlineRoutes).plugin());
 ```

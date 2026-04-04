@@ -11,11 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResumeIndexRouteImport } from './routes/resume/index'
-import { Route as JobsIndexRouteImport } from './routes/jobs/index'
-import { Route as ResumeSkillsRouteImport } from './routes/resume/skills'
-import { Route as ResumeBuilderRouteImport } from './routes/resume/builder'
-import { Route as JobsJobIdRouteImport } from './routes/jobs/$jobId'
-import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,97 +22,30 @@ const ResumeIndexRoute = ResumeIndexRouteImport.update({
   path: '/resume/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JobsIndexRoute = JobsIndexRouteImport.update({
-  id: '/jobs/',
-  path: '/jobs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResumeSkillsRoute = ResumeSkillsRouteImport.update({
-  id: '/resume/skills',
-  path: '/resume/skills',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResumeBuilderRoute = ResumeBuilderRouteImport.update({
-  id: '/resume/builder',
-  path: '/resume/builder',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JobsJobIdRoute = JobsJobIdRouteImport.update({
-  id: '/jobs/$jobId',
-  path: '/jobs/$jobId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
-  id: '/companies/$companyId',
-  path: '/companies/$companyId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/companies/$companyId': typeof CompaniesCompanyIdRoute
-  '/jobs/$jobId': typeof JobsJobIdRoute
-  '/resume/builder': typeof ResumeBuilderRoute
-  '/resume/skills': typeof ResumeSkillsRoute
-  '/jobs/': typeof JobsIndexRoute
   '/resume/': typeof ResumeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/companies/$companyId': typeof CompaniesCompanyIdRoute
-  '/jobs/$jobId': typeof JobsJobIdRoute
-  '/resume/builder': typeof ResumeBuilderRoute
-  '/resume/skills': typeof ResumeSkillsRoute
-  '/jobs': typeof JobsIndexRoute
   '/resume': typeof ResumeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/companies/$companyId': typeof CompaniesCompanyIdRoute
-  '/jobs/$jobId': typeof JobsJobIdRoute
-  '/resume/builder': typeof ResumeBuilderRoute
-  '/resume/skills': typeof ResumeSkillsRoute
-  '/jobs/': typeof JobsIndexRoute
   '/resume/': typeof ResumeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/companies/$companyId'
-    | '/jobs/$jobId'
-    | '/resume/builder'
-    | '/resume/skills'
-    | '/jobs/'
-    | '/resume/'
+  fullPaths: '/' | '/resume/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/companies/$companyId'
-    | '/jobs/$jobId'
-    | '/resume/builder'
-    | '/resume/skills'
-    | '/jobs'
-    | '/resume'
-  id:
-    | '__root__'
-    | '/'
-    | '/companies/$companyId'
-    | '/jobs/$jobId'
-    | '/resume/builder'
-    | '/resume/skills'
-    | '/jobs/'
-    | '/resume/'
+  to: '/' | '/resume'
+  id: '__root__' | '/' | '/resume/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
-  JobsJobIdRoute: typeof JobsJobIdRoute
-  ResumeBuilderRoute: typeof ResumeBuilderRoute
-  ResumeSkillsRoute: typeof ResumeSkillsRoute
-  JobsIndexRoute: typeof JobsIndexRoute
   ResumeIndexRoute: typeof ResumeIndexRoute
 }
 
@@ -137,51 +65,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/jobs/': {
-      id: '/jobs/'
-      path: '/jobs'
-      fullPath: '/jobs/'
-      preLoaderRoute: typeof JobsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resume/skills': {
-      id: '/resume/skills'
-      path: '/resume/skills'
-      fullPath: '/resume/skills'
-      preLoaderRoute: typeof ResumeSkillsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resume/builder': {
-      id: '/resume/builder'
-      path: '/resume/builder'
-      fullPath: '/resume/builder'
-      preLoaderRoute: typeof ResumeBuilderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/jobs/$jobId': {
-      id: '/jobs/$jobId'
-      path: '/jobs/$jobId'
-      fullPath: '/jobs/$jobId'
-      preLoaderRoute: typeof JobsJobIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/companies/$companyId': {
-      id: '/companies/$companyId'
-      path: '/companies/$companyId'
-      fullPath: '/companies/$companyId'
-      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
-  JobsJobIdRoute: JobsJobIdRoute,
-  ResumeBuilderRoute: ResumeBuilderRoute,
-  ResumeSkillsRoute: ResumeSkillsRoute,
-  JobsIndexRoute: JobsIndexRoute,
   ResumeIndexRoute: ResumeIndexRoute,
 }
 export const routeTree = rootRouteImport

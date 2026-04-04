@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { BookOpen, Briefcase, type LucideIcon, Sparkles } from 'lucide-react';
+import { BookOpen, GraduationCap, type LucideIcon, Sparkles, User } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -18,8 +18,10 @@ interface NavItem {
 }
 
 const appNav: NavItem[] = [
-  { label: 'Resume', to: '/resume', icon: BookOpen },
-  { label: 'Jobs', to: '/jobs', icon: Briefcase }
+  { label: 'Profile', to: '/resume', icon: User },
+  { label: 'Experience', to: '/resume', icon: BookOpen },
+  { label: 'Headlines', to: '/resume', icon: BookOpen },
+  { label: 'Education', to: '/resume', icon: GraduationCap }
 ];
 
 export function AppSidebar() {
@@ -38,7 +40,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {appNav.map(item => (
-                <SidebarMenuItem key={item.to}>
+                <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     render={<Link to={item.to} />}
                     isActive={!!matchRoute({ to: item.to, fuzzy: true })}

@@ -5,7 +5,6 @@ export type AddAccomplishmentInput = {
   experienceId: string;
   title: string;
   narrative: string;
-  skillTags: string[];
   ordinal: number;
 };
 
@@ -23,7 +22,6 @@ export class AddAccomplishment {
     const acc = experience.addAccomplishment({
       title: input.title,
       narrative: input.narrative,
-      skillTags: input.skillTags,
       ordinal: input.ordinal
     });
     await this.experienceRepository.save(experience);
@@ -32,7 +30,6 @@ export class AddAccomplishment {
       id: acc.id.value,
       title: acc.title,
       narrative: acc.narrative,
-      skillTags: acc.skillTags,
       ordinal: acc.ordinal
     });
   }

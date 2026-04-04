@@ -8,7 +8,7 @@ export type CompanyCreateProps = {
   name: string;
   website: string | null;
   logoUrl: string | null;
-  linkedinLink: string;
+  linkedinLink: string | null;
   businessType?: BusinessType | null;
   industry?: Industry | null;
   stage?: CompanyStage | null;
@@ -18,8 +18,7 @@ export class Company extends AggregateRoot<CompanyId> {
   public name: string;
   public website: string | null;
   public logoUrl: string | null;
-  public readonly linkedinLink: string;
-  public readonly ignored: boolean;
+  public readonly linkedinLink: string | null;
   public businessType: BusinessType | null;
   public industry: Industry | null;
   public stage: CompanyStage | null;
@@ -31,8 +30,7 @@ export class Company extends AggregateRoot<CompanyId> {
     name: string;
     website: string | null;
     logoUrl: string | null;
-    linkedinLink: string;
-    ignored: boolean;
+    linkedinLink: string | null;
     businessType: BusinessType | null;
     industry: Industry | null;
     stage: CompanyStage | null;
@@ -44,7 +42,6 @@ export class Company extends AggregateRoot<CompanyId> {
     this.website = props.website;
     this.logoUrl = props.logoUrl;
     this.linkedinLink = props.linkedinLink;
-    this.ignored = props.ignored;
     this.businessType = props.businessType;
     this.industry = props.industry;
     this.stage = props.stage;
@@ -80,7 +77,6 @@ export class Company extends AggregateRoot<CompanyId> {
       website: props.website,
       logoUrl: props.logoUrl,
       linkedinLink: props.linkedinLink,
-      ignored: false,
       businessType: props.businessType ?? null,
       industry: props.industry ?? null,
       stage: props.stage ?? null,

@@ -2,7 +2,7 @@
 
 Package: `@tailoredin/infrastructure`
 
-Concrete implementations of all application ports: database repositories, LLM service, LinkedIn scraper, Typst resume renderer. Also owns DI tokens and the database schema.
+Concrete implementations of all application ports: database repositories. Also owns DI tokens and the database schema.
 
 ## Directory structure
 
@@ -14,22 +14,13 @@ infrastructure/src/
 │   │   ├── education/
 │   │   ├── experience/
 │   │   ├── headline/
-│   │   ├── jobs/
-│   │   ├── profile/
-│   │   ├── resume-profile/
-│   │   ├── skills/
-│   │   ├── tag/
-│   │   └── tailored-resume/
+│   │   └── profile/
 │   ├── migrations/      ← Timestamped Kysely migrations
 │   ├── seeds/           ← DatabaseSeeder + per-domain seeders
 │   ├── BaseEntity.ts
 │   ├── BaseRepository.ts
 │   └── orm-config.ts
 ├── repositories/        ← Postgres<Entity>Repository implementations
-├── services/            ← LLM, scraper, renderer, color service
-├── linkedin/            ← Playwright LinkedIn scraper
-├── resume/              ← TypstResumeRenderer
-├── brilliant-cv/        ← Typst template type definitions
 ├── DI.ts                ← All DI tokens
 └── index.ts
 ```
@@ -59,7 +50,7 @@ class PostgresExperienceRepository implements ExperienceRepository {
 
 ```typescript
 @injectable()
-export class PostgresJobRepository implements JobRepository {
+export class PostgresExperienceRepository implements ExperienceRepository {
   public constructor(@inject(DI.Orm.EntityManager) private readonly em: EntityManager) {}
 }
 ```
@@ -73,16 +64,11 @@ export const DI = {
   Orm: {
     EntityManager: new InjectionToken<EntityManager>('EntityManager'),
   },
-  Job: {
-    Repository: new InjectionToken<JobRepository>('JobRepository'),
-    GetJob: new InjectionToken<GetJob>('GetJob'),
-    ChangeJobStatus: new InjectionToken<ChangeJobStatus>('ChangeJobStatus'),
-  },
-  Resume: {
-    Renderer: new InjectionToken<ResumeRenderer>('ResumeRenderer'),
-    GenerateResume: new InjectionToken<GenerateResume>('GenerateResume'),
-  },
-  // ...
+  Profile: { ... },
+  Headline: { ... },
+  Education: { ... },
+  Experience: { ... },
+  Company: { ... },
 };
 ```
 
@@ -115,37 +101,10 @@ Run: `bun run db:migration:up`
 ## Seeders
 
 `DatabaseSeeder` orchestrates per-domain seeders:
-- `ResumeDataSeeder` — profile, experience, bullets, education, headlines
-- `SkillsSeeder` — skill categories + items
-- `JobDataSeeder` — jobs + companies
+- `ResumeDataSeeder` — profile, experience, accomplishments, education, headlines, companies
 - `E2eSeeder` — minimal data for E2E tests
 
 Run: `bun run db:seed`
-
-## Typst resume template
-
-Located in `infrastructure/typst/`. Based on **brilliant-cv v3.3.0**:
-
-| File | Purpose |
-|---|---|
-| `cv.typ` | Root template — imports `metadata.toml` + modules |
-| `metadata.toml` | Layout config (margins, fonts, paper size), personal info, ATS keyword injection |
-| `helpers.typ` | `cv-section()` override with accent-colored divider |
-| `professional.typ` | Work experience section |
-| `skills.typ` | Skills section |
-| `education.typ` | Education section |
-
-Fonts: IBM Plex Sans + Mono OTF in `infrastructure/typst/fonts/`. The company's primary color is extracted at render time via `WebColorService` (Playwright + node-vibrant) and injected into the template.
-
-## Job scoring
-
-`PostgresJobRepository` uses Kysely to rank jobs by skill affinity overlap:
-
-| Affinity | Weight |
-|---|---|
-| `EXPERT` | 8 |
-| `INTEREST` | 2 |
-| `AVOID` | −2 |
 
 ## Integration tests
 

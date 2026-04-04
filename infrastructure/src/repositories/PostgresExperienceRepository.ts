@@ -90,7 +90,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         const ormAcc = existing.find(a => a.id === acc.id.value)!;
         ormAcc.title = acc.title;
         ormAcc.narrative = acc.narrative;
-        ormAcc.skillTags = acc.skillTags;
         ormAcc.ordinal = acc.ordinal;
         ormAcc.updatedAt = acc.updatedAt;
         this.orm.em.persist(ormAcc);
@@ -107,7 +106,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       experience,
       title: acc.title,
       narrative: acc.narrative,
-      skillTags: acc.skillTags,
       ordinal: acc.ordinal,
       createdAt: acc.createdAt,
       updatedAt: acc.updatedAt
@@ -134,7 +132,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
           experienceId: orm.id,
           title: a.title,
           narrative: a.narrative,
-          skillTags: a.skillTags,
           ordinal: a.ordinal,
           createdAt: a.createdAt,
           updatedAt: a.updatedAt

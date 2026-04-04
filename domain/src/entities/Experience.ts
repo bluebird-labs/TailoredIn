@@ -62,12 +62,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.updatedAt = props.updatedAt;
   }
 
-  public addAccomplishment(props: {
-    title: string;
-    narrative: string;
-    skillTags: string[];
-    ordinal: number;
-  }): Accomplishment {
+  public addAccomplishment(props: { title: string; narrative: string; ordinal: number }): Accomplishment {
     const accomplishment = Accomplishment.create({ experienceId: this.id.value, ...props });
     this.accomplishments.push(accomplishment);
     this.updatedAt = new Date();

@@ -20,7 +20,7 @@ Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers
 
 ```
 core/          ← Cross-cutting pure utilities (no domain, no framework deps)
-domain/          ← Single package: aggregates, value objects, domain services, events
+domain/          ← Single package: aggregates, value objects, domain services
 application/     ← Single package: use cases + ports + DTOs (plain classes, no DI framework)
 infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
 api/             ← Elysia HTTP server + DI composition root
@@ -36,9 +36,9 @@ api → infrastructure → application → domain → (core)
 | Layer | Package | Purpose | Details |
 |---|---|---|---|
 | `core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) | [core/CLAUDE.md](core/CLAUDE.md) |
-| `domain/` | `@tailoredin/domain` | Aggregates, value objects, domain services, domain events | [domain/CLAUDE.md](domain/CLAUDE.md) |
+| `domain/` | `@tailoredin/domain` | Aggregates, value objects, domain services | [domain/CLAUDE.md](domain/CLAUDE.md) |
 | `application/` | `@tailoredin/application` | Use cases, ports, DTOs | [application/CLAUDE.md](application/CLAUDE.md) |
-| `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, LLM + scraper + renderer services, DI tokens | [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) |
+| `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, DI tokens | [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) |
 | `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root | [api/CLAUDE.md](api/CLAUDE.md) |
 | `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend | [web/CLAUDE.md](web/CLAUDE.md) |
 
@@ -105,7 +105,7 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 
 ## Domain Model
 
-See **`domain/DOMAIN.mmd`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, domain services, domain events, and their relationships across Profile, Company, Tagging, Job, Resume, and Skill subdomains.
+See **`domain/DOMAIN.mmd`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, and their relationships across Profile and Company subdomains.
 
 ## Conventions
 
@@ -129,41 +129,18 @@ The composition root (`api/src/index.ts`) imports DI tokens from `@tailoredin/in
 3. Adding a DI token to `infrastructure/src/DI.ts`
 4. Binding it in `api/src/container.ts`
 
-See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for the Typst resume template details and database conventions.
+See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for database conventions.
 
 ## Entry Points
 - `api/src/index.ts` — starts Elysia server on port 8000
 
-## Data Flow
-
-**Single-URL Job Import:**
-```
-POST /jobs { linkedinUrl } → IngestJobByUrl use case
-  → PlaywrightJobScraper.scrapeByUrl() → scrape single posting
-  → IngestScrapedJob → election + scoring
-```
-
-**Resume Generation:**
-```
-PUT /jobs/:id/generate-resume → GenerateResume use case
-  → ProfileRepository.findSingle() + ArchetypeRepository.findAll()
-  → LlmService.extractJobPostingInsights() (GPT-4o structured output, skipped if no API key)
-  → WebColorService.findPrimaryColor() (Playwright + node-vibrant)
-  → DatabaseResumeContentFactory.make() (reads from Profile, Headline, Experience, Education, SkillCategory repos via Archetype content_selection)
-  → ResumeRenderer.render() → Typst compile → PDF
-```
-
 ## Database
-PostgreSQL via MikroORM (`infrastructure/src/db/`). All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`). See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for ORM entity list, migration conventions, and job scoring details.
+PostgreSQL via MikroORM (`infrastructure/src/db/`). All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`). See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for ORM entity list and migration conventions.
 
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):
 ```
 POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SCHEMA
-OPENAI_API_KEY, OPENAI_PROJECT_ID
-LINKEDIN_EMAIL, LINKEDIN_PASSWORD
-HEADLESS=true         # set false to watch Playwright browser
-SLOW_MO=0             # ms delay between Playwright actions
 ```
 Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config`.
 
@@ -172,7 +149,7 @@ Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config
 - **Biome 2.x** handles all linting and formatting (replaces ESLint + Prettier). Config at root `biome.json`. Line width is **120 characters**.
 - **Knip** detects dead code, unused exports, and unused dependencies. Config at `knip.json`. Run `bun run knip`.
 - **dependency-cruiser** enforces Onion Architecture boundaries. Run `bun run dep:check`. Config at `.dependency-cruiser.cjs`.
-- **mise** manages Bun and Typst versions (pinned in `.mise.toml`). Run `mise install` after cloning.
+- **mise** manages Bun version (pinned in `.mise.toml`). Run `mise install` after cloning.
 - Bun runs TypeScript natively — no build step required.
 - **NodeNext module resolution**: all relative imports in `.ts` files must use `.js` extensions (e.g., `import { Foo } from './Foo.js'`).
 - **`env()` helpers**: Use `env(key)`, `envInt(key)`, `envBool(key)` from `@tailoredin/core` for typed env access. They throw at call time if a key is missing — no side effects at import.

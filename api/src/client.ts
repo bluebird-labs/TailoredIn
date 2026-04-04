@@ -1,2 +1,2 @@
-export { BusinessType, CompanyStage, Industry, JobStatus } from '@tailoredin/domain';
+export { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
 export type { App } from './index.js';

@@ -31,7 +31,6 @@ function toAccomplishmentDto(accomplishment: Accomplishment): AccomplishmentDto 
     id: accomplishment.id.value,
     title: accomplishment.title,
     narrative: accomplishment.narrative,
-    skillTags: accomplishment.skillTags,
     ordinal: accomplishment.ordinal
   };
 }

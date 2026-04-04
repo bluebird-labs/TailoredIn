@@ -28,13 +28,11 @@ describe('AddAccomplishment', () => {
       experienceId: fakeExperience.id.value,
       title: 'Billing sharding',
       narrative: 'Led hash-based sharding project.',
-      skillTags: ['performance'],
       ordinal: 0
     });
     expect(result.isOk).toBe(true);
     if (result.isOk) {
       expect(result.value.title).toBe('Billing sharding');
-      expect(result.value.skillTags).toEqual(['performance']);
     }
   });
 });

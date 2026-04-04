@@ -8,20 +8,11 @@ import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
 import { Company } from './entities/companies/Company.js';
-import { CompanyBrief } from './entities/companies/CompanyBrief.js';
 import { Education } from './entities/education/Education.js';
 import { Accomplishment as OrmAccomplishment } from './entities/experience/Accomplishment.js';
 import { Experience as OrmExperience } from './entities/experience/Experience.js';
 import { Headline as OrmHeadline } from './entities/headline/Headline.js';
-import { Job } from './entities/jobs/Job.js';
-import { JobStatusUpdate } from './entities/jobs/JobStatusUpdate.js';
 import { Profile } from './entities/profile/Profile.js';
-import { ResumeProfileOrm } from './entities/resume-profile/ResumeProfileOrm.js';
-import { Skill } from './entities/skills/Skill.js';
-import { SkillCategory as OrmSkillCategory } from './entities/skills/SkillCategory.js';
-import { SkillItem as OrmSkillItem } from './entities/skills/SkillItem.js';
-import { Tag as OrmTag } from './entities/tag/Tag.js';
-import { TailoredResumeOrm } from './entities/tailored-resume/TailoredResumeOrm.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -40,24 +31,7 @@ export function createOrmConfig(db: OrmDbConfig) {
     debug: false,
     allowGlobalContext: true,
 
-    entities: [
-      BaseEntity,
-      Profile,
-      Education,
-      Company,
-      CompanyBrief,
-      Skill,
-      Job,
-      JobStatusUpdate,
-      OrmHeadline,
-      OrmTag,
-      OrmSkillCategory,
-      OrmSkillItem,
-      OrmExperience,
-      OrmAccomplishment,
-      ResumeProfileOrm,
-      TailoredResumeOrm
-    ],
+    entities: [BaseEntity, Profile, Education, Company, OrmHeadline, OrmExperience, OrmAccomplishment],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
     discovery: { warnWhenNoEntities: true },

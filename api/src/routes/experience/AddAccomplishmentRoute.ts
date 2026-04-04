@@ -15,7 +15,6 @@ export class AddAccomplishmentRoute {
           experienceId: params.id,
           title: body.title,
           narrative: body.narrative,
-          skillTags: body.skill_tags,
           ordinal: body.ordinal
         });
         if (!result.isOk) {
@@ -30,7 +29,6 @@ export class AddAccomplishmentRoute {
         body: t.Object({
           title: t.String({ minLength: 1 }),
           narrative: t.String({ minLength: 1 }),
-          skill_tags: t.Array(t.String()),
           ordinal: t.Integer({ minimum: 0 })
         })
       }

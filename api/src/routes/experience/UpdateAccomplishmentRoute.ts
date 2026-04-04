@@ -18,7 +18,6 @@ export class UpdateAccomplishmentRoute {
           accomplishmentId: params.accomplishmentId,
           title: body.title,
           narrative: body.narrative,
-          skillTags: body.skill_tags,
           ordinal: body.ordinal
         });
         if (!result.isOk) {
@@ -35,7 +34,6 @@ export class UpdateAccomplishmentRoute {
         body: t.Object({
           title: t.Optional(t.String({ minLength: 1 })),
           narrative: t.Optional(t.String({ minLength: 1 })),
-          skill_tags: t.Optional(t.Array(t.String())),
           ordinal: t.Optional(t.Integer({ minimum: 0 }))
         })
       }

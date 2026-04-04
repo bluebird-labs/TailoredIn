@@ -31,11 +31,9 @@ export class PostgresEducationRepository implements EducationRepository {
       existing.updatedAt = education.updatedAt;
       this.orm.em.persist(existing);
     } else {
-      const [profile] = await this.orm.em.findAll(OrmProfile, { limit: 1 });
-      if (!profile) throw new Error('No profile found — seed the database first');
       const orm = new OrmEducation({
         id: education.id.value,
-        profile: this.orm.em.getReference(OrmProfile, profile.id),
+        profile: this.orm.em.getReference(OrmProfile, education.profileId),
         degreeTitle: education.degreeTitle,
         institutionName: education.institutionName,
         graduationYear: education.graduationYear,
@@ -60,6 +58,7 @@ export class PostgresEducationRepository implements EducationRepository {
   private toDomain(orm: OrmEducation): DomainEducation {
     return new DomainEducation({
       id: new EducationId(orm.id),
+      profileId: typeof orm.profile === 'object' && 'id' in orm.profile ? orm.profile.id : String(orm.profile),
       degreeTitle: orm.degreeTitle,
       institutionName: orm.institutionName,
       graduationYear: orm.graduationYear,

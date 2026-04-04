@@ -48,7 +48,6 @@ export class PostgresCompanyRepository implements CompanyRepository {
       website: orm.website,
       logoUrl: orm.logoUrl,
       linkedinLink: orm.linkedinLink,
-      ignored: orm.ignored,
       businessType: orm.businessType as BusinessType | null,
       industry: orm.industry as Industry | null,
       stage: orm.stage as CompanyStage | null,

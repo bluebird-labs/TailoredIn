@@ -2,6 +2,7 @@ import { Education, type EducationRepository } from '@tailoredin/domain';
 import type { EducationDto } from '../../dtos/EducationDto.js';
 
 export type CreateEducationInput = {
+  profileId: string;
   degreeTitle: string;
   institutionName: string;
   graduationYear: number;
@@ -15,6 +16,7 @@ export class CreateEducation {
 
   public async execute(input: CreateEducationInput): Promise<EducationDto> {
     const education = Education.create({
+      profileId: input.profileId,
       degreeTitle: input.degreeTitle,
       institutionName: input.institutionName,
       graduationYear: input.graduationYear,

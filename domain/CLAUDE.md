@@ -2,7 +2,7 @@
 
 Package: `@tailoredin/domain`
 
-The pure domain layer — aggregates, entities, value objects, domain services, domain events, and repository port interfaces.
+The pure domain layer — aggregates, entities, value objects, domain services, and repository port interfaces.
 
 **Hard rules:**
 - No framework dependencies (`@injectable`, `inject`, MikroORM, Elysia, etc.)
@@ -17,12 +17,10 @@ domain/src/
 ├── entities/          ← Aggregate roots and entities
 ├── value-objects/     ← Value objects, ID types, enums
 ├── domain-services/   ← Stateless domain services
-├── events/            ← Domain events
 ├── ports/             ← Repository interfaces (not implementations)
 ├── AggregateRoot.ts
 ├── Entity.ts
 ├── ValueObject.ts
-├── DomainEvent.ts
 └── Result.ts
 ```
 
@@ -38,16 +36,14 @@ Color legend:
 | Blue | Entity |
 | Green | Value Object |
 | Amber | Enumeration / Type |
-| Purple | Domain Service |
-| Pink | Domain Event |
 
 ## AggregateRoot vs Entity vs ValueObject
 
 | Base class | When to use | Identity |
 |---|---|---|
-| `AggregateRoot<TId>` | Top-level consistency boundary; owns child entities; emits domain events | Identity by ID |
+| `AggregateRoot<TId>` | Top-level consistency boundary; owns child entities | Identity by ID |
 | `Entity<TId>` | Has lifecycle and identity but lives within an aggregate's boundary | Identity by ID |
-| `ValueObject` | Immutable, no identity, compared by value (e.g. `TagSet`, `ContentSelection`) | Equality by value |
+| `ValueObject` | Immutable, no identity, compared by value | Equality by value |
 
 ## ID value objects
 
@@ -80,62 +76,21 @@ export interface ExperienceRepository {
 - Method names are domain-focused (`findByProfileId`, `findOrFail`) — not generic CRUD
 - Methods throw for critical failures (`findByIdOrFail`)
 
-## Domain events
-
-Implement `DomainEvent`; emit from aggregate command methods via `this.addDomainEvent(...)`:
-
-```typescript
-export class JobStatusChangedEvent implements DomainEvent {
-  public readonly occurredAt = new Date();
-  public constructor(
-    public readonly jobId: string,
-    public readonly oldStatus: JobStatus,
-    public readonly newStatus: JobStatus,
-  ) {}
-}
-
-// In JobPosting.changeStatus():
-this.addDomainEvent(new JobStatusChangedEvent(this.id.value, oldStatus, newStatus));
-```
-
 ## Domain services
 
-Stateless classes for logic that spans multiple aggregates or doesn't belong to one:
-
-```typescript
-export class JobElectionService {
-  public shouldIngest(posting: ScrapedPosting): boolean { ... }
-}
-```
-
-No constructor parameters (no dependencies). If you need to inject a repository, it belongs in a use case, not a domain service.
+Stateless classes for logic that spans multiple aggregates or doesn't belong to one. No constructor parameters (no dependencies). If you need to inject a repository, it belongs in a use case, not a domain service.
 
 ## Enums
 
 Named in `CONSTANT_CASE`, live in `value-objects/`:
 
 ```typescript
-export enum SkillAffinity {
-  EXPERT = 'expert',
-  INTEREST = 'interest',
-  AVOID = 'avoid',
+export enum BusinessType {
+  B2B = 'b2b',
+  B2C = 'b2c',
+  B2B2C = 'b2b2c',
 }
 ```
-
-## JobStatus lifecycle
-
-```
-NEW / LATER
-  ↓ (manual action)
-APPLIED → RECRUITER_SCREEN → TECHNICAL_SCREEN → HM_SCREEN → ON_SITE → OFFER
-  ↓ (outcome)
-REJECTED / NO_NEWS
-
-Auto-discarded (election): RETIRED, DUPLICATE, HIGH_APPLICANTS, LOCATION_UNFIT, POSTED_TOO_LONG_AGO
-Manual discard: UNFIT, EXPIRED, LOW_SALARY
-```
-
-`IN_PROCESS_JOB_STATUSES` and `DISCARDED_JOB_STATUSES` are exported sets for grouping logic.
 
 ## Aggregate factory pattern
 

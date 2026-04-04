@@ -2,6 +2,7 @@ import { AggregateRoot } from '../AggregateRoot.js';
 import { EducationId } from '../value-objects/EducationId.js';
 
 export type EducationCreateProps = {
+  profileId: string;
   degreeTitle: string;
   institutionName: string;
   graduationYear: number;
@@ -11,6 +12,7 @@ export type EducationCreateProps = {
 };
 
 export class Education extends AggregateRoot<EducationId> {
+  public readonly profileId: string;
   public degreeTitle: string;
   public institutionName: string;
   public graduationYear: number;
@@ -22,6 +24,7 @@ export class Education extends AggregateRoot<EducationId> {
 
   public constructor(props: {
     id: EducationId;
+    profileId: string;
     degreeTitle: string;
     institutionName: string;
     graduationYear: number;
@@ -32,6 +35,7 @@ export class Education extends AggregateRoot<EducationId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.profileId = props.profileId;
     this.degreeTitle = props.degreeTitle;
     this.institutionName = props.institutionName;
     this.graduationYear = props.graduationYear;

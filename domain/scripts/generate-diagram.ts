@@ -39,53 +39,21 @@ const EXCLUDED_METHODS = new Set(['create', 'empty', 'constructor']);
  * Relationships are placed in the section of the FIRST class that appears.
  */
 const SUBDOMAIN_GROUPS: [label: string, members: string[]][] = [
-  [
-    'Profile Subdomain',
-    ['Profile', 'Experience', 'Accomplishment', 'Headline', 'Education', 'SkillCategory', 'SkillItem']
-  ],
-  ['Company Subdomain', ['Company', 'CompanyBrief']],
-  ['Tagging Subdomain', ['Tag', 'TagSet']],
-  ['Job Subdomain', ['JobPosting']],
-  [
-    'Resume Subdomain',
-    [
-      'ResumeProfile',
-      'TailoredResume',
-      'Resume',
-      'ContentSelection',
-      'ExperienceSelection',
-      'LlmProposal',
-      'GeneratedContent'
-    ]
-  ],
-  ['Skill Subdomain', ['Skill']],
-  ['Legacy (exists in code, not owned by Experience)', ['Bullet']]
+  ['Profile Subdomain', ['Profile', 'Experience', 'Accomplishment', 'Headline', 'Education']],
+  ['Company Subdomain', ['Company']]
 ];
 
 /**
  * Hardcoded relationships that cannot be inferred from code patterns.
  * These are placed in the section of the first class mentioned.
  */
-const MANUAL_RELATIONSHIPS = [
-  'Headline ..> Tag : role tags reference',
-  'JobElectionService ..> JobPosting : evaluates',
-  'JobElectionService ..> Company : evaluates',
-  'TailoringStrategyService ..> ArchetypeKey : resolves',
-  'JobPosting ..> JobStatusChangedEvent : emits',
-  'Resume ..> ResumeGeneratedEvent : emits'
-];
+const MANUAL_RELATIONSHIPS: string[] = [];
 
 /** Relationship labels by target→source pair. Default is "has". */
-const RELATIONSHIP_LABELS: Record<string, string> = {
-  'JobPosting→Company': 'belongs-to',
-  'Resume→JobPosting': 'generated-for'
-};
+const RELATIONSHIP_LABELS: Record<string, string> = {};
 
 /** Name aliases for ID properties that don't directly match class names. */
-const ID_ALIASES: Record<string, string> = {
-  job: 'JobPosting',
-  category: 'SkillCategory'
-};
+const ID_ALIASES: Record<string, string> = {};
 
 /** Color legend per stereotype. */
 const STYLES: Record<string, { fill: string; stroke: string; color: string; width: string }> = {

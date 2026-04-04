@@ -14,8 +14,7 @@ export class UpdateHeadlineRoute {
         const result = await this.updateHeadline.execute({
           headlineId: params.id,
           label: body.label,
-          summaryText: body.summary_text,
-          roleTagIds: body.role_tag_ids
+          summaryText: body.summary_text
         });
 
         if (!result.isOk) {
@@ -31,8 +30,7 @@ export class UpdateHeadlineRoute {
         }),
         body: t.Object({
           label: t.String({ minLength: 1 }),
-          summary_text: t.String({ minLength: 1 }),
-          role_tag_ids: t.Array(t.String({ format: 'uuid' }))
+          summary_text: t.String({ minLength: 1 })
         })
       }
     );

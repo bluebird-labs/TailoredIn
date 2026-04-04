@@ -20,7 +20,7 @@ React 19 SPA with file-based routing, TanStack Query for server state, and shadc
 Routes are files in `src/routes/`. TanStack Router Vite plugin auto-generates `routeTree.gen.ts` — this file is never edited by hand.
 
 Adding a route:
-1. Create `src/routes/<path>.tsx` (e.g., `src/routes/jobs/$jobId.tsx` for `/jobs/:jobId`)
+1. Create `src/routes/<path>.tsx` (e.g., `src/routes/experiences/$experienceId.tsx` for `/experiences/:experienceId`)
 2. Export a `Route` created with `createFileRoute('/<path>')`
 3. The route tree regenerates automatically on next dev server start
 
@@ -29,11 +29,11 @@ Adding a route:
 All server state goes through TanStack Query. Encapsulate calls in custom hooks:
 
 ```typescript
-// src/hooks/use-jobs.ts
-export function useJob(jobId: string) {
+// src/hooks/use-experiences.ts
+export function useExperiences(profileId: string) {
   return useQuery({
-    queryKey: queryKeys.jobs.detail(jobId),
-    queryFn: () => api.jobs[jobId].get().then(unwrap),
+    queryKey: queryKeys.experiences.list(profileId),
+    queryFn: () => api.experiences.get({ query: { profileId } }).then(unwrap),
   });
 }
 ```
@@ -59,13 +59,10 @@ The `/api` prefix is proxied to the API server (port 8000) by Vite in dev, and s
 src/components/
 ├── ui/           ← shadcn/ui primitives (exempt from Biome naming rules)
 ├── layout/       ← App shell, sidebar
-├── jobs/         ← Job list, detail, status management
 ├── companies/    ← Company classification UI
 ├── resume/
-│   ├── builder/  ← Resume builder and PDF preview
 │   ├── education/
-│   ├── experience/
-│   └── skills/
+│   └── experience/
 └── shared/       ← Generic dialogs, sortable lists
 ```
 
@@ -83,15 +80,15 @@ Keys are hierarchical in `query-keys.ts`. Always follow the existing pattern whe
 
 ```typescript
 export const queryKeys = {
-  jobs: {
-    all: ['jobs'] as const,
-    list: (params: JobListParams) => ['jobs', 'list', params] as const,
-    detail: (id: string) => ['jobs', id] as const,
+  experiences: {
+    all: ['experiences'] as const,
+    list: (profileId: string) => ['experiences', 'list', profileId] as const,
+    detail: (id: string) => ['experiences', id] as const,
   },
   // ...
 };
 ```
 
 Invalidate at the right level of specificity:
-- `queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all })` — invalidates all job queries
-- `queryClient.invalidateQueries({ queryKey: queryKeys.jobs.detail(id) })` — single job only
+- `queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all })` — invalidates all experience queries
+- `queryClient.invalidateQueries({ queryKey: queryKeys.experiences.detail(id) })` — single experience only

@@ -1,7 +1,6 @@
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,7 +11,6 @@ type Headline = {
   id: string;
   label: string;
   summaryText: string;
-  roleTags: { id: string; name: string; dimension: string }[];
 };
 
 export function HeadlineTab() {
@@ -129,11 +127,6 @@ function HeadlineCard({ headline }: { headline: Headline }) {
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className="font-medium text-sm">{headline.label}</span>
-          {headline.roleTags.map(tag => (
-            <Badge key={tag.id} variant="outline" className="text-xs">
-              {tag.name}
-            </Badge>
-          ))}
         </div>
         <p className="text-sm text-muted-foreground">{headline.summaryText}</p>
       </div>

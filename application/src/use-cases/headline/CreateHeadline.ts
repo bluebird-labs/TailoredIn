@@ -1,40 +1,28 @@
-import { Headline, type HeadlineRepository, type Tag, type TagRepository } from '@tailoredin/domain';
+import { Headline, type HeadlineRepository } from '@tailoredin/domain';
 import type { HeadlineDto } from '../../dtos/HeadlineDto.js';
 
 export type CreateHeadlineInput = {
   profileId: string;
   label: string;
   summaryText: string;
-  roleTagIds: string[];
 };
 
 function toHeadlineDto(headline: Headline): HeadlineDto {
   return {
     id: headline.id.value,
     label: headline.label,
-    summaryText: headline.summaryText,
-    roleTags: headline.roleTags.map((tag: Tag) => ({
-      id: tag.id.value,
-      name: tag.name,
-      dimension: tag.dimension
-    }))
+    summaryText: headline.summaryText
   };
 }
 
 export class CreateHeadline {
-  public constructor(
-    private readonly headlineRepository: HeadlineRepository,
-    private readonly tagRepository: TagRepository
-  ) {}
+  public constructor(private readonly headlineRepository: HeadlineRepository) {}
 
   public async execute(input: CreateHeadlineInput): Promise<HeadlineDto> {
-    const roleTags = await Promise.all(input.roleTagIds.map(id => this.tagRepository.findByIdOrFail(id)));
-
     const headline = Headline.create({
       profileId: input.profileId,
       label: input.label,
-      summaryText: input.summaryText,
-      roleTags
+      summaryText: input.summaryText
     });
 
     await this.headlineRepository.save(headline);

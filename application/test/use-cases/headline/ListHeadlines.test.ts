@@ -1,25 +1,15 @@
 import { describe, expect, test } from 'bun:test';
-import { Headline, HeadlineId, type HeadlineRepository, Tag, TagDimension, TagId } from '@tailoredin/domain';
+import { Headline, HeadlineId, type HeadlineRepository } from '@tailoredin/domain';
 import { ListHeadlines } from '../../../src/use-cases/headline/ListHeadlines.js';
 
 const NOW = new Date('2025-01-01');
 
-function makeTag(name: string, dimension: TagDimension): Tag {
-  return new Tag({
-    id: TagId.generate(),
-    name,
-    dimension,
-    createdAt: NOW
-  });
-}
-
-function makeHeadline(label: string, tags: Tag[] = []): Headline {
+function makeHeadline(label: string): Headline {
   return new Headline({
     id: HeadlineId.generate(),
     profileId: 'profile-1',
     label,
     summaryText: `Summary for ${label}`,
-    roleTags: tags,
     createdAt: NOW,
     updatedAt: NOW
   });
@@ -38,8 +28,7 @@ function mockHeadlineRepo(headlines: Headline[]): HeadlineRepository {
 
 describe('ListHeadlines', () => {
   test('returns all headlines as DTOs', async () => {
-    const tag = makeTag('engineer', TagDimension.ROLE);
-    const h1 = makeHeadline('Senior Engineer', [tag]);
+    const h1 = makeHeadline('Senior Engineer');
     const h2 = makeHeadline('Tech Lead');
 
     const useCase = new ListHeadlines(mockHeadlineRepo([h1, h2]));
@@ -49,12 +38,7 @@ describe('ListHeadlines', () => {
     expect(result[0]!.id).toBe(h1.id.value);
     expect(result[0]!.label).toBe('Senior Engineer');
     expect(result[0]!.summaryText).toBe('Summary for Senior Engineer');
-    expect(result[0]!.roleTags).toHaveLength(1);
-    expect(result[0]!.roleTags[0]!.id).toBe(tag.id.value);
-    expect(result[0]!.roleTags[0]!.name).toBe('engineer');
-    expect(result[0]!.roleTags[0]!.dimension).toBe('ROLE');
     expect(result[1]!.label).toBe('Tech Lead');
-    expect(result[1]!.roleTags).toHaveLength(0);
   });
 
   test('returns empty array when no headlines', async () => {

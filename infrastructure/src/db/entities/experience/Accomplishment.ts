@@ -8,7 +8,6 @@ type AccomplishmentProps = {
   experience: RefOrEntity<Experience>;
   title: string;
   narrative: string;
-  skillTags: string[];
   ordinal: number;
   createdAt: Date;
   updatedAt: Date;
@@ -28,9 +27,6 @@ export class Accomplishment extends BaseEntity {
   @Property({ name: 'narrative', type: 'text' })
   public narrative: string;
 
-  @Property({ name: 'skill_tags', type: 'json' })
-  public skillTags: string[];
-
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
@@ -40,7 +36,6 @@ export class Accomplishment extends BaseEntity {
     this.experience = props.experience;
     this.title = props.title;
     this.narrative = props.narrative;
-    this.skillTags = props.skillTags;
     this.ordinal = props.ordinal;
   }
 }

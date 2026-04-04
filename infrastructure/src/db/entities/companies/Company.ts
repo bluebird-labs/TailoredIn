@@ -9,8 +9,7 @@ export type CompanyProps = {
   name: string;
   website: string | null;
   logoUrl: string | null;
-  linkedinLink: string;
-  ignored: boolean;
+  linkedinLink: string | null;
   businessType: string | null;
   industry: string | null;
   stage: string | null;
@@ -20,7 +19,7 @@ export type CompanyProps = {
 
 export type CompanyCreateProps = Omit<
   CompanyProps,
-  'id' | 'createdAt' | 'updatedAt' | 'ignored' | 'businessType' | 'industry' | 'stage'
+  'id' | 'createdAt' | 'updatedAt' | 'businessType' | 'industry' | 'stage'
 >;
 
 @Entity({ tableName: 'companies', repository: () => CompanyOrmRepository })
@@ -39,11 +38,8 @@ export class Company extends BaseEntity {
   @Property({ fieldName: 'logo_url', type: 'text', nullable: true })
   public logoUrl: string | null;
 
-  @Property({ fieldName: 'linkedin_link', type: 'text', unique: 'companies_linkedin_link_key' })
-  public linkedinLink: string;
-
-  @Property({ fieldName: 'ignored', type: 'boolean', default: false })
-  public ignored: boolean;
+  @Property({ fieldName: 'linkedin_link', type: 'text', nullable: true, unique: 'companies_linkedin_link_key' })
+  public linkedinLink: string | null;
 
   @Property({ fieldName: 'business_type', type: 'text', nullable: true })
   public businessType: string | null;
@@ -61,7 +57,6 @@ export class Company extends BaseEntity {
     this.website = props.website;
     this.logoUrl = props.logoUrl;
     this.linkedinLink = props.linkedinLink;
-    this.ignored = props.ignored;
     this.businessType = props.businessType;
     this.industry = props.industry;
     this.stage = props.stage;
@@ -72,7 +67,6 @@ export class Company extends BaseEntity {
     return new Company({
       ...props,
       id: generateUuid(),
-      ignored: false,
       businessType: null,
       industry: null,
       stage: null,

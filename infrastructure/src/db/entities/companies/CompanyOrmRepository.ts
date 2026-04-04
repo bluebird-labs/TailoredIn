@@ -5,7 +5,7 @@ export class CompanyOrmRepository extends BaseRepository<Company> {
   public async upsert(props: CompanyCreateProps): Promise<Company> {
     return this.em.upsert(Company, props, {
       onConflictAction: 'merge',
-      onConflictExcludeFields: ['createdAt', 'ignored']
+      onConflictExcludeFields: ['createdAt']
     });
   }
 }

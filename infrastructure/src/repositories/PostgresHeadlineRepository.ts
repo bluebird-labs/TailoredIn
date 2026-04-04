@@ -1,44 +1,30 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import type { HeadlineRepository } from '@tailoredin/domain';
-import { Headline as DomainHeadline, Tag as DomainTag, HeadlineId, type TagDimension, TagId } from '@tailoredin/domain';
+import { Headline as DomainHeadline, HeadlineId } from '@tailoredin/domain';
 import { Headline as OrmHeadline } from '../db/entities/headline/Headline.js';
-import { Tag as OrmTag } from '../db/entities/tag/Tag.js';
 
 @injectable()
 export class PostgresHeadlineRepository implements HeadlineRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainHeadline> {
-    const orm = await this.orm.em.findOneOrFail(OrmHeadline, id, { populate: ['roleTags'] });
+    const orm = await this.orm.em.findOneOrFail(OrmHeadline, id);
     return this.toDomain(orm);
   }
 
   public async findAll(): Promise<DomainHeadline[]> {
-    const ormEntities = await this.orm.em.find(
-      OrmHeadline,
-      {},
-      { populate: ['roleTags'], orderBy: { createdAt: 'ASC' } }
-    );
+    const ormEntities = await this.orm.em.find(OrmHeadline, {}, { orderBy: { createdAt: 'ASC' } });
     return ormEntities.map(e => this.toDomain(e));
   }
 
   public async save(headline: DomainHeadline): Promise<void> {
-    const existing = await this.orm.em.findOne(OrmHeadline, headline.id.value, { populate: ['roleTags'] });
+    const existing = await this.orm.em.findOne(OrmHeadline, headline.id.value);
 
     if (existing) {
       existing.label = headline.label;
       existing.summaryText = headline.summaryText;
-      existing.status = headline.status;
       existing.updatedAt = headline.updatedAt;
-
-      // Replace role tags
-      existing.roleTags.removeAll();
-      for (const tag of headline.roleTags) {
-        const tagRef = this.orm.em.getReference(OrmTag, tag.id.value);
-        existing.roleTags.add(tagRef);
-      }
-
       this.orm.em.persist(existing);
     } else {
       const orm = new OrmHeadline({
@@ -46,16 +32,9 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
         profileId: headline.profileId,
         label: headline.label,
         summaryText: headline.summaryText,
-        status: headline.status,
         createdAt: headline.createdAt,
         updatedAt: headline.updatedAt
       });
-
-      for (const tag of headline.roleTags) {
-        const tagRef = this.orm.em.getReference(OrmTag, tag.id.value);
-        orm.roleTags.add(tagRef);
-      }
-
       this.orm.em.persist(orm);
     }
 
@@ -69,25 +48,11 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
   }
 
   private toDomain(orm: OrmHeadline): DomainHeadline {
-    const roleTags = orm.roleTags.isInitialized()
-      ? orm.roleTags.getItems().map(
-          t =>
-            new DomainTag({
-              id: new TagId(t.id),
-              name: t.name,
-              dimension: t.dimension as TagDimension,
-              createdAt: t.createdAt
-            })
-        )
-      : [];
-
     return new DomainHeadline({
       id: new HeadlineId(orm.id),
       profileId: orm.profileId,
       label: orm.label,
       summaryText: orm.summaryText,
-      status: (orm.status ?? 'active') as import('@tailoredin/domain').HeadlineStatus,
-      roleTags,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });

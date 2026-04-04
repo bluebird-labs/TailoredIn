@@ -15,12 +15,11 @@ The orchestration layer — use cases coordinate domain objects and external ser
 ```
 application/src/
 ├── use-cases/        ← Organized in domain subdirectories
+│   ├── company/
+│   ├── education/
 │   ├── experience/
 │   ├── headline/
-│   ├── resume-profile/
-│   ├── tailored-resume/
-│   ├── tag/
-│   └── *.ts          ← Top-level for cross-cutting use cases
+│   └── profile/
 ├── ports/            ← External service interfaces
 ├── dtos/             ← Data transfer objects
 ├── services/         ← Shared application-layer logic
@@ -32,14 +31,14 @@ application/src/
 Single `async execute(input)` method. One file per use case:
 
 ```typescript
-export type GetJobInput = { jobId: string };
+export type GetExperienceInput = { experienceId: string };
 
-export class GetJob {
-  public constructor(private readonly jobs: JobRepository) {}
+export class GetExperience {
+  public constructor(private readonly experiences: ExperienceRepository) {}
 
-  public async execute(input: GetJobInput): Promise<JobSummaryDto> {
-    const job = await this.jobs.findByIdOrFail(new JobId(input.jobId));
-    return toJobSummaryDto(job);
+  public async execute(input: GetExperienceInput): Promise<ExperienceDto> {
+    const experience = await this.experiences.findByIdOrFail(new ExperienceId(input.experienceId));
+    return toExperienceDto(experience);
   }
 }
 ```
@@ -54,10 +53,10 @@ Use `Result<T, E>` for **expected** failures (business rule violations). Throw f
 
 ```typescript
 // Expected failure — caller must handle both cases
-public async execute(input): Promise<Result<JobSummaryDto, 'NOT_FOUND' | 'ALREADY_APPLIED'>> { ... }
+public async execute(input): Promise<Result<ExperienceDto, 'NOT_FOUND'>> { ... }
 
 // Unexpected failure — let it propagate
-const job = await this.jobs.findByIdOrFail(id); // throws if missing
+const experience = await this.experiences.findByIdOrFail(id); // throws if missing
 ```
 
 ## Port interfaces
@@ -65,12 +64,9 @@ const job = await this.jobs.findByIdOrFail(id); // throws if missing
 Define what the application layer needs from the outside world. Live in `application/src/ports/`:
 
 ```typescript
-export interface LlmService {
-  extractJobPostingInsights(description: string): Promise<JobInsights>;
-}
-
-export interface ResumeRenderer {
-  render(content: ResumeContentDto): Promise<Buffer>;
+export interface CompanyRepository {
+  findByIdOrFail(id: CompanyId): Promise<Company>;
+  save(company: Company): Promise<void>;
 }
 ```
 
@@ -82,10 +78,9 @@ export interface ResumeRenderer {
 Plain `type` aliases — not classes. Named `<Concept>Dto`. Read-only:
 
 ```typescript
-export type JobSummaryDto = {
+export type ExperienceDto = {
   readonly id: string;
   readonly title: string;
-  readonly status: string;
   readonly company: CompanyDto;
 };
 ```
@@ -93,8 +88,8 @@ export type JobSummaryDto = {
 Sub-barrel exports keep imports clean:
 
 ```typescript
-import { JobSummaryDto } from '@tailoredin/application';          // via index.ts
-import type { JobSummaryDto } from '@tailoredin/application/dtos'; // via sub-barrel
+import { ExperienceDto } from '@tailoredin/application';          // via index.ts
+import type { ExperienceDto } from '@tailoredin/application/dtos'; // via sub-barrel
 ```
 
 ## Sub-barrels
@@ -109,11 +104,11 @@ Three sub-barrels for targeted imports:
 Mock ports in tests — never use real database or HTTP:
 
 ```typescript
-const mockJobs: JobRepository = {
-  findByIdOrFail: vi.fn().mockResolvedValue(fakeJob),
+const mockExperiences: ExperienceRepository = {
+  findByIdOrFail: vi.fn().mockResolvedValue(fakeExperience),
   // ...
 };
-const useCase = new GetJob(mockJobs);
+const useCase = new GetExperience(mockExperiences);
 ```
 
 Tests live in `application/test/use-cases/`.

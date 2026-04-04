@@ -14,8 +14,7 @@ export class CreateHeadlineRoute {
         const headline = await this.createHeadline.execute({
           profileId: body.profile_id,
           label: body.label,
-          summaryText: body.summary_text,
-          roleTagIds: body.role_tag_ids
+          summaryText: body.summary_text
         });
 
         set.status = 201;
@@ -25,8 +24,7 @@ export class CreateHeadlineRoute {
         body: t.Object({
           profile_id: t.String({ format: 'uuid' }),
           label: t.String({ minLength: 1 }),
-          summary_text: t.String({ minLength: 1 }),
-          role_tag_ids: t.Array(t.String({ format: 'uuid' }))
+          summary_text: t.String({ minLength: 1 })
         })
       }
     );

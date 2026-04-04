@@ -35,16 +35,9 @@
     "@tailoredin/application": "workspace:*",
     "@tailoredin/core": "workspace:*",
     "@tailoredin/domain": "workspace:*",
-    "@tselect/status-code": "^1.0.2",
-    "date-fns": "^4.1.0",
-    "lodash": "^4.17.21",
-    "openai": "^4.83.0",
-    "playwright": "^1.50.0",
-    "zod": "^3.24.1",
-    "zod-to-json-schema": "^3.24.1"
+    "@tselect/status-code": "^1.0.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.0",
     "@types/node": "^22.13.1",
     "testcontainers": "^11.13.0",
     "typescript": "^5.7.3",

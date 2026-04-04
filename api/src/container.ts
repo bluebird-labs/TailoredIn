@@ -2,80 +2,32 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
   AddAccomplishment,
-  AddSkillItem,
-  BulkChangeJobStatus,
-  ChangeJobStatus,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
-  CreateSkillCategory,
-  CreateTailoredResume,
   DeleteAccomplishment,
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
-  DeleteSkillCategory,
-  DeleteSkillItem,
-  GenerateCompanyBrief,
-  GenerateResume,
-  GenerateResumeMarkdown,
-  GenerateResumeProfilePdf,
-  GenerateTailoredResumePdf,
-  GetCompanyBrief,
-  GetJob,
-  GetJobCompany,
   GetProfile,
-  GetResumeProfile,
-  GetTailoredResume,
-  IngestJobByUrl,
-  IngestScrapedJob,
   ListEducation,
   ListExperiences,
   ListHeadlines,
-  ListJobs,
-  ListSkillCategories,
-  ListTags,
-  ListTailoredResumes,
-  SuggestBullets,
   UpdateAccomplishment,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
-  UpdateJobCompany,
-  UpdateProfile,
-  UpdateResumeProfile,
-  UpdateSkillCategory,
-  UpdateSkillItem,
-  UpdateTailoredResume
+  UpdateProfile
 } from '@tailoredin/application';
-import { env, envBool, envInt, envOptional } from '@tailoredin/core';
-import { JobElectionService } from '@tailoredin/domain';
+import { env, envInt } from '@tailoredin/core';
 import {
-  BrilliantCvTemplate,
   createOrmConfig,
-  DatabaseResumeChestQuery,
-  DatabaseResumeContentFactory,
   DI,
-  OPENAI_CONFIG,
-  OpenAiLlmService,
-  OpenAiResumeTailoringService,
-  PLAYWRIGHT_JOB_SCRAPER_CONFIG,
-  PlaywrightJobScraper,
-  PostgresCompanyBriefRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
   PostgresExperienceRepository,
   PostgresHeadlineRepository,
-  PostgresJobRepository,
-  PostgresProfileRepository,
-  PostgresResumeProfileRepository,
-  PostgresSkillCategoryRepository,
-  PostgresSkillRepository,
-  PostgresTagRepository,
-  PostgresTailoredResumeRepository,
-  StructuredLlmRouter,
-  TypstResumeRenderer,
-  TypstTemplateLayoutAnalyzer
+  PostgresProfileRepository
 } from '@tailoredin/infrastructure';
 
 const orm = await MikroORM.init(
@@ -95,137 +47,6 @@ const container = new Container();
 // Infrastructure: ORM
 container.bind({ provide: MikroORM, useValue: orm });
 
-// Structured LLM client
-container.bind({ provide: DI.Llm.StructuredClient, useClass: StructuredLlmRouter });
-
-// Job repositories + services
-container.bind({ provide: DI.Job.Repository, useClass: PostgresJobRepository });
-container.bind({ provide: DI.Job.CompanyRepository, useClass: PostgresCompanyRepository });
-container.bind({ provide: DI.Job.SkillRepository, useClass: PostgresSkillRepository });
-container.bind({ provide: DI.Job.Elector, useValue: new JobElectionService() });
-container.bind({
-  provide: PLAYWRIGHT_JOB_SCRAPER_CONFIG,
-  useValue: {
-    headless: envBool('HEADLESS'),
-    slowMo: envInt('SLOW_MO'),
-    email: env('LINKEDIN_EMAIL'),
-    password: env('LINKEDIN_PASSWORD')
-  }
-});
-container.bind({ provide: DI.Job.Scraper, useClass: PlaywrightJobScraper });
-
-// Job use cases
-container.bind({
-  provide: DI.Job.GetJob,
-  useFactory: () => new GetJob(container.get(DI.Job.Repository))
-});
-container.bind({
-  provide: DI.Job.ChangeJobStatus,
-  useFactory: () => new ChangeJobStatus(container.get(DI.Job.Repository))
-});
-container.bind({
-  provide: DI.Job.BulkChangeJobStatus,
-  useFactory: () => new BulkChangeJobStatus(container.get(DI.Job.Repository))
-});
-container.bind({
-  provide: DI.Job.ListJobs,
-  useFactory: () => new ListJobs(container.get(DI.Job.Repository))
-});
-container.bind({
-  provide: DI.Job.IngestScrapedJob,
-  useFactory: () =>
-    new IngestScrapedJob(
-      container.get(DI.Job.Repository),
-      container.get(DI.Job.CompanyRepository),
-      container.get(DI.Job.Elector)
-    )
-});
-container.bind({
-  provide: DI.Job.IngestJobByUrl,
-  useFactory: () =>
-    new IngestJobByUrl(
-      container.get(DI.Job.Scraper),
-      container.get(DI.Job.Repository),
-      container.get(DI.Job.IngestScrapedJob)
-    )
-});
-container.bind({
-  provide: DI.Job.GetJobCompany,
-  useFactory: () => new GetJobCompany(container.get(DI.Job.CompanyRepository))
-});
-container.bind({
-  provide: DI.Job.UpdateJobCompany,
-  useFactory: () => new UpdateJobCompany(container.get(DI.Job.CompanyRepository))
-});
-
-// Resume services
-const openAiApiKey = envOptional('OPENAI_API_KEY');
-const openAiProject = envOptional('OPENAI_PROJECT_ID');
-export const llmAvailable = !!(openAiApiKey && openAiProject);
-
-if (llmAvailable) {
-  container.bind({ provide: OPENAI_CONFIG, useValue: { apiKey: openAiApiKey, project: openAiProject } });
-  container.bind({ provide: DI.Resume.LlmService, useClass: OpenAiLlmService });
-  container.bind({ provide: DI.Resume.TailoringService, useClass: OpenAiResumeTailoringService });
-} else {
-  container.bind({ provide: DI.Resume.LlmService, useValue: null });
-  container.bind({
-    provide: DI.Resume.TailoringService,
-    useValue: {
-      tailorFromJd: async () => {
-        throw new Error('OpenAI not configured');
-      }
-    }
-  });
-}
-container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
-container.bind({
-  provide: DI.Resume.ContentFactory,
-  useFactory: () =>
-    new DatabaseResumeContentFactory(
-      container.get(DI.Profile.Repository),
-      container.get(DI.Experience.Repository),
-      container.get(DI.Education.Repository),
-      container.get(DI.SkillCategory.Repository)
-    )
-});
-container.bind({
-  provide: DI.Resume.ChestQuery,
-  useFactory: () => new DatabaseResumeChestQuery(container.get(DI.Experience.Repository))
-});
-container.bind({ provide: DI.Resume.LayoutAnalyzer, useClass: TypstTemplateLayoutAnalyzer });
-container.bind({
-  provide: DI.Resume.GenerateResume,
-  useFactory: () =>
-    new GenerateResume(
-      container.get(DI.Profile.Repository),
-      container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer),
-      BrilliantCvTemplate
-    )
-});
-container.bind({
-  provide: DI.Resume.GenerateResumeMarkdown,
-  useFactory: () =>
-    new GenerateResumeMarkdown(container.get(DI.Profile.Repository), container.get(DI.Resume.ContentFactory))
-});
-
-// Company Brief
-container.bind({ provide: DI.CompanyBrief.Repository, useClass: PostgresCompanyBriefRepository });
-container.bind({
-  provide: DI.CompanyBrief.GenerateCompanyBrief,
-  useFactory: () =>
-    new GenerateCompanyBrief(
-      container.get(DI.Job.Repository),
-      container.get(DI.CompanyBrief.Repository),
-      container.get(DI.Resume.LlmService)
-    )
-});
-container.bind({
-  provide: DI.CompanyBrief.GetCompanyBrief,
-  useFactory: () => new GetCompanyBrief(container.get(DI.Job.Repository), container.get(DI.CompanyBrief.Repository))
-});
-
 // Profile
 container.bind({ provide: DI.Profile.Repository, useClass: PostgresProfileRepository });
 container.bind({
@@ -237,60 +58,23 @@ container.bind({
   useFactory: () => new UpdateProfile(container.get(DI.Profile.Repository))
 });
 
-// ResumeProfile
-container.bind({ provide: DI.ResumeProfile.Repository, useClass: PostgresResumeProfileRepository });
+// Headlines
+container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
 container.bind({
-  provide: DI.ResumeProfile.Get,
-  useFactory: () => new GetResumeProfile(container.get(DI.ResumeProfile.Repository))
+  provide: DI.Headline.List,
+  useFactory: () => new ListHeadlines(container.get(DI.Headline.Repository))
 });
 container.bind({
-  provide: DI.ResumeProfile.Update,
-  useFactory: () => new UpdateResumeProfile(container.get(DI.ResumeProfile.Repository))
+  provide: DI.Headline.Create,
+  useFactory: () => new CreateHeadline(container.get(DI.Headline.Repository))
 });
 container.bind({
-  provide: DI.ResumeProfile.GeneratePdf,
-  useFactory: () =>
-    new GenerateResumeProfilePdf(
-      container.get(DI.ResumeProfile.Repository),
-      container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer),
-      BrilliantCvTemplate
-    )
-});
-
-// TailoredResume
-container.bind({ provide: DI.TailoredResume.Repository, useClass: PostgresTailoredResumeRepository });
-container.bind({
-  provide: DI.TailoredResume.Create,
-  useFactory: () =>
-    new CreateTailoredResume(
-      container.get(DI.ResumeProfile.Repository),
-      container.get(DI.TailoredResume.Repository),
-      container.get(DI.Resume.TailoringService),
-      container.get(DI.Resume.ChestQuery)
-    )
+  provide: DI.Headline.Update,
+  useFactory: () => new UpdateHeadline(container.get(DI.Headline.Repository))
 });
 container.bind({
-  provide: DI.TailoredResume.Get,
-  useFactory: () => new GetTailoredResume(container.get(DI.TailoredResume.Repository))
-});
-container.bind({
-  provide: DI.TailoredResume.List,
-  useFactory: () => new ListTailoredResumes(container.get(DI.TailoredResume.Repository))
-});
-container.bind({
-  provide: DI.TailoredResume.Update,
-  useFactory: () => new UpdateTailoredResume(container.get(DI.TailoredResume.Repository))
-});
-container.bind({
-  provide: DI.TailoredResume.GeneratePdf,
-  useFactory: () =>
-    new GenerateTailoredResumePdf(
-      container.get(DI.TailoredResume.Repository),
-      container.get(DI.Resume.ContentFactory),
-      container.get(DI.Resume.Renderer),
-      BrilliantCvTemplate
-    )
+  provide: DI.Headline.Delete,
+  useFactory: () => new DeleteHeadline(container.get(DI.Headline.Repository))
 });
 
 // Education
@@ -310,32 +94,6 @@ container.bind({
 container.bind({
   provide: DI.Education.DeleteEducation,
   useFactory: () => new DeleteEducation(container.get(DI.Education.Repository))
-});
-
-// Headlines
-container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
-container.bind({ provide: DI.Tag.Repository, useClass: PostgresTagRepository });
-container.bind({
-  provide: DI.Headline.List,
-  useFactory: () => new ListHeadlines(container.get(DI.Headline.Repository))
-});
-container.bind({
-  provide: DI.Headline.Create,
-  useFactory: () => new CreateHeadline(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
-});
-container.bind({
-  provide: DI.Headline.Update,
-  useFactory: () => new UpdateHeadline(container.get(DI.Headline.Repository), container.get(DI.Tag.Repository))
-});
-container.bind({
-  provide: DI.Headline.Delete,
-  useFactory: () => new DeleteHeadline(container.get(DI.Headline.Repository))
-});
-
-// Tags
-container.bind({
-  provide: DI.Tag.List,
-  useFactory: () => new ListTags(container.get(DI.Tag.Repository))
 });
 
 // Experience
@@ -368,41 +126,8 @@ container.bind({
   provide: DI.Experience.DeleteAccomplishment,
   useFactory: () => new DeleteAccomplishment(container.get(DI.Experience.Repository))
 });
-// SkillCategory
-container.bind({ provide: DI.SkillCategory.Repository, useClass: PostgresSkillCategoryRepository });
-container.bind({
-  provide: DI.SkillCategory.ListSkillCategories,
-  useFactory: () => new ListSkillCategories(container.get(DI.SkillCategory.Repository))
-});
-container.bind({
-  provide: DI.SkillCategory.CreateSkillCategory,
-  useFactory: () => new CreateSkillCategory(container.get(DI.SkillCategory.Repository))
-});
-container.bind({
-  provide: DI.SkillCategory.UpdateSkillCategory,
-  useFactory: () => new UpdateSkillCategory(container.get(DI.SkillCategory.Repository))
-});
-container.bind({
-  provide: DI.SkillCategory.DeleteSkillCategory,
-  useFactory: () => new DeleteSkillCategory(container.get(DI.SkillCategory.Repository))
-});
-container.bind({
-  provide: DI.SkillCategory.AddSkillItem,
-  useFactory: () => new AddSkillItem(container.get(DI.SkillCategory.Repository))
-});
-container.bind({
-  provide: DI.SkillCategory.UpdateSkillItem,
-  useFactory: () => new UpdateSkillItem(container.get(DI.SkillCategory.Repository))
-});
-container.bind({
-  provide: DI.SkillCategory.DeleteSkillItem,
-  useFactory: () => new DeleteSkillItem(container.get(DI.SkillCategory.Repository))
-});
 
-// Archetype (SuggestBullets remains — no archetype repo needed)
-container.bind({
-  provide: DI.Archetype.SuggestBullets,
-  useFactory: () => new SuggestBullets(container.get(DI.Experience.Repository), container.get(DI.Llm.StructuredClient))
-});
+// Company
+container.bind({ provide: DI.Company.Repository, useClass: PostgresCompanyRepository });
 
 export { container };

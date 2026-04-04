@@ -1,9 +1,6 @@
 import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
-import { container, llmAvailable } from './container.js';
-import { SuggestBulletsRoute } from './routes/archetype/SuggestBulletsRoute.js';
-import { BulkChangeJobStatusRoute } from './routes/BulkChangeJobStatusRoute.js';
-import { ChangeJobStatusRoute } from './routes/ChangeJobStatusRoute.js';
+import { container } from './container.js';
 import { configRoute } from './routes/ConfigRoute.js';
 import { CreateEducationRoute } from './routes/education/CreateEducationRoute.js';
 import { DeleteEducationRoute } from './routes/education/DeleteEducationRoute.js';
@@ -17,32 +14,12 @@ import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.j
 import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
 import { ExtractTextRoute } from './routes/factory/ExtractTextRoute.js';
-import { GenerateCompanyBriefRoute } from './routes/GenerateCompanyBriefRoute.js';
-
-import { GenerateResumeRoute } from './routes/GenerateResumeRoute.js';
-import { GetCompanyBriefRoute } from './routes/GetCompanyBriefRoute.js';
-import { GetJobCompanyRoute } from './routes/GetJobCompanyRoute.js';
-import { GetJobRoute } from './routes/GetJobRoute.js';
 import { GetProfileRoute } from './routes/GetProfileRoute.js';
 import { CreateHeadlineRoute } from './routes/headline/CreateHeadlineRoute.js';
 import { DeleteHeadlineRoute } from './routes/headline/DeleteHeadlineRoute.js';
 import { ListHeadlinesRoute } from './routes/headline/ListHeadlinesRoute.js';
 import { UpdateHeadlineRoute } from './routes/headline/UpdateHeadlineRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
-import { IngestJobByUrlRoute } from './routes/IngestJobByUrlRoute.js';
-import { ListJobsRoute } from './routes/ListJobsRoute.js';
-import { PreviewResumeRoute } from './routes/PreviewResumeRoute.js';
-import { ResumeProfileRoutes } from './routes/resume/ResumeProfileRoutes.js';
-import { TailoredResumeRoutes } from './routes/resume/TailoredResumeRoutes.js';
-import { AddSkillItemRoute } from './routes/skill-categories/AddSkillItemRoute.js';
-import { CreateSkillCategoryRoute } from './routes/skill-categories/CreateSkillCategoryRoute.js';
-import { DeleteSkillCategoryRoute } from './routes/skill-categories/DeleteSkillCategoryRoute.js';
-import { DeleteSkillItemRoute } from './routes/skill-categories/DeleteSkillItemRoute.js';
-import { ListSkillCategoriesRoute } from './routes/skill-categories/ListSkillCategoriesRoute.js';
-import { UpdateSkillCategoryRoute } from './routes/skill-categories/UpdateSkillCategoryRoute.js';
-import { UpdateSkillItemRoute } from './routes/skill-categories/UpdateSkillItemRoute.js';
-import { ListTagsRoute } from './routes/tag/ListTagsRoute.js';
-import { UpdateJobCompanyRoute } from './routes/UpdateJobCompanyRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
 // --- App ---
@@ -75,25 +52,7 @@ const app = new Elysia()
     logRequest(request, status, startTimes.get(request));
   })
   .use(healthRoutes)
-  .use(configRoute(llmAvailable))
-  // Jobs
-  .use(container.get(ListJobsRoute).plugin())
-  .use(container.get(GetJobRoute).plugin())
-  .use(container.get(ChangeJobStatusRoute).plugin())
-  .use(container.get(BulkChangeJobStatusRoute).plugin())
-  .use(container.get(IngestJobByUrlRoute).plugin())
-  .use(container.get(GenerateResumeRoute).plugin())
-  .use(container.get(PreviewResumeRoute).plugin())
-  // Resume Profile
-  .use(container.get(ResumeProfileRoutes).plugin())
-  // Tailored Resumes
-  .use(container.get(TailoredResumeRoutes).plugin())
-  // Company Briefs
-  .use(container.get(GetCompanyBriefRoute).plugin())
-  .use(container.get(GenerateCompanyBriefRoute).plugin())
-  // Companies
-  .use(container.get(GetJobCompanyRoute).plugin())
-  .use(container.get(UpdateJobCompanyRoute).plugin())
+  .use(configRoute())
   // Profile
   .use(container.get(GetProfileRoute).plugin())
   .use(container.get(UpdateProfileRoute).plugin())
@@ -102,23 +61,11 @@ const app = new Elysia()
   .use(container.get(CreateEducationRoute).plugin())
   .use(container.get(UpdateEducationRoute).plugin())
   .use(container.get(DeleteEducationRoute).plugin())
-  // Skills
-  .use(container.get(ListSkillCategoriesRoute).plugin())
-  .use(container.get(CreateSkillCategoryRoute).plugin())
-  .use(container.get(UpdateSkillCategoryRoute).plugin())
-  .use(container.get(DeleteSkillCategoryRoute).plugin())
-  .use(container.get(AddSkillItemRoute).plugin())
-  .use(container.get(UpdateSkillItemRoute).plugin())
-  .use(container.get(DeleteSkillItemRoute).plugin())
-  // Suggest Bullets (kept from archetype tooling)
-  .use(container.get(SuggestBulletsRoute).plugin())
   // Headlines
   .use(container.get(ListHeadlinesRoute).plugin())
   .use(container.get(CreateHeadlineRoute).plugin())
   .use(container.get(UpdateHeadlineRoute).plugin())
   .use(container.get(DeleteHeadlineRoute).plugin())
-  // Tags
-  .use(container.get(ListTagsRoute).plugin())
   // Experiences
   .use(container.get(ListExperiencesRoute).plugin())
   .use(container.get(CreateExperienceRoute).plugin())
