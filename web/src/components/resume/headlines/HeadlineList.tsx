@@ -52,7 +52,7 @@ export function HeadlineList() {
       ))}
 
       {adding ? (
-        <div className="border border-indigo-300 rounded-lg p-3 space-y-2">
+        <div className="border border-primary/30 rounded-lg p-3 space-y-2">
           <Input
             value={newLabel}
             onChange={e => setNewLabel(e.target.value)}
@@ -103,7 +103,7 @@ function HeadlineCard({ headline }: { headline: Headline }) {
 
   if (editing) {
     return (
-      <div className="border border-indigo-300 rounded-lg p-3 space-y-2">
+      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
         <Input value={label} onChange={e => setLabel(e.target.value)} className="font-medium text-sm" />
         <Textarea
           value={summaryText}

@@ -77,7 +77,7 @@ export function EducationList() {
       ))}
 
       {adding ? (
-        <div className="border border-indigo-300 rounded-lg p-3 space-y-2">
+        <div className="border border-primary/30 rounded-lg p-3 space-y-2">
           <Input
             value={newInstitutionName}
             onChange={e => setNewInstitutionName(e.target.value)}
@@ -172,7 +172,7 @@ function EducationCard({ education }: { education: Education }) {
 
   if (editing) {
     return (
-      <div className="border border-indigo-300 rounded-lg p-3 space-y-2">
+      <div className="border border-primary/30 rounded-lg p-3 space-y-2">
         <Input
           value={institutionName}
           onChange={e => setInstitutionName(e.target.value)}

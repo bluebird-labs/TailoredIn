@@ -32,7 +32,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
           <Sparkles className="h-5 w-5" />
-          <span className="text-lg font-semibold">TailoredIn</span>
+          <span className="text-lg font-medium">TailoredIn</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
