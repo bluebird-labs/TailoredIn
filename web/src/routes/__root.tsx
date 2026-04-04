@@ -4,7 +4,7 @@ import { Toaster } from 'sonner';
 import { AppSidebar } from '@/components/layout/sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { applyPalette, applyTheme, getEffectiveTheme, getStoredPalette } from '@/lib/theme.js';
+import { applyTheme, getEffectiveTheme } from '@/lib/theme.js';
 
 export const Route = createRootRoute({
   component: RootLayout
@@ -13,7 +13,6 @@ export const Route = createRootRoute({
 function RootLayout() {
   useEffect(() => {
     applyTheme(getEffectiveTheme());
-    applyPalette(getStoredPalette());
   }, []);
 
   return (
