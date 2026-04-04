@@ -23,12 +23,16 @@ export class E2eSeeder extends Seeder {
 
     // Profile
     await conn.execute(`
-      INSERT INTO profiles (id, email, first_name, last_name, phone, location, linkedin_url, github_url, website_url, created_at, updated_at)
-      VALUES (
+      INSERT INTO profiles (
+        id, email, first_name, last_name, about,
+        phone, location, linkedin_url, github_url, website_url,
+        created_at, updated_at
+      ) VALUES (
         'aaaaaaaa-0000-4000-8000-000000000001',
         'jane@example.com',
         'Jane',
         'Doe',
+        'I am a full-stack engineer who thrives at the intersection of product and infrastructure. I write clear, maintainable code and care deeply about developer experience and system reliability.',
         '+1-555-123-4567',
         'San Francisco, CA',
         'https://linkedin.com/in/janedoe',

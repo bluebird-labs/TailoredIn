@@ -18,6 +18,7 @@ export class PostgresProfileRepository implements ProfileRepository {
     orm.email = profile.email;
     orm.firstName = profile.firstName;
     orm.lastName = profile.lastName;
+    orm.about = profile.about;
     orm.phone = profile.phone;
     orm.location = profile.location;
     orm.linkedinUrl = profile.linkedinUrl;
@@ -34,6 +35,7 @@ export class PostgresProfileRepository implements ProfileRepository {
       email: orm.email,
       firstName: orm.firstName,
       lastName: orm.lastName,
+      about: orm.about,
       phone: orm.phone,
       location: orm.location,
       linkedinUrl: orm.linkedinUrl,

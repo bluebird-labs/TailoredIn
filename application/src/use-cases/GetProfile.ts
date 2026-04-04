@@ -12,6 +12,7 @@ export class GetProfile {
       email: profile.email,
       firstName: profile.firstName,
       lastName: profile.lastName,
+      about: profile.about,
       phone: profile.phone,
       location: profile.location,
       linkedinUrl: profile.linkedinUrl,

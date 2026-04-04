@@ -5,6 +5,7 @@ export type UpdateProfileInput = {
   email: string;
   firstName: string;
   lastName: string;
+  about: string | null;
   phone: string | null;
   location: string | null;
   linkedinUrl: string | null;
@@ -21,6 +22,7 @@ export class UpdateProfile {
     profile.email = input.email;
     profile.firstName = input.firstName;
     profile.lastName = input.lastName;
+    profile.about = input.about;
     profile.phone = input.phone;
     profile.location = input.location;
     profile.linkedinUrl = input.linkedinUrl;
@@ -35,6 +37,7 @@ export class UpdateProfile {
       email: profile.email,
       firstName: profile.firstName,
       lastName: profile.lastName,
+      about: profile.about,
       phone: profile.phone,
       location: profile.location,
       linkedinUrl: profile.linkedinUrl,

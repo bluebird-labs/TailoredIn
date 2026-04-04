@@ -20,6 +20,7 @@ erDiagram
         text linkedin_url "nullable"
         text github_url "nullable"
         text website_url "nullable"
+        text about "nullable"
     }
 
     experiences {
@@ -43,7 +44,6 @@ erDiagram
         uuid experience_id FK
         text title "default: empty"
         text narrative "default: empty"
-        json skill_tags "default: []"
         integer ordinal "default: 0"
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
@@ -64,39 +64,6 @@ erDiagram
 
 
     %% ──────────────────────────────────────────────
-    %%  Skill Subdomain
-    %% ──────────────────────────────────────────────
-
-    skill_categories {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid profile_id FK
-        text name
-        integer ordinal "default: 0"
-    }
-
-    skill_items {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid skill_category_id FK
-        text name
-        integer ordinal "default: 0"
-    }
-
-    skills {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        text name
-        text key UK
-        skill_affinity affinity "default: expert"
-        text[] variants
-    }
-
-
-    %% ──────────────────────────────────────────────
     %%  Company & Job Subdomain
     %% ──────────────────────────────────────────────
 
@@ -106,57 +73,11 @@ erDiagram
         timestamp updated_at "default: CURRENT_TIMESTAMP"
         text name
         text logo_url "nullable"
-        text linkedin_link UK
-        boolean ignored "default: false"
+        text linkedin_link UK "nullable"
         text website "nullable"
         text business_type "nullable"
         text industry "nullable"
         text stage "nullable"
-    }
-
-    company_briefs {
-        uuid id PK
-        uuid company_id FK "unique"
-        text product_overview
-        text tech_stack
-        text culture
-        text recent_news
-        text key_people
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-    }
-
-    jobs {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        text linkedin_id UK
-        uuid company_id FK
-        text title
-        text linkedin_link
-        text type "nullable"
-        text level "nullable"
-        text remote "nullable"
-        timestamp posted_at "nullable"
-        boolean is_repost "nullable"
-        text location_raw
-        integer salary_low "nullable"
-        integer salary_high "nullable"
-        text salary_raw "nullable"
-        text description
-        text description_html
-        integer applicants_count "nullable"
-        tsvector description_fts "nullable, generated, indexed"
-        job_status status "default: new"
-        text apply_link "nullable"
-    }
-
-    job_status_updates {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid job_id FK
-        job_status status
     }
 
 
@@ -174,60 +95,13 @@ erDiagram
         text status "default: active"
     }
 
-    tags {
-        uuid id PK
-        text name UK
-        text dimension UK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-    }
-
-    headline_tags {
-        uuid headline_id FK
-        uuid tag_id FK
-    }
-
-
-    %% ──────────────────────────────────────────────
-    %%  Resume Subdomain
-    %% ──────────────────────────────────────────────
-
-    tailored_resumes {
-        uuid id PK
-        uuid profile_id FK
-        text jd_content "default: empty"
-        json llm_proposals "default: {}"
-        json content_selection "default: {}"
-        text headline_text "default: empty"
-        text status "default: draft"
-        text pdf_path "nullable"
-        timestamp created_at "default: now()"
-        timestamp updated_at "default: now()"
-        json generated_content "nullable"
-    }
-
-    resume_profiles {
-        uuid profile_id PK
-        json content_selection "default: {}"
-        text headline_text "default: empty"
-        timestamp updated_at "default: now()"
-    }
-
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
 
-    companies ||--o{ jobs : "posts"
-    jobs ||--o{ job_status_updates : "tracks"
-    companies ||--o| company_briefs : "has"
     profiles ||--o{ experiences : "has"
     profiles ||--o{ headlines : "has"
-    headlines ||--o| headline_tags : "has"
-    tags ||--o| headline_tags : "has"
     profiles ||--o{ educations : "has"
-    profiles ||--o{ skill_categories : "has"
-    skill_categories ||--o{ skill_items : "contains"
-    profiles ||--o| resume_profiles : "has"
-    profiles ||--o{ tailored_resumes : "has"
     experiences ||--o{ accomplishments : "has"
 
     headlines }o--o{ tags : "tagged with"
