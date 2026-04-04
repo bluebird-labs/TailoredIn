@@ -13,7 +13,7 @@ type Headline = {
   summaryText: string;
 };
 
-export function HeadlineTab() {
+export function HeadlineList() {
   const { data: headlines = [], isLoading } = useHeadlines();
   const { data: profile } = useProfile();
   const createHeadline = useCreateHeadline();

@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { BookOpen, GraduationCap, type LucideIcon, Sparkles, User } from 'lucide-react';
+import { Briefcase, GraduationCap, Heading, type LucideIcon, Sparkles, User } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -18,10 +18,10 @@ interface NavItem {
 }
 
 const appNav: NavItem[] = [
-  { label: 'Profile', to: '/resume', icon: User },
-  { label: 'Experience', to: '/resume', icon: BookOpen },
-  { label: 'Headlines', to: '/resume', icon: BookOpen },
-  { label: 'Education', to: '/resume', icon: GraduationCap }
+  { label: 'Profile', to: '/profile', icon: User },
+  { label: 'Experiences', to: '/experiences', icon: Briefcase },
+  { label: 'Headlines', to: '/headlines', icon: Heading },
+  { label: 'Education', to: '/education', icon: GraduationCap }
 ];
 
 export function AppSidebar() {

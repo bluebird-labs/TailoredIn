@@ -10,43 +10,79 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ResumeIndexRouteImport } from './routes/resume/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as HeadlinesIndexRouteImport } from './routes/headlines/index'
+import { Route as ExperiencesIndexRouteImport } from './routes/experiences/index'
+import { Route as EducationIndexRouteImport } from './routes/education/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResumeIndexRoute = ResumeIndexRouteImport.update({
-  id: '/resume/',
-  path: '/resume/',
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeadlinesIndexRoute = HeadlinesIndexRouteImport.update({
+  id: '/headlines/',
+  path: '/headlines/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperiencesIndexRoute = ExperiencesIndexRouteImport.update({
+  id: '/experiences/',
+  path: '/experiences/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EducationIndexRoute = EducationIndexRouteImport.update({
+  id: '/education/',
+  path: '/education/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/resume/': typeof ResumeIndexRoute
+  '/education/': typeof EducationIndexRoute
+  '/experiences/': typeof ExperiencesIndexRoute
+  '/headlines/': typeof HeadlinesIndexRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/resume': typeof ResumeIndexRoute
+  '/education': typeof EducationIndexRoute
+  '/experiences': typeof ExperiencesIndexRoute
+  '/headlines': typeof HeadlinesIndexRoute
+  '/profile': typeof ProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/resume/': typeof ResumeIndexRoute
+  '/education/': typeof EducationIndexRoute
+  '/experiences/': typeof ExperiencesIndexRoute
+  '/headlines/': typeof HeadlinesIndexRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/resume/'
+  fullPaths: '/' | '/education/' | '/experiences/' | '/headlines/' | '/profile/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/resume'
-  id: '__root__' | '/' | '/resume/'
+  to: '/' | '/education' | '/experiences' | '/headlines' | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/education/'
+    | '/experiences/'
+    | '/headlines/'
+    | '/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ResumeIndexRoute: typeof ResumeIndexRoute
+  EducationIndexRoute: typeof EducationIndexRoute
+  ExperiencesIndexRoute: typeof ExperiencesIndexRoute
+  HeadlinesIndexRoute: typeof HeadlinesIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,11 +94,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resume/': {
-      id: '/resume/'
-      path: '/resume'
-      fullPath: '/resume/'
-      preLoaderRoute: typeof ResumeIndexRouteImport
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/headlines/': {
+      id: '/headlines/'
+      path: '/headlines'
+      fullPath: '/headlines/'
+      preLoaderRoute: typeof HeadlinesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiences/': {
+      id: '/experiences/'
+      path: '/experiences'
+      fullPath: '/experiences/'
+      preLoaderRoute: typeof ExperiencesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/education/': {
+      id: '/education/'
+      path: '/education'
+      fullPath: '/education/'
+      preLoaderRoute: typeof EducationIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -70,7 +127,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ResumeIndexRoute: ResumeIndexRoute,
+  EducationIndexRoute: EducationIndexRoute,
+  ExperiencesIndexRoute: ExperiencesIndexRoute,
+  HeadlinesIndexRoute: HeadlinesIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

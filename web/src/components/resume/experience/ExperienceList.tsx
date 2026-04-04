@@ -13,7 +13,6 @@ type AccomplishmentDto = {
   id: string;
   title: string;
   narrative: string;
-  skillTags: string[];
   ordinal: number;
 };
 
@@ -31,7 +30,7 @@ type Experience = {
   accomplishments: AccomplishmentDto[];
 };
 
-export function ExperienceTab() {
+export function ExperienceList() {
   const { data: experiences = [], isLoading } = useExperiences();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -84,7 +83,7 @@ function ExperienceCard({
 
   function handleAddAccomplishment() {
     addAccomplishment.mutate(
-      { title: '', narrative: '', skill_tags: [], ordinal: experience.accomplishments.length },
+      { title: '', narrative: '', ordinal: experience.accomplishments.length },
       {
         onError: () => toast.error('Failed to add accomplishment')
       }
