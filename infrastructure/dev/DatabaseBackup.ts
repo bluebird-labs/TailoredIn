@@ -1,4 +1,4 @@
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Logger } from '@tailoredin/core';
 import type { OrmDbConfig } from '../src/db/orm-config.js';
@@ -39,7 +39,7 @@ export function backupDatabase(dbConfig: OrmDbConfig, containerName: string, rep
     throw new Error(`pg_dump failed (exit ${result.exitCode}): ${stderr}`);
   }
 
-  Bun.writeSync(Bun.openSync(filePath, 'w'), result.stdout);
+  writeFileSync(filePath, result.stdout);
 
   log.info(`Backup saved: ${filePath}`);
   return filePath;
