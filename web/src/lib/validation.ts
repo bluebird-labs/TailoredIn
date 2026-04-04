@@ -93,12 +93,39 @@ function validateAccomplishment(values: AccomplishmentFormState): ValidationErro
   return errors;
 }
 
+// --- Company ---
+
+interface CompanyFormState {
+  name: string;
+  website: string;
+  logoUrl: string;
+  linkedinLink: string;
+  businessType: string;
+  industry: string;
+  stage: string;
+}
+
+function validateCompany(values: CompanyFormState): ValidationErrors<CompanyFormState> {
+  const errors: ValidationErrors<CompanyFormState> = {};
+  if (!values.name.trim()) errors.name = 'Company name is required';
+  return errors;
+}
+
 export type {
   AccomplishmentFormState,
+  CompanyFormState,
   EducationFormState,
   ExperienceFormState,
   HeadlineFormState,
   ProfileFormState,
   ValidationErrors
 };
-export { hasErrors, validateAccomplishment, validateEducation, validateExperience, validateHeadline, validateProfile };
+export {
+  hasErrors,
+  validateAccomplishment,
+  validateCompany,
+  validateEducation,
+  validateExperience,
+  validateHeadline,
+  validateProfile
+};

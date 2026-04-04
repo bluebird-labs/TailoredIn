@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Briefcase, GraduationCap, Heading, type LucideIcon, Moon, Sun, User } from 'lucide-react';
+import { Briefcase, Building2, GraduationCap, Heading, type LucideIcon, Moon, Sun, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +29,8 @@ const resumeNav: NavItem[] = [
   { label: 'Education', to: '/education', icon: GraduationCap }
 ];
 
+const directoryNav: NavItem[] = [{ label: 'Companies', to: '/companies', icon: Building2 }];
+
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
   const [theme, setTheme] = useState(getEffectiveTheme);
@@ -52,6 +54,24 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {resumeNav.map(item => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton
+                    render={<Link to={item.to} />}
+                    isActive={!!matchRoute({ to: item.to, fuzzy: true })}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Directory</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {directoryNav.map(item => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     render={<Link to={item.to} />}

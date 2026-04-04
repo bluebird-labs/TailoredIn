@@ -2,6 +2,7 @@ export type { CreateCompanyInput } from './company/CreateCompany.js';
 export { CreateCompany } from './company/CreateCompany.js';
 export type { EnrichCompanyDataInput } from './company/EnrichCompanyData.js';
 export { EnrichCompanyData } from './company/EnrichCompanyData.js';
+export { ListCompanies } from './company/ListCompanies.js';
 export type { CreateEducationInput } from './education/CreateEducation.js';
 export { CreateEducation } from './education/CreateEducation.js';
 export type { DeleteEducationInput } from './education/DeleteEducation.js';

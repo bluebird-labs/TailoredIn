@@ -18,5 +18,9 @@ export const queryKeys = {
   accomplishments: {
     all: ['accomplishments'] as const,
     byExperience: (experienceId: string) => ['accomplishments', 'experience', experienceId] as const
+  },
+  companies: {
+    all: ['companies'] as const,
+    list: () => [...queryKeys.companies.all, 'list'] as const
   }
 };

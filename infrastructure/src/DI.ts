@@ -12,6 +12,7 @@ import type {
   DeleteHeadline,
   EnrichCompanyData,
   GetProfile,
+  ListCompanies,
   ListEducation,
   ListExperiences,
   ListHeadlines,
@@ -66,6 +67,7 @@ export const DI = {
   Company: {
     Repository: new InjectionToken<CompanyRepository>('DI.Company.Repository'),
     DataProvider: new InjectionToken<CompanyDataProvider>('DI.Company.DataProvider'),
+    List: new InjectionToken<ListCompanies>('DI.Company.List'),
     Enrich: new InjectionToken<EnrichCompanyData>('DI.Company.Enrich'),
     Create: new InjectionToken<CreateCompany>('DI.Company.Create')
   }

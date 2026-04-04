@@ -12,6 +12,7 @@ import {
   DeleteHeadline,
   EnrichCompanyData,
   GetProfile,
+  ListCompanies,
   ListEducation,
   ListExperiences,
   ListHeadlines,
@@ -136,6 +137,10 @@ container.bind({ provide: DI.Company.DataProvider, useClass: ClaudeCliCompanyDat
 container.bind({
   provide: DI.Company.Enrich,
   useFactory: () => new EnrichCompanyData(container.get(DI.Company.DataProvider))
+});
+container.bind({
+  provide: DI.Company.List,
+  useFactory: () => new ListCompanies(container.get(DI.Company.Repository))
 });
 container.bind({
   provide: DI.Company.Create,

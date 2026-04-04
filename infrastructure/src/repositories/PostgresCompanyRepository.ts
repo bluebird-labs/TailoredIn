@@ -16,6 +16,11 @@ import type { CompanyOrmRepository } from '../db/entities/companies/CompanyOrmRe
 export class PostgresCompanyRepository implements CompanyRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
+  public async findAll(): Promise<DomainCompany[]> {
+    const ormEntities = await this.orm.em.find(OrmCompany, {}, { orderBy: { name: 'ASC' } });
+    return ormEntities.map(e => this.toDomain(e));
+  }
+
   public async findById(id: CompanyId): Promise<DomainCompany | null> {
     const orm = await this.orm.em.findOne(OrmCompany, id.value);
     return orm ? this.toDomain(orm) : null;

@@ -14,6 +14,7 @@ import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as HeadlinesIndexRouteImport } from './routes/headlines/index'
 import { Route as ExperiencesIndexRouteImport } from './routes/experiences/index'
 import { Route as EducationIndexRouteImport } from './routes/education/index'
+import { Route as CompaniesIndexRouteImport } from './routes/companies/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,9 +41,15 @@ const EducationIndexRoute = EducationIndexRouteImport.update({
   path: '/education/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
+  id: '/companies/',
+  path: '/companies/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/companies/': typeof CompaniesIndexRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
   '/headlines/': typeof HeadlinesIndexRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/companies': typeof CompaniesIndexRoute
   '/education': typeof EducationIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
   '/headlines': typeof HeadlinesIndexRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/companies/': typeof CompaniesIndexRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
   '/headlines/': typeof HeadlinesIndexRoute
@@ -65,12 +74,25 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/education/' | '/experiences/' | '/headlines/' | '/profile/'
+  fullPaths:
+    | '/'
+    | '/companies/'
+    | '/education/'
+    | '/experiences/'
+    | '/headlines/'
+    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/education' | '/experiences' | '/headlines' | '/profile'
+  to:
+    | '/'
+    | '/companies'
+    | '/education'
+    | '/experiences'
+    | '/headlines'
+    | '/profile'
   id:
     | '__root__'
     | '/'
+    | '/companies/'
     | '/education/'
     | '/experiences/'
     | '/headlines/'
@@ -79,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompaniesIndexRoute: typeof CompaniesIndexRoute
   EducationIndexRoute: typeof EducationIndexRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
   HeadlinesIndexRoute: typeof HeadlinesIndexRoute
@@ -122,11 +145,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EducationIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/companies/': {
+      id: '/companies/'
+      path: '/companies'
+      fullPath: '/companies/'
+      preLoaderRoute: typeof CompaniesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompaniesIndexRoute: CompaniesIndexRoute,
   EducationIndexRoute: EducationIndexRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,
   HeadlinesIndexRoute: HeadlinesIndexRoute,
