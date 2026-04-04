@@ -13,7 +13,6 @@ type AccomplishmentDto = {
   id: string;
   title: string;
   narrative: string;
-  skillTags: string[];
   ordinal: number;
 };
 
@@ -84,7 +83,7 @@ function ExperienceCard({
 
   function handleAddAccomplishment() {
     addAccomplishment.mutate(
-      { title: '', narrative: '', skill_tags: [], ordinal: experience.accomplishments.length },
+      { title: '', narrative: '', ordinal: experience.accomplishments.length },
       {
         onError: () => toast.error('Failed to add accomplishment')
       }
