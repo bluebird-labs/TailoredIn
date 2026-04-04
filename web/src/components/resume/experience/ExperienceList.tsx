@@ -23,9 +23,7 @@ export function ExperienceList() {
 
   // Resolve the live experience from query data so the modal always has fresh data
   const editingExperience =
-    modalState.mode === 'edit'
-      ? (experiences as Experience[]).find(e => e.id === modalState.experienceId)
-      : undefined;
+    modalState.mode === 'edit' ? (experiences as Experience[]).find(e => e.id === modalState.experienceId) : undefined;
 
   return (
     <>
