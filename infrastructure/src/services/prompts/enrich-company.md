@@ -26,6 +26,7 @@ Return ONLY a valid JSON object with these fields:
   "description": "string or null — one or two sentences describing what the company does",
   "website": "string or null — the company's primary website URL",
   "linkedinLink": "string or null — LinkedIn company page URL",
+  "logoUrl": "string or null — direct URL to the company's logo image (PNG, SVG, or JPG)",
   "businessType": "one of [{{businessTypes}}] or null",
   "industry": "one of [{{industries}}] or null",
   "stage": "one of [{{stages}}] or null"

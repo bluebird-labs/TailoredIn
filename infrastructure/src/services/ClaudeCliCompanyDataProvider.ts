@@ -17,6 +17,7 @@ const companyEnrichmentSchema = z.object({
   description: z.string().nullable(),
   website: z.string().nullable(),
   linkedinLink: z.string().nullable(),
+  logoUrl: z.string().nullable(),
   businessType: z.enum(Object.values(BusinessType) as [string, ...string[]]).nullable(),
   industry: z.enum(Object.values(Industry) as [string, ...string[]]).nullable(),
   stage: z.enum(Object.values(CompanyStage) as [string, ...string[]]).nullable()
@@ -80,29 +81,49 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
       ...result.value,
       website: this.normalizeUrl(result.value.website),
       linkedinLink: this.normalizeUrl(result.value.linkedinLink),
-      logoUrl: null,
+      logoUrl: result.value.logoUrl,
       businessType: result.value.businessType as BusinessType | null,
       industry: result.value.industry as Industry | null,
       stage: result.value.stage as CompanyStage | null
     };
 
-    const enriched = await this.applyLogoFromDomain(enrichment);
+    const enriched = await this.applyLogo(enrichment);
     this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}" duration=${duration}ms`);
     return enriched;
   }
 
-  private async applyLogoFromDomain(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
+  private async applyLogo(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
+    if (result.logoUrl) {
+      this.log.debug(`Using LLM-provided logo URL: "${result.logoUrl}"`);
+      return result;
+    }
+
     const websiteUrl = result.website;
     if (!websiteUrl) return result;
 
+    let domain: string;
     try {
-      const domain = new URL(websiteUrl).hostname;
-      const logoUrl = `https://logos.hunter.io/${domain}`;
-      const response = await fetch(logoUrl, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
-      return { ...result, logoUrl: response.ok ? logoUrl : null };
+      domain = new URL(websiteUrl).hostname;
     } catch {
       return result;
     }
+
+    const providers = [
+      { name: 'Hunter', url: `https://logos.hunter.io/${domain}` },
+      { name: 'CompanyEnrich', url: `https://companyenrich.com/api/logo/${domain}` }
+    ];
+
+    for (const provider of providers) {
+      this.log.debug(`Trying logo provider ${provider.name} for domain "${domain}"`);
+      const isImage = await this.urlReturnsImage(provider.url);
+      if (isImage) {
+        this.log.debug(`Logo found via ${provider.name}: "${provider.url}"`);
+        return { ...result, logoUrl: provider.url };
+      }
+    }
+
+    this.log.debug(`No logo found for domain "${domain}" from any provider`);
+    return result;
   }
 
   private normalizeUrl(url: string | null): string | null {
@@ -111,5 +132,15 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     if (!trimmed) return null;
     if (/^https?:\/\//i.test(trimmed)) return trimmed;
     return `https://${trimmed}`;
+  }
+
+  private async urlReturnsImage(url: string): Promise<boolean> {
+    try {
+      const response = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
+      const contentType = response.headers.get('content-type') ?? '';
+      return response.ok && contentType.startsWith('image/');
+    } catch {
+      return false;
+    }
   }
 }

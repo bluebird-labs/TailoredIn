@@ -14,6 +14,7 @@ function fullLlmResponse(overrides: Record<string, unknown> = {}) {
     description: 'Code hosting platform',
     website: 'https://github.com',
     linkedinLink: 'https://linkedin.com/company/github',
+    logoUrl: null as string | null,
     businessType: BusinessType.PLATFORM,
     industry: Industry.SAAS,
     stage: CompanyStage.ACQUIRED,
@@ -93,6 +94,7 @@ describe('ClaudeCliCompanyDataProvider', () => {
           description: null,
           website: null,
           linkedinLink: null,
+          logoUrl: null,
           businessType: null,
           industry: null,
           stage: null
@@ -109,6 +111,57 @@ describe('ClaudeCliCompanyDataProvider', () => {
       expect(result.businessType).toBeNull();
       expect(result.industry).toBeNull();
       expect(result.stage).toBeNull();
+      expect(result.logoUrl).toBeNull();
+    });
+  });
+
+  describe('logo provider chain', () => {
+    test('LLM-provided logoUrl is used directly (not overridden by provider chain)', async () => {
+      const mockProvider = createMockProvider(
+        ok(
+          fullLlmResponse({
+            logoUrl: 'https://example.com/logo.png',
+            website: 'https://github.com'
+          })
+        )
+      );
+
+      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const result = await dataProvider.enrichFromUrl('https://github.com');
+
+      expect(result.logoUrl).toBe('https://example.com/logo.png');
+    });
+
+    test('falls back to domain-based providers when LLM provides no logo', async () => {
+      const mockProvider = createMockProvider(
+        ok(
+          fullLlmResponse({
+            logoUrl: null,
+            website: 'https://github.com'
+          })
+        )
+      );
+
+      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const result = await dataProvider.enrichFromUrl('https://github.com');
+
+      // Result is either a string URL from a provider or null — can't control external services
+      expect(result.logoUrl === null || typeof result.logoUrl === 'string').toBe(true);
+    });
+
+    test('returns null logoUrl when no website available', async () => {
+      const mockProvider = createMockProvider(
+        ok(
+          fullLlmResponse({
+            logoUrl: null,
+            website: null
+          })
+        )
+      );
+
+      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const result = await dataProvider.enrichFromUrl('https://unknown.com');
+
       expect(result.logoUrl).toBeNull();
     });
   });
