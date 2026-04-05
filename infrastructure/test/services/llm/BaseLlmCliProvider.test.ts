@@ -187,12 +187,114 @@ describe('BaseLlmCliProvider timeout', () => {
   test('returns error when CLI process exceeds timeout', async () => {
     const provider = new SpawningTestProvider();
 
-    const result = await provider.request(new TestRequest(), { timeoutMs: 1000 });
+    const result = await provider.request(new TestRequest(), { timeoutMs: 1000, maxRetries: 1 });
 
     expect(result.isErr).toBe(true);
     if (result.isErr) {
       expect(result.error).toBeInstanceOf(LlmRequestError);
       expect(result.error.message).toContain('timed out');
+    }
+  }, 10_000);
+});
+
+const VALID_JSON = JSON.stringify({ name: 'OK', count: 1 });
+
+class CountingProvider extends BaseLlmCliProvider {
+  protected readonly log = Logger.create('counting-provider');
+  public callCount = 0;
+  public failUntil = 2;
+
+  protected buildCommand(): string[] {
+    this.callCount++;
+    if (this.callCount <= this.failUntil) {
+      return ['sh', '-c', 'exit 1'];
+    }
+    return ['sh', '-c', `echo '${VALID_JSON}'`];
+  }
+
+  protected extractResult(stdout: string): unknown {
+    return JSON.parse(stdout.trim());
+  }
+
+  protected override sleep(_ms: number): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+class SingleCallProvider extends BaseLlmCliProvider {
+  protected readonly log = Logger.create('single-call-provider');
+  public callCount = 0;
+
+  protected buildCommand(): string[] {
+    this.callCount++;
+    // Returns valid JSON, but wrong shape (missing 'count', 'name' is a number)
+    return ['sh', '-c', `echo '{"wrong":"shape"}'`];
+  }
+
+  protected extractResult(stdout: string): unknown {
+    return JSON.parse(stdout.trim());
+  }
+
+  protected override sleep(_ms: number): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+class AlwaysFailProvider extends BaseLlmCliProvider {
+  protected readonly log = Logger.create('always-fail-provider');
+  public callCount = 0;
+
+  protected buildCommand(): string[] {
+    this.callCount++;
+    return ['sh', '-c', 'exit 1'];
+  }
+
+  protected extractResult(stdout: string): unknown {
+    return JSON.parse(stdout.trim());
+  }
+
+  protected override sleep(_ms: number): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+describe('BaseLlmCliProvider retry', () => {
+  test('retries on failure then succeeds', async () => {
+    const provider = new CountingProvider();
+    provider.failUntil = 2;
+
+    const result = await provider.request(new TestRequest(), { maxRetries: 3, retryDelayMs: 10 });
+
+    expect(provider.callCount).toBe(3);
+    expect(result.isOk).toBe(true);
+    if (result.isOk) {
+      expect(result.value.name).toBe('OK');
+      expect(result.value.count).toBe(1);
+    }
+  }, 10_000);
+
+  test('does not retry Zod validation failure', async () => {
+    const provider = new SingleCallProvider();
+
+    const result = await provider.request(new TestRequest(), { maxRetries: 3, retryDelayMs: 10 });
+
+    expect(provider.callCount).toBe(1);
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error.message).toContain('Zod validation failed');
+    }
+  });
+
+  test('returns last error after exhausting retries', async () => {
+    const provider = new AlwaysFailProvider();
+
+    const result = await provider.request(new TestRequest(), { maxRetries: 3, retryDelayMs: 10 });
+
+    expect(provider.callCount).toBe(3);
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error).toBeInstanceOf(LlmRequestError);
+      expect(result.error.message).toContain('CLI exited with code');
     }
   }, 10_000);
 });

@@ -8,6 +8,8 @@ type LoggerInstance = ReturnType<typeof Logger.create>;
 
 export interface LlmRequestOptions {
   timeoutMs?: number;
+  maxRetries?: number;
+  retryDelayMs?: number;
 }
 
 export abstract class BaseLlmCliProvider {
@@ -18,6 +20,54 @@ export abstract class BaseLlmCliProvider {
   protected abstract extractResult(stdout: string): unknown;
 
   public async request<T extends z.ZodObject<z.ZodRawShape>>(
+    request: LlmJsonRequest<T>,
+    options?: LlmRequestOptions
+  ): Promise<Result<z.infer<T>, LlmRequestError>> {
+    const maxRetries = options?.maxRetries ?? 3;
+    let lastError: LlmRequestError | undefined;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const result = await this.executeOnce(request, options);
+
+      if (result.isOk) {
+        return result;
+      }
+
+      lastError = result.error;
+
+      // Only retry retryable failures: spawn errors, timeouts, non-zero exit codes
+      // Do NOT retry Zod validation failures, extraction failures, or empty results
+      if (!this.isRetryable(lastError)) {
+        return result;
+      }
+
+      if (attempt < maxRetries) {
+        const retryDelayMs = options?.retryDelayMs ?? 2_000;
+        const delay = retryDelayMs * 2 ** (attempt - 1);
+        const msg = `LLM request failed (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${lastError.message}`;
+        this.log.info(msg);
+        await this.sleep(delay);
+      }
+    }
+
+    return err(lastError!);
+  }
+
+  private isRetryable(error: LlmRequestError): boolean {
+    const msg = error.message;
+    // Retryable: spawn failures, timeouts, non-zero exit codes
+    if (msg.includes('Failed to spawn CLI')) return true;
+    if (msg.includes('timed out')) return true;
+    if (msg.startsWith('CLI exited with code')) return true;
+    // Not retryable: Zod validation, extraction, empty results
+    return false;
+  }
+
+  protected sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private async executeOnce<T extends z.ZodObject<z.ZodRawShape>>(
     request: LlmJsonRequest<T>,
     options?: LlmRequestOptions
   ): Promise<Result<z.infer<T>, LlmRequestError>> {
@@ -55,9 +105,10 @@ export abstract class BaseLlmCliProvider {
       exitCode = result.code;
     } catch (e) {
       const duration = Math.round(performance.now() - start);
-      const message = e instanceof Error && e.message.includes('timed out')
-        ? e.message
-        : `Failed to spawn CLI: ${e instanceof Error ? e.message : String(e)}`;
+      const message =
+        e instanceof Error && e.message.includes('timed out')
+          ? e.message
+          : `Failed to spawn CLI: ${e instanceof Error ? e.message : String(e)}`;
       return err(new LlmRequestError(message, command, null, '', '', duration));
     }
 
