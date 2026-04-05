@@ -50,7 +50,6 @@ export function ExperienceList() {
             if (!next) setModalState({ mode: 'closed' });
           }}
           modalMode={{ mode: 'create', experienceCount: experiences.length }}
-          onAccomplishmentDirtyChange={() => {}}
         />
       )}
     </>

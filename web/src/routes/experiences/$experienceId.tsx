@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Pencil } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
 import { ExperienceFormModal } from '@/components/resume/experience/ExperienceFormModal.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
@@ -21,8 +21,6 @@ function ExperienceDetailPage() {
   const { experienceId } = Route.useParams();
   const { data: experience, isLoading } = useExperience(experienceId);
   const [editOpen, setEditOpen] = useState(false);
-
-  const handleAccomplishmentDirtyChange = useCallback((_id: string, _isDirty: boolean) => {}, []);
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
   if (!experience) return <EmptyState message="Experience not found." />;
@@ -175,7 +173,6 @@ function ExperienceDetailPage() {
         <ExperienceFormModal
           open
           modalMode={{ mode: 'edit', experience }}
-          onAccomplishmentDirtyChange={handleAccomplishmentDirtyChange}
           onOpenChange={next => {
             if (!next) setEditOpen(false);
           }}
