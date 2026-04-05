@@ -109,5 +109,4 @@ function ProfileDisplay({ profile, className }: ProfileDisplayProps) {
   );
 }
 
-export type { ProfileDisplayProps };
 export { ProfileDisplay };

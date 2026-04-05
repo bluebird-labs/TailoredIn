@@ -8,7 +8,7 @@ import {
   useEffect
 } from 'react';
 import { cn } from '@/lib/utils';
-import { EditableSectionProvider, useEditableSection } from './EditableSectionContext.js';
+import { useEditableSection } from './EditableSectionContext.js';
 import { SaveBar } from './SaveBar.js';
 
 // Sub-components used as slot markers
@@ -148,5 +148,4 @@ const EditableSection = Object.assign(EditableSectionInner, {
   Editor: EditableSectionEditor
 });
 
-export type { EditableSectionProps };
-export { EditableSection, EditableSectionProvider };
+export { EditableSection };

@@ -17,5 +17,4 @@ function EducationCardContent({ education }: EducationCardContentProps) {
   );
 }
 
-export type { EducationCardContentProps };
 export { EducationCardContent };

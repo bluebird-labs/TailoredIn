@@ -17,5 +17,4 @@ function HeadlineCardContent({ headline }: HeadlineCardContentProps) {
   );
 }
 
-export type { HeadlineCardContentProps };
 export { HeadlineCardContent };
