@@ -9,6 +9,7 @@ import {
   ExperienceId,
   type ExperienceRepository
 } from '@tailoredin/domain';
+import { Company as OrmCompany } from '../db/entities/companies/Company.js';
 import { Accomplishment as OrmAccomplishment } from '../db/entities/experience/Accomplishment.js';
 import { Experience as OrmExperience } from '../db/entities/experience/Experience.js';
 import { Profile } from '../db/entities/profile/Profile.js';
@@ -39,6 +40,9 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       existing.title = experience.title;
       existing.companyName = experience.companyName;
       existing.companyWebsite = experience.companyWebsite;
+      existing.company = experience.companyId
+        ? this.orm.em.getReference(OrmCompany, experience.companyId)
+        : null;
       existing.location = experience.location;
       existing.startDate = experience.startDate;
       existing.endDate = experience.endDate;
@@ -55,6 +59,9 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         title: experience.title,
         companyName: experience.companyName,
         companyWebsite: experience.companyWebsite,
+        company: experience.companyId
+          ? this.orm.em.getReference(OrmCompany, experience.companyId)
+          : null,
         location: experience.location,
         startDate: experience.startDate,
         endDate: experience.endDate,
@@ -126,8 +133,12 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   private async toDomain(orm: OrmExperience): Promise<DomainExperience> {
     const [row] = await this.orm.em
       .getConnection()
-      .execute<[{ profile_id: string }]>('SELECT profile_id FROM experiences WHERE id = ?', [orm.id]);
+      .execute<[{ profile_id: string; company_id: string | null }]>(
+        'SELECT profile_id, company_id FROM experiences WHERE id = ?',
+        [orm.id]
+      );
     const profileId = row.profile_id;
+    const companyId = row.company_id;
 
     const ormAccomplishments = await this.orm.em.find(
       OrmAccomplishment,
@@ -154,6 +165,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       title: orm.title,
       companyName: orm.companyName,
       companyWebsite: orm.companyWebsite,
+      companyId,
       location: orm.location,
       startDate: orm.startDate,
       endDate: orm.endDate,

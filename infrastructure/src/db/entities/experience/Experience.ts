@@ -2,6 +2,7 @@ import { Collection, type Ref } from '@mikro-orm/core';
 import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
+import { Company } from '../companies/Company.js';
 import { Profile } from '../profile/Profile.js';
 import { Accomplishment } from './Accomplishment.js';
 
@@ -11,6 +12,7 @@ type ExperienceProps = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  company: Ref<Company> | Company | null;
   location: string;
   startDate: string;
   endDate: string;
@@ -36,6 +38,9 @@ export class Experience extends BaseEntity {
 
   @Property({ name: 'company_website', type: 'text', nullable: true })
   public companyWebsite: string | null;
+
+  @ManyToOne(() => Company, { lazy: true, name: 'company_id', nullable: true })
+  public company: Ref<Company> | Company | null;
 
   @Property({ name: 'location', type: 'text' })
   public location: string;
@@ -66,6 +71,7 @@ export class Experience extends BaseEntity {
     this.title = props.title;
     this.companyName = props.companyName;
     this.companyWebsite = props.companyWebsite;
+    this.company = props.company;
     this.location = props.location;
     this.startDate = props.startDate;
     this.endDate = props.endDate;
