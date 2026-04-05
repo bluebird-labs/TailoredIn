@@ -111,21 +111,27 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
     const candidate = candidates[selectedIndex];
     const url = candidate.website;
     if (!url) {
-      toast.error('Selected company has no website URL');
+      setFields({ ...emptyState(), name: candidate.name });
+      setStep('form');
       return;
     }
 
     setStep('enriching');
     enrichCompany.mutate(
-      { url },
+      { url, context: candidate.name },
       {
         onSuccess: result => {
-          setFields(enrichmentToFormState(result));
+          const formState = enrichmentToFormState(result);
+          if (!formState.name && candidate.name) {
+            formState.name = candidate.name;
+          }
+          setFields(formState);
           setStep('form');
         },
         onError: () => {
-          toast.error('Failed to enrich company data');
-          setStep('search');
+          toast.error('Enrichment failed — you can fill in the details manually.');
+          setFields({ ...emptyState(), name: candidate.name, website: url });
+          setStep('form');
         }
       }
     );

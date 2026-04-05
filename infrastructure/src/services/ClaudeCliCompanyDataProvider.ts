@@ -17,6 +17,7 @@ const companyEnrichmentSchema = z.object({
   description: z.string().nullable(),
   website: z.string().nullable(),
   linkedinLink: z.string().nullable(),
+  logoUrl: z.string().nullable(),
   businessType: z.enum(Object.values(BusinessType) as [string, ...string[]]).nullable(),
   industry: z.enum(Object.values(Industry) as [string, ...string[]]).nullable(),
   stage: z.enum(Object.values(CompanyStage) as [string, ...string[]]).nullable()
@@ -64,55 +65,66 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
   public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
     this.log.info(`Enriching company data for URL: "${url}"`);
 
+    const startTime = Date.now();
     const result = await this.provider.request(new CompanyEnrichmentRequest(url, context));
+    const duration = Date.now() - startTime;
 
     if (result.isErr) {
-      this.log.error(`Company enrichment failed | url="${url}" error="${result.error.message}"`);
+      const exitCode = result.error.exitCode ?? 'unknown';
+      this.log.error(
+        `Company enrichment failed | url="${url}" exitCode=${exitCode} duration=${duration}ms error="${result.error.message}"`
+      );
       throw new ExternalServiceError('Claude CLI', 'Company enrichment failed');
     }
 
     const enrichment: CompanyEnrichmentResult = {
       ...result.value,
-      logoUrl: null,
+      website: this.normalizeUrl(result.value.website),
+      linkedinLink: this.normalizeUrl(result.value.linkedinLink),
+      logoUrl: result.value.logoUrl,
       businessType: result.value.businessType as BusinessType | null,
       industry: result.value.industry as Industry | null,
       stage: result.value.stage as CompanyStage | null
     };
 
-    const validated = await this.validateUrls(enrichment);
-    const enriched = await this.applyLogoFromDomain(validated);
-    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}"`);
+    const enriched = await this.applyLogo(enrichment);
+    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}" duration=${duration}ms`);
     return enriched;
   }
 
-  private async validateUrls(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
-    const websiteUrl = this.normalizeUrl(result.website);
-    const linkedinUrl = this.normalizeUrl(result.linkedinLink);
+  private async applyLogo(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
+    if (result.logoUrl) {
+      this.log.debug(`Using LLM-provided logo URL: "${result.logoUrl}"`);
+      return result;
+    }
 
-    const [websiteOk, linkedinOk] = await Promise.all([
-      websiteUrl ? this.urlExists(websiteUrl) : false,
-      linkedinUrl ? this.urlExists(linkedinUrl) : false
-    ]);
-
-    return {
-      ...result,
-      website: websiteOk ? websiteUrl : null,
-      linkedinLink: linkedinOk ? linkedinUrl : null
-    };
-  }
-
-  private async applyLogoFromDomain(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
     const websiteUrl = result.website;
     if (!websiteUrl) return result;
 
+    let domain: string;
     try {
-      const domain = new URL(websiteUrl).hostname;
-      const logoUrl = `https://logos.hunter.io/${domain}`;
-      const exists = await this.urlExists(logoUrl);
-      return { ...result, logoUrl: exists ? logoUrl : null };
+      domain = new URL(websiteUrl).hostname;
     } catch {
+      this.log.debug(`Cannot extract domain from website URL: "${websiteUrl}"`);
       return result;
     }
+
+    const providers = [
+      { name: 'Hunter', url: `https://logos.hunter.io/${domain}` },
+      { name: 'CompanyEnrich', url: `https://companyenrich.com/api/logo/${domain}` }
+    ];
+
+    for (const provider of providers) {
+      this.log.debug(`Trying logo provider ${provider.name} for domain "${domain}"`);
+      const isImage = await this.urlReturnsImage(provider.url);
+      if (isImage) {
+        this.log.debug(`Logo found via ${provider.name}: "${provider.url}"`);
+        return { ...result, logoUrl: provider.url };
+      }
+    }
+
+    this.log.debug(`No logo found for domain "${domain}" from any provider`);
+    return result;
   }
 
   private normalizeUrl(url: string | null): string | null {
@@ -123,10 +135,11 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     return `https://${trimmed}`;
   }
 
-  private async urlExists(url: string): Promise<boolean> {
+  private async urlReturnsImage(url: string): Promise<boolean> {
     try {
       const response = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
-      return response.ok;
+      const contentType = response.headers.get('content-type') ?? '';
+      return response.ok && contentType.startsWith('image/');
     } catch {
       return false;
     }
