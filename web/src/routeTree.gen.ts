@@ -57,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
   '/headlines/': typeof HeadlinesIndexRoute
@@ -66,6 +67,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/education': typeof EducationIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
   '/headlines': typeof HeadlinesIndexRoute
@@ -76,6 +78,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
   '/headlines/': typeof HeadlinesIndexRoute
@@ -87,6 +90,7 @@ export interface FileRouteTypes {
     | '/'
     | '/companies/$companyId'
     | '/companies/'
+    | '/companies/$companyId'
     | '/education/'
     | '/experiences/'
     | '/headlines/'
@@ -96,6 +100,7 @@ export interface FileRouteTypes {
     | '/'
     | '/companies/$companyId'
     | '/companies'
+    | '/companies/$companyId'
     | '/education'
     | '/experiences'
     | '/headlines'
@@ -105,6 +110,7 @@ export interface FileRouteTypes {
     | '/'
     | '/companies/$companyId'
     | '/companies/'
+    | '/companies/$companyId'
     | '/education/'
     | '/experiences/'
     | '/headlines/'
@@ -115,6 +121,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
+  CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   EducationIndexRoute: typeof EducationIndexRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
   HeadlinesIndexRoute: typeof HeadlinesIndexRoute
@@ -179,6 +186,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
+  CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   EducationIndexRoute: EducationIndexRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,
   HeadlinesIndexRoute: HeadlinesIndexRoute,
