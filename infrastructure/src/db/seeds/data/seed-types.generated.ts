@@ -32,17 +32,3 @@ export interface JobRow {
   applicants_count: number | null;
   company_id: string;
 }
-
-export interface CompanyRow {
-  created_at: string;
-  updated_at: string;
-  id: string;
-  name: string;
-  website: string | null;
-  logo_url: string | null;
-  linkedin_link: string;
-  ignored: boolean;
-  business_type: string | null;
-  industry: string | null;
-  stage: string | null;
-}
