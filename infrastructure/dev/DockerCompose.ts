@@ -4,7 +4,16 @@ import type { DevContext } from './DevContext.js';
 const log = Logger.create('docker-compose');
 
 function composeArgs(ctx: DevContext): string[] {
-  const args = ['docker', 'compose', '-f', ctx.composeFile, '-p', ctx.projectName, '--project-directory', ctx.composeProjectDir];
+  const args = [
+    'docker',
+    'compose',
+    '-f',
+    ctx.composeFile,
+    '-p',
+    ctx.projectName,
+    '--project-directory',
+    ctx.composeProjectDir
+  ];
 
   // In worktree mode, prevent docker compose from reading the repo root's .env
   // (which contains main-branch ports). Worktree env vars are set via process.env.

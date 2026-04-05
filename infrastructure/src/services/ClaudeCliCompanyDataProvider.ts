@@ -64,41 +64,31 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
   public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
     this.log.info(`Enriching company data for URL: "${url}"`);
 
+    const startTime = Date.now();
     const result = await this.provider.request(new CompanyEnrichmentRequest(url, context));
+    const duration = Date.now() - startTime;
 
     if (result.isErr) {
-      this.log.error(`Company enrichment failed | url="${url}" error="${result.error.message}"`);
+      const exitCode = result.error.exitCode ?? 'unknown';
+      this.log.error(
+        `Company enrichment failed | url="${url}" exitCode=${exitCode} duration=${duration}ms error="${result.error.message}"`
+      );
       throw new ExternalServiceError('Claude CLI', 'Company enrichment failed');
     }
 
     const enrichment: CompanyEnrichmentResult = {
       ...result.value,
+      website: this.normalizeUrl(result.value.website),
+      linkedinLink: this.normalizeUrl(result.value.linkedinLink),
       logoUrl: null,
       businessType: result.value.businessType as BusinessType | null,
       industry: result.value.industry as Industry | null,
       stage: result.value.stage as CompanyStage | null
     };
 
-    const validated = await this.validateUrls(enrichment);
-    const enriched = await this.applyLogoFromDomain(validated);
-    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}"`);
+    const enriched = await this.applyLogoFromDomain(enrichment);
+    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}" duration=${duration}ms`);
     return enriched;
-  }
-
-  private async validateUrls(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
-    const websiteUrl = this.normalizeUrl(result.website);
-    const linkedinUrl = this.normalizeUrl(result.linkedinLink);
-
-    const [websiteOk, linkedinOk] = await Promise.all([
-      websiteUrl ? this.urlExists(websiteUrl) : false,
-      linkedinUrl ? this.urlExists(linkedinUrl) : false
-    ]);
-
-    return {
-      ...result,
-      website: websiteOk ? websiteUrl : null,
-      linkedinLink: linkedinOk ? linkedinUrl : null
-    };
   }
 
   private async applyLogoFromDomain(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
@@ -108,8 +98,8 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     try {
       const domain = new URL(websiteUrl).hostname;
       const logoUrl = `https://logos.hunter.io/${domain}`;
-      const exists = await this.urlExists(logoUrl);
-      return { ...result, logoUrl: exists ? logoUrl : null };
+      const response = await fetch(logoUrl, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
+      return { ...result, logoUrl: response.ok ? logoUrl : null };
     } catch {
       return result;
     }
@@ -121,14 +111,5 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     if (!trimmed) return null;
     if (/^https?:\/\//i.test(trimmed)) return trimmed;
     return `https://${trimmed}`;
-  }
-
-  private async urlExists(url: string): Promise<boolean> {
-    try {
-      const response = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(5000) });
-      return response.ok;
-    } catch {
-      return false;
-    }
   }
 }
