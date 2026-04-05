@@ -1,6 +1,12 @@
+import { NotFoundError } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import { Education as DomainEducation, EducationId, type EducationRepository } from '@tailoredin/domain';
+import {
+  Education as DomainEducation,
+  EducationId,
+  type EducationRepository,
+  EntityNotFoundError
+} from '@tailoredin/domain';
 import { Education as OrmEducation } from '../db/entities/education/Education.js';
 import { Profile as OrmProfile } from '../db/entities/profile/Profile.js';
 
@@ -14,8 +20,13 @@ export class PostgresEducationRepository implements EducationRepository {
   }
 
   public async findByIdOrFail(id: string): Promise<DomainEducation> {
-    const orm = await this.orm.em.findOneOrFail(OrmEducation, id);
-    return this.toDomain(orm);
+    try {
+      const orm = await this.orm.em.findOneOrFail(OrmEducation, id);
+      return this.toDomain(orm);
+    } catch (e) {
+      if (e instanceof NotFoundError) throw new EntityNotFoundError('Education', id);
+      throw e;
+    }
   }
 
   public async save(education: DomainEducation): Promise<void> {
@@ -50,9 +61,14 @@ export class PostgresEducationRepository implements EducationRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    const orm = await this.orm.em.findOneOrFail(OrmEducation, id);
-    this.orm.em.remove(orm);
-    await this.orm.em.flush();
+    try {
+      const orm = await this.orm.em.findOneOrFail(OrmEducation, id);
+      this.orm.em.remove(orm);
+      await this.orm.em.flush();
+    } catch (e) {
+      if (e instanceof NotFoundError) throw new EntityNotFoundError('Education', id);
+      throw e;
+    }
   }
 
   private toDomain(orm: OrmEducation): DomainEducation {

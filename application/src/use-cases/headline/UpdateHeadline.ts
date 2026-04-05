@@ -1,4 +1,4 @@
-import { err, type Headline, type HeadlineRepository, ok, type Result } from '@tailoredin/domain';
+import { EntityNotFoundError, err, type Headline, type HeadlineRepository, ok, type Result } from '@tailoredin/domain';
 import type { HeadlineDto } from '../../dtos/HeadlineDto.js';
 
 export type UpdateHeadlineInput = {
@@ -22,8 +22,9 @@ export class UpdateHeadline {
     let headline: Headline;
     try {
       headline = await this.headlineRepository.findByIdOrFail(input.headlineId);
-    } catch {
-      return err(new Error(`Headline not found: ${input.headlineId}`));
+    } catch (e) {
+      if (e instanceof EntityNotFoundError) return err(e);
+      throw e;
     }
 
     headline.label = input.label;

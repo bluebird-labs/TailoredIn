@@ -1,4 +1,11 @@
-import { type Experience, type ExperienceRepository, err, ok, type Result } from '@tailoredin/domain';
+import {
+  EntityNotFoundError,
+  type Experience,
+  type ExperienceRepository,
+  err,
+  ok,
+  type Result
+} from '@tailoredin/domain';
 
 export type DeleteAccomplishmentInput = {
   experienceId: string;
@@ -12,14 +19,16 @@ export class DeleteAccomplishment {
     let experience: Experience;
     try {
       experience = await this.experienceRepository.findByIdOrFail(input.experienceId);
-    } catch {
-      return err(new Error(`Experience not found: ${input.experienceId}`));
+    } catch (e) {
+      if (e instanceof EntityNotFoundError) return err(e);
+      throw e;
     }
 
     try {
       experience.removeAccomplishment(input.accomplishmentId);
-    } catch {
-      return err(new Error(`Accomplishment not found: ${input.accomplishmentId}`));
+    } catch (e) {
+      if (e instanceof EntityNotFoundError) return err(e);
+      throw e;
     }
 
     await this.experienceRepository.save(experience);

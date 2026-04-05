@@ -22,20 +22,32 @@ interface Props {
 export function AccomplishmentListEditor({ experienceId, accomplishments, onDirtyChange }: Props) {
   const updateAccomplishment = useUpdateAccomplishment(experienceId);
 
-  function handleMoveUp(index: number) {
+  async function handleMoveUp(index: number) {
     const current = accomplishments[index];
     const above = accomplishments[index - 1];
     if (!current || !above) return;
-    updateAccomplishment.mutate({ accomplishmentId: current.id, ordinal: above.ordinal });
-    updateAccomplishment.mutate({ accomplishmentId: above.id, ordinal: current.ordinal });
+    try {
+      await Promise.all([
+        updateAccomplishment.mutateAsync({ accomplishmentId: current.id, ordinal: above.ordinal }),
+        updateAccomplishment.mutateAsync({ accomplishmentId: above.id, ordinal: current.ordinal })
+      ]);
+    } catch {
+      toast.error('Failed to reorder accomplishments');
+    }
   }
 
-  function handleMoveDown(index: number) {
+  async function handleMoveDown(index: number) {
     const current = accomplishments[index];
     const below = accomplishments[index + 1];
     if (!current || !below) return;
-    updateAccomplishment.mutate({ accomplishmentId: current.id, ordinal: below.ordinal });
-    updateAccomplishment.mutate({ accomplishmentId: below.id, ordinal: current.ordinal });
+    try {
+      await Promise.all([
+        updateAccomplishment.mutateAsync({ accomplishmentId: current.id, ordinal: below.ordinal }),
+        updateAccomplishment.mutateAsync({ accomplishmentId: below.id, ordinal: current.ordinal })
+      ]);
+    } catch {
+      toast.error('Failed to reorder accomplishments');
+    }
   }
 
   return (

@@ -33,8 +33,14 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
       throw new Error(`Claude CLI failed with exit code ${exitCode}`);
     }
 
-    const parsed = JSON.parse(output);
-    const text = stripCodeFences(parsed.result ?? output);
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(output);
+    } catch (e) {
+      this.log.error(`Failed to parse Claude CLI output: ${output.slice(0, 200)}`);
+      throw new Error(`Claude CLI returned invalid JSON: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    const text = stripCodeFences(typeof parsed.result === 'string' ? parsed.result : output);
 
     const result = this.parseResponse(text);
     const validated = await this.validateUrls(result);
@@ -42,7 +48,13 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
   }
 
   public parseResponse(raw: string): CompanyEnrichmentResult {
-    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    let data: Record<string, unknown>;
+    try {
+      data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    } catch (e) {
+      this.log.error(`Failed to parse enrichment response: ${raw.slice(0, 200)}`);
+      throw new Error(`Invalid enrichment response JSON: ${e instanceof Error ? e.message : String(e)}`);
+    }
 
     return {
       name: typeof data.name === 'string' ? data.name : null,

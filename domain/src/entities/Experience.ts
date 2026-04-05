@@ -1,4 +1,5 @@
 import { AggregateRoot } from '../AggregateRoot.js';
+import { EntityNotFoundError } from '../EntityNotFoundError.js';
 import { ExperienceId } from '../value-objects/ExperienceId.js';
 import { Accomplishment } from './Accomplishment.js';
 
@@ -67,14 +68,14 @@ export class Experience extends AggregateRoot<ExperienceId> {
 
   public removeAccomplishment(accomplishmentId: string): void {
     const index = this.accomplishments.findIndex(a => a.id.value === accomplishmentId);
-    if (index === -1) throw new Error(`Accomplishment not found: ${accomplishmentId}`);
+    if (index === -1) throw new EntityNotFoundError('Accomplishment', accomplishmentId);
     this.accomplishments.splice(index, 1);
     this.updatedAt = new Date();
   }
 
   public findAccomplishmentOrFail(accomplishmentId: string): Accomplishment {
     const acc = this.accomplishments.find(a => a.id.value === accomplishmentId);
-    if (!acc) throw new Error(`Accomplishment not found: ${accomplishmentId}`);
+    if (!acc) throw new EntityNotFoundError('Accomplishment', accomplishmentId);
     return acc;
   }
 

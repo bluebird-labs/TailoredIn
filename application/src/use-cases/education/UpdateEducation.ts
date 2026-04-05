@@ -1,4 +1,11 @@
-import { type Education, type EducationRepository, err, ok, type Result } from '@tailoredin/domain';
+import {
+  type Education,
+  type EducationRepository,
+  EntityNotFoundError,
+  err,
+  ok,
+  type Result
+} from '@tailoredin/domain';
 import type { EducationDto } from '../../dtos/EducationDto.js';
 
 export type UpdateEducationInput = {
@@ -18,8 +25,9 @@ export class UpdateEducation {
     let education: Education;
     try {
       education = await this.educationRepository.findByIdOrFail(input.educationId);
-    } catch {
-      return err(new Error(`Education entry not found: ${input.educationId}`));
+    } catch (e) {
+      if (e instanceof EntityNotFoundError) return err(e);
+      throw e;
     }
 
     education.degreeTitle = input.degreeTitle;

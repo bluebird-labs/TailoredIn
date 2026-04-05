@@ -1,9 +1,11 @@
+import { NotFoundError } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import {
   AccomplishmentId,
   Accomplishment as DomainAccomplishment,
   Experience as DomainExperience,
+  EntityNotFoundError,
   ExperienceId,
   type ExperienceRepository
 } from '@tailoredin/domain';
@@ -16,8 +18,13 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainExperience> {
-    const orm = await this.orm.em.findOneOrFail(OrmExperience, id);
-    return this.toDomain(orm);
+    try {
+      const orm = await this.orm.em.findOneOrFail(OrmExperience, id);
+      return this.toDomain(orm);
+    } catch (e) {
+      if (e instanceof NotFoundError) throw new EntityNotFoundError('Experience', id);
+      throw e;
+    }
   }
 
   public async findAll(): Promise<DomainExperience[]> {
@@ -67,9 +74,14 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    const orm = await this.orm.em.findOneOrFail(OrmExperience, id);
-    this.orm.em.remove(orm);
-    await this.orm.em.flush();
+    try {
+      const orm = await this.orm.em.findOneOrFail(OrmExperience, id);
+      this.orm.em.remove(orm);
+      await this.orm.em.flush();
+    } catch (e) {
+      if (e instanceof NotFoundError) throw new EntityNotFoundError('Experience', id);
+      throw e;
+    }
   }
 
   private async syncAccomplishments(domain: DomainExperience): Promise<void> {

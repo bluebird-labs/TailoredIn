@@ -31,16 +31,31 @@ export class ClaudeCliCompanySearchProvider implements CompanySearchProvider {
       throw new Error(`Claude CLI failed with exit code ${exitCode}`);
     }
 
-    const parsed = JSON.parse(output);
-    const text = stripCodeFences(parsed.result ?? output);
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(output);
+    } catch (e) {
+      this.log.error(`Failed to parse Claude CLI output: ${output.slice(0, 200)}`);
+      throw new Error(`Claude CLI returned invalid JSON: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    const text = stripCodeFences(typeof parsed.result === 'string' ? parsed.result : output);
 
     return this.parseResponse(text);
   }
 
   public parseResponse(raw: string): CompanySearchResult[] {
-    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    let data: unknown;
+    try {
+      data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    } catch (e) {
+      this.log.error(`Failed to parse search response: ${raw.slice(0, 200)}`);
+      throw new Error(`Invalid search response JSON: ${e instanceof Error ? e.message : String(e)}`);
+    }
 
-    if (!Array.isArray(data)) return [];
+    if (!Array.isArray(data)) {
+      this.log.warn(`Unexpected search response shape (expected array): ${typeof data}`);
+      return [];
+    }
 
     return data
       .filter((item: unknown) => typeof item === 'object' && item !== null && 'name' in item)
