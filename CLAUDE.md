@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Core Rules
+
+**ALWAYS DISPLAY FULL PATHS. NEVER USE RELATIVE OR ABBREVIATED PATHS — EVERY FILE PATH SHOWN TO THE USER MUST BE THE COMPLETE, ABSOLUTE PATH.**
+
 ## Workflow: Worktrees for Feature Work
 
 **Never commit feature/milestone work directly to main.** Before starting any milestone step, create a worktree:
