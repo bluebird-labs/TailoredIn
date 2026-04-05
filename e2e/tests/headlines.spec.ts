@@ -35,20 +35,23 @@ test.describe('Headlines Page', () => {
   });
 
   test('edit a headline', async ({ page }) => {
-    // Find the "Full-Stack Developer" card by its content text and click to enter edit mode
-    const card = page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Full-Stack Developer' });
-    await card.click();
+    // Wait for content-first cards (button = display mode), then click to enter edit mode
+    const displayCard = page.locator('button[data-testid^="editable-section-headline-"]').filter({ hasText: 'Full-Stack Developer' });
+    await expect(displayCard).toBeVisible();
 
-    // Now form fields are available — edit the label
-    await card.getByLabel('Label').clear();
-    await card.getByLabel('Label').fill('Distinguished Engineer');
+    // Grab the testid before clicking (the edit div has the same testid)
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
 
-    // SaveBar should appear within the card
-    await card.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
+    // Now in edit mode — section is a div with the same testid
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.getByLabel('Label').clear();
+    await editSection.getByLabel('Label').fill('Distinguished Engineer');
+
+    await editSection.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
-    // After save, section returns to display mode — check content text
-    await expect(card.getByText('Distinguished Engineer')).toBeVisible();
+    await expect(page.getByText('Distinguished Engineer')).toBeVisible();
   });
 
   test('delete a headline', async ({ page }) => {
@@ -61,12 +64,14 @@ test.describe('Headlines Page', () => {
     // After create, new card appears as content text (not an input)
     await expect(page.getByText('Temp Headline')).toBeVisible();
 
-    // Find the card by content text and click to enter edit mode (delete button only visible in edit mode)
-    const card = page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Temp Headline' });
-    await card.click();
+    // Find the display card (button) and click to enter edit mode
+    const displayCard = page.locator('button[data-testid^="editable-section-headline-"]').filter({ hasText: 'Temp Headline' });
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
 
-    // Click the delete button (icon-only button with destructive styling)
-    await card.locator('button.text-destructive').click();
+    // Click the delete button in the edit section (div with same testid)
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');

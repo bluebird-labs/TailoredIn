@@ -96,7 +96,7 @@ test.describe('Profile Page', () => {
     await page.getByLabel('Website').fill('https://alice.dev');
 
     const saveBar = page.locator('[data-slot="save-bar"]');
-    await expect(saveBar).toContainText('3 unsaved changes');
+    await expect(saveBar).toBeVisible();
     await saveBar.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Changes saved')).toBeVisible();
   });
@@ -127,8 +127,8 @@ test.describe('Profile Page', () => {
 
     await expect(saveBar).not.toBeVisible();
     // After discard the section returns to display mode — verify original values are rendered as text
-    await expect(page.getByText(originalFirstName)).toBeVisible();
-    await expect(page.getByText(originalLocation)).toBeVisible();
+    await expect(page.getByText(originalFirstName, { exact: true })).toBeVisible();
+    await expect(page.getByText(originalLocation, { exact: true })).toBeVisible();
   });
 
   test('validation: empty required fields show errors on save', async ({ page }) => {

@@ -5,7 +5,8 @@ import {
   type ReactElement,
   type ReactNode,
   useCallback,
-  useEffect
+  useEffect,
+  useRef
 } from 'react';
 import { cn } from '@/lib/utils';
 import { useEditableSection } from './EditableSectionContext.js';
@@ -60,18 +61,29 @@ function EditableSectionInner({
     }
   });
 
+  const saveAttemptedRef = useRef(false);
+
   const handleSave = useCallback(async () => {
-    try {
-      await onSave();
-    } finally {
-      release();
-    }
-  }, [onSave, release]);
+    saveAttemptedRef.current = true;
+    await onSave();
+    // Do NOT release here — the section auto-closes when isDirty becomes false
+    // (after a successful save updates savedState via query invalidation).
+    // This keeps the section open on validation failures so the user sees errors.
+  }, [onSave]);
 
   const handleDiscard = useCallback(() => {
+    saveAttemptedRef.current = false;
     onDiscard();
     release();
   }, [onDiscard, release]);
+
+  // Auto-close when isDirty transitions to false after a save attempt (save succeeded)
+  useEffect(() => {
+    if (isEditing && !isDirty && saveAttemptedRef.current) {
+      saveAttemptedRef.current = false;
+      release();
+    }
+  }, [isEditing, isDirty, release]);
 
   const handleDisplayClick = useCallback(() => {
     requestEdit();

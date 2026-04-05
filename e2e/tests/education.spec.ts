@@ -39,20 +39,23 @@ test.describe('Education Page', () => {
   });
 
   test('edit an education', async ({ page }) => {
-    // Find the Stanford card by content text and click to enter edit mode
-    const card = page.locator('[data-testid^="editable-section-education-"]').filter({ hasText: 'Stanford University' });
-    await card.click();
+    // Wait for content-first cards to load (button = display mode)
+    const displayCard = page.locator('button[data-testid^="editable-section-education-"]').filter({ hasText: 'Stanford University' });
+    await expect(displayCard).toBeVisible();
 
-    // Now form fields are available — edit the degree
-    const degreeInput = card.getByLabel('Degree');
-    await degreeInput.clear();
-    await degreeInput.fill('B.A. Computer Science');
+    // Grab the testid before clicking (we'll need it to find the edit div)
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
 
-    await card.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
+    // Now in edit mode — the section is a div with the same testid
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.getByLabel('Degree').clear();
+    await editSection.getByLabel('Degree').fill('B.A. Computer Science');
+
+    await editSection.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
-    // After save, section returns to display mode — check content text
-    await expect(card.getByText('B.A. Computer Science')).toBeVisible();
+    await expect(page.getByText('B.A. Computer Science')).toBeVisible();
   });
 
   test('delete an education', async ({ page }) => {
@@ -66,12 +69,14 @@ test.describe('Education Page', () => {
     // After create, new card appears as content text (not an input)
     await expect(page.getByText('Temp University')).toBeVisible();
 
-    // Find the card by content text and click to enter edit mode (delete button only visible in edit mode)
-    const card = page.locator('[data-testid^="editable-section-education-"]').filter({ hasText: 'Temp University' });
-    await card.click();
+    // Find the display card (button) and click to enter edit mode
+    const displayCard = page.locator('button[data-testid^="editable-section-education-"]').filter({ hasText: 'Temp University' });
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
 
-    // Click the delete button (icon-only button with destructive styling)
-    await card.locator('button.text-destructive').click();
+    // Click the delete button in the edit section (div with same testid)
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');
