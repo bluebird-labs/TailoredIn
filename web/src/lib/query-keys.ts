@@ -13,7 +13,8 @@ export const queryKeys = {
   },
   experiences: {
     all: ['experiences'] as const,
-    list: () => [...queryKeys.experiences.all, 'list'] as const
+    list: () => [...queryKeys.experiences.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.experiences.all, 'detail', id] as const
   },
   accomplishments: {
     all: ['accomplishments'] as const,
@@ -21,7 +22,8 @@ export const queryKeys = {
   },
   companies: {
     all: ['companies'] as const,
-    list: () => [...queryKeys.companies.all, 'list'] as const
+    list: () => [...queryKeys.companies.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.companies.all, 'detail', id] as const
   },
   jobDescriptions: {
     all: ['jobDescriptions'] as const,

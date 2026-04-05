@@ -38,6 +38,18 @@ export function useExperiences() {
   });
 }
 
+export function useExperience(id: string) {
+  return useQuery({
+    queryKey: queryKeys.experiences.detail(id),
+    queryFn: async () => {
+      const segment = api.experiences as AnyRouteSegment;
+      const { data, error } = await segment({ id }).get();
+      if (error) throw new Error('Failed to fetch experience');
+      return data?.data as Experience;
+    }
+  });
+}
+
 export function useCreateExperience() {
   const queryClient = useQueryClient();
   return useMutation({

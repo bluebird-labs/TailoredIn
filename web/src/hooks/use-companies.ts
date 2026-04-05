@@ -44,6 +44,18 @@ export function useCompanies() {
   });
 }
 
+export function useCompany(id: string) {
+  return useQuery({
+    queryKey: queryKeys.companies.detail(id),
+    queryFn: async () => {
+      const segment = api.companies as AnyRouteSegment;
+      const { data, error } = await segment({ id }).get();
+      if (error) throw new Error('Failed to fetch company');
+      return data?.data as Company;
+    }
+  });
+}
+
 export function useDiscoverCompanies() {
   return useMutation({
     mutationFn: async (input: { query: string }) => {
