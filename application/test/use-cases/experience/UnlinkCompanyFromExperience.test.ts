@@ -1,10 +1,5 @@
 import { describe, expect, mock, test } from 'bun:test';
-import {
-  EntityNotFoundError,
-  Experience,
-  ExperienceId,
-  type ExperienceRepository
-} from '@tailoredin/domain';
+import { EntityNotFoundError, Experience, ExperienceId, type ExperienceRepository } from '@tailoredin/domain';
 import { UnlinkCompanyFromExperience } from '../../../src/use-cases/experience/UnlinkCompanyFromExperience.js';
 
 const makeLinkedExperience = () =>
@@ -48,7 +43,9 @@ describe('UnlinkCompanyFromExperience', () => {
 
   test('returns error when experience not found', async () => {
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => { throw new EntityNotFoundError('Experience', 'exp-1'); }),
+      findByIdOrFail: mock(() => {
+        throw new EntityNotFoundError('Experience', 'exp-1');
+      }),
       findAll: mock(() => Promise.resolve([])),
       save: mock(() => Promise.resolve()),
       delete: mock(() => Promise.resolve())

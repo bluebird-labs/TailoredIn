@@ -2,10 +2,10 @@ import { describe, expect, mock, test } from 'bun:test';
 import {
   Company,
   CompanyId,
+  type CompanyRepository,
   EntityNotFoundError,
   Experience,
   ExperienceId,
-  type CompanyRepository,
   type ExperienceRepository
 } from '@tailoredin/domain';
 import { LinkCompanyToExperience } from '../../../src/use-cases/experience/LinkCompanyToExperience.js';
@@ -71,7 +71,9 @@ describe('LinkCompanyToExperience', () => {
 
   test('returns error when experience not found', async () => {
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => { throw new EntityNotFoundError('Experience', 'exp-1'); }),
+      findByIdOrFail: mock(() => {
+        throw new EntityNotFoundError('Experience', 'exp-1');
+      }),
       findAll: mock(() => Promise.resolve([])),
       save: mock(() => Promise.resolve()),
       delete: mock(() => Promise.resolve())

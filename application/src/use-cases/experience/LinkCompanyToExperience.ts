@@ -1,7 +1,7 @@
 import {
   CompanyId,
-  EntityNotFoundError,
   type CompanyRepository,
+  EntityNotFoundError,
   type Experience,
   type ExperienceRepository,
   err,

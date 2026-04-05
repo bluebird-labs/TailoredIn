@@ -151,7 +151,8 @@ container.bind({
 });
 container.bind({
   provide: DI.Experience.LinkCompany,
-  useFactory: () => new LinkCompanyToExperience(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
+  useFactory: () =>
+    new LinkCompanyToExperience(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
 });
 container.bind({
   provide: DI.Experience.UnlinkCompany,

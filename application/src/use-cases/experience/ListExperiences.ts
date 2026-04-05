@@ -1,7 +1,13 @@
-import { CompanyId, type Accomplishment, type CompanyRepository, type Experience, type ExperienceRepository } from '@tailoredin/domain';
-import type { AccomplishmentDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
+import {
+  type Accomplishment,
+  CompanyId,
+  type CompanyRepository,
+  type Experience,
+  type ExperienceRepository
+} from '@tailoredin/domain';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
+import type { AccomplishmentDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
 
 export class ListExperiences {
   public constructor(
