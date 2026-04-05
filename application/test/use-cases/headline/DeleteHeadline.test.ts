@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { HeadlineRepository } from '@tailoredin/domain';
+import { EntityNotFoundError, type HeadlineRepository } from '@tailoredin/domain';
 import { DeleteHeadline } from '../../../src/use-cases/headline/DeleteHeadline.js';
 
 function mockHeadlineRepo(shouldThrow = false): HeadlineRepository {
@@ -10,7 +10,7 @@ function mockHeadlineRepo(shouldThrow = false): HeadlineRepository {
     findAll: async () => [],
     save: async () => {},
     delete: async (id: string) => {
-      if (shouldThrow) throw new Error(`Headline not found: ${id}`);
+      if (shouldThrow) throw new EntityNotFoundError('Headline', id);
     }
   };
 }

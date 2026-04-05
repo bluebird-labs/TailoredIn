@@ -103,5 +103,11 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
-await Promise.race([apiProc.exited, webProc.exited]);
+const exitCode = await Promise.race([
+  apiProc.exited.then(code => ({ process: 'API', code })),
+  webProc.exited.then(code => ({ process: 'Web', code }))
+]);
+if (exitCode.code !== 0) {
+  log.error(`${exitCode.process} server exited with code ${exitCode.code}`);
+}
 shutdown();

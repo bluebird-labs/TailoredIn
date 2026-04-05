@@ -2,6 +2,7 @@
 export { AggregateRoot } from './AggregateRoot.js';
 export type { DomainEvent } from './DomainEvent.js';
 export { Entity } from './Entity.js';
+export { EntityNotFoundError } from './EntityNotFoundError.js';
 // Entities
 export type { AccomplishmentCreateProps } from './entities/Accomplishment.js';
 export { Accomplishment } from './entities/Accomplishment.js';

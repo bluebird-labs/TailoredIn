@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { Headline, HeadlineId, type HeadlineRepository } from '@tailoredin/domain';
+import { EntityNotFoundError, Headline, HeadlineId, type HeadlineRepository } from '@tailoredin/domain';
 import { UpdateHeadline } from '../../../src/use-cases/headline/UpdateHeadline.js';
 
 const NOW = new Date('2025-01-01');
@@ -18,7 +18,7 @@ function makeHeadline(label: string): Headline {
 function mockHeadlineRepo(headline?: Headline, onSave?: (h: Headline) => void): HeadlineRepository {
   return {
     findByIdOrFail: async (id: string) => {
-      if (!headline || headline.id.value !== id) throw new Error(`Headline not found: ${id}`);
+      if (!headline || headline.id.value !== id) throw new EntityNotFoundError('Headline', id);
       return headline;
     },
     findAll: async () => (headline ? [headline] : []),

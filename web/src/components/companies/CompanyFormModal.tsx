@@ -147,18 +147,20 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
       stage: current.stage || null
     };
 
-    const mutation = isEdit
-      ? updateCompany.mutateAsync({ id: company.id, ...payload })
-      : createCompany.mutateAsync(payload);
-
-    mutation.then(
-      () => {
+    const options = {
+      onSuccess: () => {
         resetAll();
         onOpenChange(false);
         toast.success(isEdit ? 'Company updated' : 'Company created');
       },
-      () => toast.error(isEdit ? 'Failed to update company' : 'Failed to create company')
-    );
+      onError: () => toast.error(isEdit ? 'Failed to update company' : 'Failed to create company')
+    };
+
+    if (isEdit) {
+      updateCompany.mutate({ id: company.id, ...payload }, options);
+    } else {
+      createCompany.mutate(payload, options);
+    }
   }
 
   function handleDiscard() {

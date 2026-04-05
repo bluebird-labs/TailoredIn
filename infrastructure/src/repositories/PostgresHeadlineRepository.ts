@@ -1,7 +1,12 @@
+import { NotFoundError } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import type { HeadlineRepository } from '@tailoredin/domain';
-import { Headline as DomainHeadline, HeadlineId } from '@tailoredin/domain';
+import {
+  Headline as DomainHeadline,
+  EntityNotFoundError,
+  HeadlineId,
+  type HeadlineRepository
+} from '@tailoredin/domain';
 import { Headline as OrmHeadline } from '../db/entities/headline/Headline.js';
 
 @injectable()
@@ -9,8 +14,13 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<DomainHeadline> {
-    const orm = await this.orm.em.findOneOrFail(OrmHeadline, id);
-    return this.toDomain(orm);
+    try {
+      const orm = await this.orm.em.findOneOrFail(OrmHeadline, id);
+      return this.toDomain(orm);
+    } catch (e) {
+      if (e instanceof NotFoundError) throw new EntityNotFoundError('Headline', id);
+      throw e;
+    }
   }
 
   public async findAll(): Promise<DomainHeadline[]> {
@@ -42,9 +52,14 @@ export class PostgresHeadlineRepository implements HeadlineRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    const orm = await this.orm.em.findOneOrFail(OrmHeadline, id);
-    this.orm.em.remove(orm);
-    await this.orm.em.flush();
+    try {
+      const orm = await this.orm.em.findOneOrFail(OrmHeadline, id);
+      this.orm.em.remove(orm);
+      await this.orm.em.flush();
+    } catch (e) {
+      if (e instanceof NotFoundError) throw new EntityNotFoundError('Headline', id);
+      throw e;
+    }
   }
 
   private toDomain(orm: OrmHeadline): DomainHeadline {

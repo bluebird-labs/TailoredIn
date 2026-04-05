@@ -1,4 +1,4 @@
-import { type EducationRepository, err, ok, type Result } from '@tailoredin/domain';
+import { type EducationRepository, EntityNotFoundError, err, ok, type Result } from '@tailoredin/domain';
 
 export type DeleteEducationInput = {
   educationId: string;
@@ -11,8 +11,9 @@ export class DeleteEducation {
     try {
       await this.educationRepository.delete(input.educationId);
       return ok(undefined);
-    } catch (error) {
-      return err(error instanceof Error ? error : new Error(String(error)));
+    } catch (e) {
+      if (e instanceof EntityNotFoundError) return err(e);
+      throw e;
     }
   }
 }
