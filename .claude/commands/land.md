@@ -67,12 +67,13 @@ Then follow the matching flow exactly.
    ```
    If rebase conflicts occur, STOP and ask for help.
 
-2. **Switch to main and fast-forward merge:**
+2. **Switch to main, pull latest, and fast-forward merge:**
    ```
    git checkout main
+   git pull origin main
    git merge <feature-branch> --ff-only
    ```
-   `--ff-only` ensures a clean fast-forward after rebase. If it fails, STOP and ask for help.
+   `git pull` ensures local main is up to date with remote before merging. `--ff-only` ensures a clean fast-forward after rebase. If either fails, STOP and ask for help.
 
 3. **Push main:**
    ```

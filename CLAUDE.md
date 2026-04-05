@@ -6,18 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **ALWAYS DISPLAY FULL PATHS. NEVER USE RELATIVE OR ABBREVIATED PATHS — EVERY FILE PATH SHOWN TO THE USER MUST BE THE COMPLETE, ABSOLUTE PATH.**
 
-## Workflow: Worktrees for Feature Work
-
-**Never commit feature/milestone work directly to main.** Before starting any milestone step, create a worktree:
-
-```bash
-git worktree add .claude/worktrees/<name> -b feat/<branch-name>
-```
-
-Do all work inside that worktree. When implementation is complete and all checks pass, run `/land` to rebase on main, open a PR, wait for CI, and merge.
-
-**Always commit `docs/`:** Any files created or modified under `docs/` (specs, design docs, plans) must be included in commits — never leave them as untracked.
-
 ## Architecture: DDD / Onion Architecture
 
 Bun monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `core/` package.
@@ -128,6 +116,9 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 **Test runners**: `bun:test` (unit + integration). Integration tests in `infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `e2e/` use `@playwright/test`.
 
 ## Session Hygiene
+
+### Docs must be committed
+Any files created or modified under `docs/` (specs, design docs, plans) must be included in commits — never leave them as untracked.
 
 ### Unstaged files
 Before ending a session, run `git status`. If there are unstaged or untracked files, ask the user what to do with each (commit, stash, or discard). Never leave files dangling silently.

@@ -32,6 +32,8 @@ After all checks pass, tell the user:
 
 ### Step 2 — Start the dev environment
 
+**Port & volume stability:** Throughout this QA session, maintain the same ports and Docker volume. Never run `bun wt:down` to tear down and recreate — use `bun wt:fresh` if a restart is needed, which preserves the same port allocations and Docker volume.
+
 **If the session already exists** (`.wt-session.json` is present), read it:
 ```
 cat .wt-session.json
@@ -41,7 +43,7 @@ Then check if the API is responding:
 curl -s -o /dev/null -w "%{http_code}" http://localhost:<apiPort>/
 ```
 - If the API responds (any HTTP status): skip to Step 3 using the existing ports.
-- If the API does not respond: run `bun wt:fresh` in the background to restart cleanly, then continue below.
+- If the API does not respond: run `bun wt:fresh` in the background to restart cleanly (preserves ports and volume), then continue below.
 
 **If the session does not exist**, start the environment:
 
