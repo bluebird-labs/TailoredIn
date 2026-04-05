@@ -1,10 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { ProfileDisplay } from '@/components/resume/profile/ProfileDisplay.js';
 import { EditableField } from '@/components/shared/EditableField.js';
+import { EditableSection } from '@/components/shared/EditableSection.js';
+import { EditableSectionProvider } from '@/components/shared/EditableSectionContext.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
-import { SaveBar } from '@/components/shared/SaveBar.js';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import { useNavGuard } from '@/hooks/use-nav-guard.js';
 import { useProfile, useUpdateProfile } from '@/hooks/use-profile';
@@ -90,7 +92,7 @@ function ProfileForm({ profile }: { readonly profile: ProfileData }) {
     ]
   );
 
-  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
+  const { current, setField, isDirtyField, isDirty, reset } = useDirtyTracking(savedState);
 
   useNavGuard({ isDirty });
 
@@ -122,99 +124,115 @@ function ProfileForm({ profile }: { readonly profile: ProfileData }) {
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader />
+    <EditableSectionProvider>
+      <div className="space-y-6">
+        <PageHeader />
 
-      <div className="space-y-4 max-w-lg">
-        <div className="grid grid-cols-2 gap-4">
-          <EditableField
-            type="text"
-            label="First Name"
-            required
-            value={current.firstName}
-            onChange={v => setField('firstName', v)}
-            isDirty={isDirtyField('firstName')}
-            error={errors.firstName}
-            disabled={updateProfile.isPending}
-          />
-          <EditableField
-            type="text"
-            label="Last Name"
-            required
-            value={current.lastName}
-            onChange={v => setField('lastName', v)}
-            isDirty={isDirtyField('lastName')}
-            error={errors.lastName}
-            disabled={updateProfile.isPending}
-          />
+        <div className="max-w-xl">
+          <EditableSection
+            sectionId="profile"
+            onSave={handleSave}
+            onDiscard={reset}
+            isDirty={isDirty}
+            isSaving={updateProfile.isPending}
+          >
+            <EditableSection.Display>
+              <ProfileDisplay profile={profile} />
+            </EditableSection.Display>
+
+            <EditableSection.Editor>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <EditableField
+                    type="text"
+                    label="First Name"
+                    required
+                    value={current.firstName}
+                    onChange={v => setField('firstName', v)}
+                    isDirty={isDirtyField('firstName')}
+                    error={errors.firstName}
+                    disabled={updateProfile.isPending}
+                  />
+                  <EditableField
+                    type="text"
+                    label="Last Name"
+                    required
+                    value={current.lastName}
+                    onChange={v => setField('lastName', v)}
+                    isDirty={isDirtyField('lastName')}
+                    error={errors.lastName}
+                    disabled={updateProfile.isPending}
+                  />
+                </div>
+
+                <EditableField
+                  type="text"
+                  label="Email"
+                  required
+                  value={current.email}
+                  onChange={v => setField('email', v)}
+                  isDirty={isDirtyField('email')}
+                  error={errors.email}
+                  disabled={updateProfile.isPending}
+                />
+                <EditableField
+                  type="text"
+                  label="Phone"
+                  value={current.phone}
+                  onChange={v => setField('phone', v)}
+                  isDirty={isDirtyField('phone')}
+                  disabled={updateProfile.isPending}
+                />
+                <EditableField
+                  type="text"
+                  label="Location"
+                  value={current.location}
+                  onChange={v => setField('location', v)}
+                  isDirty={isDirtyField('location')}
+                  disabled={updateProfile.isPending}
+                />
+                <EditableField
+                  type="text"
+                  label="LinkedIn"
+                  value={current.linkedinUrl}
+                  onChange={v => setField('linkedinUrl', v)}
+                  isDirty={isDirtyField('linkedinUrl')}
+                  placeholder="https://linkedin.com/in/..."
+                  disabled={updateProfile.isPending}
+                />
+                <EditableField
+                  type="text"
+                  label="GitHub"
+                  value={current.githubUrl}
+                  onChange={v => setField('githubUrl', v)}
+                  isDirty={isDirtyField('githubUrl')}
+                  placeholder="https://github.com/..."
+                  disabled={updateProfile.isPending}
+                />
+                <EditableField
+                  type="text"
+                  label="Website"
+                  value={current.websiteUrl}
+                  onChange={v => setField('websiteUrl', v)}
+                  isDirty={isDirtyField('websiteUrl')}
+                  placeholder="https://..."
+                  disabled={updateProfile.isPending}
+                />
+                <EditableField
+                  type="textarea"
+                  label="About"
+                  value={current.about}
+                  onChange={v => setField('about', v)}
+                  isDirty={isDirtyField('about')}
+                  rows={5}
+                  placeholder="A narrative description of your professional identity..."
+                  disabled={updateProfile.isPending}
+                />
+              </div>
+            </EditableSection.Editor>
+          </EditableSection>
         </div>
-
-        <EditableField
-          type="text"
-          label="Email"
-          required
-          value={current.email}
-          onChange={v => setField('email', v)}
-          isDirty={isDirtyField('email')}
-          error={errors.email}
-          disabled={updateProfile.isPending}
-        />
-        <EditableField
-          type="text"
-          label="Phone"
-          value={current.phone}
-          onChange={v => setField('phone', v)}
-          isDirty={isDirtyField('phone')}
-          disabled={updateProfile.isPending}
-        />
-        <EditableField
-          type="text"
-          label="Location"
-          value={current.location}
-          onChange={v => setField('location', v)}
-          isDirty={isDirtyField('location')}
-          disabled={updateProfile.isPending}
-        />
-        <EditableField
-          type="text"
-          label="LinkedIn"
-          value={current.linkedinUrl}
-          onChange={v => setField('linkedinUrl', v)}
-          isDirty={isDirtyField('linkedinUrl')}
-          placeholder="https://linkedin.com/in/..."
-          disabled={updateProfile.isPending}
-        />
-        <EditableField
-          type="text"
-          label="GitHub"
-          value={current.githubUrl}
-          onChange={v => setField('githubUrl', v)}
-          isDirty={isDirtyField('githubUrl')}
-          placeholder="https://github.com/..."
-          disabled={updateProfile.isPending}
-        />
-        <EditableField
-          type="text"
-          label="Website"
-          value={current.websiteUrl}
-          onChange={v => setField('websiteUrl', v)}
-          isDirty={isDirtyField('websiteUrl')}
-          placeholder="https://..."
-          disabled={updateProfile.isPending}
-        />
-        <EditableField
-          type="textarea"
-          label="About"
-          value={current.about}
-          onChange={v => setField('about', v)}
-          isDirty={isDirtyField('about')}
-          rows={5}
-          placeholder="A narrative description of your professional identity..."
-          disabled={updateProfile.isPending}
-        />
       </div>
-
-      <SaveBar dirtyCount={dirtyCount} onSave={handleSave} onDiscard={reset} isSaving={updateProfile.isPending} />
-    </div>
+    </EditableSectionProvider>
   );
 }
