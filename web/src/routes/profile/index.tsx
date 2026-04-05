@@ -131,6 +131,7 @@ function ProfileForm({ profile }: { readonly profile: ProfileData }) {
         <div className="max-w-xl">
           <EditableSection
             sectionId="profile"
+            variant="card"
             onSave={handleSave}
             onDiscard={reset}
             isDirty={isDirty}
