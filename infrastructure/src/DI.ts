@@ -18,6 +18,7 @@ import type {
   DiscoverCompanies,
   EnrichCompanyData,
   GetApplication,
+  GetCompany,
   GetJobDescription,
   GetProfile,
   JobDescriptionParser,
@@ -120,6 +121,7 @@ export const DI = {
     Enrich: new InjectionToken<EnrichCompanyData>('DI.Company.Enrich'),
     Discover: new InjectionToken<DiscoverCompanies>('DI.Company.Discover'),
     Create: new InjectionToken<CreateCompany>('DI.Company.Create'),
-    Update: new InjectionToken<UpdateCompany>('DI.Company.Update')
+    Update: new InjectionToken<UpdateCompany>('DI.Company.Update'),
+    Get: new InjectionToken<GetCompany>('DI.Company.Get')
   }
 };

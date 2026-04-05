@@ -19,6 +19,8 @@ export { EnrichCompanyData } from './company/EnrichCompanyData.js';
 export { ListCompanies } from './company/ListCompanies.js';
 export type { UpdateCompanyInput } from './company/UpdateCompany.js';
 export { UpdateCompany } from './company/UpdateCompany.js';
+export type { GetCompanyInput } from './company/GetCompany.js';
+export { GetCompany } from './company/GetCompany.js';
 export type { CreateEducationInput } from './education/CreateEducation.js';
 export { CreateEducation } from './education/CreateEducation.js';
 export type { DeleteEducationInput } from './education/DeleteEducation.js';

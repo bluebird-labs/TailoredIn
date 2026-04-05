@@ -12,6 +12,7 @@ import { configRoute } from './routes/ConfigRoute.js';
 import { CreateCompanyRoute } from './routes/company/CreateCompanyRoute.js';
 import { DiscoverCompaniesRoute } from './routes/company/DiscoverCompaniesRoute.js';
 import { EnrichCompanyRoute } from './routes/company/EnrichCompanyRoute.js';
+import { GetCompanyRoute } from './routes/company/GetCompanyRoute.js';
 import { ListCompaniesRoute } from './routes/company/ListCompaniesRoute.js';
 import { UpdateCompanyRoute } from './routes/company/UpdateCompanyRoute.js';
 import { CreateEducationRoute } from './routes/education/CreateEducationRoute.js';
@@ -133,6 +134,7 @@ const app = new Elysia()
   .use(container.get(EnrichCompanyRoute).plugin())
   .use(container.get(CreateCompanyRoute).plugin())
   .use(container.get(UpdateCompanyRoute).plugin())
+  .use(container.get(GetCompanyRoute).plugin())
   // Applications
   .use(container.get(CreateApplicationRoute).plugin())
   .use(container.get(GetApplicationRoute).plugin())

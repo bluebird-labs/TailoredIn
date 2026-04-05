@@ -17,6 +17,7 @@ import {
   DiscoverCompanies,
   EnrichCompanyData,
   GetApplication,
+  GetCompany,
   GetJobDescription,
   GetProfile,
   LinkCompanyToExperience,
@@ -187,6 +188,10 @@ container.bind({
 container.bind({
   provide: DI.Company.Update,
   useFactory: () => new UpdateCompany(container.get(DI.Company.Repository))
+});
+container.bind({
+  provide: DI.Company.Get,
+  useFactory: () => new GetCompany(container.get(DI.Company.Repository))
 });
 
 // Application (job applications)
