@@ -13,6 +13,8 @@ export interface WorktreeSession {
   dbName: string;
   projectName: string;
   containerName: string;
+  apiPid?: number;
+  webPid?: number;
 }
 
 function sessionPath(): string {
@@ -23,10 +25,17 @@ export function sessionExists(): boolean {
   return existsSync(sessionPath());
 }
 
+// Worktree ports use offset ranges to never collide with main dev servers
+// (DB=5432, API=8000, Web=5173). Even if main isn't running, worktrees
+// stay in their own range.
+const WT_BASE_DB = 15432;
+const WT_BASE_API = 18000;
+const WT_BASE_WEB = 15173;
+
 export async function allocateSession(ctx: DevContext): Promise<WorktreeSession> {
-  const dbPort = await findFreePort(5432);
-  const apiPort = await findFreePort(8000);
-  const webPort = await findFreePort(5173);
+  const dbPort = await findFreePort(WT_BASE_DB);
+  const apiPort = await findFreePort(WT_BASE_API);
+  const webPort = await findFreePort(WT_BASE_WEB);
   const dbName = `tailoredin_${ctx.worktreeName}`;
 
   return {

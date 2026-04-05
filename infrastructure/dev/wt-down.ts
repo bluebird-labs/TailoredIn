@@ -12,7 +12,7 @@ import { Logger } from '@tailoredin/core';
 import { requireWorktree } from './ContextGuard.js';
 import { resolveDevContext } from './DevContext.js';
 import { composeDown, isContainerRunning } from './DockerCompose.js';
-import { deleteSession, readSession, sessionExists, toProcessEnv } from './WorktreeSession.js';
+import { deleteSession, readSession, sessionExists, toProcessEnv, type WorktreeSession } from './WorktreeSession.js';
 
 const log = Logger.create('wt:down');
 
@@ -21,25 +21,37 @@ requireWorktree(ctx);
 
 log.info(`Stopping worktree environment: ${ctx.worktreeName}`);
 
-// Kill any running dev server processes (best-effort)
-log.info('Stopping dev servers...');
-Bun.spawnSync(['pkill', '-f', 'bun.*api/src/index.ts'], { stdout: 'ignore', stderr: 'ignore' });
-Bun.spawnSync(['pkill', '-f', 'bun.*--cwd web dev'], { stdout: 'ignore', stderr: 'ignore' });
+// Read session once (if it exists) for PIDs and env
+let session: WorktreeSession | null = null;
+if (sessionExists()) {
+  session = await readSession();
+}
 
-if (!sessionExists() && !isContainerRunning(ctx.containerName)) {
+if (!session && !isContainerRunning(ctx.containerName)) {
   log.info('Nothing to tear down.');
   process.exit(0);
 }
 
-if (sessionExists()) {
-  const session = await readSession();
+// Kill only this worktree's dev server processes using stored PIDs
+if (session) {
+  log.info('Stopping dev servers...');
+  for (const pid of [session.apiPid, session.webPid]) {
+    if (pid) {
+      try {
+        process.kill(pid, 'SIGTERM');
+      } catch {
+        // Process already exited
+      }
+    }
+  }
+
   Object.assign(process.env, toProcessEnv(session));
 }
 
 log.info('Stopping PostgreSQL and removing volume...');
 composeDown(ctx, true);
 
-if (sessionExists()) {
+if (session) {
   log.info('Removing .wt-session.json...');
   deleteSession();
 }

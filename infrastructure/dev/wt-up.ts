@@ -127,6 +127,11 @@ const webProc = Bun.spawn(['bun', 'run', '--cwd', 'web', 'dev'], {
   stderr: 'inherit'
 });
 
+// Persist PIDs so wt:down can kill only this worktree's servers
+session.apiPid = apiProc.pid;
+session.webPid = webProc.pid;
+await writeSession(session);
+
 log.info(`Session "${ctx.worktreeName}" ready!`);
 log.info(`  API: http://localhost:${session.apiPort}`);
 log.info(`  Web: http://localhost:${session.webPort}`);
