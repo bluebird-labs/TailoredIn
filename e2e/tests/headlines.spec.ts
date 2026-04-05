@@ -30,8 +30,8 @@ test.describe('Headlines Page', () => {
     await createForm.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Headline created')).toBeVisible();
-    // New card appears with the value in an input
-    await expect(page.locator('input[value="Principal Engineer"]')).toBeVisible();
+    // New card appears with the value as content text
+    await expect(page.getByText('Principal Engineer')).toBeVisible();
   });
 
   test('edit a headline', async ({ page }) => {

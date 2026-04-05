@@ -22,6 +22,8 @@ test.describe('Profile Page', () => {
   });
 
   test('shows seeded data in inputs', async ({ page }) => {
+    // Profile is content-first — click to enter edit mode before checking input values
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await expect(page.getByLabel('First Name')).toHaveValue('Jane');
     await expect(page.getByLabel('Last Name')).toHaveValue('Doe');
     await expect(page.getByLabel('Email')).toHaveValue('jane@example.com');
@@ -40,6 +42,7 @@ test.describe('Profile Page', () => {
   });
 
   test('editing a field shows SaveBar with dirty count', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('First Name').fill('Alice');
     await expect(page.locator('[data-slot="save-bar"]')).toBeVisible();
@@ -51,6 +54,7 @@ test.describe('Profile Page', () => {
   });
 
   test('save name via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('First Name').fill('Alice');
 
@@ -59,10 +63,12 @@ test.describe('Profile Page', () => {
 
     await expect(page.getByText('Changes saved')).toBeVisible();
     await expect(saveBar).not.toBeVisible();
-    await expect(page.getByLabel('First Name')).toHaveValue('Alice');
+    // After save the section returns to display mode — check the rendered text
+    await expect(page.getByText('Alice')).toBeVisible();
   });
 
   test('save email via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('Email').clear();
     await page.getByLabel('Email').fill('alice@test.com');
 
@@ -71,6 +77,7 @@ test.describe('Profile Page', () => {
   });
 
   test('save phone via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('Phone').clear();
     await page.getByLabel('Phone').fill('555-000-1111');
 
@@ -79,6 +86,7 @@ test.describe('Profile Page', () => {
   });
 
   test('save social links via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('LinkedIn').clear();
     await page.getByLabel('LinkedIn').fill('https://linkedin.com/in/alice');
     await page.getByLabel('GitHub').clear();
@@ -93,6 +101,7 @@ test.describe('Profile Page', () => {
   });
 
   test('save about text via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('About').clear();
     await page.getByLabel('About').fill('Updated professional narrative for testing.');
 
@@ -101,6 +110,8 @@ test.describe('Profile Page', () => {
   });
 
   test('discard reverts all dirty fields', async ({ page }) => {
+    // Enter edit mode before reading input values
+    await page.locator('[data-testid="editable-section-profile"]').click();
     // Read current values before editing (may differ from seed if prior tests mutated)
     const originalFirstName = await page.getByLabel('First Name').inputValue();
     const originalLocation = await page.getByLabel('Location').inputValue();
@@ -114,11 +125,13 @@ test.describe('Profile Page', () => {
     await saveBar.getByRole('button', { name: 'Discard' }).click();
 
     await expect(saveBar).not.toBeVisible();
-    await expect(page.getByLabel('First Name')).toHaveValue(originalFirstName);
-    await expect(page.getByLabel('Location')).toHaveValue(originalLocation);
+    // After discard the section returns to display mode — verify original values are rendered as text
+    await expect(page.getByText(originalFirstName)).toBeVisible();
+    await expect(page.getByText(originalLocation)).toBeVisible();
   });
 
   test('validation: empty required fields show errors on save', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('Last Name').clear();
     await page.getByLabel('Email').clear();

@@ -33,8 +33,8 @@ test.describe('Education Page', () => {
     await dialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Education created')).toBeVisible();
-    await expect(page.locator('input[value="MIT"]')).toBeVisible();
-    await expect(page.locator('input[value="Ph.D. Artificial Intelligence"]')).toBeVisible();
+    await expect(page.getByText('MIT')).toBeVisible();
+    await expect(page.getByText('Ph.D. Artificial Intelligence')).toBeVisible();
   });
 
   test('edit an education', async ({ page }) => {
