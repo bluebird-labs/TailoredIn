@@ -18,6 +18,7 @@ import {
   EnrichCompanyData,
   GetApplication,
   GetCompany,
+  GetExperience,
   GetJobDescription,
   GetProfile,
   LinkCompanyToExperience,
@@ -151,6 +152,10 @@ container.bind({
 container.bind({
   provide: DI.Experience.DeleteAccomplishment,
   useFactory: () => new DeleteAccomplishment(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.Get,
+  useFactory: () => new GetExperience(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
 });
 container.bind({
   provide: DI.Experience.LinkCompany,

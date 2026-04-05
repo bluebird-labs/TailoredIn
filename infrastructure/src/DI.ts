@@ -19,6 +19,7 @@ import type {
   EnrichCompanyData,
   GetApplication,
   GetCompany,
+  GetExperience,
   GetJobDescription,
   GetProfile,
   JobDescriptionParser,
@@ -109,6 +110,7 @@ export const DI = {
     AddAccomplishment: new InjectionToken<AddAccomplishment>('DI.Experience.AddAccomplishment'),
     UpdateAccomplishment: new InjectionToken<UpdateAccomplishment>('DI.Experience.UpdateAccomplishment'),
     DeleteAccomplishment: new InjectionToken<DeleteAccomplishment>('DI.Experience.DeleteAccomplishment'),
+    Get: new InjectionToken<GetExperience>('DI.Experience.Get'),
     LinkCompany: new InjectionToken<LinkCompanyToExperience>('DI.Experience.LinkCompany'),
     UnlinkCompany: new InjectionToken<UnlinkCompanyFromExperience>('DI.Experience.UnlinkCompany')
   },

@@ -23,6 +23,7 @@ import { AddAccomplishmentRoute } from './routes/experience/AddAccomplishmentRou
 import { CreateExperienceRoute } from './routes/experience/CreateExperienceRoute.js';
 import { DeleteAccomplishmentRoute } from './routes/experience/DeleteAccomplishmentRoute.js';
 import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute.js';
+import { GetExperienceRoute } from './routes/experience/GetExperienceRoute.js';
 import { LinkCompanyRoute } from './routes/experience/LinkCompanyRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
 import { UnlinkCompanyRoute } from './routes/experience/UnlinkCompanyRoute.js';
@@ -118,6 +119,7 @@ const app = new Elysia()
   .use(container.get(DeleteHeadlineRoute).plugin())
   // Experiences
   .use(container.get(ListExperiencesRoute).plugin())
+  .use(container.get(GetExperienceRoute).plugin())
   .use(container.get(CreateExperienceRoute).plugin())
   .use(container.get(UpdateExperienceRoute).plugin())
   .use(container.get(DeleteExperienceRoute).plugin())
