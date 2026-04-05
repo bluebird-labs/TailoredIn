@@ -17,7 +17,7 @@ export type Company = {
   stage: string | null;
 };
 
-export type CompanySearchResult = {
+export type CompanyDiscoveryResult = {
   name: string;
   website: string | null;
   description: string | null;
@@ -44,13 +44,13 @@ export function useCompanies() {
   });
 }
 
-export function useSearchCompanies() {
+export function useDiscoverCompanies() {
   return useMutation({
-    mutationFn: async (input: { name: string; description?: string }) => {
+    mutationFn: async (input: { query: string }) => {
       const segment = api.companies as AnyRouteSegment;
-      const { data, error } = await segment.search.post(input);
-      if (error) throw new Error('Failed to search companies');
-      return (data?.data ?? []) as CompanySearchResult[];
+      const { data, error } = await segment.discover.post(input);
+      if (error) throw new Error('Failed to discover companies');
+      return (data?.data ?? []) as CompanyDiscoveryResult[];
     }
   });
 }

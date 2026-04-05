@@ -6,14 +6,13 @@ import { FormModal } from '@/components/shared/FormModal.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   type Company,
+  type CompanyDiscoveryResult,
   type CompanyEnrichmentResult,
-  type CompanySearchResult,
   useCreateCompany,
+  useDiscoverCompanies,
   useEnrichCompany,
-  useSearchCompanies,
   useUpdateCompany
 } from '@/hooks/use-companies';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
@@ -28,7 +27,7 @@ interface Props {
   readonly overlayClassName?: string;
 }
 
-type Step = 'search' | 'enriching' | 'form';
+type Step = 'discovery' | 'enriching' | 'form';
 
 function emptyState(): CompanyFormState {
   return {
@@ -73,14 +72,13 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
   const isEdit = !!company;
   const createCompany = useCreateCompany();
   const updateCompany = useUpdateCompany();
-  const searchCompanies = useSearchCompanies();
+  const discoverCompanies = useDiscoverCompanies();
   const enrichCompany = useEnrichCompany();
   const isSaving = createCompany.isPending || updateCompany.isPending;
 
-  const [step, setStep] = useState<Step>(isEdit ? 'form' : 'search');
-  const [searchName, setSearchName] = useState('');
-  const [searchDescription, setSearchDescription] = useState('');
-  const [candidates, setCandidates] = useState<CompanySearchResult[]>([]);
+  const [step, setStep] = useState<Step>(isEdit ? 'form' : 'discovery');
+  const [discoveryQuery, setDiscoveryQuery] = useState('');
+  const [candidates, setCandidates] = useState<CompanyDiscoveryResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const savedState = useMemo(() => (isEdit ? companyToFormState(company) : emptyState()), [isEdit, company]);
@@ -88,25 +86,24 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
   const [errors, setErrors] = useState<ValidationErrors<CompanyFormState>>({});
 
   function resetAll() {
-    setStep(isEdit ? 'form' : 'search');
-    setSearchName('');
-    setSearchDescription('');
+    setStep(isEdit ? 'form' : 'discovery');
+    setDiscoveryQuery('');
     setCandidates([]);
     setSelectedIndex(null);
     reset();
     setErrors({});
   }
 
-  function handleSearch() {
-    if (!searchName.trim()) return;
-    searchCompanies.mutate(
-      { name: searchName.trim(), description: searchDescription.trim() || undefined },
+  function handleDiscover() {
+    if (!discoveryQuery.trim()) return;
+    discoverCompanies.mutate(
+      { query: discoveryQuery.trim() },
       {
         onSuccess: results => {
           setCandidates(results);
           setSelectedIndex(null);
         },
-        onError: () => toast.error('Failed to search companies')
+        onError: () => toast.error('Failed to discover companies')
       }
     );
   }
@@ -190,20 +187,18 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
     onDiscard: handleDiscard,
     selectedIndex,
     onEnrich: handleEnrich,
-    isSearching: searchCompanies.isPending,
-    onBack: () => setStep('search')
+    isDiscovering: discoverCompanies.isPending,
+    onBack: () => setStep('discovery')
   });
 
   return (
     <FormModal open={open} onOpenChange={onOpenChange} overlayClassName={overlayClassName} {...modalProps}>
-      {step === 'search' && (
-        <SearchStep
-          searchName={searchName}
-          onSearchNameChange={setSearchName}
-          searchDescription={searchDescription}
-          onSearchDescriptionChange={setSearchDescription}
-          onSearch={handleSearch}
-          isSearching={searchCompanies.isPending}
+      {step === 'discovery' && (
+        <DiscoveryStep
+          query={discoveryQuery}
+          onQueryChange={setDiscoveryQuery}
+          onDiscover={handleDiscover}
+          isDiscovering={discoverCompanies.isPending}
           candidates={candidates}
           selectedIndex={selectedIndex}
           onSelect={setSelectedIndex}
@@ -227,24 +222,20 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
 
 // --- Step Components ---
 
-function SearchStep({
-  searchName,
-  onSearchNameChange,
-  searchDescription,
-  onSearchDescriptionChange,
-  onSearch,
-  isSearching,
+function DiscoveryStep({
+  query,
+  onQueryChange,
+  onDiscover,
+  isDiscovering,
   candidates,
   selectedIndex,
   onSelect
 }: {
-  searchName: string;
-  onSearchNameChange: (v: string) => void;
-  searchDescription: string;
-  onSearchDescriptionChange: (v: string) => void;
-  onSearch: () => void;
-  isSearching: boolean;
-  candidates: CompanySearchResult[];
+  query: string;
+  onQueryChange: (v: string) => void;
+  onDiscover: () => void;
+  isDiscovering: boolean;
+  candidates: CompanyDiscoveryResult[];
   selectedIndex: number | null;
   onSelect: (i: number) => void;
 }) {
@@ -253,40 +244,25 @@ function SearchStep({
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
-        <Label>Company name</Label>
+        <Label>Company name or website URL</Label>
         <Input
-          value={searchName}
-          onChange={e => onSearchNameChange(e.target.value)}
-          placeholder="e.g. Stripe"
-          disabled={isSearching}
+          value={query}
+          onChange={e => onQueryChange(e.target.value)}
+          placeholder="e.g. Stripe or https://stripe.com"
+          disabled={isDiscovering}
           onKeyDown={e => {
-            if (e.key === 'Enter') onSearch();
+            if (e.key === 'Enter') onDiscover();
           }}
         />
       </div>
 
-      {!hasResults && (
-        <div className="space-y-1.5">
-          <Label>
-            Description <span className="text-muted-foreground text-xs">(optional)</span>
-          </Label>
-          <Textarea
-            value={searchDescription}
-            onChange={e => onSearchDescriptionChange(e.target.value)}
-            placeholder="e.g. fintech company for online payments"
-            disabled={isSearching}
-            rows={2}
-          />
-        </div>
-      )}
-
-      <Button size="sm" className="w-full" onClick={onSearch} disabled={!searchName.trim() || isSearching}>
-        {isSearching ? (
+      <Button size="sm" className="w-full" onClick={onDiscover} disabled={!query.trim() || isDiscovering}>
+        {isDiscovering ? (
           <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
         ) : (
           <Search className="mr-1.5 h-3.5 w-3.5" />
         )}
-        {isSearching ? 'Searching...' : 'Search'}
+        {isDiscovering ? 'Discovering...' : 'Discover'}
       </Button>
 
       {hasResults && (
@@ -395,7 +371,7 @@ function FormStep({
           onChange={v => setField('linkedinLink', v)}
           isDirty={isDirtyField('linkedinLink')}
           disabled={isSaving}
-          placeholder="https://linkedin.com/company/..."
+          placeholder="https://www.linkedin.com/company/..."
         />
       </div>
 
@@ -457,7 +433,7 @@ function getModalProps(
     onDiscard: () => void;
     selectedIndex: number | null;
     onEnrich: () => void;
-    isSearching: boolean;
+    isDiscovering: boolean;
     onBack: () => void;
   }
 ) {
@@ -467,13 +443,13 @@ function getModalProps(
   };
 
   switch (step) {
-    case 'search':
+    case 'discovery':
       return {
         ...base,
         description: 'Find a company to add to your profile.',
         dirtyCount: ctx.selectedIndex !== null ? 1 : 0,
-        isSaving: ctx.isSearching,
-        savingLabel: 'Searching...',
+        isSaving: ctx.isDiscovering,
+        savingLabel: 'Discovering...',
         onSave: ctx.onEnrich,
         saveLabel: 'Next',
         saveDisabled: ctx.selectedIndex === null

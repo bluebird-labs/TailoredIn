@@ -2,7 +2,7 @@ import { InjectionToken } from '@needle-di/core';
 import type {
   AddAccomplishment,
   CompanyDataProvider,
-  CompanySearchProvider,
+  CompanyDiscoveryProvider,
   CreateApplication,
   CreateCompany,
   CreateEducation,
@@ -15,6 +15,7 @@ import type {
   DeleteExperience,
   DeleteHeadline,
   DeleteJobDescription,
+  DiscoverCompanies,
   EnrichCompanyData,
   GetApplication,
   GetJobDescription,
@@ -28,7 +29,6 @@ import type {
   ListHeadlines,
   ListJobDescriptions,
   ParseJobDescription,
-  SearchCompanies,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -115,10 +115,10 @@ export const DI = {
   Company: {
     Repository: new InjectionToken<CompanyRepository>('DI.Company.Repository'),
     DataProvider: new InjectionToken<CompanyDataProvider>('DI.Company.DataProvider'),
-    SearchProvider: new InjectionToken<CompanySearchProvider>('DI.Company.SearchProvider'),
+    DiscoveryProvider: new InjectionToken<CompanyDiscoveryProvider>('DI.Company.DiscoveryProvider'),
     List: new InjectionToken<ListCompanies>('DI.Company.List'),
     Enrich: new InjectionToken<EnrichCompanyData>('DI.Company.Enrich'),
-    Search: new InjectionToken<SearchCompanies>('DI.Company.Search'),
+    Discover: new InjectionToken<DiscoverCompanies>('DI.Company.Discover'),
     Create: new InjectionToken<CreateCompany>('DI.Company.Create'),
     Update: new InjectionToken<UpdateCompany>('DI.Company.Update')
   }

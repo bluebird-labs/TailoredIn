@@ -12,7 +12,7 @@ export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDesc
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 // Services
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
-export { ClaudeCliCompanySearchProvider } from './services/ClaudeCliCompanySearchProvider.js';
+export { ClaudeCliCompanyDiscoveryProvider } from './services/ClaudeCliCompanyDiscoveryProvider.js';
 export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptionParser.js';
 // LLM
 export {

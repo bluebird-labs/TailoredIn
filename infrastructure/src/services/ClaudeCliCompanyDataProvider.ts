@@ -15,9 +15,12 @@ const PROMPT_PATH = resolve(import.meta.dir, 'prompts/enrich-company.md');
 const companyEnrichmentSchema = z.object({
   name: z.string().nullable(),
   description: z.string().nullable(),
-  website: z.string().nullable(),
-  linkedinLink: z.string().nullable(),
-  logoUrl: z.string().nullable(),
+  website: z.string().url().nullable(),
+  linkedinLink: z
+    .string()
+    .regex(/^https:\/\/(www\.)?linkedin\.com\/company\/.+/)
+    .nullable(),
+  logoUrl: z.string().url().nullable(),
   businessType: z.enum(Object.values(BusinessType) as [string, ...string[]]).nullable(),
   industry: z.enum(Object.values(Industry) as [string, ...string[]]).nullable(),
   stage: z.enum(Object.values(CompanyStage) as [string, ...string[]]).nullable()
@@ -35,15 +38,8 @@ class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSc
 
   public get prompt(): string {
     const template = readFileSync(PROMPT_PATH, 'utf-8');
-    const businessTypes = Object.values(BusinessType).join(', ');
-    const industries = Object.values(Industry).join(', ');
-    const stages = Object.values(CompanyStage).join(', ');
 
-    let prompt = template
-      .replace('{{url}}', this.url)
-      .replace('{{businessTypes}}', businessTypes)
-      .replace('{{industries}}', industries)
-      .replace('{{stages}}', stages);
+    let prompt = template.replace('{{url}}', this.url);
 
     if (this.context) {
       prompt = prompt.replace('{{#context}}\n', '').replace('{{/context}}', '');

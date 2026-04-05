@@ -10,9 +10,9 @@ import { UpdateApplicationRoute } from './routes/application/UpdateApplicationRo
 import { UpdateApplicationStatusRoute } from './routes/application/UpdateApplicationStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
 import { CreateCompanyRoute } from './routes/company/CreateCompanyRoute.js';
+import { DiscoverCompaniesRoute } from './routes/company/DiscoverCompaniesRoute.js';
 import { EnrichCompanyRoute } from './routes/company/EnrichCompanyRoute.js';
 import { ListCompaniesRoute } from './routes/company/ListCompaniesRoute.js';
-import { SearchCompaniesRoute } from './routes/company/SearchCompaniesRoute.js';
 import { UpdateCompanyRoute } from './routes/company/UpdateCompanyRoute.js';
 import { CreateEducationRoute } from './routes/education/CreateEducationRoute.js';
 import { DeleteEducationRoute } from './routes/education/DeleteEducationRoute.js';
@@ -129,7 +129,7 @@ const app = new Elysia()
   .use(container.get(ExtractTextRoute).plugin())
   // Companies
   .use(container.get(ListCompaniesRoute).plugin())
-  .use(container.get(SearchCompaniesRoute).plugin())
+  .use(container.get(DiscoverCompaniesRoute).plugin())
   .use(container.get(EnrichCompanyRoute).plugin())
   .use(container.get(CreateCompanyRoute).plugin())
   .use(container.get(UpdateCompanyRoute).plugin())

@@ -14,6 +14,7 @@ import {
   DeleteExperience,
   DeleteHeadline,
   DeleteJobDescription,
+  DiscoverCompanies,
   EnrichCompanyData,
   GetApplication,
   GetJobDescription,
@@ -26,7 +27,6 @@ import {
   ListHeadlines,
   ListJobDescriptions,
   ParseJobDescription,
-  SearchCompanies,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -41,7 +41,7 @@ import {
 import { env, envInt } from '@tailoredin/core';
 import {
   ClaudeCliCompanyDataProvider,
-  ClaudeCliCompanySearchProvider,
+  ClaudeCliCompanyDiscoveryProvider,
   ClaudeCliJobDescriptionParser,
   ClaudeCliProvider,
   createOrmConfig,
@@ -167,14 +167,14 @@ container.bind({ provide: DI.Llm.ClaudeCliProvider, useClass: ClaudeCliProvider 
 // Company
 container.bind({ provide: DI.Company.Repository, useClass: PostgresCompanyRepository });
 container.bind({ provide: DI.Company.DataProvider, useClass: ClaudeCliCompanyDataProvider });
-container.bind({ provide: DI.Company.SearchProvider, useClass: ClaudeCliCompanySearchProvider });
+container.bind({ provide: DI.Company.DiscoveryProvider, useClass: ClaudeCliCompanyDiscoveryProvider });
 container.bind({
   provide: DI.Company.Enrich,
   useFactory: () => new EnrichCompanyData(container.get(DI.Company.DataProvider))
 });
 container.bind({
-  provide: DI.Company.Search,
-  useFactory: () => new SearchCompanies(container.get(DI.Company.SearchProvider))
+  provide: DI.Company.Discover,
+  useFactory: () => new DiscoverCompanies(container.get(DI.Company.DiscoveryProvider))
 });
 container.bind({
   provide: DI.Company.List,

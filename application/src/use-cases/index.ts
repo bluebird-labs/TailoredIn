@@ -12,11 +12,11 @@ export type { UpdateApplicationStatusInput } from './application/UpdateApplicati
 export { UpdateApplicationStatus } from './application/UpdateApplicationStatus.js';
 export type { CreateCompanyInput } from './company/CreateCompany.js';
 export { CreateCompany } from './company/CreateCompany.js';
+export type { DiscoverCompaniesInput } from './company/DiscoverCompanies.js';
+export { DiscoverCompanies } from './company/DiscoverCompanies.js';
 export type { EnrichCompanyDataInput } from './company/EnrichCompanyData.js';
 export { EnrichCompanyData } from './company/EnrichCompanyData.js';
 export { ListCompanies } from './company/ListCompanies.js';
-export type { SearchCompaniesInput } from './company/SearchCompanies.js';
-export { SearchCompanies } from './company/SearchCompanies.js';
 export type { UpdateCompanyInput } from './company/UpdateCompany.js';
 export { UpdateCompany } from './company/UpdateCompany.js';
 export type { CreateEducationInput } from './education/CreateEducation.js';

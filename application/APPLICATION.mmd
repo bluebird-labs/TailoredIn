@@ -56,6 +56,12 @@ classDiagram
         +execute(CreateCompanyInput) CompanyDto
     }
 
+    class DiscoverCompanies {
+        <<UseCase>>
+        +CompanyDiscoveryProvider discoveryProvider
+        +execute(DiscoverCompaniesInput) CompanyDiscoveryResult[]
+    }
+
     class EnrichCompanyData {
         <<UseCase>>
         +CompanyDataProvider companyDataProvider
@@ -66,12 +72,6 @@ classDiagram
         <<UseCase>>
         +CompanyRepository companyRepository
         +execute() CompanyDto[]
-    }
-
-    class SearchCompanies {
-        <<UseCase>>
-        +CompanySearchProvider searchProvider
-        +execute(SearchCompaniesInput) CompanySearchResult[]
     }
 
     class UpdateCompany {
@@ -228,6 +228,12 @@ classDiagram
         +execute(ListJobDescriptionsInput) JobDescriptionDto[]
     }
 
+    class ParseJobDescription {
+        <<UseCase>>
+        +JobDescriptionParser parser
+        +execute(ParseJobDescriptionInput) JobDescriptionParseResult
+    }
+
     class UpdateJobDescription {
         <<UseCase>>
         +JobDescriptionRepository jobDescriptionRepository
@@ -261,13 +267,19 @@ classDiagram
         +enrichFromUrl(url, context?) Promise<CompanyEnrichmentResult>
     }
 
-    class CompanySearchProvider {
+    class CompanyDiscoveryProvider {
         <<Port>>
-        +searchByName(name, description?) Promise<CompanySearchResult[]>
+        +discover(query) Promise<CompanyDiscoveryResult[]>
     }
 
+    class JobDescriptionParser {
+        <<Port>>
+        +parseFromText(text) Promise<JobDescriptionParseResult>
+    }
+
+    DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
-    SearchCompanies ..> CompanySearchProvider : depends
+    ParseJobDescription ..> JobDescriptionParser : depends
 
     %% ──────────────────────────────────────────────
     %%  DTOs
@@ -298,6 +310,13 @@ classDiagram
         +string updatedAt
     }
 
+    class CompanyDiscoveryResult {
+        <<DTO>>
+        +string name
+        +string? website
+        +string? description
+    }
+
     class CompanyDto {
         <<DTO>>
         +string id
@@ -321,13 +340,6 @@ classDiagram
         +BusinessType? businessType
         +Industry? industry
         +CompanyStage? stage
-    }
-
-    class CompanySearchResult {
-        <<DTO>>
-        +string name
-        +string? website
-        +string? description
     }
 
     class EducationDto {
@@ -381,6 +393,20 @@ classDiagram
         +string updatedAt
     }
 
+    class JobDescriptionParseResult {
+        <<DTO>>
+        +string? title
+        +string? description
+        +string? url
+        +string? location
+        +number? salaryMin
+        +number? salaryMax
+        +string? salaryCurrency
+        +JobLevel? level
+        +LocationType? locationType
+        +string? postedAt
+    }
+
     class PaginatedDto {
         <<DTO>>
         +T[] items
@@ -421,16 +447,17 @@ classDiagram
     JobDescriptionDto *-- SalaryRangeDto
     PaginatedDto *-- PaginationMeta
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
-    CompanySearchProvider ..> CompanySearchResult : produces
+    CompanyDiscoveryProvider ..> CompanyDiscoveryResult : produces
+    JobDescriptionParser ..> JobDescriptionParseResult : produces
     CreateApplication ..> ApplicationDto : returns
     GetApplication ..> ApplicationDto : returns
     ListApplications ..> ApplicationDto : returns
     UpdateApplication ..> ApplicationDto : returns
     UpdateApplicationStatus ..> ApplicationDto : returns
     CreateCompany ..> CompanyDto : returns
+    DiscoverCompanies ..> CompanyDiscoveryResult : returns
     EnrichCompanyData ..> CompanyEnrichmentResult : returns
     ListCompanies ..> CompanyDto : returns
-    SearchCompanies ..> CompanySearchResult : returns
     UpdateCompany ..> CompanyDto : returns
     CreateEducation ..> EducationDto : returns
     ListEducation ..> EducationDto : returns
@@ -448,6 +475,7 @@ classDiagram
     CreateJobDescription ..> JobDescriptionDto : returns
     GetJobDescription ..> JobDescriptionDto : returns
     ListJobDescriptions ..> JobDescriptionDto : returns
+    ParseJobDescription ..> JobDescriptionParseResult : returns
     UpdateJobDescription ..> JobDescriptionDto : returns
     UpdateProfile ..> ProfileDto : returns
 
@@ -542,9 +570,9 @@ classDiagram
     style UpdateApplication fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateApplicationStatus fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DiscoverCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style EnrichCompanyData fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style SearchCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -567,21 +595,24 @@ classDiagram
     style DeleteJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListJobDescriptions fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ParseJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
-    style CompanySearchProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style JobDescriptionParser fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApplicationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyDiscoveryResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style CompanySearchResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style HeadlineDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobDescriptionDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobDescriptionParseResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginatedDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginationMeta fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ProfileDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
