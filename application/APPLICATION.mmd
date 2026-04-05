@@ -68,6 +68,12 @@ classDiagram
         +execute(EnrichCompanyDataInput) CompanyEnrichmentResult
     }
 
+    class GetCompany {
+        <<UseCase>>
+        +CompanyRepository companyRepository
+        +execute(GetCompanyInput) CompanyDto
+    }
+
     class ListCompanies {
         <<UseCase>>
         +CompanyRepository companyRepository
@@ -136,6 +142,13 @@ classDiagram
         <<UseCase>>
         +ExperienceRepository experienceRepository
         +execute(DeleteExperienceInput) Result<void, Error>
+    }
+
+    class GetExperience {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +CompanyRepository companyRepository
+        +execute(GetExperienceInput) ExperienceDto
     }
 
     class LinkCompanyToExperience {
@@ -457,6 +470,7 @@ classDiagram
     CreateCompany ..> CompanyDto : returns
     DiscoverCompanies ..> CompanyDiscoveryResult : returns
     EnrichCompanyData ..> CompanyEnrichmentResult : returns
+    GetCompany ..> CompanyDto : returns
     ListCompanies ..> CompanyDto : returns
     UpdateCompany ..> CompanyDto : returns
     CreateEducation ..> EducationDto : returns
@@ -464,6 +478,7 @@ classDiagram
     UpdateEducation ..> EducationDto : returns
     AddAccomplishment ..> AccomplishmentDto : returns
     CreateExperience ..> ExperienceDto : returns
+    GetExperience ..> ExperienceDto : returns
     LinkCompanyToExperience ..> ExperienceDto : returns
     ListExperiences ..> ExperienceDto : returns
     UnlinkCompanyFromExperience ..> ExperienceDto : returns
@@ -530,6 +545,7 @@ classDiagram
     UpdateApplication ..> ApplicationRepository : depends
     UpdateApplicationStatus ..> ApplicationRepository : depends
     CreateCompany ..> CompanyRepository : depends
+    GetCompany ..> CompanyRepository : depends
     ListCompanies ..> CompanyRepository : depends
     UpdateCompany ..> CompanyRepository : depends
     CreateEducation ..> EducationRepository : depends
@@ -540,6 +556,8 @@ classDiagram
     CreateExperience ..> ExperienceRepository : depends
     DeleteAccomplishment ..> ExperienceRepository : depends
     DeleteExperience ..> ExperienceRepository : depends
+    GetExperience ..> ExperienceRepository : depends
+    GetExperience ..> CompanyRepository : depends
     LinkCompanyToExperience ..> ExperienceRepository : depends
     LinkCompanyToExperience ..> CompanyRepository : depends
     ListExperiences ..> ExperienceRepository : depends
@@ -572,6 +590,7 @@ classDiagram
     style CreateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DiscoverCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style EnrichCompanyData fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GetCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -582,6 +601,7 @@ classDiagram
     style CreateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GetExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style LinkCompanyToExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListExperiences fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UnlinkCompanyFromExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
