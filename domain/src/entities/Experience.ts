@@ -93,6 +93,41 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.updatedAt = new Date();
   }
 
+  public syncAccomplishments(
+    items: { id: string | null; title: string; narrative: string; ordinal: number }[]
+  ): void {
+    const inputIds = new Set(items.filter(i => i.id !== null).map(i => i.id as string));
+
+    // Remove accomplishments absent from the input list
+    for (let i = this.accomplishments.length - 1; i >= 0; i--) {
+      if (!inputIds.has(this.accomplishments[i].id.value)) {
+        this.accomplishments.splice(i, 1);
+      }
+    }
+
+    // Add new (id === null) or update existing
+    for (const item of items) {
+      if (item.id === null) {
+        this.accomplishments.push(
+          Accomplishment.create({
+            experienceId: this.id.value,
+            title: item.title,
+            narrative: item.narrative,
+            ordinal: item.ordinal
+          })
+        );
+      } else {
+        this.findAccomplishmentOrFail(item.id).update({
+          title: item.title,
+          narrative: item.narrative,
+          ordinal: item.ordinal
+        });
+      }
+    }
+
+    this.updatedAt = new Date();
+  }
+
   public static create(props: ExperienceCreateProps): Experience {
     const now = new Date();
     return new Experience({
