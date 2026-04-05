@@ -249,7 +249,7 @@ classDiagram
 
     class CompanySearchProvider {
         <<Port>>
-        +searchByName(name) Promise<CompanySearchResult[]>
+        +searchByName(name, description?) Promise<CompanySearchResult[]>
     }
 
     EnrichCompanyData ..> CompanyDataProvider : depends

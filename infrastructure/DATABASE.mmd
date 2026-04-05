@@ -5,7 +5,7 @@ title: TailoredIn — Database ERD (PostgreSQL)
 erDiagram
 
     %% ──────────────────────────────────────────────
-    %%  Group 1
+    %%  Tables
     %% ──────────────────────────────────────────────
 
     accomplishments {
@@ -16,6 +16,50 @@ erDiagram
         integer ordinal "default: 0"
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
+    applications {
+        uuid id PK
+        uuid profile_id FK
+        uuid company_id FK
+        uuid job_description_id FK "nullable"
+        text status "default: draft"
+        text notes "nullable"
+        timestamp applied_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
+    archetype_tag_weights {
+        uuid id PK
+        uuid archetype_id FK "unique"
+        uuid tag_id UK
+        numeric weight
+    }
+
+    archetypes {
+        uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+        uuid profile_id FK
+        text key
+        text label
+        uuid headline_id FK "nullable"
+        json content_selection "default: {}"
+        text headline_text "default: empty"
+    }
+
+    companies {
+        uuid id PK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+        text name
+        text logo_url "nullable"
+        text linkedin_link UK "nullable"
+        text website "nullable"
+        text business_type "nullable"
+        text industry "nullable"
+        text stage "nullable"
+        text description "nullable"
     }
 
     educations {
@@ -56,6 +100,24 @@ erDiagram
         text status "default: active"
     }
 
+    job_descriptions {
+        uuid id PK
+        uuid company_id FK
+        text title
+        text description
+        text url "nullable"
+        text location "nullable"
+        integer salary_min "nullable"
+        integer salary_max "nullable"
+        text salary_currency "nullable"
+        text level "nullable"
+        text location_type "nullable"
+        text source
+        timestamp posted_at "nullable"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
     profiles {
         uuid id PK
         timestamp created_at "default: CURRENT_TIMESTAMP"
@@ -71,31 +133,20 @@ erDiagram
         text about "nullable"
     }
 
-
-    %% ──────────────────────────────────────────────
-    %%  Standalone
-    %% ──────────────────────────────────────────────
-
-    companies {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        text name
-        text logo_url "nullable"
-        text linkedin_link UK "nullable"
-        text website "nullable"
-        text business_type "nullable"
-        text industry "nullable"
-        text stage "nullable"
-    }
-
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
 
+    companies ||--o{ job_descriptions : "has"
+    profiles ||--o{ applications : "has"
+    companies ||--o{ applications : "has"
+    job_descriptions ||--o{ applications : "has"
     profiles ||--o{ experiences : "has"
     profiles ||--o{ headlines : "has"
     profiles ||--o{ educations : "has"
+    profiles ||--o{ archetypes : "has"
+    headlines ||--o{ archetypes : "has"
+    archetypes ||--o| archetype_tag_weights : "has"
     experiences ||--o{ accomplishments : "has"
 
     %% ──────────────────────────────────────────────
@@ -104,9 +155,12 @@ erDiagram
 
     classDef group0 fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px
     class accomplishments group0
+    class applications group0
+    class archetype_tag_weights group0
+    class archetypes group0
+    class companies group0
     class educations group0
     class experiences group0
     class headlines group0
+    class job_descriptions group0
     class profiles group0
-    classDef group1 fill:#d5e8d4,stroke:#82b366,stroke-width:2px
-    class companies group1
