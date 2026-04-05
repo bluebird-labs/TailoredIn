@@ -18,7 +18,7 @@ export class CreateExperience {
   public constructor(private readonly experienceRepository: ExperienceRepository) {}
 
   public async execute(input: CreateExperienceInput): Promise<ExperienceDto> {
-    const experience = Experience.create(input);
+    const experience = Experience.create({ ...input, companyId: null });
     await this.experienceRepository.save(experience);
     return toExperienceDto(experience);
   }

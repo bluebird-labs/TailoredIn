@@ -1,4 +1,5 @@
 import type { AccomplishmentDto } from './AccomplishmentDto.js';
+import type { CompanyDto } from './CompanyDto.js';
 
 export type { AccomplishmentDto };
 
@@ -7,6 +8,8 @@ export type ExperienceDto = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyId: string | null;
+  company: CompanyDto | null;
   location: string;
   startDate: string;
   endDate: string;
