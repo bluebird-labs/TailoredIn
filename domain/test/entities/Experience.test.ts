@@ -8,6 +8,7 @@ describe('Experience', () => {
       title: 'Staff Engineer',
       companyName: 'Acme Corp',
       companyWebsite: 'https://acme.com',
+      companyId: null,
       location: 'New York, NY',
       startDate: '2022-01',
       endDate: 'Present',
@@ -57,5 +58,25 @@ describe('Experience', () => {
     expect(exp.title).toBe('Principal Engineer');
     expect(exp.companyName).toBe('NewCo');
     expect(exp.location).toBe('Remote');
+  });
+
+  test('starts with null companyId', () => {
+    const exp = makeExperience();
+    expect(exp.companyId).toBeNull();
+  });
+
+  test('links a company', () => {
+    const exp = makeExperience();
+    const before = exp.updatedAt;
+    exp.linkCompany('company-123');
+    expect(exp.companyId).toBe('company-123');
+    expect(exp.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
+  });
+
+  test('unlinks a company', () => {
+    const exp = makeExperience();
+    exp.linkCompany('company-123');
+    exp.unlinkCompany();
+    expect(exp.companyId).toBeNull();
   });
 });

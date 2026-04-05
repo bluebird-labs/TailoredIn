@@ -8,6 +8,7 @@ export type ExperienceCreateProps = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyId: string | null;
   location: string;
   startDate: string;
   endDate: string;
@@ -20,6 +21,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   public title: string;
   public companyName: string;
   public companyWebsite: string | null;
+  public companyId: string | null;
   public location: string;
   public startDate: string;
   public endDate: string;
@@ -35,6 +37,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     title: string;
     companyName: string;
     companyWebsite: string | null;
+    companyId: string | null;
     location: string;
     startDate: string;
     endDate: string;
@@ -49,6 +52,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.title = props.title;
     this.companyName = props.companyName;
     this.companyWebsite = props.companyWebsite;
+    this.companyId = props.companyId;
     this.location = props.location;
     this.startDate = props.startDate;
     this.endDate = props.endDate;
@@ -77,6 +81,16 @@ export class Experience extends AggregateRoot<ExperienceId> {
     const acc = this.accomplishments.find(a => a.id.value === accomplishmentId);
     if (!acc) throw new EntityNotFoundError('Accomplishment', accomplishmentId);
     return acc;
+  }
+
+  public linkCompany(companyId: string): void {
+    this.companyId = companyId;
+    this.updatedAt = new Date();
+  }
+
+  public unlinkCompany(): void {
+    this.companyId = null;
+    this.updatedAt = new Date();
   }
 
   public static create(props: ExperienceCreateProps): Experience {
