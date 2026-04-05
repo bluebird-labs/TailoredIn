@@ -10,3 +10,4 @@ export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepos
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 // Services
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
+export { ClaudeCliCompanySearchProvider } from './services/ClaudeCliCompanySearchProvider.js';

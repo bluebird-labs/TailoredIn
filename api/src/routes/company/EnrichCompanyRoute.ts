@@ -11,12 +11,13 @@ export class EnrichCompanyRoute {
     return new Elysia().post(
       '/companies/enrich',
       async ({ body }) => {
-        const data = await this.enrichCompanyData.execute({ url: body.url });
+        const data = await this.enrichCompanyData.execute({ url: body.url, context: body.context });
         return { data };
       },
       {
         body: t.Object({
-          url: t.String({ minLength: 1 })
+          url: t.String({ minLength: 1 }),
+          context: t.Optional(t.String())
         })
       }
     );

@@ -1,10 +1,10 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, mock, test } from 'bun:test';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '../../../src/ports/CompanyDataProvider.js';
 import { EnrichCompanyData } from '../../../src/use-cases/company/EnrichCompanyData.js';
 
 function mockProvider(result: CompanyEnrichmentResult): CompanyDataProvider {
   return {
-    enrichFromUrl: async () => result
+    enrichFromUrl: mock(async () => result)
   };
 }
 
@@ -42,5 +42,41 @@ describe('EnrichCompanyData', () => {
 
     expect(result.name).toBeNull();
     expect(result.website).toBeNull();
+  });
+
+  test('passes context to provider when provided', async () => {
+    const enrichmentResult: CompanyEnrichmentResult = {
+      name: 'Stripe',
+      website: 'https://stripe.com',
+      logoUrl: null,
+      linkedinLink: null,
+      businessType: null,
+      industry: null,
+      stage: null
+    };
+
+    const provider = mockProvider(enrichmentResult);
+    const useCase = new EnrichCompanyData(provider);
+    await useCase.execute({ url: 'https://stripe.com', context: 'the fintech one in SF' });
+
+    expect(provider.enrichFromUrl).toHaveBeenCalledWith('https://stripe.com', 'the fintech one in SF');
+  });
+
+  test('calls provider without context when not provided', async () => {
+    const enrichmentResult: CompanyEnrichmentResult = {
+      name: 'GitHub',
+      website: 'https://github.com',
+      logoUrl: null,
+      linkedinLink: null,
+      businessType: null,
+      industry: null,
+      stage: null
+    };
+
+    const provider = mockProvider(enrichmentResult);
+    const useCase = new EnrichCompanyData(provider);
+    await useCase.execute({ url: 'https://github.com' });
+
+    expect(provider.enrichFromUrl).toHaveBeenCalledWith('https://github.com', undefined);
   });
 });

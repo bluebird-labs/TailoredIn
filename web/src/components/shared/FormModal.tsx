@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import {
   AlertDialog,
@@ -30,6 +30,9 @@ interface FormModalProps {
   readonly isSaving: boolean;
   readonly onSave: () => void | Promise<void>;
   readonly onDiscard: () => void;
+  readonly saveLabel?: string;
+  readonly saveDisabled?: boolean;
+  readonly backAction?: () => void;
 }
 
 function FormModal({
@@ -41,7 +44,10 @@ function FormModal({
   dirtyCount,
   isSaving,
   onSave,
-  onDiscard
+  onDiscard,
+  saveLabel,
+  saveDisabled,
+  backAction
 }: FormModalProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -78,13 +84,25 @@ function FormModal({
           <div className="max-h-[60vh] space-y-4 overflow-y-auto">{children}</div>
 
           <DialogFooter>
-            <Button variant="ghost" size="sm" onClick={handleClose} disabled={isSaving}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={onSave} disabled={dirtyCount === 0 || isSaving}>
-              {isSaving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-              {isSaving ? 'Saving...' : 'Save'}
-            </Button>
+            <div className="flex w-full items-center justify-between">
+              <div>
+                {backAction && (
+                  <Button variant="ghost" size="sm" onClick={backAction} disabled={isSaving}>
+                    <ArrowLeft className="mr-1 h-3.5 w-3.5" />
+                    Back
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={handleClose} disabled={isSaving}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={onSave} disabled={(saveDisabled ?? dirtyCount === 0) || isSaving}>
+                  {isSaving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                  {isSaving ? 'Saving...' : (saveLabel ?? 'Save')}
+                </Button>
+              </div>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

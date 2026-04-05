@@ -6,6 +6,7 @@ import type { Industry } from '../value-objects/Industry.js';
 
 export type CompanyCreateProps = {
   name: string;
+  description: string | null;
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string | null;
@@ -16,6 +17,7 @@ export type CompanyCreateProps = {
 
 export class Company extends AggregateRoot<CompanyId> {
   public name: string;
+  public description: string | null;
   public website: string | null;
   public logoUrl: string | null;
   public readonly linkedinLink: string | null;
@@ -28,6 +30,7 @@ export class Company extends AggregateRoot<CompanyId> {
   public constructor(props: {
     id: CompanyId;
     name: string;
+    description: string | null;
     website: string | null;
     logoUrl: string | null;
     linkedinLink: string | null;
@@ -39,6 +42,7 @@ export class Company extends AggregateRoot<CompanyId> {
   }) {
     super(props.id);
     this.name = props.name;
+    this.description = props.description;
     this.website = props.website;
     this.logoUrl = props.logoUrl;
     this.linkedinLink = props.linkedinLink;
@@ -74,6 +78,7 @@ export class Company extends AggregateRoot<CompanyId> {
     return new Company({
       id: CompanyId.generate(),
       name: props.name,
+      description: props.description ?? null,
       website: props.website,
       logoUrl: props.logoUrl,
       linkedinLink: props.linkedinLink,

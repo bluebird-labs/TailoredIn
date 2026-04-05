@@ -5,6 +5,7 @@ type DirtyTracking<T extends object> = {
   isDirty: boolean;
   dirtyCount: number;
   setField: <K extends keyof T>(key: K, value: T[K]) => void;
+  setFields: (fields: Partial<T>) => void;
   isDirtyField: (key: keyof T) => boolean;
   reset: () => void;
   getChanges: () => Partial<T>;
@@ -22,6 +23,10 @@ function useDirtyTracking<T extends object>(savedState: T): DirtyTracking<T> {
 
   const setField = useCallback(<K extends keyof T>(key: K, value: T[K]) => {
     setCurrent(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const setFields = useCallback((fields: Partial<T>) => {
+    setCurrent(prev => ({ ...prev, ...fields }));
   }, []);
 
   const isDirtyField = useCallback((key: keyof T): boolean => current[key] !== savedRef.current[key], [current]);
@@ -53,6 +58,7 @@ function useDirtyTracking<T extends object>(savedState: T): DirtyTracking<T> {
     isDirty: dirtyCount > 0,
     dirtyCount,
     setField,
+    setFields,
     isDirtyField,
     reset,
     getChanges

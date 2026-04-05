@@ -3,6 +3,7 @@ import type { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
 
 export type CompanyEnrichmentResult = {
   name: string | null;
+  description: string | null;
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string | null;
@@ -12,5 +13,5 @@ export type CompanyEnrichmentResult = {
 };
 
 export interface CompanyDataProvider {
-  enrichFromUrl(url: string): Promise<CompanyEnrichmentResult>;
+  enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult>;
 }

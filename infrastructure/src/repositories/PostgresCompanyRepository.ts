@@ -34,14 +34,33 @@ export class PostgresCompanyRepository implements CompanyRepository {
   }
 
   public async save(company: DomainCompany): Promise<void> {
-    const ormCompany = await this.orm.em.findOneOrFail(OrmCompany, company.id.value);
-    ormCompany.name = company.name;
-    ormCompany.website = company.website;
-    ormCompany.logoUrl = company.logoUrl;
-    ormCompany.businessType = company.businessType;
-    ormCompany.industry = company.industry;
-    ormCompany.stage = company.stage;
-    ormCompany.updatedAt = company.updatedAt;
+    let ormCompany = await this.orm.em.findOne(OrmCompany, company.id.value);
+
+    if (ormCompany) {
+      ormCompany.name = company.name;
+      ormCompany.description = company.description;
+      ormCompany.website = company.website;
+      ormCompany.logoUrl = company.logoUrl;
+      ormCompany.businessType = company.businessType;
+      ormCompany.industry = company.industry;
+      ormCompany.stage = company.stage;
+      ormCompany.updatedAt = company.updatedAt;
+    } else {
+      ormCompany = this.orm.em.create(OrmCompany, {
+        id: company.id.value,
+        name: company.name,
+        description: company.description,
+        website: company.website,
+        logoUrl: company.logoUrl,
+        linkedinLink: company.linkedinLink,
+        businessType: company.businessType,
+        industry: company.industry,
+        stage: company.stage,
+        createdAt: company.createdAt,
+        updatedAt: company.updatedAt
+      });
+    }
+
     this.orm.em.persist(ormCompany);
     await this.orm.em.flush();
   }
@@ -50,6 +69,7 @@ export class PostgresCompanyRepository implements CompanyRepository {
     return new DomainCompany({
       id: new CompanyId(orm.id),
       name: orm.name,
+      description: orm.description,
       website: orm.website,
       logoUrl: orm.logoUrl,
       linkedinLink: orm.linkedinLink,

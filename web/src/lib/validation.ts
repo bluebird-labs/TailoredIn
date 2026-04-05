@@ -97,6 +97,7 @@ function validateAccomplishment(values: AccomplishmentFormState): ValidationErro
 
 interface CompanyFormState {
   name: string;
+  description: string;
   website: string;
   logoUrl: string;
   linkedinLink: string;

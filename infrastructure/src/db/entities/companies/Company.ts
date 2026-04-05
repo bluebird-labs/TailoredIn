@@ -7,6 +7,7 @@ import { CompanyOrmRepository } from './CompanyOrmRepository.js';
 export type CompanyProps = {
   id: string;
   name: string;
+  description: string | null;
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string | null;
@@ -32,6 +33,9 @@ export class Company extends BaseEntity {
   @Property({ fieldName: 'name', type: 'text' })
   public name: string;
 
+  @Property({ fieldName: 'description', type: 'text', nullable: true })
+  public description: string | null;
+
   @Property({ fieldName: 'website', type: 'text', nullable: true })
   public website: string | null;
 
@@ -54,6 +58,7 @@ export class Company extends BaseEntity {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
     this.name = props.name;
+    this.description = props.description;
     this.website = props.website;
     this.logoUrl = props.logoUrl;
     this.linkedinLink = props.linkedinLink;
