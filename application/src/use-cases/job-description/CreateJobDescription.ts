@@ -22,6 +22,7 @@ export type CreateJobDescriptionInput = {
   locationType?: LocationType | null;
   source: JobSource;
   postedAt?: Date | null;
+  rawText?: string | null;
 };
 
 export class CreateJobDescription {
@@ -47,7 +48,8 @@ export class CreateJobDescription {
       level: input.level,
       locationType: input.locationType,
       source: input.source,
-      postedAt: input.postedAt
+      postedAt: input.postedAt,
+      rawText: input.rawText
     });
     await this.jobDescriptionRepository.save(jobDescription);
     return toJobDescriptionDto(jobDescription);

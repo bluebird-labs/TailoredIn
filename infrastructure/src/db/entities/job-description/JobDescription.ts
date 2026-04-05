@@ -45,6 +45,9 @@ export class JobDescription extends BaseEntity {
   @Property({ fieldName: 'posted_at', type: 'timestamp(3)', nullable: true })
   public postedAt: Date | null;
 
+  @Property({ fieldName: 'raw_text', type: 'text', nullable: true })
+  public rawText: string | null;
+
   public constructor(props: {
     id: string;
     company: Ref<Company> | Company;
@@ -59,6 +62,7 @@ export class JobDescription extends BaseEntity {
     locationType: string | null;
     source: string;
     postedAt: Date | null;
+    rawText: string | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -76,5 +80,6 @@ export class JobDescription extends BaseEntity {
     this.locationType = props.locationType;
     this.source = props.source;
     this.postedAt = props.postedAt;
+    this.rawText = props.rawText;
   }
 }

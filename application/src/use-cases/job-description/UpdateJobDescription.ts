@@ -22,6 +22,7 @@ export type UpdateJobDescriptionInput = {
   locationType?: LocationType | null;
   source: JobSource;
   postedAt?: Date | null;
+  rawText?: string | null;
 };
 
 export class UpdateJobDescription {
@@ -41,6 +42,7 @@ export class UpdateJobDescription {
     jd.locationType = input.locationType ?? null;
     jd.source = input.source;
     jd.postedAt = input.postedAt ?? null;
+    if (input.rawText !== undefined) jd.rawText = input.rawText;
     jd.salaryRange =
       input.salaryCurrency != null
         ? new SalaryRange({

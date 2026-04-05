@@ -46,6 +46,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       ormJd.locationType = jd.locationType;
       ormJd.source = jd.source;
       ormJd.postedAt = jd.postedAt;
+      ormJd.rawText = jd.rawText;
       ormJd.updatedAt = jd.updatedAt;
     } else {
       const companyRef = this.orm.em.getReference(OrmCompany, jd.companyId);
@@ -63,6 +64,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
         locationType: jd.locationType,
         source: jd.source,
         postedAt: jd.postedAt,
+        rawText: jd.rawText,
         createdAt: jd.createdAt,
         updatedAt: jd.updatedAt
       });
@@ -101,6 +103,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       locationType: orm.locationType as LocationType | null,
       source: orm.source as JobSource,
       postedAt: orm.postedAt,
+      rawText: orm.rawText,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });

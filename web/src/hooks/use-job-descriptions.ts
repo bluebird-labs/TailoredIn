@@ -25,6 +25,7 @@ export type JobDescription = {
   postedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  rawText: string | null;
 };
 
 export type JobDescriptionParseResult = {
@@ -89,6 +90,7 @@ export function useCreateJobDescription() {
       location_type?: string | null;
       source: string;
       posted_at?: string | null;
+      raw_text?: string | null;
     }) => {
       const segment = api['job-descriptions'] as AnyRouteSegment;
       const { data, error } = await segment.post(input);
@@ -118,6 +120,7 @@ export function useUpdateJobDescription(companyId: string) {
       location_type?: string | null;
       source: string;
       posted_at?: string | null;
+      raw_text?: string | null;
     }) => {
       const { id, ...body } = input;
       const segment = api['job-descriptions'] as AnyRouteSegment;

@@ -16,6 +16,7 @@ export type JobDescriptionCreateProps = {
   locationType?: LocationType | null;
   source: JobSource;
   postedAt?: Date | null;
+  rawText?: string | null;
 };
 
 export class JobDescription extends AggregateRoot<JobDescriptionId> {
@@ -29,6 +30,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
   public locationType: LocationType | null;
   public source: JobSource;
   public postedAt: Date | null;
+  public rawText: string | null;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -44,6 +46,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     locationType: LocationType | null;
     source: JobSource;
     postedAt: Date | null;
+    rawText: string | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -58,6 +61,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     this.locationType = props.locationType;
     this.source = props.source;
     this.postedAt = props.postedAt;
+    this.rawText = props.rawText;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -76,6 +80,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
       locationType: props.locationType ?? null,
       source: props.source,
       postedAt: props.postedAt ?? null,
+      rawText: props.rawText ?? null,
       createdAt: now,
       updatedAt: now
     });

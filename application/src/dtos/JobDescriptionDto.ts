@@ -20,6 +20,7 @@ export type JobDescriptionDto = {
   readonly postedAt: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly rawText: string | null;
 };
 
 export function toJobDescriptionDto(jd: JobDescription): JobDescriptionDto {
@@ -38,6 +39,7 @@ export function toJobDescriptionDto(jd: JobDescription): JobDescriptionDto {
     source: jd.source,
     postedAt: jd.postedAt?.toISOString() ?? null,
     createdAt: jd.createdAt.toISOString(),
-    updatedAt: jd.updatedAt.toISOString()
+    updatedAt: jd.updatedAt.toISOString(),
+    rawText: jd.rawText
   };
 }

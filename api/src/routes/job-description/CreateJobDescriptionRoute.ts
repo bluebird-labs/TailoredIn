@@ -24,7 +24,8 @@ export class CreateJobDescriptionRoute {
           level: body.level as JobLevel | undefined,
           locationType: body.location_type as LocationType | undefined,
           source: body.source as JobSource,
-          postedAt: body.posted_at ? new Date(body.posted_at) : null
+          postedAt: body.posted_at ? new Date(body.posted_at) : null,
+          rawText: body.raw_text
         });
         set.status = 201;
         return { data };
@@ -42,7 +43,8 @@ export class CreateJobDescriptionRoute {
           level: t.Optional(t.Nullable(t.String())),
           location_type: t.Optional(t.Nullable(t.String())),
           source: t.String({ minLength: 1 }),
-          posted_at: t.Optional(t.Nullable(t.String()))
+          posted_at: t.Optional(t.Nullable(t.String())),
+          raw_text: t.Optional(t.Nullable(t.String()))
         })
       }
     );

@@ -114,6 +114,7 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
   const [sourceMode, setSourceMode] = useState<SourceMode>('text');
   const [pastedText, setPastedText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [rawText, setRawText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const savedState = useMemo(() => (isEdit ? jdToFormState(jobDescription) : emptyState()), [isEdit, jobDescription]);
@@ -125,6 +126,7 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
     setSourceMode('text');
     setPastedText('');
     setSelectedFile(null);
+    setRawText(null);
     reset();
     setErrors({});
   }
@@ -144,11 +146,13 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
             { text: extractedText },
             {
               onSuccess: result => {
+                setRawText(extractedText);
                 setFields(parseResultToFormState(result));
                 setStep('form');
               },
               onError: () => {
                 toast.error('Parsing failed — you can fill in the details manually.');
+                setRawText(extractedText);
                 setFields(emptyState());
                 setStep('form');
               }
@@ -165,11 +169,13 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
         { text },
         {
           onSuccess: result => {
+            setRawText(text);
             setFields(parseResultToFormState(result));
             setStep('form');
           },
           onError: () => {
             toast.error('Parsing failed — you can fill in the details manually.');
+            setRawText(text);
             setFields(emptyState());
             setStep('form');
           }
@@ -195,7 +201,8 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
       level: current.level || null,
       location_type: current.locationType || null,
       source: isEdit ? jobDescription.source : 'upload',
-      posted_at: current.postedAt || null
+      posted_at: current.postedAt || null,
+      raw_text: rawText
     };
 
     const options = {
