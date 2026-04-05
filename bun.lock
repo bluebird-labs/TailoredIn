@@ -85,6 +85,8 @@
         "@tailoredin/core": "workspace:*",
         "@tailoredin/domain": "workspace:*",
         "@tselect/status-code": "^1.0.2",
+        "zod": "^3.24.1",
+        "zod-to-json-schema": "^3.24.0",
       },
       "devDependencies": {
         "@types/node": "^22.13.1",

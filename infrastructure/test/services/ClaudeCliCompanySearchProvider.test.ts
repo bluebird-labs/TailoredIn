@@ -1,69 +1,49 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, mock, test } from 'bun:test';
+import { err, ok } from '@tailoredin/domain';
 import { ClaudeCliCompanySearchProvider } from '../../src/services/ClaudeCliCompanySearchProvider.js';
+import type { ClaudeCliProvider } from '../../src/services/llm/ClaudeCliProvider.js';
+import { LlmRequestError } from '../../src/services/llm/LlmRequestError.js';
+
+function createMockProvider(result: ReturnType<typeof ok> | ReturnType<typeof err>) {
+  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeCliProvider;
+}
 
 describe('ClaudeCliCompanySearchProvider', () => {
-  test('parses valid JSON array response', () => {
-    const validResponse = JSON.stringify([
-      { name: 'Stripe', website: 'https://stripe.com', description: 'Online payment processing' },
-      { name: 'Stripe Atlas', website: 'https://stripe.com/atlas', description: 'Business incorporation' }
-    ]);
+  test('returns companies from successful LLM response', async () => {
+    const mockProvider = createMockProvider(
+      ok({
+        companies: [
+          { name: 'Stripe', website: 'https://stripe.com', description: 'Online payments' },
+          { name: 'Stripe Atlas', website: 'https://stripe.com/atlas', description: 'Business incorporation' }
+        ]
+      })
+    );
 
-    const provider = new ClaudeCliCompanySearchProvider();
-    const results = provider.parseResponse(validResponse);
+    const searchProvider = new ClaudeCliCompanySearchProvider(mockProvider);
+    const results = await searchProvider.searchByName('stripe');
 
     expect(results).toHaveLength(2);
     expect(results[0].name).toBe('Stripe');
     expect(results[0].website).toBe('https://stripe.com');
-    expect(results[0].description).toBe('Online payment processing');
     expect(results[1].name).toBe('Stripe Atlas');
   });
 
-  test('handles null fields gracefully', () => {
-    const response = JSON.stringify([{ name: 'Unknown Corp', website: null, description: null }]);
+  test('throws ExternalServiceError on LLM failure', async () => {
+    const mockProvider = createMockProvider(
+      err(new LlmRequestError('CLI exited with code 1', ['claude'], 1, '', '', 100))
+    );
 
-    const provider = new ClaudeCliCompanySearchProvider();
-    const results = provider.parseResponse(response);
+    const searchProvider = new ClaudeCliCompanySearchProvider(mockProvider);
 
-    expect(results).toHaveLength(1);
-    expect(results[0].website).toBeNull();
-    expect(results[0].description).toBeNull();
+    await expect(searchProvider.searchByName('test')).rejects.toThrow('Company search failed');
   });
 
-  test('returns empty array for non-array response', () => {
-    const provider = new ClaudeCliCompanySearchProvider();
-    const results = provider.parseResponse(JSON.stringify({ name: 'not an array' }));
+  test('returns empty array when LLM returns empty companies', async () => {
+    const mockProvider = createMockProvider(ok({ companies: [] }));
+
+    const searchProvider = new ClaudeCliCompanySearchProvider(mockProvider);
+    const results = await searchProvider.searchByName('nonexistent');
 
     expect(results).toEqual([]);
-  });
-
-  test('filters out entries without name', () => {
-    const response = JSON.stringify([
-      { name: 'Valid', website: 'https://valid.com', description: 'A valid company' },
-      { website: 'https://no-name.com', description: 'Missing name field' }
-    ]);
-
-    const provider = new ClaudeCliCompanySearchProvider();
-    const results = provider.parseResponse(response);
-
-    expect(results).toHaveLength(1);
-    expect(results[0].name).toBe('Valid');
-  });
-
-  test('limits results to 5', () => {
-    const items = Array.from({ length: 10 }, (_, i) => ({
-      name: `Company ${i}`,
-      website: null,
-      description: null
-    }));
-
-    const provider = new ClaudeCliCompanySearchProvider();
-    const results = provider.parseResponse(JSON.stringify(items));
-
-    expect(results).toHaveLength(5);
-  });
-
-  test('throws on invalid JSON', () => {
-    const provider = new ClaudeCliCompanySearchProvider();
-    expect(() => provider.parseResponse('not json')).toThrow();
   });
 });

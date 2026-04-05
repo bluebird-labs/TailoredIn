@@ -32,8 +32,13 @@ import type {
   HeadlineRepository,
   ProfileRepository
 } from '@tailoredin/domain';
+import type { ClaudeCliProvider } from './services/llm/ClaudeCliProvider.js';
 
 export const DI = {
+  Llm: {
+    ClaudeCliProvider: new InjectionToken<ClaudeCliProvider>('DI.Llm.ClaudeCliProvider')
+  },
+
   Profile: {
     Repository: new InjectionToken<ProfileRepository>('DI.Profile.Repository'),
     GetProfile: new InjectionToken<GetProfile>('DI.Profile.GetProfile'),

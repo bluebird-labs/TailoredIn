@@ -28,6 +28,7 @@ import { env, envInt } from '@tailoredin/core';
 import {
   ClaudeCliCompanyDataProvider,
   ClaudeCliCompanySearchProvider,
+  ClaudeCliProvider,
   createOrmConfig,
   DI,
   PostgresCompanyRepository,
@@ -133,6 +134,9 @@ container.bind({
   provide: DI.Experience.DeleteAccomplishment,
   useFactory: () => new DeleteAccomplishment(container.get(DI.Experience.Repository))
 });
+
+// LLM
+container.bind({ provide: DI.Llm.ClaudeCliProvider, useClass: ClaudeCliProvider });
 
 // Company
 container.bind({ provide: DI.Company.Repository, useClass: PostgresCompanyRepository });
