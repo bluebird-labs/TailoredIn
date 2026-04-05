@@ -79,7 +79,12 @@ function FormModal({
           }
         }}
       >
-        <DialogContent showCloseButton={false} className="sm:max-w-lg" overlayClassName={overlayClassName}>
+        <DialogContent
+          showCloseButton={false}
+          className="sm:max-w-lg"
+          overlayClassName={overlayClassName}
+          stacked={confirmOpen}
+        >
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
