@@ -1,5 +1,5 @@
-import { describe, expect, test } from 'bun:test';
-import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, test } from 'bun:test';
+import { cleanup, render, screen } from '@testing-library/react';
 import { ProfileDisplay } from '../ProfileDisplay.js';
 
 const fullProfile = {
@@ -25,6 +25,10 @@ const minimalProfile = {
   githubUrl: null,
   websiteUrl: null
 };
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('ProfileDisplay', () => {
   test('renders all fields as text, not inputs', () => {

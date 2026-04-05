@@ -1,5 +1,5 @@
-import { describe, expect, test } from 'bun:test';
-import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, test } from 'bun:test';
+import { cleanup, render, screen } from '@testing-library/react';
 import type { Education } from '@/hooks/use-educations';
 import { EducationCardContent } from '../EducationCardContent.js';
 
@@ -22,6 +22,10 @@ const minimalEducation: Education = {
   honors: null,
   ordinal: 1
 };
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('EducationCardContent', () => {
   test('renders all fields when provided', () => {
