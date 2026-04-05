@@ -69,13 +69,21 @@ function jdToFormState(jd: JobDescription): JobDescriptionFormState {
     salaryCurrency: jd.salaryRange?.currency ?? '',
     level: str(jd.level),
     locationType: str(jd.locationType),
-    postedAt: str(jd.postedAt) || todayIso()
+    postedAt: toDateStr(jd.postedAt)
   };
 }
 
-function str(value: string | null | undefined): string {
+function str(value: string | Date | null | undefined): string {
   if (value == null || value === 'null') return '';
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
   return value;
+}
+
+function toDateStr(value: string | Date | null | undefined): string {
+  const s = str(value);
+  if (!s) return todayIso();
+  // Truncate ISO timestamps (2026-04-05T00:00:00.000Z) to date-only
+  return s.length > 10 ? s.slice(0, 10) : s;
 }
 
 function parseResultToFormState(result: JobDescriptionParseResult): JobDescriptionFormState {
@@ -89,7 +97,7 @@ function parseResultToFormState(result: JobDescriptionParseResult): JobDescripti
     salaryCurrency: str(result.salaryCurrency),
     level: str(result.level),
     locationType: str(result.locationType),
-    postedAt: str(result.postedAt) || todayIso()
+    postedAt: toDateStr(result.postedAt)
   };
 }
 

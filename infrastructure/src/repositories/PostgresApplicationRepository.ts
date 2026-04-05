@@ -8,6 +8,9 @@ import {
   EntityNotFoundError
 } from '@tailoredin/domain';
 import { Application as OrmApplication } from '../db/entities/application/Application.js';
+import { Company as OrmCompany } from '../db/entities/companies/Company.js';
+import { JobDescription as OrmJobDescription } from '../db/entities/job-description/JobDescription.js';
+import { Profile as OrmProfile } from '../db/entities/profile/Profile.js';
 
 @injectable()
 export class PostgresApplicationRepository implements ApplicationRepository {
@@ -33,14 +36,21 @@ export class PostgresApplicationRepository implements ApplicationRepository {
     if (ormApp) {
       ormApp.status = application.status;
       ormApp.notes = application.notes;
-      ormApp.jobDescription = application.jobDescriptionId ? (application.jobDescriptionId as never) : null;
+      ormApp.jobDescription = application.jobDescriptionId
+        ? this.orm.em.getReference(OrmJobDescription, application.jobDescriptionId)
+        : null;
       ormApp.updatedAt = application.updatedAt;
     } else {
-      ormApp = this.orm.em.create(OrmApplication, {
+      const profileRef = this.orm.em.getReference(OrmProfile, application.profileId);
+      const companyRef = this.orm.em.getReference(OrmCompany, application.companyId);
+      const jdRef = application.jobDescriptionId
+        ? this.orm.em.getReference(OrmJobDescription, application.jobDescriptionId)
+        : null;
+      ormApp = new OrmApplication({
         id: application.id.value,
-        profile: application.profileId as never,
-        company: application.companyId as never,
-        jobDescription: application.jobDescriptionId ? (application.jobDescriptionId as never) : null,
+        profile: profileRef,
+        company: companyRef,
+        jobDescription: jdRef,
         status: application.status,
         notes: application.notes,
         appliedAt: application.appliedAt,
