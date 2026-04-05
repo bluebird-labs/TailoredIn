@@ -1,4 +1,5 @@
 export { BaseLlmCliProvider } from './BaseLlmCliProvider.js';
+export type { LlmRequestOptions } from './BaseLlmCliProvider.js';
 export { ClaudeCliProvider } from './ClaudeCliProvider.js';
 export type { ClaudeCliResponse, ClaudeCliUsage } from './ClaudeCliResponse.js';
 export { LlmJsonRequest } from './LlmJsonRequest.js';

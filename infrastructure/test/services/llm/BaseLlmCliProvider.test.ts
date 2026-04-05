@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { Logger } from '@tailoredin/core';
 import { z } from 'zod';
+import type { LlmRequestOptions } from '../../../src/services/llm/BaseLlmCliProvider.js';
 import { BaseLlmCliProvider } from '../../../src/services/llm/BaseLlmCliProvider.js';
 import { LlmJsonRequest } from '../../../src/services/llm/LlmJsonRequest.js';
 import { LlmRequestError } from '../../../src/services/llm/LlmRequestError.js';
@@ -30,7 +31,10 @@ class TestProvider extends BaseLlmCliProvider {
   }
 
   // Override request to avoid actual Bun.spawn
-  public override async request<T extends z.ZodObject<z.ZodRawShape>>(request: LlmJsonRequest<T>) {
+  public override async request<T extends z.ZodObject<z.ZodRawShape>>(
+    request: LlmJsonRequest<T>,
+    _options?: LlmRequestOptions
+  ) {
     // Simulate the base class logic without spawning
     const jsonSchema = request.getJsonSchema();
     const command = this.buildCommand(request, jsonSchema);
@@ -162,4 +166,33 @@ describe('BaseLlmCliProvider', () => {
       expect(result.error.duration).toBeGreaterThanOrEqual(0);
     }
   });
+});
+
+class SpawningTestProvider extends BaseLlmCliProvider {
+  protected readonly log = Logger.create('spawning-test-provider');
+
+  public commandArgs: string[] = ['sleep', '120'];
+
+  protected buildCommand(): string[] {
+    return this.commandArgs;
+  }
+
+  protected extractResult(stdout: string): unknown {
+    const parsed = JSON.parse(stdout);
+    return JSON.parse(parsed.result);
+  }
+}
+
+describe('BaseLlmCliProvider timeout', () => {
+  test('returns error when CLI process exceeds timeout', async () => {
+    const provider = new SpawningTestProvider();
+
+    const result = await provider.request(new TestRequest(), { timeoutMs: 1000 });
+
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error).toBeInstanceOf(LlmRequestError);
+      expect(result.error.message).toContain('timed out');
+    }
+  }, 10_000);
 });

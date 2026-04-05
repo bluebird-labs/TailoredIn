@@ -6,6 +6,10 @@ import { LlmRequestError } from './LlmRequestError.js';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
 
+export interface LlmRequestOptions {
+  timeoutMs?: number;
+}
+
 export abstract class BaseLlmCliProvider {
   protected abstract readonly log: LoggerInstance;
 
@@ -14,8 +18,10 @@ export abstract class BaseLlmCliProvider {
   protected abstract extractResult(stdout: string): unknown;
 
   public async request<T extends z.ZodObject<z.ZodRawShape>>(
-    request: LlmJsonRequest<T>
+    request: LlmJsonRequest<T>,
+    options?: LlmRequestOptions
   ): Promise<Result<z.infer<T>, LlmRequestError>> {
+    const timeoutMs = options?.timeoutMs ?? 60_000;
     const jsonSchema = request.getJsonSchema();
     const command = this.buildCommand(request, jsonSchema);
     const start = performance.now();
@@ -28,12 +34,30 @@ export abstract class BaseLlmCliProvider {
 
     try {
       const proc = Bun.spawn(command, { stdout: 'pipe', stderr: 'pipe' });
-      stdout = await new Response(proc.stdout).text();
-      stderr = await new Response(proc.stderr).text();
-      exitCode = await proc.exited;
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          proc.kill();
+          reject(new Error(`CLI process timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      });
+
+      const processPromise = (async () => {
+        const out = await new Response(proc.stdout).text();
+        const errOut = await new Response(proc.stderr).text();
+        const code = await proc.exited;
+        return { out, errOut, code };
+      })();
+
+      const result = await Promise.race([processPromise, timeoutPromise]);
+      stdout = result.out;
+      stderr = result.errOut;
+      exitCode = result.code;
     } catch (e) {
       const duration = Math.round(performance.now() - start);
-      const message = `Failed to spawn CLI: ${e instanceof Error ? e.message : String(e)}`;
+      const message = e instanceof Error && e.message.includes('timed out')
+        ? e.message
+        : `Failed to spawn CLI: ${e instanceof Error ? e.message : String(e)}`;
       return err(new LlmRequestError(message, command, null, '', '', duration));
     }
 
