@@ -17,7 +17,7 @@ export class E2eSeeder extends Seeder {
       TRUNCATE
         accomplishments, experiences,
         headlines, educations, profiles,
-        companies
+        job_descriptions, companies
       CASCADE
     `);
 
@@ -145,6 +145,48 @@ export class E2eSeeder extends Seeder {
           'aaaaaaaa-0000-4000-8000-000000000001',
           'Full-Stack Developer',
           'Versatile engineer comfortable across the entire stack, from React frontends to PostgreSQL internals.',
+          NOW(), NOW()
+        )
+    `);
+
+    // Companies
+    await conn.execute(`
+      INSERT INTO companies (id, name, description, website, logo_url, linkedin_link, business_type, industry, stage, created_at, updated_at)
+      VALUES
+        (
+          'ffffffff-0000-4000-8000-000000000001',
+          'Acme Corp',
+          'Leading provider of innovative cloud solutions.',
+          'https://acme.com',
+          NULL,
+          'https://linkedin.com/company/acme',
+          'b2b',
+          'saas',
+          'series_b',
+          NOW(), NOW()
+        ),
+        (
+          'ffffffff-0000-4000-8000-000000000002',
+          'StartupCo',
+          'Early-stage fintech startup.',
+          'https://startupco.io',
+          NULL,
+          NULL,
+          'b2c',
+          'finance',
+          'seed',
+          NOW(), NOW()
+        ),
+        (
+          'ffffffff-0000-4000-8000-000000000003',
+          'Big Bank Inc.',
+          'Global financial services corporation.',
+          'https://bigbank.com',
+          NULL,
+          'https://linkedin.com/company/bigbank',
+          'b2b',
+          'finance',
+          'public',
           NOW(), NOW()
         )
     `);
