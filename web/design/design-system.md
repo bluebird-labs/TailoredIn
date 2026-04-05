@@ -200,6 +200,42 @@ All editable data renders as plain content by default. Form inputs only appear w
 - Toggles `.dark` class on `<html>` element
 - Preference persisted to `localStorage`
 
+### Detail Page Header
+
+- Logo/avatar: 52×52px, 12px border-radius, `bg-accent` with `text-accent-foreground`
+- Title: h1 (22px, medium 500, -0.01em tracking)
+- Meta row: flex wrap, 8px gap, badges + dots + text
+- Action buttons: right-aligned, 8px gap
+
+### Breadcrumb
+
+- Font: 13px, `text-muted-foreground`
+- Parent link: `text-primary`, hover underline
+- Separator: `/` in `text-border`, 6px gap
+
+### Info Card (Read-Only)
+
+- Same card base: `bg-card`, 1px `border`, 14px border-radius, 20px padding
+- Section label: 11px uppercase, 0.06em letter-spacing, `text-muted-foreground`, 12px bottom margin
+- Description variant: 14px body text, 1.6 line-height
+- Key-value variant: `InfoRow` pairs with flex space-between, 8px vertical padding, `border-border/50` bottom border
+
+### Linked Entity Card
+
+- Card base with 14px border-radius
+- Logo: 36×36px, 8px border-radius, `bg-accent`
+- Name: 13px medium, `text-foreground`
+- Meta: 11px, `text-muted-foreground`
+- Arrow: lucide `ArrowRight`, 16px, `text-muted-foreground`
+- Hover: `bg-accent/40`, `border-primary/30`
+
+### Stacked Modal
+
+- Background modal: `scale(0.90)`, `blur(1.5px)`, `opacity: 0.5`
+- Transition: `200ms ease` on transform, filter, opacity
+- Between-modal overlay: `rgba(0, 0, 0, 0.15)`
+- Foreground modal shadow: `0 16px 48px rgba(0,0,0,0.2)`
+
 ## Radius Scale
 
 Slightly larger than shadcn default to support the warm, rounded feel:

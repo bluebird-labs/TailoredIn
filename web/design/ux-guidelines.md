@@ -71,8 +71,18 @@ Prefer modals over inline editing when creating or editing entities with **3 or 
 - Footer: Save (primary, disabled until dirty) + Cancel (ghost)
 - Cancel with dirty fields triggers `ConfirmDialog`: "You have unsaved changes. Discard?"
 - Close (X) and overlay click behave identically to Cancel
-- **Stacked modals:** The dialog overlay uses `backdrop-blur-sm` globally. When a second modal opens over the first, the blur compounds — the underlying modal and page content become visibly blurred, giving clear depth separation without extra configuration
+- **Stacked modals:** See the "Stacked Modals" section below for explicit depth treatment
 - Validation fires on save attempt only — same rules as inline forms
+
+### Stacked Modals
+
+When a second dialog opens over an existing modal (e.g., discard confirmation over an edit form):
+
+- **Background modal:** `scale(0.90)`, `blur(1.5px)`, `opacity: 0.5`, with `200ms` transition
+- **Between-modal overlay:** `rgba(0, 0, 0, 0.15)`
+- **Foreground modal:** enhanced shadow `0 16px 48px rgba(0,0,0,0.2)`
+- Triggered automatically when `FormModal` detects a nested dialog is open
+- Does **not** apply to popovers, dropdowns, or tooltips overlapping a modal
 - Content scrolls if form exceeds viewport height (`max-h-[60vh]`)
 
 ---
@@ -151,3 +161,50 @@ Required for **destructive** actions:
 - Stay on the same page after saving
 - Toast confirmation
 - No automatic redirects
+
+---
+
+## 5. Detail Pages
+
+### When to Use Detail Pages
+
+Use a dedicated detail page (full route) for entities that have:
+- Nested sub-entities (e.g., experiences with accomplishments, companies with job descriptions)
+- Cross-entity references (e.g., experiences linking to companies)
+- Enough content to warrant tabbed organization
+
+Keep modal/inline editing for entities that are simple and flat (headlines, education).
+
+### Layout Structure
+
+Detail pages follow a consistent structure:
+
+1. **Breadcrumb** — `Parent / Current` with the parent as a link
+2. **Header** — Logo/avatar, title (h1), meta badges/text, action buttons (Edit, external links)
+3. **Tabs** — Section navigation with count badges for lists
+4. **Content** — Tab-specific content using `InfoCard` components
+
+### Read-Only Default
+
+Detail pages are **information-oriented** by default. All data displays as plain text in `InfoCard` components. Editing is only accessible via the Edit button in the header, which opens the entity's existing `FormModal`.
+
+### Navigation
+
+- Clicking a card in a list navigates to the detail page (not opens a modal)
+- Cards use `<Link>` from TanStack Router, not `<button>` with onClick
+- Breadcrumb links navigate back to the parent list
+- Cross-entity links (e.g., linked company on an experience) navigate to that entity's detail page
+
+### Linked Entity Card
+
+When a detail page references another entity, display it as a `LinkedEntityCard`:
+- Logo/initial + name + meta text + arrow icon
+- Clickable — navigates to the linked entity's detail page
+- Hover treatment: `bg-accent/40` warm amber wash, `border-primary/30`
+
+### Side Panel (Optional)
+
+For detail pages with supplementary information (e.g., experience overview), use a side panel layout:
+- Main content column: `1fr`
+- Side panel: fixed `280px`
+- Side panel contains: linked entity cards, quick stats
