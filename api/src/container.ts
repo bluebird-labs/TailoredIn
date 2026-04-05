@@ -18,6 +18,7 @@ import {
   GetApplication,
   GetJobDescription,
   GetProfile,
+  LinkCompanyToExperience,
   ListApplications,
   ListCompanies,
   ListEducation,
@@ -25,6 +26,7 @@ import {
   ListHeadlines,
   ListJobDescriptions,
   SearchCompanies,
+  UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
   UpdateApplicationStatus,
@@ -121,7 +123,7 @@ container.bind({
 container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
 container.bind({
   provide: DI.Experience.List,
-  useFactory: () => new ListExperiences(container.get(DI.Experience.Repository))
+  useFactory: () => new ListExperiences(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
 });
 container.bind({
   provide: DI.Experience.Create,
@@ -146,6 +148,14 @@ container.bind({
 container.bind({
   provide: DI.Experience.DeleteAccomplishment,
   useFactory: () => new DeleteAccomplishment(container.get(DI.Experience.Repository))
+});
+container.bind({
+  provide: DI.Experience.LinkCompany,
+  useFactory: () => new LinkCompanyToExperience(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
+});
+container.bind({
+  provide: DI.Experience.UnlinkCompany,
+  useFactory: () => new UnlinkCompanyFromExperience(container.get(DI.Experience.Repository))
 });
 
 // LLM

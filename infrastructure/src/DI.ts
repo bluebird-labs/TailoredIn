@@ -19,6 +19,7 @@ import type {
   GetApplication,
   GetJobDescription,
   GetProfile,
+  LinkCompanyToExperience,
   ListApplications,
   ListCompanies,
   ListEducation,
@@ -26,6 +27,7 @@ import type {
   ListHeadlines,
   ListJobDescriptions,
   SearchCompanies,
+  UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
   UpdateApplicationStatus,
@@ -101,7 +103,9 @@ export const DI = {
     Delete: new InjectionToken<DeleteExperience>('DI.Experience.Delete'),
     AddAccomplishment: new InjectionToken<AddAccomplishment>('DI.Experience.AddAccomplishment'),
     UpdateAccomplishment: new InjectionToken<UpdateAccomplishment>('DI.Experience.UpdateAccomplishment'),
-    DeleteAccomplishment: new InjectionToken<DeleteAccomplishment>('DI.Experience.DeleteAccomplishment')
+    DeleteAccomplishment: new InjectionToken<DeleteAccomplishment>('DI.Experience.DeleteAccomplishment'),
+    LinkCompany: new InjectionToken<LinkCompanyToExperience>('DI.Experience.LinkCompany'),
+    UnlinkCompany: new InjectionToken<UnlinkCompanyFromExperience>('DI.Experience.UnlinkCompany')
   },
 
   Company: {

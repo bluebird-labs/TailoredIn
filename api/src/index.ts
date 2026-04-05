@@ -21,6 +21,8 @@ import { UpdateEducationRoute } from './routes/education/UpdateEducationRoute.js
 import { AddAccomplishmentRoute } from './routes/experience/AddAccomplishmentRoute.js';
 import { CreateExperienceRoute } from './routes/experience/CreateExperienceRoute.js';
 import { DeleteAccomplishmentRoute } from './routes/experience/DeleteAccomplishmentRoute.js';
+import { LinkCompanyRoute } from './routes/experience/LinkCompanyRoute.js';
+import { UnlinkCompanyRoute } from './routes/experience/UnlinkCompanyRoute.js';
 import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
 import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
@@ -120,6 +122,8 @@ const app = new Elysia()
   .use(container.get(AddAccomplishmentRoute).plugin())
   .use(container.get(UpdateAccomplishmentRoute).plugin())
   .use(container.get(DeleteAccomplishmentRoute).plugin())
+  .use(container.get(LinkCompanyRoute).plugin())
+  .use(container.get(UnlinkCompanyRoute).plugin())
   // Factory
   .use(container.get(ExtractTextRoute).plugin())
   // Companies
