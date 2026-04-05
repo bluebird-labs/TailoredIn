@@ -38,6 +38,7 @@ import { CreateJobDescriptionRoute } from './routes/job-description/CreateJobDes
 import { DeleteJobDescriptionRoute } from './routes/job-description/DeleteJobDescriptionRoute.js';
 import { GetJobDescriptionRoute } from './routes/job-description/GetJobDescriptionRoute.js';
 import { ListJobDescriptionsRoute } from './routes/job-description/ListJobDescriptionsRoute.js';
+import { ParseJobDescriptionRoute } from './routes/job-description/ParseJobDescriptionRoute.js';
 import { UpdateJobDescriptionRoute } from './routes/job-description/UpdateJobDescriptionRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
@@ -140,6 +141,7 @@ const app = new Elysia()
   .use(container.get(UpdateApplicationStatusRoute).plugin())
   .use(container.get(DeleteApplicationRoute).plugin())
   // Job Descriptions
+  .use(container.get(ParseJobDescriptionRoute).plugin())
   .use(container.get(CreateJobDescriptionRoute).plugin())
   .use(container.get(GetJobDescriptionRoute).plugin())
   .use(container.get(ListJobDescriptionsRoute).plugin())

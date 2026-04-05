@@ -25,6 +25,7 @@ import {
   ListExperiences,
   ListHeadlines,
   ListJobDescriptions,
+  ParseJobDescription,
   SearchCompanies,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -41,6 +42,7 @@ import { env, envInt } from '@tailoredin/core';
 import {
   ClaudeCliCompanyDataProvider,
   ClaudeCliCompanySearchProvider,
+  ClaudeCliJobDescriptionParser,
   ClaudeCliProvider,
   createOrmConfig,
   DI,
@@ -216,6 +218,11 @@ container.bind({
 
 // Job Descriptions
 container.bind({ provide: DI.JobDescription.Repository, useClass: PostgresJobDescriptionRepository });
+container.bind({ provide: DI.JobDescription.Parser, useClass: ClaudeCliJobDescriptionParser });
+container.bind({
+  provide: DI.JobDescription.Parse,
+  useFactory: () => new ParseJobDescription(container.get(DI.JobDescription.Parser))
+});
 container.bind({
   provide: DI.JobDescription.Create,
   useFactory: () => new CreateJobDescription(container.get(DI.JobDescription.Repository))

@@ -19,6 +19,7 @@ import type {
   GetApplication,
   GetJobDescription,
   GetProfile,
+  JobDescriptionParser,
   LinkCompanyToExperience,
   ListApplications,
   ListCompanies,
@@ -26,6 +27,7 @@ import type {
   ListExperiences,
   ListHeadlines,
   ListJobDescriptions,
+  ParseJobDescription,
   SearchCompanies,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -66,9 +68,11 @@ export const DI = {
 
   JobDescription: {
     Repository: new InjectionToken<JobDescriptionRepository>('DI.JobDescription.Repository'),
+    Parser: new InjectionToken<JobDescriptionParser>('DI.JobDescription.Parser'),
     Create: new InjectionToken<CreateJobDescription>('DI.JobDescription.Create'),
     Get: new InjectionToken<GetJobDescription>('DI.JobDescription.Get'),
     List: new InjectionToken<ListJobDescriptions>('DI.JobDescription.List'),
+    Parse: new InjectionToken<ParseJobDescription>('DI.JobDescription.Parse'),
     Update: new InjectionToken<UpdateJobDescription>('DI.JobDescription.Update'),
     Delete: new InjectionToken<DeleteJobDescription>('DI.JobDescription.Delete')
   },

@@ -13,6 +13,7 @@ export { PostgresProfileRepository } from './repositories/PostgresProfileReposit
 // Services
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
 export { ClaudeCliCompanySearchProvider } from './services/ClaudeCliCompanySearchProvider.js';
+export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptionParser.js';
 // LLM
 export {
   ClaudeCliProvider,

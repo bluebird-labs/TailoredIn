@@ -10,6 +10,7 @@ import {
   type LocationType,
   SalaryRange
 } from '@tailoredin/domain';
+import { Company as OrmCompany } from '../db/entities/companies/Company.js';
 import { JobDescription as OrmJobDescription } from '../db/entities/job-description/JobDescription.js';
 
 @injectable()
@@ -47,9 +48,10 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       ormJd.postedAt = jd.postedAt;
       ormJd.updatedAt = jd.updatedAt;
     } else {
-      ormJd = this.orm.em.create(OrmJobDescription, {
+      const companyRef = this.orm.em.getReference(OrmCompany, jd.companyId);
+      ormJd = new OrmJobDescription({
         id: jd.id.value,
-        company: jd.companyId as never,
+        company: companyRef,
         title: jd.title,
         description: jd.description,
         url: jd.url,
