@@ -1,4 +1,12 @@
-import { Children, isValidElement, type KeyboardEvent, type ReactNode, useCallback, useEffect } from 'react';
+import {
+  Children,
+  isValidElement,
+  type KeyboardEvent,
+  type ReactElement,
+  type ReactNode,
+  useCallback,
+  useEffect
+} from 'react';
 import { cn } from '@/lib/utils';
 import { EditableSectionProvider, useEditableSection } from './EditableSectionContext.js';
 import { SaveBar } from './SaveBar.js';
@@ -45,9 +53,9 @@ function EditableSectionInner({
   Children.forEach(children, child => {
     if (isValidElement(child)) {
       if (child.type === EditableSectionDisplay) {
-        displayChildren = child.props.children as ReactNode;
+        displayChildren = (child as ReactElement<{ children: ReactNode }>).props.children;
       } else if (child.type === EditableSectionEditor) {
-        editorChildren = child.props.children as ReactNode;
+        editorChildren = (child as ReactElement<{ children: ReactNode }>).props.children;
       }
     }
   });
@@ -70,7 +78,7 @@ function EditableSectionInner({
   }, [requestEdit]);
 
   const handleDisplayKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLDivElement>) => {
+    (e: KeyboardEvent<HTMLButtonElement>) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         requestEdit();

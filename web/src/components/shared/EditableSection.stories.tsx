@@ -14,7 +14,15 @@ const meta = {
         </div>
       </EditableSectionProvider>
     )
-  ]
+  ],
+  args: {
+    sectionId: 'demo',
+    isDirty: false,
+    isSaving: false,
+    onSave: () => {},
+    onDiscard: () => {},
+    children: null
+  }
 } satisfies Meta<typeof EditableSection>;
 
 export default meta;
