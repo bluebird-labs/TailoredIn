@@ -102,7 +102,9 @@ function EditableField(props: EditableFieldProps) {
       {type === 'select' && (
         <Select value={props.value} onValueChange={v => props.onChange(v ?? '')} disabled={disabled}>
           <SelectTrigger id={fieldId} aria-invalid={!!error || undefined}>
-            <SelectValue placeholder={props.placeholder} />
+            <SelectValue placeholder={props.placeholder}>
+              {props.value ? (props.options.find(o => o.value === props.value)?.label ?? props.value) : undefined}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {props.options.map(option => (

@@ -16,7 +16,9 @@ import {
   ListEducation,
   ListExperiences,
   ListHeadlines,
+  SearchCompanies,
   UpdateAccomplishment,
+  UpdateCompany,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
@@ -25,6 +27,7 @@ import {
 import { env, envInt } from '@tailoredin/core';
 import {
   ClaudeCliCompanyDataProvider,
+  ClaudeCliCompanySearchProvider,
   createOrmConfig,
   DI,
   PostgresCompanyRepository,
@@ -134,9 +137,14 @@ container.bind({
 // Company
 container.bind({ provide: DI.Company.Repository, useClass: PostgresCompanyRepository });
 container.bind({ provide: DI.Company.DataProvider, useClass: ClaudeCliCompanyDataProvider });
+container.bind({ provide: DI.Company.SearchProvider, useClass: ClaudeCliCompanySearchProvider });
 container.bind({
   provide: DI.Company.Enrich,
   useFactory: () => new EnrichCompanyData(container.get(DI.Company.DataProvider))
+});
+container.bind({
+  provide: DI.Company.Search,
+  useFactory: () => new SearchCompanies(container.get(DI.Company.SearchProvider))
 });
 container.bind({
   provide: DI.Company.List,
@@ -145,6 +153,10 @@ container.bind({
 container.bind({
   provide: DI.Company.Create,
   useFactory: () => new CreateCompany(container.get(DI.Company.Repository))
+});
+container.bind({
+  provide: DI.Company.Update,
+  useFactory: () => new UpdateCompany(container.get(DI.Company.Repository))
 });
 
 export { container };

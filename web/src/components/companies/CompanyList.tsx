@@ -4,11 +4,11 @@ import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useCompanies } from '@/hooks/use-companies';
+import { type Company, useCompanies } from '@/hooks/use-companies';
 import { CompanyCard } from './CompanyCard.js';
 import { CompanyFormModal } from './CompanyFormModal.js';
 
-type ModalState = { mode: 'closed' } | { mode: 'create' };
+type ModalState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; company: Company };
 
 export function CompanyList() {
   const { data: companies = [], isLoading } = useCompanies();
@@ -48,7 +48,13 @@ export function CompanyList() {
           {filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">No companies match your search.</p>
           ) : (
-            filtered.map(company => <CompanyCard key={company.id} company={company} onClick={() => {}} />)
+            filtered.map(company => (
+              <CompanyCard
+                key={company.id}
+                company={company}
+                onClick={() => setModalState({ mode: 'edit', company })}
+              />
+            ))
           )}
 
           <Button
@@ -63,9 +69,18 @@ export function CompanyList() {
         </div>
       )}
 
-      {modalState.mode !== 'closed' && (
+      {modalState.mode === 'create' && (
         <CompanyFormModal
-          open={modalOpen}
+          open
+          onOpenChange={next => {
+            if (!next) setModalState({ mode: 'closed' });
+          }}
+        />
+      )}
+      {modalState.mode === 'edit' && (
+        <CompanyFormModal
+          open
+          company={modalState.company}
           onOpenChange={next => {
             if (!next) setModalState({ mode: 'closed' });
           }}

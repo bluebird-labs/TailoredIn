@@ -5,6 +5,7 @@ import { toCompanyDto } from '../../dtos/CompanyDto.js';
 
 export type CreateCompanyInput = {
   name: string;
+  description: string | null;
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string | null;
@@ -19,6 +20,7 @@ export class CreateCompany {
   public async execute(input: CreateCompanyInput): Promise<CompanyDto> {
     const company = Company.create({
       name: input.name,
+      description: input.description,
       website: input.website,
       logoUrl: input.logoUrl,
       linkedinLink: input.linkedinLink,
