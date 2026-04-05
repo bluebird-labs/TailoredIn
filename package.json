@@ -48,8 +48,8 @@
     "e2e:test:headed": "bun run --cwd e2e test:headed",
     "db:seed:generate-types": "bun --env-file=.env run infrastructure/src/db/generate-seed-types.ts",
     "domain:diagram": "bun run domain/scripts/generate-diagram.ts",
-    "db:diagram": "bun --env-file=.env run infrastructure/scripts/generate-database-diagram.ts",
-    "verify": "bun run scripts/verify.ts"
+    "app:diagram": "bun run application/scripts/generate-diagram.ts",
+    "db:diagram": "bun --env-file=.env run infrastructure/scripts/generate-database-diagram.ts"
   },
   "workspaces": [
     "domain",

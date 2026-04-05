@@ -52,7 +52,7 @@ All commands are run from the repo root. Commands are scoped by context:
 - **`dev:*`** — main branch only (reads `.env`, guarded)
 - **`wt:*`** — worktree only (uses `.wt-session.json`, no `.env`)
 - **`e2e:*`** — runs anywhere (Testcontainers, fully ephemeral)
-- **Context-free** — `verify`, `check`, `typecheck`, `test`, etc.
+- **Context-free** — `check`, `typecheck`, `test`, etc.
 
 ### dev: commands (main branch only)
 
@@ -84,10 +84,9 @@ bun e2e:test:ui            # Playwright test UI
 bun e2e:test:headed        # Playwright with visible browser
 ```
 
-### Quality checks (run individually or via `bun verify`)
+### Quality checks
 
 ```bash
-bun verify                 # full project health check (typecheck → lint → dep:check → knip → test:coverage → test:integration → e2e:test)
 bun run typecheck          # type-check all packages
 bun run check              # Biome lint + format check
 bun run check:fix          # Biome lint + format with auto-fix
@@ -108,6 +107,7 @@ bun test <path/to/test.ts>   # run a single test file
 
 ```bash
 bun run domain:diagram       # regenerate domain/DOMAIN.mmd
+bun run app:diagram          # regenerate application/APPLICATION.mmd
 bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running, main only)
 ```
 
@@ -132,10 +132,9 @@ Before ending a session, run `git status`. If there are unstaged or untracked fi
 **Never run `db:migration:up` without asking first.** When asking, read the migration file and explicitly state whether it includes data deletion (DROP TABLE, DROP COLUMN, DELETE, TRUNCATE). Show the destructive SQL if present.
 
 ### Session-end checklist
-1. `bun verify` — all checks must pass
-2. `bun run domain:diagram && bun run db:diagram` — regenerate diagrams
-3. Commit any diagram changes
-4. `git status` — resolve any remaining unstaged/untracked files with the user
+1. `bun run domain:diagram && bun run app:diagram && bun run db:diagram` — regenerate diagrams
+2. Commit any diagram changes
+3. `git status` — resolve any remaining unstaged/untracked files with the user
 
 ## Domain Model
 

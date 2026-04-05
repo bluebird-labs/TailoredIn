@@ -1,0 +1,414 @@
+---
+title: TailoredIn — Application Layer (Use Cases, Ports, DTOs)
+---
+
+classDiagram
+    direction TB
+
+    %% ──────────────────────────────────────────────
+    %%  Company Use Cases
+    %% ──────────────────────────────────────────────
+
+    class CreateCompany {
+        <<UseCase>>
+        +CompanyRepository companyRepository
+        +execute(CreateCompanyInput) CompanyDto
+    }
+
+    class EnrichCompanyData {
+        <<UseCase>>
+        +CompanyDataProvider companyDataProvider
+        +execute(EnrichCompanyDataInput) CompanyEnrichmentResult
+    }
+
+    class ListCompanies {
+        <<UseCase>>
+        +CompanyRepository companyRepository
+        +execute() CompanyDto[]
+    }
+
+    class SearchCompanies {
+        <<UseCase>>
+        +CompanySearchProvider searchProvider
+        +execute(SearchCompaniesInput) CompanySearchResult[]
+    }
+
+    class UpdateCompany {
+        <<UseCase>>
+        +CompanyRepository companyRepository
+        +execute(UpdateCompanyInput) CompanyDto
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Education Use Cases
+    %% ──────────────────────────────────────────────
+
+    class CreateEducation {
+        <<UseCase>>
+        +EducationRepository educationRepository
+        +execute(CreateEducationInput) EducationDto
+    }
+
+    class DeleteEducation {
+        <<UseCase>>
+        +EducationRepository educationRepository
+        +execute(DeleteEducationInput) Result<void, Error>
+    }
+
+    class ListEducation {
+        <<UseCase>>
+        +EducationRepository educationRepository
+        +execute() EducationDto[]
+    }
+
+    class UpdateEducation {
+        <<UseCase>>
+        +EducationRepository educationRepository
+        +execute(UpdateEducationInput) Result<EducationDto, Error>
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Experience Use Cases
+    %% ──────────────────────────────────────────────
+
+    class AddAccomplishment {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(AddAccomplishmentInput) Result<AccomplishmentDto, Error>
+    }
+
+    class CreateExperience {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(CreateExperienceInput) ExperienceDto
+    }
+
+    class DeleteAccomplishment {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(DeleteAccomplishmentInput) Result<void, Error>
+    }
+
+    class DeleteExperience {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(DeleteExperienceInput) Result<void, Error>
+    }
+
+    class ListExperiences {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute() ExperienceDto[]
+    }
+
+    class UpdateAccomplishment {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(UpdateAccomplishmentInput) Result<void, Error>
+    }
+
+    class UpdateExperience {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(UpdateExperienceInput) Result<ExperienceDto, Error>
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Headline Use Cases
+    %% ──────────────────────────────────────────────
+
+    class CreateHeadline {
+        <<UseCase>>
+        +HeadlineRepository headlineRepository
+        +execute(CreateHeadlineInput) HeadlineDto
+    }
+
+    class DeleteHeadline {
+        <<UseCase>>
+        +HeadlineRepository headlineRepository
+        +execute(DeleteHeadlineInput) Result<void, Error>
+    }
+
+    class ListHeadlines {
+        <<UseCase>>
+        +HeadlineRepository headlineRepository
+        +execute() HeadlineDto[]
+    }
+
+    class UpdateHeadline {
+        <<UseCase>>
+        +HeadlineRepository headlineRepository
+        +execute(UpdateHeadlineInput) Result<HeadlineDto, Error>
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Profile Use Cases
+    %% ──────────────────────────────────────────────
+
+    class GetProfile {
+        <<UseCase>>
+        +ProfileRepository profileRepository
+        +execute() ProfileDto
+    }
+
+    class UpdateProfile {
+        <<UseCase>>
+        +ProfileRepository profileRepository
+        +execute(UpdateProfileInput) ProfileDto
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Ports
+    %% ──────────────────────────────────────────────
+
+    class CompanyDataProvider {
+        <<Port>>
+        +enrichFromUrl(url, context?) Promise<CompanyEnrichmentResult>
+    }
+
+    class CompanySearchProvider {
+        <<Port>>
+        +searchByName(name) Promise<CompanySearchResult[]>
+    }
+
+    EnrichCompanyData ..> CompanyDataProvider : depends
+    SearchCompanies ..> CompanySearchProvider : depends
+
+    %% ──────────────────────────────────────────────
+    %%  DTOs
+    %% ──────────────────────────────────────────────
+
+    class AccomplishmentDto {
+        <<DTO>>
+        +string id
+        +string title
+        +string narrative
+        +number ordinal
+    }
+
+    class ApiErrorDto {
+        <<DTO>>
+        +object error
+    }
+
+    class CompanyDto {
+        <<DTO>>
+        +string id
+        +string name
+        +string? description
+        +string? website
+        +string? logoUrl
+        +string? linkedinLink
+        +BusinessType? businessType
+        +Industry? industry
+        +CompanyStage? stage
+    }
+
+    class CompanyEnrichmentResult {
+        <<DTO>>
+        +string? name
+        +string? description
+        +string? website
+        +string? logoUrl
+        +string? linkedinLink
+        +BusinessType? businessType
+        +Industry? industry
+        +CompanyStage? stage
+    }
+
+    class CompanySearchResult {
+        <<DTO>>
+        +string name
+        +string? website
+        +string? description
+    }
+
+    class EducationDto {
+        <<DTO>>
+        +string id
+        +string degreeTitle
+        +string institutionName
+        +number graduationYear
+        +string? location
+        +string? honors
+        +number ordinal
+    }
+
+    class ExperienceDto {
+        <<DTO>>
+        +string id
+        +string title
+        +string companyName
+        +string? companyWebsite
+        +string location
+        +string startDate
+        +string endDate
+        +string? summary
+        +number ordinal
+        +AccomplishmentDto[] accomplishments
+    }
+
+    class HeadlineDto {
+        <<DTO>>
+        +string id
+        +string label
+        +string summaryText
+    }
+
+    class PaginatedDto {
+        <<DTO>>
+        +T[] items
+        +PaginationMeta pagination
+    }
+
+    class PaginationMeta {
+        <<DTO>>
+        +number limit
+        +number offset
+        +number total
+        +boolean hasNext
+    }
+
+    class ProfileDto {
+        <<DTO>>
+        +string id
+        +string email
+        +string firstName
+        +string lastName
+        +string? about
+        +string? phone
+        +string? location
+        +string? linkedinUrl
+        +string? githubUrl
+        +string? websiteUrl
+    }
+
+    ExperienceDto "1" *-- "*" AccomplishmentDto : contains
+    PaginatedDto *-- PaginationMeta
+    CompanyDataProvider ..> CompanyEnrichmentResult : produces
+    CompanySearchProvider ..> CompanySearchResult : produces
+    CreateCompany ..> CompanyDto : returns
+    EnrichCompanyData ..> CompanyEnrichmentResult : returns
+    ListCompanies ..> CompanyDto : returns
+    SearchCompanies ..> CompanySearchResult : returns
+    UpdateCompany ..> CompanyDto : returns
+    CreateEducation ..> EducationDto : returns
+    ListEducation ..> EducationDto : returns
+    UpdateEducation ..> EducationDto : returns
+    AddAccomplishment ..> AccomplishmentDto : returns
+    CreateExperience ..> ExperienceDto : returns
+    ListExperiences ..> ExperienceDto : returns
+    UpdateExperience ..> ExperienceDto : returns
+    GetProfile ..> ProfileDto : returns
+    CreateHeadline ..> HeadlineDto : returns
+    ListHeadlines ..> HeadlineDto : returns
+    UpdateHeadline ..> HeadlineDto : returns
+    UpdateProfile ..> ProfileDto : returns
+
+    %% ──────────────────────────────────────────────
+    %%  Errors
+    %% ──────────────────────────────────────────────
+
+    class ExternalServiceError {
+        <<Error>>
+        +number statusCode
+        +string code
+        +constructor(service, message)
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Domain Ports (external)
+    %% ──────────────────────────────────────────────
+
+    class CompanyRepository {
+        <<DomainPort>>
+    }
+
+    class EducationRepository {
+        <<DomainPort>>
+    }
+
+    class ExperienceRepository {
+        <<DomainPort>>
+    }
+
+    class HeadlineRepository {
+        <<DomainPort>>
+    }
+
+    class ProfileRepository {
+        <<DomainPort>>
+    }
+
+    CreateCompany ..> CompanyRepository : depends
+    ListCompanies ..> CompanyRepository : depends
+    UpdateCompany ..> CompanyRepository : depends
+    CreateEducation ..> EducationRepository : depends
+    DeleteEducation ..> EducationRepository : depends
+    ListEducation ..> EducationRepository : depends
+    UpdateEducation ..> EducationRepository : depends
+    AddAccomplishment ..> ExperienceRepository : depends
+    CreateExperience ..> ExperienceRepository : depends
+    DeleteAccomplishment ..> ExperienceRepository : depends
+    DeleteExperience ..> ExperienceRepository : depends
+    ListExperiences ..> ExperienceRepository : depends
+    UpdateAccomplishment ..> ExperienceRepository : depends
+    UpdateExperience ..> ExperienceRepository : depends
+    GetProfile ..> ProfileRepository : depends
+    CreateHeadline ..> HeadlineRepository : depends
+    DeleteHeadline ..> HeadlineRepository : depends
+    ListHeadlines ..> HeadlineRepository : depends
+    UpdateHeadline ..> HeadlineRepository : depends
+    UpdateProfile ..> ProfileRepository : depends
+
+    %% ──────────────────────────────────────────────
+    %%  Apply Styles
+    %% ──────────────────────────────────────────────
+
+    style CreateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style EnrichCompanyData fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style SearchCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style CreateEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DeleteEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateEducation fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style AddAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style CreateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DeleteAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DeleteExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListExperiences fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style CreateHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DeleteHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListHeadlines fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style CompanySearchProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanySearchResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style HeadlineDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style PaginatedDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style PaginationMeta fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ProfileDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
+    style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style EducationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style HeadlineRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
