@@ -20,7 +20,13 @@ export class UpdateExperienceRoute {
           startDate: body.start_date,
           endDate: body.end_date,
           summary: body.summary ?? null,
-          ordinal: body.ordinal
+          ordinal: body.ordinal,
+          accomplishments: body.accomplishments.map(a => ({
+            id: a.id ?? null,
+            title: a.title,
+            narrative: a.narrative,
+            ordinal: a.ordinal
+          }))
         });
         if (!result.isOk) {
           set.status = 404;
@@ -38,7 +44,15 @@ export class UpdateExperienceRoute {
           start_date: t.String({ minLength: 1 }),
           end_date: t.String({ minLength: 1 }),
           summary: t.Optional(t.String()),
-          ordinal: t.Integer({ minimum: 0 })
+          ordinal: t.Integer({ minimum: 0 }),
+          accomplishments: t.Array(
+            t.Object({
+              id: t.Nullable(t.String()),
+              title: t.String({ minLength: 1 }),
+              narrative: t.String(),
+              ordinal: t.Integer({ minimum: 0 })
+            })
+          )
         })
       }
     );

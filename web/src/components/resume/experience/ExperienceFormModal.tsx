@@ -138,7 +138,13 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
           start_date: current.startDate.trim(),
           end_date: current.endDate.trim(),
           summary: current.summary.trim() || undefined,
-          ordinal: experience.ordinal
+          ordinal: experience.ordinal,
+          accomplishments: experience.accomplishments.map(a => ({
+            id: a.id,
+            title: a.title,
+            narrative: a.narrative,
+            ordinal: a.ordinal
+          }))
         },
         {
           onSuccess: () => {

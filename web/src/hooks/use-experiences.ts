@@ -87,6 +87,7 @@ export function useUpdateExperience() {
       end_date: string;
       summary?: string;
       ordinal: number;
+      accomplishments: { id: string | null; title: string; narrative: string; ordinal: number }[];
     }) => {
       const { id, ...body } = input;
       const { error } = await api.experiences({ id }).put(body);
