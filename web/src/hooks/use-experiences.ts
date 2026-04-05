@@ -90,8 +90,9 @@ export function useUpdateExperience() {
       accomplishments: { id: string | null; title: string; narrative: string; ordinal: number }[];
     }) => {
       const { id, ...body } = input;
-      const { error } = await api.experiences({ id }).put(body);
+      const { data, error } = await api.experiences({ id }).put(body);
       if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to update experience');
+      return (data as AnyRouteSegment)?.data as Experience;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
