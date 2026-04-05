@@ -27,8 +27,7 @@ export const Full: Story = {
       businessType: 'b2b',
       industry: 'saas',
       stage: 'series_b'
-    },
-    onClick: () => {}
+    }
   }
 };
 
@@ -44,7 +43,6 @@ export const Minimal: Story = {
       businessType: null,
       industry: null,
       stage: null
-    },
-    onClick: () => {}
+    }
   }
 };

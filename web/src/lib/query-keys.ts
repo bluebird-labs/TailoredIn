@@ -22,5 +22,9 @@ export const queryKeys = {
   companies: {
     all: ['companies'] as const,
     list: () => [...queryKeys.companies.all, 'list'] as const
+  },
+  jobDescriptions: {
+    all: ['jobDescriptions'] as const,
+    list: (companyId: string) => ['jobDescriptions', 'list', companyId] as const
   }
 };

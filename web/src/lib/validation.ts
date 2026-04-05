@@ -112,12 +112,35 @@ function validateCompany(values: CompanyFormState): ValidationErrors<CompanyForm
   return errors;
 }
 
+// --- Job Description ---
+
+interface JobDescriptionFormState {
+  title: string;
+  description: string;
+  url: string;
+  location: string;
+  salaryMin: string;
+  salaryMax: string;
+  salaryCurrency: string;
+  level: string;
+  locationType: string;
+  postedAt: string;
+}
+
+function validateJobDescription(values: JobDescriptionFormState): ValidationErrors<JobDescriptionFormState> {
+  const errors: ValidationErrors<JobDescriptionFormState> = {};
+  if (!values.title.trim()) errors.title = 'Title is required';
+  if (!values.description.trim()) errors.description = 'Description is required';
+  return errors;
+}
+
 export type {
   AccomplishmentFormState,
   CompanyFormState,
   EducationFormState,
   ExperienceFormState,
   HeadlineFormState,
+  JobDescriptionFormState,
   ProfileFormState,
   ValidationErrors
 };
@@ -128,5 +151,6 @@ export {
   validateEducation,
   validateExperience,
   validateHeadline,
+  validateJobDescription,
   validateProfile
 };
