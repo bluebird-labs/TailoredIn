@@ -34,9 +34,13 @@ export type { DeleteAccomplishmentInput } from './experience/DeleteAccomplishmen
 export { DeleteAccomplishment } from './experience/DeleteAccomplishment.js';
 export type { DeleteExperienceInput } from './experience/DeleteExperience.js';
 export { DeleteExperience } from './experience/DeleteExperience.js';
+export type { LinkCompanyToExperienceInput } from './experience/LinkCompanyToExperience.js';
+export { LinkCompanyToExperience } from './experience/LinkCompanyToExperience.js';
 export { ListExperiences, toExperienceDto } from './experience/ListExperiences.js';
 export type { UpdateAccomplishmentInput } from './experience/UpdateAccomplishment.js';
 export { UpdateAccomplishment } from './experience/UpdateAccomplishment.js';
+export type { UnlinkCompanyFromExperienceInput } from './experience/UnlinkCompanyFromExperience.js';
+export { UnlinkCompanyFromExperience } from './experience/UnlinkCompanyFromExperience.js';
 export type { UpdateExperienceInput } from './experience/UpdateExperience.js';
 export { UpdateExperience } from './experience/UpdateExperience.js';
 export { GetProfile } from './GetProfile.js';
