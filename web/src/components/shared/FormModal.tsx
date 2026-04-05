@@ -34,6 +34,7 @@ interface FormModalProps {
   readonly savingLabel?: string;
   readonly saveDisabled?: boolean;
   readonly backAction?: () => void;
+  readonly overlayClassName?: string;
 }
 
 function FormModal({
@@ -49,7 +50,8 @@ function FormModal({
   saveLabel,
   savingLabel,
   saveDisabled,
-  backAction
+  backAction,
+  overlayClassName
 }: FormModalProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -77,7 +79,7 @@ function FormModal({
           }
         }}
       >
-        <DialogContent showCloseButton={false} className="sm:max-w-lg">
+        <DialogContent showCloseButton={false} className="sm:max-w-lg" overlayClassName={overlayClassName}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}

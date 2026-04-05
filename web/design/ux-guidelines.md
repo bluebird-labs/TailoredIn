@@ -71,6 +71,7 @@ Prefer modals over inline editing when creating or editing entities with **3 or 
 - Footer: Save (primary, disabled until dirty) + Cancel (ghost)
 - Cancel with dirty fields triggers `ConfirmDialog`: "You have unsaved changes. Discard?"
 - Close (X) and overlay click behave identically to Cancel
+- **Stacked modals:** The dialog overlay uses `backdrop-blur-sm` globally. When a second modal opens over the first, the blur compounds — the underlying modal and page content become visibly blurred, giving clear depth separation without extra configuration
 - Validation fires on save attempt only — same rules as inline forms
 - Content scrolls if form exceeds viewport height (`max-h-[60vh]`)
 

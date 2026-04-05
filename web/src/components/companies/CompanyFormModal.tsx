@@ -25,6 +25,7 @@ interface Props {
   readonly onOpenChange: (open: boolean) => void;
   readonly company?: Company;
   readonly onCreated?: (company: Company) => void;
+  readonly overlayClassName?: string;
 }
 
 type Step = 'search' | 'enriching' | 'form';
@@ -68,7 +69,7 @@ function enrichmentToFormState(result: CompanyEnrichmentResult): CompanyFormStat
   };
 }
 
-export function CompanyFormModal({ open, onOpenChange, company, onCreated }: Props) {
+export function CompanyFormModal({ open, onOpenChange, company, onCreated, overlayClassName }: Props) {
   const isEdit = !!company;
   const createCompany = useCreateCompany();
   const updateCompany = useUpdateCompany();
@@ -194,7 +195,7 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated }: Pro
   });
 
   return (
-    <FormModal open={open} onOpenChange={onOpenChange} {...modalProps}>
+    <FormModal open={open} onOpenChange={onOpenChange} overlayClassName={overlayClassName} {...modalProps}>
       {step === 'search' && (
         <SearchStep
           searchName={searchName}

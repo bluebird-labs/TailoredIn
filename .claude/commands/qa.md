@@ -57,13 +57,19 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:<apiPort>/
    curl -s -o /dev/null -w "%{http_code}" http://localhost:<apiPort>/
    ```
 
-4. Once the API responds, present this to the user:
+4. **Find the actual Vite web URL.** The `webPort` in `.wt-session.json` is the *requested* port, but Vite auto-increments if it's already taken (e.g., 5173 → 5174). Read the `bun wt:up` background task output and grep for the actual URL:
+   ```
+   grep -o 'http://localhost:[0-9]*/' <background-task-output-file>
+   ```
+   Look for the line containing `➜  Local:` — that's Vite's actual URL. Use that URL for the web app, NOT the session file's `webPort`.
 
-> **🚀 Dev environment is up!**
+5. Once the API responds, present this to the user:
+
+> **Dev environment is up!**
 >
 > | Service | URL |
 > |---------|-----|
-> | Web app | **http://localhost:{webPort}** |
+> | Web app | **{actual Vite URL from step 4}** |
 > | API     | http://localhost:{apiPort} |
 > | Database | localhost:{dbPort} |
 >
@@ -89,7 +95,7 @@ Enter a loop. On each iteration:
    Fix any issues. Do NOT run the full test suite on every iteration — only typecheck and lint.
 
 5. **Tell the user to re-test:**
-   > Changes applied. Servers have auto-reloaded — please test again at **http://localhost:{webPort}** and let me know how it looks.
+   > Changes applied. Servers have auto-reloaded — please test again at **{actual Vite URL}** and let me know how it looks.
 
 6. **Repeat** from step 1 of this loop.
 

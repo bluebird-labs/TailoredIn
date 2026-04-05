@@ -134,3 +134,7 @@
     line-height: 1.3;
   }
 }
+
+/* TODO: Stacked dialogs — blur underlying modal when a second modal opens.
+   Needs investigation into base-ui/floating-ui portal DOM structure to find
+   the right CSS selector or a React-based approach. */

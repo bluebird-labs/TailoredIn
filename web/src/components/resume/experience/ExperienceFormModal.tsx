@@ -195,6 +195,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
             {experience && (
               <CompanySearchPopover
                 linkedCompany={linkedCompany}
+                companyName={current.companyName}
                 onLink={handleLinkCompany}
                 onUnlink={handleUnlinkCompany}
                 disabled={isSaving}

@@ -1,4 +1,4 @@
-import { Link2, MapPin, Trash2 } from 'lucide-react';
+import { Building2, Link2, MapPin, Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,23 +39,27 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
         }
       }}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start gap-3">
+        {experience.company?.logoUrl ? (
+          <img
+            src={experience.company.logoUrl}
+            alt=""
+            className="h-9 w-9 shrink-0 rounded-lg border object-contain bg-white p-0.5"
+            onError={e => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : experience.company ? (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-muted text-sm font-medium text-muted-foreground">
+            {experience.company.name.charAt(0).toUpperCase()}
+          </div>
+        ) : (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-dashed bg-muted/50 text-muted-foreground/50">
+            <Building2 className="h-4 w-4" />
+          </div>
+        )}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            {experience.company?.logoUrl ? (
-              <img
-                src={experience.company.logoUrl}
-                alt=""
-                className="h-5 w-5 rounded object-contain shrink-0"
-                onError={e => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            ) : experience.company ? (
-              <span className="flex h-5 w-5 items-center justify-center rounded bg-muted text-[10px] font-medium shrink-0">
-                {experience.companyName.slice(0, 2).toUpperCase()}
-              </span>
-            ) : null}
+          <div className="flex items-center gap-1.5">
             <p className="font-medium truncate">{experience.companyName}</p>
             {experience.company && <Link2 className="h-3 w-3 text-muted-foreground shrink-0" />}
           </div>

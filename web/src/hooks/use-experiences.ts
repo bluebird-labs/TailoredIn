@@ -76,10 +76,9 @@ export function useUpdateExperience() {
       summary?: string;
       ordinal: number;
     }) => {
-      const segment = api.experiences as AnyRouteSegment;
       const { id, ...body } = input;
-      const { error } = await segment({ id, experienceId: id }).put(body);
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to update experience');
+      const { error } = await api.experiences({ id }).put(body);
+      if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to update experience');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
@@ -105,12 +104,11 @@ export function useLinkCompany() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: { experienceId: string; companyId: string }) => {
-      const segment = api.experiences as AnyRouteSegment;
-      const { data, error } = await segment({ id: input.experienceId }).company.put({
+      const { data, error } = await api.experiences({ id: input.experienceId }).company.put({
         company_id: input.companyId
       });
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to link company');
-      return data?.data;
+      if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to link company');
+      return (data as AnyRouteSegment)?.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
@@ -122,10 +120,9 @@ export function useUnlinkCompany() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (experienceId: string) => {
-      const segment = api.experiences as AnyRouteSegment;
-      const { data, error } = await segment({ id: experienceId }).company.delete();
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to unlink company');
-      return data?.data;
+      const { data, error } = await api.experiences({ id: experienceId }).company.delete();
+      if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to unlink company');
+      return (data as AnyRouteSegment)?.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
