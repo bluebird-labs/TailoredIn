@@ -5,5 +5,5 @@ export type CompanySearchResult = {
 };
 
 export interface CompanySearchProvider {
-  searchByName(name: string): Promise<CompanySearchResult[]>;
+  searchByName(name: string, description?: string): Promise<CompanySearchResult[]>;
 }

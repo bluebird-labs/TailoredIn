@@ -163,6 +163,6 @@ export abstract class BaseLlmCliProvider<TResponse extends z.ZodType> {
   }
 
   private formatCommand(command: string[]): string {
-    return command.map(a => (a.includes(' ') || a.includes('"') ? `'${a}'` : a)).join(' ');
+    return command.map(a => (/^[a-zA-Z0-9_./:=-]+$/.test(a) ? a : `'${a.replace(/'/g, "'\\''")}'`)).join(' ');
   }
 }

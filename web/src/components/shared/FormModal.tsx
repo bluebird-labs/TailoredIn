@@ -31,6 +31,7 @@ interface FormModalProps {
   readonly onSave: () => void | Promise<void>;
   readonly onDiscard: () => void;
   readonly saveLabel?: string;
+  readonly savingLabel?: string;
   readonly saveDisabled?: boolean;
   readonly backAction?: () => void;
 }
@@ -46,6 +47,7 @@ function FormModal({
   onSave,
   onDiscard,
   saveLabel,
+  savingLabel,
   saveDisabled,
   backAction
 }: FormModalProps) {
@@ -99,7 +101,7 @@ function FormModal({
                 </Button>
                 <Button size="sm" onClick={onSave} disabled={(saveDisabled ?? dirtyCount === 0) || isSaving}>
                   {isSaving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-                  {isSaving ? 'Saving...' : (saveLabel ?? 'Save')}
+                  {isSaving ? (savingLabel ?? 'Saving...') : (saveLabel ?? 'Save')}
                 </Button>
               </div>
             </div>

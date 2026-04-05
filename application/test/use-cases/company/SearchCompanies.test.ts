@@ -20,7 +20,20 @@ describe('SearchCompanies', () => {
     const output = await useCase.execute({ name: 'Stripe' });
 
     expect(output).toEqual(results);
-    expect(provider.searchByName).toHaveBeenCalledWith('Stripe');
+    expect(provider.searchByName).toHaveBeenCalledWith('Stripe', undefined);
+  });
+
+  test('passes description to provider when provided', async () => {
+    const results: CompanySearchResult[] = [
+      { name: 'Stripe', website: 'https://stripe.com', description: 'Online payment processing' }
+    ];
+
+    const provider = mockProvider(results);
+    const useCase = new SearchCompanies(provider);
+    const output = await useCase.execute({ name: 'Stripe', description: 'payments company' });
+
+    expect(output).toEqual(results);
+    expect(provider.searchByName).toHaveBeenCalledWith('Stripe', 'payments company');
   });
 
   test('returns empty array when no matches', async () => {

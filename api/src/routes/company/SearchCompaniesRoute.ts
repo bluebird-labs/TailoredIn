@@ -11,12 +11,13 @@ export class SearchCompaniesRoute {
     return new Elysia().post(
       '/companies/search',
       async ({ body }) => {
-        const data = await this.searchCompanies.execute({ name: body.name });
+        const data = await this.searchCompanies.execute({ name: body.name, description: body.description });
         return { data };
       },
       {
         body: t.Object({
-          name: t.String({ minLength: 1 })
+          name: t.String({ minLength: 1 }),
+          description: t.Optional(t.String())
         })
       }
     );

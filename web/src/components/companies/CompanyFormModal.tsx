@@ -6,6 +6,7 @@ import { FormModal } from '@/components/shared/FormModal.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   type Company,
   type CompanyEnrichmentResult,
@@ -76,6 +77,7 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
 
   const [step, setStep] = useState<Step>(isEdit ? 'form' : 'search');
   const [searchName, setSearchName] = useState('');
+  const [searchDescription, setSearchDescription] = useState('');
   const [candidates, setCandidates] = useState<CompanySearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -86,6 +88,7 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
   function resetAll() {
     setStep(isEdit ? 'form' : 'search');
     setSearchName('');
+    setSearchDescription('');
     setCandidates([]);
     setSelectedIndex(null);
     reset();
@@ -95,7 +98,7 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
   function handleSearch() {
     if (!searchName.trim()) return;
     searchCompanies.mutate(
-      { name: searchName.trim() },
+      { name: searchName.trim(), description: searchDescription.trim() || undefined },
       {
         onSuccess: results => {
           setCandidates(results);
@@ -191,6 +194,8 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
         <SearchStep
           searchName={searchName}
           onSearchNameChange={setSearchName}
+          searchDescription={searchDescription}
+          onSearchDescriptionChange={setSearchDescription}
           onSearch={handleSearch}
           isSearching={searchCompanies.isPending}
           candidates={candidates}
@@ -219,6 +224,8 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
 function SearchStep({
   searchName,
   onSearchNameChange,
+  searchDescription,
+  onSearchDescriptionChange,
   onSearch,
   isSearching,
   candidates,
@@ -227,33 +234,56 @@ function SearchStep({
 }: {
   searchName: string;
   onSearchNameChange: (v: string) => void;
+  searchDescription: string;
+  onSearchDescriptionChange: (v: string) => void;
   onSearch: () => void;
   isSearching: boolean;
   candidates: CompanySearchResult[];
   selectedIndex: number | null;
   onSelect: (i: number) => void;
 }) {
+  const hasResults = candidates.length > 0;
+
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
         <Label>Company name</Label>
-        <div className="flex gap-2">
-          <Input
-            value={searchName}
-            onChange={e => onSearchNameChange(e.target.value)}
-            placeholder="e.g. Stripe"
-            disabled={isSearching}
-            onKeyDown={e => {
-              if (e.key === 'Enter') onSearch();
-            }}
-          />
-          <Button size="sm" onClick={onSearch} disabled={!searchName.trim() || isSearching}>
-            {isSearching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
-          </Button>
-        </div>
+        <Input
+          value={searchName}
+          onChange={e => onSearchNameChange(e.target.value)}
+          placeholder="e.g. Stripe"
+          disabled={isSearching}
+          onKeyDown={e => {
+            if (e.key === 'Enter') onSearch();
+          }}
+        />
       </div>
 
-      {candidates.length > 0 && (
+      {!hasResults && (
+        <div className="space-y-1.5">
+          <Label>
+            Description <span className="text-muted-foreground text-xs">(optional)</span>
+          </Label>
+          <Textarea
+            value={searchDescription}
+            onChange={e => onSearchDescriptionChange(e.target.value)}
+            placeholder="e.g. fintech company for online payments"
+            disabled={isSearching}
+            rows={2}
+          />
+        </div>
+      )}
+
+      <Button size="sm" className="w-full" onClick={onSearch} disabled={!searchName.trim() || isSearching}>
+        {isSearching ? (
+          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Search className="mr-1.5 h-3.5 w-3.5" />
+        )}
+        {isSearching ? 'Searching...' : 'Search'}
+      </Button>
+
+      {hasResults && (
         <div className="space-y-1.5">
           <Label>Select the right company</Label>
           <div className="space-y-1">
@@ -434,9 +464,10 @@ function getModalProps(
     case 'search':
       return {
         ...base,
-        description: 'Search for a company by name.',
+        description: 'Find a company to add to your profile.',
         dirtyCount: ctx.selectedIndex !== null ? 1 : 0,
         isSaving: ctx.isSearching,
+        savingLabel: 'Searching...',
         onSave: ctx.onEnrich,
         saveLabel: 'Next',
         saveDisabled: ctx.selectedIndex === null

@@ -13,6 +13,11 @@ export { PostgresProfileRepository } from './repositories/PostgresProfileReposit
 // Services
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
 export { ClaudeCliCompanySearchProvider } from './services/ClaudeCliCompanySearchProvider.js';
-export { claudeCliResponseSchema, type ClaudeCliResponse } from './services/llm/index.js';
 // LLM
-export { ClaudeCliProvider, LlmJsonRequest, LlmRequestError } from './services/llm/index.js';
+export {
+  ClaudeCliProvider,
+  type ClaudeCliResponse,
+  claudeCliResponseSchema,
+  LlmJsonRequest,
+  LlmRequestError
+} from './services/llm/index.js';

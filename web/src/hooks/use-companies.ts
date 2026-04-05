@@ -46,7 +46,7 @@ export function useCompanies() {
 
 export function useSearchCompanies() {
   return useMutation({
-    mutationFn: async (input: { name: string }) => {
+    mutationFn: async (input: { name: string; description?: string }) => {
       const segment = api.companies as AnyRouteSegment;
       const { data, error } = await segment.search.post(input);
       if (error) throw new Error('Failed to search companies');

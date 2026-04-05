@@ -22,16 +22,23 @@ const companySearchSchema = z.object({
 class CompanySearchRequest extends LlmJsonRequest<typeof companySearchSchema> {
   public readonly schema = companySearchSchema;
 
-  public constructor(private readonly name: string) {
+  public constructor(
+    private readonly name: string,
+    private readonly description?: string
+  ) {
     super();
   }
 
   public get prompt(): string {
-    return [
-      `Given this company name: "${this.name}"`,
+    const lines = [`Given this company name: "${this.name}"`];
+    if (this.description) {
+      lines.push(`Additional context about the company: "${this.description}"`);
+    }
+    lines.push(
       'Find the top 3 real companies that best match this name.',
       'Order by likelihood of match (best match first).'
-    ].join('\n');
+    );
+    return lines.join('\n');
   }
 }
 
@@ -41,10 +48,10 @@ export class ClaudeCliCompanySearchProvider implements CompanySearchProvider {
 
   public constructor(private readonly provider: ClaudeCliProvider = inject(DI.Llm.ClaudeCliProvider)) {}
 
-  public async searchByName(name: string): Promise<CompanySearchResult[]> {
+  public async searchByName(name: string, description?: string): Promise<CompanySearchResult[]> {
     this.log.info(`Searching companies by name: "${name}"`);
 
-    const result = await this.provider.request(new CompanySearchRequest(name));
+    const result = await this.provider.request(new CompanySearchRequest(name, description));
 
     if (result.isErr) {
       this.log.error(`Company search failed | name="${name}" error="${result.error.message}"`);
