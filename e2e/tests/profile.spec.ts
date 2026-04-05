@@ -13,11 +13,12 @@ test.describe('Profile Page', () => {
   });
 
   test('shows all field labels', async ({ page }) => {
-    // Labels include a required asterisk (*) as a child span, so exact text match won't work.
-    // Verify labels exist via getByLabel, which uses accessible name computation.
-    for (const label of ['First Name', 'Last Name', 'Email', 'Phone', 'Location', 'LinkedIn', 'GitHub', 'Website', 'About']) {
-      await expect(page.getByLabel(label)).toBeVisible();
-    }
+    // Profile displays as content-first (ProfileDisplay). Check that seeded values are visible as text.
+    await expect(page.getByText('Jane')).toBeVisible();
+    await expect(page.getByText('Doe')).toBeVisible();
+    await expect(page.getByText('jane@example.com')).toBeVisible();
+    await expect(page.getByText('+1-555-123-4567')).toBeVisible();
+    await expect(page.getByText('San Francisco, CA')).toBeVisible();
   });
 
   test('shows seeded data in inputs', async ({ page }) => {

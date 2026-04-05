@@ -12,14 +12,11 @@ test.describe('Headlines Page', () => {
   });
 
   test('lists all seeded headlines', async ({ page }) => {
-    // Headline values are in always-editable inputs; check via getByRole + toHaveValue
-    const labelInputs = page.getByRole('textbox', { name: /^Label/ });
-    await expect(labelInputs.nth(0)).toHaveValue('Staff Engineer');
-    await expect(labelInputs.nth(1)).toHaveValue('Engineering Manager');
-    await expect(labelInputs.nth(2)).toHaveValue('Full-Stack Developer');
-
-    const summaryInputs = page.getByRole('textbox', { name: /^Summary/ });
-    await expect(summaryInputs.nth(0)).toContainText('deep expertise in distributed systems');
+    // Headlines display as content cards (HeadlineCardContent); check for rendered text.
+    await expect(page.getByText('Staff Engineer')).toBeVisible();
+    await expect(page.getByText('Engineering Manager')).toBeVisible();
+    await expect(page.getByText('Full-Stack Developer')).toBeVisible();
+    await expect(page.getByText(/deep expertise in distributed systems/)).toBeVisible();
   });
 
   test('create a new headline', async ({ page }) => {

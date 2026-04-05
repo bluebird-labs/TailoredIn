@@ -20,6 +20,7 @@ export const Full: Story = {
     company: {
       id: '1',
       name: 'Acme Corp',
+      description: 'Leading provider of innovative solutions.',
       website: 'https://acme.com',
       logoUrl: null,
       linkedinLink: 'https://linkedin.com/company/acme',
@@ -36,6 +37,7 @@ export const Minimal: Story = {
     company: {
       id: '2',
       name: 'Tiny Startup',
+      description: null,
       website: null,
       logoUrl: null,
       linkedinLink: null,
