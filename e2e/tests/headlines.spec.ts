@@ -30,13 +30,13 @@ test.describe('Headlines Page', () => {
     await createForm.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Headline created')).toBeVisible();
-    // New card appears with the value as content text
-    await expect(page.getByText('Principal Engineer')).toBeVisible();
+    // Wait for the create form to collapse and new card to appear as content
+    await expect(page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Principal Engineer' })).toBeVisible();
   });
 
   test('edit a headline', async ({ page }) => {
     // Find the "Full-Stack Developer" card by its content text and click to enter edit mode
-    const card = page.locator('[data-slot="editable-section"]').filter({ hasText: 'Full-Stack Developer' });
+    const card = page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Full-Stack Developer' });
     await card.click();
 
     // Now form fields are available — edit the label
@@ -62,11 +62,11 @@ test.describe('Headlines Page', () => {
     await expect(page.getByText('Temp Headline')).toBeVisible();
 
     // Find the card by content text and click to enter edit mode (delete button only visible in edit mode)
-    const card = page.locator('[data-slot="editable-section"]').filter({ hasText: 'Temp Headline' });
+    const card = page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Temp Headline' });
     await card.click();
 
-    // Click the delete button (visible in edit mode, inside the card)
-    await card.getByRole('button', { name: /delete/i }).click();
+    // Click the delete button (icon-only button with destructive styling)
+    await card.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');

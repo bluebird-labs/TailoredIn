@@ -33,13 +33,14 @@ test.describe('Education Page', () => {
     await dialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Education created')).toBeVisible();
-    await expect(page.getByText('MIT')).toBeVisible();
+    // Wait for modal to close and new card to appear as content
+    await expect(page.locator('[data-testid^="editable-section-education-"]').filter({ hasText: 'MIT' })).toBeVisible();
     await expect(page.getByText('Ph.D. Artificial Intelligence')).toBeVisible();
   });
 
   test('edit an education', async ({ page }) => {
     // Find the Stanford card by content text and click to enter edit mode
-    const card = page.locator('[data-slot="editable-section"]').filter({ hasText: 'Stanford University' });
+    const card = page.locator('[data-testid^="editable-section-education-"]').filter({ hasText: 'Stanford University' });
     await card.click();
 
     // Now form fields are available — edit the degree
@@ -66,11 +67,11 @@ test.describe('Education Page', () => {
     await expect(page.getByText('Temp University')).toBeVisible();
 
     // Find the card by content text and click to enter edit mode (delete button only visible in edit mode)
-    const card = page.locator('[data-slot="editable-section"]').filter({ hasText: 'Temp University' });
+    const card = page.locator('[data-testid^="editable-section-education-"]').filter({ hasText: 'Temp University' });
     await card.click();
 
-    // Click the delete button (visible in edit mode, inside the card)
-    await card.getByRole('button', { name: /delete/i }).click();
+    // Click the delete button (icon-only button with destructive styling)
+    await card.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');

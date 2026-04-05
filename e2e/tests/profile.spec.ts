@@ -5,6 +5,8 @@ test.describe('Profile Page', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/profile');
+    // Wait for the profile data to load (content-first display appears)
+    await page.waitForSelector('[data-testid="editable-section-profile"]');
   });
 
   test('displays heading and subtitle', async ({ page }) => {
@@ -13,8 +15,7 @@ test.describe('Profile Page', () => {
   });
 
   test('shows all field labels', async ({ page }) => {
-    // Profile displays as content-first (ProfileDisplay). Wait for the section then check seeded values as text.
-    await page.waitForSelector('[data-testid="editable-section-profile"]');
+    // Profile displays as content-first (ProfileDisplay). Check seeded values rendered as text.
     await expect(page.getByText('Jane', { exact: true })).toBeVisible();
     await expect(page.getByText('Doe', { exact: true })).toBeVisible();
     await expect(page.getByText('jane@example.com')).toBeVisible();
@@ -42,16 +43,15 @@ test.describe('Profile Page', () => {
     await expect(page.locator('[data-slot="save-bar"]')).not.toBeVisible();
   });
 
-  test('editing a field shows SaveBar with dirty count', async ({ page }) => {
+  test('editing a field shows SaveBar with Save and Discard', async ({ page }) => {
     await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('First Name').fill('Alice');
-    await expect(page.locator('[data-slot="save-bar"]')).toBeVisible();
-    await expect(page.locator('[data-slot="save-bar"]')).toContainText('1 unsaved change');
-
-    await page.getByLabel('Location').clear();
-    await page.getByLabel('Location').fill('New York, NY');
-    await expect(page.locator('[data-slot="save-bar"]')).toContainText('2 unsaved changes');
+    // Inline SaveBar shows Save/Discard buttons (no dirty count in inline variant)
+    const saveBar = page.locator('[data-slot="save-bar"]');
+    await expect(saveBar).toBeVisible();
+    await expect(saveBar.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(saveBar.getByRole('button', { name: 'Discard' })).toBeVisible();
   });
 
   test('save name via SaveBar', async ({ page }) => {
