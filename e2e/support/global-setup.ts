@@ -35,7 +35,7 @@ export default async function globalSetup(_config: FullConfig): Promise<() => Pr
       });
 
       child.on('error', reject);
-      child.on('exit', (code) => {
+      child.on('exit', code => {
         if (code !== 0 && code !== null) {
           reject(new Error(`e2e-start-servers.ts exited with code ${code}`));
         }
@@ -51,7 +51,7 @@ export default async function globalSetup(_config: FullConfig): Promise<() => Pr
   return async () => {
     if (serverProcess) {
       serverProcess.kill('SIGTERM');
-      await new Promise<void>((r) => {
+      await new Promise<void>(r => {
         serverProcess!.on('exit', () => r());
         setTimeout(r, 10_000);
       });

@@ -1,12 +1,7 @@
 {
   "permissions": {
     "defaultMode": "plan",
-    "additionalDirectories": [
-      "~/Documents"
-    ],
-    "allow": [
-      "EnterPlanMode",
-      "WebFetch"
-    ]
+    "additionalDirectories": ["~/Documents"],
+    "allow": ["EnterPlanMode", "WebFetch"]
   }
 }

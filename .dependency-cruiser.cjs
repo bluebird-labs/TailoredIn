@@ -17,7 +17,8 @@ module.exports = {
     {
       name: 'domain-no-workspace-deps',
       severity: 'error',
-      comment: 'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/api/web imports.',
+      comment:
+        'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/api/web imports.',
       from: { path: '^domain/' },
       to: { path: '^(application|infrastructure|api|web)/' }
     },
@@ -75,8 +76,7 @@ module.exports = {
       comment: 'web must not depend on core.',
       from: { path: '^web/' },
       to: { path: '^core/' }
-    },
-
+    }
   ],
 
   options: {
@@ -84,14 +84,7 @@ module.exports = {
       path: 'node_modules'
     },
     exclude: {
-      path: [
-        'node_modules',
-        '\\.d\\.ts$',
-        'dist/',
-        'build/',
-        '\\.sql\\.ts$',
-        'migrations/'
-      ]
+      path: ['node_modules', '\\.d\\.ts$', 'dist/', 'build/', '\\.sql\\.ts$', 'migrations/']
     },
     tsConfig: {
       fileName: 'tsconfig.base.json'

@@ -16,6 +16,7 @@ import {
 } from '@/hooks/use-experiences';
 import { cn } from '@/lib/utils';
 import { type ExperienceFormState, hasErrors, type ValidationErrors, validateExperience } from '@/lib/validation.js';
+import type { AccomplishmentItem } from './AccomplishmentEditor.js';
 import { AccomplishmentListEditor } from './AccomplishmentListEditor.js';
 import { CompanySearchPopover } from './CompanySearchPopover.js';
 
@@ -25,7 +26,6 @@ interface Props {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
   readonly modalMode: ModalMode;
-  readonly onAccomplishmentDirtyChange: (id: string, isDirty: boolean) => void;
 }
 
 function emptyState(): ExperienceFormState {
@@ -52,7 +52,17 @@ function stateFromExperience(exp: Experience): ExperienceFormState {
   };
 }
 
-export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplishmentDirtyChange }: Props) {
+function toLocalAccomplishments(accomplishments: Experience['accomplishments']): AccomplishmentItem[] {
+  return accomplishments.map(acc => ({
+    id: acc.id,
+    tempId: acc.id,
+    title: acc.title,
+    narrative: acc.narrative,
+    ordinal: acc.ordinal
+  }));
+}
+
+export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
   const isCreate = modalMode.mode === 'create';
   const experience = modalMode.mode === 'edit' ? modalMode.experience : null;
 
@@ -67,6 +77,11 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
     modalMode.mode === 'edit' ? modalMode.experience.company : null
   );
 
+  // Local accomplishment list — initialized once from server data on mount
+  const [localAccomplishments, setLocalAccomplishments] = useState<AccomplishmentItem[]>(() =>
+    toLocalAccomplishments(experience?.accomplishments ?? [])
+  );
+
   const isSaving =
     createExperience.isPending || updateExperience.isPending || linkCompany.isPending || unlinkCompany.isPending;
 
@@ -74,6 +89,62 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
 
   const { current, setField, isDirtyField, dirtyCount, reset } = useDirtyTracking(savedState);
   const [errors, setErrors] = useState<ValidationErrors<ExperienceFormState>>({});
+
+  // Snapshot of accomplishments at mount — used to detect dirty state
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally snapshot once on mount
+  const initialAccomplishments = useMemo(
+    () => toLocalAccomplishments(experience?.accomplishments ?? []),
+    [] // intentionally snapshot once on mount
+  );
+
+  const accomplishmentsDirty = useMemo(() => {
+    if (localAccomplishments.length !== initialAccomplishments.length) return true;
+    return localAccomplishments.some((acc, i) => {
+      const orig = initialAccomplishments[i];
+      return !orig || acc.tempId !== orig.tempId || acc.title !== orig.title || acc.narrative !== orig.narrative;
+    });
+  }, [localAccomplishments, initialAccomplishments]);
+
+  const totalDirtyCount = dirtyCount + (accomplishmentsDirty ? 1 : 0);
+
+  function handleAccomplishmentAdd(title: string, narrative: string) {
+    setLocalAccomplishments(prev => [
+      ...prev,
+      {
+        id: null,
+        tempId: crypto.randomUUID(),
+        title,
+        narrative,
+        ordinal: prev.length
+      }
+    ]);
+  }
+
+  function handleAccomplishmentChange(tempId: string, field: 'title' | 'narrative', value: string) {
+    setLocalAccomplishments(prev => prev.map(acc => (acc.tempId === tempId ? { ...acc, [field]: value } : acc)));
+  }
+
+  function handleAccomplishmentDelete(tempId: string) {
+    setLocalAccomplishments(prev => prev.filter(acc => acc.tempId !== tempId));
+  }
+
+  function handleMoveUp(index: number) {
+    if (index === 0) return;
+    setLocalAccomplishments(prev => {
+      const next = [...prev];
+      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      return next.map((acc, i) => ({ ...acc, ordinal: i }));
+    });
+  }
+
+  function handleMoveDown(index: number) {
+    setLocalAccomplishments(prev => {
+      if (index >= prev.length - 1) return prev;
+      const next = [...prev];
+      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      return next.map((acc, i) => ({ ...acc, ordinal: i }));
+    });
+  }
 
   function handleLinkCompany(company: Company) {
     if (!experience) return;
@@ -104,6 +175,12 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
     const validationErrors = validateExperience(current);
     setErrors(validationErrors);
     if (hasErrors(validationErrors)) return;
+
+    const invalidAccomplishments = localAccomplishments.filter(a => !a.title.trim());
+    if (invalidAccomplishments.length > 0) {
+      toast.error('All accomplishments must have a title.');
+      return;
+    }
 
     if (isCreate) {
       createExperience.mutate(
@@ -138,12 +215,21 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
           start_date: current.startDate.trim(),
           end_date: current.endDate.trim(),
           summary: current.summary.trim() || undefined,
-          ordinal: experience.ordinal
+          ordinal: experience.ordinal,
+          accomplishments: localAccomplishments.map((acc, index) => ({
+            id: acc.id,
+            title: acc.title.trim(),
+            narrative: acc.narrative.trim(),
+            ordinal: index
+          }))
         },
         {
-          onSuccess: () => {
+          onSuccess: updatedExperience => {
             setErrors({});
             reset();
+            if (updatedExperience) {
+              setLocalAccomplishments(toLocalAccomplishments(updatedExperience.accomplishments));
+            }
             toast.success('Changes saved');
           },
           onError: () => toast.error('Failed to save. Please try again.')
@@ -155,6 +241,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
   function handleDiscard() {
     reset();
     setErrors({});
+    setLocalAccomplishments(toLocalAccomplishments(experience?.accomplishments ?? []));
   }
 
   return (
@@ -163,7 +250,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
       onOpenChange={onOpenChange}
       title={isCreate ? 'Add Experience' : 'Edit Experience'}
       description={isCreate ? 'Add a new work experience to your profile.' : undefined}
-      dirtyCount={dirtyCount}
+      dirtyCount={totalDirtyCount}
       isSaving={isSaving}
       onSave={handleSave}
       onDiscard={handleDiscard}
@@ -283,9 +370,13 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
       {experience && (
         <div className="pt-2 border-t">
           <AccomplishmentListEditor
-            experienceId={experience.id}
-            accomplishments={experience.accomplishments}
-            onDirtyChange={onAccomplishmentDirtyChange}
+            accomplishments={localAccomplishments}
+            onAdd={handleAccomplishmentAdd}
+            onChange={handleAccomplishmentChange}
+            onDelete={handleAccomplishmentDelete}
+            onMoveUp={handleMoveUp}
+            onMoveDown={handleMoveDown}
+            disabled={isSaving}
           />
         </div>
       )}

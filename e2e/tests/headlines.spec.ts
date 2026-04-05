@@ -31,12 +31,16 @@ test.describe('Headlines Page', () => {
 
     await expect(page.getByText('Headline created')).toBeVisible();
     // Wait for the create form to collapse and new card to appear as content
-    await expect(page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Principal Engineer' })).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Principal Engineer' })
+    ).toBeVisible();
   });
 
   test('edit a headline', async ({ page }) => {
     // Wait for content-first cards (button = display mode), then click to enter edit mode
-    const displayCard = page.locator('button[data-testid^="editable-section-headline-"]').filter({ hasText: 'Full-Stack Developer' });
+    const displayCard = page
+      .locator('button[data-testid^="editable-section-headline-"]')
+      .filter({ hasText: 'Full-Stack Developer' });
     await expect(displayCard).toBeVisible();
 
     // Grab the testid before clicking (the edit div has the same testid)
@@ -65,7 +69,9 @@ test.describe('Headlines Page', () => {
     await expect(page.getByText('Temp Headline')).toBeVisible();
 
     // Find the display card (button) and click to enter edit mode
-    const displayCard = page.locator('button[data-testid^="editable-section-headline-"]').filter({ hasText: 'Temp Headline' });
+    const displayCard = page
+      .locator('button[data-testid^="editable-section-headline-"]')
+      .filter({ hasText: 'Temp Headline' });
     const testId = await displayCard.getAttribute('data-testid');
     await displayCard.click();
 
