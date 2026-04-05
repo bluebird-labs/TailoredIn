@@ -85,8 +85,9 @@ export abstract class BaseLlmCliProvider {
     try {
       const proc = Bun.spawn(command, { stdout: 'pipe', stderr: 'pipe' });
 
+      let timer: Timer;
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
+        timer = setTimeout(() => {
           proc.kill();
           reject(new Error(`CLI process timed out after ${timeoutMs}ms`));
         }, timeoutMs);
@@ -100,6 +101,7 @@ export abstract class BaseLlmCliProvider {
       })();
 
       const result = await Promise.race([processPromise, timeoutPromise]);
+      clearTimeout(timer!);
       stdout = result.out;
       stderr = result.errOut;
       exitCode = result.code;
