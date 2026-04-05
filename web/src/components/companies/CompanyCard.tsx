@@ -16,7 +16,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
     <Link
       to="/companies/$companyId"
       params={{ companyId: company.id }}
-      className="group block w-full text-left border rounded-[14px] p-4 cursor-pointer transition-colors hover:bg-accent/40"
+      className="group block w-full text-left border rounded-[14px] p-4 transition-colors hover:bg-accent/40"
     >
       <div className="flex items-start gap-3 min-w-0">
         {company.logoUrl ? (

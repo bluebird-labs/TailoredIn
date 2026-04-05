@@ -1,15 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterProvider
+} from '@tanstack/react-router';
 import { CompanyCard } from './CompanyCard.js';
+
+function withRouter(Story: React.ComponentType) {
+  const Wrapped = () => <Story />;
+  const rootRoute = createRootRoute({ component: Wrapped });
+  const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/' });
+  const companyRoute = createRoute({ getParentRoute: () => rootRoute, path: '/companies/$companyId' });
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([indexRoute, companyRoute]),
+    history: createMemoryHistory({ initialEntries: ['/'] })
+  });
+  return <RouterProvider router={router} />;
+}
 
 const meta = {
   component: CompanyCard,
-  decorators: [
-    Story => (
-      <div className="max-w-md">
-        <Story />
-      </div>
-    )
-  ]
+  decorators: [Story => <div className="max-w-md">{withRouter(Story)}</div>]
 } satisfies Meta<typeof CompanyCard>;
 
 export default meta;

@@ -1,15 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterProvider
+} from '@tanstack/react-router';
 import { ExperienceCard } from './ExperienceCard.js';
+
+function withRouter(Story: React.ComponentType) {
+  const Wrapped = () => <Story />;
+  const rootRoute = createRootRoute({ component: Wrapped });
+  const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/' });
+  const experienceRoute = createRoute({ getParentRoute: () => rootRoute, path: '/experiences/$experienceId' });
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([indexRoute, experienceRoute]),
+    history: createMemoryHistory({ initialEntries: ['/'] })
+  });
+  return <RouterProvider router={router} />;
+}
 
 const meta = {
   component: ExperienceCard,
-  decorators: [
-    Story => (
-      <div className="max-w-md">
-        <Story />
-      </div>
-    )
-  ]
+  decorators: [Story => <div className="max-w-md">{withRouter(Story)}</div>]
 } satisfies Meta<typeof ExperienceCard>;
 
 export default meta;
@@ -33,8 +46,7 @@ export const Full: Story = {
         { id: 'a1', title: 'Reduced latency by 40%', narrative: '', ordinal: 0 },
         { id: 'a2', title: 'Mentored 3 junior engineers', narrative: '', ordinal: 1 }
       ]
-    },
-    onEdit: () => {}
+    }
   }
 };
 
@@ -53,7 +65,6 @@ export const Minimal: Story = {
       summary: null,
       ordinal: 0,
       accomplishments: []
-    },
-    onEdit: () => {}
+    }
   }
 };

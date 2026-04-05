@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { Building2, Link2, MapPin, Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { Badge } from '@/components/ui/badge';
@@ -15,10 +16,9 @@ function formatMonthYear(value: string): string {
 
 interface ExperienceCardProps {
   readonly experience: Experience;
-  readonly onEdit: () => void;
 }
 
-export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
+export function ExperienceCard({ experience }: ExperienceCardProps) {
   const deleteExperience = useDeleteExperience();
 
   const startFormatted = formatMonthYear(experience.startDate);
@@ -26,18 +26,10 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
   const dateRange = startFormatted && endFormatted ? `${startFormatted} — ${endFormatted}` : '';
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: cannot use <button> because it contains a nested <button> (delete trigger)
-    <div
-      role="button"
-      tabIndex={0}
-      className="group w-full text-left border rounded-[14px] p-4 cursor-pointer transition-colors hover:bg-accent/40"
-      onClick={onEdit}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onEdit();
-        }
-      }}
+    <Link
+      to="/experiences/$experienceId"
+      params={{ experienceId: experience.id }}
+      className="group block w-full text-left border rounded-[14px] p-4 transition-colors hover:bg-accent/40"
     >
       <div className="flex items-start gap-3">
         {experience.company?.logoUrl ? (
@@ -89,7 +81,10 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
                 size="icon"
                 variant="ghost"
                 className="h-7 w-7 text-destructive shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={e => e.stopPropagation()}
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
@@ -97,6 +92,6 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
           />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
