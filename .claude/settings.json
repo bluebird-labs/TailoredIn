@@ -1,18 +1,5 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.command // \"\"' | { read -r cmd; if echo \"$cmd\" | grep -qE '\\bgit worktree add\\b' && ! echo \"$cmd\" | grep -qF '.claude/worktrees/'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Worktrees must be created under .claude/worktrees/ — e.g. git worktree add .claude/worktrees/<name> <branch>\"}}'; fi; }"
-          }
-        ]
-      }
-    ]
-  },
-"permissions": {
+  "permissions": {
     "defaultMode": "plan",
     "additionalDirectories": [
       "~/Documents"

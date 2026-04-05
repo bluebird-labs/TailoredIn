@@ -136,9 +136,15 @@ Before ending a session, run `git status`. If there are unstaged or untracked fi
 2. Commit any diagram changes
 3. `git status` — resolve any remaining unstaged/untracked files with the user
 
-## Domain Model
+## Diagrams — Read Before Modifying
 
-See **`domain/DOMAIN.mmd`** for the full domain model — mermaid class diagram covering all aggregates, entities, value objects, and their relationships across Profile and Company subdomains.
+| Diagram | Covers | Regenerate |
+|---|---|---|
+| `domain/DOMAIN.mmd` | Aggregates, entities, value objects, enums, relationships | `bun run domain:diagram` |
+| `application/APPLICATION.mmd` | Use cases, ports, DTOs, orchestration flows | `bun run app:diagram` |
+| `infrastructure/DATABASE.mmd` | Database tables, columns, indexes, FK relationships | `bun run db:diagram` |
+
+**Before modifying any layer, read its diagram to understand current state.** These are auto-generated from code — regenerate after changes and commit the result.
 
 ## Conventions
 
@@ -146,29 +152,14 @@ See **`CONVENTIONS.md`** for detailed coding standards: OOP-first design, DI pat
 
 ## Key Design Decisions
 
-### Plain Application Layer (No DI Framework)
-Use cases are plain TypeScript classes with explicit constructor parameters. The `@needle-di/core` framework (`@injectable`, `inject`, `InjectionToken`) is only used in `infrastructure/` and the entry-point composition root (`api/`). This keeps the application layer framework-agnostic and testable.
-
-### MikroORM Entities as ORM Aggregates
-The ORM entities in `infrastructure/src/db/entities/` are separate from the domain entities in `domain/src/entities/`. The repository implementations in `infrastructure/src/repositories/` map between them.
-
-### DI Tokens
-DI tokens are defined in `infrastructure/src/DI.ts` as a single `DI` object. The composition root in `api/` uses these tokens to wire up the container.
-
-### Dependency Injection
-The composition root (`api/src/index.ts`) imports DI tokens from `@tailoredin/infrastructure` and wires up all services. Add new services by:
-1. Adding a port interface to `application/src/ports/`
-2. Adding an implementation to `infrastructure/src/`
-3. Adding a DI token to `infrastructure/src/DI.ts`
-4. Binding it in `api/src/container.ts`
-
-See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for database conventions.
+- **Plain application layer**: use cases are plain TypeScript classes — no `@injectable()`, no `inject()`. The DI framework (`@needle-di/core`) is only used in `infrastructure/` and the composition root (`api/`).
+- **Separate ORM entities**: MikroORM entities in `infrastructure/src/db/entities/` are distinct from domain entities in `domain/src/entities/`. Repositories map between them.
+- **DI tokens & wiring**: see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for the full workflow of adding new services.
 
 ## Entry Points
-- `api/src/index.ts` — starts Elysia server on port 8000
 
-## Database
-PostgreSQL via MikroORM (`infrastructure/src/db/`). All tables use `UnderscoreNamingStrategy`. Integration tests use Testcontainers (`infrastructure/test-integration/`). See [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for ORM entity list and migration conventions.
+- `api/src/index.ts` — starts Elysia server on port 8000
+- PostgreSQL via MikroORM — see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for database conventions
 
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):
@@ -186,6 +177,4 @@ Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config
 - **dependency-cruiser** enforces Onion Architecture boundaries. Run `bun run dep:check`. Config at `.dependency-cruiser.cjs`.
 - **mise** manages Bun version (pinned in `.mise.toml`). Run `mise install` after cloning.
 - Bun runs TypeScript natively — no build step required.
-- **NodeNext module resolution**: all relative imports in `.ts` files must use `.js` extensions (e.g., `import { Foo } from './Foo.js'`).
-- **`env()` helpers**: Use `env(key)`, `envInt(key)`, `envBool(key)` from `@tailoredin/core` for typed env access. They throw at call time if a key is missing — no side effects at import.
-- **No deep subpath imports from `@tailoredin/core`**: Always import from `@tailoredin/core`, never from `@tailoredin/core/src/Foo.js`. Everything is exported via the barrel.
+- See **`CONVENTIONS.md`** for file naming and import conventions (`.js` extensions, barrel imports, `import type`).

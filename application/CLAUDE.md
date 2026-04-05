@@ -10,6 +10,10 @@ The orchestration layer — use cases coordinate domain objects and external ser
 - No HTTP framework imports
 - Only imports from `@tailoredin/domain` and `@tailoredin/core`
 
+## Keeping the diagram in sync
+
+**`application/APPLICATION.mmd` is the source of truth for the application layer.** Whenever you add, remove, or rename a use case, port, or DTO — regenerate with `bun run app:diagram`. The diagram must always reflect the code.
+
 ## Directory structure
 
 ```
@@ -61,17 +65,17 @@ const experience = await this.experiences.findByIdOrFail(id); // throws if missi
 
 ## Port interfaces
 
-Define what the application layer needs from the outside world. Live in `application/src/ports/`:
+Interfaces for **external services** (data providers, search APIs, enrichment, etc.). Live in `application/src/ports/`:
 
 ```typescript
-export interface CompanyRepository {
-  findByIdOrFail(id: CompanyId): Promise<Company>;
-  save(company: Company): Promise<void>;
+export interface CompanyDataProvider {
+  enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult>;
 }
 ```
 
 - Ports model the **application's intent**, not the infrastructure's capabilities
 - Method signatures use DTOs or primitives — never ORM/infrastructure types
+- **Repository interfaces live in `domain/src/ports/`**, not here. Application ports are for external services only
 
 ## DTOs
 

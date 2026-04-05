@@ -15,7 +15,7 @@ Elysia HTTP server, DI composition root, and Eden Treaty client export. This is 
 
 ## Route class anatomy
 
-One file per logical endpoint (`<VerbNoun>Route.ts`). Each is an `@injectable()` class with a `plugin()` method:
+One file per endpoint (`<VerbNoun>Route.ts`), organized in domain subdirectories (e.g., `routes/experience/CreateExperienceRoute.ts`). Each is an `@injectable()` class with a `plugin()` method:
 
 ```typescript
 @injectable()
@@ -33,21 +33,9 @@ export class GetExperienceRoute {
 }
 ```
 
-Related endpoints are grouped into a route module (e.g., `ExperienceRoutes.ts`) instead of individual files.
-
 ## Response envelope
 
-Every response follows one of two shapes (see `CONVENTIONS.md` for full details):
-
-```typescript
-// Success
-{ data: T, pagination?: PaginationMeta }
-
-// Error
-{ error: { code: string, message: string } }
-```
-
-HTTP status codes carry the signal — no `success: boolean` fields.
+See `CONVENTIONS.md` for the full response envelope spec (success/error shapes, HTTP status codes, pagination).
 
 ## Error mapping
 
@@ -63,19 +51,7 @@ return { data: result.value };
 
 ## Wiring a new service in container.ts
 
-```typescript
-// Use cases: plain class, useFactory
-container.bind({
-  provide: DI.Experience.GetExperience,
-  useFactory: () => new GetExperience(container.get(DI.Experience.Repository)),
-});
-
-// Infrastructure services: class with DI, useClass
-container.bind({
-  provide: DI.Experience.Repository,
-  useClass: PostgresExperienceRepository,
-});
-```
+See [infrastructure/CLAUDE.md](../infrastructure/CLAUDE.md) for the full "Adding a new service" workflow (port → implementation → token → binding).
 
 ## Eden Treaty client
 

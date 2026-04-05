@@ -4,6 +4,10 @@ Package: `@tailoredin/infrastructure`
 
 Concrete implementations of all application ports: database repositories. Also owns DI tokens and the database schema.
 
+## Keeping the diagram in sync
+
+**`infrastructure/DATABASE.mmd` is the source of truth for the database schema.** After adding migrations or modifying entities, regenerate with `bun run db:diagram` (requires DB running). The diagram must always reflect the schema.
+
 ## Directory structure
 
 ```
@@ -96,7 +100,7 @@ export async function down(db: Kysely<unknown>): Promise<void> {
 }
 ```
 
-Run: `bun run db:migration:up`
+Run: `bun dev:migration:up` (main branch) or `bun wt:migration:up` (worktree)
 
 ## Seeders
 

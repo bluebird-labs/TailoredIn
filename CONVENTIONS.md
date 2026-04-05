@@ -74,7 +74,7 @@ api/cli → infrastructure → application → domain → core
 
 ## API Layer
 
-- Each route is its own `@injectable()` class — **one file per route**
+- Each route is its own `@injectable()` class — **one file per route, organized in domain subdirectories** (e.g., `routes/experience/CreateExperienceRoute.ts`)
 - File naming: `<VerbNounRoute>.ts` (e.g., `GetTopJobRoute.ts`, `ChangeJobStatusRoute.ts`)
 - Each class has a `plugin()` method returning an Elysia instance
 - Composition root resolves routes: `container.get(RouteClass).plugin()`
