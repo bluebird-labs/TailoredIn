@@ -41,3 +41,22 @@ export const Saving: Story = {
     isSaving: true
   }
 };
+
+export const Inline: Story = {
+  args: {
+    dirtyCount: 2,
+    variant: 'inline',
+    onSave: () => {},
+    onDiscard: () => {}
+  }
+};
+
+export const InlineSaving: Story = {
+  args: {
+    dirtyCount: 1,
+    variant: 'inline',
+    onSave: () => {},
+    onDiscard: () => {},
+    isSaving: true
+  }
+};
