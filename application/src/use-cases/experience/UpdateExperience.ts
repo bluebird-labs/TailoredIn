@@ -9,6 +9,13 @@ import {
 import type { ExperienceDto } from '../../dtos/ExperienceDto.js';
 import { toExperienceDto } from './ListExperiences.js';
 
+export type AccomplishmentInput = {
+  id: string | null;
+  title: string;
+  narrative: string;
+  ordinal: number;
+};
+
 export type UpdateExperienceInput = {
   experienceId: string;
   title: string;
@@ -19,6 +26,7 @@ export type UpdateExperienceInput = {
   endDate: string;
   summary: string | null;
   ordinal: number;
+  accomplishments: AccomplishmentInput[];
 };
 
 export class UpdateExperience {
@@ -42,6 +50,7 @@ export class UpdateExperience {
     experience.summary = input.summary;
     experience.ordinal = input.ordinal;
     experience.updatedAt = new Date();
+    experience.syncAccomplishments(input.accomplishments);
 
     await this.experienceRepository.save(experience);
     return ok(toExperienceDto(experience));
