@@ -33,7 +33,6 @@ graph TB
     end
 
     subgraph NEUTRAL["Context-free commands"]
-        VERIFY["verify"]
         CHECK["check / typecheck / test / knip / dep:check"]
     end
 
@@ -190,7 +189,6 @@ MikroORM's `ensureDatabase: true` will `CREATE DATABASE tailored_in` automatical
   "e2e:test:ui": "bun run --cwd e2e test:ui",
   "e2e:test:headed": "bun run --cwd e2e test:headed",
 
-  "verify": "bun run scripts/verify.ts"
 }
 ```
 
@@ -205,8 +203,6 @@ MikroORM's `ensureDatabase: true` will `CREATE DATABASE tailored_in` automatical
 1. **`.gitignore`**: Add `.wt-session.json`
 2. **Delete**: `infrastructure/dev/up.ts`, `infrastructure/dev/down.ts`, `infrastructure/dev/EnvFile.ts`
 3. **Update `CLAUDE.md`**: Rewrite Commands section to reflect `dev:*` / `wt:*` / `e2e:*` structure
-4. **Update `scripts/verify.ts`**: Change `test:e2e` reference to `e2e:test`
-
 ---
 
 ## Files Summary
@@ -226,7 +222,6 @@ MikroORM's `ensureDatabase: true` will `CREATE DATABASE tailored_in` automatical
 | **Modify** | `compose.yaml` — default `POSTGRES_DB` → `tailored_in` |
 | **Modify** | `.gitignore` — add `.wt-session.json` |
 | **Modify** | `CLAUDE.md` — update Commands section |
-| **Modify** | `scripts/verify.ts` — `test:e2e` → `e2e:test` |
 | **Delete** | `infrastructure/dev/up.ts` |
 | **Delete** | `infrastructure/dev/down.ts` |
 | **Delete** | `infrastructure/dev/EnvFile.ts` |
@@ -240,6 +235,5 @@ MikroORM's `ensureDatabase: true` will `CREATE DATABASE tailored_in` automatical
 3. **Worktree flow**: `bun wt:up` → dynamic ports, isolated container, no `.env` created → `bun wt:down` removes volume + session file
 4. **E2E from worktree**: `bun e2e:test` from a worktree works (Testcontainers, no `.env` needed)
 5. **E2E from main**: `bun e2e:test` from main also works
-6. **Verify from both**: `bun verify` passes from main and from a worktree
-7. **Old commands gone**: `bun up`, `bun down`, `bun fresh` fail with "Script not found"
+6. **Old commands gone**: `bun up`, `bun down`, `bun fresh` fail with "Script not found"
 8. **DB naming**: `docker exec tailored-in-postgres-1 psql -U postgres -l` shows `tailored_in`

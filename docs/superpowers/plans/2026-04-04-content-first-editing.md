@@ -1913,10 +1913,10 @@ git commit -m "feat: add Storybook stories for ExperienceCard and CompanyCard co
 
 ## Task 13: Final Verification
 
-- [ ] **Step 1: Run full verify**
+- [ ] **Step 1: Run all quality checks**
 
-Run: `bun verify`
-Expected: typecheck, lint, dep:check, knip, test:coverage, test:integration, e2e:test all PASS
+Run each individually: `bun run typecheck`, `bun run check`, `bun run dep:check`, `bun run knip`, `bun run test:coverage`
+Expected: all PASS
 
 - [ ] **Step 2: Run Storybook and verify all stories**
 

@@ -312,4 +312,4 @@ Retained (no change):
 4. **Experiences:** Verify content-first cards open modal on click (unchanged behavior for the modal itself).
 5. **Navigation guard:** Verify dirty state still blocks navigation when editing.
 6. **Dark mode:** Verify all three states (resting, hovered, editing) look correct in both light and dark mode.
-7. **Run `bun verify`** — full project health check passes.
+7. **Run all quality checks** (`typecheck`, `check`, `dep:check`, `knip`, `test:coverage`) — all pass.

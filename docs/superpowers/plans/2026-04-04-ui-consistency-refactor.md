@@ -255,4 +255,4 @@ After each milestone:
 2. `bun run check` — Biome lint/format passes
 3. `bun run test` — unit tests pass
 4. Visual check in browser — confirm always-editable fields render, SaveBar appears on edit, dirty indicators show, ConfirmDialog appears on delete, skeletons show during load
-5. After M5: `bun verify` — full project health check
+5. After M5: run all quality checks (typecheck, lint, dep:check, knip, test:coverage)
