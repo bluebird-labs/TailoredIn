@@ -1,3 +1,4 @@
+import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container } from './container.js';
@@ -56,6 +57,35 @@ const app = new Elysia()
     const status = (set as { status?: number }).status ?? 200;
     logRequest(request, status, startTimes.get(request));
   })
+  .onError(({ request, error, set, code }) => {
+    if (code === 'VALIDATION') return;
+
+    // Elysia may wrap thrown errors — check both the error and its cause
+    const source =
+      error instanceof ExternalServiceError
+        ? error
+        : error instanceof Error && error.cause instanceof ExternalServiceError
+          ? error.cause
+          : null;
+
+    const statusCode = source?.statusCode ?? 500;
+    const errorCode = source?.code ?? (statusCode === 500 ? 'INTERNAL_ERROR' : 'SERVER_ERROR');
+    const message = source?.message ?? (error instanceof Error ? error.message : String(error));
+
+    set.status = statusCode;
+    logRequest(request, statusCode, startTimes.get(request));
+
+    if (statusCode === 500) {
+      log.error(error instanceof Error ? error.stack : String(error));
+    }
+
+    return {
+      error: {
+        code: errorCode,
+        message: statusCode === 500 ? 'Internal server error' : message
+      }
+    };
+  })
   .use(healthRoutes)
   .use(configRoute())
   // Profile
@@ -87,23 +117,6 @@ const app = new Elysia()
   .use(container.get(EnrichCompanyRoute).plugin())
   .use(container.get(CreateCompanyRoute).plugin())
   .use(container.get(UpdateCompanyRoute).plugin())
-  .onError(({ request, error, set, code }) => {
-    const err = error as unknown as { statusCode?: number; message?: string };
-    const message = err.message ?? String(error);
-
-    if (code === 'VALIDATION') return;
-
-    const statusCode = err.statusCode ?? 500;
-    set.status = statusCode;
-    logRequest(request, statusCode, startTimes.get(request));
-    if (statusCode === 500) log.error(error instanceof Error ? error.stack : String(error));
-    return {
-      error: {
-        code: statusCode === 500 ? 'INTERNAL_ERROR' : 'SERVER_ERROR',
-        message: statusCode === 500 ? 'Internal server error' : message
-      }
-    };
-  })
   .listen(port);
 
 log.info(`Listening on port ${port}...`);

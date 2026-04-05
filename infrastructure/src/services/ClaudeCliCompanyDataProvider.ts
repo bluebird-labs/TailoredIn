@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { injectable } from '@needle-di/core';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '@tailoredin/application';
+import { ExternalServiceError } from '@tailoredin/application';
 import { EnumUtil, Logger } from '@tailoredin/core';
 import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
 import { stripCodeFences } from './strip-code-fences.js';
@@ -14,47 +15,57 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
 
   public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
     const prompt = this.buildPrompt(url, context);
+    const start = performance.now();
 
-    this.log.info(`Enriching company data for URL: ${url}`);
+    this.log.info(`Enriching company data for URL: "${url}"`);
 
     const jsonSchema = JSON.stringify(this.buildSchema());
 
-    const proc = Bun.spawn(['claude', '-p', prompt, '--output-format', 'json', '--json-schema', jsonSchema], {
-      stdout: 'pipe',
-      stderr: 'pipe'
-    });
+    let output: string;
+    let exitCode: number;
+    let stderr: string;
+    try {
+      const proc = Bun.spawn(['claude', '-p', prompt, '--output-format', 'json', '--json-schema', jsonSchema], {
+        stdout: 'pipe',
+        stderr: 'pipe'
+      });
+      output = await new Response(proc.stdout).text();
+      stderr = await new Response(proc.stderr).text();
+      exitCode = await proc.exited;
+    } catch (e) {
+      this.log.error(`Failed to spawn Claude CLI: ${e instanceof Error ? e.message : String(e)}`);
+      throw new ExternalServiceError('Claude CLI', 'Company enrichment unavailable');
+    }
 
-    const output = await new Response(proc.stdout).text();
-    const exitCode = await proc.exited;
+    const duration = Math.round(performance.now() - start);
 
     if (exitCode !== 0) {
-      const stderr = await new Response(proc.stderr).text();
-      this.log.error(`Claude CLI failed (exit ${exitCode}): ${stderr}`);
-      throw new Error(`Claude CLI failed with exit code ${exitCode}`);
+      this.log.error(
+        `Claude CLI failed | url="${url}" exitCode=${exitCode} duration=${duration}ms stdout="${output.trim().slice(0, 500)}" stderr="${stderr.trim()}"`
+      );
+      throw new ExternalServiceError('Claude CLI', 'Company enrichment failed');
     }
 
-    let parsed: Record<string, unknown>;
+    let result: CompanyEnrichmentResult;
     try {
-      parsed = JSON.parse(output);
-    } catch (e) {
-      this.log.error(`Failed to parse Claude CLI output: ${output.slice(0, 200)}`);
-      throw new Error(`Claude CLI returned invalid JSON: ${e instanceof Error ? e.message : String(e)}`);
+      const parsed = JSON.parse(output);
+      const text = stripCodeFences(parsed.result ?? output);
+      result = this.parseResponse(text);
+    } catch {
+      this.log.error(
+        `Failed to parse Claude CLI response | url="${url}" duration=${duration}ms output="${output.slice(0, 500)}"`
+      );
+      throw new ExternalServiceError('Claude CLI', 'Company enrichment returned invalid response');
     }
-    const text = stripCodeFences(typeof parsed.result === 'string' ? parsed.result : output);
 
-    const result = this.parseResponse(text);
     const validated = await this.validateUrls(result);
-    return this.applyLogoFromDomain(validated);
+    const enriched = await this.applyLogoFromDomain(validated);
+    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}" duration=${duration}ms`);
+    return enriched;
   }
 
   public parseResponse(raw: string): CompanyEnrichmentResult {
-    let data: Record<string, unknown>;
-    try {
-      data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    } catch (e) {
-      this.log.error(`Failed to parse enrichment response: ${raw.slice(0, 200)}`);
-      throw new Error(`Invalid enrichment response JSON: ${e instanceof Error ? e.message : String(e)}`);
-    }
+    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
     return {
       name: typeof data.name === 'string' ? data.name : null,
