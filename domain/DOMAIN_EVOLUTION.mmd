@@ -1,0 +1,260 @@
+---
+title: TailoredIn — Domain Entities & Relationships
+---
+
+classDiagram
+    direction TB
+
+    %% ──────────────────────────────────────────────
+    %%  Profile Subdomain
+    %% ──────────────────────────────────────────────
+
+    class Profile {
+        <<AggregateRoot>>
+        +ProfileId id
+        +string email
+        +string firstName
+        +string lastName
+        +string? about
+        +string? phone
+        +string? githubUrl
+        +string? linkedinUrl
+        +string? websiteUrl
+        +string? location
+        +fullName()
+    }
+
+    class Accomplishment {
+        <<Entity>>
+        +AccomplishmentId id
+        +string experienceId
+        +string title
+        +string narrative
+        +number ordinal
+        +update()
+    }
+
+    class Education {
+        <<AggregateRoot>>
+        +EducationId id
+        +string profileId
+        +string degreeTitle
+        +string institutionName
+        +number graduationYear
+        +string? location
+        +string? honors
+        +number ordinal
+    }
+
+    class Experience {
+        <<AggregateRoot>>
+        +ExperienceId id
+        +string profileId
+        +string title
+        +string companyName
+        +string? companyWebsite
+        +string location
+        +string startDate
+        +string endDate
+        +string? summary
+        +number ordinal
+        +Accomplishment[] accomplishments
+        +addAccomplishment()
+        +removeAccomplishment()
+        +findAccomplishmentOrFail()
+    }
+
+    class Headline {
+        <<AggregateRoot>>
+        +HeadlineId id
+        +string profileId
+        +string label
+        +string summaryText
+    }
+
+    Profile "1" --> "*" Headline : has
+    Profile "1" --> "*" Education : has
+    Profile "1" --> "*" Experience : has
+    Experience "1" *-- "*" Accomplishment : contains
+
+    %% ──────────────────────────────────────────────
+    %%  Company Subdomain
+    %% ──────────────────────────────────────────────
+
+    class Company {
+        <<AggregateRoot>>
+        +CompanyId id
+        +string name
+        +string? website
+        +string? logoUrl
+        +string? linkedinLink
+        +BusinessType? businessType
+        +Industry? industry
+        +CompanyStage? stage
+        +setWebsite()
+        +setBusinessType()
+        +setIndustry()
+        +setStage()
+    }
+
+    class BusinessType {
+        <<enumeration>>
+        B2B · B2C · B2B2C
+        B2G · D2C · MARKETPLACE
+        PLATFORM
+    }
+
+    class CompanyStage {
+        <<enumeration>>
+        SEED · SERIES_A · SERIES_B
+        SERIES_C · SERIES_D_PLUS · GROWTH
+        PUBLIC · BOOTSTRAPPED · ACQUIRED
+    }
+
+    class Industry {
+        <<enumeration>>
+        AUTOMOBILE · SECURITY · FINANCE
+        HEALTHCARE · EDUCATION · E_COMMERCE
+        REAL_ESTATE · MEDIA · LOGISTICS
+        ENERGY · AGRICULTURE · TRAVEL
+        FOOD · LEGAL · HR
+        MARKETING · SAAS · AI_ML
+        GAMING · TELECOM · INSURANCE
+        RETAIL · CONSTRUCTION · GOVERNMENT
+    }
+
+    Company --> BusinessType
+    Company --> Industry
+    Company --> CompanyStage
+
+    %% ──────────────────────────────────────────────
+    %%  Application Subdomain
+    %% ──────────────────────────────────────────────
+
+    class Application {
+        <<AggregateRoot>>
+        +ApplicationId id
+        +string profileId
+        +string companyId
+        +ApplicationStatus status
+        +string? jobDescriptionId
+        +string? notes
+        +Date appliedAt
+        +Date updatedAt
+    }
+
+    class ApplicationStatus {
+        <<enumeration>>
+        DRAFT · APPLIED · INTERVIEWING
+        OFFERED · REJECTED · WITHDRAWN
+        ACCEPTED
+    }
+
+    class JobDescription {
+        <<AggregateRoot>>
+        +JobDescriptionId id
+        +string companyId
+        +string title
+        +string description
+        +string? url
+        +string? location
+        +SalaryRange? salaryRange
+        +JobLevel? level
+        +LocationType? locationType
+        +JobSource source
+        +Date? postedAt
+        +Date createdAt
+        +Date updatedAt
+    }
+
+    class SalaryRange {
+        <<ValueObject>>
+        +number? min
+        +number? max
+        +string currency
+    }
+
+    class JobLevel {
+        <<enumeration>>
+        INTERNSHIP · ENTRY_LEVEL
+        ASSOCIATE · MID_SENIOR
+        DIRECTOR · EXECUTIVE
+    }
+
+    class LocationType {
+        <<enumeration>>
+        REMOTE · HYBRID · ONSITE
+    }
+
+    class JobSource {
+        <<enumeration>>
+        LINKEDIN · PARAFORM
+        GREENHOUSE · UPLOAD
+    }
+
+    Profile "1" --> "*" Application : has
+    Company "1" --> "*" Application : has
+    Company "1" --> "*" JobDescription : has
+    Application --> ApplicationStatus
+    Application "1" --> "0..1" JobDescription : references
+    JobDescription *-- SalaryRange : contains
+    JobDescription --> JobLevel
+    JobDescription --> LocationType
+    JobDescription --> JobSource
+
+    %% ──────────────────────────────────────────────
+    %%  Enums & Types
+    %% ──────────────────────────────────────────────
+
+    class BlockLayout {
+        <<ValueObject>>
+        +number lineCount
+        +number[] pageNumbers
+    }
+
+    class LayoutAnalysis {
+        <<ValueObject>>
+        +number totalPages
+        +object header
+        +object experiences
+        +BlockLayout[] education
+        +BlockLayout[] skills
+    }
+
+    class ResumeTemplate {
+        <<ValueObject>>
+        +string id
+        +string pageSize
+        +object margins
+        +number bodyFontSizePt
+        +number lineHeightEm
+        +number headerFontSizePt
+        +number sectionSpacingPt
+        +number entrySpacingPt
+    }
+
+    LayoutAnalysis "1" *-- "*" BlockLayout : contains
+
+    %% ──────────────────────────────────────────────
+    %%  Apply Styles
+    %% ──────────────────────────────────────────────
+
+    style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ResumeTemplate fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
