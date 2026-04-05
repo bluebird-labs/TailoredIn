@@ -138,10 +138,24 @@ classDiagram
         +execute(DeleteExperienceInput) Result<void, Error>
     }
 
+    class LinkCompanyToExperience {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +CompanyRepository companyRepository
+        +execute(LinkCompanyToExperienceInput) Result<ExperienceDto, Error>
+    }
+
     class ListExperiences {
         <<UseCase>>
         +ExperienceRepository experienceRepository
+        +CompanyRepository companyRepository
         +execute() ExperienceDto[]
+    }
+
+    class UnlinkCompanyFromExperience {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(UnlinkCompanyFromExperienceInput) Result<ExperienceDto, Error>
     }
 
     class UpdateAccomplishment {
@@ -333,6 +347,8 @@ classDiagram
         +string title
         +string companyName
         +string? companyWebsite
+        +string? companyId
+        +CompanyDto? company
         +string location
         +string startDate
         +string endDate
@@ -400,6 +416,7 @@ classDiagram
         +string currency
     }
 
+    ExperienceDto *-- CompanyDto
     ExperienceDto "1" *-- "*" AccomplishmentDto : contains
     JobDescriptionDto *-- SalaryRangeDto
     PaginatedDto *-- PaginationMeta
@@ -420,7 +437,9 @@ classDiagram
     UpdateEducation ..> EducationDto : returns
     AddAccomplishment ..> AccomplishmentDto : returns
     CreateExperience ..> ExperienceDto : returns
+    LinkCompanyToExperience ..> ExperienceDto : returns
     ListExperiences ..> ExperienceDto : returns
+    UnlinkCompanyFromExperience ..> ExperienceDto : returns
     UpdateExperience ..> ExperienceDto : returns
     GetProfile ..> ProfileDto : returns
     CreateHeadline ..> HeadlineDto : returns
@@ -493,7 +512,11 @@ classDiagram
     CreateExperience ..> ExperienceRepository : depends
     DeleteAccomplishment ..> ExperienceRepository : depends
     DeleteExperience ..> ExperienceRepository : depends
+    LinkCompanyToExperience ..> ExperienceRepository : depends
+    LinkCompanyToExperience ..> CompanyRepository : depends
     ListExperiences ..> ExperienceRepository : depends
+    ListExperiences ..> CompanyRepository : depends
+    UnlinkCompanyFromExperience ..> ExperienceRepository : depends
     UpdateAccomplishment ..> ExperienceRepository : depends
     UpdateExperience ..> ExperienceRepository : depends
     GetProfile ..> ProfileRepository : depends
@@ -531,7 +554,9 @@ classDiagram
     style CreateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style LinkCompanyToExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListExperiences fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UnlinkCompanyFromExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px

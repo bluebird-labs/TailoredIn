@@ -65,6 +65,7 @@ classDiagram
         +string title
         +string companyName
         +string? companyWebsite
+        +string? companyId
         +string location
         +string startDate
         +string endDate
@@ -74,6 +75,8 @@ classDiagram
         +addAccomplishment()
         +removeAccomplishment()
         +findAccomplishmentOrFail()
+        +linkCompany()
+        +unlinkCompany()
     }
 
     class Headline {
@@ -191,6 +194,7 @@ classDiagram
     JobDescription --> JobSource
     Company "1" --> "*" Application : has
     JobDescription "1" --> "*" Application : has
+    Company "1" --> "*" Experience : has
     Company --> BusinessType
     Company --> Industry
     Company --> CompanyStage
