@@ -4,16 +4,15 @@ import type { DevContext } from './DevContext.js';
 const log = Logger.create('docker-compose');
 
 function composeArgs(ctx: DevContext): string[] {
-  return [
-    'docker',
-    'compose',
-    '-f',
-    ctx.composeFile,
-    '-p',
-    ctx.projectName,
-    '--project-directory',
-    ctx.composeProjectDir
-  ];
+  const args = ['docker', 'compose', '-f', ctx.composeFile, '-p', ctx.projectName, '--project-directory', ctx.composeProjectDir];
+
+  // In worktree mode, prevent docker compose from reading the repo root's .env
+  // (which contains main-branch ports). Worktree env vars are set via process.env.
+  if (ctx.mode === 'worktree') {
+    args.push('--env-file', '/dev/null');
+  }
+
+  return args;
 }
 
 /** Throws if Docker daemon is not reachable. */
@@ -28,7 +27,7 @@ export function assertDockerRunning(): void {
 export function composeUp(ctx: DevContext): void {
   const args = [...composeArgs(ctx), 'up', '-d'];
   log.info(`Starting: ${args.join(' ')}`);
-  const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit' });
+  const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit', env: process.env });
   if (result.exitCode !== 0) {
     throw new Error(`docker compose up failed (exit ${result.exitCode}).`);
   }
@@ -42,7 +41,7 @@ export function composeDown(ctx: DevContext, removeVolumes: boolean): void {
   if (removeVolumes) args.push('-v');
 
   log.info(`Stopping: ${args.join(' ')}`);
-  const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit' });
+  const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit', env: process.env });
   if (result.exitCode !== 0) {
     log.warn(`docker compose down exited with code ${result.exitCode}`);
   }

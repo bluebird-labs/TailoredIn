@@ -1,85 +1,88 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { injectable } from '@needle-di/core';
+import { inject, injectable } from '@needle-di/core';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
-import { EnumUtil, Logger } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core';
 import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
-import { stripCodeFences } from './strip-code-fences.js';
+import { z } from 'zod';
+import { DI } from '../DI.js';
+import type { ClaudeCliProvider } from './llm/ClaudeCliProvider.js';
+import { LlmJsonRequest } from './llm/LlmJsonRequest.js';
 
 const PROMPT_PATH = resolve(import.meta.dir, 'prompts/enrich-company.md');
+
+const companyEnrichmentSchema = z.object({
+  name: z.string().nullable(),
+  description: z.string().nullable(),
+  website: z.string().nullable(),
+  linkedinLink: z.string().nullable(),
+  businessType: z.enum(Object.values(BusinessType) as [string, ...string[]]).nullable(),
+  industry: z.enum(Object.values(Industry) as [string, ...string[]]).nullable(),
+  stage: z.enum(Object.values(CompanyStage) as [string, ...string[]]).nullable()
+});
+
+class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSchema> {
+  public readonly schema = companyEnrichmentSchema;
+
+  public constructor(
+    private readonly url: string,
+    private readonly context?: string
+  ) {
+    super();
+  }
+
+  public get prompt(): string {
+    const template = readFileSync(PROMPT_PATH, 'utf-8');
+    const businessTypes = Object.values(BusinessType).join(', ');
+    const industries = Object.values(Industry).join(', ');
+    const stages = Object.values(CompanyStage).join(', ');
+
+    let prompt = template
+      .replace('{{url}}', this.url)
+      .replace('{{businessTypes}}', businessTypes)
+      .replace('{{industries}}', industries)
+      .replace('{{stages}}', stages);
+
+    if (this.context) {
+      prompt = prompt.replace('{{#context}}\n', '').replace('{{/context}}', '');
+      prompt = prompt.replace('{{context}}', this.context);
+    } else {
+      prompt = prompt.replace(/\{\{#context\}\}[\s\S]*?\{\{\/context\}\}/g, '');
+    }
+
+    return prompt;
+  }
+}
 
 @injectable()
 export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
   private readonly log = Logger.create(this);
 
-  public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
-    const prompt = this.buildPrompt(url, context);
-    const start = performance.now();
+  public constructor(private readonly provider: ClaudeCliProvider = inject(DI.Llm.ClaudeCliProvider)) {}
 
+  public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
     this.log.info(`Enriching company data for URL: "${url}"`);
 
-    const jsonSchema = JSON.stringify(this.buildSchema());
+    const result = await this.provider.request(new CompanyEnrichmentRequest(url, context));
 
-    let output: string;
-    let exitCode: number;
-    let stderr: string;
-    try {
-      const proc = Bun.spawn(['claude', '-p', prompt, '--output-format', 'json', '--json-schema', jsonSchema], {
-        stdout: 'pipe',
-        stderr: 'pipe'
-      });
-      output = await new Response(proc.stdout).text();
-      stderr = await new Response(proc.stderr).text();
-      exitCode = await proc.exited;
-    } catch (e) {
-      this.log.error(`Failed to spawn Claude CLI: ${e instanceof Error ? e.message : String(e)}`);
-      throw new ExternalServiceError('Claude CLI', 'Company enrichment unavailable');
-    }
-
-    const duration = Math.round(performance.now() - start);
-
-    if (exitCode !== 0) {
-      this.log.error(
-        `Claude CLI failed | url="${url}" exitCode=${exitCode} duration=${duration}ms stdout="${output.trim().slice(0, 500)}" stderr="${stderr.trim()}"`
-      );
+    if (result.isErr) {
+      this.log.error(`Company enrichment failed | url="${url}" error="${result.error.message}"`);
       throw new ExternalServiceError('Claude CLI', 'Company enrichment failed');
     }
 
-    let result: CompanyEnrichmentResult;
-    try {
-      const parsed = JSON.parse(output);
-      const text = stripCodeFences(parsed.result ?? output);
-      result = this.parseResponse(text);
-    } catch {
-      this.log.error(
-        `Failed to parse Claude CLI response | url="${url}" duration=${duration}ms output="${output.slice(0, 500)}"`
-      );
-      throw new ExternalServiceError('Claude CLI', 'Company enrichment returned invalid response');
-    }
-
-    const validated = await this.validateUrls(result);
-    const enriched = await this.applyLogoFromDomain(validated);
-    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}" duration=${duration}ms`);
-    return enriched;
-  }
-
-  public parseResponse(raw: string): CompanyEnrichmentResult {
-    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-
-    return {
-      name: typeof data.name === 'string' ? data.name : null,
-      description: typeof data.description === 'string' ? data.description : null,
-      website: typeof data.website === 'string' ? data.website : null,
+    const enrichment: CompanyEnrichmentResult = {
+      ...result.value,
       logoUrl: null,
-      linkedinLink: typeof data.linkedinLink === 'string' ? data.linkedinLink : null,
-      businessType:
-        typeof data.businessType === 'string' && EnumUtil.is(data.businessType, BusinessType)
-          ? data.businessType
-          : null,
-      industry: typeof data.industry === 'string' && EnumUtil.is(data.industry, Industry) ? data.industry : null,
-      stage: typeof data.stage === 'string' && EnumUtil.is(data.stage, CompanyStage) ? data.stage : null
+      businessType: result.value.businessType as BusinessType | null,
+      industry: result.value.industry as Industry | null,
+      stage: result.value.stage as CompanyStage | null
     };
+
+    const validated = await this.validateUrls(enrichment);
+    const enriched = await this.applyLogoFromDomain(validated);
+    this.log.info(`Company enrichment completed | url="${url}" name="${enriched.name}"`);
+    return enriched;
   }
 
   private async validateUrls(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
@@ -127,42 +130,5 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     } catch {
       return false;
     }
-  }
-
-  private buildSchema(): object {
-    return {
-      type: 'object',
-      properties: {
-        name: { type: ['string', 'null'] },
-        description: { type: ['string', 'null'] },
-        website: { type: ['string', 'null'] },
-        linkedinLink: { type: ['string', 'null'] },
-        businessType: { enum: [...Object.values(BusinessType), null] },
-        industry: { enum: [...Object.values(Industry), null] },
-        stage: { enum: [...Object.values(CompanyStage), null] }
-      }
-    };
-  }
-
-  private buildPrompt(url: string, context?: string): string {
-    const template = readFileSync(PROMPT_PATH, 'utf-8');
-    const businessTypes = Object.values(BusinessType).join(', ');
-    const industries = Object.values(Industry).join(', ');
-    const stages = Object.values(CompanyStage).join(', ');
-
-    let prompt = template
-      .replace('{{url}}', url)
-      .replace('{{businessTypes}}', businessTypes)
-      .replace('{{industries}}', industries)
-      .replace('{{stages}}', stages);
-
-    if (context) {
-      prompt = prompt.replace('{{#context}}\n', '').replace('{{/context}}', '');
-      prompt = prompt.replace('{{context}}', context);
-    } else {
-      prompt = prompt.replace(/\{\{#context\}\}[\s\S]*?\{\{\/context\}\}/g, '');
-    }
-
-    return prompt;
   }
 }

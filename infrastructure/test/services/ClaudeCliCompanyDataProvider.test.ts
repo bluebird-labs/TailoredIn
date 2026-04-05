@@ -1,71 +1,66 @@
-import { describe, expect, test } from 'bun:test';
-import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import { describe, expect, mock, test } from 'bun:test';
+import { BusinessType, CompanyStage, err, Industry, ok } from '@tailoredin/domain';
 import { ClaudeCliCompanyDataProvider } from '../../src/services/ClaudeCliCompanyDataProvider.js';
+import type { ClaudeCliProvider } from '../../src/services/llm/ClaudeCliProvider.js';
+import { LlmRequestError } from '../../src/services/llm/LlmRequestError.js';
+
+function createMockProvider(result: ReturnType<typeof ok> | ReturnType<typeof err>) {
+  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeCliProvider;
+}
 
 describe('ClaudeCliCompanyDataProvider', () => {
-  test('parses valid JSON response from CLI', () => {
-    const validResponse = JSON.stringify({
-      name: 'GitHub',
-      website: 'https://github.com',
-      logoUrl: null,
-      linkedinLink: 'https://linkedin.com/company/github',
-      businessType: 'platform',
-      industry: 'saas',
-      stage: 'acquired'
-    });
+  test('returns enrichment result from successful LLM response', async () => {
+    const mockProvider = createMockProvider(
+      ok({
+        name: 'GitHub',
+        description: 'Code hosting platform',
+        website: null,
+        linkedinLink: null,
+        businessType: BusinessType.PLATFORM,
+        industry: Industry.SAAS,
+        stage: CompanyStage.ACQUIRED
+      })
+    );
 
-    const provider = new ClaudeCliCompanyDataProvider();
-    const result = provider.parseResponse(validResponse);
+    const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+    const result = await dataProvider.enrichFromUrl('https://github.com');
 
     expect(result.name).toBe('GitHub');
-    expect(result.website).toBe('https://github.com');
-    expect(result.logoUrl).toBeNull();
-    expect(result.linkedinLink).toBe('https://linkedin.com/company/github');
+    expect(result.description).toBe('Code hosting platform');
     expect(result.businessType).toBe(BusinessType.PLATFORM);
     expect(result.industry).toBe(Industry.SAAS);
     expect(result.stage).toBe(CompanyStage.ACQUIRED);
+    expect(result.logoUrl).toBeNull();
   });
 
-  test('maps unknown enum values to null', () => {
-    const response = JSON.stringify({
-      name: 'SomeCo',
-      website: null,
-      logoUrl: null,
-      linkedinLink: null,
-      businessType: 'invalid_type',
-      industry: 'not_an_industry',
-      stage: 'unknown'
-    });
+  test('throws ExternalServiceError on LLM failure', async () => {
+    const mockProvider = createMockProvider(
+      err(new LlmRequestError('CLI exited with code 1', ['claude'], 1, '', '', 100))
+    );
 
-    const provider = new ClaudeCliCompanyDataProvider();
-    const result = provider.parseResponse(response);
+    const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
 
-    expect(result.businessType).toBeNull();
-    expect(result.industry).toBeNull();
-    expect(result.stage).toBeNull();
+    await expect(dataProvider.enrichFromUrl('https://example.com')).rejects.toThrow('Company enrichment failed');
   });
 
-  test('handles all-null response', () => {
-    const response = JSON.stringify({
-      name: null,
-      website: null,
-      logoUrl: null,
-      linkedinLink: null,
-      businessType: null,
-      industry: null,
-      stage: null
-    });
+  test('handles all-null enrichment response', async () => {
+    const mockProvider = createMockProvider(
+      ok({
+        name: null,
+        description: null,
+        website: null,
+        linkedinLink: null,
+        businessType: null,
+        industry: null,
+        stage: null
+      })
+    );
 
-    const provider = new ClaudeCliCompanyDataProvider();
-    const result = provider.parseResponse(response);
+    const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+    const result = await dataProvider.enrichFromUrl('https://unknown.com');
 
     expect(result.name).toBeNull();
     expect(result.businessType).toBeNull();
-  });
-
-  test('throws on invalid JSON', () => {
-    const provider = new ClaudeCliCompanyDataProvider();
-
-    expect(() => provider.parseResponse('not json')).toThrow();
+    expect(result.logoUrl).toBeNull();
   });
 });
