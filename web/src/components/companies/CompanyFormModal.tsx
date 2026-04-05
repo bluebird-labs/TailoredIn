@@ -24,6 +24,7 @@ interface Props {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
   readonly company?: Company;
+  readonly onCreated?: (company: Company) => void;
 }
 
 type Step = 'search' | 'enriching' | 'form';
@@ -67,7 +68,7 @@ function enrichmentToFormState(result: CompanyEnrichmentResult): CompanyFormStat
   };
 }
 
-export function CompanyFormModal({ open, onOpenChange, company }: Props) {
+export function CompanyFormModal({ open, onOpenChange, company, onCreated }: Props) {
   const isEdit = !!company;
   const createCompany = useCreateCompany();
   const updateCompany = useUpdateCompany();
@@ -157,10 +158,14 @@ export function CompanyFormModal({ open, onOpenChange, company }: Props) {
     };
 
     const options = {
-      onSuccess: () => {
+      // biome-ignore lint/suspicious/noExplicitAny: mutation result type varies between create/update
+      onSuccess: (result: any) => {
         resetAll();
         onOpenChange(false);
         toast.success(isEdit ? 'Company updated' : 'Company created');
+        if (!isEdit && onCreated && result) {
+          onCreated(result as Company);
+        }
       },
       onError: () => toast.error(isEdit ? 'Failed to update company' : 'Failed to create company')
     };

@@ -5,11 +5,19 @@ import { FieldError } from '@/components/shared/FieldError.js';
 import { FormModal } from '@/components/shared/FormModal.js';
 import { Label } from '@/components/ui/label';
 import { MonthYearPicker } from '@/components/ui/month-year-picker';
+import type { Company } from '@/hooks/use-companies';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
-import { type Experience, useCreateExperience, useUpdateExperience } from '@/hooks/use-experiences';
+import {
+  type Experience,
+  useCreateExperience,
+  useLinkCompany,
+  useUnlinkCompany,
+  useUpdateExperience
+} from '@/hooks/use-experiences';
 import { cn } from '@/lib/utils';
 import { type ExperienceFormState, hasErrors, type ValidationErrors, validateExperience } from '@/lib/validation.js';
 import { AccomplishmentListEditor } from './AccomplishmentListEditor.js';
+import { CompanySearchPopover } from './CompanySearchPopover.js';
 
 type ModalMode = { mode: 'create'; experienceCount: number } | { mode: 'edit'; experience: Experience };
 
@@ -50,12 +58,45 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
 
   const createExperience = useCreateExperience();
   const updateExperience = useUpdateExperience();
-  const isSaving = createExperience.isPending || updateExperience.isPending;
+  const linkCompany = useLinkCompany();
+  const unlinkCompany = useUnlinkCompany();
+
+  const [linkedCompany, setLinkedCompany] = useState<Company | null>(
+    modalMode.mode === 'edit' ? modalMode.experience.company : null
+  );
+
+  const isSaving =
+    createExperience.isPending || updateExperience.isPending || linkCompany.isPending || unlinkCompany.isPending;
 
   const savedState = useMemo(() => (experience ? stateFromExperience(experience) : emptyState()), [experience]);
 
   const { current, setField, isDirtyField, dirtyCount, reset } = useDirtyTracking(savedState);
   const [errors, setErrors] = useState<ValidationErrors<ExperienceFormState>>({});
+
+  function handleLinkCompany(company: Company) {
+    if (!experience) return;
+    linkCompany.mutate(
+      { experienceId: experience.id, companyId: company.id },
+      {
+        onSuccess: () => {
+          setLinkedCompany(company);
+          toast.success(`Linked to ${company.name}`);
+        },
+        onError: () => toast.error('Failed to link company')
+      }
+    );
+  }
+
+  function handleUnlinkCompany() {
+    if (!experience) return;
+    unlinkCompany.mutate(experience.id, {
+      onSuccess: () => {
+        setLinkedCompany(null);
+        toast.success('Company unlinked');
+      },
+      onError: () => toast.error('Failed to unlink company')
+    });
+  }
 
   function handleSave() {
     const validationErrors = validateExperience(current);
@@ -136,17 +177,40 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
           disabled={isSaving}
           placeholder="e.g. Senior Software Engineer"
         />
-        <EditableField
-          type="text"
-          label="Company"
-          required
-          value={current.companyName}
-          onChange={v => setField('companyName', v)}
-          isDirty={isDirtyField('companyName')}
-          error={errors.companyName}
-          disabled={isSaving}
-          placeholder="e.g. Acme Corp"
-        />
+        <div>
+          <div className="flex items-end gap-1">
+            <div className="flex-1">
+              <EditableField
+                type="text"
+                label="Company"
+                required
+                value={current.companyName}
+                onChange={v => setField('companyName', v)}
+                isDirty={isDirtyField('companyName')}
+                error={errors.companyName}
+                disabled={isSaving}
+                placeholder="e.g. Acme Corp"
+              />
+            </div>
+            {experience && (
+              <CompanySearchPopover
+                linkedCompany={linkedCompany}
+                onLink={handleLinkCompany}
+                onUnlink={handleUnlinkCompany}
+                disabled={isSaving}
+              />
+            )}
+          </div>
+          {linkedCompany && linkedCompany.name !== current.companyName && (
+            <button
+              type="button"
+              className="mt-1 text-xs text-primary hover:underline"
+              onClick={() => setField('companyName', linkedCompany.name)}
+            >
+              Use "{linkedCompany.name}"?
+            </button>
+          )}
+        </div>
       </div>
 
       <EditableField
@@ -158,6 +222,15 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
         disabled={isSaving}
         placeholder="https://..."
       />
+      {linkedCompany?.website && linkedCompany.website !== current.companyWebsite && (
+        <button
+          type="button"
+          className="mt-1 text-xs text-primary hover:underline"
+          onClick={() => setField('companyWebsite', linkedCompany.website!)}
+        >
+          Use "{linkedCompany.website}"?
+        </button>
+      )}
 
       <EditableField
         type="text"

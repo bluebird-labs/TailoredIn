@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
+import type { Company } from './use-companies';
 
 // biome-ignore lint/suspicious/noExplicitAny: Eden Treaty route param types vary
 type AnyRouteSegment = any;
@@ -10,6 +11,8 @@ export type Experience = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyId: string | null;
+  company: Company | null;
   location: string;
   startDate: string;
   endDate: string;
@@ -91,6 +94,38 @@ export function useDeleteExperience() {
       const segment = api.experiences as AnyRouteSegment;
       const { error } = await segment({ id }).delete();
       if (error) throw new Error(error.value?.error?.message ?? 'Failed to delete experience');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+    }
+  });
+}
+
+export function useLinkCompany() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { experienceId: string; companyId: string }) => {
+      const segment = api.experiences as AnyRouteSegment;
+      const { data, error } = await segment({ id: input.experienceId }).company.put({
+        company_id: input.companyId
+      });
+      if (error) throw new Error(error.value?.error?.message ?? 'Failed to link company');
+      return data?.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+    }
+  });
+}
+
+export function useUnlinkCompany() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (experienceId: string) => {
+      const segment = api.experiences as AnyRouteSegment;
+      const { data, error } = await segment({ id: experienceId }).company.delete();
+      if (error) throw new Error(error.value?.error?.message ?? 'Failed to unlink company');
+      return data?.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
