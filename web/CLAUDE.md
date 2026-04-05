@@ -103,8 +103,9 @@ Key visual rules:
 - **No bold (700) or semibold (600)** — max weight is `font-medium` (500)
 - **No hardcoded colors** — use design tokens (`primary`, `accent`, `muted`, etc.)
 - **No shadows on cards/inputs** — use borders only
-- **Always-editable fields** — no edit mode toggles or pencil icons
-- **Aggregate-scoped save** — sticky SaveBar appears when fields are dirty
+- **Content-first click-to-edit** — data displays as plain text, click to enter edit mode
+- **Inline save/discard per section** — each editing section has its own Save/Discard buttons
+- **One section editable at a time** — mutual exclusion via `EditableSectionProvider`
 - **Typography scale**: h1=22px/medium, h2=18px/medium, h3=15px/medium, body=14px/regular
 
 ## Domain Model as Source of Truth

@@ -184,6 +184,15 @@ Five-step amber-to-neutral scale for data visualization:
 - Footer: Save (primary) + Cancel (ghost), same styling as SaveBar
 - Dirty-cancel: triggers ConfirmDialog with discard warning
 
+### Content-First Editable Sections
+
+All editable data renders as plain content by default. Form inputs only appear when the user clicks to edit.
+
+- **Resting state:** Standard card/section appearance. Content displayed as text with label/value pairs.
+- **Hover affordance:** `bg-accent/40` warm amber background wash, `cursor-pointer`, `transition-colors duration-200`.
+- **Editing state:** Border shifts to amber (`border-primary/50`). Form fields replace content. Inline Save/Discard buttons at section bottom.
+- **Empty fields:** Render as "Not set" in `text-muted-foreground italic`.
+
 ### Dark Mode Toggle
 
 - Located at bottom of sidebar
