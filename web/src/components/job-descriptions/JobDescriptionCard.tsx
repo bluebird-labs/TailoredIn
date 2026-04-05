@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { JobDescription } from '@/hooks/use-job-descriptions';
@@ -5,7 +6,6 @@ import { formatEnumLabel } from './job-description-options.js';
 
 interface JobDescriptionCardProps {
   readonly jobDescription: JobDescription;
-  readonly onClick: () => void;
 }
 
 function formatSalary(jd: JobDescription): string | null {
@@ -19,16 +19,16 @@ function formatSalary(jd: JobDescription): string | null {
   return null;
 }
 
-export function JobDescriptionCard({ jobDescription, onClick }: JobDescriptionCardProps) {
+export function JobDescriptionCard({ jobDescription }: JobDescriptionCardProps) {
   const levelLabel = formatEnumLabel('level', jobDescription.level);
   const locationTypeLabel = formatEnumLabel('locationType', jobDescription.locationType);
   const salary = formatSalary(jobDescription);
 
   return (
-    <button
-      type="button"
-      className="group w-full text-left border rounded-[14px] p-4 cursor-pointer transition-colors hover:bg-accent/40"
-      onClick={onClick}
+    <Link
+      to="/job-descriptions/$jobDescriptionId"
+      params={{ jobDescriptionId: jobDescription.id }}
+      className="group block w-full text-left border rounded-[14px] p-4 transition-colors hover:bg-accent/40"
     >
       <div className="min-w-0">
         <p className="font-medium truncate">{jobDescription.title}</p>
@@ -44,6 +44,6 @@ export function JobDescriptionCard({ jobDescription, onClick }: JobDescriptionCa
           </div>
         )}
       </div>
-    </button>
+    </Link>
   );
 }

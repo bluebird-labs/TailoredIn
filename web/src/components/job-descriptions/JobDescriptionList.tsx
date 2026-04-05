@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { type JobDescription, useJobDescriptions } from '@/hooks/use-job-descriptions';
+import { useJobDescriptions } from '@/hooks/use-job-descriptions';
 import { JobDescriptionCard } from './JobDescriptionCard.js';
 import { JobDescriptionFormModal } from './JobDescriptionFormModal.js';
 
@@ -12,11 +12,9 @@ interface JobDescriptionListProps {
   readonly companyId: string;
 }
 
-type ModalState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; jobDescription: JobDescription };
-
 export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
   const { data: jobDescriptions = [], isLoading } = useJobDescriptions(companyId);
-  const [modalState, setModalState] = useState<ModalState>({ mode: 'closed' });
+  const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
@@ -27,15 +25,13 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
 
   if (isLoading) return <LoadingSkeleton variant="list" count={3} />;
 
-  const modalOpen = modalState.mode !== 'closed';
-
   return (
     <>
-      {jobDescriptions.length === 0 && !modalOpen ? (
+      {jobDescriptions.length === 0 && !createOpen ? (
         <EmptyState
           message="No job descriptions yet."
           actionLabel="Add job description"
-          onAction={() => setModalState({ mode: 'create' })}
+          onAction={() => setCreateOpen(true)}
         />
       ) : (
         <div className="space-y-3">
@@ -52,43 +48,22 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
           {filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">No job descriptions match your search.</p>
           ) : (
-            filtered.map(jd => (
-              <JobDescriptionCard
-                key={jd.id}
-                jobDescription={jd}
-                onClick={() => setModalState({ mode: 'edit', jobDescription: jd })}
-              />
-            ))
+            filtered.map(jd => <JobDescriptionCard key={jd.id} jobDescription={jd} />)
           )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full border-dashed"
-            onClick={() => setModalState({ mode: 'create' })}
-          >
+          <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setCreateOpen(true)}>
             <Plus className="h-3 w-3 mr-1" />
             Add job description
           </Button>
         </div>
       )}
 
-      {modalState.mode === 'create' && (
+      {createOpen && (
         <JobDescriptionFormModal
           open
           companyId={companyId}
           onOpenChange={next => {
-            if (!next) setModalState({ mode: 'closed' });
-          }}
-        />
-      )}
-      {modalState.mode === 'edit' && (
-        <JobDescriptionFormModal
-          open
-          companyId={companyId}
-          jobDescription={modalState.jobDescription}
-          onOpenChange={next => {
-            if (!next) setModalState({ mode: 'closed' });
+            if (!next) setCreateOpen(false);
           }}
         />
       )}

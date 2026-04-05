@@ -52,6 +52,18 @@ export function useJobDescriptions(companyId: string) {
   });
 }
 
+export function useJobDescription(id: string) {
+  return useQuery({
+    queryKey: queryKeys.jobDescriptions.detail(id),
+    queryFn: async () => {
+      const segment = api['job-descriptions'] as AnyRouteSegment;
+      const { data, error } = await segment({ id }).get();
+      if (error) throw new Error('Failed to fetch job description');
+      return data?.data as JobDescription;
+    }
+  });
+}
+
 export function useParseJobDescription() {
   return useMutation({
     mutationFn: async (input: { text: string }) => {
@@ -128,8 +140,9 @@ export function useUpdateJobDescription(companyId: string) {
       if (error) throw new Error(error.value?.error?.message ?? 'Failed to update job description');
       return data?.data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(companyId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(variables.id) });
     }
   });
 }
