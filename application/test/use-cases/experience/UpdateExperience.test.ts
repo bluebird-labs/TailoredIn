@@ -98,7 +98,9 @@ describe('UpdateExperience', () => {
   it('returns NOT_FOUND error when experience does not exist', async () => {
     const { EntityNotFoundError } = await import('@tailoredin/domain');
     const repo = {
-      findByIdOrFail: mock(async () => { throw new EntityNotFoundError('Experience', 'x'); }),
+      findByIdOrFail: mock(async () => {
+        throw new EntityNotFoundError('Experience', 'x');
+      }),
       findAll: mock(async () => []),
       save: mock(async () => {}),
       delete: mock(async () => {})

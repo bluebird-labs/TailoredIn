@@ -78,8 +78,8 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
   );
 
   // Local accomplishment list — initialized once from server data on mount
-  const [localAccomplishments, setLocalAccomplishments] = useState<AccomplishmentItem[]>(
-    () => toLocalAccomplishments(experience?.accomplishments ?? [])
+  const [localAccomplishments, setLocalAccomplishments] = useState<AccomplishmentItem[]>(() =>
+    toLocalAccomplishments(experience?.accomplishments ?? [])
   );
 
   const isSaving =
@@ -91,9 +91,9 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
   const [errors, setErrors] = useState<ValidationErrors<ExperienceFormState>>({});
 
   // Snapshot of accomplishments at mount — used to detect dirty state
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally snapshot once on mount
   const initialAccomplishments = useMemo(
     () => toLocalAccomplishments(experience?.accomplishments ?? []),
-    // biome-ignore lint/correctness/noExhaustiveDeps: intentionally snapshot once on mount
     [] // intentionally snapshot once on mount
   );
 
@@ -121,9 +121,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
   }
 
   function handleAccomplishmentChange(tempId: string, field: 'title' | 'narrative', value: string) {
-    setLocalAccomplishments(prev =>
-      prev.map(acc => (acc.tempId === tempId ? { ...acc, [field]: value } : acc))
-    );
+    setLocalAccomplishments(prev => prev.map(acc => (acc.tempId === tempId ? { ...acc, [field]: value } : acc)));
   }
 
   function handleAccomplishmentDelete(tempId: string) {

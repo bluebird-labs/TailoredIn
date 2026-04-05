@@ -93,9 +93,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.updatedAt = new Date();
   }
 
-  public syncAccomplishments(
-    items: { id: string | null; title: string; narrative: string; ordinal: number }[]
-  ): void {
+  public syncAccomplishments(items: { id: string | null; title: string; narrative: string; ordinal: number }[]): void {
     const inputIds = new Set(items.filter(i => i.id !== null).map(i => i.id as string));
 
     // Remove accomplishments absent from the input list

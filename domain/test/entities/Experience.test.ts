@@ -126,9 +126,7 @@ describe('Experience', () => {
     it('removes accomplishments absent from input', () => {
       const exp = makeExperienceWithAccomplishments();
       const id0 = exp.accomplishments[0].id.value;
-      exp.syncAccomplishments([
-        { id: id0, title: 'First', narrative: 'Narrative 1', ordinal: 0 }
-      ]);
+      exp.syncAccomplishments([{ id: id0, title: 'First', narrative: 'Narrative 1', ordinal: 0 }]);
       expect(exp.accomplishments).toHaveLength(1);
       expect(exp.accomplishments[0].id.value).toBe(id0);
     });
@@ -160,9 +158,9 @@ describe('Experience', () => {
 
     it('throws when updating with unknown id', () => {
       const exp = makeExperienceWithAccomplishments();
-      expect(() =>
-        exp.syncAccomplishments([{ id: 'unknown-id', title: 'X', narrative: 'Y', ordinal: 0 }])
-      ).toThrow('Accomplishment');
+      expect(() => exp.syncAccomplishments([{ id: 'unknown-id', title: 'X', narrative: 'Y', ordinal: 0 }])).toThrow(
+        'Accomplishment'
+      );
     });
   });
 });

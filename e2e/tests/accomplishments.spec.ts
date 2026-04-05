@@ -16,7 +16,9 @@ test.describe('Accomplishments', () => {
   /** Get accomplishment editors within the dialog (excludes add form) */
   function getEditors(dialog: import('@playwright/test').Locator) {
     // Accomplishment editors have border + rounded-lg + editable-field, but NOT border-dashed (which is the add form)
-    return dialog.locator('div.border.rounded-lg:not(.border-dashed)').filter({ has: dialog.page().locator('[data-slot="editable-field"]') });
+    return dialog
+      .locator('div.border.rounded-lg:not(.border-dashed)')
+      .filter({ has: dialog.page().locator('[data-slot="editable-field"]') });
   }
 
   test('displays accomplishments in experience edit modal', async ({ page }) => {
@@ -41,7 +43,9 @@ test.describe('Accomplishments', () => {
     await expect(addForm).toBeVisible();
 
     await addForm.getByPlaceholder('Accomplishment title').fill('Built observability platform');
-    await addForm.getByPlaceholder('Describe what you did').fill('Designed and deployed a comprehensive observability stack.');
+    await addForm
+      .getByPlaceholder('Describe what you did')
+      .fill('Designed and deployed a comprehensive observability stack.');
 
     await addForm.getByRole('button', { name: 'Add', exact: true }).click();
 

@@ -40,7 +40,9 @@ test.describe('Education Page', () => {
 
   test('edit an education', async ({ page }) => {
     // Wait for content-first cards to load (button = display mode)
-    const displayCard = page.locator('button[data-testid^="editable-section-education-"]').filter({ hasText: 'Stanford University' });
+    const displayCard = page
+      .locator('button[data-testid^="editable-section-education-"]')
+      .filter({ hasText: 'Stanford University' });
     await expect(displayCard).toBeVisible();
 
     // Grab the testid before clicking (we'll need it to find the edit div)
@@ -70,7 +72,9 @@ test.describe('Education Page', () => {
     await expect(page.getByText('Temp University')).toBeVisible();
 
     // Find the display card (button) and click to enter edit mode
-    const displayCard = page.locator('button[data-testid^="editable-section-education-"]').filter({ hasText: 'Temp University' });
+    const displayCard = page
+      .locator('button[data-testid^="editable-section-education-"]')
+      .filter({ hasText: 'Temp University' });
     const testId = await displayCard.getAttribute('data-testid');
     await displayCard.click();
 
