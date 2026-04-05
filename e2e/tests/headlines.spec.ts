@@ -35,11 +35,11 @@ test.describe('Headlines Page', () => {
   });
 
   test('edit a headline', async ({ page }) => {
-    // Use the last seeded card (Full-Stack Developer at nth(2)) to avoid conflicts with create test
-    const card = page.locator('div.border.rounded-lg').nth(2);
-    const originalValue = await card.getByLabel('Label').inputValue();
-    await expect(originalValue).toBeTruthy();
+    // Find the "Full-Stack Developer" card by its content text and click to enter edit mode
+    const card = page.locator('[data-slot="editable-section"]').filter({ hasText: 'Full-Stack Developer' });
+    await card.click();
 
+    // Now form fields are available — edit the label
     await card.getByLabel('Label').clear();
     await card.getByLabel('Label').fill('Distinguished Engineer');
 
@@ -47,7 +47,8 @@ test.describe('Headlines Page', () => {
     await card.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
-    await expect(card.getByLabel('Label')).toHaveValue('Distinguished Engineer');
+    // After save, section returns to display mode — check content text
+    await expect(card.getByText('Distinguished Engineer')).toBeVisible();
   });
 
   test('delete a headline', async ({ page }) => {
@@ -57,18 +58,23 @@ test.describe('Headlines Page', () => {
     await createForm.getByLabel('Label').fill('Temp Headline');
     await createForm.getByLabel('Summary').fill('To be deleted.');
     await createForm.getByRole('button', { name: 'Save' }).click();
-    await expect(page.locator('input[value="Temp Headline"]')).toBeVisible();
+    // After create, new card appears as content text (not an input)
+    await expect(page.getByText('Temp Headline')).toBeVisible();
 
-    // Click delete on the card
-    const card = page.locator('div.border.rounded-lg').filter({ has: page.locator('input[value="Temp Headline"]') });
-    await card.locator('button.text-destructive').click();
+    // Find the card by content text and click to enter edit mode (delete button only visible in edit mode)
+    const card = page.locator('[data-slot="editable-section"]').filter({ hasText: 'Temp Headline' });
+    await card.click();
+
+    // Click the delete button (visible in edit mode, inside the card)
+    await card.getByRole('button', { name: /delete/i }).click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');
     await expect(alertDialog.getByText('Delete headline?')).toBeVisible();
     await alertDialog.getByRole('button', { name: 'Delete' }).click();
 
-    await expect(page.locator('input[value="Temp Headline"]')).not.toBeVisible();
+    // Headline text is gone from the page
+    await expect(page.getByText('Temp Headline')).not.toBeVisible();
   });
 
   test('validation: empty label shows error', async ({ page }) => {

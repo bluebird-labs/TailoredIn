@@ -13,9 +13,10 @@ test.describe('Profile Page', () => {
   });
 
   test('shows all field labels', async ({ page }) => {
-    // Profile displays as content-first (ProfileDisplay). Check that seeded values are visible as text.
-    await expect(page.getByText('Jane')).toBeVisible();
-    await expect(page.getByText('Doe')).toBeVisible();
+    // Profile displays as content-first (ProfileDisplay). Wait for the section then check seeded values as text.
+    await page.waitForSelector('[data-testid="editable-section-profile"]');
+    await expect(page.getByText('Jane', { exact: true })).toBeVisible();
+    await expect(page.getByText('Doe', { exact: true })).toBeVisible();
     await expect(page.getByText('jane@example.com')).toBeVisible();
     await expect(page.getByText('+1-555-123-4567')).toBeVisible();
     await expect(page.getByText('San Francisco, CA')).toBeVisible();
