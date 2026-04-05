@@ -2,6 +2,12 @@ import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
 import { container } from './container.js';
+import { CreateApplicationRoute } from './routes/application/CreateApplicationRoute.js';
+import { DeleteApplicationRoute } from './routes/application/DeleteApplicationRoute.js';
+import { GetApplicationRoute } from './routes/application/GetApplicationRoute.js';
+import { ListApplicationsRoute } from './routes/application/ListApplicationsRoute.js';
+import { UpdateApplicationRoute } from './routes/application/UpdateApplicationRoute.js';
+import { UpdateApplicationStatusRoute } from './routes/application/UpdateApplicationStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
 import { CreateCompanyRoute } from './routes/company/CreateCompanyRoute.js';
 import { EnrichCompanyRoute } from './routes/company/EnrichCompanyRoute.js';
@@ -26,6 +32,11 @@ import { DeleteHeadlineRoute } from './routes/headline/DeleteHeadlineRoute.js';
 import { ListHeadlinesRoute } from './routes/headline/ListHeadlinesRoute.js';
 import { UpdateHeadlineRoute } from './routes/headline/UpdateHeadlineRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
+import { CreateJobDescriptionRoute } from './routes/job-description/CreateJobDescriptionRoute.js';
+import { DeleteJobDescriptionRoute } from './routes/job-description/DeleteJobDescriptionRoute.js';
+import { GetJobDescriptionRoute } from './routes/job-description/GetJobDescriptionRoute.js';
+import { ListJobDescriptionsRoute } from './routes/job-description/ListJobDescriptionsRoute.js';
+import { UpdateJobDescriptionRoute } from './routes/job-description/UpdateJobDescriptionRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
 // --- App ---
@@ -117,6 +128,19 @@ const app = new Elysia()
   .use(container.get(EnrichCompanyRoute).plugin())
   .use(container.get(CreateCompanyRoute).plugin())
   .use(container.get(UpdateCompanyRoute).plugin())
+  // Applications
+  .use(container.get(CreateApplicationRoute).plugin())
+  .use(container.get(GetApplicationRoute).plugin())
+  .use(container.get(ListApplicationsRoute).plugin())
+  .use(container.get(UpdateApplicationRoute).plugin())
+  .use(container.get(UpdateApplicationStatusRoute).plugin())
+  .use(container.get(DeleteApplicationRoute).plugin())
+  // Job Descriptions
+  .use(container.get(CreateJobDescriptionRoute).plugin())
+  .use(container.get(GetJobDescriptionRoute).plugin())
+  .use(container.get(ListJobDescriptionsRoute).plugin())
+  .use(container.get(UpdateJobDescriptionRoute).plugin())
+  .use(container.get(DeleteJobDescriptionRoute).plugin())
   .listen(port);
 
 log.info(`Listening on port ${port}...`);

@@ -7,11 +7,13 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
 import { StatusCode } from '@tselect/status-code';
 import { BaseEntity } from './BaseEntity.js';
+import { Application as OrmApplication } from './entities/application/Application.js';
 import { Company } from './entities/companies/Company.js';
 import { Education } from './entities/education/Education.js';
 import { Accomplishment as OrmAccomplishment } from './entities/experience/Accomplishment.js';
 import { Experience as OrmExperience } from './entities/experience/Experience.js';
 import { Headline as OrmHeadline } from './entities/headline/Headline.js';
+import { JobDescription as OrmJobDescription } from './entities/job-description/JobDescription.js';
 import { Profile } from './entities/profile/Profile.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
@@ -31,7 +33,17 @@ export function createOrmConfig(db: OrmDbConfig) {
     debug: false,
     allowGlobalContext: true,
 
-    entities: [BaseEntity, Profile, Education, Company, OrmHeadline, OrmExperience, OrmAccomplishment],
+    entities: [
+      BaseEntity,
+      Profile,
+      Education,
+      Company,
+      OrmHeadline,
+      OrmExperience,
+      OrmAccomplishment,
+      OrmApplication,
+      OrmJobDescription
+    ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
     discovery: { warnWhenNoEntities: true },

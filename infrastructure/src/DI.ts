@@ -3,33 +3,46 @@ import type {
   AddAccomplishment,
   CompanyDataProvider,
   CompanySearchProvider,
+  CreateApplication,
   CreateCompany,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
+  CreateJobDescription,
   DeleteAccomplishment,
+  DeleteApplication,
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
+  DeleteJobDescription,
   EnrichCompanyData,
+  GetApplication,
+  GetJobDescription,
   GetProfile,
+  ListApplications,
   ListCompanies,
   ListEducation,
   ListExperiences,
   ListHeadlines,
+  ListJobDescriptions,
   SearchCompanies,
   UpdateAccomplishment,
+  UpdateApplication,
+  UpdateApplicationStatus,
   UpdateCompany,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
+  UpdateJobDescription,
   UpdateProfile
 } from '@tailoredin/application';
 import type {
+  ApplicationRepository,
   CompanyRepository,
   EducationRepository,
   ExperienceRepository,
   HeadlineRepository,
+  JobDescriptionRepository,
   ProfileRepository
 } from '@tailoredin/domain';
 import type { ClaudeCliProvider } from './services/llm/ClaudeCliProvider.js';
@@ -37,6 +50,25 @@ import type { ClaudeCliProvider } from './services/llm/ClaudeCliProvider.js';
 export const DI = {
   Llm: {
     ClaudeCliProvider: new InjectionToken<ClaudeCliProvider>('DI.Llm.ClaudeCliProvider')
+  },
+
+  Application: {
+    Repository: new InjectionToken<ApplicationRepository>('DI.Application.Repository'),
+    Create: new InjectionToken<CreateApplication>('DI.Application.Create'),
+    Get: new InjectionToken<GetApplication>('DI.Application.Get'),
+    List: new InjectionToken<ListApplications>('DI.Application.List'),
+    Update: new InjectionToken<UpdateApplication>('DI.Application.Update'),
+    UpdateStatus: new InjectionToken<UpdateApplicationStatus>('DI.Application.UpdateStatus'),
+    Delete: new InjectionToken<DeleteApplication>('DI.Application.Delete')
+  },
+
+  JobDescription: {
+    Repository: new InjectionToken<JobDescriptionRepository>('DI.JobDescription.Repository'),
+    Create: new InjectionToken<CreateJobDescription>('DI.JobDescription.Create'),
+    Get: new InjectionToken<GetJobDescription>('DI.JobDescription.Get'),
+    List: new InjectionToken<ListJobDescriptions>('DI.JobDescription.List'),
+    Update: new InjectionToken<UpdateJobDescription>('DI.JobDescription.Update'),
+    Delete: new InjectionToken<DeleteJobDescription>('DI.JobDescription.Delete')
   },
 
   Profile: {

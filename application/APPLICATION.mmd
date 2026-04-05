@@ -6,6 +6,47 @@ classDiagram
     direction TB
 
     %% ──────────────────────────────────────────────
+    %%  Application Use Cases
+    %% ──────────────────────────────────────────────
+
+    class CreateApplication {
+        <<UseCase>>
+        +ApplicationRepository applicationRepository
+        +execute(CreateApplicationInput) ApplicationDto
+    }
+
+    class DeleteApplication {
+        <<UseCase>>
+        +ApplicationRepository applicationRepository
+        +execute(DeleteApplicationInput) Result<void, Error>
+    }
+
+    class GetApplication {
+        <<UseCase>>
+        +ApplicationRepository applicationRepository
+        +execute(GetApplicationInput) ApplicationDto
+    }
+
+    class ListApplications {
+        <<UseCase>>
+        +ApplicationRepository applicationRepository
+        +execute(ListApplicationsInput) ApplicationDto[]
+    }
+
+    class UpdateApplication {
+        <<UseCase>>
+        +ApplicationRepository applicationRepository
+        +execute(UpdateApplicationInput) ApplicationDto
+    }
+
+    class UpdateApplicationStatus {
+        <<UseCase>>
+        +ApplicationRepository applicationRepository
+        +execute(UpdateApplicationStatusInput) ApplicationDto
+    }
+
+
+    %% ──────────────────────────────────────────────
     %%  Company Use Cases
     %% ──────────────────────────────────────────────
 
@@ -146,6 +187,41 @@ classDiagram
 
 
     %% ──────────────────────────────────────────────
+    %%  Job-description Use Cases
+    %% ──────────────────────────────────────────────
+
+    class CreateJobDescription {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(CreateJobDescriptionInput) JobDescriptionDto
+    }
+
+    class DeleteJobDescription {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(DeleteJobDescriptionInput) Result<void, Error>
+    }
+
+    class GetJobDescription {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(GetJobDescriptionInput) JobDescriptionDto
+    }
+
+    class ListJobDescriptions {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(ListJobDescriptionsInput) JobDescriptionDto[]
+    }
+
+    class UpdateJobDescription {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(UpdateJobDescriptionInput) JobDescriptionDto
+    }
+
+
+    %% ──────────────────────────────────────────────
     %%  Profile Use Cases
     %% ──────────────────────────────────────────────
 
@@ -194,6 +270,18 @@ classDiagram
     class ApiErrorDto {
         <<DTO>>
         +object error
+    }
+
+    class ApplicationDto {
+        <<DTO>>
+        +string id
+        +string profileId
+        +string companyId
+        +ApplicationStatus status
+        +string? jobDescriptionId
+        +string? notes
+        +string appliedAt
+        +string updatedAt
     }
 
     class CompanyDto {
@@ -260,6 +348,23 @@ classDiagram
         +string summaryText
     }
 
+    class JobDescriptionDto {
+        <<DTO>>
+        +string id
+        +string companyId
+        +string title
+        +string description
+        +string? url
+        +string? location
+        +SalaryRangeDto? salaryRange
+        +JobLevel? level
+        +LocationType? locationType
+        +JobSource source
+        +string? postedAt
+        +string createdAt
+        +string updatedAt
+    }
+
     class PaginatedDto {
         <<DTO>>
         +T[] items
@@ -288,10 +393,23 @@ classDiagram
         +string? websiteUrl
     }
 
+    class SalaryRangeDto {
+        <<DTO>>
+        +number? min
+        +number? max
+        +string currency
+    }
+
     ExperienceDto "1" *-- "*" AccomplishmentDto : contains
+    JobDescriptionDto *-- SalaryRangeDto
     PaginatedDto *-- PaginationMeta
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
     CompanySearchProvider ..> CompanySearchResult : produces
+    CreateApplication ..> ApplicationDto : returns
+    GetApplication ..> ApplicationDto : returns
+    ListApplications ..> ApplicationDto : returns
+    UpdateApplication ..> ApplicationDto : returns
+    UpdateApplicationStatus ..> ApplicationDto : returns
     CreateCompany ..> CompanyDto : returns
     EnrichCompanyData ..> CompanyEnrichmentResult : returns
     ListCompanies ..> CompanyDto : returns
@@ -308,6 +426,10 @@ classDiagram
     CreateHeadline ..> HeadlineDto : returns
     ListHeadlines ..> HeadlineDto : returns
     UpdateHeadline ..> HeadlineDto : returns
+    CreateJobDescription ..> JobDescriptionDto : returns
+    GetJobDescription ..> JobDescriptionDto : returns
+    ListJobDescriptions ..> JobDescriptionDto : returns
+    UpdateJobDescription ..> JobDescriptionDto : returns
     UpdateProfile ..> ProfileDto : returns
 
     %% ──────────────────────────────────────────────
@@ -326,6 +448,10 @@ classDiagram
     %%  Domain Ports (external)
     %% ──────────────────────────────────────────────
 
+    class ApplicationRepository {
+        <<DomainPort>>
+    }
+
     class CompanyRepository {
         <<DomainPort>>
     }
@@ -342,10 +468,20 @@ classDiagram
         <<DomainPort>>
     }
 
+    class JobDescriptionRepository {
+        <<DomainPort>>
+    }
+
     class ProfileRepository {
         <<DomainPort>>
     }
 
+    CreateApplication ..> ApplicationRepository : depends
+    DeleteApplication ..> ApplicationRepository : depends
+    GetApplication ..> ApplicationRepository : depends
+    ListApplications ..> ApplicationRepository : depends
+    UpdateApplication ..> ApplicationRepository : depends
+    UpdateApplicationStatus ..> ApplicationRepository : depends
     CreateCompany ..> CompanyRepository : depends
     ListCompanies ..> CompanyRepository : depends
     UpdateCompany ..> CompanyRepository : depends
@@ -365,12 +501,23 @@ classDiagram
     DeleteHeadline ..> HeadlineRepository : depends
     ListHeadlines ..> HeadlineRepository : depends
     UpdateHeadline ..> HeadlineRepository : depends
+    CreateJobDescription ..> JobDescriptionRepository : depends
+    DeleteJobDescription ..> JobDescriptionRepository : depends
+    GetJobDescription ..> JobDescriptionRepository : depends
+    ListJobDescriptions ..> JobDescriptionRepository : depends
+    UpdateJobDescription ..> JobDescriptionRepository : depends
     UpdateProfile ..> ProfileRepository : depends
 
     %% ──────────────────────────────────────────────
     %%  Apply Styles
     %% ──────────────────────────────────────────────
 
+    style CreateApplication fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DeleteApplication fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GetApplication fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListApplications fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateApplication fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateApplicationStatus fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style EnrichCompanyData fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -391,24 +538,34 @@ classDiagram
     style DeleteHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListHeadlines fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style CreateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style DeleteJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GetJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListJobDescriptions fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanySearchProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ApplicationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanySearchResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style HeadlineDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobDescriptionDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginatedDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginationMeta fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ProfileDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style SalaryRangeDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
+    style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style EducationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style HeadlineRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style JobDescriptionRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

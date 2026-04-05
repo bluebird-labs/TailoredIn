@@ -1,9 +1,13 @@
 export type { AccomplishmentDto } from './AccomplishmentDto.js';
 export type { ApiErrorDto } from './ApiErrorDto.js';
+export type { ApplicationDto } from './ApplicationDto.js';
+export { toApplicationDto } from './ApplicationDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export { toCompanyDto } from './CompanyDto.js';
 export type { EducationDto } from './EducationDto.js';
 export type { ExperienceDto } from './ExperienceDto.js';
 export type { HeadlineDto } from './HeadlineDto.js';
+export type { JobDescriptionDto, SalaryRangeDto } from './JobDescriptionDto.js';
+export { toJobDescriptionDto } from './JobDescriptionDto.js';
 export type { PaginatedDto, PaginationMeta } from './PaginationDto.js';
 export type { ProfileDto } from './ProfileDto.js';

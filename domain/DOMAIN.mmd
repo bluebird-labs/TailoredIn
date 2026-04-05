@@ -34,6 +34,18 @@ classDiagram
         +update()
     }
 
+    class Application {
+        <<AggregateRoot>>
+        +ApplicationId id
+        +string profileId
+        +string companyId
+        +ApplicationStatus status
+        +string? jobDescriptionId
+        +string? notes
+        +Date appliedAt
+        +setStatus()
+    }
+
     class Education {
         <<AggregateRoot>>
         +EducationId id
@@ -72,7 +84,16 @@ classDiagram
         +string summaryText
     }
 
+    class ApplicationStatus {
+        <<enumeration>>
+        DRAFT · APPLIED · INTERVIEWING
+        OFFERED · REJECTED · WITHDRAWN
+        ACCEPTED
+    }
+
     Profile "1" --> "*" Headline : has
+    Profile "1" --> "*" Application : has
+    Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
     Profile "1" --> "*" Experience : has
     Experience "1" *-- "*" Accomplishment : contains
@@ -85,6 +106,7 @@ classDiagram
         <<AggregateRoot>>
         +CompanyId id
         +string name
+        +string? description
         +string? website
         +string? logoUrl
         +string? linkedinLink
@@ -95,6 +117,21 @@ classDiagram
         +setBusinessType()
         +setIndustry()
         +setStage()
+    }
+
+    class JobDescription {
+        <<AggregateRoot>>
+        +JobDescriptionId id
+        +string companyId
+        +string title
+        +string description
+        +string? url
+        +string? location
+        +SalaryRange? salaryRange
+        +JobLevel? level
+        +LocationType? locationType
+        +JobSource source
+        +Date? postedAt
     }
 
     class BusinessType {
@@ -123,6 +160,37 @@ classDiagram
         RETAIL · CONSTRUCTION · GOVERNMENT
     }
 
+    class JobLevel {
+        <<enumeration>>
+        INTERNSHIP · ENTRY_LEVEL · ASSOCIATE
+        MID_SENIOR · DIRECTOR · EXECUTIVE
+    }
+
+    class JobSource {
+        <<enumeration>>
+        LINKEDIN · PARAFORM · GREENHOUSE
+        UPLOAD
+    }
+
+    class LocationType {
+        <<enumeration>>
+        REMOTE · HYBRID · ONSITE
+    }
+
+    class SalaryRange {
+        <<ValueObject>>
+        +min()
+        +max()
+        +currency()
+    }
+
+    Company "1" --> "*" JobDescription : has
+    JobDescription *-- SalaryRange
+    JobDescription --> JobLevel
+    JobDescription --> LocationType
+    JobDescription --> JobSource
+    Company "1" --> "*" Application : has
+    JobDescription "1" --> "*" Application : has
     Company --> BusinessType
     Company --> Industry
     Company --> CompanyStage
@@ -166,13 +234,20 @@ classDiagram
 
     style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ResumeTemplate fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px

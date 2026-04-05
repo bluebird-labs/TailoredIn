@@ -2,26 +2,37 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import { Container } from '@needle-di/core';
 import {
   AddAccomplishment,
+  CreateApplication,
   CreateCompany,
   CreateEducation,
   CreateExperience,
   CreateHeadline,
+  CreateJobDescription,
   DeleteAccomplishment,
+  DeleteApplication,
   DeleteEducation,
   DeleteExperience,
   DeleteHeadline,
+  DeleteJobDescription,
   EnrichCompanyData,
+  GetApplication,
+  GetJobDescription,
   GetProfile,
+  ListApplications,
   ListCompanies,
   ListEducation,
   ListExperiences,
   ListHeadlines,
+  ListJobDescriptions,
   SearchCompanies,
   UpdateAccomplishment,
+  UpdateApplication,
+  UpdateApplicationStatus,
   UpdateCompany,
   UpdateEducation,
   UpdateExperience,
   UpdateHeadline,
+  UpdateJobDescription,
   UpdateProfile
 } from '@tailoredin/application';
 import { env, envInt } from '@tailoredin/core';
@@ -31,10 +42,12 @@ import {
   ClaudeCliProvider,
   createOrmConfig,
   DI,
+  PostgresApplicationRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
   PostgresExperienceRepository,
   PostgresHeadlineRepository,
+  PostgresJobDescriptionRepository,
   PostgresProfileRepository
 } from '@tailoredin/infrastructure';
 
@@ -161,6 +174,56 @@ container.bind({
 container.bind({
   provide: DI.Company.Update,
   useFactory: () => new UpdateCompany(container.get(DI.Company.Repository))
+});
+
+// Application (job applications)
+container.bind({ provide: DI.Application.Repository, useClass: PostgresApplicationRepository });
+container.bind({
+  provide: DI.Application.Create,
+  useFactory: () => new CreateApplication(container.get(DI.Application.Repository))
+});
+container.bind({
+  provide: DI.Application.Get,
+  useFactory: () => new GetApplication(container.get(DI.Application.Repository))
+});
+container.bind({
+  provide: DI.Application.List,
+  useFactory: () => new ListApplications(container.get(DI.Application.Repository))
+});
+container.bind({
+  provide: DI.Application.Update,
+  useFactory: () => new UpdateApplication(container.get(DI.Application.Repository))
+});
+container.bind({
+  provide: DI.Application.UpdateStatus,
+  useFactory: () => new UpdateApplicationStatus(container.get(DI.Application.Repository))
+});
+container.bind({
+  provide: DI.Application.Delete,
+  useFactory: () => new DeleteApplication(container.get(DI.Application.Repository))
+});
+
+// Job Descriptions
+container.bind({ provide: DI.JobDescription.Repository, useClass: PostgresJobDescriptionRepository });
+container.bind({
+  provide: DI.JobDescription.Create,
+  useFactory: () => new CreateJobDescription(container.get(DI.JobDescription.Repository))
+});
+container.bind({
+  provide: DI.JobDescription.Get,
+  useFactory: () => new GetJobDescription(container.get(DI.JobDescription.Repository))
+});
+container.bind({
+  provide: DI.JobDescription.List,
+  useFactory: () => new ListJobDescriptions(container.get(DI.JobDescription.Repository))
+});
+container.bind({
+  provide: DI.JobDescription.Update,
+  useFactory: () => new UpdateJobDescription(container.get(DI.JobDescription.Repository))
+});
+container.bind({
+  provide: DI.JobDescription.Delete,
+  useFactory: () => new DeleteJobDescription(container.get(DI.JobDescription.Repository))
 });
 
 export { container };
