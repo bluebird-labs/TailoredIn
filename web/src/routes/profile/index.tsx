@@ -23,7 +23,7 @@ function ProfilePage() {
     return (
       <div className="space-y-6">
         <PageHeader />
-        <div className="max-w-lg">
+        <div>
           <LoadingSkeleton variant="form" />
         </div>
       </div>
@@ -128,7 +128,7 @@ function ProfileForm({ profile }: { readonly profile: ProfileData }) {
       <div className="space-y-6">
         <PageHeader />
 
-        <div className="max-w-xl">
+        <div>
           <EditableSection
             sectionId="profile"
             variant="card"
