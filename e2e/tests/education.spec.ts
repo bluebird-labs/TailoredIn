@@ -12,17 +12,13 @@ test.describe('Education Page', () => {
   });
 
   test('lists all seeded educations', async ({ page }) => {
-    // Education values are in always-editable inputs; check via label-scoped assertions
-    const institutionInputs = page.getByRole('textbox', { name: /^Institution/ });
-    await expect(institutionInputs.nth(0)).toHaveValue('Stanford University');
-    await expect(institutionInputs.nth(1)).toHaveValue('Carnegie Mellon University');
-
-    const degreeInputs = page.getByRole('textbox', { name: /^Degree/ });
-    await expect(degreeInputs.nth(0)).toHaveValue('B.S. Computer Science');
-    await expect(degreeInputs.nth(1)).toHaveValue('M.S. Software Engineering');
-
-    await expect(page.getByRole('spinbutton', { name: /Graduation Year/ }).nth(0)).toHaveValue('2020');
-    await expect(page.locator('input[value="Magna Cum Laude"]')).toBeVisible();
+    // Education displays as content cards (EducationCardContent); check for rendered text.
+    await expect(page.getByText('Stanford University')).toBeVisible();
+    await expect(page.getByText('Carnegie Mellon University')).toBeVisible();
+    await expect(page.getByText('B.S. Computer Science')).toBeVisible();
+    await expect(page.getByText('M.S. Software Engineering')).toBeVisible();
+    await expect(page.getByText(/2020/)).toBeVisible();
+    await expect(page.getByText('Magna Cum Laude')).toBeVisible();
   });
 
   test('create a new education', async ({ page }) => {
@@ -37,21 +33,29 @@ test.describe('Education Page', () => {
     await dialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Education created')).toBeVisible();
-    await expect(page.locator('input[value="MIT"]')).toBeVisible();
-    await expect(page.locator('input[value="Ph.D. Artificial Intelligence"]')).toBeVisible();
+    // Wait for modal to close and new card to appear as content
+    await expect(page.locator('[data-testid^="editable-section-education-"]').filter({ hasText: 'MIT' })).toBeVisible();
+    await expect(page.getByText('Ph.D. Artificial Intelligence')).toBeVisible();
   });
 
   test('edit an education', async ({ page }) => {
-    // Locate the card containing the Stanford input
-    const card = page.locator('div.border.rounded-lg').filter({ has: page.locator('input[value="Stanford University"]') });
-    const degreeInput = card.getByLabel('Degree');
-    await degreeInput.clear();
-    await degreeInput.fill('B.A. Computer Science');
+    // Wait for content-first cards to load (button = display mode)
+    const displayCard = page.locator('button[data-testid^="editable-section-education-"]').filter({ hasText: 'Stanford University' });
+    await expect(displayCard).toBeVisible();
 
-    await card.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
+    // Grab the testid before clicking (we'll need it to find the edit div)
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
+
+    // Now in edit mode — the section is a div with the same testid
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.getByLabel('Degree').clear();
+    await editSection.getByLabel('Degree').fill('B.A. Computer Science');
+
+    await editSection.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
-    await expect(page.locator('input[value="B.A. Computer Science"]')).toBeVisible();
+    await expect(page.getByText('B.A. Computer Science')).toBeVisible();
   });
 
   test('delete an education', async ({ page }) => {
@@ -62,17 +66,24 @@ test.describe('Education Page', () => {
     await dialog.getByLabel('Degree').fill('Temp Degree');
     await dialog.getByLabel('Graduation Year').fill('2000');
     await dialog.getByRole('button', { name: 'Save' }).click();
-    await expect(page.locator('input[value="Temp University"]')).toBeVisible();
+    // After create, new card appears as content text (not an input)
+    await expect(page.getByText('Temp University')).toBeVisible();
 
-    // Click delete on the card
-    const card = page.locator('div.border.rounded-lg').filter({ has: page.locator('input[value="Temp University"]') });
-    await card.locator('button.text-destructive').click();
+    // Find the display card (button) and click to enter edit mode
+    const displayCard = page.locator('button[data-testid^="editable-section-education-"]').filter({ hasText: 'Temp University' });
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
+
+    // Click the delete button in the edit section (div with same testid)
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');
     await expect(alertDialog.getByText('Delete education?')).toBeVisible();
     await alertDialog.getByRole('button', { name: 'Delete' }).click();
 
-    await expect(page.locator('input[value="Temp University"]')).not.toBeVisible();
+    // Education text is gone from the page
+    await expect(page.getByText('Temp University')).not.toBeVisible();
   });
 });

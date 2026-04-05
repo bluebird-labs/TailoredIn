@@ -1,12 +1,12 @@
 import { Plus, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { EditableField } from '@/components/shared/EditableField.js';
+import { EditableSection } from '@/components/shared/EditableSection.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { FormModal } from '@/components/shared/FormModal.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
-import { SaveBar } from '@/components/shared/SaveBar.js';
 import { Button } from '@/components/ui/button';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import {
@@ -17,6 +17,7 @@ import {
   useUpdateEducation
 } from '@/hooks/use-educations';
 import { type EducationFormState, hasErrors, type ValidationErrors, validateEducation } from '@/lib/validation.js';
+import { EducationCardContent } from './EducationCardContent.js';
 
 const EMPTY_EDUCATION: EducationFormState = {
   institutionName: '',
@@ -26,12 +27,7 @@ const EMPTY_EDUCATION: EducationFormState = {
   honors: ''
 };
 
-interface EducationCardProps {
-  readonly education: Education;
-  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
-}
-
-function EducationCard({ education, onDirtyChange }: EducationCardProps) {
+function EducationEditor({ education }: { readonly education: Education }) {
   const update = useUpdateEducation();
   const del = useDeleteEducation();
   const [errors, setErrors] = useState<ValidationErrors<EducationFormState>>({});
@@ -47,11 +43,7 @@ function EducationCard({ education, onDirtyChange }: EducationCardProps) {
     [education.institutionName, education.degreeTitle, education.graduationYear, education.location, education.honors]
   );
 
-  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
-
-  useEffect(() => {
-    onDirtyChange(education.id, isDirty);
-  }, [education.id, isDirty, onDirtyChange]);
+  const { current, setField, isDirtyField, isDirty, reset } = useDirtyTracking(savedState);
 
   function handleSave() {
     const validationErrors = validateEducation(current);
@@ -80,72 +72,85 @@ function EducationCard({ education, onDirtyChange }: EducationCardProps) {
   }
 
   return (
-    <div className="border rounded-lg p-4 space-y-3">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 space-y-3">
-          <EditableField
-            type="text"
-            label="Institution"
-            required
-            value={current.institutionName}
-            onChange={v => setField('institutionName', v)}
-            isDirty={isDirtyField('institutionName')}
-            error={errors.institutionName}
-            disabled={update.isPending}
-          />
-          <EditableField
-            type="text"
-            label="Degree"
-            required
-            value={current.degreeTitle}
-            onChange={v => setField('degreeTitle', v)}
-            isDirty={isDirtyField('degreeTitle')}
-            error={errors.degreeTitle}
-            disabled={update.isPending}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <EditableField
-              type="number"
-              label="Graduation Year"
-              required
-              value={current.graduationYear}
-              onChange={v => setField('graduationYear', v)}
-              isDirty={isDirtyField('graduationYear')}
-              error={errors.graduationYear}
-              disabled={update.isPending}
-            />
-            <EditableField
-              type="text"
-              label="Location"
-              value={current.location}
-              onChange={v => setField('location', v)}
-              isDirty={isDirtyField('location')}
-              disabled={update.isPending}
+    <EditableSection
+      variant="card"
+      sectionId={`education-${education.id}`}
+      onSave={handleSave}
+      onDiscard={reset}
+      isDirty={isDirty}
+      isSaving={update.isPending}
+    >
+      <EditableSection.Display>
+        <EducationCardContent education={education} />
+      </EditableSection.Display>
+      <EditableSection.Editor>
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 space-y-3">
+              <EditableField
+                type="text"
+                label="Institution"
+                required
+                value={current.institutionName}
+                onChange={v => setField('institutionName', v)}
+                isDirty={isDirtyField('institutionName')}
+                error={errors.institutionName}
+                disabled={update.isPending}
+              />
+              <EditableField
+                type="text"
+                label="Degree"
+                required
+                value={current.degreeTitle}
+                onChange={v => setField('degreeTitle', v)}
+                isDirty={isDirtyField('degreeTitle')}
+                error={errors.degreeTitle}
+                disabled={update.isPending}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <EditableField
+                  type="number"
+                  label="Graduation Year"
+                  required
+                  value={current.graduationYear}
+                  onChange={v => setField('graduationYear', v)}
+                  isDirty={isDirtyField('graduationYear')}
+                  error={errors.graduationYear}
+                  disabled={update.isPending}
+                />
+                <EditableField
+                  type="text"
+                  label="Location"
+                  value={current.location}
+                  onChange={v => setField('location', v)}
+                  isDirty={isDirtyField('location')}
+                  disabled={update.isPending}
+                />
+              </div>
+              <EditableField
+                type="text"
+                label="Honors"
+                value={current.honors}
+                onChange={v => setField('honors', v)}
+                isDirty={isDirtyField('honors')}
+                disabled={update.isPending}
+                placeholder="e.g. Magna Cum Laude"
+              />
+            </div>
+            <ConfirmDialog
+              title="Delete education?"
+              description="This education entry will be permanently removed."
+              onConfirm={() => del.mutate(education.id)}
+              trigger={
+                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              }
             />
           </div>
-          <EditableField
-            type="text"
-            label="Honors"
-            value={current.honors}
-            onChange={v => setField('honors', v)}
-            isDirty={isDirtyField('honors')}
-            disabled={update.isPending}
-            placeholder="e.g. Magna Cum Laude"
-          />
         </div>
-        <ConfirmDialog
-          title="Delete education?"
-          description="This education entry will be permanently removed."
-          onConfirm={() => del.mutate(education.id)}
-          trigger={
-            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          }
-        />
-      </div>
-      <SaveBar dirtyCount={dirtyCount} onSave={handleSave} onDiscard={reset} isSaving={update.isPending} />
-    </div>
+      </EditableSection.Editor>
+    </EditableSection>
   );
 }
 
@@ -255,11 +260,7 @@ function CreateEducationModal({
   );
 }
 
-interface EducationListProps {
-  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
-}
-
-export function EducationList({ onDirtyChange }: EducationListProps) {
+export function EducationList() {
   const { data: educations = [], isLoading } = useEducations();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -285,7 +286,7 @@ export function EducationList({ onDirtyChange }: EducationListProps) {
   return (
     <div className="space-y-3">
       {(educations as Education[]).map(edu => (
-        <EducationCard key={edu.id} education={edu} onDirtyChange={onDirtyChange} />
+        <EducationEditor key={edu.id} education={edu} />
       ))}
 
       <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setModalOpen(true)}>

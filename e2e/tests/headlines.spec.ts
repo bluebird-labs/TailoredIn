@@ -12,14 +12,11 @@ test.describe('Headlines Page', () => {
   });
 
   test('lists all seeded headlines', async ({ page }) => {
-    // Headline values are in always-editable inputs; check via getByRole + toHaveValue
-    const labelInputs = page.getByRole('textbox', { name: /^Label/ });
-    await expect(labelInputs.nth(0)).toHaveValue('Staff Engineer');
-    await expect(labelInputs.nth(1)).toHaveValue('Engineering Manager');
-    await expect(labelInputs.nth(2)).toHaveValue('Full-Stack Developer');
-
-    const summaryInputs = page.getByRole('textbox', { name: /^Summary/ });
-    await expect(summaryInputs.nth(0)).toContainText('deep expertise in distributed systems');
+    // Headlines display as content cards (HeadlineCardContent); check for rendered text.
+    await expect(page.getByText('Staff Engineer')).toBeVisible();
+    await expect(page.getByText('Engineering Manager')).toBeVisible();
+    await expect(page.getByText('Full-Stack Developer')).toBeVisible();
+    await expect(page.getByText(/deep expertise in distributed systems/)).toBeVisible();
   });
 
   test('create a new headline', async ({ page }) => {
@@ -33,24 +30,28 @@ test.describe('Headlines Page', () => {
     await createForm.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Headline created')).toBeVisible();
-    // New card appears with the value in an input
-    await expect(page.locator('input[value="Principal Engineer"]')).toBeVisible();
+    // Wait for the create form to collapse and new card to appear as content
+    await expect(page.locator('[data-testid^="editable-section-headline-"]').filter({ hasText: 'Principal Engineer' })).toBeVisible();
   });
 
   test('edit a headline', async ({ page }) => {
-    // Use the last seeded card (Full-Stack Developer at nth(2)) to avoid conflicts with create test
-    const card = page.locator('div.border.rounded-lg').nth(2);
-    const originalValue = await card.getByLabel('Label').inputValue();
-    await expect(originalValue).toBeTruthy();
+    // Wait for content-first cards (button = display mode), then click to enter edit mode
+    const displayCard = page.locator('button[data-testid^="editable-section-headline-"]').filter({ hasText: 'Full-Stack Developer' });
+    await expect(displayCard).toBeVisible();
 
-    await card.getByLabel('Label').clear();
-    await card.getByLabel('Label').fill('Distinguished Engineer');
+    // Grab the testid before clicking (the edit div has the same testid)
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
 
-    // SaveBar should appear within the card
-    await card.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
+    // Now in edit mode — section is a div with the same testid
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.getByLabel('Label').clear();
+    await editSection.getByLabel('Label').fill('Distinguished Engineer');
+
+    await editSection.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
-    await expect(card.getByLabel('Label')).toHaveValue('Distinguished Engineer');
+    await expect(page.getByText('Distinguished Engineer')).toBeVisible();
   });
 
   test('delete a headline', async ({ page }) => {
@@ -60,18 +61,25 @@ test.describe('Headlines Page', () => {
     await createForm.getByLabel('Label').fill('Temp Headline');
     await createForm.getByLabel('Summary').fill('To be deleted.');
     await createForm.getByRole('button', { name: 'Save' }).click();
-    await expect(page.locator('input[value="Temp Headline"]')).toBeVisible();
+    // After create, new card appears as content text (not an input)
+    await expect(page.getByText('Temp Headline')).toBeVisible();
 
-    // Click delete on the card
-    const card = page.locator('div.border.rounded-lg').filter({ has: page.locator('input[value="Temp Headline"]') });
-    await card.locator('button.text-destructive').click();
+    // Find the display card (button) and click to enter edit mode
+    const displayCard = page.locator('button[data-testid^="editable-section-headline-"]').filter({ hasText: 'Temp Headline' });
+    const testId = await displayCard.getAttribute('data-testid');
+    await displayCard.click();
+
+    // Click the delete button in the edit section (div with same testid)
+    const editSection = page.locator(`div[data-testid="${testId}"]`);
+    await editSection.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
     const alertDialog = page.getByRole('alertdialog');
     await expect(alertDialog.getByText('Delete headline?')).toBeVisible();
     await alertDialog.getByRole('button', { name: 'Delete' }).click();
 
-    await expect(page.locator('input[value="Temp Headline"]')).not.toBeVisible();
+    // Headline text is gone from the page
+    await expect(page.getByText('Temp Headline')).not.toBeVisible();
   });
 
   test('validation: empty label shows error', async ({ page }) => {

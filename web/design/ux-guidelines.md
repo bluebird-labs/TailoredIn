@@ -6,23 +6,39 @@ Behavioral UX patterns for TailoredIn. For visual tokens and component styling, 
 
 ## 1. Editing & Forms
 
-### Always-Editable Fields
+### Content-First Click-to-Edit
 
-All data fields render as inputs by default. There is no read-only display mode and no "edit" toggle. The field IS the display.
+All data fields render as plain text by default. The user clicks a section to enter edit mode.
 
-- Text fields render as `<Input>` or `<Textarea>`
-- Selects render as `<Select>`
-- Date fields render as `<MonthYearPicker>`
-- Labels are always visible above the field
+- Section hover shows a warm amber background wash (`bg-accent/40`) with pointer cursor
+- Click transforms the section into an editor with form fields
+- Each section has its own inline **Save** (primary) and **Discard** (ghost) buttons
+- Only one section can be in edit mode at a time (mutual exclusion via `EditableSectionProvider`)
+- Clicking another section while one is editing: if current is clean, it closes silently; if dirty, user must save/discard first
+- Escape key discards changes (if clean) or does nothing (if dirty)
+- Save button shows spinner during mutation, both buttons disabled
 
-### Aggregate-Scoped Save
+### Edit Granularity
 
-Saving is explicit and scoped to the domain aggregate boundary:
+Edit sections are scoped to the domain aggregate boundary:
+- **Profile page:** One section for the entire Profile aggregate
+- **List pages:** Each list item (headline, education, company) is its own editable section
+- **Complex entities (Experiences):** Click opens a modal instead of inline expand
 
-- A **sticky footer bar** (SaveBar) slides up at the bottom of the aggregate's section when any field within it is dirty
-- Contains **Save** (primary) and **Discard** (ghost) buttons
-- Disappears on successful save or discard
-- Save button shows a spinner and disables during mutation
+### Inline Expand for Lists
+
+Simple-entity list items (Headlines, Education, Companies) expand in-place when clicked:
+- Card displays content in resting state
+- Click expands card to reveal form fields with Save/Discard
+- Only one card can be expanded at a time within a list
+
+### Modal Forms (Complex Entities)
+
+Experiences (with nested Accomplishments) use modal forms. The card is content-first with the same hover treatment, but click opens `ExperienceFormModal` instead of inline expand.
+
+The `FormModal` shared component continues to handle:
+- Create flows for any entity type
+- Edit flows for complex entities (Experiences)
 
 ### Dirty Tracking
 

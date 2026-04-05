@@ -2,6 +2,8 @@ export type { ConfirmDialogProps } from './ConfirmDialog.js';
 export { ConfirmDialog } from './ConfirmDialog.js';
 export type { EditableFieldProps, FieldType } from './EditableField.js';
 export { EditableField } from './EditableField.js';
+export type { EditableSectionHook } from './EditableSectionContext.js';
+export { EditableSectionProvider, useEditableSection } from './EditableSectionContext.js';
 export type { EmptyStateProps } from './EmptyState.js';
 export { EmptyState } from './EmptyState.js';
 export type { FieldErrorProps } from './FieldError.js';

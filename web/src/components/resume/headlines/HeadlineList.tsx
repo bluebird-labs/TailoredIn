@@ -1,16 +1,17 @@
 import { Plus, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { EditableField } from '@/components/shared/EditableField.js';
+import { EditableSection } from '@/components/shared/EditableSection.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
-import { SaveBar } from '@/components/shared/SaveBar.js';
 import { Button } from '@/components/ui/button';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import { useCreateHeadline, useDeleteHeadline, useHeadlines, useUpdateHeadline } from '@/hooks/use-headlines';
 import { useProfile } from '@/hooks/use-profile';
 import { type HeadlineFormState, hasErrors, type ValidationErrors, validateHeadline } from '@/lib/validation.js';
+import { HeadlineCardContent } from './HeadlineCardContent.js';
 
 type Headline = {
   id: string;
@@ -18,12 +19,7 @@ type Headline = {
   summaryText: string;
 };
 
-interface HeadlineCardProps {
-  readonly headline: Headline;
-  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
-}
-
-function HeadlineCard({ headline, onDirtyChange }: HeadlineCardProps) {
+function HeadlineEditor({ headline }: { readonly headline: Headline }) {
   const update = useUpdateHeadline();
   const del = useDeleteHeadline();
   const [errors, setErrors] = useState<ValidationErrors<HeadlineFormState>>({});
@@ -32,11 +28,7 @@ function HeadlineCard({ headline, onDirtyChange }: HeadlineCardProps) {
     () => ({ label: headline.label, summaryText: headline.summaryText }),
     [headline.label, headline.summaryText]
   );
-  const { current, setField, isDirtyField, isDirty, dirtyCount, reset } = useDirtyTracking(savedState);
-
-  useEffect(() => {
-    onDirtyChange(headline.id, isDirty);
-  }, [headline.id, isDirty, onDirtyChange]);
+  const { current, setField, isDirtyField, isDirty, reset } = useDirtyTracking(savedState);
 
   function handleSave() {
     const validationErrors = validateHeadline(current);
@@ -56,52 +48,61 @@ function HeadlineCard({ headline, onDirtyChange }: HeadlineCardProps) {
   }
 
   return (
-    <div className="border rounded-lg p-4 space-y-3">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 space-y-3">
-          <EditableField
-            type="text"
-            label="Label"
-            required
-            value={current.label}
-            onChange={v => setField('label', v)}
-            isDirty={isDirtyField('label')}
-            error={errors.label}
-            disabled={update.isPending}
-            placeholder="e.g. Staff Engineer"
-          />
-          <EditableField
-            type="textarea"
-            label="Summary"
-            value={current.summaryText}
-            onChange={v => setField('summaryText', v)}
-            isDirty={isDirtyField('summaryText')}
-            rows={2}
-            disabled={update.isPending}
-            placeholder="1–3 sentence professional summary..."
-          />
+    <EditableSection
+      variant="card"
+      sectionId={`headline-${headline.id}`}
+      onSave={handleSave}
+      onDiscard={reset}
+      isDirty={isDirty}
+      isSaving={update.isPending}
+    >
+      <EditableSection.Display>
+        <HeadlineCardContent headline={headline} />
+      </EditableSection.Display>
+      <EditableSection.Editor>
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 space-y-3">
+              <EditableField
+                type="text"
+                label="Label"
+                required
+                value={current.label}
+                onChange={v => setField('label', v)}
+                isDirty={isDirtyField('label')}
+                error={errors.label}
+                disabled={update.isPending}
+                placeholder="e.g. Staff Engineer"
+              />
+              <EditableField
+                type="textarea"
+                label="Summary"
+                value={current.summaryText}
+                onChange={v => setField('summaryText', v)}
+                isDirty={isDirtyField('summaryText')}
+                rows={2}
+                disabled={update.isPending}
+                placeholder="1–3 sentence professional summary..."
+              />
+            </div>
+            <ConfirmDialog
+              title="Delete headline?"
+              description="This headline will be permanently removed."
+              onConfirm={() => del.mutate(headline.id)}
+              trigger={
+                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              }
+            />
+          </div>
         </div>
-        <ConfirmDialog
-          title="Delete headline?"
-          description="This headline will be permanently removed."
-          onConfirm={() => del.mutate(headline.id)}
-          trigger={
-            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive shrink-0">
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          }
-        />
-      </div>
-      <SaveBar dirtyCount={dirtyCount} onSave={handleSave} onDiscard={reset} isSaving={update.isPending} />
-    </div>
+      </EditableSection.Editor>
+    </EditableSection>
   );
 }
 
-interface HeadlineListProps {
-  readonly onDirtyChange: (id: string, isDirty: boolean) => void;
-}
-
-export function HeadlineList({ onDirtyChange }: HeadlineListProps) {
+export function HeadlineList() {
   const { data: headlines = [], isLoading } = useHeadlines();
   const { data: profile } = useProfile();
   const createHeadline = useCreateHeadline();
@@ -143,7 +144,7 @@ export function HeadlineList({ onDirtyChange }: HeadlineListProps) {
   return (
     <div className="space-y-3">
       {(headlines as Headline[]).map(h => (
-        <HeadlineCard key={h.id} headline={h} onDirtyChange={onDirtyChange} />
+        <HeadlineEditor key={h.id} headline={h} />
       ))}
 
       {adding ? (

@@ -5,6 +5,8 @@ test.describe('Profile Page', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/profile');
+    // Wait for the profile data to load (content-first display appears)
+    await page.waitForSelector('[data-testid="editable-section-profile"]');
   });
 
   test('displays heading and subtitle', async ({ page }) => {
@@ -13,14 +15,17 @@ test.describe('Profile Page', () => {
   });
 
   test('shows all field labels', async ({ page }) => {
-    // Labels include a required asterisk (*) as a child span, so exact text match won't work.
-    // Verify labels exist via getByLabel, which uses accessible name computation.
-    for (const label of ['First Name', 'Last Name', 'Email', 'Phone', 'Location', 'LinkedIn', 'GitHub', 'Website', 'About']) {
-      await expect(page.getByLabel(label)).toBeVisible();
-    }
+    // Profile displays as content-first (ProfileDisplay). Check seeded values rendered as text.
+    await expect(page.getByText('Jane', { exact: true })).toBeVisible();
+    await expect(page.getByText('Doe', { exact: true })).toBeVisible();
+    await expect(page.getByText('jane@example.com')).toBeVisible();
+    await expect(page.getByText('+1-555-123-4567')).toBeVisible();
+    await expect(page.getByText('San Francisco, CA')).toBeVisible();
   });
 
   test('shows seeded data in inputs', async ({ page }) => {
+    // Profile is content-first — click to enter edit mode before checking input values
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await expect(page.getByLabel('First Name')).toHaveValue('Jane');
     await expect(page.getByLabel('Last Name')).toHaveValue('Doe');
     await expect(page.getByLabel('Email')).toHaveValue('jane@example.com');
@@ -38,18 +43,19 @@ test.describe('Profile Page', () => {
     await expect(page.locator('[data-slot="save-bar"]')).not.toBeVisible();
   });
 
-  test('editing a field shows SaveBar with dirty count', async ({ page }) => {
+  test('editing a field shows SaveBar with Save and Discard', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('First Name').fill('Alice');
-    await expect(page.locator('[data-slot="save-bar"]')).toBeVisible();
-    await expect(page.locator('[data-slot="save-bar"]')).toContainText('1 unsaved change');
-
-    await page.getByLabel('Location').clear();
-    await page.getByLabel('Location').fill('New York, NY');
-    await expect(page.locator('[data-slot="save-bar"]')).toContainText('2 unsaved changes');
+    // Inline SaveBar shows Save/Discard buttons (no dirty count in inline variant)
+    const saveBar = page.locator('[data-slot="save-bar"]');
+    await expect(saveBar).toBeVisible();
+    await expect(saveBar.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(saveBar.getByRole('button', { name: 'Discard' })).toBeVisible();
   });
 
   test('save name via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('First Name').fill('Alice');
 
@@ -58,10 +64,12 @@ test.describe('Profile Page', () => {
 
     await expect(page.getByText('Changes saved')).toBeVisible();
     await expect(saveBar).not.toBeVisible();
-    await expect(page.getByLabel('First Name')).toHaveValue('Alice');
+    // After save the section returns to display mode — check the rendered text
+    await expect(page.getByText('Alice')).toBeVisible();
   });
 
   test('save email via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('Email').clear();
     await page.getByLabel('Email').fill('alice@test.com');
 
@@ -70,6 +78,7 @@ test.describe('Profile Page', () => {
   });
 
   test('save phone via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('Phone').clear();
     await page.getByLabel('Phone').fill('555-000-1111');
 
@@ -78,6 +87,7 @@ test.describe('Profile Page', () => {
   });
 
   test('save social links via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('LinkedIn').clear();
     await page.getByLabel('LinkedIn').fill('https://linkedin.com/in/alice');
     await page.getByLabel('GitHub').clear();
@@ -86,12 +96,13 @@ test.describe('Profile Page', () => {
     await page.getByLabel('Website').fill('https://alice.dev');
 
     const saveBar = page.locator('[data-slot="save-bar"]');
-    await expect(saveBar).toContainText('3 unsaved changes');
+    await expect(saveBar).toBeVisible();
     await saveBar.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Changes saved')).toBeVisible();
   });
 
   test('save about text via SaveBar', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('About').clear();
     await page.getByLabel('About').fill('Updated professional narrative for testing.');
 
@@ -100,6 +111,8 @@ test.describe('Profile Page', () => {
   });
 
   test('discard reverts all dirty fields', async ({ page }) => {
+    // Enter edit mode before reading input values
+    await page.locator('[data-testid="editable-section-profile"]').click();
     // Read current values before editing (may differ from seed if prior tests mutated)
     const originalFirstName = await page.getByLabel('First Name').inputValue();
     const originalLocation = await page.getByLabel('Location').inputValue();
@@ -113,11 +126,13 @@ test.describe('Profile Page', () => {
     await saveBar.getByRole('button', { name: 'Discard' }).click();
 
     await expect(saveBar).not.toBeVisible();
-    await expect(page.getByLabel('First Name')).toHaveValue(originalFirstName);
-    await expect(page.getByLabel('Location')).toHaveValue(originalLocation);
+    // After discard the section returns to display mode — verify original values are rendered as text
+    await expect(page.getByText(originalFirstName, { exact: true })).toBeVisible();
+    await expect(page.getByText(originalLocation, { exact: true })).toBeVisible();
   });
 
   test('validation: empty required fields show errors on save', async ({ page }) => {
+    await page.locator('[data-testid="editable-section-profile"]').click();
     await page.getByLabel('First Name').clear();
     await page.getByLabel('Last Name').clear();
     await page.getByLabel('Email').clear();
