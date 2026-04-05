@@ -1,5 +1,7 @@
+export { Breadcrumb } from './Breadcrumb.js';
 export type { ConfirmDialogProps } from './ConfirmDialog.js';
 export { ConfirmDialog } from './ConfirmDialog.js';
+export { DetailPageHeader, MetaBadge, MetaDot, MetaText } from './DetailPageHeader.js';
 export type { EditableFieldProps, FieldType } from './EditableField.js';
 export { EditableField } from './EditableField.js';
 export type { EditableSectionHook } from './EditableSectionContext.js';
@@ -10,6 +12,8 @@ export type { FieldErrorProps } from './FieldError.js';
 export { FieldError } from './FieldError.js';
 export type { FormModalProps } from './FormModal.js';
 export { FormModal } from './FormModal.js';
+export { InfoCard, InfoRow } from './InfoCard.js';
+export { LinkedEntityCard } from './LinkedEntityCard.js';
 export type { LoadingSkeletonProps, SkeletonVariant } from './LoadingSkeleton.js';
 export { LoadingSkeleton } from './LoadingSkeleton.js';
 export type { SaveBarProps } from './SaveBar.js';
