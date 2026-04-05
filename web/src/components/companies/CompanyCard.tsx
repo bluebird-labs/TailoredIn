@@ -24,7 +24,7 @@ export function CompanyCard({ company, onClick }: CompanyCardProps) {
   return (
     <button
       type="button"
-      className="group w-full text-left border rounded-[14px] p-4 cursor-pointer transition-colors hover:bg-muted/30"
+      className="group w-full text-left border rounded-[14px] p-4 cursor-pointer transition-colors hover:bg-accent/40"
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-3">
