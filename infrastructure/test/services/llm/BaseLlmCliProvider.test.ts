@@ -14,8 +14,15 @@ class TestRequest extends LlmJsonRequest<typeof testSchema> {
   }
 }
 
-class TestProvider extends BaseLlmCliProvider {
+const testResponseSchema = z
+  .object({
+    data: z.unknown().optional()
+  })
+  .passthrough();
+
+class TestProvider extends BaseLlmCliProvider<typeof testResponseSchema> {
   protected readonly log = Logger.create('test-provider');
+  protected readonly responseSchema = testResponseSchema;
   public extractedValue: unknown = null;
   public spawnBehavior: 'success' | 'fail-exit' | 'fail-spawn' = 'success';
   public stdout = '';
@@ -25,13 +32,12 @@ class TestProvider extends BaseLlmCliProvider {
     return ['echo', 'test'];
   }
 
-  protected extractResult(_stdout: string): unknown {
-    return this.extractedValue;
+  protected extractResult(response: z.infer<typeof testResponseSchema>): unknown {
+    return response.data ?? this.extractedValue;
   }
 
   // Override request to avoid actual Bun.spawn
   public override async request<T extends z.ZodObject<z.ZodRawShape>>(request: LlmJsonRequest<T>) {
-    // Simulate the base class logic without spawning
     const jsonSchema = request.getJsonSchema();
     const command = this.buildCommand(request, jsonSchema);
 
@@ -51,7 +57,7 @@ class TestProvider extends BaseLlmCliProvider {
       };
     }
 
-    const extracted = this.extractResult(this.stdout);
+    const extracted = this.extractedValue;
 
     if (extracted == null) {
       return {

@@ -6,12 +6,13 @@ import { LlmRequestError } from './LlmRequestError.js';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
 
-export abstract class BaseLlmCliProvider {
+export abstract class BaseLlmCliProvider<TResponse extends z.ZodType> {
   protected abstract readonly log: LoggerInstance;
+  protected abstract readonly responseSchema: TResponse;
 
   protected abstract buildCommand(request: LlmJsonRequest<z.ZodObject<z.ZodRawShape>>, jsonSchema: string): string[];
 
-  protected abstract extractResult(stdout: string): unknown;
+  protected abstract extractResult(response: z.infer<TResponse>): unknown;
 
   public async request<T extends z.ZodObject<z.ZodRawShape>>(
     request: LlmJsonRequest<T>
@@ -47,9 +48,24 @@ export abstract class BaseLlmCliProvider {
       return err(new LlmRequestError(`CLI exited with code ${exitCode}`, command, exitCode, stdout, stderr, duration));
     }
 
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stdout);
+    } catch (e) {
+      const message = `Failed to parse stdout as JSON: ${e instanceof Error ? e.message : String(e)}`;
+      return err(new LlmRequestError(message, command, exitCode, stdout, stderr, duration));
+    }
+
+    const responseParsed = this.responseSchema.safeParse(parsed);
+
+    if (!responseParsed.success) {
+      const message = `Response validation failed: ${responseParsed.error.issues.map((i: z.ZodIssue) => `${i.path.join('.')}: ${i.message}`).join(', ')}`;
+      return err(new LlmRequestError(message, command, exitCode, stdout, stderr, duration));
+    }
+
     let extracted: unknown;
     try {
-      extracted = this.extractResult(stdout);
+      extracted = this.extractResult(responseParsed.data);
     } catch (e) {
       const message = `Failed to extract result: ${e instanceof Error ? e.message : String(e)}`;
       return err(new LlmRequestError(message, command, exitCode, stdout, stderr, duration));
@@ -59,14 +75,14 @@ export abstract class BaseLlmCliProvider {
       return err(new LlmRequestError('Empty result from LLM', command, exitCode, stdout, stderr, duration));
     }
 
-    const parsed = request.schema.safeParse(extracted);
+    const dataParsed = request.schema.safeParse(extracted);
 
-    if (!parsed.success) {
-      const message = `Zod validation failed: ${parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')}`;
+    if (!dataParsed.success) {
+      const message = `Zod validation failed: ${dataParsed.error.issues.map((i: z.ZodIssue) => `${i.path.join('.')}: ${i.message}`).join(', ')}`;
       return err(new LlmRequestError(message, command, exitCode, stdout, stderr, duration));
     }
 
-    return ok(parsed.data as z.infer<T>);
+    return ok(dataParsed.data as z.infer<T>);
   }
 
   private formatCommand(command: string[]): string {
