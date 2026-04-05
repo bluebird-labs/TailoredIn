@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { injectable } from '@needle-di/core';
 import type { CompanySearchProvider, CompanySearchResult } from '@tailoredin/application';
+import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { stripCodeFences } from './strip-code-fences.js';
 
@@ -14,48 +15,53 @@ export class ClaudeCliCompanySearchProvider implements CompanySearchProvider {
 
   public async searchByName(name: string): Promise<CompanySearchResult[]> {
     const prompt = this.buildPrompt(name);
+    const start = performance.now();
 
-    this.log.info(`Searching companies by name: ${name}`);
+    this.log.info(`Searching companies by name: "${name}"`);
 
-    const proc = Bun.spawn(['claude', '-p', prompt, '--output-format', 'json', '--json-schema', schema], {
-      stdout: 'pipe',
-      stderr: 'pipe'
-    });
+    let output: string;
+    let exitCode: number;
+    let stderr: string;
+    try {
+      const proc = Bun.spawn(['claude', '-p', prompt, '--output-format', 'json', '--json-schema', schema], {
+        stdout: 'pipe',
+        stderr: 'pipe'
+      });
+      output = await new Response(proc.stdout).text();
+      stderr = await new Response(proc.stderr).text();
+      exitCode = await proc.exited;
+    } catch (e) {
+      this.log.error(`Failed to spawn Claude CLI: ${e instanceof Error ? e.message : String(e)}`);
+      throw new ExternalServiceError('Claude CLI', 'Company search unavailable');
+    }
 
-    const output = await new Response(proc.stdout).text();
-    const exitCode = await proc.exited;
+    const duration = Math.round(performance.now() - start);
 
     if (exitCode !== 0) {
-      const stderr = await new Response(proc.stderr).text();
-      this.log.error(`Claude CLI failed (exit ${exitCode}): ${stderr}`);
-      throw new Error(`Claude CLI failed with exit code ${exitCode}`);
+      this.log.error(
+        `Claude CLI failed | name="${name}" exitCode=${exitCode} duration=${duration}ms stdout="${output.trim().slice(0, 500)}" stderr="${stderr.trim()}"`
+      );
+      throw new ExternalServiceError('Claude CLI', 'Company search failed');
     }
 
-    let parsed: Record<string, unknown>;
     try {
-      parsed = JSON.parse(output);
-    } catch (e) {
-      this.log.error(`Failed to parse Claude CLI output: ${output.slice(0, 200)}`);
-      throw new Error(`Claude CLI returned invalid JSON: ${e instanceof Error ? e.message : String(e)}`);
+      const parsed = JSON.parse(output);
+      const text = stripCodeFences(parsed.result ?? output);
+      const results = this.parseResponse(text);
+      this.log.info(`Company search completed | name="${name}" results=${results.length} duration=${duration}ms`);
+      return results;
+    } catch {
+      this.log.error(
+        `Failed to parse Claude CLI response | name="${name}" duration=${duration}ms output="${output.slice(0, 500)}"`
+      );
+      throw new ExternalServiceError('Claude CLI', 'Company search returned invalid response');
     }
-    const text = stripCodeFences(typeof parsed.result === 'string' ? parsed.result : output);
-
-    return this.parseResponse(text);
   }
 
   public parseResponse(raw: string): CompanySearchResult[] {
-    let data: unknown;
-    try {
-      data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    } catch (e) {
-      this.log.error(`Failed to parse search response: ${raw.slice(0, 200)}`);
-      throw new Error(`Invalid search response JSON: ${e instanceof Error ? e.message : String(e)}`);
-    }
+    const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
-    if (!Array.isArray(data)) {
-      this.log.warn(`Unexpected search response shape (expected array): ${typeof data}`);
-      return [];
-    }
+    if (!Array.isArray(data)) return [];
 
     return data
       .filter((item: unknown) => typeof item === 'object' && item !== null && 'name' in item)
