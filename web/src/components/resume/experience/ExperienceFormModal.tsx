@@ -61,6 +61,8 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
   const linkCompany = useLinkCompany();
   const unlinkCompany = useUnlinkCompany();
 
+  const [nestedModalOpen, setNestedModalOpen] = useState(false);
+
   const [linkedCompany, setLinkedCompany] = useState<Company | null>(
     modalMode.mode === 'edit' ? modalMode.experience.company : null
   );
@@ -141,6 +143,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
         {
           onSuccess: () => {
             setErrors({});
+            reset();
             toast.success('Changes saved');
           },
           onError: () => toast.error('Failed to save. Please try again.')
@@ -164,6 +167,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
       isSaving={isSaving}
       onSave={handleSave}
       onDiscard={handleDiscard}
+      externalStacked={nestedModalOpen}
     >
       <div className="grid grid-cols-2 gap-3">
         <EditableField
@@ -199,6 +203,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onAccomplis
                 onLink={handleLinkCompany}
                 onUnlink={handleUnlinkCompany}
                 disabled={isSaving}
+                onNestedModalChange={setNestedModalOpen}
               />
             )}
           </div>

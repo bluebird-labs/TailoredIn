@@ -15,8 +15,8 @@ import { Route as HeadlinesIndexRouteImport } from './routes/headlines/index'
 import { Route as ExperiencesIndexRouteImport } from './routes/experiences/index'
 import { Route as EducationIndexRouteImport } from './routes/education/index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies/index'
-import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 import { Route as ExperiencesExperienceIdRouteImport } from './routes/experiences/$experienceId'
+import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,36 +48,34 @@ const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
   path: '/companies/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
-  id: '/companies/$companyId',
-  path: '/companies/$companyId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ExperiencesExperienceIdRoute = ExperiencesExperienceIdRouteImport.update({
   id: '/experiences/$experienceId',
   path: '/experiences/$experienceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
+  id: '/companies/$companyId',
+  path: '/companies/$companyId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
+  '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/companies/': typeof CompaniesIndexRoute
-  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
-  '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/headlines/': typeof HeadlinesIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
+  '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/companies': typeof CompaniesIndexRoute
-  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/education': typeof EducationIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
-  '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/headlines': typeof HeadlinesIndexRoute
   '/profile': typeof ProfileIndexRoute
 }
@@ -85,11 +83,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
+  '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/companies/': typeof CompaniesIndexRoute
-  '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
-  '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/headlines/': typeof HeadlinesIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
@@ -98,33 +95,30 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/companies/$companyId'
+    | '/experiences/$experienceId'
     | '/companies/'
-    | '/companies/$companyId'
     | '/education/'
     | '/experiences/'
-    | '/experiences/$experienceId'
     | '/headlines/'
     | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/companies/$companyId'
+    | '/experiences/$experienceId'
     | '/companies'
-    | '/companies/$companyId'
     | '/education'
     | '/experiences'
-    | '/experiences/$experienceId'
     | '/headlines'
     | '/profile'
   id:
     | '__root__'
     | '/'
     | '/companies/$companyId'
+    | '/experiences/$experienceId'
     | '/companies/'
-    | '/companies/$companyId'
     | '/education/'
     | '/experiences/'
-    | '/experiences/$experienceId'
     | '/headlines/'
     | '/profile/'
   fileRoutesById: FileRoutesById
@@ -132,11 +126,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
+  ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
-  CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   EducationIndexRoute: typeof EducationIndexRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
-  ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
   HeadlinesIndexRoute: typeof HeadlinesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
@@ -185,18 +178,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompaniesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/companies/$companyId': {
-      id: '/companies/$companyId'
-      path: '/companies/$companyId'
-      fullPath: '/companies/$companyId'
-      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/experiences/$experienceId': {
       id: '/experiences/$experienceId'
       path: '/experiences/$experienceId'
       fullPath: '/experiences/$experienceId'
       preLoaderRoute: typeof ExperiencesExperienceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies/$companyId': {
+      id: '/companies/$companyId'
+      path: '/companies/$companyId'
+      fullPath: '/companies/$companyId'
+      preLoaderRoute: typeof CompaniesCompanyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -205,11 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
+  ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
-  CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   EducationIndexRoute: EducationIndexRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,
-  ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
   HeadlinesIndexRoute: HeadlinesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }

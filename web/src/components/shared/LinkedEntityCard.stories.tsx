@@ -29,9 +29,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const WithInitial: Story = {
-  args: { to: '/companies/1', logo: 'A', name: 'Acme Corporation', meta: 'SaaS · Series B' }
+  args: { to: '/companies/1', logoInitial: 'A', name: 'Acme Corporation', meta: 'SaaS · Series B' }
 };
 
 export const MinimalMeta: Story = {
-  args: { to: '/companies/2', logo: 'T', name: 'Tiny Startup', meta: '' }
+  args: { to: '/companies/2', logoInitial: 'T', name: 'Tiny Startup', meta: '' }
 };

@@ -3,6 +3,7 @@ import { ExternalLink, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal.js';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
+import { JobDescriptionList } from '@/components/job-descriptions/JobDescriptionList.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
@@ -107,7 +108,7 @@ function CompanyDetailPage() {
 
         <TabsContent value="job-descriptions">
           <div className="mt-4">
-            <EmptyState message="No job descriptions yet." />
+            <JobDescriptionList companyId={companyId} />
           </div>
         </TabsContent>
       </Tabs>

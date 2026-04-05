@@ -125,7 +125,8 @@ function ExperienceDetailPage() {
                 <InfoCard label="Company">
                   <LinkedEntityCard
                     to={`/companies/${experience.company.id}`}
-                    logo={experience.company.logoUrl ?? experience.company.name.charAt(0).toUpperCase()}
+                    logoUrl={experience.company.logoUrl}
+                    logoInitial={experience.company.name.charAt(0).toUpperCase()}
                     name={experience.company.name}
                     meta={
                       [industryLabel, stageLabel].filter(Boolean).join(' · ') ||

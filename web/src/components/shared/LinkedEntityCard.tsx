@@ -3,19 +3,20 @@ import { ArrowRight } from 'lucide-react';
 
 interface LinkedEntityCardProps {
   readonly to: string;
-  readonly logo: string;
+  readonly logoUrl?: string | null;
+  readonly logoInitial: string;
   readonly name: string;
   readonly meta: string;
 }
 
-export function LinkedEntityCard({ to, logo, name, meta }: LinkedEntityCardProps) {
+export function LinkedEntityCard({ to, logoUrl, logoInitial, name, meta }: LinkedEntityCardProps) {
   return (
     <Link
       to={to}
       className="flex items-center gap-3 rounded-[14px] border bg-card p-4 transition-colors hover:border-primary/30 hover:bg-accent/40"
     >
-      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-accent text-[14px] font-medium text-accent-foreground">
-        {logo}
+      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-accent text-[14px] font-medium text-accent-foreground overflow-hidden">
+        {logoUrl ? <img src={logoUrl} alt={name} className="h-full w-full rounded-lg object-contain" /> : logoInitial}
       </div>
       <div className="flex-1">
         <div className="text-[13px] font-medium text-foreground">{name}</div>

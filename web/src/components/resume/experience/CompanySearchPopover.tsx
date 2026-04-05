@@ -1,5 +1,5 @@
 import { ExternalLink, Link2, Link2Off, Plus, Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,14 +13,26 @@ interface Props {
   readonly onLink: (company: Company) => void;
   readonly onUnlink: () => void;
   readonly disabled?: boolean;
+  readonly onNestedModalChange?: (open: boolean) => void;
 }
 
-export function CompanySearchPopover({ linkedCompany, companyName, onLink, onUnlink, disabled }: Props) {
+export function CompanySearchPopover({
+  linkedCompany,
+  companyName,
+  onLink,
+  onUnlink,
+  disabled,
+  onNestedModalChange
+}: Props) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(companyName ?? '');
   const [createOpen, setCreateOpen] = useState(false);
   const [viewCompany, setViewCompany] = useState<Company | null>(null);
   const { data: companies = [] } = useCompanies();
+
+  useEffect(() => {
+    onNestedModalChange?.(createOpen || !!viewCompany);
+  }, [createOpen, viewCompany, onNestedModalChange]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return companies.slice(0, 8);

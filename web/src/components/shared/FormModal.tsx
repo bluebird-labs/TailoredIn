@@ -35,6 +35,7 @@ interface FormModalProps {
   readonly saveDisabled?: boolean;
   readonly backAction?: () => void;
   readonly overlayClassName?: string;
+  readonly externalStacked?: boolean;
 }
 
 function FormModal({
@@ -51,7 +52,8 @@ function FormModal({
   savingLabel,
   saveDisabled,
   backAction,
-  overlayClassName
+  overlayClassName,
+  externalStacked
 }: FormModalProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -83,7 +85,7 @@ function FormModal({
           showCloseButton={false}
           className="sm:max-w-lg"
           overlayClassName={overlayClassName}
-          stacked={confirmOpen}
+          stacked={confirmOpen || externalStacked}
         >
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
