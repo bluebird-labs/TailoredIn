@@ -14,6 +14,7 @@
 import { Logger } from '@tailoredin/core';
 import { checkBunInstall } from './BunInstall.js';
 import { requireWorktree } from './ContextGuard.js';
+import { cloneDevDatabase } from './DatabaseClone.js';
 import { resolveDevContext } from './DevContext.js';
 import { assertDockerRunning, composeDown, composeUp, isContainerRunning, waitForPostgres } from './DockerCompose.js';
 import { runMigrations } from './MigrationRunner.js';
@@ -87,24 +88,37 @@ if (isContainerRunning(ctx.containerName)) {
   }
 }
 
-// ── Migrations + seeds ───────────────────────────────────────────
+// ── Database: clone dev or migrate + seed ────────────────────────
 
 const ormConfig = toOrmConfig(session);
 
-log.info('Running migrations...');
+let dbReady = false;
+
+log.info('Attempting to clone dev database...');
 try {
-  await runMigrations({ dbConfig: ormConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
+  dbReady = await cloneDevDatabase(ctx.containerName, session.dbName);
 } catch (e) {
-  teardown();
-  throw e;
+  log.warn(`Clone failed: ${e instanceof Error ? e.message : e}`);
 }
 
-log.info('Running seeds...');
-try {
-  await runSeeds(ormConfig);
-} catch (e) {
-  teardown();
-  throw e;
+if (!dbReady) {
+  log.warn('Falling back to migrations + seeds.');
+
+  log.info('Running migrations...');
+  try {
+    await runMigrations({ dbConfig: ormConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
+  } catch (e) {
+    teardown();
+    throw e;
+  }
+
+  log.info('Running seeds...');
+  try {
+    await runSeeds(ormConfig);
+  } catch (e) {
+    teardown();
+    throw e;
+  }
 }
 
 // ── Start dev servers ────────────────────────────────────────────
