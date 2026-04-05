@@ -105,6 +105,7 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     try {
       domain = new URL(websiteUrl).hostname;
     } catch {
+      this.log.debug(`Cannot extract domain from website URL: "${websiteUrl}"`);
       return result;
     }
 
