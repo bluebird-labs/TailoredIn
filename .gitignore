@@ -2,6 +2,7 @@
 # .claude/settings.local.json is gitignored (personal overrides)
 .claude/settings.local.json
 .claude/worktrees/
+.claude/scheduled_tasks*
 node_modules/
 .env
 .env.local
