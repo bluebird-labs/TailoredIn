@@ -2,7 +2,7 @@
 import type { ResumeRenderExperience, ResumeRenderInput } from '@tailoredin/application';
 import { escapeTypst } from '../typst-generators.js';
 
-export type CompanyGroup = {
+type CompanyGroup = {
   companyName: string;
   companySlug: string;
   /** Start date of the earliest role at this company (MM-YYYY) */
