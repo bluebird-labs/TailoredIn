@@ -16,6 +16,7 @@ import {
   DeleteJobDescription,
   DiscoverCompanies,
   EnrichCompanyData,
+  GenerateResumeContent,
   GetApplication,
   GetCompany,
   GetExperience,
@@ -46,6 +47,7 @@ import {
   ClaudeCliCompanyDiscoveryProvider,
   ClaudeCliJobDescriptionParser,
   ClaudeCliProvider,
+  ClaudeCliResumeContentGenerator,
   createOrmConfig,
   DI,
   PostgresApplicationRepository,
@@ -252,6 +254,20 @@ container.bind({
 container.bind({
   provide: DI.JobDescription.Delete,
   useFactory: () => new DeleteJobDescription(container.get(DI.JobDescription.Repository))
+});
+
+// Resume
+container.bind({ provide: DI.Resume.Generator, useClass: ClaudeCliResumeContentGenerator });
+container.bind({
+  provide: DI.Resume.Generate,
+  useFactory: () =>
+    new GenerateResumeContent(
+      container.get(DI.Profile.Repository),
+      container.get(DI.Headline.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.Resume.Generator)
+    )
 });
 
 export { container };
