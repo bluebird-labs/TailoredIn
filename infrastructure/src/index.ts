@@ -17,10 +17,14 @@ export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptio
 export { ClaudeCliResumeContentGenerator } from './services/ClaudeCliResumeContentGenerator.js';
 // LLM
 export {
+  BaseLlmApiProvider,
+  BaseLlmCliProvider,
+  ClaudeApiProvider,
   ClaudeCliProvider,
   type ClaudeCliResponse,
   claudeCliResponseSchema,
   LlmJsonRequest,
-  LlmRequestError
+  LlmRequestError,
+  type LlmRequestOptions
 } from './services/llm/index.js';
 export { TypstResumeRendererFactory } from './services/TypstResumeRendererFactory.js';

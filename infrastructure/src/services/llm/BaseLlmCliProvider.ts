@@ -3,14 +3,11 @@ import { err, ok, type Result } from '@tailoredin/domain';
 import type { z } from 'zod';
 import type { LlmJsonRequest } from './LlmJsonRequest.js';
 import { LlmRequestError } from './LlmRequestError.js';
+import type { LlmRequestOptions } from './LlmRequestOptions.js';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
 
-export interface LlmRequestOptions {
-  timeoutMs?: number;
-  maxRetries?: number;
-  retryDelayMs?: number;
-}
+export type { LlmRequestOptions };
 
 export abstract class BaseLlmCliProvider<TResponse extends z.ZodType> {
   protected abstract readonly log: LoggerInstance;

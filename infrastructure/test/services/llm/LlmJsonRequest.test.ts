@@ -36,4 +36,18 @@ describe('LlmJsonRequest', () => {
     const request = new TestRequest();
     expect(request.prompt).toBe('test prompt');
   });
+
+  test('maxTokens defaults to undefined', () => {
+    const testSchema = z.object({ x: z.string() });
+
+    class ConcreteRequest extends LlmJsonRequest<typeof testSchema> {
+      public readonly schema = testSchema;
+
+      public get prompt(): string {
+        return 'test';
+      }
+    }
+
+    expect(new ConcreteRequest().maxTokens).toBeUndefined();
+  });
 });
