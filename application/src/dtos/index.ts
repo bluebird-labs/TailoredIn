@@ -11,3 +11,4 @@ export type { JobDescriptionDto, SalaryRangeDto } from './JobDescriptionDto.js';
 export { toJobDescriptionDto } from './JobDescriptionDto.js';
 export type { PaginatedDto, PaginationMeta } from './PaginationDto.js';
 export type { ProfileDto } from './ProfileDto.js';
+export type { ResumeContentDto, ResumeExperienceBulletsDto } from './ResumeContentDto.js';

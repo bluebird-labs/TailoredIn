@@ -67,5 +67,7 @@ export type { ParseJobDescriptionInput } from './job-description/ParseJobDescrip
 export { ParseJobDescription } from './job-description/ParseJobDescription.js';
 export type { UpdateJobDescriptionInput } from './job-description/UpdateJobDescription.js';
 export { UpdateJobDescription } from './job-description/UpdateJobDescription.js';
+export type { GenerateResumeContentInput } from './resume/GenerateResumeContent.js';
+export { GenerateResumeContent } from './resume/GenerateResumeContent.js';
 export type { UpdateProfileInput } from './UpdateProfile.js';
 export { UpdateProfile } from './UpdateProfile.js';
