@@ -10,13 +10,16 @@ const generateResumeBulletsSchema = z.object({
   experiences: z.array(
     z.object({
       experienceId: z.string(),
-      bullets: z.array(z.string().min(80).max(250))
+      bullets: z.array(z.string().min(80).max(350))
     })
   )
 });
 
 export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generateResumeBulletsSchema> {
   public readonly schema = generateResumeBulletsSchema;
+  public get model() {
+    return 'haiku';
+  }
 
   public constructor(private readonly input: ResumeContentGeneratorInput) {
     super();

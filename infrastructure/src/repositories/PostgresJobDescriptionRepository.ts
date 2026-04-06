@@ -18,7 +18,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findById(id: JobDescriptionId): Promise<DomainJobDescription | null> {
-    const orm = await this.orm.em.findOne(OrmJobDescription, id.value);
+    const orm = await this.orm.em.findOne(OrmJobDescription, id.value, { populate: ['company'] });
     return orm ? this.toDomain(orm) : null;
   }
 

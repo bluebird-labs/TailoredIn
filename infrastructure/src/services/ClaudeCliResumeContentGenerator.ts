@@ -20,7 +20,7 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
     this.log.info(`Generating resume bullets for ${input.experiences.length} experience(s)`);
 
     const startTime = Date.now();
-    const result = await this.provider.request(new GenerateResumeBulletsRequest(input));
+    const result = await this.provider.request(new GenerateResumeBulletsRequest(input), { timeoutMs: 300_000 });
     const duration = Date.now() - startTime;
 
     if (result.isErr) {
@@ -42,7 +42,7 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
           experienceId: llmExp.experienceId,
           experienceTitle: inputExp.title,
           companyName: inputExp.companyName,
-          bullets: llmExp.bullets
+          bullets: llmExp.bullets.map(b => b.replaceAll('—', '-'))
         }
       ];
     });

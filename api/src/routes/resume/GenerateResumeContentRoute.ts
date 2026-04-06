@@ -33,7 +33,7 @@ export class GenerateResumeContentRoute {
       },
       {
         body: t.Object({
-          jobDescriptionId: t.String({ format: 'uuid' })
+          jobDescriptionId: t.String()
         })
       }
     );

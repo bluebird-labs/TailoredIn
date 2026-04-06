@@ -88,9 +88,9 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('rejects bullets longer than 250 characters', () => {
+    test('rejects bullets longer than 350 characters', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
-      const longBullet = 'A'.repeat(251);
+      const longBullet = 'A'.repeat(351);
       const payload = {
         experiences: [
           {
@@ -104,10 +104,10 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('accepts bullets at the boundary lengths (80 and 250 chars)', () => {
+    test('accepts bullets at the boundary lengths (80 and 350 chars)', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const exactMin = 'A'.repeat(80);
-      const exactMax = 'A'.repeat(250);
+      const exactMax = 'A'.repeat(350);
       const payload = {
         experiences: [
           {

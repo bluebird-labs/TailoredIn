@@ -6,7 +6,7 @@
 
 ## Context
 
-Add an LLM-powered endpoint (`POST /resume/generate`) that takes a job description already in the database and returns tailored resume bullet points for each work experience of the first (and only) profile. The LLM frames bullets to highlight relevance to the JD without inventing any competency, respects per-experience bullet count tiers based on recency, and enforces bullet length bounds (min 80, max 250 characters).
+Add an LLM-powered endpoint (`POST /resume/generate`) that takes a job description already in the database and returns tailored resume bullet points for each work experience of the first (and only) profile. The LLM frames bullets to highlight relevance to the JD without inventing any competency, respects per-experience bullet count tiers based on recency, and enforces bullet length bounds (min 80, max 350 characters).
 
 ## Architecture
 
@@ -82,7 +82,7 @@ Experiences sorted by `startDate` descending. Position 0 = most recent.
 ## Bullet Quality Rules
 
 1. **No invention** — bullets MUST be derived strictly from their experience's data (title, summary, accomplishments). No borrowing from other experiences.
-2. **Length** — each bullet is ≥ 80 and ≤ 250 characters.
+2. **Length** — each bullet is ≥ 80 and ≤ 350 characters.
 3. **Tone** — inspired by the candidate's `about` text and headline summary.
 4. **Relevance** — bullets framed to highlight fit with the target job description.
 
@@ -92,7 +92,7 @@ Experiences sorted by `startDate` descending. Position 0 = most recent.
 z.object({
   experiences: z.array(z.object({
     experienceId: z.string(),
-    bullets: z.array(z.string().min(80).max(250))
+    bullets: z.array(z.string().min(80).max(350))
   }))
 })
 ```
