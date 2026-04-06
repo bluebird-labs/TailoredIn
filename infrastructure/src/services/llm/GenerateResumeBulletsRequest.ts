@@ -43,10 +43,7 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
       })
       .join('\n\n');
 
-    const jdRawTextSection =
-      this.input.jobDescription.rawText
-        ? `Raw Text:\n${this.input.jobDescription.rawText}`
-        : '';
+    const jdRawTextSection = this.input.jobDescription.rawText ? `Raw Text:\n${this.input.jobDescription.rawText}` : '';
 
     return template
       .replace('{{firstName}}', this.input.profile.firstName)
