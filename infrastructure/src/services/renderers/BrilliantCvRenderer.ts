@@ -3,18 +3,14 @@ import { join } from 'node:path';
 import { injectable } from '@needle-di/core';
 import type { ResumeRenderer, ResumeRenderInput } from '@tailoredin/application';
 import {
-  analyzeLayout,
   generateConfigTyp,
   generateEducationTyp,
   generateMetadataToml,
-  generateProfessionalTyp,
-  type ResumeRenderEducation,
-  type ResumeRenderExperience
+  generateProfessionalTyp
 } from '../typst-generators.js';
 
 const TYPST_DIR = join(import.meta.dir, '../../../typst/brilliant-cv');
 const FONTS_DIR = join(import.meta.dir, '../../../typst/fonts');
-const MAX_PAGES = 2;
 
 @injectable()
 export class BrilliantCvRenderer implements ResumeRenderer {
@@ -23,34 +19,7 @@ export class BrilliantCvRenderer implements ResumeRenderer {
 
     try {
       await this.setupTempDir(tmpDir, input);
-
-      let educations = [...input.educations];
-      const experiences = input.experiences.map(e => ({ ...e, bullets: [...e.bullets] }));
-
-      let pdf = await this.compile(tmpDir, experiences, educations);
-      let { totalPages } = analyzeLayout(pdf);
-
-      while (totalPages > MAX_PAGES && educations.length > 1) {
-        educations = educations.slice(0, -1);
-        pdf = await this.compile(tmpDir, experiences, educations);
-        ({ totalPages } = analyzeLayout(pdf));
-      }
-
-      while (totalPages > MAX_PAGES) {
-        let trimmed = false;
-        for (let i = experiences.length - 1; i >= 0; i--) {
-          if (experiences[i].bullets.length > 1) {
-            experiences[i] = { ...experiences[i], bullets: experiences[i].bullets.slice(0, -1) };
-            trimmed = true;
-            break;
-          }
-        }
-        if (!trimmed) break;
-        pdf = await this.compile(tmpDir, experiences, educations);
-        ({ totalPages } = analyzeLayout(pdf));
-      }
-
-      return pdf;
+      return await this.compile(tmpDir, input.experiences, input.educations);
     } finally {
       await rm(tmpDir, { recursive: true, force: true });
     }
@@ -79,8 +48,8 @@ export class BrilliantCvRenderer implements ResumeRenderer {
 
   private async compile(
     tmpDir: string,
-    experiences: ResumeRenderExperience[],
-    educations: ResumeRenderEducation[]
+    experiences: ResumeRenderInput['experiences'],
+    educations: ResumeRenderInput['educations']
   ): Promise<Uint8Array> {
     await writeFile(join(tmpDir, 'modules_en', 'professional.typ'), generateProfessionalTyp(experiences));
     await writeFile(join(tmpDir, 'modules_en', 'education.typ'), generateEducationTyp(educations));
