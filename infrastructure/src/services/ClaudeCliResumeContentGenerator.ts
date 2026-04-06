@@ -50,7 +50,7 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
       ];
     });
 
-    const requestSchema = JSON.parse(request.getJsonSchema()) as Record<string, unknown>;
+    const requestSchema = request.getJsonSchema();
 
     this.log.info(`Resume bullets generated | experiences=${experiences.length} duration=${duration}ms`);
 

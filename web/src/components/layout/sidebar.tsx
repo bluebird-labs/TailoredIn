@@ -45,7 +45,13 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
-          <span className="text-sidebar-primary text-lg font-medium">✦ TailoredIn</span>
+          <svg viewBox="0 0 100 100" className="h-6 w-6 shrink-0" aria-hidden="true">
+            <path d="M22,22 L50,50 L22,78" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.45" />
+            <path d="M36,26 L58,50 L36,74" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+            <path d="M50,30 L66,50 L50,70" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="1" />
+            <circle cx="76" cy="50" r="4" fill="currentColor" />
+          </svg>
+          <span className="text-sidebar-primary text-lg font-medium">TailoredIn</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

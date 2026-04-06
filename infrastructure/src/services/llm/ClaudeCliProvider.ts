@@ -12,8 +12,8 @@ export class ClaudeCliProvider extends BaseLlmCliProvider<typeof claudeCliRespon
   protected readonly log: LoggerInstance = Logger.create(this);
   protected readonly responseSchema = claudeCliResponseSchema;
 
-  protected buildCommand(request: LlmJsonRequest<z.ZodObject<z.ZodRawShape>>, jsonSchema: string): string[] {
-    const cmd = ['claude', '-p', request.prompt, '--output-format', 'json', '--json-schema', jsonSchema];
+  protected buildCommand(request: LlmJsonRequest<z.ZodObject<z.ZodRawShape>>, jsonSchema: Record<string, unknown>): string[] {
+    const cmd = ['claude', '-p', request.prompt, '--output-format', 'json', '--json-schema', JSON.stringify(jsonSchema)];
     if (request.model) cmd.push('--model', request.model);
     return cmd;
   }

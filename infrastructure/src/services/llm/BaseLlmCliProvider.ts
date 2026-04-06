@@ -13,7 +13,7 @@ export abstract class BaseLlmCliProvider<TResponse extends z.ZodType> {
   protected abstract readonly log: LoggerInstance;
   protected abstract readonly responseSchema: TResponse;
 
-  protected abstract buildCommand(request: LlmJsonRequest<z.ZodObject<z.ZodRawShape>>, jsonSchema: string): string[];
+  protected abstract buildCommand(request: LlmJsonRequest<z.ZodObject<z.ZodRawShape>>, jsonSchema: Record<string, unknown>): string[];
 
   protected abstract extractResult(response: z.infer<TResponse>): unknown;
 

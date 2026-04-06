@@ -104,12 +104,6 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
 
   return (
     <div className="mt-4 space-y-5">
-      <div className="space-y-3">
-        {experiences.map(exp => (
-          <ExperienceCard key={exp.experienceId} exp={exp} />
-        ))}
-      </div>
-
       <div className="border rounded-lg p-4 space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-[12px] text-muted-foreground">Generated{generatedAt ? ` on ${generatedAt}` : ''}</p>
@@ -135,6 +129,12 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
             )}
           </Button>
         </div>
+      </div>
+
+      <div className="space-y-3">
+        {experiences.map(exp => (
+          <ExperienceCard key={exp.experienceId} exp={exp} />
+        ))}
       </div>
     </div>
   );

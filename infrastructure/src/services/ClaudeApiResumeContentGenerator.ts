@@ -29,7 +29,7 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
       throw new ExternalServiceError('Claude API', result.error.message);
     }
 
-    const requestSchema = JSON.parse(request.getJsonSchema()) as Record<string, unknown>;
+    const requestSchema = request.getJsonSchema();
 
     const experiences = result.value.experiences.flatMap(llmExp => {
       const inputExp = input.experiences.find(e => e.id === llmExp.experienceId);

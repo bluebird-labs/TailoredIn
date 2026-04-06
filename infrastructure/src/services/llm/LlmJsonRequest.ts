@@ -13,7 +13,7 @@ export abstract class LlmJsonRequest<T extends z.ZodObject<z.ZodRawShape>> {
     return undefined;
   }
 
-  public getJsonSchema(): string {
-    return JSON.stringify(zodToJsonSchema(this.schema, { target: 'openApi3' }));
+  public getJsonSchema(): Record<string, unknown> {
+    return zodToJsonSchema(this.schema, { target: 'openApi3' }) as Record<string, unknown>;
   }
 }

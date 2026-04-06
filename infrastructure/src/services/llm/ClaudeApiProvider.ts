@@ -1,6 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
 import { inject, injectable } from '@needle-di/core';
 import { Logger } from '@tailoredin/core';
+import type { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DI } from '../../DI.js';
 import { BaseLlmApiProvider } from './BaseLlmApiProvider.js';
 
@@ -27,32 +30,26 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
     return this._client;
   }
 
-  protected async callApi(
+  protected async callApi<T extends z.ZodObject<z.ZodRawShape>>(
     prompt: string,
-    jsonSchema: string,
+    schema: T,
     model: string,
     maxTokens: number,
     timeoutMs: number
-  ): Promise<string> {
-    const systemPrompt = [
-      'You must respond with valid JSON that conforms exactly to this JSON schema:',
-      '',
-      jsonSchema,
-      '',
-      'Return ONLY the JSON object. No markdown code blocks, no explanation, no extra text.'
-    ].join('\n');
-
-    let message: Anthropic.Message;
+  ): Promise<z.infer<T>> {
     try {
-      message = await this.getClient().messages.create(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' }) as any;
+      const message = await this.getClient().messages.parse(
         {
           model,
           max_tokens: maxTokens,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: prompt }]
+          messages: [{ role: 'user', content: prompt }],
+          output_config: { format: jsonSchemaOutputFormat(jsonSchema) }
         },
         { timeout: timeoutMs }
       );
+      return message.parsed_output as z.infer<T>;
     } catch (e) {
       if (e instanceof Anthropic.APIConnectionTimeoutError) throw new Error(`API call timed out after ${timeoutMs}ms`);
       if (e instanceof Anthropic.RateLimitError) throw new Error('API rate limit exceeded: 429');
@@ -60,12 +57,5 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
       if (e instanceof Anthropic.APIConnectionError) throw new Error(`API connection failed: ${e.message}`);
       throw e;
     }
-
-    const block = message.content[0];
-    if (!block || block.type !== 'text') {
-      throw new Error('Unexpected API response: no text content');
-    }
-
-    return block.text;
   }
 }
