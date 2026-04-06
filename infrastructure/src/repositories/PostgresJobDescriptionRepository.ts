@@ -72,16 +72,16 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
         source: jd.source,
         postedAt: jd.postedAt,
         rawText: jd.rawText,
+        resumeOutput: jd.resumeOutput
+          ? {
+              schema: jd.resumeOutput.schema,
+              output: jd.resumeOutput.output,
+              generatedAt: jd.resumeOutput.generatedAt.toISOString()
+            }
+          : null,
         createdAt: jd.createdAt,
         updatedAt: jd.updatedAt
       });
-      ormJd.resumeOutput = jd.resumeOutput
-        ? {
-            schema: jd.resumeOutput.schema,
-            output: jd.resumeOutput.output,
-            generatedAt: jd.resumeOutput.generatedAt.toISOString()
-          }
-        : null;
     }
 
     this.orm.em.persist(ormJd);

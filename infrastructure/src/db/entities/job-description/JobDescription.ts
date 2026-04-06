@@ -55,7 +55,7 @@ export class JobDescription extends BaseEntity {
   public rawText: string | null;
 
   @Property({ fieldName: 'resume_output', type: 'jsonb', nullable: true })
-  public resumeOutput: ResumeOutputJson | null = null;
+  public resumeOutput: ResumeOutputJson | null;
 
   public constructor(props: {
     id: string;
@@ -72,6 +72,7 @@ export class JobDescription extends BaseEntity {
     source: string;
     postedAt: Date | null;
     rawText: string | null;
+    resumeOutput: ResumeOutputJson | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -90,5 +91,6 @@ export class JobDescription extends BaseEntity {
     this.source = props.source;
     this.postedAt = props.postedAt;
     this.rawText = props.rawText;
+    this.resumeOutput = props.resumeOutput;
   }
 }
