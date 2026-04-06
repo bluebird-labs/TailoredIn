@@ -42,7 +42,7 @@ import {
   UpdateJobDescription,
   UpdateProfile
 } from '@tailoredin/application';
-import { env, envInt } from '@tailoredin/core';
+import { env, envInt, envOptional } from '@tailoredin/core';
 import {
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
@@ -172,7 +172,7 @@ container.bind({
 });
 
 // LLM
-container.bind({ provide: DI.Llm.ClaudeApiKey, useValue: env('CLAUDE_API_KEY') });
+container.bind({ provide: DI.Llm.ClaudeApiKey, useValue: envOptional('CLAUDE_API_KEY') ?? '' });
 container.bind({ provide: DI.Llm.ClaudeApiProvider, useClass: ClaudeApiProvider });
 
 // Company
