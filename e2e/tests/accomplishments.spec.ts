@@ -83,9 +83,8 @@ test.describe('Accomplishments', () => {
     await titleInput.clear();
     await titleInput.fill('Migrated to K8s');
 
-    // SaveBar should appear in the accomplishment editor
-    await expect(firstEditor.locator('[data-slot="save-bar"]')).toBeVisible();
-    await firstEditor.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Save' }).click();
+    // Accomplishments are saved via the modal-level Save button (no per-editor save bar)
+    await dialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
     // Verify the original value placeholder confirms we changed it
@@ -104,9 +103,19 @@ test.describe('Accomplishments', () => {
     await titleInput.clear();
     await titleInput.fill('Something Else');
 
-    await firstEditor.locator('[data-slot="save-bar"]').getByRole('button', { name: 'Discard' }).click();
+    // Discard via modal Cancel → alertDialog "Discard" (no per-editor discard button)
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    const alertDialog = page.getByRole('alertdialog');
+    await expect(alertDialog.getByText('Discard unsaved changes?')).toBeVisible();
+    await alertDialog.getByRole('button', { name: 'Discard' }).click();
 
-    await expect(titleInput).toHaveValue(originalValue);
+    // Reopen edit modal and verify the accomplishment title reverted to original
+    await expect(dialog).not.toBeVisible();
+    await page.getByRole('button', { name: 'Edit' }).click();
+    const reopenedDialog = page.getByRole('dialog');
+    await expect(reopenedDialog).toBeVisible();
+    const reopenedEditors = getEditors(reopenedDialog);
+    await expect(reopenedEditors.first().getByLabel('Title')).toHaveValue(originalValue);
   });
 
   test('delete accomplishment shows confirmation dialog', async ({ page }) => {
