@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { Logger } from '@tailoredin/core';
 import { z } from 'zod';
-import type { LlmRequestOptions } from '../../../src/services/llm/BaseLlmCliProvider.js';
+import type { LlmRequestOptions } from '../../../src/services/llm/LlmRequestOptions.js';
 import { BaseLlmCliProvider } from '../../../src/services/llm/BaseLlmCliProvider.js';
 import { LlmJsonRequest } from '../../../src/services/llm/LlmJsonRequest.js';
 import { LlmRequestError } from '../../../src/services/llm/LlmRequestError.js';
