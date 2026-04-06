@@ -16,20 +16,19 @@ class TestRequest extends LlmJsonRequest<typeof TestRequest.testSchema> {
 }
 
 describe('LlmJsonRequest', () => {
-  test('getJsonSchema produces valid JSON with type "object" at root', () => {
+  test('getJsonSchema produces an object with type "object" at root', () => {
     const request = new TestRequest();
-    const json = request.getJsonSchema();
-    const parsed = JSON.parse(json);
+    const schema = request.getJsonSchema();
 
-    expect(parsed.type).toBe('object');
-    expect(parsed.properties).toBeDefined();
-    expect(parsed.properties.name).toBeDefined();
-    expect(parsed.properties.items).toBeDefined();
+    expect(schema.type).toBe('object');
+    expect(schema.properties).toBeDefined();
+    expect((schema.properties as Record<string, unknown>).name).toBeDefined();
+    expect((schema.properties as Record<string, unknown>).items).toBeDefined();
   });
 
-  test('getJsonSchema output is a string', () => {
+  test('getJsonSchema output is an object', () => {
     const request = new TestRequest();
-    expect(typeof request.getJsonSchema()).toBe('string');
+    expect(typeof request.getJsonSchema()).toBe('object');
   });
 
   test('prompt returns the abstract implementation', () => {

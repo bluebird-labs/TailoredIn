@@ -36,26 +36,31 @@ class TestRequestWithModel extends LlmJsonRequest<typeof testSchema> {
   }
 }
 
-type CallBehavior = 'success' | 'fail-timeout' | 'fail-connection' | 'fail-server-error' | 'fail-rate-limit';
+type CallBehavior =
+  | 'success'
+  | 'fail-timeout'
+  | 'fail-connection'
+  | 'fail-server-error'
+  | 'fail-rate-limit'
+  | 'fail-generic';
 
 class TestApiProvider extends BaseLlmApiProvider {
   protected readonly log = Logger.create('test-api-provider');
   protected readonly defaultModel = 'test-model';
   protected readonly providerName = 'test-api';
   public callBehavior: CallBehavior = 'success';
-  public responseText = '{"name":"Acme","count":42}';
   public callCount = 0;
   public lastMaxTokens: number | undefined;
   public lastModel: string | undefined;
   public lastTimeoutMs: number | undefined;
 
-  protected async callApi(
+  protected async callApi<T extends z.ZodObject<z.ZodRawShape>>(
     _prompt: string,
-    _jsonSchema: string,
+    _schema: T,
     model: string,
     maxTokens: number,
     timeoutMs: number
-  ): Promise<string> {
+  ): Promise<z.infer<T>> {
     this.callCount++;
     this.lastMaxTokens = maxTokens;
     this.lastModel = model;
@@ -69,8 +74,10 @@ class TestApiProvider extends BaseLlmApiProvider {
         throw new Error('API server error (500): Internal Server Error');
       case 'fail-rate-limit':
         throw new Error('API rate limit exceeded: 429');
+      case 'fail-generic':
+        throw new Error('unexpected provider failure');
       default:
-        return this.responseText;
+        return { name: 'Acme', count: 42 } as z.infer<T>;
     }
   }
 
@@ -89,10 +96,10 @@ class CountingTestApiProvider extends BaseLlmApiProvider {
     super();
   }
 
-  protected async callApi(): Promise<string> {
+  protected async callApi<T extends z.ZodObject<z.ZodRawShape>>(): Promise<z.infer<T>> {
     this.callCount++;
     if (this.callCount <= this.failUntil) throw new Error('API call timed out after 1000ms');
-    return '{"name":"Acme","count":42}';
+    return { name: 'Acme', count: 42 } as z.infer<T>;
   }
 
   public override sleep(_ms: number): Promise<void> {
@@ -164,27 +171,16 @@ describe('BaseLlmApiProvider', () => {
     }
   });
 
-  test('returns err when response is not valid JSON', async () => {
+  test('returns err when callApi throws a non-retryable error', async () => {
     const provider = new TestApiProvider();
-    provider.responseText = 'not json at all';
+    provider.callBehavior = 'fail-generic';
 
-    const result = await provider.request(new TestRequest(), { maxRetries: 1 });
+    const result = await provider.request(new TestRequest(), { maxRetries: 3, retryDelayMs: 10 });
 
+    expect(provider.callCount).toBe(1);
     expect(result.isErr).toBe(true);
     if (result.isErr) {
-      expect(result.error.message).toContain('Failed to parse API response as JSON');
-    }
-  });
-
-  test('returns err on Zod validation failure', async () => {
-    const provider = new TestApiProvider();
-    provider.responseText = '{"name":123,"count":"not-a-number"}';
-
-    const result = await provider.request(new TestRequest(), { maxRetries: 1 });
-
-    expect(result.isErr).toBe(true);
-    if (result.isErr) {
-      expect(result.error.message).toContain('Zod validation failed');
+      expect(result.error.message).toContain('unexpected provider failure');
     }
   });
 
@@ -215,30 +211,14 @@ describe('BaseLlmApiProvider retry', () => {
     }
   });
 
-  test('does not retry Zod validation failure', async () => {
+  test('does not retry non-retryable generic error', async () => {
     const provider = new TestApiProvider();
-    provider.responseText = '{"wrong":"shape"}';
+    provider.callBehavior = 'fail-generic';
 
     const result = await provider.request(new TestRequest(), { maxRetries: 3, retryDelayMs: 10 });
 
     expect(provider.callCount).toBe(1);
     expect(result.isErr).toBe(true);
-    if (result.isErr) {
-      expect(result.error.message).toContain('Zod validation failed');
-    }
-  });
-
-  test('does not retry JSON parse failure', async () => {
-    const provider = new TestApiProvider();
-    provider.responseText = 'invalid json';
-
-    const result = await provider.request(new TestRequest(), { maxRetries: 3, retryDelayMs: 10 });
-
-    expect(provider.callCount).toBe(1);
-    expect(result.isErr).toBe(true);
-    if (result.isErr) {
-      expect(result.error.message).toContain('Failed to parse API response as JSON');
-    }
   });
 
   test('exhausts retries and returns last error', async () => {

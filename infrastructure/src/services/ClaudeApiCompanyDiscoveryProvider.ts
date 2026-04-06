@@ -51,7 +51,7 @@ export class ClaudeApiCompanyDiscoveryProvider implements CompanyDiscoveryProvid
 
     if (result.isErr) {
       this.log.error(`Company discovery failed | query="${query}" error="${result.error.message}"`);
-      throw new ExternalServiceError('Claude API', result.error.message);
+      throw new ExternalServiceError('Claude API', `Company discovery failed: ${result.error.message}`);
     }
 
     const companies = result.value.companies;

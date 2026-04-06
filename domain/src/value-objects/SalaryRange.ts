@@ -1,6 +1,7 @@
 import { ValueObject } from '../ValueObject.js';
 
 export class SalaryRange extends ValueObject<{ min: number | null; max: number | null; currency: string }> {
+  // biome-ignore lint/complexity/noUselessConstructor: required to expose protected ValueObject constructor as public
   public constructor(props: { min: number | null; max: number | null; currency: string }) {
     super(props);
   }

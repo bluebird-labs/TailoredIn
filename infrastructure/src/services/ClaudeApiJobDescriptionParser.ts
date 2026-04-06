@@ -53,7 +53,7 @@ export class ClaudeApiJobDescriptionParser implements JobDescriptionParser {
 
     if (result.isErr) {
       this.log.error(`Job description parsing failed | duration=${duration}ms error="${result.error.message}"`);
-      throw new ExternalServiceError('Claude API', result.error.message);
+      throw new ExternalServiceError('Claude API', `Job description parsing failed: ${result.error.message}`);
     }
 
     this.log.info(`Job description parsed | title="${result.value.title}" duration=${duration}ms`);

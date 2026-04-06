@@ -68,7 +68,7 @@ export class ClaudeApiCompanyDataProvider implements CompanyDataProvider {
 
     if (result.isErr) {
       this.log.error(`Company enrichment failed | url="${url}" duration=${duration}ms error="${result.error.message}"`);
-      throw new ExternalServiceError('Claude API', result.error.message);
+      throw new ExternalServiceError('Claude API', `Company enrichment failed: ${result.error.message}`);
     }
 
     const enrichment: CompanyEnrichmentResult = {
