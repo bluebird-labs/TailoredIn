@@ -50,12 +50,17 @@ test.describe('Experiences Page', () => {
 
     await expect(page.getByText('Experience created')).toBeVisible();
     await expect(page.getByText('NewCo')).toBeVisible();
-    await expect(page.getByText('Principal Engineer')).toBeVisible();
+    // Use first() to guard against retry-induced duplicates in shared DB state
+    await expect(page.getByText('Principal Engineer').first()).toBeVisible();
   });
 
   test('edit experience via modal', async ({ page }) => {
-    // Click ScratchCorp text to open edit modal (click bubbles to card onClick)
+    // Click ScratchCorp card → navigates to detail page
     await page.getByText('ScratchCorp').click();
+    await page.waitForURL(/\/experiences\/.+/);
+
+    // Open the edit modal from the detail page
+    await page.getByRole('button', { name: 'Edit' }).click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByText('Edit Experience')).toBeVisible();
@@ -136,7 +141,12 @@ test.describe('Experiences Page', () => {
   });
 
   test('discard unsaved modal changes', async ({ page }) => {
+    // Click ScratchCorp card → navigates to detail page
     await page.getByText('ScratchCorp').click();
+    await page.waitForURL(/\/experiences\/.+/);
+
+    // Open the edit modal from the detail page
+    await page.getByRole('button', { name: 'Edit' }).click();
 
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Role / Title').clear();
@@ -157,7 +167,7 @@ test.describe('Experiences Page', () => {
     await dialog.getByRole('button', { name: 'Cancel' }).click();
     await page.getByRole('alertdialog').getByRole('button', { name: 'Discard' }).click();
 
-    // Modal should be closed, original data intact
+    // Modal should be closed, original data intact — QA Analyst visible on detail page
     await expect(dialog).not.toBeVisible();
     await expect(page.getByText('QA Analyst')).toBeVisible();
   });

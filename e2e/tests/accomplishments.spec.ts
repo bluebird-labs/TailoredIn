@@ -7,9 +7,11 @@ test.describe('Accomplishments', () => {
     await page.goto('/experiences');
   });
 
-  /** Click Acme Corp card text to open the edit modal */
+  /** Click Acme Corp card → navigate to detail → open edit modal */
   async function openAcmeCorpModal(page: import('@playwright/test').Page) {
     await page.getByText('Acme Corp').click();
+    await page.waitForURL(/\/experiences\/.+/);
+    await page.getByRole('button', { name: 'Edit' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
   }
 
