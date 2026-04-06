@@ -31,6 +31,7 @@ type CallBehavior = 'success' | 'fail-timeout' | 'fail-connection' | 'fail-serve
 class TestApiProvider extends BaseLlmApiProvider {
   protected readonly log = Logger.create('test-api-provider');
   protected readonly defaultModel = 'test-model';
+  protected readonly providerName = 'test-api';
   public callBehavior: CallBehavior = 'success';
   public responseText = '{"name":"Acme","count":42}';
   public callCount = 0;
@@ -66,6 +67,7 @@ class TestApiProvider extends BaseLlmApiProvider {
 class CountingTestApiProvider extends BaseLlmApiProvider {
   protected readonly log = Logger.create('counting-test-api-provider');
   protected readonly defaultModel = 'test-model';
+  protected readonly providerName = 'test-api';
   public callCount = 0;
 
   constructor(private readonly failUntil: number) { super(); }
@@ -177,7 +179,7 @@ describe('BaseLlmApiProvider', () => {
 
     expect(result.isErr).toBe(true);
     if (result.isErr) {
-      expect(result.error.command).toEqual(['claude-api', 'test-model', 'messages']);
+      expect(result.error.command).toEqual(['test-api', 'test-model', 'messages']);
       expect(result.error.duration).toBeGreaterThanOrEqual(0);
     }
   });

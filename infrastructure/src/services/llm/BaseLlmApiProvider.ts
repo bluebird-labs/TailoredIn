@@ -1,7 +1,7 @@
 import type { Logger } from '@tailoredin/core';
 import { err, ok, type Result } from '@tailoredin/domain';
 import type { z } from 'zod';
-import type { LlmRequestOptions } from './BaseLlmCliProvider.js';
+import type { LlmRequestOptions } from './LlmRequestOptions.js';
 import type { LlmJsonRequest } from './LlmJsonRequest.js';
 import { LlmRequestError } from './LlmRequestError.js';
 
@@ -12,6 +12,7 @@ const DEFAULT_MAX_TOKENS = 4096;
 export abstract class BaseLlmApiProvider {
   protected abstract readonly log: LoggerInstance;
   protected abstract readonly defaultModel: string;
+  protected abstract readonly providerName: string;
 
   /**
    * Perform the HTTP call to the LLM API.
@@ -72,7 +73,7 @@ export abstract class BaseLlmApiProvider {
     const jsonSchema = request.getJsonSchema();
     const model = request.model ?? this.defaultModel;
     const maxTokens = request.maxTokens ?? DEFAULT_MAX_TOKENS;
-    const descriptor = ['claude-api', model, 'messages'];
+    const descriptor = [this.providerName, model, 'messages'];
     const start = performance.now();
 
     this.log.debug(`LLM API request | model: ${model} maxTokens: ${maxTokens}`);
