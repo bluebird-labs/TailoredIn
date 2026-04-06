@@ -1,4 +1,5 @@
 import {
+  EntityNotFoundError,
   type ExperienceRepository,
   type HeadlineRepository,
   JobDescriptionId,
@@ -32,7 +33,7 @@ export class GenerateResumeContent {
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
     const jd = await this.jobDescriptionRepository.findById(new JobDescriptionId(input.jobDescriptionId));
     if (!jd) {
-      throw new Error(`JobDescription not found: ${input.jobDescriptionId}`);
+      throw new EntityNotFoundError('JobDescription', input.jobDescriptionId);
     }
 
     const profile = await this.profileRepository.findSingle();
