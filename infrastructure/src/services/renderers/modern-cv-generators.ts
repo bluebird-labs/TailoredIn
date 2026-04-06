@@ -1,14 +1,6 @@
 // infrastructure/src/services/renderers/modern-cv-generators.ts
 import type { ResumeRenderInput } from '@tailoredin/application';
-import { escapeTypst } from '../typst-generators.js';
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-function formatDate(iso: string): string {
-  const [year, month] = iso.split('-');
-  const monthIndex = parseInt(month ?? '1', 10) - 1;
-  return `${MONTHS[monthIndex] ?? 'Jan'} ${year}`;
-}
+import { escapeTypst, formatDate } from '../typst-generators.js';
 
 function formatDateRange(startDate: string, endDate: string | null): string {
   return `${formatDate(startDate)} - ${endDate ? formatDate(endDate) : 'Present'}`;
@@ -26,7 +18,7 @@ export function generateModernCvTyp(input: ResumeRenderInput): string {
   const experienceEntries = experiences
     .filter(exp => exp.bullets.length > 0)
     .map(exp => {
-      const date = escapeTypst(formatDateRange(exp.startDate, exp.endDate));
+      const date = escapeAuthorField(formatDateRange(exp.startDate, exp.endDate));
       const bullets = exp.bullets.map(b => `  - ${escapeTypst(b)}`).join('\n');
       return `#resume-entry(
   title: "${escapeAuthorField(exp.title)}",
@@ -41,7 +33,7 @@ ${bullets}
     });
 
   const educationEntries = educations.map(edu => {
-    return `#education-entry(
+    return `#resume-entry(
   title: "${escapeAuthorField(edu.degreeTitle)}",
   location: "${escapeAuthorField(edu.location ?? '')}",
   date: "${edu.graduationYear}",

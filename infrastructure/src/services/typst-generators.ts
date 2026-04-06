@@ -5,7 +5,7 @@ export type { ResumeRenderEducation, ResumeRenderExperience } from '@tailoredin/
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function formatDate(iso: string): string {
+export function formatDate(iso: string): string {
   const [year, month] = iso.split('-');
   const monthIndex = parseInt(month ?? '1', 10) - 1;
   return `${MONTHS[monthIndex] ?? 'Jan'} ${year}`;

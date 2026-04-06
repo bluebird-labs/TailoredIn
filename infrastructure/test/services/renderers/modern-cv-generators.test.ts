@@ -80,7 +80,7 @@ describe('generateModernCvTyp', () => {
     const input = makeInput();
     input.experiences[0].bullets = [];
     const typ = generateModernCvTyp(input);
-    expect(typ).not.toContain('resume-entry');
+    expect(typ).not.toContain('Acme Corp');
   });
 
   test('formats date range correctly', () => {

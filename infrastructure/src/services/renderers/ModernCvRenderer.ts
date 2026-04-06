@@ -17,6 +17,7 @@ export class ModernCvRenderer implements ResumeRenderer {
       await mkdir(join(tmpDir, 'fonts'));
       const fontsGlob = new Bun.Glob('**/*.{otf,ttf,woff,woff2}');
       for await (const fontFile of fontsGlob.scan(FONTS_DIR)) {
+        // Flatten all font files into fonts/ — basenames are assumed unique across subdirectories
         const dest = join(tmpDir, 'fonts', fontFile.split('/').pop()!);
         await Bun.write(dest, Bun.file(join(FONTS_DIR, fontFile)));
       }
