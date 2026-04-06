@@ -1,9 +1,9 @@
 import type { Logger } from '@tailoredin/core';
 import { err, ok, type Result } from '@tailoredin/domain';
 import type { z } from 'zod';
-import type { LlmRequestOptions } from './LlmRequestOptions.js';
 import type { LlmJsonRequest } from './LlmJsonRequest.js';
 import { LlmRequestError } from './LlmRequestError.js';
+import type { LlmRequestOptions } from './LlmRequestOptions.js';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
 

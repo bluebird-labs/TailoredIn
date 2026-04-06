@@ -8,6 +8,9 @@ export abstract class ValueObject<T extends Record<string, unknown>> {
   public equals(other: ValueObject<T>): boolean {
     if (other === null || other === undefined) return false;
     if (other.constructor !== this.constructor) return false;
-    return JSON.stringify(this.props) === JSON.stringify(other.props);
+
+    const keys = Object.keys(this.props) as (keyof T)[];
+    if (keys.length !== Object.keys(other.props).length) return false;
+    return keys.every(key => Object.is(this.props[key], other.props[key]));
   }
 }
