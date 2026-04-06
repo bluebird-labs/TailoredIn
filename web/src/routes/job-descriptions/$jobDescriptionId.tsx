@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { formatEnumLabel } from '@/components/job-descriptions/job-description-options.js';
+import { ResumePdfPreview } from '@/components/job-descriptions/resume-pdf-preview.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
@@ -103,39 +104,43 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
   }
 
   return (
-    <div className="mt-4 space-y-5">
-      <div className="border rounded-lg p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-[12px] text-muted-foreground">Generated{generatedAt ? ` on ${generatedAt}` : ''}</p>
+    <div className="mt-4 grid grid-cols-[1fr_480px] gap-5">
+      <div className="space-y-5">
+        <div className="border rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] text-muted-foreground">Generated{generatedAt ? ` on ${generatedAt}` : ''}</p>
+          </div>
+          <Textarea
+            placeholder="Optional: add instructions to steer the regeneration…"
+            value={additionalPrompt}
+            onChange={e => setAdditionalPrompt(e.target.value)}
+            className="text-[13px] min-h-[72px] resize-none"
+          />
+          <div className="flex justify-end">
+            <Button size="sm" variant="outline" onClick={handleGenerate} disabled={generate.isPending}>
+              {generate.isPending ? (
+                <>
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Regenerating…
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                  Regenerate
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-        <Textarea
-          placeholder="Optional: add instructions to steer the regeneration…"
-          value={additionalPrompt}
-          onChange={e => setAdditionalPrompt(e.target.value)}
-          className="text-[13px] min-h-[72px] resize-none"
-        />
-        <div className="flex justify-end">
-          <Button size="sm" variant="outline" onClick={handleGenerate} disabled={generate.isPending}>
-            {generate.isPending ? (
-              <>
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Regenerating…
-              </>
-            ) : (
-              <>
-                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-                Regenerate
-              </>
-            )}
-          </Button>
+
+        <div className="space-y-3">
+          {experiences.map(exp => (
+            <ExperienceCard key={exp.experienceId} exp={exp} />
+          ))}
         </div>
       </div>
 
-      <div className="space-y-3">
-        {experiences.map(exp => (
-          <ExperienceCard key={exp.experienceId} exp={exp} />
-        ))}
-      </div>
+      <ResumePdfPreview jobDescriptionId={jd.id} />
     </div>
   );
 }
