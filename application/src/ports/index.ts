@@ -13,3 +13,4 @@ export type {
   ResumeRenderer,
   ResumeRenderInput
 } from './ResumeRenderer.js';
+export type { ResumeRendererFactory, ResumeTheme } from './ResumeRendererFactory.js';
