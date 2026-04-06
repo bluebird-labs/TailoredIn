@@ -17,6 +17,7 @@ import type {
   DeleteJobDescription,
   DiscoverCompanies,
   EnrichCompanyData,
+  GenerateResumeContent,
   GetApplication,
   GetCompany,
   GetExperience,
@@ -31,6 +32,7 @@ import type {
   ListHeadlines,
   ListJobDescriptions,
   ParseJobDescription,
+  ResumeContentGenerator,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -113,6 +115,11 @@ export const DI = {
     Get: new InjectionToken<GetExperience>('DI.Experience.Get'),
     LinkCompany: new InjectionToken<LinkCompanyToExperience>('DI.Experience.LinkCompany'),
     UnlinkCompany: new InjectionToken<UnlinkCompanyFromExperience>('DI.Experience.UnlinkCompany')
+  },
+
+  Resume: {
+    Generator: new InjectionToken<ResumeContentGenerator>('DI.Resume.Generator'),
+    Generate: new InjectionToken<GenerateResumeContent>('DI.Resume.Generate')
   },
 
   Company: {

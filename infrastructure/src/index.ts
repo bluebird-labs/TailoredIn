@@ -14,6 +14,7 @@ export { PostgresProfileRepository } from './repositories/PostgresProfileReposit
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
 export { ClaudeCliCompanyDiscoveryProvider } from './services/ClaudeCliCompanyDiscoveryProvider.js';
 export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptionParser.js';
+export { ClaudeCliResumeContentGenerator } from './services/ClaudeCliResumeContentGenerator.js';
 // LLM
 export {
   ClaudeCliProvider,
