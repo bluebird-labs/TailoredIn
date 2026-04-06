@@ -10,9 +10,8 @@ export function useGenerateResumePdf() {
       });
       if (!response.ok) {
         const json = await response.json().catch(() => null);
-        throw new Error(
-          (json as { error?: { message?: string } } | null)?.error?.message ?? 'Failed to generate resume PDF'
-        );
+        const serverMessage = (json as { error?: { message?: string } } | null)?.error?.message;
+        throw new Error(serverMessage ?? 'Could not generate resume PDF');
       }
       return response.blob();
     }

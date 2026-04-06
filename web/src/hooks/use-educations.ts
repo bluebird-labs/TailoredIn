@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
-
-// biome-ignore lint/suspicious/noExplicitAny: Eden Treaty route param types vary
-type AnyRouteSegment = any;
 
 export type Education = {
   id: string;
@@ -36,9 +34,12 @@ export function useCreateEducation() {
       honors: string | null;
       ordinal: number;
     }) => {
-      const segment = api.educations as AnyRouteSegment;
+      const segment = api.educations as EdenRouteSegment;
       const { data, error } = await segment.post(input);
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to create education');
+      if (error)
+        throw new Error(
+          extractApiError(error, `Could not create education "${input.degree_title}" at ${input.institution_name}`)
+        );
       return data?.data;
     },
     onSuccess: () => {
@@ -59,7 +60,7 @@ export function useUpdateEducation() {
       honors: string | null;
       ordinal: number;
     }) => {
-      const segment = api.educations as AnyRouteSegment;
+      const segment = api.educations as EdenRouteSegment;
       const { error } = await segment({ id: input.id }).put({
         degree_title: input.degree_title,
         institution_name: input.institution_name,
@@ -68,7 +69,10 @@ export function useUpdateEducation() {
         honors: input.honors,
         ordinal: input.ordinal
       });
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to update education');
+      if (error)
+        throw new Error(
+          extractApiError(error, `Could not update education "${input.degree_title}" at ${input.institution_name}`)
+        );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.educations.list() });
@@ -80,9 +84,9 @@ export function useDeleteEducation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const segment = api.educations as AnyRouteSegment;
+      const segment = api.educations as EdenRouteSegment;
       const { error } = await segment({ id }).delete();
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to delete education');
+      if (error) throw new Error(extractApiError(error, `Could not delete education ${id}`));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.educations.list() });

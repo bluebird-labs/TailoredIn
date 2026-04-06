@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
-
-// biome-ignore lint/suspicious/noExplicitAny: Eden Treaty route param types vary
-type AnyRouteSegment = any;
 
 export type Company = {
   id: string;
@@ -48,9 +46,9 @@ export function useCompany(id: string) {
   return useQuery({
     queryKey: queryKeys.companies.detail(id),
     queryFn: async () => {
-      const segment = api.companies as AnyRouteSegment;
+      const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment({ id }).get();
-      if (error) throw new Error('Failed to fetch company');
+      if (error) throw new Error(extractApiError(error, `Could not load company ${id}`));
       return data?.data as Company;
     }
   });
@@ -59,9 +57,9 @@ export function useCompany(id: string) {
 export function useDiscoverCompanies() {
   return useMutation({
     mutationFn: async (input: { query: string }) => {
-      const segment = api.companies as AnyRouteSegment;
+      const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment.discover.post(input);
-      if (error) throw new Error('Failed to discover companies');
+      if (error) throw new Error(extractApiError(error, `Could not discover companies for "${input.query}"`));
       return (data?.data ?? []) as CompanyDiscoveryResult[];
     }
   });
@@ -70,9 +68,9 @@ export function useDiscoverCompanies() {
 export function useEnrichCompany() {
   return useMutation({
     mutationFn: async (input: { url: string; context?: string }) => {
-      const segment = api.companies as AnyRouteSegment;
+      const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment.enrich.post(input);
-      if (error) throw new Error('Failed to enrich company data');
+      if (error) throw new Error(extractApiError(error, `Could not enrich company data from ${input.url}`));
       return data?.data as CompanyEnrichmentResult;
     }
   });
@@ -93,9 +91,9 @@ export function useUpdateCompany() {
       stage?: string | null;
     }) => {
       const { id, ...body } = input;
-      const segment = api.companies as AnyRouteSegment;
+      const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment({ id }).put(body);
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to update company');
+      if (error) throw new Error(extractApiError(error, `Could not update company "${input.name}"`));
       return data?.data;
     },
     onSuccess: () => {
@@ -117,9 +115,9 @@ export function useCreateCompany() {
       industry?: string | null;
       stage?: string | null;
     }) => {
-      const segment = api.companies as AnyRouteSegment;
+      const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment.post(input);
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to create company');
+      if (error) throw new Error(extractApiError(error, `Could not create company "${input.name}"`));
       return data?.data;
     },
     onSuccess: () => {

@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
-
-// biome-ignore lint/suspicious/noExplicitAny: Eden Treaty route param types vary
-type AnyRouteSegment = any;
 
 export function useProfile() {
   return useQuery({
@@ -29,9 +27,9 @@ export function useUpdateProfile() {
       github_url: string | null;
       website_url: string | null;
     }) => {
-      const segment = api.profile as AnyRouteSegment;
+      const segment = api.profile as EdenRouteSegment;
       const { error } = await segment.put(input);
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to update profile');
+      if (error) throw new Error(extractApiError(error, 'Could not update profile'));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.detail() });

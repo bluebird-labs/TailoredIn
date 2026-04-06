@@ -1,10 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { Company } from './use-companies';
-
-// biome-ignore lint/suspicious/noExplicitAny: Eden Treaty route param types vary
-type AnyRouteSegment = any;
 
 export type Experience = {
   id: string;
@@ -42,9 +40,9 @@ export function useExperience(id: string) {
   return useQuery({
     queryKey: queryKeys.experiences.detail(id),
     queryFn: async () => {
-      const segment = api.experiences as AnyRouteSegment;
+      const segment = api.experiences as EdenRouteSegment;
       const { data, error } = await segment({ id }).get();
-      if (error) throw new Error('Failed to fetch experience');
+      if (error) throw new Error(extractApiError(error, `Could not load experience ${id}`));
       return data?.data as Experience;
     }
   });
@@ -63,9 +61,9 @@ export function useCreateExperience() {
       summary?: string;
       ordinal: number;
     }) => {
-      const segment = api.experiences as AnyRouteSegment;
+      const segment = api.experiences as EdenRouteSegment;
       const { data, error } = await segment.post(input);
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to create experience');
+      if (error) throw new Error(extractApiError(error, `Could not create experience "${input.title}"`));
       return data?.data;
     },
     onSuccess: () => {
@@ -91,8 +89,9 @@ export function useUpdateExperience() {
     }) => {
       const { id, ...body } = input;
       const { data, error } = await api.experiences({ id }).put(body);
-      if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to update experience');
-      return (data as AnyRouteSegment)?.data as Experience;
+      if (error)
+        throw new Error(extractApiError(error as EdenRouteSegment, `Could not update experience "${input.title}"`));
+      return (data as EdenRouteSegment)?.data as Experience;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
@@ -104,9 +103,9 @@ export function useDeleteExperience() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const segment = api.experiences as AnyRouteSegment;
+      const segment = api.experiences as EdenRouteSegment;
       const { error } = await segment({ id }).delete();
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to delete experience');
+      if (error) throw new Error(extractApiError(error, `Could not delete experience ${id}`));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
@@ -121,8 +120,11 @@ export function useLinkCompany() {
       const { data, error } = await api.experiences({ id: input.experienceId }).company.put({
         company_id: input.companyId
       });
-      if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to link company');
-      return (data as AnyRouteSegment)?.data;
+      if (error)
+        throw new Error(
+          extractApiError(error as EdenRouteSegment, `Could not link company to experience ${input.experienceId}`)
+        );
+      return (data as EdenRouteSegment)?.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
@@ -135,8 +137,11 @@ export function useUnlinkCompany() {
   return useMutation({
     mutationFn: async (experienceId: string) => {
       const { data, error } = await api.experiences({ id: experienceId }).company.delete();
-      if (error) throw new Error((error as AnyRouteSegment).value?.error?.message ?? 'Failed to unlink company');
-      return (data as AnyRouteSegment)?.data;
+      if (error)
+        throw new Error(
+          extractApiError(error as EdenRouteSegment, `Could not unlink company from experience ${experienceId}`)
+        );
+      return (data as EdenRouteSegment)?.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });

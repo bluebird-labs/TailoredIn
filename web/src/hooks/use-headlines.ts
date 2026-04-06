@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
-
-// biome-ignore lint/suspicious/noExplicitAny: Eden Treaty route param types vary
-type AnyRouteSegment = any;
 
 export function useHeadlines() {
   return useQuery({
@@ -23,13 +21,13 @@ export function useCreateHeadline() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: { profile_id: string; label: string; summary_text: string }) => {
-      const segment = api.headlines as AnyRouteSegment;
+      const segment = api.headlines as EdenRouteSegment;
       const { data, error } = await segment.post({
         profile_id: input.profile_id,
         label: input.label,
         summary_text: input.summary_text
       });
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to create headline');
+      if (error) throw new Error(extractApiError(error, `Could not create headline "${input.label}"`));
       return data?.data;
     },
     onSuccess: () => {
@@ -42,12 +40,12 @@ export function useUpdateHeadline() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: { id: string; label: string; summary_text: string }) => {
-      const segment = api.headlines as AnyRouteSegment;
+      const segment = api.headlines as EdenRouteSegment;
       const { error } = await segment({ id: input.id }).put({
         label: input.label,
         summary_text: input.summary_text
       });
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to update headline');
+      if (error) throw new Error(extractApiError(error, `Could not update headline "${input.label}"`));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.headlines.list() });
@@ -59,9 +57,9 @@ export function useDeleteHeadline() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const segment = api.headlines as AnyRouteSegment;
+      const segment = api.headlines as EdenRouteSegment;
       const { error } = await segment({ id }).delete();
-      if (error) throw new Error(error.value?.error?.message ?? 'Failed to delete headline');
+      if (error) throw new Error(extractApiError(error, `Could not delete headline ${id}`));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.headlines.list() });
