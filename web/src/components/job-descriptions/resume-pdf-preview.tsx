@@ -1,7 +1,8 @@
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText, Loader2, Maximize2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type ResumeTheme, useGenerateResumePdf } from '@/hooks/use-resume';
 
@@ -17,6 +18,7 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
 
   const [theme, setTheme] = useState<ResumeTheme>('brilliant-cv');
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+  const [fullPage, setFullPage] = useState(false);
   const prevBlobRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -43,63 +45,112 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
     );
   }
 
-  return (
-    <div className="space-y-4 sticky top-5">
-      <div className="flex items-center justify-between">
-        <p className="text-[14px] font-medium text-foreground">PDF Preview</p>
-      </div>
+  const themeSelector = (
+    <Select value={theme} onValueChange={v => setTheme(v as ResumeTheme)}>
+      <SelectTrigger size="sm">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {THEME_OPTIONS.map(opt => (
+          <SelectItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 
-      <div className="flex items-center gap-2">
-        <Select value={theme} onValueChange={v => setTheme(v as ResumeTheme)}>
-          <SelectTrigger size="sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {THEME_OPTIONS.map(opt => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Button size="sm" onClick={handleGenerate} disabled={generatePdf.isPending}>
-          {generatePdf.isPending ? (
-            <>
-              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-              Generating…
-            </>
-          ) : (
-            <>
-              <FileText className="mr-1.5 h-3.5 w-3.5" />
-              Generate PDF
-            </>
-          )}
-        </Button>
-      </div>
-
-      {pdfBlobUrl ? (
-        <iframe
-          src={pdfBlobUrl}
-          title="Resume PDF preview"
-          className="w-full border rounded-lg"
-          style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
-        />
+  const generateButton = (
+    <Button size="sm" onClick={handleGenerate} disabled={generatePdf.isPending}>
+      {generatePdf.isPending ? (
+        <>
+          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          Generating…
+        </>
       ) : (
-        <div
-          className="flex items-center justify-center border rounded-lg bg-muted/30"
-          style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
-        >
-          {generatePdf.isPending ? (
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              <p className="text-[13px] text-muted-foreground">Generating PDF…</p>
-            </div>
-          ) : (
-            <p className="text-[13px] text-muted-foreground">Click "Generate PDF" to preview</p>
-          )}
+        <>
+          <FileText className="mr-1.5 h-3.5 w-3.5" />
+          Generate PDF
+        </>
+      )}
+    </Button>
+  );
+
+  const placeholder = (
+    <div
+      className="flex items-center justify-center border rounded-lg bg-muted/30"
+      style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
+    >
+      {generatePdf.isPending ? (
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <p className="text-[13px] text-muted-foreground">Generating PDF…</p>
         </div>
+      ) : (
+        <p className="text-[13px] text-muted-foreground">Click "Generate PDF" to preview</p>
       )}
     </div>
+  );
+
+  return (
+    <>
+      <div className="space-y-4 sticky top-5">
+        <div className="flex items-center justify-between">
+          <p className="text-[14px] font-medium text-foreground">PDF Preview</p>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setFullPage(true)}
+            disabled={!pdfBlobUrl}
+            title="View full page"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {themeSelector}
+          {generateButton}
+        </div>
+
+        {pdfBlobUrl ? (
+          <iframe
+            src={pdfBlobUrl}
+            title="Resume PDF preview"
+            className="w-full border rounded-lg"
+            style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
+          />
+        ) : (
+          placeholder
+        )}
+      </div>
+
+      <Dialog open={fullPage} onOpenChange={setFullPage}>
+        <DialogContent
+          showCloseButton
+          className="fixed inset-4 top-4 left-4 flex max-w-none -translate-x-0 -translate-y-0 flex-col sm:max-w-none"
+        >
+          <DialogTitle className="sr-only">Resume PDF Preview</DialogTitle>
+          <div className="flex items-center gap-2">
+            {themeSelector}
+            {generateButton}
+          </div>
+          {pdfBlobUrl ? (
+            <iframe src={pdfBlobUrl} title="Resume PDF preview" className="flex-1 w-full border rounded-lg" />
+          ) : (
+            <div className="flex flex-1 items-center justify-center border rounded-lg bg-muted/30">
+              {generatePdf.isPending ? (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <p className="text-[13px] text-muted-foreground">Generating PDF…</p>
+                </div>
+              ) : (
+                <p className="text-[13px] text-muted-foreground">Click "Generate PDF" to preview</p>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
