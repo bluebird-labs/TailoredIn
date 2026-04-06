@@ -69,35 +69,48 @@ export class GenerateResumePdf {
       .filter(e => e.profileId === profile.id.value)
       .sort((a, b) => b.graduationYear - a.graduationYear);
 
-    const generated = await this.generator.generate({
-      profile: {
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        about: profile.about
-      },
-      headline: { summaryText: headline.summaryText },
-      jobDescription: {
-        title: jd.title,
-        description: jd.description,
-        rawText: jd.rawText
-      },
-      experiences: experiences.map(exp => {
-        return {
-          id: exp.id.value,
-          title: exp.title,
-          companyName: exp.companyName,
-          summary: exp.summary,
-          accomplishments: exp.accomplishments.map(a => ({
-            title: a.title,
-            narrative: a.narrative
-          })),
-          minBullets: BULLET_LIMITS.min,
-          maxBullets: BULLET_LIMITS.max
-        };
-      })
-    });
+    const storedExperiences = jd.resumeOutput?.output?.experiences as
+      | Array<{ experienceId: string; summary: string; bullets: string[] }>
+      | undefined;
 
-    const generatedByExperienceId = new Map(generated.experiences.map(e => [e.experienceId, e]));
+    const generatedByExperienceId = new Map<string, { summary: string; bullets: string[] }>();
+
+    if (storedExperiences?.length) {
+      for (const e of storedExperiences) {
+        generatedByExperienceId.set(e.experienceId, e);
+      }
+    } else {
+      const generated = await this.generator.generate({
+        profile: {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          about: profile.about
+        },
+        headline: { summaryText: headline.summaryText },
+        jobDescription: {
+          title: jd.title,
+          description: jd.description,
+          rawText: jd.rawText
+        },
+        experiences: experiences.map(exp => {
+          return {
+            id: exp.id.value,
+            title: exp.title,
+            companyName: exp.companyName,
+            summary: exp.summary,
+            accomplishments: exp.accomplishments.map(a => ({
+              title: a.title,
+              narrative: a.narrative
+            })),
+            minBullets: BULLET_LIMITS.min,
+            maxBullets: BULLET_LIMITS.max
+          };
+        })
+      });
+      for (const e of generated.experiences) {
+        generatedByExperienceId.set(e.experienceId, e);
+      }
+    }
 
     const renderInput: ResumeRenderInput = {
       personal: {
