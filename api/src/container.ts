@@ -44,6 +44,7 @@ import {
 } from '@tailoredin/application';
 import { env, envInt } from '@tailoredin/core';
 import {
+  ClaudeApiProvider,
   ClaudeCliCompanyDataProvider,
   ClaudeCliCompanyDiscoveryProvider,
   ClaudeCliJobDescriptionParser,
@@ -172,6 +173,8 @@ container.bind({
 });
 
 // LLM
+container.bind({ provide: DI.Llm.ClaudeApiKey, useValue: env('CLAUDE_API_KEY') });
+container.bind({ provide: DI.Llm.ClaudeApiProvider, useClass: ClaudeApiProvider });
 container.bind({ provide: DI.Llm.ClaudeCliProvider, useClass: ClaudeCliProvider });
 
 // Company

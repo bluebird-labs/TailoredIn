@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { injectable } from '@needle-di/core';
+import { inject, injectable } from '@needle-di/core';
 import { Logger } from '@tailoredin/core';
+import { DI } from '../../DI.js';
 import { BaseLlmApiProvider } from './BaseLlmApiProvider.js';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
@@ -13,7 +14,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
 
   private _client: Anthropic | undefined;
 
-  public constructor(private readonly apiKey: string) {
+  public constructor(private readonly apiKey: string = inject(DI.Llm.ClaudeApiKey)) {
     super();
   }
 
@@ -21,7 +22,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
   protected getClient(): Anthropic {
     this._client ??= new Anthropic({
       apiKey: this.apiKey,
-      maxRetries: 0, // BaseLlmApiProvider owns the retry loop
+      maxRetries: 0 // BaseLlmApiProvider owns the retry loop
     });
     return this._client;
   }
@@ -31,14 +32,14 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
     jsonSchema: string,
     model: string,
     maxTokens: number,
-    timeoutMs: number,
+    timeoutMs: number
   ): Promise<string> {
     const systemPrompt = [
       'You must respond with valid JSON that conforms exactly to this JSON schema:',
       '',
       jsonSchema,
       '',
-      'Return ONLY the JSON object. No markdown code blocks, no explanation, no extra text.',
+      'Return ONLY the JSON object. No markdown code blocks, no explanation, no extra text.'
     ].join('\n');
 
     const message = await this.getClient().messages.create(
@@ -46,9 +47,9 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
         model,
         max_tokens: maxTokens,
         system: systemPrompt,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: prompt }]
       },
-      { timeout: timeoutMs },
+      { timeout: timeoutMs }
     );
 
     const block = message.content[0];
