@@ -9,8 +9,12 @@ import {
   type ProfileRepository
 } from '@tailoredin/domain';
 import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.js';
-import { DEFAULT_RESUME_THEME, type ResumeRendererFactory, type ResumeTheme } from '../../ports/ResumeRendererFactory.js';
 import type { ResumeRenderInput } from '../../ports/ResumeRenderer.js';
+import {
+  DEFAULT_RESUME_THEME,
+  type ResumeRendererFactory,
+  type ResumeTheme
+} from '../../ports/ResumeRendererFactory.js';
 
 export type GenerateResumePdfInput = {
   jobDescriptionId: string;
