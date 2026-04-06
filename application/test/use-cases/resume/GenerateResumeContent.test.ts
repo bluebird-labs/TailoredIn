@@ -71,7 +71,8 @@ function makeGeneratorResult(
 function mockResumeContentRepo(): ResumeContentRepository {
   return {
     findLatestByJobDescriptionId: mock(() => Promise.resolve(null)),
-    save: mock(() => Promise.resolve())
+    save: mock(() => Promise.resolve()),
+    update: mock(() => Promise.resolve())
   };
 }
 

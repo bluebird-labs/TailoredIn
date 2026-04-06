@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Loader2, Pencil, RefreshCw, RotateCw, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Eye, EyeOff, Loader2, Minus, Pencil, Plus, RefreshCw, RotateCw, Sparkles } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
@@ -16,8 +16,9 @@ import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useCompany } from '@/hooks/use-companies';
+import { useEducations } from '@/hooks/use-educations';
 import { type JobDescription, type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
-import { useGenerateResumeContent } from '@/hooks/use-resume';
+import { useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
 
 export const Route = createFileRoute('/job-descriptions/$jobDescriptionId')({
   component: JobDescriptionDetailPage,
@@ -45,12 +46,17 @@ function formatDate(dateStr: string | null): string | null {
 function ExperienceCard({
   exp,
   onRegenerate,
-  isRegenerating
+  isRegenerating,
+  onBulletCountChange
 }: {
   exp: ResumeOutputExperience;
   onRegenerate: () => void;
   isRegenerating: boolean;
+  onBulletCountChange: (count: number | null) => void;
 }) {
+  const total = exp.bullets.length;
+  const displayed = exp.displayedBulletCount ?? total;
+
   return (
     <div className="border rounded-lg p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
@@ -58,22 +64,54 @@ function ExperienceCard({
           <p className="text-[14px] font-medium text-foreground">{exp.experienceTitle}</p>
           <p className="text-[13px] text-muted-foreground">{exp.companyName}</p>
         </div>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7 shrink-0"
-          onClick={onRegenerate}
-          disabled={isRegenerating}
-          title="Regenerate this experience"
-        >
-          {isRegenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
-        </Button>
+        <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-0.5 border rounded-md px-1 h-7">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-5 w-5"
+              onClick={() => onBulletCountChange(Math.max(0, displayed - 1))}
+              disabled={displayed <= 0}
+              title="Show fewer bullets"
+            >
+              <Minus className="h-3 w-3" />
+            </Button>
+            <button
+              type="button"
+              className="text-[12px] text-muted-foreground tabular-nums min-w-[40px] text-center hover:text-foreground transition-colors"
+              onClick={() => onBulletCountChange(null)}
+              title="Reset to show all bullets"
+            >
+              {displayed}/{total}
+            </button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-5 w-5"
+              onClick={() => onBulletCountChange(Math.min(total, displayed + 1))}
+              disabled={displayed >= total}
+              title="Show more bullets"
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+          </div>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7"
+            onClick={onRegenerate}
+            disabled={isRegenerating}
+            title="Regenerate this experience"
+          >
+            {isRegenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
+          </Button>
+        </div>
       </div>
       {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
       <ul className="space-y-1.5">
         {exp.bullets.map((bullet, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static ordered list
-          <li key={i} className="flex gap-2 text-[13px] leading-relaxed">
+          <li key={i} className={`flex gap-2 text-[13px] leading-relaxed${i >= displayed ? ' opacity-30' : ''}`}>
             <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
             <span>{bullet}</span>
           </li>
@@ -86,12 +124,37 @@ function ExperienceCard({
 function ResumeTab({ jd }: { jd: JobDescription }) {
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const generate = useGenerateResumeContent(jd.id);
+  const updateSettings = useUpdateResumeDisplaySettings(jd.id);
+  const { data: educations } = useEducations();
 
   const resumeOutput = jd.resumeOutput;
   const headline = resumeOutput?.headline ?? null;
   const experiences = resumeOutput?.experiences ?? [];
+  const hiddenEducationIds = resumeOutput?.hiddenEducationIds ?? [];
   const generatedAt = resumeOutput ? formatDate(resumeOutput.generatedAt) : null;
+
+  const handleBulletCountChange = useCallback(
+    (experienceId: string, count: number | null) => {
+      updateSettings.mutate(
+        { experienceBulletCounts: [{ experienceId, displayedBulletCount: count }] },
+        { onSuccess: () => setRefreshKey(k => k + 1) }
+      );
+    },
+    [updateSettings]
+  );
+
+  const handleToggleEducation = useCallback(
+    (educationId: string) => {
+      const isHidden = hiddenEducationIds.includes(educationId);
+      const next = isHidden
+        ? hiddenEducationIds.filter(id => id !== educationId)
+        : [...hiddenEducationIds, educationId];
+      updateSettings.mutate({ hiddenEducationIds: next }, { onSuccess: () => setRefreshKey(k => k + 1) });
+    },
+    [updateSettings, hiddenEducationIds]
+  );
 
   function handleGenerate() {
     generate.mutate(
@@ -233,12 +296,49 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
               exp={exp}
               onRegenerate={() => handleRegenerateExperience(exp.experienceId)}
               isRegenerating={regeneratingId === exp.experienceId}
+              onBulletCountChange={count => handleBulletCountChange(exp.experienceId, count)}
             />
           ))}
         </div>
+
+        {educations && educations.length > 0 && (
+          <div className="border rounded-lg p-4 space-y-3">
+            <p className="text-[12px] text-muted-foreground">Education</p>
+            <div className="space-y-2">
+              {educations.map(edu => {
+                const isHidden = hiddenEducationIds.includes(edu.id);
+                return (
+                  <div
+                    key={edu.id}
+                    className={`flex items-center justify-between gap-2 py-1${isHidden ? ' opacity-40' : ''}`}
+                  >
+                    <div>
+                      <p className="text-[13px] text-foreground">{edu.degreeTitle}</p>
+                      <p className="text-[12px] text-muted-foreground">{edu.institutionName}</p>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 shrink-0"
+                      onClick={() => handleToggleEducation(edu.id)}
+                      title={isHidden ? 'Show in resume' : 'Hide from resume'}
+                    >
+                      {isHidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
-      <ResumePdfPreview jobDescriptionId={jd.id} hasCachedPdf={jd.hasCachedPdf} resumePdfTheme={jd.resumePdfTheme} />
+      <ResumePdfPreview
+        jobDescriptionId={jd.id}
+        hasCachedPdf={jd.hasCachedPdf}
+        resumePdfTheme={jd.resumePdfTheme}
+        refreshKey={refreshKey}
+      />
     </div>
   );
 }

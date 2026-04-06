@@ -64,7 +64,10 @@ export class GenerateResumePdf {
       throw new Error('Resume content has not been generated yet. Generate content before creating a PDF.');
     }
 
-    const generatedByExperienceId = new Map<string, { summary: string; bullets: string[] }>();
+    const generatedByExperienceId = new Map<
+      string,
+      { summary: string; bullets: string[]; displayedBulletCount: number | null }
+    >();
     for (const e of resumeContent.experiences) {
       generatedByExperienceId.set(e.experienceId, e);
     }
@@ -90,16 +93,18 @@ export class GenerateResumePdf {
           startDate: exp.startDate,
           endDate: exp.endDate || null,
           summary: gen?.summary ?? null,
-          bullets: gen?.bullets ?? []
+          bullets: gen ? gen.bullets.slice(0, gen.displayedBulletCount ?? gen.bullets.length) : []
         };
       }),
-      educations: educations.map(edu => ({
-        degreeTitle: edu.degreeTitle,
-        institutionName: edu.institutionName,
-        graduationYear: edu.graduationYear,
-        location: edu.location,
-        honors: edu.honors
-      })),
+      educations: educations
+        .filter(edu => !resumeContent.hiddenEducationIds.includes(edu.id.value))
+        .map(edu => ({
+          degreeTitle: edu.degreeTitle,
+          institutionName: edu.institutionName,
+          graduationYear: edu.graduationYear,
+          location: edu.location,
+          honors: edu.honors
+        })),
       template: DEFAULT_RESUME_TEMPLATE
     };
 

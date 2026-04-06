@@ -1,5 +1,5 @@
 import { FileText, Loader2, Maximize2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -16,11 +16,13 @@ const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
 export function ResumePdfPreview({
   jobDescriptionId,
   hasCachedPdf,
-  resumePdfTheme
+  resumePdfTheme,
+  refreshKey = 0
 }: {
   jobDescriptionId: string;
   hasCachedPdf: boolean;
   resumePdfTheme: string | null;
+  refreshKey?: number;
 }) {
   const generatePdf = useGenerateResumePdf();
   const cachedPdf = useCachedResumePdf(jobDescriptionId, hasCachedPdf);
@@ -29,6 +31,8 @@ export function ResumePdfPreview({
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [fullPage, setFullPage] = useState(false);
   const prevBlobRef = useRef<string | null>(null);
+  const hasGeneratedRef = useRef(false);
+  const lastRefreshKeyRef = useRef(refreshKey);
 
   useEffect(() => {
     return () => {
@@ -47,7 +51,7 @@ export function ResumePdfPreview({
     }
   }, [cachedPdf.data]);
 
-  function handleGenerate() {
+  const handleGenerate = useCallback(() => {
     generatePdf.mutate(
       { jobDescriptionId, theme },
       {
@@ -57,13 +61,21 @@ export function ResumePdfPreview({
           const url = URL.createObjectURL(blob);
           prevBlobRef.current = url;
           setPdfBlobUrl(url);
+          hasGeneratedRef.current = true;
         },
         onError: err => {
           toast.error(err instanceof Error ? err.message : 'PDF generation failed');
         }
       }
     );
-  }
+  }, [generatePdf, jobDescriptionId, theme]);
+
+  useEffect(() => {
+    if (refreshKey > 0 && refreshKey !== lastRefreshKeyRef.current && hasGeneratedRef.current) {
+      lastRefreshKeyRef.current = refreshKey;
+      handleGenerate();
+    }
+  }, [refreshKey, handleGenerate]);
 
   const isLoading = generatePdf.isPending || cachedPdf.isLoading;
 

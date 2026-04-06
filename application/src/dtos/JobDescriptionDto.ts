@@ -14,7 +14,9 @@ export type ResumeOutputDto = {
     readonly companyName: string;
     readonly summary: string;
     readonly bullets: readonly string[];
+    readonly displayedBulletCount: number | null;
   }>;
+  readonly hiddenEducationIds: readonly string[];
   readonly generatedAt: string;
 };
 
@@ -70,9 +72,11 @@ export function toJobDescriptionDto(
               experienceTitle: exp?.title ?? '',
               companyName: exp?.companyName ?? '',
               summary: e.summary,
-              bullets: e.bullets
+              bullets: e.bullets,
+              displayedBulletCount: e.displayedBulletCount
             };
           }),
+          hiddenEducationIds: resumeContent.hiddenEducationIds,
           generatedAt: resumeContent.createdAt.toISOString()
         }
       : null,

@@ -83,6 +83,10 @@ export class GenerateResumeContent {
       return { experienceTitle: exp?.title ?? '', companyName: exp?.companyName ?? '' };
     };
 
+    const existingBulletCounts = new Map(
+      existing?.experiences.map(e => [e.experienceId, e.displayedBulletCount]) ?? []
+    );
+
     if (input.scope?.type === 'headline') {
       headline = result.headline;
       mergedExperiences = existing
@@ -114,6 +118,8 @@ export class GenerateResumeContent {
       mergedExperiences = result.experiences;
     }
 
+    const isScoped = input.scope != null;
+
     const resumeContent = ResumeContent.create({
       profileId: profile.id.value,
       jobDescriptionId: jd.id.value,
@@ -121,8 +127,10 @@ export class GenerateResumeContent {
       experiences: mergedExperiences.map(e => ({
         experienceId: e.experienceId,
         summary: e.summary,
-        bullets: e.bullets
+        bullets: e.bullets,
+        displayedBulletCount: isScoped ? (existingBulletCounts.get(e.experienceId) ?? null) : null
       })),
+      hiddenEducationIds: existing?.hiddenEducationIds ?? [],
       prompt: result.requestPrompt,
       schema: result.requestSchema
     });

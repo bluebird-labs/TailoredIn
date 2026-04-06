@@ -59,15 +59,22 @@ function makeJd() {
 }
 
 function makeResumeContent(
-  experiences: Array<{ experienceId: string; summary: string; bullets: string[] }> = DEFAULT_EXPERIENCES,
-  headline = 'Staff Engineer | 5+ Years of Experience'
+  experiences: Array<{
+    experienceId: string;
+    summary: string;
+    bullets: string[];
+    displayedBulletCount?: number | null;
+  }> = DEFAULT_EXPERIENCES,
+  headline = 'Staff Engineer | 5+ Years of Experience',
+  hiddenEducationIds: string[] = []
 ) {
   return new ResumeContent({
     id: new ResumeContentId('rc-00000000-0000-0000-0000-000000000001'),
     profileId: 'profile-1',
     jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
     headline,
-    experiences,
+    experiences: experiences.map(e => ({ ...e, displayedBulletCount: e.displayedBulletCount ?? null })),
+    hiddenEducationIds,
     prompt: 'test prompt',
     schema: {},
     createdAt: new Date('2024-01-01'),
@@ -117,7 +124,8 @@ function makeEducation() {
 function mockResumeContentRepo(resumeContent: ResumeContent | null): ResumeContentRepository {
   return {
     findLatestByJobDescriptionId: mock(async () => resumeContent),
-    save: mock(async () => {})
+    save: mock(async () => {}),
+    update: mock(async () => {})
   };
 }
 
@@ -249,5 +257,54 @@ describe('GenerateResumePdf', () => {
     await expect(useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' })).rejects.toThrow(
       'Resume content has not been generated yet'
     );
+  });
+
+  test('slices bullets when displayedBulletCount is set', async () => {
+    const rc = makeResumeContent([
+      {
+        experienceId: 'exp-00000000-0000-0000-0000-000000000001',
+        summary: 'Built things',
+        bullets: ['Bullet 1', 'Bullet 2', 'Bullet 3'],
+        displayedBulletCount: 2
+      }
+    ]);
+    const { useCase, fakeRenderer } = makeUseCase(rc);
+    await useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
+
+    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+      experiences: Array<{ bullets: string[] }>;
+    };
+    expect(renderInput.experiences[0].bullets).toEqual(['Bullet 1', 'Bullet 2']);
+  });
+
+  test('shows all bullets when displayedBulletCount is null', async () => {
+    const rc = makeResumeContent([
+      {
+        experienceId: 'exp-00000000-0000-0000-0000-000000000001',
+        summary: 'Built things',
+        bullets: ['Bullet 1', 'Bullet 2', 'Bullet 3'],
+        displayedBulletCount: null
+      }
+    ]);
+    const { useCase, fakeRenderer } = makeUseCase(rc);
+    await useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
+
+    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+      experiences: Array<{ bullets: string[] }>;
+    };
+    expect(renderInput.experiences[0].bullets).toEqual(['Bullet 1', 'Bullet 2', 'Bullet 3']);
+  });
+
+  test('filters out hidden educations', async () => {
+    const rc = makeResumeContent(DEFAULT_EXPERIENCES, 'Staff Engineer | 5+ Years of Experience', [
+      'edu-00000000-0000-0000-0000-000000000001'
+    ]);
+    const { useCase, fakeRenderer } = makeUseCase(rc);
+    await useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
+
+    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+      educations: Array<{ degreeTitle: string }>;
+    };
+    expect(renderInput.educations).toEqual([]);
   });
 });

@@ -38,7 +38,8 @@ import {
   UpdateEducation,
   UpdateExperience,
   UpdateJobDescription,
-  UpdateProfile
+  UpdateProfile,
+  UpdateResumeDisplaySettings
 } from '@tailoredin/application';
 import { env, envInt, envOptional } from '@tailoredin/core';
 import {
@@ -280,6 +281,10 @@ container.bind({
 container.bind({
   provide: DI.Resume.GetCachedPdf,
   useFactory: () => new GetCachedResumePdf(container.get(DI.JobDescription.Repository))
+});
+container.bind({
+  provide: DI.Resume.UpdateDisplaySettings,
+  useFactory: () => new UpdateResumeDisplaySettings(container.get(DI.ResumeContent.Repository))
 });
 
 export { container };

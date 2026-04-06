@@ -15,11 +15,13 @@ export type ResumeOutputExperience = {
   companyName: string;
   summary: string;
   bullets: string[];
+  displayedBulletCount: number | null;
 };
 
 export type ResumeOutput = {
   headline?: string;
   experiences: ResumeOutputExperience[];
+  hiddenEducationIds: string[];
   generatedAt: string;
 };
 

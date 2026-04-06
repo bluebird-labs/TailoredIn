@@ -67,5 +67,7 @@ export type { GenerateResumePdfInput } from './resume/GenerateResumePdf.js';
 export { GenerateResumePdf } from './resume/GenerateResumePdf.js';
 export type { CachedResumePdfResult, GetCachedResumePdfInput } from './resume/GetCachedResumePdf.js';
 export { GetCachedResumePdf } from './resume/GetCachedResumePdf.js';
+export type { UpdateResumeDisplaySettingsInput } from './resume/UpdateResumeDisplaySettings.js';
+export { UpdateResumeDisplaySettings } from './resume/UpdateResumeDisplaySettings.js';
 export type { UpdateProfileInput } from './UpdateProfile.js';
 export { UpdateProfile } from './UpdateProfile.js';

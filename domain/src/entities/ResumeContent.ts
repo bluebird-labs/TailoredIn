@@ -7,6 +7,7 @@ export type ResumeContentCreateProps = {
   jobDescriptionId: string;
   headline: string;
   experiences: ResumeExperience[];
+  hiddenEducationIds?: string[];
   prompt: string;
   schema: Record<string, unknown> | null;
 };
@@ -16,6 +17,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
   public readonly jobDescriptionId: string;
   public readonly headline: string;
   public readonly experiences: ResumeExperience[];
+  public readonly hiddenEducationIds: string[];
   public readonly prompt: string;
   public readonly schema: Record<string, unknown> | null;
   public readonly createdAt: Date;
@@ -27,6 +29,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
     jobDescriptionId: string;
     headline: string;
     experiences: ResumeExperience[];
+    hiddenEducationIds: string[];
     prompt: string;
     schema: Record<string, unknown> | null;
     createdAt: Date;
@@ -37,6 +40,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
     this.jobDescriptionId = props.jobDescriptionId;
     this.headline = props.headline;
     this.experiences = props.experiences;
+    this.hiddenEducationIds = props.hiddenEducationIds;
     this.prompt = props.prompt;
     this.schema = props.schema;
     this.createdAt = props.createdAt;
@@ -51,10 +55,44 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
       jobDescriptionId: props.jobDescriptionId,
       headline: props.headline,
       experiences: props.experiences,
+      hiddenEducationIds: props.hiddenEducationIds ?? [],
       prompt: props.prompt,
       schema: props.schema,
       createdAt: now,
       updatedAt: now
+    });
+  }
+
+  public withExperienceBulletCount(experienceId: string, count: number | null): ResumeContent {
+    const experiences = this.experiences.map(e =>
+      e.experienceId === experienceId ? { ...e, displayedBulletCount: count } : e
+    );
+    return new ResumeContent({
+      id: this.id,
+      profileId: this.profileId,
+      jobDescriptionId: this.jobDescriptionId,
+      headline: this.headline,
+      experiences,
+      hiddenEducationIds: this.hiddenEducationIds,
+      prompt: this.prompt,
+      schema: this.schema,
+      createdAt: this.createdAt,
+      updatedAt: new Date()
+    });
+  }
+
+  public withHiddenEducationIds(ids: string[]): ResumeContent {
+    return new ResumeContent({
+      id: this.id,
+      profileId: this.profileId,
+      jobDescriptionId: this.jobDescriptionId,
+      headline: this.headline,
+      experiences: this.experiences,
+      hiddenEducationIds: ids,
+      prompt: this.prompt,
+      schema: this.schema,
+      createdAt: this.createdAt,
+      updatedAt: new Date()
     });
   }
 }

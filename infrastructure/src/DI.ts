@@ -42,7 +42,8 @@ import type {
   UpdateEducation,
   UpdateExperience,
   UpdateJobDescription,
-  UpdateProfile
+  UpdateProfile,
+  UpdateResumeDisplaySettings
 } from '@tailoredin/application';
 import type {
   ApplicationRepository,
@@ -120,7 +121,8 @@ export const DI = {
     RendererFactory: new InjectionToken<ResumeRendererFactory>('DI.Resume.RendererFactory'),
     GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf'),
     GenerateContentWithPdf: new InjectionToken<GenerateResumeContentWithPdf>('DI.Resume.GenerateContentWithPdf'),
-    GetCachedPdf: new InjectionToken<GetCachedResumePdf>('DI.Resume.GetCachedPdf')
+    GetCachedPdf: new InjectionToken<GetCachedResumePdf>('DI.Resume.GetCachedPdf'),
+    UpdateDisplaySettings: new InjectionToken<UpdateResumeDisplaySettings>('DI.Resume.UpdateDisplaySettings')
   },
 
   Company: {

@@ -9,6 +9,7 @@ type ResumeExperienceJson = {
   experienceId: string;
   summary: string;
   bullets: string[];
+  displayedBulletCount?: number | null;
 };
 
 @Entity({ tableName: 'resume_contents' })
@@ -28,6 +29,9 @@ export class ResumeContent extends BaseEntity {
   @Property({ fieldName: 'experiences', type: 'jsonb' })
   public experiences: ResumeExperienceJson[];
 
+  @Property({ fieldName: 'hidden_education_ids', type: 'jsonb' })
+  public hiddenEducationIds: string[];
+
   @Property({ fieldName: 'prompt', type: 'text' })
   public prompt: string;
 
@@ -40,6 +44,7 @@ export class ResumeContent extends BaseEntity {
     jobDescription: Ref<JobDescription> | JobDescription;
     headline: string;
     experiences: ResumeExperienceJson[];
+    hiddenEducationIds: string[];
     prompt: string;
     schema: Record<string, unknown> | null;
     createdAt: Date;
@@ -51,6 +56,7 @@ export class ResumeContent extends BaseEntity {
     this.jobDescription = props.jobDescription;
     this.headline = props.headline;
     this.experiences = props.experiences;
+    this.hiddenEducationIds = props.hiddenEducationIds;
     this.prompt = props.prompt;
     this.schema = props.schema;
   }

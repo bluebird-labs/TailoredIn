@@ -25,6 +25,32 @@ export function useGenerateResumePdf() {
   });
 }
 
+export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      experienceBulletCounts?: Array<{ experienceId: string; displayedBulletCount: number | null }>;
+      hiddenEducationIds?: string[];
+    }) => {
+      const response = await fetch('/api/resume/display-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobDescriptionId, ...input })
+      });
+      if (!response.ok) {
+        const json = await response.json().catch(() => null);
+        throw new Error(
+          (json as { error?: { message?: string } } | null)?.error?.message ?? 'Failed to update display settings'
+        );
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
+    }
+  });
+}
+
 export type ResumeGenerationScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
 
 export function useGenerateResumeContent(jobDescriptionId: string) {

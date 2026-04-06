@@ -34,8 +34,10 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
       experiences: resumeContent.experiences.map(e => ({
         experienceId: e.experienceId,
         summary: e.summary,
-        bullets: e.bullets
+        bullets: e.bullets,
+        displayedBulletCount: e.displayedBulletCount
       })),
+      hiddenEducationIds: resumeContent.hiddenEducationIds,
       prompt: resumeContent.prompt,
       schema: resumeContent.schema,
       createdAt: resumeContent.createdAt,
@@ -43,6 +45,19 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
     });
 
     this.orm.em.persist(ormEntity);
+    await this.orm.em.flush();
+  }
+
+  public async update(resumeContent: DomainResumeContent): Promise<void> {
+    const existing = await this.orm.em.findOneOrFail(OrmResumeContent, resumeContent.id.value);
+    existing.experiences = resumeContent.experiences.map(e => ({
+      experienceId: e.experienceId,
+      summary: e.summary,
+      bullets: e.bullets,
+      displayedBulletCount: e.displayedBulletCount
+    }));
+    existing.hiddenEducationIds = resumeContent.hiddenEducationIds;
+    existing.updatedAt = resumeContent.updatedAt;
     await this.orm.em.flush();
   }
 
@@ -59,8 +74,10 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
       experiences: orm.experiences.map(e => ({
         experienceId: e.experienceId,
         summary: e.summary,
-        bullets: e.bullets
+        bullets: e.bullets,
+        displayedBulletCount: e.displayedBulletCount ?? null
       })),
+      hiddenEducationIds: orm.hiddenEducationIds ?? [],
       prompt: orm.prompt,
       schema: orm.schema,
       createdAt: orm.createdAt,
