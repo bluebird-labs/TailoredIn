@@ -39,6 +39,7 @@ export function generateConfigTyp(template: ResumeTemplate): string {
   return `#let cfg-body-font-size = ${template.bodyFontSizePt}pt
 #let cfg-leading = ${template.lineHeightEm}em
 #let cfg-margin = (top: ${top}cm, bottom: ${bottom}cm, left: ${left}cm, right: ${right}cm)
+#let cfg-header-font-size = ${template.headerFontSizePt}pt
 `;
 }
 

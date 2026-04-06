@@ -69,6 +69,7 @@ describe('generateConfigTyp', () => {
     expect(result).toContain('cfg-leading = 0.65em');
     expect(result).toContain('cfg-margin');
     expect(result).toContain('1.1cm');
+    expect(result).toContain('cfg-header-font-size = 32pt');
   });
 
   test('uses a4 page size when specified', () => {
