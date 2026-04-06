@@ -10,7 +10,7 @@ import { Elysia, t } from 'elysia';
  * @example
  * curl -X POST http://localhost:8000/resume/pdf \
  *   -H "Content-Type: application/json" \
- *   -d '{"jobDescriptionId": "your-jd-id", "headlineId": "your-headline-id"}' \
+ *   -d '{"jobDescriptionId": "your-jd-id", "headlineId": "your-headline-id", "theme": "imprecv"}' \
  *   --output resume.pdf
  */
 @injectable()
@@ -24,7 +24,8 @@ export class GenerateResumePdfRoute {
         try {
           const pdf = await this.generateResumePdf.execute({
             jobDescriptionId: body.jobDescriptionId,
-            headlineId: body.headlineId
+            headlineId: body.headlineId,
+            theme: body.theme
           });
           set.headers['Content-Type'] = 'application/pdf';
           set.headers['Content-Disposition'] = 'attachment; filename="resume.pdf"';
@@ -40,7 +41,10 @@ export class GenerateResumePdfRoute {
       {
         body: t.Object({
           jobDescriptionId: t.String(),
-          headlineId: t.String()
+          headlineId: t.String(),
+          theme: t.Optional(
+            t.Union([t.Literal('brilliant-cv'), t.Literal('imprecv'), t.Literal('modern-cv'), t.Literal('linked-cv')])
+          )
         })
       }
     );

@@ -1,10 +1,10 @@
 // infrastructure/test/services/TypstResumeRendererFactory.test.ts
 import { describe, expect, test } from 'bun:test';
-import { TypstResumeRendererFactory } from '../../src/services/TypstResumeRendererFactory.js';
 import { BrilliantCvRenderer } from '../../src/services/renderers/BrilliantCvRenderer.js';
 import { ImprecvRenderer } from '../../src/services/renderers/ImprecvRenderer.js';
-import { ModernCvRenderer } from '../../src/services/renderers/ModernCvRenderer.js';
 import { LinkedCvRenderer } from '../../src/services/renderers/LinkedCvRenderer.js';
+import { ModernCvRenderer } from '../../src/services/renderers/ModernCvRenderer.js';
+import { TypstResumeRendererFactory } from '../../src/services/TypstResumeRendererFactory.js';
 
 describe('TypstResumeRendererFactory', () => {
   const factory = new TypstResumeRendererFactory();
