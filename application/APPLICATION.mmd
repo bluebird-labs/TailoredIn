@@ -203,6 +203,7 @@ classDiagram
     class GetJobDescription {
         <<UseCase>>
         +JobDescriptionRepository jobDescriptionRepository
+        +ResumeContentRepository resumeContentRepository
         +execute(GetJobDescriptionInput) JobDescriptionDto
     }
 
@@ -251,6 +252,7 @@ classDiagram
         +ProfileRepository profileRepository
         +ExperienceRepository experienceRepository
         +JobDescriptionRepository jobDescriptionRepository
+        +ResumeContentRepository resumeContentRepository
         +ResumeContentGenerator generator
         +execute(GenerateResumeContentInput) ResumeContentDto
     }
@@ -261,7 +263,7 @@ classDiagram
         +ExperienceRepository experienceRepository
         +EducationRepository educationRepository
         +JobDescriptionRepository jobDescriptionRepository
-        +ResumeContentGenerator generator
+        +ResumeContentRepository resumeContentRepository
         +ResumeRendererFactory rendererFactory
         +execute(GenerateResumePdfInput) Uint8Array
     }
@@ -305,7 +307,6 @@ classDiagram
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
     GenerateResumeContent ..> ResumeContentGenerator : depends
-    GenerateResumePdf ..> ResumeContentGenerator : depends
     GenerateResumePdf ..> ResumeRendererFactory : depends
 
     %% ──────────────────────────────────────────────
@@ -480,6 +481,7 @@ classDiagram
         <<DTO>>
         +string headline
         +object experiences
+        +string requestPrompt
         +Record<string, unknown> requestSchema
     }
 
@@ -489,6 +491,17 @@ classDiagram
         +string experienceTitle
         +string companyName
         +string[] bullets
+    }
+
+    class ResumeOutputDto {
+        <<DTO>>
+        +string headline
+        +Readonly{
+    readonly experienceId: string;
+    readonly summary: string;
+    readonly bullets: readonly string[];
+  }[] experiences
+        +string generatedAt
     }
 
     class ResumeRenderEducation {
@@ -521,6 +534,7 @@ classDiagram
     ExperienceDto *-- CompanyDto
     ExperienceDto "1" *-- "*" AccomplishmentDto : contains
     JobDescriptionDto *-- SalaryRangeDto
+    JobDescriptionDto *-- ResumeOutputDto
     PaginatedDto *-- PaginationMeta
     ResumeContentDto "1" *-- "*" ResumeExperienceBulletsDto : contains
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
@@ -597,6 +611,10 @@ classDiagram
         <<DomainPort>>
     }
 
+    class ResumeContentRepository {
+        <<DomainPort>>
+    }
+
     CreateApplication ..> ApplicationRepository : depends
     DeleteApplication ..> ApplicationRepository : depends
     GetApplication ..> ApplicationRepository : depends
@@ -628,15 +646,18 @@ classDiagram
     CreateJobDescription ..> JobDescriptionRepository : depends
     DeleteJobDescription ..> JobDescriptionRepository : depends
     GetJobDescription ..> JobDescriptionRepository : depends
+    GetJobDescription ..> ResumeContentRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
     GenerateResumeContent ..> ProfileRepository : depends
     GenerateResumeContent ..> ExperienceRepository : depends
     GenerateResumeContent ..> JobDescriptionRepository : depends
+    GenerateResumeContent ..> ResumeContentRepository : depends
     GenerateResumePdf ..> ProfileRepository : depends
     GenerateResumePdf ..> ExperienceRepository : depends
     GenerateResumePdf ..> EducationRepository : depends
     GenerateResumePdf ..> JobDescriptionRepository : depends
+    GenerateResumePdf ..> ResumeContentRepository : depends
     UpdateProfile ..> ProfileRepository : depends
 
     %% ──────────────────────────────────────────────
@@ -702,6 +723,7 @@ classDiagram
     style ResumeContentGeneratorExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeContentGeneratorResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperienceBulletsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeOutputDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeRenderEducation fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeRenderExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SalaryRangeDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -712,3 +734,4 @@ classDiagram
     style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style JobDescriptionRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style ResumeContentRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

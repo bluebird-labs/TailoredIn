@@ -5,7 +5,8 @@ import {
   type ExperienceRepository,
   JobDescriptionId,
   type JobDescriptionRepository,
-  type ProfileRepository
+  type ProfileRepository,
+  type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeRenderInput } from '../../ports/ResumeRenderer.js';
 import {
@@ -35,6 +36,7 @@ export class GenerateResumePdf {
     private readonly experienceRepository: ExperienceRepository,
     private readonly educationRepository: EducationRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
+    private readonly resumeContentRepository: ResumeContentRepository,
     private readonly rendererFactory: ResumeRendererFactory
   ) {}
 
@@ -56,17 +58,14 @@ export class GenerateResumePdf {
       .filter(e => e.profileId === profile.id.value)
       .sort((a, b) => b.graduationYear - a.graduationYear);
 
-    const storedOutput = jd.resumeOutput?.output as
-      | { headline?: string; experiences?: Array<{ experienceId: string; summary: string; bullets: string[] }> }
-      | undefined;
+    const resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
 
-    if (!storedOutput?.headline || !storedOutput.experiences?.length) {
+    if (!resumeContent) {
       throw new Error('Resume content has not been generated yet. Generate content before creating a PDF.');
     }
 
-    const headlineSummary = storedOutput.headline;
     const generatedByExperienceId = new Map<string, { summary: string; bullets: string[] }>();
-    for (const e of storedOutput.experiences) {
+    for (const e of resumeContent.experiences) {
       generatedByExperienceId.set(e.experienceId, e);
     }
 
@@ -81,7 +80,7 @@ export class GenerateResumePdf {
         github: extractGithubUsername(profile.githubUrl),
         website: profile.websiteUrl
       },
-      headlineSummary,
+      headlineSummary: resumeContent.headline,
       experiences: experiences.map(exp => {
         const gen = generatedByExperienceId.get(exp.id.value);
         return {

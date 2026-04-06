@@ -20,9 +20,7 @@ export function useGenerateResumePdf() {
   });
 }
 
-export type ResumeGenerationScope =
-  | { type: 'headline' }
-  | { type: 'experience'; experienceId: string };
+export type ResumeGenerationScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
 
 export function useGenerateResumeContent(jobDescriptionId: string) {
   const queryClient = useQueryClient();

@@ -80,6 +80,17 @@ classDiagram
         +syncAccomplishments()
     }
 
+    class ResumeContent {
+        <<AggregateRoot>>
+        +ResumeContentId id
+        +string profileId
+        +string jobDescriptionId
+        +string headline
+        +ResumeExperience[] experiences
+        +string prompt
+        +Record<string, unknown>? schema
+    }
+
     class ApplicationStatus {
         <<enumeration>>
         DRAFT · APPLIED · INTERVIEWING
@@ -87,6 +98,15 @@ classDiagram
         ACCEPTED
     }
 
+    class ResumeExperience {
+        <<ValueObject>>
+        +string experienceId
+        +string summary
+        +string[] bullets
+    }
+
+    Profile "1" --> "*" ResumeContent : has
+    ResumeContent "1" *-- "*" ResumeExperience : contains
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
@@ -130,7 +150,6 @@ classDiagram
         +JobSource source
         +Date? postedAt
         +string? rawText
-        +ResumeOutput? resumeOutput
     }
 
     class BusinessType {
@@ -181,13 +200,6 @@ classDiagram
         REMOTE · HYBRID · ONSITE
     }
 
-    class ResumeOutput {
-        <<ValueObject>>
-        +Record<string, unknown> schema
-        +Record<string, unknown> output
-        +Date generatedAt
-    }
-
     class SalaryRange {
         <<ValueObject>>
         +min()
@@ -195,12 +207,12 @@ classDiagram
         +currency()
     }
 
+    JobDescription "1" --> "*" ResumeContent : has
     Company "1" --> "*" JobDescription : has
     JobDescription *-- SalaryRange
     JobDescription --> JobLevel
     JobDescription --> LocationType
     JobDescription --> JobSource
-    JobDescription *-- ResumeOutput
     Company "1" --> "*" Application : has
     JobDescription "1" --> "*" Application : has
     Company "1" --> "*" Experience : has
@@ -251,7 +263,9 @@ classDiagram
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeExperience fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -261,7 +275,6 @@ classDiagram
     style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style ResumeOutput fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px

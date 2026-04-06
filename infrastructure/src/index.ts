@@ -9,6 +9,7 @@ export { PostgresEducationRepository } from './repositories/PostgresEducationRep
 export { PostgresExperienceRepository } from './repositories/PostgresExperienceRepository.js';
 export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDescriptionRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
+export { PostgresResumeContentRepository } from './repositories/PostgresResumeContentRepository.js';
 // Services
 export { ClaudeApiCompanyDataProvider } from './services/ClaudeApiCompanyDataProvider.js';
 export { ClaudeApiCompanyDiscoveryProvider } from './services/ClaudeApiCompanyDiscoveryProvider.js';

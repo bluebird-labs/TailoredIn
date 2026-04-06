@@ -9,7 +9,10 @@ import {
   JobDescriptionId,
   type JobDescriptionRepository,
   JobSource,
-  type ProfileRepository
+  type ProfileRepository,
+  ResumeContent,
+  ResumeContentId,
+  type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeRenderer } from '../../../src/ports/ResumeRenderer.js';
 import type { ResumeRendererFactory } from '../../../src/ports/ResumeRendererFactory.js';
@@ -34,11 +37,8 @@ function makeProfile() {
   };
 }
 
-function makeJd(resumeOutput?: {
-  headline: string;
-  experiences: Array<{ experienceId: string; summary: string; bullets: string[] }>;
-}) {
-  const jd = new JobDescription({
+function makeJd() {
+  return new JobDescription({
     id: new JobDescriptionId('jd-00000000-0000-0000-0000-000000000001'),
     companyId: 'company-1',
     title: 'Staff Engineer',
@@ -54,28 +54,32 @@ function makeJd(resumeOutput?: {
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   });
-
-  if (resumeOutput) {
-    jd.resumeOutput = {
-      schema: {},
-      output: resumeOutput,
-      generatedAt: new Date('2024-01-01')
-    };
-  }
-
-  return jd;
 }
 
-const DEFAULT_RESUME_OUTPUT = {
-  headline: 'Staff Engineer | 5+ Years of Experience',
-  experiences: [
-    {
-      experienceId: 'exp-00000000-0000-0000-0000-000000000001',
-      summary: 'Built scalable systems',
-      bullets: ['Designed and implemented distributed systems']
-    }
-  ]
-};
+function makeResumeContent(
+  experiences: Array<{ experienceId: string; summary: string; bullets: string[] }> = DEFAULT_EXPERIENCES,
+  headline = 'Staff Engineer | 5+ Years of Experience'
+) {
+  return new ResumeContent({
+    id: new ResumeContentId('rc-00000000-0000-0000-0000-000000000001'),
+    profileId: 'profile-1',
+    jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
+    headline,
+    experiences,
+    prompt: 'test prompt',
+    schema: {},
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-01')
+  });
+}
+
+const DEFAULT_EXPERIENCES = [
+  {
+    experienceId: 'exp-00000000-0000-0000-0000-000000000001',
+    summary: 'Built scalable systems',
+    bullets: ['Designed and implemented distributed systems']
+  }
+];
 
 function makeExperience() {
   return new Experience({
@@ -108,12 +112,19 @@ function makeEducation() {
   };
 }
 
+function mockResumeContentRepo(resumeContent: ResumeContent | null): ResumeContentRepository {
+  return {
+    findLatestByJobDescriptionId: mock(async () => resumeContent),
+    save: mock(async () => {})
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
 describe('GenerateResumePdf', () => {
-  function makeUseCase(resumeOutput = DEFAULT_RESUME_OUTPUT) {
+  function makeUseCase(resumeContent: ResumeContent | null = makeResumeContent()) {
     const fakePdf = new Uint8Array([1, 2, 3]);
 
     const fakeRenderer: ResumeRenderer = {
@@ -124,7 +135,7 @@ describe('GenerateResumePdf', () => {
       get: mock(() => fakeRenderer)
     };
 
-    const jd = makeJd(resumeOutput);
+    const jd = makeJd();
     const profile = makeProfile();
     const experience = makeExperience();
     const education = makeEducation();
@@ -137,8 +148,16 @@ describe('GenerateResumePdf', () => {
       findAll: mock(async () => [education])
     } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = { findById: mock(async () => jd) } as unknown as JobDescriptionRepository;
+    const resumeContentRepo = mockResumeContentRepo(resumeContent);
 
-    const useCase = new GenerateResumePdf(profileRepo, experienceRepo, educationRepo, jdRepo, fakeFactory);
+    const useCase = new GenerateResumePdf(
+      profileRepo,
+      experienceRepo,
+      educationRepo,
+      jdRepo,
+      resumeContentRepo,
+      fakeFactory
+    );
 
     return { useCase, fakeFactory, fakeRenderer };
   }
@@ -179,6 +198,7 @@ describe('GenerateResumePdf', () => {
     const jdRepo: JobDescriptionRepository = {
       findById: mock(async () => null)
     } as unknown as JobDescriptionRepository;
+    const resumeContentRepo = mockResumeContentRepo(null);
 
     const fakeRenderer: ResumeRenderer = {
       render: mock(async () => new Uint8Array([1, 2, 3]))
@@ -188,28 +208,19 @@ describe('GenerateResumePdf', () => {
       get: mock(() => fakeRenderer)
     };
 
-    const useCase = new GenerateResumePdf(profileRepo, experienceRepo, educationRepo, jdRepo, fakeFactory);
+    const useCase = new GenerateResumePdf(
+      profileRepo,
+      experienceRepo,
+      educationRepo,
+      jdRepo,
+      resumeContentRepo,
+      fakeFactory
+    );
     await expect(useCase.execute({ jobDescriptionId: 'nonexistent' })).rejects.toThrow(EntityNotFoundError);
   });
 
   test('throws when resume content has not been generated', async () => {
-    const profile = makeProfile();
-    const jd = makeJd(); // no resumeOutput
-
-    const profileRepo: ProfileRepository = { findSingle: mock(async () => profile) } as unknown as ProfileRepository;
-    const experienceRepo: ExperienceRepository = {
-      findAll: mock(async () => [makeExperience()])
-    } as unknown as ExperienceRepository;
-    const educationRepo: EducationRepository = {
-      findAll: mock(async () => [makeEducation()])
-    } as unknown as EducationRepository;
-    const jdRepo: JobDescriptionRepository = { findById: mock(async () => jd) } as unknown as JobDescriptionRepository;
-
-    const fakeFactory: ResumeRendererFactory = {
-      get: mock(() => ({ render: mock(async () => new Uint8Array()) }))
-    };
-
-    const useCase = new GenerateResumePdf(profileRepo, experienceRepo, educationRepo, jdRepo, fakeFactory);
+    const { useCase } = makeUseCase(null);
     await expect(useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' })).rejects.toThrow(
       'Resume content has not been generated yet'
     );

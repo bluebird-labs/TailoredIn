@@ -14,6 +14,7 @@ import { Accomplishment as OrmAccomplishment } from './entities/experience/Accom
 import { Experience as OrmExperience } from './entities/experience/Experience.js';
 import { JobDescription as OrmJobDescription } from './entities/job-description/JobDescription.js';
 import { Profile } from './entities/profile/Profile.js';
+import { ResumeContent as OrmResumeContent } from './entities/resume-content/ResumeContent.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -40,7 +41,8 @@ export function createOrmConfig(db: OrmDbConfig) {
       OrmExperience,
       OrmAccomplishment,
       OrmApplication,
-      OrmJobDescription
+      OrmJobDescription,
+      OrmResumeContent
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

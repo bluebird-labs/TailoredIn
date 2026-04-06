@@ -5,7 +5,8 @@ import {
   ExperienceId,
   type ExperienceRepository,
   type JobDescriptionRepository,
-  type ProfileRepository
+  type ProfileRepository,
+  type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeContentGenerator, ResumeContentGeneratorInput } from '../../../src/ports/ResumeContentGenerator.js';
 import { GenerateResumeContent } from '../../../src/use-cases/resume/GenerateResumeContent.js';
@@ -59,7 +60,19 @@ function makeGeneratorResult(
   experiences: Array<{ experienceId: string; experienceTitle: string; companyName: string; bullets: string[] }>,
   headline = 'Senior Software Engineer | 10+ Years of Experience'
 ) {
-  return { headline, experiences };
+  return {
+    headline,
+    experiences: experiences.map(e => ({ ...e, summary: 'Summary.' })),
+    requestPrompt: 'test prompt',
+    requestSchema: { type: 'object' }
+  };
+}
+
+function mockResumeContentRepo(): ResumeContentRepository {
+  return {
+    findLatestByJobDescriptionId: mock(() => Promise.resolve(null)),
+    save: mock(() => Promise.resolve())
+  };
 }
 
 function mockProfileRepo(profile: ReturnType<typeof makeProfile>): ProfileRepository {
@@ -133,6 +146,7 @@ describe('GenerateResumeContent', () => {
       mockProfileRepo(profile),
       mockExperienceRepo([exp1, exp2]),
       mockJobDescriptionRepo(jd),
+      mockResumeContentRepo(),
       generator
     );
 
@@ -191,6 +205,7 @@ describe('GenerateResumeContent', () => {
       mockProfileRepo(profile),
       mockExperienceRepo([expOld, expNew, expMid]),
       mockJobDescriptionRepo(jd),
+      mockResumeContentRepo(),
       generator
     );
 
@@ -226,6 +241,7 @@ describe('GenerateResumeContent', () => {
       mockProfileRepo(profile),
       mockExperienceRepo(experiences),
       mockJobDescriptionRepo(jd),
+      mockResumeContentRepo(),
       generator
     );
 
@@ -244,6 +260,7 @@ describe('GenerateResumeContent', () => {
       mockProfileRepo(profile),
       mockExperienceRepo([]),
       mockJobDescriptionRepo(null),
+      mockResumeContentRepo(),
       mockGenerator(makeGeneratorResult([]))
     );
 
@@ -270,6 +287,7 @@ describe('GenerateResumeContent', () => {
       mockProfileRepo(profile),
       mockExperienceRepo([]),
       mockJobDescriptionRepo(jd),
+      mockResumeContentRepo(),
       generator
     );
 

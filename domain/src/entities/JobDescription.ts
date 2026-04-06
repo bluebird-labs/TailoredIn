@@ -3,7 +3,6 @@ import { JobDescriptionId } from '../value-objects/JobDescriptionId.js';
 import type { JobLevel } from '../value-objects/JobLevel.js';
 import type { JobSource } from '../value-objects/JobSource.js';
 import type { LocationType } from '../value-objects/LocationType.js';
-import type { ResumeOutput } from '../value-objects/ResumeOutput.js';
 import type { SalaryRange } from '../value-objects/SalaryRange.js';
 
 export type JobDescriptionCreateProps = {
@@ -32,7 +31,6 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
   public source: JobSource;
   public postedAt: Date | null;
   public rawText: string | null;
-  public resumeOutput: ResumeOutput | null;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -49,7 +47,6 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     source: JobSource;
     postedAt: Date | null;
     rawText: string | null;
-    resumeOutput: ResumeOutput | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -65,7 +62,6 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     this.source = props.source;
     this.postedAt = props.postedAt;
     this.rawText = props.rawText;
-    this.resumeOutput = props.resumeOutput;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -85,7 +81,6 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
       source: props.source,
       postedAt: props.postedAt ?? null,
       rawText: props.rawText ?? null,
-      resumeOutput: null,
       createdAt: now,
       updatedAt: now
     });

@@ -8,13 +8,15 @@ import { LlmJsonRequest } from './LlmJsonRequest.js';
 const PROMPT_PATH = resolve(import.meta.dir, '../prompts/generate-resume-bullets.md');
 
 const regenerateExperienceSchema = z.object({
-  experiences: z.array(
-    z.object({
-      experienceId: z.string(),
-      summary: z.string().min(20).max(300),
-      bullets: z.array(z.string().min(80).max(350))
-    })
-  ).length(1)
+  experiences: z
+    .array(
+      z.object({
+        experienceId: z.string(),
+        summary: z.string().min(20).max(300),
+        bullets: z.array(z.string().min(80).max(350))
+      })
+    )
+    .length(1)
 });
 
 export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerateExperienceSchema> {

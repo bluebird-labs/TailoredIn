@@ -48,7 +48,8 @@ import type {
   EducationRepository,
   ExperienceRepository,
   JobDescriptionRepository,
-  ProfileRepository
+  ProfileRepository,
+  ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ClaudeApiProvider } from './services/llm/ClaudeApiProvider.js';
 
@@ -105,6 +106,10 @@ export const DI = {
     Get: new InjectionToken<GetExperience>('DI.Experience.Get'),
     LinkCompany: new InjectionToken<LinkCompanyToExperience>('DI.Experience.LinkCompany'),
     UnlinkCompany: new InjectionToken<UnlinkCompanyFromExperience>('DI.Experience.UnlinkCompany')
+  },
+
+  ResumeContent: {
+    Repository: new InjectionToken<ResumeContentRepository>('DI.ResumeContent.Repository')
   },
 
   Resume: {

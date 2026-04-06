@@ -3,14 +3,14 @@ import {
   type ExperienceRepository,
   JobDescriptionId,
   type JobDescriptionRepository,
-  type ProfileRepository
+  type ProfileRepository,
+  ResumeContent,
+  type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeContentDto } from '../../dtos/ResumeContentDto.js';
 import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.js';
 
-export type GenerateResumeContentScope =
-  | { type: 'headline' }
-  | { type: 'experience'; experienceId: string };
+export type GenerateResumeContentScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
 
 export type GenerateResumeContentInput = {
   jobDescriptionId: string;
@@ -25,6 +25,7 @@ export class GenerateResumeContent {
     private readonly profileRepository: ProfileRepository,
     private readonly experienceRepository: ExperienceRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
+    private readonly resumeContentRepository: ResumeContentRepository,
     private readonly generator: ResumeContentGenerator
   ) {}
 
@@ -72,24 +73,36 @@ export class GenerateResumeContent {
 
     const result = await this.generator.generate(generatorInput);
 
-    const existing = jd.resumeOutput?.output as
-      | { headline?: string; experiences?: Array<{ experienceId: string; experienceTitle: string; companyName: string; summary: string; bullets: string[] }> }
-      | undefined;
+    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
 
     let headline: string;
     let mergedExperiences: typeof result.experiences;
 
     if (input.scope?.type === 'headline') {
       headline = result.headline;
-      mergedExperiences = (existing?.experiences as typeof result.experiences) ?? [];
+      mergedExperiences = existing
+        ? existing.experiences.map(e => ({
+            experienceId: e.experienceId,
+            experienceTitle: '',
+            companyName: '',
+            summary: e.summary,
+            bullets: e.bullets
+          }))
+        : [];
     } else if (input.scope?.type === 'experience') {
       headline = existing?.headline ?? result.headline;
-      const prev = (existing?.experiences as typeof result.experiences) ?? [];
+      const prev = existing
+        ? existing.experiences.map(e => ({
+            experienceId: e.experienceId,
+            experienceTitle: '',
+            companyName: '',
+            summary: e.summary,
+            bullets: e.bullets
+          }))
+        : [];
       const regenerated = result.experiences[0];
       if (regenerated) {
-        mergedExperiences = prev.map(e =>
-          e.experienceId === regenerated.experienceId ? regenerated : e
-        );
+        mergedExperiences = prev.map(e => (e.experienceId === regenerated.experienceId ? regenerated : e));
       } else {
         mergedExperiences = prev;
       }
@@ -98,12 +111,19 @@ export class GenerateResumeContent {
       mergedExperiences = result.experiences;
     }
 
-    jd.resumeOutput = {
-      schema: result.requestSchema,
-      output: { headline, experiences: mergedExperiences },
-      generatedAt: new Date()
-    };
-    await this.jobDescriptionRepository.save(jd);
+    const resumeContent = ResumeContent.create({
+      profileId: profile.id.value,
+      jobDescriptionId: jd.id.value,
+      headline,
+      experiences: mergedExperiences.map(e => ({
+        experienceId: e.experienceId,
+        summary: e.summary,
+        bullets: e.bullets
+      })),
+      prompt: result.requestPrompt,
+      schema: result.requestSchema
+    });
+    await this.resumeContentRepository.save(resumeContent);
 
     return {
       headline,

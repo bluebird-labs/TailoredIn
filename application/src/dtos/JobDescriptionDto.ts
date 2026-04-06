@@ -1,4 +1,4 @@
-import type { JobDescription, JobLevel, JobSource, LocationType } from '@tailoredin/domain';
+import type { JobDescription, JobLevel, JobSource, LocationType, ResumeContent } from '@tailoredin/domain';
 
 export type SalaryRangeDto = {
   readonly min: number | null;
@@ -7,8 +7,12 @@ export type SalaryRangeDto = {
 };
 
 export type ResumeOutputDto = {
-  readonly schema: Record<string, unknown>;
-  readonly output: Record<string, unknown>;
+  readonly headline: string;
+  readonly experiences: ReadonlyArray<{
+    readonly experienceId: string;
+    readonly summary: string;
+    readonly bullets: readonly string[];
+  }>;
   readonly generatedAt: string;
 };
 
@@ -30,7 +34,7 @@ export type JobDescriptionDto = {
   readonly resumeOutput: ResumeOutputDto | null;
 };
 
-export function toJobDescriptionDto(jd: JobDescription): JobDescriptionDto {
+export function toJobDescriptionDto(jd: JobDescription, resumeContent?: ResumeContent | null): JobDescriptionDto {
   return {
     id: jd.id.value,
     companyId: jd.companyId,
@@ -48,11 +52,15 @@ export function toJobDescriptionDto(jd: JobDescription): JobDescriptionDto {
     createdAt: jd.createdAt.toISOString(),
     updatedAt: jd.updatedAt.toISOString(),
     rawText: jd.rawText,
-    resumeOutput: jd.resumeOutput
+    resumeOutput: resumeContent
       ? {
-          schema: jd.resumeOutput.schema,
-          output: jd.resumeOutput.output,
-          generatedAt: jd.resumeOutput.generatedAt.toISOString()
+          headline: resumeContent.headline,
+          experiences: resumeContent.experiences.map(e => ({
+            experienceId: e.experienceId,
+            summary: e.summary,
+            bullets: e.bullets
+          })),
+          generatedAt: resumeContent.createdAt.toISOString()
         }
       : null
   };

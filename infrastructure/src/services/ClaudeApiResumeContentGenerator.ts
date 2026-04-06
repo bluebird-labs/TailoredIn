@@ -46,7 +46,7 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
 
     this.log.info(`Resume bullets generated | experiences=${experiences.length} duration=${duration}ms`);
 
-    return { headline: result.value.headline, experiences, requestSchema };
+    return { headline: result.value.headline, experiences, requestPrompt: request.prompt, requestSchema };
   }
 
   private async generateHeadline(input: ResumeContentGeneratorInput): Promise<ResumeContentGeneratorResult> {
@@ -64,7 +64,12 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
 
     this.log.info(`Headline regenerated | duration=${duration}ms`);
 
-    return { headline: result.value.headline, experiences: [], requestSchema: request.getJsonSchema() };
+    return {
+      headline: result.value.headline,
+      experiences: [],
+      requestPrompt: request.prompt,
+      requestSchema: request.getJsonSchema()
+    };
   }
 
   private async generateExperience(
@@ -87,7 +92,7 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
 
     this.log.info(`Experience regenerated | experienceId="${experienceId}" duration=${duration}ms`);
 
-    return { headline: '', experiences, requestSchema: request.getJsonSchema() };
+    return { headline: '', experiences, requestPrompt: request.prompt, requestSchema: request.getJsonSchema() };
   }
 
   private mapExperiences(

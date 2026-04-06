@@ -66,11 +66,7 @@ function ExperienceCard({
           disabled={isRegenerating}
           title="Regenerate this experience"
         >
-          {isRegenerating ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <RotateCw className="h-3.5 w-3.5" />
-          )}
+          {isRegenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
         </Button>
       </div>
       {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
@@ -93,8 +89,8 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
   const generate = useGenerateResumeContent(jd.id);
 
   const resumeOutput = jd.resumeOutput;
-  const headline = resumeOutput?.output.headline ?? null;
-  const experiences = resumeOutput?.output.experiences ?? [];
+  const headline = resumeOutput?.headline ?? null;
+  const experiences = resumeOutput?.experiences ?? [];
   const generatedAt = resumeOutput ? formatDate(resumeOutput.generatedAt) : null;
 
   function handleGenerate() {

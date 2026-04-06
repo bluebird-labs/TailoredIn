@@ -11,6 +11,6 @@ export class ListJobDescriptions {
 
   public async execute(input: ListJobDescriptionsInput): Promise<JobDescriptionDto[]> {
     const jobDescriptions = await this.jobDescriptionRepository.findByCompanyId(input.companyId);
-    return jobDescriptions.map(toJobDescriptionDto);
+    return jobDescriptions.map(jd => toJobDescriptionDto(jd));
   }
 }

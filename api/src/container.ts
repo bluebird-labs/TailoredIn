@@ -53,6 +53,7 @@ import {
   PostgresExperienceRepository,
   PostgresJobDescriptionRepository,
   PostgresProfileRepository,
+  PostgresResumeContentRepository,
   TypstResumeRendererFactory
 } from '@tailoredin/infrastructure';
 
@@ -220,7 +221,8 @@ container.bind({
 });
 container.bind({
   provide: DI.JobDescription.Get,
-  useFactory: () => new GetJobDescription(container.get(DI.JobDescription.Repository))
+  useFactory: () =>
+    new GetJobDescription(container.get(DI.JobDescription.Repository), container.get(DI.ResumeContent.Repository))
 });
 container.bind({
   provide: DI.JobDescription.List,
@@ -235,6 +237,9 @@ container.bind({
   useFactory: () => new DeleteJobDescription(container.get(DI.JobDescription.Repository))
 });
 
+// Resume Content
+container.bind({ provide: DI.ResumeContent.Repository, useClass: PostgresResumeContentRepository });
+
 // Resume
 container.bind({ provide: DI.Resume.Generator, useClass: ClaudeApiResumeContentGenerator });
 container.bind({
@@ -244,6 +249,7 @@ container.bind({
       container.get(DI.Profile.Repository),
       container.get(DI.Experience.Repository),
       container.get(DI.JobDescription.Repository),
+      container.get(DI.ResumeContent.Repository),
       container.get(DI.Resume.Generator)
     )
 });
@@ -256,6 +262,7 @@ container.bind({
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.JobDescription.Repository),
+      container.get(DI.ResumeContent.Repository),
       container.get(DI.Resume.RendererFactory)
     )
 });

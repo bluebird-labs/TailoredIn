@@ -8,9 +8,7 @@ export type ResumeContentGeneratorExperience = {
   maxBullets: number;
 };
 
-export type ResumeContentGeneratorScope =
-  | { type: 'headline' }
-  | { type: 'experience'; experienceId: string };
+export type ResumeContentGeneratorScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
 
 export type ResumeContentGeneratorInput = {
   profile: { firstName: string; lastName: string; about: string | null };
@@ -29,6 +27,7 @@ export type ResumeContentGeneratorResult = {
     summary: string;
     bullets: string[];
   }>;
+  requestPrompt: string;
   requestSchema: Record<string, unknown>;
 };
 
