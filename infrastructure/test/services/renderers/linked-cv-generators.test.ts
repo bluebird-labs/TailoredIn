@@ -90,6 +90,15 @@ describe('groupExperiencesByCompany', () => {
     const groups = groupExperiencesByCompany(exps);
     expect(groups).toHaveLength(0);
   });
+
+  test('sets overallStart to the earliest role start date', () => {
+    const exps = [
+      makeExp({ title: 'Staff Engineer', companyName: 'Acme', startDate: '2023-01' }),
+      makeExp({ title: 'Senior Engineer', companyName: 'Acme', startDate: '2021-01', endDate: '2022-12' })
+    ];
+    const groups = groupExperiencesByCompany(exps);
+    expect(groups[0].overallStart).toBe('01-2021');
+  });
 });
 
 describe('generateLinkedCvTyp', () => {

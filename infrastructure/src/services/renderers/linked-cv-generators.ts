@@ -37,9 +37,20 @@ export function groupExperiencesByCompany(experiences: ResumeRenderExperience[])
     const existing = indexByCompany.get(exp.companyName);
     if (existing !== undefined) {
       groups[existing].roles.push(exp);
-      // Expand the overall date range if this role is earlier
+      // Update overall end if this role is still ongoing
       if (exp.endDate === null) {
         groups[existing].overallEnd = 'current';
+      } else if (groups[existing].overallEnd !== 'current') {
+        // Update overall end if this role ends later
+        const formattedEnd = formatLinkedCvDate(exp.endDate);
+        if (formattedEnd > groups[existing].overallEnd) {
+          groups[existing].overallEnd = formattedEnd;
+        }
+      }
+      // Update overall start if this role started earlier
+      const formattedStart = formatLinkedCvDate(exp.startDate);
+      if (formattedStart < groups[existing].overallStart) {
+        groups[existing].overallStart = formattedStart;
       }
     } else {
       indexByCompany.set(exp.companyName, groups.length);
@@ -91,6 +102,7 @@ ${roles},
   const educationEntries = educations.map(edu => {
     const endYear = `${edu.graduationYear}-06-01`;
     const slug = toSlug(edu.institutionName);
+    // Heuristic: assume 4-year bachelor's degree; graduate/associate degrees may be inaccurate
     return `#components.employer-info(
   none,
   name: "${escapeTypst(edu.institutionName)}",
