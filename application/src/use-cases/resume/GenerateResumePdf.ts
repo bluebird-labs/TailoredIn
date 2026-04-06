@@ -7,7 +7,6 @@ import {
   type JobDescriptionRepository,
   type ProfileRepository
 } from '@tailoredin/domain';
-import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.js';
 import type { ResumeRenderInput } from '../../ports/ResumeRenderer.js';
 import {
   DEFAULT_RESUME_THEME,
@@ -19,8 +18,6 @@ export type GenerateResumePdfInput = {
   jobDescriptionId: string;
   theme?: ResumeTheme;
 };
-
-const BULLET_LIMITS = { min: 2, max: 20 };
 
 function extractLinkedinSlug(url: string | null): string | null {
   if (!url) return null;
@@ -38,7 +35,6 @@ export class GenerateResumePdf {
     private readonly experienceRepository: ExperienceRepository,
     private readonly educationRepository: EducationRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly generator: ResumeContentGenerator,
     private readonly rendererFactory: ResumeRendererFactory
   ) {}
 
@@ -64,45 +60,14 @@ export class GenerateResumePdf {
       | { headline?: string; experiences?: Array<{ experienceId: string; summary: string; bullets: string[] }> }
       | undefined;
 
-    let headlineSummary: string;
-    const generatedByExperienceId = new Map<string, { summary: string; bullets: string[] }>();
+    if (!storedOutput?.headline || !storedOutput.experiences?.length) {
+      throw new Error('Resume content has not been generated yet. Generate content before creating a PDF.');
+    }
 
-    if (storedOutput?.headline && storedOutput.experiences?.length) {
-      headlineSummary = storedOutput.headline;
-      for (const e of storedOutput.experiences) {
-        generatedByExperienceId.set(e.experienceId, e);
-      }
-    } else {
-      const generated = await this.generator.generate({
-        profile: {
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          about: profile.about
-        },
-        jobDescription: {
-          title: jd.title,
-          description: jd.description,
-          rawText: jd.rawText
-        },
-        experiences: experiences.map(exp => {
-          return {
-            id: exp.id.value,
-            title: exp.title,
-            companyName: exp.companyName,
-            summary: exp.summary,
-            accomplishments: exp.accomplishments.map(a => ({
-              title: a.title,
-              narrative: a.narrative
-            })),
-            minBullets: BULLET_LIMITS.min,
-            maxBullets: BULLET_LIMITS.max
-          };
-        })
-      });
-      headlineSummary = generated.headline;
-      for (const e of generated.experiences) {
-        generatedByExperienceId.set(e.experienceId, e);
-      }
+    const headlineSummary = storedOutput.headline;
+    const generatedByExperienceId = new Map<string, { summary: string; bullets: string[] }>();
+    for (const e of storedOutput.experiences) {
+      generatedByExperienceId.set(e.experienceId, e);
     }
 
     const renderInput: ResumeRenderInput = {

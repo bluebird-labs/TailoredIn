@@ -256,7 +256,6 @@ container.bind({
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.JobDescription.Repository),
-      container.get(DI.Resume.Generator),
       container.get(DI.Resume.RendererFactory)
     )
 });
