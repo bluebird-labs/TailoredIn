@@ -129,9 +129,9 @@ export class GenerateResumePdf {
         institutionName: edu.institutionName,
         graduationYear: edu.graduationYear,
         location: edu.location,
-        honors: edu.honors,
+        honors: edu.honors
       })),
-      template: DEFAULT_RESUME_TEMPLATE,
+      template: DEFAULT_RESUME_TEMPLATE
     };
 
     return this.renderer.render(renderInput);

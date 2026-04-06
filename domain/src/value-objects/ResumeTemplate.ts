@@ -20,5 +20,5 @@ export const DEFAULT_RESUME_TEMPLATE: ResumeTemplate = {
   lineHeightEm: 0.65,
   headerFontSizePt: 32,
   sectionSpacingPt: 2,
-  entrySpacingPt: 2,
+  entrySpacingPt: 2
 };
