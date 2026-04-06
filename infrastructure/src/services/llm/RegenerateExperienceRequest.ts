@@ -22,7 +22,7 @@ const regenerateExperienceSchema = z.object({
 export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerateExperienceSchema> {
   public readonly schema = regenerateExperienceSchema;
   public get model(): Anthropic.Messages.Model {
-    return 'claude-sonnet-4-6';
+    return 'claude-opus-4-6';
   }
 
   public constructor(

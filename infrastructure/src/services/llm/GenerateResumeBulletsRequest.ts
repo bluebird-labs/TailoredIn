@@ -21,7 +21,7 @@ const generateResumeBulletsSchema = z.object({
 export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generateResumeBulletsSchema> {
   public readonly schema = generateResumeBulletsSchema;
   public get model(): Anthropic.Messages.Model {
-    return 'claude-sonnet-4-6';
+    return 'claude-opus-4-6';
   }
 
   public constructor(private readonly input: ResumeContentGeneratorInput) {

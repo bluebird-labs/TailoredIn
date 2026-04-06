@@ -14,7 +14,7 @@ const regenerateHeadlineSchema = z.object({
 export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateHeadlineSchema> {
   public readonly schema = regenerateHeadlineSchema;
   public get model(): Anthropic.Messages.Model {
-    return 'claude-sonnet-4-6';
+    return 'claude-opus-4-6';
   }
 
   public constructor(private readonly input: ResumeContentGeneratorInput) {
