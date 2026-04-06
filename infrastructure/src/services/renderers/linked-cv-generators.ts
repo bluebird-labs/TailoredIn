@@ -91,10 +91,15 @@ ${roles},
   const educationEntries = educations.map(edu => {
     const endYear = `${edu.graduationYear}-06-01`;
     const slug = toSlug(edu.institutionName);
-    return `#frame.connected-frames(
+    return `#components.employer-info(
+  none,
+  name: "${escapeTypst(edu.institutionName)}",
+  duration: ("09-${edu.graduationYear - 4}", "${formatLinkedCvDate(endYear)}"),
+)
+#frame.connected-frames(
   "${slug}",
   (
-    title: [${escapeTypst(edu.degreeTitle)} --- ${escapeTypst(edu.institutionName)}],
+    title: [${escapeTypst(edu.degreeTitle)}],
     duration: ("09-${edu.graduationYear - 4}", "${formatLinkedCvDate(endYear)}"),
     body: []
   ),

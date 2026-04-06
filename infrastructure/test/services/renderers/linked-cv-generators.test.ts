@@ -130,9 +130,10 @@ describe('generateLinkedCvTyp', () => {
       makeExp({ title: 'Senior Engineer', companyName: 'Acme', startDate: '2021-01', endDate: '2022-12' })
     ];
     const typ = generateLinkedCvTyp(makeInput(exps));
-    // Only one employer-info block for Acme
+    // Acme group + MIT education = 2 employer-info blocks total; grouping is proved because there are
+    // 2 roles at Acme but still only 1 Acme employer-info
     const employerInfoCount = (typ.match(/employer-info/g) ?? []).length;
-    expect(employerInfoCount).toBe(1);
+    expect(employerInfoCount).toBe(2);
     // Both titles appear
     expect(typ).toContain('Staff Engineer');
     expect(typ).toContain('Senior Engineer');
