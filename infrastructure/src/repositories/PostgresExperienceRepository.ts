@@ -20,7 +20,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
   public async findByIdOrFail(id: string): Promise<DomainExperience> {
     try {
-      const orm = await this.orm.em.findOneOrFail(OrmExperience, id);
+      const orm = await this.orm.em.findOneOrFail(OrmExperience, id, { populate: ['profile', 'company'] });
       return this.toDomain(orm);
     } catch (e) {
       if (e instanceof NotFoundError) throw new EntityNotFoundError('Experience', id);
@@ -29,7 +29,11 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   }
 
   public async findAll(): Promise<DomainExperience[]> {
-    const ormEntities = await this.orm.em.find(OrmExperience, {}, { orderBy: { ordinal: 'ASC' } });
+    const ormEntities = await this.orm.em.find(
+      OrmExperience,
+      {},
+      { orderBy: { ordinal: 'ASC' }, populate: ['profile', 'company'] }
+    );
     return Promise.all(ormEntities.map(e => this.toDomain(e)));
   }
 
@@ -127,14 +131,9 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   }
 
   private async toDomain(orm: OrmExperience): Promise<DomainExperience> {
-    const [row] = await this.orm.em
-      .getConnection()
-      .execute<[{ profile_id: string; company_id: string | null }]>(
-        'SELECT profile_id, company_id FROM experiences WHERE id = ?',
-        [orm.id]
-      );
-    const profileId = row.profile_id;
-    const companyId = row.company_id;
+    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
+    const companyId =
+      orm.company == null ? null : typeof orm.company === 'string' ? orm.company : (orm.company as { id: string }).id;
 
     const ormAccomplishments = await this.orm.em.find(
       OrmAccomplishment,

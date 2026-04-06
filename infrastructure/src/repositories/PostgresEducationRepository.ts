@@ -15,13 +15,13 @@ export class PostgresEducationRepository implements EducationRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findAll(): Promise<DomainEducation[]> {
-    const entries = await this.orm.em.findAll(OrmEducation, { orderBy: { ordinal: 'ASC' } });
+    const entries = await this.orm.em.findAll(OrmEducation, { orderBy: { ordinal: 'ASC' }, populate: ['profile'] });
     return entries.map(e => this.toDomain(e));
   }
 
   public async findByIdOrFail(id: string): Promise<DomainEducation> {
     try {
-      const orm = await this.orm.em.findOneOrFail(OrmEducation, id);
+      const orm = await this.orm.em.findOneOrFail(OrmEducation, id, { populate: ['profile'] });
       return this.toDomain(orm);
     } catch (e) {
       if (e instanceof NotFoundError) throw new EntityNotFoundError('Education', id);
@@ -74,7 +74,7 @@ export class PostgresEducationRepository implements EducationRepository {
   private toDomain(orm: OrmEducation): DomainEducation {
     return new DomainEducation({
       id: new EducationId(orm.id),
-      profileId: typeof orm.profile === 'object' && 'id' in orm.profile ? orm.profile.id : String(orm.profile),
+      profileId: typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id,
       degreeTitle: orm.degreeTitle,
       institutionName: orm.institutionName,
       graduationYear: orm.graduationYear,
