@@ -237,7 +237,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
   }
 
   return (
-    <div className="mt-4 grid grid-cols-[1fr_480px] gap-5">
+    <div className="mt-4 grid grid-cols-[1fr_560px] gap-5">
       <div className="space-y-5">
         <div className="border rounded-lg p-4 space-y-3">
           <div className="flex items-center justify-between">
