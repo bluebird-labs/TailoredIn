@@ -35,7 +35,7 @@ web → api → infrastructure → application → domain → (core)
 | `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, DI tokens | [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) |
 | `api/` | `@tailoredin/api` | Elysia HTTP routes + DI composition root | [api/CLAUDE.md](api/CLAUDE.md) |
 | `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend | [web/CLAUDE.md](web/CLAUDE.md) |
-| `e2e/` | `@tailoredin/e2e` | Playwright end-to-end tests | — |
+| `e2e/` | `@tailoredin/e2e` | Playwright end-to-end tests | [e2e/CLAUDE.md](e2e/CLAUDE.md) |
 
 ## Commands
 
@@ -115,10 +115,20 @@ All TypeScript is executed directly by Bun (no compilation step). `typecheck` sc
 
 **Test runners**: `bun:test` (unit + integration). Integration tests in `infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `e2e/` use `@playwright/test`.
 
+### Testing Strategy by Layer
+
+| Layer | Unit | Integration | E2E |
+|---|---|---|---|
+| `core/`, `domain/` | Yes | — | — |
+| `application/` | Yes (mock ports) | — | — |
+| `infrastructure/` | Yes | Yes (Testcontainers) | — |
+| `api/` | — | — | Yes |
+| `web/` | — | — | Yes |
+
 ## Session Hygiene
 
 ### Docs must be committed
-Any files created or modified under `docs/` (specs, design docs, plans) must be included in commits — never leave them as untracked.
+Any files created or modified under `docs/` (specs, design docs, plans) must be included in commits — never leave them as untracked. Specs and design documents live in `docs/superpowers/specs/` and `docs/superpowers/plans/`.
 
 ### Unstaged files
 Before ending a session, run `git status`. If there are unstaged or untracked files, ask the user what to do with each (commit, stash, or discard). Never leave files dangling silently.
@@ -173,3 +183,10 @@ Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config
 - **mise** manages Bun version (pinned in `.mise.toml`). Run `mise install` after cloning.
 - Bun runs TypeScript natively — no build step required.
 - See **`CONVENTIONS.md`** for file naming and import conventions (`.js` extensions, barrel imports, `import type`).
+
+## Design System
+
+Before writing or modifying frontend code, read these specs:
+
+- **[web/design/design-system.md](web/design/design-system.md)** — OKLch color tokens, typography scale, component styling rules (borders not shadows, no bold/semibold text)
+- **[web/design/ux-guidelines.md](web/design/ux-guidelines.md)** — click-to-edit interaction pattern, mutual exclusion of editable sections, validation timing, modal vs inline editing rules
