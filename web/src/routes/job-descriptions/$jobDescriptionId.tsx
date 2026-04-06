@@ -12,6 +12,7 @@ import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
 import { LinkedEntityCard } from '@/components/shared/LinkedEntityCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useCompany } from '@/hooks/use-companies';
@@ -254,7 +255,6 @@ function JobDescriptionDetailPage() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="resume">Resume</TabsTrigger>
-          <TabsTrigger value="raw-text">Raw Text</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -276,6 +276,19 @@ function JobDescriptionDetailPage() {
                 <InfoRow label="Posted" value={postedAt} />
                 {jd.url && <InfoRow label="Job Posting" value="View posting" href={jd.url} />}
               </InfoCard>
+
+              {jd.rawText && (
+                <Collapsible defaultOpen={false}>
+                  <div className="rounded-[14px] border bg-card p-5">
+                    <CollapsibleTrigger>Raw Text</CollapsibleTrigger>
+                    <CollapsiblePanel>
+                      <pre className="pt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-foreground font-sans">
+                        {jd.rawText}
+                      </pre>
+                    </CollapsiblePanel>
+                  </div>
+                </Collapsible>
+              )}
             </div>
 
             <div className="space-y-5">
@@ -301,20 +314,6 @@ function JobDescriptionDetailPage() {
 
         <TabsContent value="resume">
           <ResumeTab jd={jd} />
-        </TabsContent>
-
-        <TabsContent value="raw-text">
-          <div className="mt-4">
-            <InfoCard label="Raw Text">
-              {jd.rawText ? (
-                <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground font-sans">
-                  {jd.rawText}
-                </pre>
-              ) : (
-                <p className="text-[14px] italic text-muted-foreground">No raw text available.</p>
-              )}
-            </InfoCard>
-          </div>
         </TabsContent>
       </Tabs>
 
