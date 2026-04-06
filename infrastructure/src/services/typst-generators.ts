@@ -1,22 +1,7 @@
+import type { ResumeRenderEducation, ResumeRenderExperience } from '@tailoredin/application';
 import type { LayoutAnalysis, ResumeTemplate } from '@tailoredin/domain';
 
-export type ResumeRenderExperience = {
-  title: string;
-  companyName: string;
-  location: string;
-  startDate: string;
-  endDate: string | null;
-  summary: string | null;
-  bullets: string[];
-};
-
-export type ResumeRenderEducation = {
-  degreeTitle: string;
-  institutionName: string;
-  graduationYear: number;
-  location: string | null;
-  honors: string | null;
-};
+export type { ResumeRenderEducation, ResumeRenderExperience } from '@tailoredin/application';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -202,10 +187,10 @@ export function analyzeLayout(pdf: Uint8Array): LayoutAnalysis {
     header: {
       name: EMPTY_BLOCK_LAYOUT,
       headline: EMPTY_BLOCK_LAYOUT,
-      infoLine: EMPTY_BLOCK_LAYOUT,
+      infoLine: EMPTY_BLOCK_LAYOUT
     },
     experiences: [],
     education: [],
-    skills: [],
+    skills: []
   };
 }

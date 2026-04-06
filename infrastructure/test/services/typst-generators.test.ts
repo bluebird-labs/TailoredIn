@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'bun:test';
-import type { ResumeRenderEducation, ResumeRenderExperience } from '../../src/services/typst-generators.js';
+import type { ResumeRenderEducation, ResumeRenderExperience } from '@tailoredin/application';
+import type { ResumeTemplate } from '@tailoredin/domain';
 import {
   analyzeLayout,
   generateConfigTyp,
   generateEducationTyp,
-  generateProfessionalTyp,
+  generateProfessionalTyp
 } from '../../src/services/typst-generators.js';
-import type { ResumeTemplate } from '@tailoredin/domain';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -20,7 +20,7 @@ const TEMPLATE: ResumeTemplate = {
   lineHeightEm: 0.65,
   headerFontSizePt: 32,
   sectionSpacingPt: 2,
-  entrySpacingPt: 2,
+  entrySpacingPt: 2
 };
 
 function fakePdf(pageCount: number): Uint8Array {
@@ -43,7 +43,7 @@ function makeExperience(overrides: Partial<ResumeRenderExperience> = {}): Resume
     endDate: null,
     summary: null,
     bullets: ['Built things', 'Shipped features'],
-    ...overrides,
+    ...overrides
   };
 }
 
@@ -54,7 +54,7 @@ function makeEducation(overrides: Partial<ResumeRenderEducation> = {}): ResumeRe
     graduationYear: 2020,
     location: 'Cambridge, MA',
     honors: null,
-    ...overrides,
+    ...overrides
   };
 }
 
@@ -89,9 +89,7 @@ describe('generateProfessionalTyp', () => {
   });
 
   test('includes all bullet text', () => {
-    const result = generateProfessionalTyp([
-      makeExperience({ bullets: ['First bullet', 'Second bullet'] }),
-    ]);
+    const result = generateProfessionalTyp([makeExperience({ bullets: ['First bullet', 'Second bullet'] })]);
     expect(result).toContain('First bullet');
     expect(result).toContain('Second bullet');
   });
