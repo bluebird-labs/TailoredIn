@@ -11,6 +11,7 @@ export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepos
 export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDescriptionRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 // Services
+export { ClaudeApiResumeContentGenerator } from './services/ClaudeApiResumeContentGenerator.js';
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
 export { ClaudeCliCompanyDiscoveryProvider } from './services/ClaudeCliCompanyDiscoveryProvider.js';
 export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptionParser.js';

@@ -9,6 +9,20 @@ export type SalaryRangeDto = {
   currency: string;
 };
 
+export type ResumeOutputExperience = {
+  experienceId: string;
+  experienceTitle: string;
+  companyName: string;
+  summary: string;
+  bullets: string[];
+};
+
+export type ResumeOutput = {
+  schema: Record<string, unknown>;
+  output: { experiences: ResumeOutputExperience[] };
+  generatedAt: string;
+};
+
 export type JobDescription = {
   id: string;
   companyId: string;
@@ -24,6 +38,7 @@ export type JobDescription = {
   createdAt: string;
   updatedAt: string;
   rawText: string | null;
+  resumeOutput: ResumeOutput | null;
 };
 
 export type JobDescriptionParseResult = {

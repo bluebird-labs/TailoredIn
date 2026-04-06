@@ -7,14 +7,14 @@ import type {
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { DI } from '../DI.js';
-import type { ClaudeCliProvider } from './llm/ClaudeCliProvider.js';
+import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 import { GenerateResumeBulletsRequest } from './llm/GenerateResumeBulletsRequest.js';
 
 @injectable()
-export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
+export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeCliProvider = inject(DI.Llm.ClaudeCliProvider)) {}
+  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
 
   public async generate(input: ResumeContentGeneratorInput): Promise<ResumeContentGeneratorResult> {
     this.log.info(`Generating resume bullets for ${input.experiences.length} experience(s)`);
@@ -25,12 +25,11 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
     const duration = Date.now() - startTime;
 
     if (result.isErr) {
-      const exitCode = result.error.exitCode ?? 'unknown';
-      this.log.error(
-        `Resume content generation failed | exitCode=${exitCode} duration=${duration}ms error="${result.error.message}"`
-      );
-      throw new ExternalServiceError('Claude CLI', 'Resume content generation failed');
+      this.log.error(`Resume content generation failed | duration=${duration}ms error="${result.error.message}"`);
+      throw new ExternalServiceError('Claude API', 'Resume content generation failed');
     }
+
+    const requestSchema = JSON.parse(request.getJsonSchema()) as Record<string, unknown>;
 
     const experiences = result.value.experiences.flatMap(llmExp => {
       const inputExp = input.experiences.find(e => e.id === llmExp.experienceId);
@@ -49,8 +48,6 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
         }
       ];
     });
-
-    const requestSchema = JSON.parse(request.getJsonSchema()) as Record<string, unknown>;
 
     this.log.info(`Resume bullets generated | experiences=${experiences.length} duration=${duration}ms`);
 

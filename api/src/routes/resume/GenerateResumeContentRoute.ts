@@ -5,7 +5,8 @@ import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
 /**
- * Generates tailored resume bullet points for each experience based on a job description.
+ * Generates tailored resume bullet points for each experience based on a job description,
+ * and persists the result on the job description for future retrieval.
  *
  * @example
  * curl -X POST http://localhost:8000/resume/generate \
@@ -21,7 +22,10 @@ export class GenerateResumeContentRoute {
       '/resume/generate',
       async ({ body, set }) => {
         try {
-          const data = await this.generateResumeContent.execute({ jobDescriptionId: body.jobDescriptionId });
+          const data = await this.generateResumeContent.execute({
+            jobDescriptionId: body.jobDescriptionId,
+            additionalPrompt: body.additionalPrompt
+          });
           return { data };
         } catch (e) {
           if (e instanceof EntityNotFoundError) {
@@ -33,7 +37,8 @@ export class GenerateResumeContentRoute {
       },
       {
         body: t.Object({
-          jobDescriptionId: t.String()
+          jobDescriptionId: t.String(),
+          additionalPrompt: t.Optional(t.String())
         })
       }
     );

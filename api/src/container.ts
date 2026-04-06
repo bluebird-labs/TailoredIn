@@ -45,11 +45,11 @@ import {
 import { env, envInt } from '@tailoredin/core';
 import {
   ClaudeApiProvider,
+  ClaudeApiResumeContentGenerator,
   ClaudeCliCompanyDataProvider,
   ClaudeCliCompanyDiscoveryProvider,
   ClaudeCliJobDescriptionParser,
   ClaudeCliProvider,
-  ClaudeCliResumeContentGenerator,
   createOrmConfig,
   DI,
   PostgresApplicationRepository,
@@ -262,7 +262,7 @@ container.bind({
 });
 
 // Resume
-container.bind({ provide: DI.Resume.Generator, useClass: ClaudeCliResumeContentGenerator });
+container.bind({ provide: DI.Resume.Generator, useClass: ClaudeApiResumeContentGenerator });
 container.bind({
   provide: DI.Resume.Generate,
   useFactory: () =>

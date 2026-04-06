@@ -11,6 +11,7 @@ import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.
 
 export type GenerateResumeContentInput = {
   jobDescriptionId: string;
+  additionalPrompt?: string;
 };
 
 const BULLET_LIMITS: Array<{ min: number; max: number }> = [
@@ -75,8 +76,16 @@ export class GenerateResumeContent {
           minBullets: limits.min,
           maxBullets: limits.max
         };
-      })
+      }),
+      additionalPrompt: input.additionalPrompt
     });
+
+    jd.resumeOutput = {
+      schema: result.requestSchema,
+      output: { experiences: result.experiences },
+      generatedAt: new Date()
+    };
+    await this.jobDescriptionRepository.save(jd);
 
     return {
       experiences: result.experiences.map(e => ({

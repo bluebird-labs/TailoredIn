@@ -47,6 +47,13 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       ormJd.source = jd.source;
       ormJd.postedAt = jd.postedAt;
       ormJd.rawText = jd.rawText;
+      ormJd.resumeOutput = jd.resumeOutput
+        ? {
+            schema: jd.resumeOutput.schema,
+            output: jd.resumeOutput.output,
+            generatedAt: jd.resumeOutput.generatedAt.toISOString()
+          }
+        : null;
       ormJd.updatedAt = jd.updatedAt;
     } else {
       const companyRef = this.orm.em.getReference(OrmCompany, jd.companyId);
@@ -68,6 +75,13 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
         createdAt: jd.createdAt,
         updatedAt: jd.updatedAt
       });
+      ormJd.resumeOutput = jd.resumeOutput
+        ? {
+            schema: jd.resumeOutput.schema,
+            output: jd.resumeOutput.output,
+            generatedAt: jd.resumeOutput.generatedAt.toISOString()
+          }
+        : null;
     }
 
     this.orm.em.persist(ormJd);
@@ -104,6 +118,13 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       source: orm.source as JobSource,
       postedAt: orm.postedAt,
       rawText: orm.rawText,
+      resumeOutput: orm.resumeOutput
+        ? {
+            schema: orm.resumeOutput.schema,
+            output: orm.resumeOutput.output,
+            generatedAt: new Date(orm.resumeOutput.generatedAt)
+          }
+        : null,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });

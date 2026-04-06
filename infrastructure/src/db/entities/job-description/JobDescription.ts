@@ -4,6 +4,12 @@ import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 import { Company } from '../companies/Company.js';
 
+type ResumeOutputJson = {
+  schema: Record<string, unknown>;
+  output: Record<string, unknown>;
+  generatedAt: string;
+};
+
 @Entity({ tableName: 'job_descriptions' })
 export class JobDescription extends BaseEntity {
   @UuidPrimaryKey({ fieldName: 'id' })
@@ -47,6 +53,9 @@ export class JobDescription extends BaseEntity {
 
   @Property({ fieldName: 'raw_text', type: 'text', nullable: true })
   public rawText: string | null;
+
+  @Property({ fieldName: 'resume_output', type: 'jsonb', nullable: true })
+  public resumeOutput: ResumeOutputJson | null = null;
 
   public constructor(props: {
     id: string;

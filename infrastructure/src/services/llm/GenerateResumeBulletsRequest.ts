@@ -49,7 +49,7 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
 
     const jdRawTextSection = this.input.jobDescription.rawText ? `Raw Text:\n${this.input.jobDescription.rawText}` : '';
 
-    return template
+    let prompt = template
       .replace('{{firstName}}', this.input.profile.firstName)
       .replace('{{lastName}}', this.input.profile.lastName)
       .replace('{{about}}', this.input.profile.about ?? '(not provided)')
@@ -58,5 +58,11 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
       .replace('{{jdDescription}}', this.input.jobDescription.description)
       .replace('{{jdRawText}}', jdRawTextSection)
       .replace('{{experiencesBlock}}', experiencesBlock);
+
+    if (this.input.additionalPrompt) {
+      prompt += `\n\nAdditional instructions: ${this.input.additionalPrompt}`;
+    }
+
+    return prompt;
   }
 }

@@ -13,6 +13,7 @@ export type ResumeContentGeneratorInput = {
   headline: { summaryText: string } | null;
   jobDescription: { title: string; description: string; rawText: string | null };
   experiences: ResumeContentGeneratorExperience[];
+  additionalPrompt?: string;
 };
 
 export type ResumeContentGeneratorResult = {
@@ -23,6 +24,7 @@ export type ResumeContentGeneratorResult = {
     summary: string;
     bullets: string[];
   }>;
+  requestSchema: Record<string, unknown>;
 };
 
 export interface ResumeContentGenerator {

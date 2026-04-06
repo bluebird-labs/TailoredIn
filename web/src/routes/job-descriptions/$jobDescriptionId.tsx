@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { FileText, Pencil } from 'lucide-react';
+import { Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
-import { GenerateResumeModal } from '@/components/job-descriptions/GenerateResumeModal.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { formatEnumLabel } from '@/components/job-descriptions/job-description-options.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
@@ -12,8 +12,10 @@ import { LinkedEntityCard } from '@/components/shared/LinkedEntityCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { useCompany } from '@/hooks/use-companies';
-import { type JobDescription, useJobDescription } from '@/hooks/use-job-descriptions';
+import { type JobDescription, type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
+import { useGenerateResumeContent } from '@/hooks/use-resume';
 
 export const Route = createFileRoute('/job-descriptions/$jobDescriptionId')({
   component: JobDescriptionDetailPage
@@ -35,12 +37,114 @@ function formatDate(dateStr: string | null): string | null {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function ExperienceCard({ exp }: { exp: ResumeOutputExperience }) {
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div>
+        <p className="text-[14px] font-medium text-foreground">{exp.experienceTitle}</p>
+        <p className="text-[13px] text-muted-foreground">{exp.companyName}</p>
+      </div>
+      {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
+      <ul className="space-y-1.5">
+        {exp.bullets.map((bullet, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static ordered list
+          <li key={i} className="flex gap-2 text-[13px] leading-relaxed">
+            <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
+            <span>{bullet}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ResumeTab({ jd }: { jd: JobDescription }) {
+  const [additionalPrompt, setAdditionalPrompt] = useState('');
+  const generate = useGenerateResumeContent(jd.id);
+
+  const resumeOutput = jd.resumeOutput;
+  const experiences = resumeOutput?.output.experiences ?? [];
+  const generatedAt = resumeOutput ? formatDate(resumeOutput.generatedAt) : null;
+
+  function handleGenerate() {
+    generate.mutate(
+      { additionalPrompt: additionalPrompt.trim() || undefined },
+      {
+        onSuccess: () => {
+          setAdditionalPrompt('');
+          toast.success('Resume content generated');
+        },
+        onError: err => {
+          toast.error(err instanceof Error ? err.message : 'Generation failed');
+        }
+      }
+    );
+  }
+
+  if (!resumeOutput) {
+    return (
+      <div className="mt-4 flex flex-col items-center justify-center gap-4 py-16 text-center">
+        <p className="text-[14px] text-muted-foreground">No resume content generated yet.</p>
+        <Button size="sm" onClick={handleGenerate} disabled={generate.isPending}>
+          {generate.isPending ? (
+            <>
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              Generating…
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+              Generate Resume
+            </>
+          )}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 space-y-5">
+      <div className="space-y-3">
+        {experiences.map(exp => (
+          <ExperienceCard key={exp.experienceId} exp={exp} />
+        ))}
+      </div>
+
+      <div className="border rounded-lg p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[12px] text-muted-foreground">Generated{generatedAt ? ` on ${generatedAt}` : ''}</p>
+        </div>
+        <Textarea
+          placeholder="Optional: add instructions to steer the regeneration…"
+          value={additionalPrompt}
+          onChange={e => setAdditionalPrompt(e.target.value)}
+          className="text-[13px] min-h-[72px] resize-none"
+        />
+        <div className="flex justify-end">
+          <Button size="sm" variant="outline" onClick={handleGenerate} disabled={generate.isPending}>
+            {generate.isPending ? (
+              <>
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                Regenerating…
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                Regenerate
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function JobDescriptionDetailPage() {
   const { jobDescriptionId } = Route.useParams();
   const { data: jd, isLoading } = useJobDescription(jobDescriptionId);
   const { data: company } = useCompany(jd?.companyId ?? '');
   const [editOpen, setEditOpen] = useState(false);
-  const [generateOpen, setGenerateOpen] = useState(false);
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
   if (!jd) return <EmptyState message="Job description not found." />;
@@ -121,22 +225,17 @@ function JobDescriptionDetailPage() {
           </>
         }
         actions={
-          <>
-            <Button size="sm" variant="outline" onClick={() => setGenerateOpen(true)}>
-              <FileText className="mr-1.5 h-3.5 w-3.5" />
-              Generate Resume
-            </Button>
-            <Button size="sm" onClick={() => setEditOpen(true)}>
-              <Pencil className="mr-1.5 h-3.5 w-3.5" />
-              Edit
-            </Button>
-          </>
+          <Button size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="mr-1.5 h-3.5 w-3.5" />
+            Edit
+          </Button>
         }
       />
 
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="resume">Resume</TabsTrigger>
           <TabsTrigger value="raw-text">Raw Text</TabsTrigger>
         </TabsList>
 
@@ -182,6 +281,10 @@ function JobDescriptionDetailPage() {
           </div>
         </TabsContent>
 
+        <TabsContent value="resume">
+          <ResumeTab jd={jd} />
+        </TabsContent>
+
         <TabsContent value="raw-text">
           <div className="mt-4">
             <InfoCard label="Raw Text">
@@ -204,18 +307,6 @@ function JobDescriptionDetailPage() {
           jobDescription={jd}
           onOpenChange={next => {
             if (!next) setEditOpen(false);
-          }}
-        />
-      )}
-
-      {generateOpen && (
-        <GenerateResumeModal
-          open
-          jobDescriptionId={jobDescriptionId}
-          jobTitle={jd.title}
-          companyName={company?.name ?? jd.companyId}
-          onOpenChange={next => {
-            if (!next) setGenerateOpen(false);
           }}
         />
       )}

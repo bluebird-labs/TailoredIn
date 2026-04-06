@@ -6,6 +6,12 @@ export type SalaryRangeDto = {
   readonly currency: string;
 };
 
+export type ResumeOutputDto = {
+  readonly schema: Record<string, unknown>;
+  readonly output: Record<string, unknown>;
+  readonly generatedAt: string;
+};
+
 export type JobDescriptionDto = {
   readonly id: string;
   readonly companyId: string;
@@ -21,6 +27,7 @@ export type JobDescriptionDto = {
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly rawText: string | null;
+  readonly resumeOutput: ResumeOutputDto | null;
 };
 
 export function toJobDescriptionDto(jd: JobDescription): JobDescriptionDto {
@@ -40,6 +47,13 @@ export function toJobDescriptionDto(jd: JobDescription): JobDescriptionDto {
     postedAt: jd.postedAt?.toISOString() ?? null,
     createdAt: jd.createdAt.toISOString(),
     updatedAt: jd.updatedAt.toISOString(),
-    rawText: jd.rawText
+    rawText: jd.rawText,
+    resumeOutput: jd.resumeOutput
+      ? {
+          schema: jd.resumeOutput.schema,
+          output: jd.resumeOutput.output,
+          generatedAt: jd.resumeOutput.generatedAt.toISOString()
+        }
+      : null
   };
 }
