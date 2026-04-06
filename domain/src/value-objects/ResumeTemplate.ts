@@ -11,3 +11,14 @@ export type ResumeTemplate = {
   /** Space before each cv-entry block, in pt. */
   entrySpacingPt: number;
 };
+
+export const DEFAULT_RESUME_TEMPLATE: ResumeTemplate = {
+  id: 'brilliant-cv-default',
+  pageSize: 'us-letter',
+  margins: { top: 1.1, bottom: 1.1, left: 1.1, right: 1.1 },
+  bodyFontSizePt: 10,
+  lineHeightEm: 0.65,
+  headerFontSizePt: 32,
+  sectionSpacingPt: 2,
+  entrySpacingPt: 2,
+};

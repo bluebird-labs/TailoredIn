@@ -50,5 +50,6 @@ export { JobSource } from './value-objects/JobSource.js';
 export type { BlockLayout, LayoutAnalysis } from './value-objects/LayoutAnalysis.js';
 export { LocationType } from './value-objects/LocationType.js';
 export { ProfileId } from './value-objects/ProfileId.js';
+export { DEFAULT_RESUME_TEMPLATE } from './value-objects/ResumeTemplate.js';
 export type { ResumeTemplate } from './value-objects/ResumeTemplate.js';
 export { SalaryRange } from './value-objects/SalaryRange.js';
