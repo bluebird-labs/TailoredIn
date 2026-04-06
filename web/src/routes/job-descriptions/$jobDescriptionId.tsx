@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Pencil } from 'lucide-react';
+import { FileText, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
+import { GenerateResumeModal } from '@/components/job-descriptions/GenerateResumeModal.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { formatEnumLabel } from '@/components/job-descriptions/job-description-options.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
@@ -39,6 +40,7 @@ function JobDescriptionDetailPage() {
   const { data: jd, isLoading } = useJobDescription(jobDescriptionId);
   const { data: company } = useCompany(jd?.companyId ?? '');
   const [editOpen, setEditOpen] = useState(false);
+  const [generateOpen, setGenerateOpen] = useState(false);
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
   if (!jd) return <EmptyState message="Job description not found." />;
@@ -119,10 +121,16 @@ function JobDescriptionDetailPage() {
           </>
         }
         actions={
-          <Button size="sm" onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-1.5 h-3.5 w-3.5" />
-            Edit
-          </Button>
+          <>
+            <Button size="sm" variant="outline" onClick={() => setGenerateOpen(true)}>
+              <FileText className="mr-1.5 h-3.5 w-3.5" />
+              Generate Resume
+            </Button>
+            <Button size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="mr-1.5 h-3.5 w-3.5" />
+              Edit
+            </Button>
+          </>
         }
       />
 
@@ -196,6 +204,15 @@ function JobDescriptionDetailPage() {
           jobDescription={jd}
           onOpenChange={next => {
             if (!next) setEditOpen(false);
+          }}
+        />
+      )}
+
+      {generateOpen && (
+        <GenerateResumeModal
+          open
+          onOpenChange={next => {
+            if (!next) setGenerateOpen(false);
           }}
         />
       )}
