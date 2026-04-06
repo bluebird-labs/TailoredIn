@@ -11,19 +11,29 @@ const testSchema = z.object({ name: z.string(), count: z.number() });
 
 class TestRequest extends LlmJsonRequest<typeof testSchema> {
   public readonly schema = testSchema;
-  public get prompt(): string { return 'test prompt'; }
+  public get prompt(): string {
+    return 'test prompt';
+  }
 }
 
 class TestRequestWithMaxTokens extends LlmJsonRequest<typeof testSchema> {
   public readonly schema = testSchema;
-  public get prompt(): string { return 'test prompt'; }
-  public override get maxTokens(): number { return 512; }
+  public get prompt(): string {
+    return 'test prompt';
+  }
+  public override get maxTokens(): number {
+    return 512;
+  }
 }
 
 class TestRequestWithModel extends LlmJsonRequest<typeof testSchema> {
   public readonly schema = testSchema;
-  public get prompt(): string { return 'test prompt'; }
-  public override get model(): string { return 'custom-model'; }
+  public get prompt(): string {
+    return 'test prompt';
+  }
+  public override get model(): string {
+    return 'custom-model';
+  }
 }
 
 type CallBehavior = 'success' | 'fail-timeout' | 'fail-connection' | 'fail-server-error' | 'fail-rate-limit';
@@ -51,11 +61,16 @@ class TestApiProvider extends BaseLlmApiProvider {
     this.lastModel = model;
     this.lastTimeoutMs = timeoutMs;
     switch (this.callBehavior) {
-      case 'fail-timeout':      throw new Error('API call timed out after 1000ms');
-      case 'fail-connection':   throw new Error('API connection failed: ECONNREFUSED');
-      case 'fail-server-error': throw new Error('API server error (500): Internal Server Error');
-      case 'fail-rate-limit':   throw new Error('API rate limit exceeded: 429');
-      default:                  return this.responseText;
+      case 'fail-timeout':
+        throw new Error('API call timed out after 1000ms');
+      case 'fail-connection':
+        throw new Error('API connection failed: ECONNREFUSED');
+      case 'fail-server-error':
+        throw new Error('API server error (500): Internal Server Error');
+      case 'fail-rate-limit':
+        throw new Error('API rate limit exceeded: 429');
+      default:
+        return this.responseText;
     }
   }
 
@@ -70,7 +85,9 @@ class CountingTestApiProvider extends BaseLlmApiProvider {
   protected readonly providerName = 'test-api';
   public callCount = 0;
 
-  constructor(private readonly failUntil: number) { super(); }
+  public constructor(private readonly failUntil: number) {
+    super();
+  }
 
   protected async callApi(): Promise<string> {
     this.callCount++;
