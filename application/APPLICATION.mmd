@@ -272,6 +272,33 @@ classDiagram
 
 
     %% ──────────────────────────────────────────────
+    %%  Resume Use Cases
+    %% ──────────────────────────────────────────────
+
+    class GenerateResumeContent {
+        <<UseCase>>
+        +ProfileRepository profileRepository
+        +HeadlineRepository headlineRepository
+        +ExperienceRepository experienceRepository
+        +JobDescriptionRepository jobDescriptionRepository
+        +ResumeContentGenerator generator
+        +execute(GenerateResumeContentInput) ResumeContentDto
+    }
+
+    class GenerateResumePdf {
+        <<UseCase>>
+        +ProfileRepository profileRepository
+        +HeadlineRepository headlineRepository
+        +ExperienceRepository experienceRepository
+        +EducationRepository educationRepository
+        +JobDescriptionRepository jobDescriptionRepository
+        +ResumeContentGenerator generator
+        +ResumeRenderer renderer
+        +execute(GenerateResumePdfInput) Uint8Array
+    }
+
+
+    %% ──────────────────────────────────────────────
     %%  Ports
     %% ──────────────────────────────────────────────
 
@@ -290,9 +317,22 @@ classDiagram
         +parseFromText(text) Promise<JobDescriptionParseResult>
     }
 
+    class ResumeContentGenerator {
+        <<Port>>
+        +generate(input) Promise<ResumeContentGeneratorResult>
+    }
+
+    class ResumeRenderer {
+        <<Port>>
+        +render(input) Promise<Uint8Array>
+    }
+
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
+    GenerateResumeContent ..> ResumeContentGenerator : depends
+    GenerateResumePdf ..> ResumeContentGenerator : depends
+    GenerateResumePdf ..> ResumeRenderer : depends
 
     %% ──────────────────────────────────────────────
     %%  DTOs
@@ -404,6 +444,7 @@ classDiagram
         +string? postedAt
         +string createdAt
         +string updatedAt
+        +string? rawText
     }
 
     class JobDescriptionParseResult {
@@ -448,6 +489,54 @@ classDiagram
         +string? websiteUrl
     }
 
+    class ResumeContentDto {
+        <<DTO>>
+        +ResumeExperienceBulletsDto[] experiences
+    }
+
+    class ResumeContentGeneratorExperience {
+        <<DTO>>
+        +string id
+        +string title
+        +string companyName
+        +string? summary
+        +object? accomplishments
+        +number minBullets
+        +number maxBullets
+    }
+
+    class ResumeContentGeneratorResult {
+        <<DTO>>
+        +object experiences
+    }
+
+    class ResumeExperienceBulletsDto {
+        <<DTO>>
+        +string experienceId
+        +string experienceTitle
+        +string companyName
+        +string[] bullets
+    }
+
+    class ResumeRenderEducation {
+        <<DTO>>
+        +string degreeTitle
+        +string institutionName
+        +number graduationYear
+        +string? location
+    }
+
+    class ResumeRenderExperience {
+        <<DTO>>
+        +string title
+        +string companyName
+        +string location
+        +string startDate
+        +string? endDate
+        +string? summary
+        +string[] bullets
+    }
+
     class SalaryRangeDto {
         <<DTO>>
         +number? min
@@ -459,9 +548,11 @@ classDiagram
     ExperienceDto "1" *-- "*" AccomplishmentDto : contains
     JobDescriptionDto *-- SalaryRangeDto
     PaginatedDto *-- PaginationMeta
+    ResumeContentDto "1" *-- "*" ResumeExperienceBulletsDto : contains
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
     CompanyDiscoveryProvider ..> CompanyDiscoveryResult : produces
     JobDescriptionParser ..> JobDescriptionParseResult : produces
+    ResumeContentGenerator ..> ResumeContentGeneratorResult : produces
     CreateApplication ..> ApplicationDto : returns
     GetApplication ..> ApplicationDto : returns
     ListApplications ..> ApplicationDto : returns
@@ -492,6 +583,7 @@ classDiagram
     ListJobDescriptions ..> JobDescriptionDto : returns
     ParseJobDescription ..> JobDescriptionParseResult : returns
     UpdateJobDescription ..> JobDescriptionDto : returns
+    GenerateResumeContent ..> ResumeContentDto : returns
     UpdateProfile ..> ProfileDto : returns
 
     %% ──────────────────────────────────────────────
@@ -575,6 +667,15 @@ classDiagram
     GetJobDescription ..> JobDescriptionRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
+    GenerateResumeContent ..> ProfileRepository : depends
+    GenerateResumeContent ..> HeadlineRepository : depends
+    GenerateResumeContent ..> ExperienceRepository : depends
+    GenerateResumeContent ..> JobDescriptionRepository : depends
+    GenerateResumePdf ..> ProfileRepository : depends
+    GenerateResumePdf ..> HeadlineRepository : depends
+    GenerateResumePdf ..> ExperienceRepository : depends
+    GenerateResumePdf ..> EducationRepository : depends
+    GenerateResumePdf ..> JobDescriptionRepository : depends
     UpdateProfile ..> ProfileRepository : depends
 
     %% ──────────────────────────────────────────────
@@ -619,9 +720,13 @@ classDiagram
     style UpdateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GenerateResumeContent fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GenerateResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style JobDescriptionParser fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style ResumeContentGenerator fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style ResumeRenderer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApplicationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -636,6 +741,12 @@ classDiagram
     style PaginatedDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginationMeta fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ProfileDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeContentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeContentGeneratorExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeContentGeneratorResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeExperienceBulletsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeRenderEducation fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeRenderExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SalaryRangeDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
