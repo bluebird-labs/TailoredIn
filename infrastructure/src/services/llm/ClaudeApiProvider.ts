@@ -42,15 +42,24 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
       'Return ONLY the JSON object. No markdown code blocks, no explanation, no extra text.'
     ].join('\n');
 
-    const message = await this.getClient().messages.create(
-      {
-        model,
-        max_tokens: maxTokens,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: prompt }]
-      },
-      { timeout: timeoutMs }
-    );
+    let message: Anthropic.Message;
+    try {
+      message = await this.getClient().messages.create(
+        {
+          model,
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: prompt }]
+        },
+        { timeout: timeoutMs }
+      );
+    } catch (e) {
+      if (e instanceof Anthropic.APIConnectionTimeoutError) throw new Error(`API call timed out after ${timeoutMs}ms`);
+      if (e instanceof Anthropic.RateLimitError) throw new Error('API rate limit exceeded: 429');
+      if (e instanceof Anthropic.InternalServerError) throw new Error(`API server error (${e.status}): ${e.message}`);
+      if (e instanceof Anthropic.APIConnectionError) throw new Error(`API connection failed: ${e.message}`);
+      throw e;
+    }
 
     const block = message.content[0];
     if (!block || block.type !== 'text') {

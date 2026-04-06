@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type Anthropic from '@anthropic-ai/sdk';
+import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { ClaudeApiProvider } from '../../../src/services/llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from '../../../src/services/llm/LlmJsonRequest.js';
@@ -146,6 +146,68 @@ describe('ClaudeApiProvider', () => {
     expect(result.isErr).toBe(true);
     if (result.isErr) {
       expect(result.error.message).toContain('timed out');
+    }
+  });
+
+  test('translates APIConnectionTimeoutError to retryable timed out message', async () => {
+    const provider = makeProvider(async () => {
+      throw new Anthropic.APIConnectionTimeoutError();
+    });
+
+    const result = await provider.request(new JobRequest(), { maxRetries: 1 });
+
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error.message).toContain('API call timed out');
+    }
+  });
+
+  test('translates RateLimitError to retryable rate limit message', async () => {
+    const provider = makeProvider(async () => {
+      throw new Anthropic.RateLimitError(
+        429,
+        { message: 'Rate limited' },
+        'Rate limited',
+        undefined as unknown as Headers
+      );
+    });
+
+    const result = await provider.request(new JobRequest(), { maxRetries: 1 });
+
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error.message).toContain('API rate limit exceeded');
+    }
+  });
+
+  test('translates InternalServerError to retryable server error message', async () => {
+    const provider = makeProvider(async () => {
+      throw new Anthropic.InternalServerError(
+        500,
+        { message: 'Internal error' },
+        'Internal error',
+        undefined as unknown as Headers
+      );
+    });
+
+    const result = await provider.request(new JobRequest(), { maxRetries: 1 });
+
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error.message).toContain('API server error');
+    }
+  });
+
+  test('translates APIConnectionError to connection failed message', async () => {
+    const provider = makeProvider(async () => {
+      throw new Anthropic.APIConnectionError({ message: 'ECONNREFUSED' });
+    });
+
+    const result = await provider.request(new JobRequest(), { maxRetries: 1 });
+
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error.message).toContain('API connection failed');
     }
   });
 });
