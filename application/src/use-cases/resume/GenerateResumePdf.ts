@@ -9,11 +9,13 @@ import {
   type ProfileRepository
 } from '@tailoredin/domain';
 import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.js';
-import type { ResumeRenderer, ResumeRenderInput } from '../../ports/ResumeRenderer.js';
+import { DEFAULT_RESUME_THEME, type ResumeRendererFactory, type ResumeTheme } from '../../ports/ResumeRendererFactory.js';
+import type { ResumeRenderInput } from '../../ports/ResumeRenderer.js';
 
 export type GenerateResumePdfInput = {
   jobDescriptionId: string;
   headlineId: string;
+  theme?: ResumeTheme;
 };
 
 const BULLET_LIMITS: Array<{ min: number; max: number }> = [
@@ -42,7 +44,7 @@ export class GenerateResumePdf {
     private readonly educationRepository: EducationRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
     private readonly generator: ResumeContentGenerator,
-    private readonly renderer: ResumeRenderer
+    private readonly rendererFactory: ResumeRendererFactory
   ) {}
 
   public async execute(input: GenerateResumePdfInput): Promise<Uint8Array> {
@@ -113,15 +115,15 @@ export class GenerateResumePdf {
       },
       headlineSummary: headline.summaryText,
       experiences: experiences.map(exp => {
-        const generated = generatedByExperienceId.get(exp.id.value);
+        const gen = generatedByExperienceId.get(exp.id.value);
         return {
           title: exp.title,
           companyName: exp.companyName,
           location: exp.location,
           startDate: exp.startDate,
           endDate: exp.endDate || null,
-          summary: generated?.summary ?? null,
-          bullets: generated?.bullets ?? []
+          summary: gen?.summary ?? null,
+          bullets: gen?.bullets ?? []
         };
       }),
       educations: educations.map(edu => ({
@@ -134,6 +136,7 @@ export class GenerateResumePdf {
       template: DEFAULT_RESUME_TEMPLATE
     };
 
-    return this.renderer.render(renderInput);
+    const renderer = this.rendererFactory.get(input.theme ?? DEFAULT_RESUME_THEME);
+    return renderer.render(renderInput);
   }
 }
