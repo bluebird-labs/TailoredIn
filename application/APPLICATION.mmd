@@ -293,7 +293,7 @@ classDiagram
         +EducationRepository educationRepository
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentGenerator generator
-        +ResumeRenderer renderer
+        +ResumeRendererFactory rendererFactory
         +execute(GenerateResumePdfInput) Uint8Array
     }
 
@@ -327,12 +327,17 @@ classDiagram
         +render(input) Promise<Uint8Array>
     }
 
+    class ResumeRendererFactory {
+        <<Port>>
+        +get(theme) ResumeRenderer
+    }
+
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
     GenerateResumeContent ..> ResumeContentGenerator : depends
     GenerateResumePdf ..> ResumeContentGenerator : depends
-    GenerateResumePdf ..> ResumeRenderer : depends
+    GenerateResumePdf ..> ResumeRendererFactory : depends
 
     %% ──────────────────────────────────────────────
     %%  DTOs
@@ -524,6 +529,7 @@ classDiagram
         +string institutionName
         +number graduationYear
         +string? location
+        +string? honors
     }
 
     class ResumeRenderExperience {
@@ -727,6 +733,7 @@ classDiagram
     style JobDescriptionParser fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeContentGenerator fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeRenderer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style ResumeRendererFactory fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApplicationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
