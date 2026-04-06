@@ -1,4 +1,5 @@
 import {
+  DEFAULT_RESUME_TEMPLATE,
   type EducationRepository,
   EntityNotFoundError,
   type ExperienceRepository,
@@ -127,8 +128,10 @@ export class GenerateResumePdf {
         degreeTitle: edu.degreeTitle,
         institutionName: edu.institutionName,
         graduationYear: edu.graduationYear,
-        location: edu.location
-      }))
+        location: edu.location,
+        honors: edu.honors,
+      })),
+      template: DEFAULT_RESUME_TEMPLATE,
     };
 
     return this.renderer.render(renderInput);

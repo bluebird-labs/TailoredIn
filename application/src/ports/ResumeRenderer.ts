@@ -1,3 +1,5 @@
+import type { ResumeTemplate } from '@tailoredin/domain';
+
 export type ResumeRenderExperience = {
   title: string;
   companyName: string;
@@ -13,6 +15,7 @@ export type ResumeRenderEducation = {
   institutionName: string;
   graduationYear: number;
   location: string | null;
+  honors: string | null;
 };
 
 export type ResumeRenderInput = {
@@ -29,6 +32,7 @@ export type ResumeRenderInput = {
   headlineSummary: string | null;
   experiences: ResumeRenderExperience[];
   educations: ResumeRenderEducation[];
+  template: ResumeTemplate;
 };
 
 export interface ResumeRenderer {
