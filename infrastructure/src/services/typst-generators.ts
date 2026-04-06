@@ -80,6 +80,7 @@ export function generateMetadataToml(
   [layout.header]
     header_align = "left"
     display_profile_photo = false
+    info_font_size = "8pt"
   [layout.entry]
     display_entry_society_first = true
     display_logo = false

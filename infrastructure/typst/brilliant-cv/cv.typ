@@ -6,11 +6,11 @@
 #set page(margin: cfg-margin)
 // Override personal info icons to use text labels instead of Font Awesome
 #let custom-icons = (
-  github: box(width: 10pt, align(center, text(size: 8pt, "GH"))),
-  email: box(width: 10pt, align(center, text(size: 8pt, "✉"))),
-  linkedin: box(width: 10pt, align(center, text(size: 8pt, "in"))),
-  phone: box(width: 10pt, align(center, text(size: 8pt, "☎"))),
-  location: box(width: 10pt, align(center, text(size: 8pt, "⌂"))),
+  github: box(width: 8pt, align(center, text(size: 7pt, "GH"))),
+  email: box(width: 8pt, align(center, text(size: 7pt, "✉"))),
+  linkedin: box(width: 8pt, align(center, text(size: 7pt, "in"))),
+  phone: box(width: 8pt, align(center, text(size: 7pt, "☎"))),
+  location: box(width: 8pt, align(center, text(size: 7pt, "⌂"))),
 )
 #show: cv.with(metadata, custom-icons: custom-icons)
 
