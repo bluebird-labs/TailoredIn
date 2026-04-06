@@ -20,6 +20,12 @@ class TestRequestWithMaxTokens extends LlmJsonRequest<typeof testSchema> {
   public override get maxTokens(): number { return 512; }
 }
 
+class TestRequestWithModel extends LlmJsonRequest<typeof testSchema> {
+  public readonly schema = testSchema;
+  public get prompt(): string { return 'test prompt'; }
+  public override get model(): string { return 'custom-model'; }
+}
+
 type CallBehavior = 'success' | 'fail-timeout' | 'fail-connection' | 'fail-server-error' | 'fail-rate-limit';
 
 class TestApiProvider extends BaseLlmApiProvider {
@@ -29,16 +35,20 @@ class TestApiProvider extends BaseLlmApiProvider {
   public responseText = '{"name":"Acme","count":42}';
   public callCount = 0;
   public lastMaxTokens: number | undefined;
+  public lastModel: string | undefined;
+  public lastTimeoutMs: number | undefined;
 
   protected async callApi(
     _prompt: string,
     _jsonSchema: string,
-    _model: string,
+    model: string,
     maxTokens: number,
-    _timeoutMs: number
+    timeoutMs: number
   ): Promise<string> {
     this.callCount++;
     this.lastMaxTokens = maxTokens;
+    this.lastModel = model;
+    this.lastTimeoutMs = timeoutMs;
     switch (this.callBehavior) {
       case 'fail-timeout':      throw new Error('API call timed out after 1000ms');
       case 'fail-connection':   throw new Error('API connection failed: ECONNREFUSED');
@@ -96,6 +106,30 @@ describe('BaseLlmApiProvider', () => {
     const provider = new TestApiProvider();
     await provider.request(new TestRequestWithMaxTokens());
     expect(provider.lastMaxTokens).toBe(512);
+  });
+
+  test('passes request.model to callApi when overridden', async () => {
+    const provider = new TestApiProvider();
+    await provider.request(new TestRequestWithModel());
+    expect(provider.lastModel).toBe('custom-model');
+  });
+
+  test('passes defaultModel to callApi when request has no model override', async () => {
+    const provider = new TestApiProvider();
+    await provider.request(new TestRequest());
+    expect(provider.lastModel).toBe('test-model');
+  });
+
+  test('passes timeoutMs from options to callApi', async () => {
+    const provider = new TestApiProvider();
+    await provider.request(new TestRequest(), { timeoutMs: 5000 });
+    expect(provider.lastTimeoutMs).toBe(5000);
+  });
+
+  test('passes default timeoutMs (60000) when not specified', async () => {
+    const provider = new TestApiProvider();
+    await provider.request(new TestRequest());
+    expect(provider.lastTimeoutMs).toBe(60_000);
   });
 
   test('returns err when API call throws', async () => {
