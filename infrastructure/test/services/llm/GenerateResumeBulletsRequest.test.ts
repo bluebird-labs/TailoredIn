@@ -32,7 +32,7 @@ function makeInput(overrides: Partial<ResumeContentGeneratorInput> = {}): Resume
           { title: 'Mentored 4 junior engineers', narrative: null }
         ],
         minBullets: 2,
-        maxBullets: 12
+        maxBullets: 20
       },
       {
         id: 'exp-bbb-222',
@@ -41,7 +41,7 @@ function makeInput(overrides: Partial<ResumeContentGeneratorInput> = {}): Resume
         summary: null,
         accomplishments: [{ title: 'Launched payments feature', narrative: 'Integrated Stripe API' }],
         minBullets: 2,
-        maxBullets: 10
+        maxBullets: 20
       }
     ],
     ...overrides
@@ -201,8 +201,7 @@ describe('GenerateResumeBulletsRequest', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const prompt = request.prompt;
 
-      expect(prompt).toContain('Generate between 2 and 12 bullets');
-      expect(prompt).toContain('Generate between 2 and 10 bullets');
+      expect(prompt).toContain('Generate between 2 and 20 bullets');
     });
 
     test('contains strict derivation / do not invent rules', () => {

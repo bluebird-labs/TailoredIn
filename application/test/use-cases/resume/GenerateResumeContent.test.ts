@@ -221,44 +221,7 @@ describe('GenerateResumeContent', () => {
     expect(ids).toEqual(['exp-new', 'exp-mid', 'exp-old']);
   });
 
-  test('bullet tier assignment: first experience gets {min:2,max:12}, second {min:2,max:10}, etc.', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
-
-    const experiences = [
-      makeExperience({ id: 'e1', startDate: '2024-01' }),
-      makeExperience({ id: 'e2', startDate: '2023-01' }),
-      makeExperience({ id: 'e3', startDate: '2022-01' }),
-      makeExperience({ id: 'e4', startDate: '2021-01' })
-    ];
-
-    let capturedInput: ResumeContentGeneratorInput | null = null;
-    const generator: ResumeContentGenerator = {
-      generate: mock((input: ResumeContentGeneratorInput) => {
-        capturedInput = input;
-        return Promise.resolve(makeGeneratorResult([]));
-      })
-    };
-
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockHeadlineRepo([]),
-      mockExperienceRepo(experiences),
-      mockJobDescriptionRepo(jd),
-      generator
-    );
-
-    await useCase.execute({ jobDescriptionId: 'jd-1' });
-
-    expect(capturedInput).not.toBeNull();
-    const exps = capturedInput!.experiences;
-    expect(exps[0]).toMatchObject({ minBullets: 2, maxBullets: 12 });
-    expect(exps[1]).toMatchObject({ minBullets: 2, maxBullets: 10 });
-    expect(exps[2]).toMatchObject({ minBullets: 2, maxBullets: 8 });
-    expect(exps[3]).toMatchObject({ minBullets: 2, maxBullets: 6 });
-  });
-
-  test('5+ experiences: position 4+ gets {min:2,max:3} tier', async () => {
+  test('all experiences get the same bullet limits {min:2, max:20}', async () => {
     const profile = makeProfile();
     const jd = makeJobDescription();
 
@@ -290,9 +253,9 @@ describe('GenerateResumeContent', () => {
     await useCase.execute({ jobDescriptionId: 'jd-1' });
 
     expect(capturedInput).not.toBeNull();
-    const exps = capturedInput!.experiences;
-    expect(exps[4]).toMatchObject({ minBullets: 2, maxBullets: 3 });
-    expect(exps[5]).toMatchObject({ minBullets: 2, maxBullets: 3 });
+    for (const exp of capturedInput!.experiences) {
+      expect(exp).toMatchObject({ minBullets: 2, maxBullets: 20 });
+    }
   });
 
   test('JD not found: throws EntityNotFoundError', async () => {

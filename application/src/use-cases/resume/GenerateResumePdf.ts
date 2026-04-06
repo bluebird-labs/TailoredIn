@@ -22,13 +22,7 @@ export type GenerateResumePdfInput = {
   theme?: ResumeTheme;
 };
 
-const BULLET_LIMITS: Array<{ min: number; max: number }> = [
-  { min: 2, max: 12 },
-  { min: 2, max: 10 },
-  { min: 2, max: 8 },
-  { min: 2, max: 6 }
-];
-const BULLET_LIMITS_DEFAULT = { min: 2, max: 3 };
+const BULLET_LIMITS = { min: 2, max: 20 };
 
 function extractLinkedinSlug(url: string | null): string | null {
   if (!url) return null;
@@ -87,8 +81,7 @@ export class GenerateResumePdf {
         description: jd.description,
         rawText: jd.rawText
       },
-      experiences: experiences.map((exp, index) => {
-        const limits = BULLET_LIMITS[index] ?? BULLET_LIMITS_DEFAULT;
+      experiences: experiences.map(exp => {
         return {
           id: exp.id.value,
           title: exp.title,
@@ -98,8 +91,8 @@ export class GenerateResumePdf {
             title: a.title,
             narrative: a.narrative
           })),
-          minBullets: limits.min,
-          maxBullets: limits.max
+          minBullets: BULLET_LIMITS.min,
+          maxBullets: BULLET_LIMITS.max
         };
       })
     });
