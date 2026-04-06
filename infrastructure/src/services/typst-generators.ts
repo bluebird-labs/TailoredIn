@@ -69,7 +69,7 @@ export function generateMetadataToml(
   return `language = "en"
 
 [layout]
-  awesome_color = "#1A1A1A"
+  awesome_color = "#3E6B8A"
   before_section_skip = "${template.sectionSpacingPt}pt"
   before_entry_skip = "${template.entrySpacingPt}pt"
   before_entry_description_skip = "${descriptionSkip}pt"

@@ -19,10 +19,10 @@ All elements use **IBM Plex Sans** (overriding the package defaults of Source Sa
 |---|---|---|---|---|---|
 | **First name** | 32pt | light | normal | `#212529` (darkgray) | `cv.typ:18` `_header-styles` |
 | **Last name** | 32pt | bold | normal | inherited (`#343a40`) | `cv.typ:23` `_header-styles` |
-| **Info line** (email, phone, linkedin, etc.) | **8pt** | regular | normal | accent `#1A1A1A` | `metadata.toml` `info_font_size = "8pt"` → `cv.typ:24` |
+| **Info line** (email, phone, linkedin, etc.) | **8pt** | regular | normal | accent `#3E6B8A` | `metadata.toml` `info_font_size = "8pt"` → `cv.typ:24` |
 | **Info icons** (GH, ✉, in, ☎, ⌂) | **7pt** | regular | normal | inherited from info | `cv.typ:9-13` custom-icons |
 | **h-bar separator** (`\|`) | inherited from info (8pt) | inherited | normal | inherited from info | `styles.typ:2` |
-| **Headline / quote** | **10pt** | medium | **italic** | accent `#1A1A1A` | `cv.typ:25` `_header-styles` |
+| **Headline / quote** | **10pt** | medium | **italic** | accent `#3E6B8A` | `cv.typ:25` `_header-styles` |
 
 ## Section Headers (custom `cv-section` in `helpers.typ`)
 
@@ -39,8 +39,8 @@ All elements use **IBM Plex Sans** (overriding the package defaults of Source Sa
 | Element | Size | Weight | Style | Fill | Source |
 |---|---|---|---|---|---|
 | **Company name** (a1 = society, top-left) | 10pt | bold | normal | inherited (`#343a40`) | `cv.typ:363` `_entry-styles.a1` |
-| **Location** (a2, top-right) | inherited (10pt) | medium | **oblique** | accent `#1A1A1A` | `cv.typ:364` `_entry-styles.a2` |
-| **Job title** (b1 = title, bottom-left) | **8pt** | medium | normal, **smallcaps** | accent `#1A1A1A` | `cv.typ:365` `_entry-styles.b1` |
+| **Location** (a2, top-right) | inherited (10pt) | medium | **oblique** | accent `#3E6B8A` | `cv.typ:364` `_entry-styles.a2` |
+| **Job title** (b1 = title, bottom-left) | **8pt** | medium | normal, **smallcaps** | accent `#3E6B8A` | `cv.typ:365` `_entry-styles.b1` |
 | **Date range** (b2, bottom-right) | **8pt** | medium | **oblique** | `gray` (Typst built-in) | `cv.typ:366` `_entry-styles.b2` |
 | **Experience summary** (italic line before bullets) | inherited (10pt) | regular | **italic** | inherited (`#343a40`) | `typst-generators.ts:118` `_text_` markup |
 | **Bullet points** (description list items) | inherited (10pt) | regular | normal | `#343a40` (lightgray) | `cv.typ:371-377` `_entry-styles.description` |
@@ -68,7 +68,7 @@ All elements use **IBM Plex Sans** (overriding the package defaults of Source Sa
 
 | Name | Hex | Used for |
 |---|---|---|
-| `awesome_color` (accent in metadata) | `#1A1A1A` | Info line, headline, job title (b1), location (a2) |
+| `awesome_color` (accent in metadata) | `#3E6B8A` | Info line, headline, job title (b1), location (a2) |
 | `_accent` (helpers.typ) | `#3E6B8A` | Section header divider line only |
 | `lightgray` | `#343a40` | Base text, bullet points, company name |
 | `darkgray` | `#212529` | First name |
