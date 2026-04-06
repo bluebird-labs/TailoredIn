@@ -71,6 +71,40 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(true);
     });
 
+    test('accepts headline at the maximum length (400 chars)', () => {
+      const request = new GenerateResumeBulletsRequest(makeInput());
+      const payload = {
+        headline: 'A'.repeat(400),
+        experiences: [
+          {
+            experienceId: 'exp-aaa-111',
+            summary: 'Summary text that is between 20 and 300 characters long for this test.',
+            bullets: ['A'.repeat(100)]
+          }
+        ]
+      };
+
+      const result = request.schema.safeParse(payload);
+      expect(result.success).toBe(true);
+    });
+
+    test('rejects headline exceeding maximum length (401 chars)', () => {
+      const request = new GenerateResumeBulletsRequest(makeInput());
+      const payload = {
+        headline: 'A'.repeat(401),
+        experiences: [
+          {
+            experienceId: 'exp-aaa-111',
+            summary: 'Summary text that is between 20 and 300 characters long for this test.',
+            bullets: ['A'.repeat(100)]
+          }
+        ]
+      };
+
+      const result = request.schema.safeParse(payload);
+      expect(result.success).toBe(false);
+    });
+
     test('rejects payload missing headline', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const payload = {
