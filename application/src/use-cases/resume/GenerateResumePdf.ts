@@ -103,7 +103,15 @@ export class GenerateResumePdf {
       template: DEFAULT_RESUME_TEMPLATE
     };
 
-    const renderer = this.rendererFactory.get(input.theme ?? DEFAULT_RESUME_THEME);
-    return renderer.render(renderInput);
+    const theme = input.theme ?? DEFAULT_RESUME_THEME;
+    const renderer = this.rendererFactory.get(theme);
+    const pdfBytes = await renderer.render(renderInput);
+
+    jd.resumePdf = pdfBytes;
+    jd.resumePdfTheme = theme;
+    jd.updatedAt = new Date();
+    await this.jobDescriptionRepository.save(jd);
+
+    return pdfBytes;
   }
 }

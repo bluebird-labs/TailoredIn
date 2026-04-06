@@ -47,6 +47,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       ormJd.source = jd.source;
       ormJd.postedAt = jd.postedAt;
       ormJd.rawText = jd.rawText;
+      ormJd.resumePdf = jd.resumePdf ? Buffer.from(jd.resumePdf) : null;
+      ormJd.resumePdfTheme = jd.resumePdfTheme;
       ormJd.updatedAt = jd.updatedAt;
     } else {
       const companyRef = this.orm.em.getReference(OrmCompany, jd.companyId);
@@ -65,6 +67,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
         source: jd.source,
         postedAt: jd.postedAt,
         rawText: jd.rawText,
+        resumePdf: jd.resumePdf ? Buffer.from(jd.resumePdf) : null,
+        resumePdfTheme: jd.resumePdfTheme,
         createdAt: jd.createdAt,
         updatedAt: jd.updatedAt
       });
@@ -104,6 +108,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       source: orm.source as JobSource,
       postedAt: orm.postedAt,
       rawText: orm.rawText,
+      resumePdf: orm.resumePdf ? new Uint8Array(orm.resumePdf) : null,
+      resumePdfTheme: orm.resumePdfTheme ?? null,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });

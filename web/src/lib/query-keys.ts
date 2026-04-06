@@ -25,5 +25,8 @@ export const queryKeys = {
     all: ['jobDescriptions'] as const,
     list: (companyId: string) => ['jobDescriptions', 'list', companyId] as const,
     detail: (id: string) => [...queryKeys.jobDescriptions.all, 'detail', id] as const
+  },
+  resume: {
+    cachedPdf: (jobDescriptionId: string) => ['resume', 'cachedPdf', jobDescriptionId] as const
   }
 };

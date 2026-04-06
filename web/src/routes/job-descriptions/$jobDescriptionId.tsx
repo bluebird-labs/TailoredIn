@@ -238,7 +238,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
         </div>
       </div>
 
-      <ResumePdfPreview jobDescriptionId={jd.id} />
+      <ResumePdfPreview jobDescriptionId={jd.id} hasCachedPdf={jd.hasCachedPdf} resumePdfTheme={jd.resumePdfTheme} />
     </div>
   );
 }

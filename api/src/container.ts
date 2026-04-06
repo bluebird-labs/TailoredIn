@@ -15,8 +15,10 @@ import {
   DiscoverCompanies,
   EnrichCompanyData,
   GenerateResumeContent,
+  GenerateResumeContentWithPdf,
   GenerateResumePdf,
   GetApplication,
+  GetCachedResumePdf,
   GetCompany,
   GetExperience,
   GetJobDescription,
@@ -269,6 +271,15 @@ container.bind({
       container.get(DI.ResumeContent.Repository),
       container.get(DI.Resume.RendererFactory)
     )
+});
+container.bind({
+  provide: DI.Resume.GenerateContentWithPdf,
+  useFactory: () =>
+    new GenerateResumeContentWithPdf(container.get(DI.Resume.Generate), container.get(DI.Resume.GeneratePdf))
+});
+container.bind({
+  provide: DI.Resume.GetCachedPdf,
+  useFactory: () => new GetCachedResumePdf(container.get(DI.JobDescription.Repository))
 });
 
 export { container };

@@ -48,6 +48,12 @@ export class JobDescription extends BaseEntity {
   @Property({ fieldName: 'raw_text', type: 'text', nullable: true })
   public rawText: string | null;
 
+  @Property({ fieldName: 'resume_pdf', type: 'blob', nullable: true })
+  public resumePdf: Buffer | null;
+
+  @Property({ fieldName: 'resume_pdf_theme', type: 'text', nullable: true })
+  public resumePdfTheme: string | null;
+
   public constructor(props: {
     id: string;
     company: Ref<Company> | Company;
@@ -63,6 +69,8 @@ export class JobDescription extends BaseEntity {
     source: string;
     postedAt: Date | null;
     rawText: string | null;
+    resumePdf: Buffer | null;
+    resumePdfTheme: string | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -81,5 +89,7 @@ export class JobDescription extends BaseEntity {
     this.source = props.source;
     this.postedAt = props.postedAt;
     this.rawText = props.rawText;
+    this.resumePdf = props.resumePdf;
+    this.resumePdfTheme = props.resumePdfTheme;
   }
 }

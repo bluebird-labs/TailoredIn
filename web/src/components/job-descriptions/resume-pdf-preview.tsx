@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { type ResumeTheme, useGenerateResumePdf } from '@/hooks/use-resume';
+import { type ResumeTheme, useCachedResumePdf, useGenerateResumePdf } from '@/hooks/use-resume';
 
 const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
   { value: 'brilliant-cv', label: 'Brilliant CV' },
@@ -13,10 +13,19 @@ const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
   { value: 'linked-cv', label: 'Linked CV' }
 ];
 
-export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: string }) {
+export function ResumePdfPreview({
+  jobDescriptionId,
+  hasCachedPdf,
+  resumePdfTheme
+}: {
+  jobDescriptionId: string;
+  hasCachedPdf: boolean;
+  resumePdfTheme: string | null;
+}) {
   const generatePdf = useGenerateResumePdf();
+  const cachedPdf = useCachedResumePdf(jobDescriptionId, hasCachedPdf);
 
-  const [theme, setTheme] = useState<ResumeTheme>('brilliant-cv');
+  const [theme, setTheme] = useState<ResumeTheme>((resumePdfTheme as ResumeTheme) ?? 'brilliant-cv');
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [fullPage, setFullPage] = useState(false);
   const prevBlobRef = useRef<string | null>(null);
@@ -26,6 +35,17 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
       if (prevBlobRef.current) URL.revokeObjectURL(prevBlobRef.current);
     };
   }, []);
+
+  // Auto-display cached PDF when it loads
+  useEffect(() => {
+    if (cachedPdf.data) {
+      if (prevBlobRef.current) URL.revokeObjectURL(prevBlobRef.current);
+      const blob = new Blob([cachedPdf.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      prevBlobRef.current = url;
+      setPdfBlobUrl(url);
+    }
+  }, [cachedPdf.data]);
 
   function handleGenerate() {
     generatePdf.mutate(
@@ -44,6 +64,8 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
       }
     );
   }
+
+  const isLoading = generatePdf.isPending || cachedPdf.isLoading;
 
   const themeSelector = (
     <Select value={theme} onValueChange={v => setTheme(v as ResumeTheme)}>
@@ -81,10 +103,12 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
       className="flex items-center justify-center border rounded-lg bg-muted/30"
       style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
     >
-      {generatePdf.isPending ? (
+      {isLoading ? (
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <p className="text-[13px] text-muted-foreground">Generating PDF…</p>
+          <p className="text-[13px] text-muted-foreground">
+            {cachedPdf.isLoading ? 'Loading PDF…' : 'Generating PDF…'}
+          </p>
         </div>
       ) : (
         <p className="text-[13px] text-muted-foreground">Click "Generate PDF" to preview</p>
@@ -139,10 +163,12 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
             <iframe src={pdfBlobUrl} title="Resume PDF preview" className="flex-1 w-full border rounded-lg" />
           ) : (
             <div className="flex flex-1 items-center justify-center border rounded-lg bg-muted/30">
-              {generatePdf.isPending ? (
+              {isLoading ? (
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  <p className="text-[13px] text-muted-foreground">Generating PDF…</p>
+                  <p className="text-[13px] text-muted-foreground">
+                    {cachedPdf.isLoading ? 'Loading PDF…' : 'Generating PDF…'}
+                  </p>
                 </div>
               ) : (
                 <p className="text-[13px] text-muted-foreground">Click "Generate PDF" to preview</p>

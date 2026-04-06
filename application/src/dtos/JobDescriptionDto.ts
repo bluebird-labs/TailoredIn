@@ -34,6 +34,8 @@ export type JobDescriptionDto = {
   readonly updatedAt: string;
   readonly rawText: string | null;
   readonly resumeOutput: ResumeOutputDto | null;
+  readonly hasCachedPdf: boolean;
+  readonly resumePdfTheme: string | null;
 };
 
 export function toJobDescriptionDto(
@@ -73,6 +75,8 @@ export function toJobDescriptionDto(
           }),
           generatedAt: resumeContent.createdAt.toISOString()
         }
-      : null
+      : null,
+    hasCachedPdf: jd.resumePdf !== null,
+    resumePdfTheme: jd.resumePdfTheme
   };
 }

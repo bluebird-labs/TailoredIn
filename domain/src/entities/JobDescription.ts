@@ -31,6 +31,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
   public source: JobSource;
   public postedAt: Date | null;
   public rawText: string | null;
+  public resumePdf: Uint8Array | null;
+  public resumePdfTheme: string | null;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -47,6 +49,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     source: JobSource;
     postedAt: Date | null;
     rawText: string | null;
+    resumePdf: Uint8Array | null;
+    resumePdfTheme: string | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -62,6 +66,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     this.source = props.source;
     this.postedAt = props.postedAt;
     this.rawText = props.rawText;
+    this.resumePdf = props.resumePdf;
+    this.resumePdfTheme = props.resumePdfTheme;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -81,6 +87,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
       source: props.source,
       postedAt: props.postedAt ?? null,
       rawText: props.rawText ?? null,
+      resumePdf: null,
+      resumePdfTheme: null,
       createdAt: now,
       updatedAt: now
     });

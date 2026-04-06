@@ -39,6 +39,8 @@ export type JobDescription = {
   updatedAt: string;
   rawText: string | null;
   resumeOutput: ResumeOutput | null;
+  hasCachedPdf: boolean;
+  resumePdfTheme: string | null;
 };
 
 export type JobDescriptionParseResult = {

@@ -51,6 +51,8 @@ function makeJd() {
     locationType: null,
     source: JobSource.UPLOAD,
     postedAt: null,
+    resumePdf: null,
+    resumePdfTheme: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   });
@@ -147,7 +149,10 @@ describe('GenerateResumePdf', () => {
     const educationRepo: EducationRepository = {
       findAll: mock(async () => [education])
     } as unknown as EducationRepository;
-    const jdRepo: JobDescriptionRepository = { findById: mock(async () => jd) } as unknown as JobDescriptionRepository;
+    const jdRepo: JobDescriptionRepository = {
+      findById: mock(async () => jd),
+      save: mock(async () => {})
+    } as unknown as JobDescriptionRepository;
     const resumeContentRepo = mockResumeContentRepo(resumeContent);
 
     const useCase = new GenerateResumePdf(
@@ -159,7 +164,7 @@ describe('GenerateResumePdf', () => {
       fakeFactory
     );
 
-    return { useCase, fakeFactory, fakeRenderer };
+    return { useCase, fakeFactory, fakeRenderer, jdRepo, jd };
   }
 
   test('calls factory.get with the provided theme', async () => {
@@ -190,13 +195,33 @@ describe('GenerateResumePdf', () => {
     expect(renderInput.headlineSummary).toBe('Staff Engineer | 5+ Years of Experience');
   });
 
+  test('caches PDF bytes and theme on the job description', async () => {
+    const { useCase, jd, jdRepo } = makeUseCase();
+    await useCase.execute({
+      jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
+    });
+    expect(jd.resumePdf).toEqual(new Uint8Array([1, 2, 3]));
+    expect(jd.resumePdfTheme).toBe('brilliant-cv');
+    expect((jdRepo.save as ReturnType<typeof mock>).mock.calls).toHaveLength(1);
+  });
+
+  test('caches the requested theme', async () => {
+    const { useCase, jd } = makeUseCase();
+    await useCase.execute({
+      jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
+      theme: 'modern-cv'
+    });
+    expect(jd.resumePdfTheme).toBe('modern-cv');
+  });
+
   test('throws EntityNotFoundError when JD does not exist', async () => {
     const profile = makeProfile();
     const profileRepo: ProfileRepository = { findSingle: mock(async () => profile) } as unknown as ProfileRepository;
     const experienceRepo: ExperienceRepository = { findAll: mock(async () => []) } as unknown as ExperienceRepository;
     const educationRepo: EducationRepository = { findAll: mock(async () => []) } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = {
-      findById: mock(async () => null)
+      findById: mock(async () => null),
+      save: mock(async () => {})
     } as unknown as JobDescriptionRepository;
     const resumeContentRepo = mockResumeContentRepo(null);
 

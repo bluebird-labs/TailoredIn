@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 
 export type ResumeTheme = 'brilliant-cv' | 'imprecv' | 'modern-cv' | 'linked-cv';
 
 export function useGenerateResumePdf() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: { jobDescriptionId: string; theme?: ResumeTheme }) => {
       const response = await fetch('/api/resume/pdf', {
@@ -16,6 +17,10 @@ export function useGenerateResumePdf() {
         throw new Error((json as { error?: { message?: string } } | null)?.error?.message ?? 'Failed to generate PDF');
       }
       return response.arrayBuffer();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.cachedPdf(variables.jobDescriptionId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(variables.jobDescriptionId) });
     }
   });
 }
@@ -41,6 +46,20 @@ export function useGenerateResumeContent(jobDescriptionId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.cachedPdf(jobDescriptionId) });
     }
+  });
+}
+
+export function useCachedResumePdf(jobDescriptionId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.resume.cachedPdf(jobDescriptionId),
+    queryFn: async () => {
+      const response = await fetch(`/api/resume/pdf/${jobDescriptionId}`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error('Failed to fetch cached PDF');
+      return response.arrayBuffer();
+    },
+    enabled
   });
 }

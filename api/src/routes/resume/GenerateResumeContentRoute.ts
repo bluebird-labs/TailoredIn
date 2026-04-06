@@ -1,5 +1,5 @@
 import { inject, injectable } from '@needle-di/core';
-import type { GenerateResumeContent } from '@tailoredin/application';
+import type { GenerateResumeContentWithPdf } from '@tailoredin/application';
 import { EntityNotFoundError } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
@@ -15,7 +15,9 @@ import { Elysia, t } from 'elysia';
  */
 @injectable()
 export class GenerateResumeContentRoute {
-  public constructor(private readonly generateResumeContent: GenerateResumeContent = inject(DI.Resume.Generate)) {}
+  public constructor(
+    private readonly generateResumeContent: GenerateResumeContentWithPdf = inject(DI.Resume.GenerateContentWithPdf)
+  ) {}
 
   public plugin() {
     return new Elysia().post(

@@ -16,8 +16,10 @@ import type {
   DiscoverCompanies,
   EnrichCompanyData,
   GenerateResumeContent,
+  GenerateResumeContentWithPdf,
   GenerateResumePdf,
   GetApplication,
+  GetCachedResumePdf,
   GetCompany,
   GetExperience,
   GetJobDescription,
@@ -116,7 +118,9 @@ export const DI = {
     Generator: new InjectionToken<ResumeContentGenerator>('DI.Resume.Generator'),
     Generate: new InjectionToken<GenerateResumeContent>('DI.Resume.Generate'),
     RendererFactory: new InjectionToken<ResumeRendererFactory>('DI.Resume.RendererFactory'),
-    GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf')
+    GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf'),
+    GenerateContentWithPdf: new InjectionToken<GenerateResumeContentWithPdf>('DI.Resume.GenerateContentWithPdf'),
+    GetCachedPdf: new InjectionToken<GetCachedResumePdf>('DI.Resume.GetCachedPdf')
   },
 
   Company: {
