@@ -19,7 +19,10 @@ import { type JobDescription, type ResumeOutputExperience, useJobDescription } f
 import { useGenerateResumeContent } from '@/hooks/use-resume';
 
 export const Route = createFileRoute('/job-descriptions/$jobDescriptionId')({
-  component: JobDescriptionDetailPage
+  component: JobDescriptionDetailPage,
+  validateSearch: (search: Record<string, unknown>): { tab?: string } => ({
+    tab: (search.tab as string) || undefined,
+  }),
 });
 
 function formatSalary(jd: JobDescription): string | null {
@@ -155,6 +158,8 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
 
 function JobDescriptionDetailPage() {
   const { jobDescriptionId } = Route.useParams();
+  const { tab = 'overview' } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const { data: jd, isLoading } = useJobDescription(jobDescriptionId);
   const { data: company } = useCompany(jd?.companyId ?? '');
   const [editOpen, setEditOpen] = useState(false);
@@ -245,7 +250,7 @@ function JobDescriptionDetailPage() {
         }
       />
 
-      <Tabs defaultValue="overview">
+      <Tabs value={tab} onValueChange={(value) => navigate({ search: { tab: value }, replace: true })}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="resume">Resume</TabsTrigger>
