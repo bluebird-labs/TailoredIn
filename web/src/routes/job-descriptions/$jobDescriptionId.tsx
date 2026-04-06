@@ -148,21 +148,31 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
 
   if (!resumeOutput) {
     return (
-      <div className="mt-4 flex flex-col items-center justify-center gap-4 py-16 text-center">
-        <p className="text-[14px] text-muted-foreground">No resume content generated yet.</p>
-        <Button size="sm" onClick={handleGenerate} disabled={generate.isPending}>
-          {generate.isPending ? (
-            <>
-              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-              Generating…
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-              Generate Resume
-            </>
-          )}
-        </Button>
+      <div className="mt-4">
+        <div className="border rounded-lg p-4 space-y-3">
+          <p className="text-[12px] text-muted-foreground">No resume content generated yet.</p>
+          <Textarea
+            placeholder="Optional: add instructions to steer the generation…"
+            value={additionalPrompt}
+            onChange={e => setAdditionalPrompt(e.target.value)}
+            className="text-[13px] min-h-[72px] resize-none"
+          />
+          <div className="flex justify-end">
+            <Button size="sm" onClick={handleGenerate} disabled={generate.isPending}>
+              {generate.isPending ? (
+                <>
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                  Generate Resume
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
