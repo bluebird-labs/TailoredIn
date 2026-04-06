@@ -20,10 +20,14 @@ export function useGenerateResumePdf() {
   });
 }
 
+export type ResumeGenerationScope =
+  | { type: 'headline' }
+  | { type: 'experience'; experienceId: string };
+
 export function useGenerateResumeContent(jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { additionalPrompt?: string } = {}) => {
+    mutationFn: async (input: { additionalPrompt?: string; scope?: ResumeGenerationScope } = {}) => {
       const response = await fetch('/api/resume/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

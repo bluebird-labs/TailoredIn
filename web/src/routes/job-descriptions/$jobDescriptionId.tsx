@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
+import { Loader2, Pencil, RefreshCw, RotateCw, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
@@ -42,12 +42,36 @@ function formatDate(dateStr: string | null): string | null {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function ExperienceCard({ exp }: { exp: ResumeOutputExperience }) {
+function ExperienceCard({
+  exp,
+  onRegenerate,
+  isRegenerating
+}: {
+  exp: ResumeOutputExperience;
+  onRegenerate: () => void;
+  isRegenerating: boolean;
+}) {
   return (
     <div className="border rounded-lg p-4 space-y-3">
-      <div>
-        <p className="text-[14px] font-medium text-foreground">{exp.experienceTitle}</p>
-        <p className="text-[13px] text-muted-foreground">{exp.companyName}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-[14px] font-medium text-foreground">{exp.experienceTitle}</p>
+          <p className="text-[13px] text-muted-foreground">{exp.companyName}</p>
+        </div>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-7 w-7 shrink-0"
+          onClick={onRegenerate}
+          disabled={isRegenerating}
+          title="Regenerate this experience"
+        >
+          {isRegenerating ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RotateCw className="h-3.5 w-3.5" />
+          )}
+        </Button>
       </div>
       {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
       <ul className="space-y-1.5">
@@ -65,6 +89,7 @@ function ExperienceCard({ exp }: { exp: ResumeOutputExperience }) {
 
 function ResumeTab({ jd }: { jd: JobDescription }) {
   const [additionalPrompt, setAdditionalPrompt] = useState('');
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
   const generate = useGenerateResumeContent(jd.id);
 
   const resumeOutput = jd.resumeOutput;
@@ -82,6 +107,40 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
         },
         onError: err => {
           toast.error(err instanceof Error ? err.message : 'Generation failed');
+        }
+      }
+    );
+  }
+
+  function handleRegenerateHeadline() {
+    setRegeneratingId('headline');
+    generate.mutate(
+      { additionalPrompt: additionalPrompt.trim() || undefined, scope: { type: 'headline' } },
+      {
+        onSuccess: () => {
+          setRegeneratingId(null);
+          toast.success('Headline regenerated');
+        },
+        onError: err => {
+          setRegeneratingId(null);
+          toast.error(err instanceof Error ? err.message : 'Headline regeneration failed');
+        }
+      }
+    );
+  }
+
+  function handleRegenerateExperience(experienceId: string) {
+    setRegeneratingId(experienceId);
+    generate.mutate(
+      { additionalPrompt: additionalPrompt.trim() || undefined, scope: { type: 'experience', experienceId } },
+      {
+        onSuccess: () => {
+          setRegeneratingId(null);
+          toast.success('Experience regenerated');
+        },
+        onError: err => {
+          setRegeneratingId(null);
+          toast.error(err instanceof Error ? err.message : 'Experience regeneration failed');
         }
       }
     );
@@ -140,14 +199,35 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
 
         {headline && (
           <div className="border rounded-lg p-4">
-            <p className="text-[12px] text-muted-foreground mb-1">Headline</p>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[12px] text-muted-foreground">Headline</p>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7"
+                onClick={handleRegenerateHeadline}
+                disabled={generate.isPending}
+                title="Regenerate headline"
+              >
+                {regeneratingId === 'headline' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RotateCw className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </div>
             <p className="text-[15px] font-medium text-foreground">{headline}</p>
           </div>
         )}
 
         <div className="space-y-3">
           {experiences.map(exp => (
-            <ExperienceCard key={exp.experienceId} exp={exp} />
+            <ExperienceCard
+              key={exp.experienceId}
+              exp={exp}
+              onRegenerate={() => handleRegenerateExperience(exp.experienceId)}
+              isRegenerating={regeneratingId === exp.experienceId}
+            />
           ))}
         </div>
       </div>

@@ -8,11 +8,16 @@ export type ResumeContentGeneratorExperience = {
   maxBullets: number;
 };
 
+export type ResumeContentGeneratorScope =
+  | { type: 'headline' }
+  | { type: 'experience'; experienceId: string };
+
 export type ResumeContentGeneratorInput = {
   profile: { firstName: string; lastName: string; about: string | null };
   jobDescription: { title: string; description: string; rawText: string | null };
   experiences: ResumeContentGeneratorExperience[];
   additionalPrompt?: string;
+  scope?: ResumeContentGeneratorScope;
 };
 
 export type ResumeContentGeneratorResult = {

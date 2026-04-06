@@ -8,9 +8,14 @@ import {
 import type { ResumeContentDto } from '../../dtos/ResumeContentDto.js';
 import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.js';
 
+export type GenerateResumeContentScope =
+  | { type: 'headline' }
+  | { type: 'experience'; experienceId: string };
+
 export type GenerateResumeContentInput = {
   jobDescriptionId: string;
   additionalPrompt?: string;
+  scope?: GenerateResumeContentScope;
 };
 
 const BULLET_LIMITS = { min: 2, max: 20 };
@@ -36,7 +41,7 @@ export class GenerateResumeContent {
       .filter(e => e.profileId === profile.id.value)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-    const result = await this.generator.generate({
+    const generatorInput = {
       profile: {
         firstName: profile.firstName,
         lastName: profile.lastName,
@@ -61,19 +66,48 @@ export class GenerateResumeContent {
           maxBullets: BULLET_LIMITS.max
         };
       }),
-      additionalPrompt: input.additionalPrompt
-    });
+      additionalPrompt: input.additionalPrompt,
+      scope: input.scope
+    };
+
+    const result = await this.generator.generate(generatorInput);
+
+    const existing = jd.resumeOutput?.output as
+      | { headline?: string; experiences?: Array<{ experienceId: string; experienceTitle: string; companyName: string; summary: string; bullets: string[] }> }
+      | undefined;
+
+    let headline: string;
+    let mergedExperiences: typeof result.experiences;
+
+    if (input.scope?.type === 'headline') {
+      headline = result.headline;
+      mergedExperiences = (existing?.experiences as typeof result.experiences) ?? [];
+    } else if (input.scope?.type === 'experience') {
+      headline = existing?.headline ?? result.headline;
+      const prev = (existing?.experiences as typeof result.experiences) ?? [];
+      const regenerated = result.experiences[0];
+      if (regenerated) {
+        mergedExperiences = prev.map(e =>
+          e.experienceId === regenerated.experienceId ? regenerated : e
+        );
+      } else {
+        mergedExperiences = prev;
+      }
+    } else {
+      headline = result.headline;
+      mergedExperiences = result.experiences;
+    }
 
     jd.resumeOutput = {
       schema: result.requestSchema,
-      output: { headline: result.headline, experiences: result.experiences },
+      output: { headline, experiences: mergedExperiences },
       generatedAt: new Date()
     };
     await this.jobDescriptionRepository.save(jd);
 
     return {
-      headline: result.headline,
-      experiences: result.experiences.map(e => ({
+      headline,
+      experiences: mergedExperiences.map(e => ({
         experienceId: e.experienceId,
         experienceTitle: e.experienceTitle,
         companyName: e.companyName,
