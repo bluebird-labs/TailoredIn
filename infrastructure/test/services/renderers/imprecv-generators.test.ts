@@ -108,7 +108,7 @@ describe('generateImprecvYaml', () => {
     const input = makeInput();
     input.experiences[0].bullets = [];
     const yaml = generateImprecvYaml(input);
-    expect(yaml).not.toContain('Staff Engineer');
+    expect(yaml).not.toContain('position: "Staff Engineer"');
   });
 
   test('includes education institution', () => {
@@ -119,6 +119,11 @@ describe('generateImprecvYaml', () => {
   test('includes graduation year as endDate year', () => {
     const yaml = generateImprecvYaml(makeInput());
     expect(yaml).toContain('"2020-');
+  });
+
+  test('includes headline summary', () => {
+    const yaml = generateImprecvYaml(makeInput());
+    expect(yaml).toContain('Staff Engineer focused on platform');
   });
 });
 

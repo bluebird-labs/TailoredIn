@@ -68,6 +68,7 @@ ${highlights}`;
   email: "${escapeYamlString(personal.email)}"
   phone: "${escapeYamlString(personal.phone ?? '')}"
   url: "${escapeYamlString(personal.website ?? '')}"
+  summary: "${escapeYamlString(input.headlineSummary)}"
   location:
     city: "${escapeYamlString(personal.location ?? '')}"
   profiles:
