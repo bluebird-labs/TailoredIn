@@ -73,7 +73,7 @@ export type { ResumeRendererFactory, ResumeTheme } from './ResumeRendererFactory
 
 - [ ] **Step 3: Verify `application/src/index.ts` re-exports ports**
 
-`application/src/index.ts` already has `export type * from './ports/index.js'` and `export * from './ports/index.js'` (via sub-barrel). Confirm `ResumeTheme` and `DEFAULT_RESUME_THEME` are re-exported.
+`application/src/index.ts` already has `export type * from './ports/index.js'` and `export * from './ports/index.js'` (via sub-barrel). Confirm `ResumeTheme` is re-exported. `DEFAULT_RESUME_THEME` is intentionally excluded from the barrel (value constant, internal to the application package — imported directly by path in `GenerateResumePdf.ts`).
 
 Run:
 ```bash

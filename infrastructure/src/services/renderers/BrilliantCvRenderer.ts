@@ -9,7 +9,7 @@ import {
   generateMetadataToml,
   generateProfessionalTyp,
   type ResumeRenderEducation,
-  type ResumeRenderExperience,
+  type ResumeRenderExperience
 } from '../typst-generators.js';
 
 const TYPST_DIR = join(import.meta.dir, '../../../typst/brilliant-cv');
@@ -73,21 +73,21 @@ export class BrilliantCvRenderer implements ResumeRenderer {
     await writeFile(join(tmpDir, 'config.typ'), generateConfigTyp(input.template));
     await writeFile(
       join(tmpDir, 'metadata.toml'),
-      generateMetadataToml(input.personal, input.headlineSummary, input.template),
+      generateMetadataToml(input.personal, input.headlineSummary, input.template)
     );
   }
 
   private async compile(
     tmpDir: string,
     experiences: ResumeRenderExperience[],
-    educations: ResumeRenderEducation[],
+    educations: ResumeRenderEducation[]
   ): Promise<Uint8Array> {
     await writeFile(join(tmpDir, 'modules_en', 'professional.typ'), generateProfessionalTyp(experiences));
     await writeFile(join(tmpDir, 'modules_en', 'education.typ'), generateEducationTyp(educations));
 
     const proc = Bun.spawn(['typst', 'compile', '--font-path', './fonts', 'cv.typ', 'output.pdf'], {
       cwd: tmpDir,
-      stderr: 'pipe',
+      stderr: 'pipe'
     });
 
     const exitCode = await proc.exited;
