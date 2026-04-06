@@ -43,6 +43,7 @@ import { ListJobDescriptionsRoute } from './routes/job-description/ListJobDescri
 import { ParseJobDescriptionRoute } from './routes/job-description/ParseJobDescriptionRoute.js';
 import { UpdateJobDescriptionRoute } from './routes/job-description/UpdateJobDescriptionRoute.js';
 import { GenerateResumeContentRoute } from './routes/resume/GenerateResumeContentRoute.js';
+import { GenerateResumePdfRoute } from './routes/resume/GenerateResumePdfRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
 // --- App ---
@@ -154,6 +155,7 @@ const app = new Elysia()
   .use(container.get(DeleteJobDescriptionRoute).plugin())
   // Resume
   .use(container.get(GenerateResumeContentRoute).plugin())
+  .use(container.get(GenerateResumePdfRoute).plugin())
   .listen(port);
 
 log.info(`Listening on port ${port}...`);

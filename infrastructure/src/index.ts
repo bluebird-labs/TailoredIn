@@ -23,3 +23,4 @@ export {
   LlmJsonRequest,
   LlmRequestError
 } from './services/llm/index.js';
+export { TypstResumeRenderer } from './services/TypstResumeRenderer.js';

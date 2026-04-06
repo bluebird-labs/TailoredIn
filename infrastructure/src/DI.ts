@@ -18,6 +18,7 @@ import type {
   DiscoverCompanies,
   EnrichCompanyData,
   GenerateResumeContent,
+  GenerateResumePdf,
   GetApplication,
   GetCompany,
   GetExperience,
@@ -33,6 +34,7 @@ import type {
   ListJobDescriptions,
   ParseJobDescription,
   ResumeContentGenerator,
+  ResumeRenderer,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -119,7 +121,9 @@ export const DI = {
 
   Resume: {
     Generator: new InjectionToken<ResumeContentGenerator>('DI.Resume.Generator'),
-    Generate: new InjectionToken<GenerateResumeContent>('DI.Resume.Generate')
+    Generate: new InjectionToken<GenerateResumeContent>('DI.Resume.Generate'),
+    Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
+    GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf')
   },
 
   Company: {

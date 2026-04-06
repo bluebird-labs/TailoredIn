@@ -7,3 +7,9 @@ export type {
   ResumeContentGeneratorInput,
   ResumeContentGeneratorResult
 } from './ResumeContentGenerator.js';
+export type {
+  ResumeRenderEducation,
+  ResumeRenderExperience,
+  ResumeRenderer,
+  ResumeRenderInput
+} from './ResumeRenderer.js';

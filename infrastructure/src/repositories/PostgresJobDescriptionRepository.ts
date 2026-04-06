@@ -26,7 +26,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
     const ormEntities = await this.orm.em.find(
       OrmJobDescription,
       { company: companyId },
-      { orderBy: { createdAt: 'DESC' } }
+      { populate: ['company'], orderBy: { createdAt: 'DESC' } }
     );
     return ormEntities.map(e => this.toDomain(e));
   }

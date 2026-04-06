@@ -211,6 +211,9 @@ function JobDescriptionDetailPage() {
       {generateOpen && (
         <GenerateResumeModal
           open
+          jobDescriptionId={jobDescriptionId}
+          jobTitle={jd.title}
+          companyName={company?.name ?? jd.companyId}
           onOpenChange={next => {
             if (!next) setGenerateOpen(false);
           }}

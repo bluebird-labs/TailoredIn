@@ -17,6 +17,7 @@ import {
   DiscoverCompanies,
   EnrichCompanyData,
   GenerateResumeContent,
+  GenerateResumePdf,
   GetApplication,
   GetCompany,
   GetExperience,
@@ -56,7 +57,8 @@ import {
   PostgresExperienceRepository,
   PostgresHeadlineRepository,
   PostgresJobDescriptionRepository,
-  PostgresProfileRepository
+  PostgresProfileRepository,
+  TypstResumeRenderer
 } from '@tailoredin/infrastructure';
 
 const orm = await MikroORM.init(
@@ -267,6 +269,20 @@ container.bind({
       container.get(DI.Experience.Repository),
       container.get(DI.JobDescription.Repository),
       container.get(DI.Resume.Generator)
+    )
+});
+container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
+container.bind({
+  provide: DI.Resume.GeneratePdf,
+  useFactory: () =>
+    new GenerateResumePdf(
+      container.get(DI.Profile.Repository),
+      container.get(DI.Headline.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.Education.Repository),
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.Resume.Generator),
+      container.get(DI.Resume.Renderer)
     )
 });
 

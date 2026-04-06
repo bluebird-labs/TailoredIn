@@ -20,6 +20,7 @@ export type ResumeContentGeneratorResult = {
     experienceId: string;
     experienceTitle: string;
     companyName: string;
+    summary: string;
     bullets: string[];
   }>;
 };

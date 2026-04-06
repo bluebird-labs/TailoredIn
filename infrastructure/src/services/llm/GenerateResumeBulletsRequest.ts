@@ -10,6 +10,7 @@ const generateResumeBulletsSchema = z.object({
   experiences: z.array(
     z.object({
       experienceId: z.string(),
+      summary: z.string().min(20).max(300),
       bullets: z.array(z.string().min(80).max(350))
     })
   )

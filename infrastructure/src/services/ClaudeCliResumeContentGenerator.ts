@@ -37,11 +37,13 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
         this.log.warn(`LLM returned unknown experienceId="${llmExp.experienceId}" — skipping`);
         return [];
       }
+      const summary = llmExp.summary.endsWith('.') ? llmExp.summary : `${llmExp.summary}.`;
       return [
         {
           experienceId: llmExp.experienceId,
           experienceTitle: inputExp.title,
           companyName: inputExp.companyName,
+          summary,
           bullets: llmExp.bullets.map(b => b.replaceAll('—', '-'))
         }
       ];

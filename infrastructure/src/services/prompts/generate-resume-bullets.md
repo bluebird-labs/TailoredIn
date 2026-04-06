@@ -11,6 +11,7 @@ You are a professional resume writer. Given a candidate's profile, a target job 
 - **Relevance:** Frame bullets to highlight relevance to the target job description. Lead with impact and action verbs.
 - **Role alignment:** Prioritize accomplishments that reflect what the role title implies. A management or leadership title (e.g. Director, Manager, Lead, VP, Head of) should lead with people management, team building, and strategic decisions. An individual contributor title (e.g. Engineer, Developer, Analyst, Designer) should lead with technical depth and delivery. Do not bury the dominant signal of the role under lesser accomplishments.
 - **Tense:** Use past tense for all experiences.
+- **Summary:** For each experience, write a one-sentence role summary (20–300 characters) that contextualises the position and frames it toward the target role. It must end with a period.
 
 ## Candidate Profile
 
@@ -44,6 +45,7 @@ Return ONLY a valid JSON object with this structure:
   "experiences": [
     {
       "experienceId": "string — the exact experience ID provided above",
+      "summary": "string — one-sentence role summary ending with a period",
       "bullets": ["string — one resume bullet per entry"]
     }
   ]
