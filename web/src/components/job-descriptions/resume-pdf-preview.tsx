@@ -128,7 +128,7 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
       <Dialog open={fullPage} onOpenChange={setFullPage}>
         <DialogContent
           showCloseButton
-          className="fixed inset-4 top-4 left-4 flex max-w-none -translate-x-0 -translate-y-0 flex-col sm:max-w-none"
+          className="fixed inset-4 flex w-auto max-w-none -translate-x-0 -translate-y-0 flex-col sm:max-w-none"
         >
           <DialogTitle className="sr-only">Resume PDF Preview</DialogTitle>
           <div className="flex items-center gap-2">
