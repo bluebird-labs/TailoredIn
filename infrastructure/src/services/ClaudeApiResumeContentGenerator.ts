@@ -26,7 +26,7 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
 
     if (result.isErr) {
       this.log.error(`Resume content generation failed | duration=${duration}ms error="${result.error.message}"`);
-      throw new ExternalServiceError('Claude API', 'Resume content generation failed');
+      throw new ExternalServiceError('Claude API', result.error.message);
     }
 
     const requestSchema = JSON.parse(request.getJsonSchema()) as Record<string, unknown>;

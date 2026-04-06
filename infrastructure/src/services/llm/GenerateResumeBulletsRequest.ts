@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ResumeContentGeneratorInput } from '@tailoredin/application';
+import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { LlmJsonRequest } from './LlmJsonRequest.js';
 
@@ -18,8 +19,8 @@ const generateResumeBulletsSchema = z.object({
 
 export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generateResumeBulletsSchema> {
   public readonly schema = generateResumeBulletsSchema;
-  public get model() {
-    return 'haiku';
+  public get model(): Anthropic.Messages.Model {
+    return 'claude-haiku-4-5-20251001';
   }
 
   public constructor(private readonly input: ResumeContentGeneratorInput) {
