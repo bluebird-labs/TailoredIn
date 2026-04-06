@@ -4,6 +4,8 @@
 #set text(size: cfg-body-font-size)
 #set par(leading: cfg-leading)
 #set page(margin: cfg-margin)
+// Bump job-title smallcaps from package default 8pt to 9pt for readability
+#show smallcaps: it => text(size: 9pt, it)
 // Override personal info icons to use text labels instead of Font Awesome
 #let custom-icons = (
   github: box(width: 8pt, align(center, text(size: 7pt, "GH"))),

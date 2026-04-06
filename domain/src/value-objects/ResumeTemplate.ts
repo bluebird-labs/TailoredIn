@@ -15,10 +15,10 @@ export type ResumeTemplate = {
 export const DEFAULT_RESUME_TEMPLATE: ResumeTemplate = {
   id: 'brilliant-cv-default',
   pageSize: 'us-letter',
-  margins: { top: 1.1, bottom: 1.1, left: 1.1, right: 1.1 },
+  margins: { top: 1.4, bottom: 1.4, left: 1.4, right: 1.4 },
   bodyFontSizePt: 10,
   lineHeightEm: 0.65,
   headerFontSizePt: 32,
-  sectionSpacingPt: 2,
-  entrySpacingPt: 2
+  sectionSpacingPt: 4,
+  entrySpacingPt: 4
 };
