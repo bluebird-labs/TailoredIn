@@ -1,5 +1,9 @@
 import { inject, injectable } from '@needle-di/core';
-import type { ResumeContentGenerator, ResumeContentGeneratorInput, ResumeContentGeneratorResult } from '@tailoredin/application';
+import type {
+  ResumeContentGenerator,
+  ResumeContentGeneratorInput,
+  ResumeContentGeneratorResult
+} from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { DI } from '../DI.js';
@@ -30,6 +34,7 @@ export class ClaudeCliResumeContentGenerator implements ResumeContentGenerator {
     const experiences = result.value.experiences.flatMap(llmExp => {
       const inputExp = input.experiences.find(e => e.id === llmExp.experienceId);
       if (!inputExp) {
+        this.log.warn(`LLM returned unknown experienceId="${llmExp.experienceId}" — skipping`);
         return [];
       }
       return [
