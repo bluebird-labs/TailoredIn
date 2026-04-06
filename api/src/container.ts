@@ -58,7 +58,7 @@ import {
   PostgresHeadlineRepository,
   PostgresJobDescriptionRepository,
   PostgresProfileRepository,
-  TypstResumeRenderer
+  TypstResumeRendererFactory
 } from '@tailoredin/infrastructure';
 
 const orm = await MikroORM.init(
@@ -271,7 +271,7 @@ container.bind({
       container.get(DI.Resume.Generator)
     )
 });
-container.bind({ provide: DI.Resume.Renderer, useClass: TypstResumeRenderer });
+container.bind({ provide: DI.Resume.RendererFactory, useClass: TypstResumeRendererFactory });
 container.bind({
   provide: DI.Resume.GeneratePdf,
   useFactory: () =>
@@ -282,7 +282,7 @@ container.bind({
       container.get(DI.Education.Repository),
       container.get(DI.JobDescription.Repository),
       container.get(DI.Resume.Generator),
-      container.get(DI.Resume.Renderer)
+      container.get(DI.Resume.RendererFactory)
     )
 });
 

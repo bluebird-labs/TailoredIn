@@ -34,7 +34,7 @@ import type {
   ListJobDescriptions,
   ParseJobDescription,
   ResumeContentGenerator,
-  ResumeRenderer,
+  ResumeRendererFactory,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -122,7 +122,7 @@ export const DI = {
   Resume: {
     Generator: new InjectionToken<ResumeContentGenerator>('DI.Resume.Generator'),
     Generate: new InjectionToken<GenerateResumeContent>('DI.Resume.Generate'),
-    Renderer: new InjectionToken<ResumeRenderer>('DI.Resume.Renderer'),
+    RendererFactory: new InjectionToken<ResumeRendererFactory>('DI.Resume.RendererFactory'),
     GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf')
   },
 

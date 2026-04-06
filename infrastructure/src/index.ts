@@ -12,6 +12,7 @@ export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDesc
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 // Services
 export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
+export { TypstResumeRendererFactory } from './services/TypstResumeRendererFactory.js';
 export { ClaudeCliCompanyDiscoveryProvider } from './services/ClaudeCliCompanyDiscoveryProvider.js';
 export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptionParser.js';
 export { ClaudeCliResumeContentGenerator } from './services/ClaudeCliResumeContentGenerator.js';
