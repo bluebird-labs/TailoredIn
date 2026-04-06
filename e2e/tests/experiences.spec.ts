@@ -49,8 +49,8 @@ test.describe('Experiences Page', () => {
     await dialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Experience created')).toBeVisible();
-    await expect(page.getByText('NewCo')).toBeVisible();
     // Use first() to guard against retry-induced duplicates in shared DB state
+    await expect(page.getByText('NewCo').first()).toBeVisible();
     await expect(page.getByText('Principal Engineer').first()).toBeVisible();
   });
 
@@ -115,14 +115,15 @@ test.describe('Experiences Page', () => {
   });
 
   test('cancel delete keeps experience', async ({ page }) => {
-    await page.getByText('ScratchCorp').hover();
-    const card = page.locator('.group').filter({ hasText: 'ScratchCorp' });
+    // Use first() to guard against retry-induced duplicates in shared DB state
+    await page.getByText('ScratchCorp').first().hover();
+    const card = page.locator('.group').filter({ hasText: 'ScratchCorp' }).first();
     await card.locator('button.text-destructive').click();
 
     const alertDialog = page.getByRole('alertdialog');
     await alertDialog.getByRole('button', { name: 'Cancel' }).click();
 
-    await expect(page.getByText('ScratchCorp')).toBeVisible();
+    await expect(page.getByText('ScratchCorp').first()).toBeVisible();
   });
 
   test('validation: empty required fields', async ({ page }) => {

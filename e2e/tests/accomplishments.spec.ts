@@ -51,7 +51,10 @@ test.describe('Accomplishments', () => {
 
     await addForm.getByRole('button', { name: 'Add', exact: true }).click();
 
-    await expect(page.getByText('Accomplishment added')).toBeVisible();
+    // The add form closes and the new accomplishment appears in the editors list
+    await expect(addForm).not.toBeVisible();
+    const editors = getEditors(dialog);
+    await expect(editors.last().getByLabel('Title')).toHaveValue('Built observability platform');
   });
 
   test('cancel adding accomplishment hides the form', async ({ page }) => {
