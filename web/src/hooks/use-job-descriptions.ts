@@ -13,6 +13,8 @@ export type ResumeOutputExperience = {
   experienceId: string;
   experienceTitle: string;
   companyName: string;
+  startDate: string;
+  endDate: string;
   summary: string;
   bullets: string[];
   displayedBulletCount: number | null;

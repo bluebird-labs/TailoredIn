@@ -43,6 +43,14 @@ function formatDate(dateStr: string | null): string | null {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function formatMonthYear(value: string): string {
+  if (!value) return '';
+  const [year, month] = value.split('-');
+  if (!year || !month) return value;
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
 function ExperienceCard({
   exp,
   onRegenerate,
@@ -57,67 +65,87 @@ function ExperienceCard({
   const total = exp.bullets.length;
   const displayed = exp.displayedBulletCount ?? total;
 
+  const startFormatted = formatMonthYear(exp.startDate);
+  const endFormatted = formatMonthYear(exp.endDate);
+  const dateRange = startFormatted && endFormatted ? `${startFormatted} — ${endFormatted}` : '';
+
   return (
-    <div className="border rounded-lg p-4 space-y-3">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[14px] font-medium text-foreground">{exp.experienceTitle}</p>
-          <p className="text-[13px] text-muted-foreground">{exp.companyName}</p>
-        </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <div className="flex items-center gap-0.5 border rounded-md px-1 h-7">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-5 w-5"
-              onClick={() => onBulletCountChange(Math.max(0, displayed - 1))}
-              disabled={displayed <= 0}
-              title="Show fewer bullets"
-            >
-              <Minus className="h-3 w-3" />
-            </Button>
-            <button
-              type="button"
-              className="text-[12px] text-muted-foreground tabular-nums min-w-[40px] text-center hover:text-foreground transition-colors"
-              onClick={() => onBulletCountChange(null)}
-              title="Reset to show all bullets"
-            >
-              {displayed}/{total}
-            </button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-5 w-5"
-              onClick={() => onBulletCountChange(Math.min(total, displayed + 1))}
-              disabled={displayed >= total}
-              title="Show more bullets"
-            >
-              <Plus className="h-3 w-3" />
-            </Button>
+    <Collapsible defaultOpen={false}>
+      <div className="border rounded-lg p-4">
+        <CollapsibleTrigger className="text-left">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-[14px] font-medium text-foreground truncate">{exp.experienceTitle}</p>
+              {dateRange && <p className="text-[12px] text-muted-foreground shrink-0">{dateRange}</p>}
+            </div>
+            <p className="text-[13px] text-muted-foreground">{exp.companyName}</p>
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-7 w-7"
-            onClick={onRegenerate}
-            disabled={isRegenerating}
-            title="Regenerate this experience"
-          >
-            {isRegenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
-          </Button>
-        </div>
+        </CollapsibleTrigger>
+        <CollapsiblePanel>
+          <div className="pt-3 space-y-3">
+            <div className="flex items-center justify-end gap-1">
+              <div className="flex items-center gap-0.5 border rounded-md px-1 h-7">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-5 w-5"
+                  onClick={() => onBulletCountChange(Math.max(0, displayed - 1))}
+                  disabled={displayed <= 0}
+                  title="Show fewer bullets"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <button
+                  type="button"
+                  className="text-[12px] text-muted-foreground tabular-nums min-w-[40px] text-center hover:text-foreground transition-colors"
+                  onClick={() => onBulletCountChange(null)}
+                  title="Reset to show all bullets"
+                >
+                  {displayed}/{total}
+                </button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-5 w-5"
+                  onClick={() => onBulletCountChange(Math.min(total, displayed + 1))}
+                  disabled={displayed >= total}
+                  title="Show more bullets"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7"
+                onClick={onRegenerate}
+                disabled={isRegenerating}
+                title="Regenerate this experience"
+              >
+                {isRegenerating ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RotateCw className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </div>
+            {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
+            <ul className="space-y-1.5">
+              {exp.bullets.map((bullet, i) => (
+                <li
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static ordered list
+                  key={i}
+                  className={`flex gap-2 text-[13px] leading-relaxed${i >= displayed ? ' opacity-30' : ''}`}
+                >
+                  <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </CollapsiblePanel>
       </div>
-      {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
-      <ul className="space-y-1.5">
-        {exp.bullets.map((bullet, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static ordered list
-          <li key={i} className={`flex gap-2 text-[13px] leading-relaxed${i >= displayed ? ' opacity-30' : ''}`}>
-            <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
-            <span>{bullet}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    </Collapsible>
   );
 }
 
