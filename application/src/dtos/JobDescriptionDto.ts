@@ -1,4 +1,4 @@
-import type { JobDescription, JobLevel, JobSource, LocationType, ResumeContent } from '@tailoredin/domain';
+import type { Experience, JobDescription, JobLevel, JobSource, LocationType, ResumeContent } from '@tailoredin/domain';
 
 export type SalaryRangeDto = {
   readonly min: number | null;
@@ -10,6 +10,8 @@ export type ResumeOutputDto = {
   readonly headline: string;
   readonly experiences: ReadonlyArray<{
     readonly experienceId: string;
+    readonly experienceTitle: string;
+    readonly companyName: string;
     readonly summary: string;
     readonly bullets: readonly string[];
   }>;
@@ -34,7 +36,11 @@ export type JobDescriptionDto = {
   readonly resumeOutput: ResumeOutputDto | null;
 };
 
-export function toJobDescriptionDto(jd: JobDescription, resumeContent?: ResumeContent | null): JobDescriptionDto {
+export function toJobDescriptionDto(
+  jd: JobDescription,
+  resumeContent?: ResumeContent | null,
+  experiences?: Experience[]
+): JobDescriptionDto {
   return {
     id: jd.id.value,
     companyId: jd.companyId,
@@ -55,11 +61,16 @@ export function toJobDescriptionDto(jd: JobDescription, resumeContent?: ResumeCo
     resumeOutput: resumeContent
       ? {
           headline: resumeContent.headline,
-          experiences: resumeContent.experiences.map(e => ({
-            experienceId: e.experienceId,
-            summary: e.summary,
-            bullets: e.bullets
-          })),
+          experiences: resumeContent.experiences.map(e => {
+            const exp = experiences?.find(x => x.id.value === e.experienceId);
+            return {
+              experienceId: e.experienceId,
+              experienceTitle: exp?.title ?? '',
+              companyName: exp?.companyName ?? '',
+              summary: e.summary,
+              bullets: e.bullets
+            };
+          }),
           generatedAt: resumeContent.createdAt.toISOString()
         }
       : null

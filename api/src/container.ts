@@ -222,7 +222,11 @@ container.bind({
 container.bind({
   provide: DI.JobDescription.Get,
   useFactory: () =>
-    new GetJobDescription(container.get(DI.JobDescription.Repository), container.get(DI.ResumeContent.Repository))
+    new GetJobDescription(
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.ResumeContent.Repository),
+      container.get(DI.Experience.Repository)
+    )
 });
 container.bind({
   provide: DI.JobDescription.List,

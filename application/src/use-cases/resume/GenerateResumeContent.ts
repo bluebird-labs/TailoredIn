@@ -78,13 +78,17 @@ export class GenerateResumeContent {
     let headline: string;
     let mergedExperiences: typeof result.experiences;
 
+    const resolveExperienceMeta = (experienceId: string) => {
+      const exp = experiences.find(e => e.id.value === experienceId);
+      return { experienceTitle: exp?.title ?? '', companyName: exp?.companyName ?? '' };
+    };
+
     if (input.scope?.type === 'headline') {
       headline = result.headline;
       mergedExperiences = existing
         ? existing.experiences.map(e => ({
             experienceId: e.experienceId,
-            experienceTitle: '',
-            companyName: '',
+            ...resolveExperienceMeta(e.experienceId),
             summary: e.summary,
             bullets: e.bullets
           }))
@@ -94,8 +98,7 @@ export class GenerateResumeContent {
       const prev = existing
         ? existing.experiences.map(e => ({
             experienceId: e.experienceId,
-            experienceTitle: '',
-            companyName: '',
+            ...resolveExperienceMeta(e.experienceId),
             summary: e.summary,
             bullets: e.bullets
           }))
