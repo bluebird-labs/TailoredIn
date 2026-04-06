@@ -17,7 +17,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
     const orm = await this.orm.em.findOne(
       OrmResumeContent,
       { jobDescription: jobDescriptionId },
-      { orderBy: { createdAt: 'DESC' } }
+      { populate: ['profile', 'jobDescription'], orderBy: { createdAt: 'DESC' } }
     );
     return orm ? this.toDomain(orm) : null;
   }
