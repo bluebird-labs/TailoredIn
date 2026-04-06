@@ -222,7 +222,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
                 )}
               </Button>
             </div>
-            <p className="text-[15px] font-medium text-foreground">{headline}</p>
+            <p className="text-[15px] text-foreground">{headline}</p>
           </div>
         )}
 
