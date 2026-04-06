@@ -1,8 +1,9 @@
 #import "@preview/brilliant-cv:3.3.0": cv
+#import "./config.typ": cfg-body-font-size, cfg-leading, cfg-margin
 #let metadata = toml("./metadata.toml")
-#set text(size: 10.5pt)
-#set par(leading: 0.75em)
-#set page(margin: 1.5cm)
+#set text(size: cfg-body-font-size)
+#set par(leading: cfg-leading)
+#set page(margin: cfg-margin)
 // Override personal info icons to use text labels instead of Font Awesome
 #let custom-icons = (
   github: box(width: 10pt, align(center, text(size: 8pt, "GH"))),
