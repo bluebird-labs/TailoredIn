@@ -6,5 +6,6 @@ export type ResumeExperienceBulletsDto = {
 };
 
 export type ResumeContentDto = {
+  headline: string;
   experiences: ResumeExperienceBulletsDto[];
 };

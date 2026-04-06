@@ -9,12 +9,11 @@ test.describe('Navigation & Routing', () => {
     await expect(page).toHaveURL(/\/profile/);
   });
 
-  test('sidebar has all four nav items', async ({ page }) => {
+  test('sidebar has all three nav items', async ({ page }) => {
     await page.goto('/profile');
     const nav = page.locator(sidebar);
     await expect(nav.getByText('Profile')).toBeVisible();
     await expect(nav.getByText('Experiences')).toBeVisible();
-    await expect(nav.getByText('Headlines')).toBeVisible();
     await expect(nav.getByText('Education')).toBeVisible();
   });
 
@@ -32,13 +31,6 @@ test.describe('Navigation & Routing', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Experiences' })).toBeVisible();
   });
 
-  test('sidebar Headlines navigates to /headlines', async ({ page }) => {
-    await page.goto('/profile');
-    await page.locator(sidebar).getByText('Headlines').click();
-    await page.waitForURL('/headlines');
-    await expect(page.getByRole('heading', { level: 1, name: 'Headlines' })).toBeVisible();
-  });
-
   test('sidebar Education navigates to /education', async ({ page }) => {
     await page.goto('/profile');
     await page.locator(sidebar).getByText('Education').click();
@@ -50,7 +42,6 @@ test.describe('Navigation & Routing', () => {
     const routes = [
       { path: '/profile', label: 'Profile' },
       { path: '/experiences', label: 'Experiences' },
-      { path: '/headlines', label: 'Headlines' },
       { path: '/education', label: 'Education' }
     ];
 

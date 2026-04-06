@@ -51,6 +51,6 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
 
     this.log.info(`Resume bullets generated | experiences=${experiences.length} duration=${duration}ms`);
 
-    return { experiences, requestSchema };
+    return { headline: result.value.headline, experiences, requestSchema };
   }
 }

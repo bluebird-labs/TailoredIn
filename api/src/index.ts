@@ -31,10 +31,6 @@ import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishm
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
 import { ExtractTextRoute } from './routes/factory/ExtractTextRoute.js';
 import { GetProfileRoute } from './routes/GetProfileRoute.js';
-import { CreateHeadlineRoute } from './routes/headline/CreateHeadlineRoute.js';
-import { DeleteHeadlineRoute } from './routes/headline/DeleteHeadlineRoute.js';
-import { ListHeadlinesRoute } from './routes/headline/ListHeadlinesRoute.js';
-import { UpdateHeadlineRoute } from './routes/headline/UpdateHeadlineRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { CreateJobDescriptionRoute } from './routes/job-description/CreateJobDescriptionRoute.js';
 import { DeleteJobDescriptionRoute } from './routes/job-description/DeleteJobDescriptionRoute.js';
@@ -114,11 +110,6 @@ const app = new Elysia()
   .use(container.get(CreateEducationRoute).plugin())
   .use(container.get(UpdateEducationRoute).plugin())
   .use(container.get(DeleteEducationRoute).plugin())
-  // Headlines
-  .use(container.get(ListHeadlinesRoute).plugin())
-  .use(container.get(CreateHeadlineRoute).plugin())
-  .use(container.get(UpdateHeadlineRoute).plugin())
-  .use(container.get(DeleteHeadlineRoute).plugin())
   // Experiences
   .use(container.get(ListExperiencesRoute).plugin())
   .use(container.get(GetExperienceRoute).plugin())

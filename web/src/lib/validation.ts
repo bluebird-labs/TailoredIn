@@ -26,19 +26,6 @@ function validateProfile(values: ProfileFormState): ValidationErrors<ProfileForm
   return errors;
 }
 
-// --- Headline ---
-
-interface HeadlineFormState {
-  label: string;
-  summaryText: string;
-}
-
-function validateHeadline(values: HeadlineFormState): ValidationErrors<HeadlineFormState> {
-  const errors: ValidationErrors<HeadlineFormState> = {};
-  if (!values.label.trim()) errors.label = 'Label is required';
-  return errors;
-}
-
 // --- Education ---
 
 interface EducationFormState {
@@ -140,7 +127,6 @@ export type {
   CompanyFormState,
   EducationFormState,
   ExperienceFormState,
-  HeadlineFormState,
   JobDescriptionFormState,
   ProfileFormState,
   ValidationErrors
@@ -151,7 +137,6 @@ export {
   validateCompany,
   validateEducation,
   validateExperience,
-  validateHeadline,
   validateJobDescription,
   validateProfile
 };

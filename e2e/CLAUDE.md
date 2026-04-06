@@ -25,7 +25,6 @@ All commands can be run from any branch — the environment is fully self-contai
 e2e/tests/
 ├── navigation.spec.ts       ← Page navigation, routing
 ├── profile.spec.ts          ← Profile display and editing
-├── headlines.spec.ts        ← Headline CRUD
 ├── education.spec.ts        ← Education CRUD
 ├── experiences.spec.ts      ← Experience CRUD
 └── accomplishments.spec.ts  ← Accomplishment CRUD within experiences

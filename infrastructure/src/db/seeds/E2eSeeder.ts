@@ -16,7 +16,7 @@ export class E2eSeeder extends Seeder {
     await conn.execute(`
       TRUNCATE
         accomplishments, experiences,
-        headlines, educations, profiles,
+        educations, profiles,
         job_descriptions, companies
       CASCADE
     `);
@@ -120,33 +120,6 @@ export class E2eSeeder extends Seeder {
         0,
         NOW(), NOW()
       )
-    `);
-
-    // Headlines
-    await conn.execute(`
-      INSERT INTO headlines (id, profile_id, label, summary_text, created_at, updated_at)
-      VALUES
-        (
-          'dddddddd-0000-4000-8000-000000000001',
-          'aaaaaaaa-0000-4000-8000-000000000001',
-          'Staff Engineer',
-          'Staff-level platform engineer with deep expertise in distributed systems and developer tooling.',
-          NOW(), NOW()
-        ),
-        (
-          'dddddddd-0000-4000-8000-000000000002',
-          'aaaaaaaa-0000-4000-8000-000000000001',
-          'Engineering Manager',
-          'Technical leader who ships reliable systems and grows high-performing teams.',
-          NOW(), NOW()
-        ),
-        (
-          'dddddddd-0000-4000-8000-000000000003',
-          'aaaaaaaa-0000-4000-8000-000000000001',
-          'Full-Stack Developer',
-          'Versatile engineer comfortable across the entire stack, from React frontends to PostgreSQL internals.',
-          NOW(), NOW()
-        )
     `);
 
     // Companies

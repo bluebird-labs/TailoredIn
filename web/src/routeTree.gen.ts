@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
-import { Route as HeadlinesIndexRouteImport } from './routes/headlines/index'
 import { Route as ExperiencesIndexRouteImport } from './routes/experiences/index'
 import { Route as EducationIndexRouteImport } from './routes/education/index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies/index'
@@ -27,11 +26,6 @@ const IndexRoute = IndexRouteImport.update({
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HeadlinesIndexRoute = HeadlinesIndexRouteImport.update({
-  id: '/headlines/',
-  path: '/headlines/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperiencesIndexRoute = ExperiencesIndexRouteImport.update({
@@ -74,7 +68,6 @@ export interface FileRoutesByFullPath {
   '/companies/': typeof CompaniesIndexRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
-  '/headlines/': typeof HeadlinesIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
@@ -85,7 +78,6 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesIndexRoute
   '/education': typeof EducationIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
-  '/headlines': typeof HeadlinesIndexRoute
   '/profile': typeof ProfileIndexRoute
 }
 export interface FileRoutesById {
@@ -97,7 +89,6 @@ export interface FileRoutesById {
   '/companies/': typeof CompaniesIndexRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
-  '/headlines/': typeof HeadlinesIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRouteTypes {
@@ -110,7 +101,6 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/education/'
     | '/experiences/'
-    | '/headlines/'
     | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,7 +111,6 @@ export interface FileRouteTypes {
     | '/companies'
     | '/education'
     | '/experiences'
-    | '/headlines'
     | '/profile'
   id:
     | '__root__'
@@ -132,7 +121,6 @@ export interface FileRouteTypes {
     | '/companies/'
     | '/education/'
     | '/experiences/'
-    | '/headlines/'
     | '/profile/'
   fileRoutesById: FileRoutesById
 }
@@ -144,7 +132,6 @@ export interface RootRouteChildren {
   CompaniesIndexRoute: typeof CompaniesIndexRoute
   EducationIndexRoute: typeof EducationIndexRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
-  HeadlinesIndexRoute: typeof HeadlinesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
@@ -162,13 +149,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/headlines/': {
-      id: '/headlines/'
-      path: '/headlines'
-      fullPath: '/headlines/'
-      preLoaderRoute: typeof HeadlinesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiences/': {
@@ -224,7 +204,6 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesIndexRoute: CompaniesIndexRoute,
   EducationIndexRoute: EducationIndexRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,
-  HeadlinesIndexRoute: HeadlinesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport

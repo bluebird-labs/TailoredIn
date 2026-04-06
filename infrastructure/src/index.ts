@@ -7,7 +7,6 @@ export { PostgresApplicationRepository } from './repositories/PostgresApplicatio
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 export { PostgresEducationRepository } from './repositories/PostgresEducationRepository.js';
 export { PostgresExperienceRepository } from './repositories/PostgresExperienceRepository.js';
-export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepository.js';
 export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDescriptionRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 // Services

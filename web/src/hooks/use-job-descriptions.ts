@@ -19,7 +19,7 @@ export type ResumeOutputExperience = {
 
 export type ResumeOutput = {
   schema: Record<string, unknown>;
-  output: { experiences: ResumeOutputExperience[] };
+  output: { headline?: string; experiences: ResumeOutputExperience[] };
   generatedAt: string;
 };
 

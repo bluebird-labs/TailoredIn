@@ -12,7 +12,6 @@ import { Company } from './entities/companies/Company.js';
 import { Education } from './entities/education/Education.js';
 import { Accomplishment as OrmAccomplishment } from './entities/experience/Accomplishment.js';
 import { Experience as OrmExperience } from './entities/experience/Experience.js';
-import { Headline as OrmHeadline } from './entities/headline/Headline.js';
 import { JobDescription as OrmJobDescription } from './entities/job-description/JobDescription.js';
 import { Profile } from './entities/profile/Profile.js';
 
@@ -38,7 +37,6 @@ export function createOrmConfig(db: OrmDbConfig) {
       Profile,
       Education,
       Company,
-      OrmHeadline,
       OrmExperience,
       OrmAccomplishment,
       OrmApplication,

@@ -7,13 +7,11 @@ import type {
   CreateCompany,
   CreateEducation,
   CreateExperience,
-  CreateHeadline,
   CreateJobDescription,
   DeleteAccomplishment,
   DeleteApplication,
   DeleteEducation,
   DeleteExperience,
-  DeleteHeadline,
   DeleteJobDescription,
   DiscoverCompanies,
   EnrichCompanyData,
@@ -30,7 +28,6 @@ import type {
   ListCompanies,
   ListEducation,
   ListExperiences,
-  ListHeadlines,
   ListJobDescriptions,
   ParseJobDescription,
   ResumeContentGenerator,
@@ -42,7 +39,6 @@ import type {
   UpdateCompany,
   UpdateEducation,
   UpdateExperience,
-  UpdateHeadline,
   UpdateJobDescription,
   UpdateProfile
 } from '@tailoredin/application';
@@ -51,7 +47,6 @@ import type {
   CompanyRepository,
   EducationRepository,
   ExperienceRepository,
-  HeadlineRepository,
   JobDescriptionRepository,
   ProfileRepository
 } from '@tailoredin/domain';
@@ -88,14 +83,6 @@ export const DI = {
     Repository: new InjectionToken<ProfileRepository>('DI.Profile.Repository'),
     GetProfile: new InjectionToken<GetProfile>('DI.Profile.GetProfile'),
     UpdateProfile: new InjectionToken<UpdateProfile>('DI.Profile.UpdateProfile')
-  },
-
-  Headline: {
-    Repository: new InjectionToken<HeadlineRepository>('DI.Headline.Repository'),
-    List: new InjectionToken<ListHeadlines>('DI.Headline.List'),
-    Create: new InjectionToken<CreateHeadline>('DI.Headline.Create'),
-    Update: new InjectionToken<UpdateHeadline>('DI.Headline.Update'),
-    Delete: new InjectionToken<DeleteHeadline>('DI.Headline.Delete')
   },
 
   Education: {

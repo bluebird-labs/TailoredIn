@@ -64,6 +64,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
   const generate = useGenerateResumeContent(jd.id);
 
   const resumeOutput = jd.resumeOutput;
+  const headline = resumeOutput?.output.headline ?? null;
   const experiences = resumeOutput?.output.experiences ?? [];
   const generatedAt = resumeOutput ? formatDate(resumeOutput.generatedAt) : null;
 
@@ -132,6 +133,13 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
             </Button>
           </div>
         </div>
+
+        {headline && (
+          <div className="border rounded-lg p-4">
+            <p className="text-[12px] text-muted-foreground mb-1">Headline</p>
+            <p className="text-[15px] font-medium text-foreground">{headline}</p>
+          </div>
+        )}
 
         <div className="space-y-3">
           {experiences.map(exp => (

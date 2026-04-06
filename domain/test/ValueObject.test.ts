@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
+import { EducationId } from '../src/value-objects/EducationId.js';
 import { ExperienceId } from '../src/value-objects/ExperienceId.js';
-import { HeadlineId } from '../src/value-objects/HeadlineId.js';
 import { SalaryRange } from '../src/value-objects/SalaryRange.js';
 
 describe('ValueObject', () => {
@@ -19,9 +19,9 @@ describe('ValueObject', () => {
 
     test('not equal when different types with same value', () => {
       const expId = new ExperienceId('abc');
-      const headlineId = new HeadlineId('abc');
+      const eduId = new EducationId('abc');
       // biome-ignore lint/suspicious/noExplicitAny: testing cross-type equality
-      expect(expId.equals(headlineId as any)).toBe(false);
+      expect(expId.equals(eduId as any)).toBe(false);
     });
 
     test('not equal to null or undefined', () => {

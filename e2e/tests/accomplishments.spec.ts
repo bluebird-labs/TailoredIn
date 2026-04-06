@@ -138,7 +138,7 @@ test.describe('Accomplishments', () => {
     await expect(alertDialog.getByRole('button', { name: 'Cancel' })).toBeVisible();
     await expect(alertDialog.getByRole('button', { name: 'Delete' })).toBeVisible();
 
-    // Cancel to dismiss (delete confirmation is verified in headlines/education tests)
+    // Cancel to dismiss (delete confirmation is verified in education tests)
     await alertDialog.getByRole('button', { name: 'Cancel' }).click();
     await expect(alertDialog).not.toBeVisible();
   });

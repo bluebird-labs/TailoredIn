@@ -3,7 +3,6 @@ import {
   type EducationRepository,
   EntityNotFoundError,
   type ExperienceRepository,
-  type HeadlineRepository,
   JobDescriptionId,
   type JobDescriptionRepository,
   type ProfileRepository
@@ -18,7 +17,6 @@ import {
 
 export type GenerateResumePdfInput = {
   jobDescriptionId: string;
-  headlineId: string;
   theme?: ResumeTheme;
 };
 
@@ -37,7 +35,6 @@ function extractGithubUsername(url: string | null): string | null {
 export class GenerateResumePdf {
   public constructor(
     private readonly profileRepository: ProfileRepository,
-    private readonly headlineRepository: HeadlineRepository,
     private readonly experienceRepository: ExperienceRepository,
     private readonly educationRepository: EducationRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
@@ -53,12 +50,6 @@ export class GenerateResumePdf {
 
     const profile = await this.profileRepository.findSingle();
 
-    const allHeadlines = await this.headlineRepository.findAll();
-    const headline = allHeadlines.find(h => h.id.value === input.headlineId) ?? null;
-    if (!headline) {
-      throw new EntityNotFoundError('Headline', input.headlineId);
-    }
-
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences
       .filter(e => e.profileId === profile.id.value)
@@ -69,14 +60,16 @@ export class GenerateResumePdf {
       .filter(e => e.profileId === profile.id.value)
       .sort((a, b) => b.graduationYear - a.graduationYear);
 
-    const storedExperiences = jd.resumeOutput?.output?.experiences as
-      | Array<{ experienceId: string; summary: string; bullets: string[] }>
+    const storedOutput = jd.resumeOutput?.output as
+      | { headline?: string; experiences?: Array<{ experienceId: string; summary: string; bullets: string[] }> }
       | undefined;
 
+    let headlineSummary: string;
     const generatedByExperienceId = new Map<string, { summary: string; bullets: string[] }>();
 
-    if (storedExperiences?.length) {
-      for (const e of storedExperiences) {
+    if (storedOutput?.headline && storedOutput.experiences?.length) {
+      headlineSummary = storedOutput.headline;
+      for (const e of storedOutput.experiences) {
         generatedByExperienceId.set(e.experienceId, e);
       }
     } else {
@@ -86,7 +79,6 @@ export class GenerateResumePdf {
           lastName: profile.lastName,
           about: profile.about
         },
-        headline: { summaryText: headline.summaryText },
         jobDescription: {
           title: jd.title,
           description: jd.description,
@@ -107,6 +99,7 @@ export class GenerateResumePdf {
           };
         })
       });
+      headlineSummary = generated.headline;
       for (const e of generated.experiences) {
         generatedByExperienceId.set(e.experienceId, e);
       }
@@ -123,7 +116,7 @@ export class GenerateResumePdf {
         github: extractGithubUsername(profile.githubUrl),
         website: profile.websiteUrl
       },
-      headlineSummary: headline.summaryText,
+      headlineSummary,
       experiences: experiences.map(exp => {
         const gen = generatedByExperienceId.get(exp.id.value);
         return {

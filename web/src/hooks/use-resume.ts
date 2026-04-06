@@ -5,7 +5,7 @@ export type ResumeTheme = 'brilliant-cv' | 'imprecv' | 'modern-cv' | 'linked-cv'
 
 export function useGenerateResumePdf() {
   return useMutation({
-    mutationFn: async (input: { jobDescriptionId: string; headlineId: string; theme?: ResumeTheme }) => {
+    mutationFn: async (input: { jobDescriptionId: string; theme?: ResumeTheme }) => {
       const response = await fetch('/api/resume/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

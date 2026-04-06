@@ -4,9 +4,6 @@ import {
   Experience,
   ExperienceId,
   type ExperienceRepository,
-  Headline,
-  HeadlineId,
-  type HeadlineRepository,
   type JobDescriptionRepository,
   type ProfileRepository
 } from '@tailoredin/domain';
@@ -48,17 +45,6 @@ function makeExperience(
   });
 }
 
-function makeHeadline(overrides: { profileId?: string; summaryText?: string; createdAt?: Date } = {}) {
-  return new Headline({
-    id: new HeadlineId('headline-aaaa-0000-0000-0000-000000000001'),
-    profileId: overrides.profileId ?? 'profile-1',
-    label: 'Default Headline',
-    summaryText: overrides.summaryText ?? 'Product-focused engineer',
-    createdAt: overrides.createdAt ?? new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  });
-}
-
 function makeJobDescription(overrides: Record<string, unknown> = {}) {
   return {
     id: { value: 'jd-1' },
@@ -70,24 +56,16 @@ function makeJobDescription(overrides: Record<string, unknown> = {}) {
 }
 
 function makeGeneratorResult(
-  experiences: Array<{ experienceId: string; experienceTitle: string; companyName: string; bullets: string[] }>
+  experiences: Array<{ experienceId: string; experienceTitle: string; companyName: string; bullets: string[] }>,
+  headline = 'Senior Software Engineer | 10+ Years of Experience'
 ) {
-  return { experiences };
+  return { headline, experiences };
 }
 
 function mockProfileRepo(profile: ReturnType<typeof makeProfile>): ProfileRepository {
   return {
     findSingle: mock(() => Promise.resolve(profile as never)),
     save: mock(() => Promise.resolve())
-  };
-}
-
-function mockHeadlineRepo(headlines: Headline[]): HeadlineRepository {
-  return {
-    findAll: mock(() => Promise.resolve(headlines)),
-    findByIdOrFail: mock(() => Promise.reject(new Error('Not implemented'))),
-    save: mock(() => Promise.resolve()),
-    delete: mock(() => Promise.resolve())
   };
 }
 
@@ -120,7 +98,7 @@ function mockGenerator(
 // ---------------------------------------------------------------------------
 
 describe('GenerateResumeContent', () => {
-  test('happy path: returns ResumeContentDto with bullets from generator output', async () => {
+  test('happy path: returns ResumeContentDto with headline and bullets from generator output', async () => {
     const profile = makeProfile();
     const jd = makeJobDescription();
     const exp1 = makeExperience({
@@ -131,26 +109,28 @@ describe('GenerateResumeContent', () => {
     });
     const exp2 = makeExperience({ id: 'exp-2222', title: 'Engineer', companyName: 'Corp B', startDate: '2020-01' });
 
-    const generatorResult = makeGeneratorResult([
-      {
-        experienceId: 'exp-1111',
-        experienceTitle: 'Lead Engineer',
-        companyName: 'Corp A',
-        bullets: ['Led a team of 5 engineers to deliver a new platform']
-      },
-      {
-        experienceId: 'exp-2222',
-        experienceTitle: 'Engineer',
-        companyName: 'Corp B',
-        bullets: ['Built microservices using Node.js and Kubernetes']
-      }
-    ]);
+    const generatorResult = makeGeneratorResult(
+      [
+        {
+          experienceId: 'exp-1111',
+          experienceTitle: 'Lead Engineer',
+          companyName: 'Corp A',
+          bullets: ['Led a team of 5 engineers to deliver a new platform']
+        },
+        {
+          experienceId: 'exp-2222',
+          experienceTitle: 'Engineer',
+          companyName: 'Corp B',
+          bullets: ['Built microservices using Node.js and Kubernetes']
+        }
+      ],
+      'Lead Engineer | 5+ Years of Experience'
+    );
 
     const generator = mockGenerator(generatorResult);
 
     const useCase = new GenerateResumeContent(
       mockProfileRepo(profile),
-      mockHeadlineRepo([makeHeadline()]),
       mockExperienceRepo([exp1, exp2]),
       mockJobDescriptionRepo(jd),
       generator
@@ -158,6 +138,7 @@ describe('GenerateResumeContent', () => {
 
     const result = await useCase.execute({ jobDescriptionId: 'jd-1' });
 
+    expect(result.headline).toBe('Lead Engineer | 5+ Years of Experience');
     expect(result.experiences).toHaveLength(2);
     expect(result.experiences[0]).toEqual({
       experienceId: 'exp-1111',
@@ -208,7 +189,6 @@ describe('GenerateResumeContent', () => {
 
     const useCase = new GenerateResumeContent(
       mockProfileRepo(profile),
-      mockHeadlineRepo([]),
       mockExperienceRepo([expOld, expNew, expMid]),
       mockJobDescriptionRepo(jd),
       generator
@@ -244,7 +224,6 @@ describe('GenerateResumeContent', () => {
 
     const useCase = new GenerateResumeContent(
       mockProfileRepo(profile),
-      mockHeadlineRepo([]),
       mockExperienceRepo(experiences),
       mockJobDescriptionRepo(jd),
       generator
@@ -263,7 +242,6 @@ describe('GenerateResumeContent', () => {
 
     const useCase = new GenerateResumeContent(
       mockProfileRepo(profile),
-      mockHeadlineRepo([]),
       mockExperienceRepo([]),
       mockJobDescriptionRepo(null),
       mockGenerator(makeGeneratorResult([]))
@@ -272,71 +250,13 @@ describe('GenerateResumeContent', () => {
     await expect(useCase.execute({ jobDescriptionId: 'missing-jd' })).rejects.toThrow(EntityNotFoundError);
   });
 
-  test('most recent headline is selected when multiple headlines exist', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
-
-    const oldHeadline = makeHeadline({ summaryText: 'Old summary', createdAt: new Date('2023-01-01') });
-    const newHeadline = makeHeadline({ summaryText: 'New summary', createdAt: new Date('2024-06-01') });
-    const midHeadline = makeHeadline({ summaryText: 'Mid summary', createdAt: new Date('2023-09-01') });
-
-    let capturedInput: ResumeContentGeneratorInput | null = null;
-    const generator: ResumeContentGenerator = {
-      generate: mock((input: ResumeContentGeneratorInput) => {
-        capturedInput = input;
-        return Promise.resolve(makeGeneratorResult([]));
-      })
-    };
-
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockHeadlineRepo([oldHeadline, newHeadline, midHeadline]),
-      mockExperienceRepo([]),
-      mockJobDescriptionRepo(jd),
-      generator
-    );
-
-    await useCase.execute({ jobDescriptionId: 'jd-1' });
-
-    expect(capturedInput).not.toBeNull();
-    expect(capturedInput!.headline).not.toBeNull();
-    expect(capturedInput!.headline!.summaryText).toBe('New summary');
-  });
-
-  test('no headline: null is passed to generator', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
-
-    let capturedInput: ResumeContentGeneratorInput | null = null;
-    const generator: ResumeContentGenerator = {
-      generate: mock((input: ResumeContentGeneratorInput) => {
-        capturedInput = input;
-        return Promise.resolve(makeGeneratorResult([]));
-      })
-    };
-
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockHeadlineRepo([]),
-      mockExperienceRepo([]),
-      mockJobDescriptionRepo(jd),
-      generator
-    );
-
-    await useCase.execute({ jobDescriptionId: 'jd-1' });
-
-    expect(capturedInput).not.toBeNull();
-    expect(capturedInput!.headline).toBeNull();
-  });
-
-  test('generator input has correct profile/headline/jd fields', async () => {
+  test('generator input has correct profile and jd fields', async () => {
     const profile = makeProfile({ firstName: 'Alice', lastName: 'Smith', about: 'Full-stack developer' });
     const jd = makeJobDescription({
       title: 'Principal Engineer',
       description: 'Lead architecture',
       rawText: 'Raw JD text'
     });
-    const headline = makeHeadline({ summaryText: 'Architecture-first engineer' });
 
     let capturedInput: ResumeContentGeneratorInput | null = null;
     const generator: ResumeContentGenerator = {
@@ -348,7 +268,6 @@ describe('GenerateResumeContent', () => {
 
     const useCase = new GenerateResumeContent(
       mockProfileRepo(profile),
-      mockHeadlineRepo([headline]),
       mockExperienceRepo([]),
       mockJobDescriptionRepo(jd),
       generator
@@ -358,7 +277,6 @@ describe('GenerateResumeContent', () => {
 
     expect(capturedInput).not.toBeNull();
     expect(capturedInput!.profile).toEqual({ firstName: 'Alice', lastName: 'Smith', about: 'Full-stack developer' });
-    expect(capturedInput!.headline).toEqual({ summaryText: 'Architecture-first engineer' });
     expect(capturedInput!.jobDescription).toEqual({
       title: 'Principal Engineer',
       description: 'Lead architecture',

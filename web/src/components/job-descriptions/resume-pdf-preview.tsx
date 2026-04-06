@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useHeadlines } from '@/hooks/use-headlines';
 import { type ResumeTheme, useGenerateResumePdf } from '@/hooks/use-resume';
 
 const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
@@ -14,7 +13,6 @@ const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
 ];
 
 export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: string }) {
-  const { data: headlines } = useHeadlines();
   const generatePdf = useGenerateResumePdf();
 
   const [theme, setTheme] = useState<ResumeTheme>('brilliant-cv');
@@ -27,12 +25,9 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
     };
   }, []);
 
-  const headlineId = headlines?.[0]?.id;
-
   function handleGenerate() {
-    if (!headlineId) return;
     generatePdf.mutate(
-      { jobDescriptionId, headlineId, theme },
+      { jobDescriptionId, theme },
       {
         onSuccess: arrayBuffer => {
           if (prevBlobRef.current) URL.revokeObjectURL(prevBlobRef.current);
@@ -68,7 +63,7 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
           </SelectContent>
         </Select>
 
-        <Button size="sm" onClick={handleGenerate} disabled={!headlineId || generatePdf.isPending}>
+        <Button size="sm" onClick={handleGenerate} disabled={generatePdf.isPending}>
           {generatePdf.isPending ? (
             <>
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -101,9 +96,7 @@ export function ResumePdfPreview({ jobDescriptionId }: { jobDescriptionId: strin
               <p className="text-[13px] text-muted-foreground">Generating PDF…</p>
             </div>
           ) : (
-            <p className="text-[13px] text-muted-foreground">
-              {headlineId ? 'Click "Generate PDF" to preview' : 'No headlines available'}
-            </p>
+            <p className="text-[13px] text-muted-foreground">Click "Generate PDF" to preview</p>
           )}
         </div>
       )}

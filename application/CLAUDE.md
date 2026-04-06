@@ -22,7 +22,6 @@ application/src/
 │   ├── company/
 │   ├── education/
 │   ├── experience/
-│   ├── headline/
 │   └── profile/
 ├── ports/            ← External service interfaces
 ├── dtos/             ← Data transfer objects

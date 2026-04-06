@@ -5,12 +5,12 @@ import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
 /**
- * Generates a tailored resume PDF for a given job description and headline.
+ * Generates a tailored resume PDF for a given job description.
  *
  * @example
  * curl -X POST http://localhost:8000/resume/pdf \
  *   -H "Content-Type: application/json" \
- *   -d '{"jobDescriptionId": "your-jd-id", "headlineId": "your-headline-id", "theme": "imprecv"}' \
+ *   -d '{"jobDescriptionId": "your-jd-id", "theme": "imprecv"}' \
  *   --output resume.pdf
  */
 @injectable()
@@ -24,7 +24,6 @@ export class GenerateResumePdfRoute {
         try {
           const pdf = await this.generateResumePdf.execute({
             jobDescriptionId: body.jobDescriptionId,
-            headlineId: body.headlineId,
             theme: body.theme
           });
           set.headers['Content-Type'] = 'application/pdf';
@@ -41,7 +40,6 @@ export class GenerateResumePdfRoute {
       {
         body: t.Object({
           jobDescriptionId: t.String(),
-          headlineId: t.String(),
           theme: t.Optional(
             t.Union([t.Literal('brilliant-cv'), t.Literal('imprecv'), t.Literal('modern-cv'), t.Literal('linked-cv')])
           )

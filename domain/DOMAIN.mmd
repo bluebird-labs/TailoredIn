@@ -80,14 +80,6 @@ classDiagram
         +syncAccomplishments()
     }
 
-    class Headline {
-        <<AggregateRoot>>
-        +HeadlineId id
-        +string profileId
-        +string label
-        +string summaryText
-    }
-
     class ApplicationStatus {
         <<enumeration>>
         DRAFT · APPLIED · INTERVIEWING
@@ -95,7 +87,6 @@ classDiagram
         ACCEPTED
     }
 
-    Profile "1" --> "*" Headline : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
@@ -117,10 +108,12 @@ classDiagram
         +BusinessType? businessType
         +Industry? industry
         +CompanyStage? stage
+        +CompanyStatus? status
         +setWebsite()
         +setBusinessType()
         +setIndustry()
         +setStage()
+        +setStatus()
     }
 
     class JobDescription {
@@ -137,6 +130,7 @@ classDiagram
         +JobSource source
         +Date? postedAt
         +string? rawText
+        +ResumeOutput? resumeOutput
     }
 
     class BusinessType {
@@ -150,7 +144,12 @@ classDiagram
         <<enumeration>>
         SEED · SERIES_A · SERIES_B
         SERIES_C · SERIES_D_PLUS · GROWTH
-        PUBLIC · BOOTSTRAPPED · ACQUIRED
+        PUBLIC · BOOTSTRAPPED
+    }
+
+    class CompanyStatus {
+        <<enumeration>>
+        RUNNING · ACQUIRED · DEFUNCT
     }
 
     class Industry {
@@ -182,6 +181,13 @@ classDiagram
         REMOTE · HYBRID · ONSITE
     }
 
+    class ResumeOutput {
+        <<ValueObject>>
+        +Record<string, unknown> schema
+        +Record<string, unknown> output
+        +Date generatedAt
+    }
+
     class SalaryRange {
         <<ValueObject>>
         +min()
@@ -194,12 +200,14 @@ classDiagram
     JobDescription --> JobLevel
     JobDescription --> LocationType
     JobDescription --> JobSource
+    JobDescription *-- ResumeOutput
     Company "1" --> "*" Application : has
     JobDescription "1" --> "*" Application : has
     Company "1" --> "*" Experience : has
     Company --> BusinessType
     Company --> Industry
     Company --> CompanyStage
+    Company --> CompanyStatus
 
     %% ──────────────────────────────────────────────
     %%  Enums & Types
@@ -243,16 +251,17 @@ classDiagram
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style Headline fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanyStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeOutput fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px

@@ -17,7 +17,6 @@ infrastructure/src/
 │   │   ├── companies/
 │   │   ├── education/
 │   │   ├── experience/
-│   │   ├── headline/
 │   │   └── profile/
 │   ├── migrations/      ← Timestamped Kysely migrations
 │   ├── seeds/           ← DatabaseSeeder + per-domain seeders
@@ -69,7 +68,6 @@ export const DI = {
     EntityManager: new InjectionToken<EntityManager>('EntityManager'),
   },
   Profile: { ... },
-  Headline: { ... },
   Education: { ... },
   Experience: { ... },
   Company: { ... },
@@ -105,7 +103,7 @@ Run: `bun dev:migration:up` (main branch) or `bun wt:migration:up` (worktree)
 ## Seeders
 
 `DatabaseSeeder` orchestrates per-domain seeders:
-- `ResumeDataSeeder` — profile, experience, accomplishments, education, headlines, companies
+- `ResumeDataSeeder` — profile, experience, accomplishments, education, companies
 - `E2eSeeder` — minimal data for E2E tests
 
 Run: `bun run db:seed`

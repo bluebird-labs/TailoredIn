@@ -185,35 +185,6 @@ classDiagram
 
 
     %% ──────────────────────────────────────────────
-    %%  Headline Use Cases
-    %% ──────────────────────────────────────────────
-
-    class CreateHeadline {
-        <<UseCase>>
-        +HeadlineRepository headlineRepository
-        +execute(CreateHeadlineInput) HeadlineDto
-    }
-
-    class DeleteHeadline {
-        <<UseCase>>
-        +HeadlineRepository headlineRepository
-        +execute(DeleteHeadlineInput) Result<void, Error>
-    }
-
-    class ListHeadlines {
-        <<UseCase>>
-        +HeadlineRepository headlineRepository
-        +execute() HeadlineDto[]
-    }
-
-    class UpdateHeadline {
-        <<UseCase>>
-        +HeadlineRepository headlineRepository
-        +execute(UpdateHeadlineInput) Result<HeadlineDto, Error>
-    }
-
-
-    %% ──────────────────────────────────────────────
     %%  Job-description Use Cases
     %% ──────────────────────────────────────────────
 
@@ -278,7 +249,6 @@ classDiagram
     class GenerateResumeContent {
         <<UseCase>>
         +ProfileRepository profileRepository
-        +HeadlineRepository headlineRepository
         +ExperienceRepository experienceRepository
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentGenerator generator
@@ -288,7 +258,6 @@ classDiagram
     class GenerateResumePdf {
         <<UseCase>>
         +ProfileRepository profileRepository
-        +HeadlineRepository headlineRepository
         +ExperienceRepository experienceRepository
         +EducationRepository educationRepository
         +JobDescriptionRepository jobDescriptionRepository
@@ -386,6 +355,7 @@ classDiagram
         +BusinessType? businessType
         +Industry? industry
         +CompanyStage? stage
+        +CompanyStatus? status
     }
 
     class CompanyEnrichmentResult {
@@ -398,6 +368,7 @@ classDiagram
         +BusinessType? businessType
         +Industry? industry
         +CompanyStage? stage
+        +CompanyStatus? status
     }
 
     class EducationDto {
@@ -427,13 +398,6 @@ classDiagram
         +AccomplishmentDto[] accomplishments
     }
 
-    class HeadlineDto {
-        <<DTO>>
-        +string id
-        +string label
-        +string summaryText
-    }
-
     class JobDescriptionDto {
         <<DTO>>
         +string id
@@ -450,6 +414,7 @@ classDiagram
         +string createdAt
         +string updatedAt
         +string? rawText
+        +ResumeOutputDto? resumeOutput
     }
 
     class JobDescriptionParseResult {
@@ -496,6 +461,7 @@ classDiagram
 
     class ResumeContentDto {
         <<DTO>>
+        +string headline
         +ResumeExperienceBulletsDto[] experiences
     }
 
@@ -512,7 +478,9 @@ classDiagram
 
     class ResumeContentGeneratorResult {
         <<DTO>>
+        +string headline
         +object experiences
+        +Record<string, unknown> requestSchema
     }
 
     class ResumeExperienceBulletsDto {
@@ -581,9 +549,6 @@ classDiagram
     UnlinkCompanyFromExperience ..> ExperienceDto : returns
     UpdateExperience ..> ExperienceDto : returns
     GetProfile ..> ProfileDto : returns
-    CreateHeadline ..> HeadlineDto : returns
-    ListHeadlines ..> HeadlineDto : returns
-    UpdateHeadline ..> HeadlineDto : returns
     CreateJobDescription ..> JobDescriptionDto : returns
     GetJobDescription ..> JobDescriptionDto : returns
     ListJobDescriptions ..> JobDescriptionDto : returns
@@ -624,10 +589,6 @@ classDiagram
         <<DomainPort>>
     }
 
-    class HeadlineRepository {
-        <<DomainPort>>
-    }
-
     class JobDescriptionRepository {
         <<DomainPort>>
     }
@@ -664,21 +625,15 @@ classDiagram
     UpdateAccomplishment ..> ExperienceRepository : depends
     UpdateExperience ..> ExperienceRepository : depends
     GetProfile ..> ProfileRepository : depends
-    CreateHeadline ..> HeadlineRepository : depends
-    DeleteHeadline ..> HeadlineRepository : depends
-    ListHeadlines ..> HeadlineRepository : depends
-    UpdateHeadline ..> HeadlineRepository : depends
     CreateJobDescription ..> JobDescriptionRepository : depends
     DeleteJobDescription ..> JobDescriptionRepository : depends
     GetJobDescription ..> JobDescriptionRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
     GenerateResumeContent ..> ProfileRepository : depends
-    GenerateResumeContent ..> HeadlineRepository : depends
     GenerateResumeContent ..> ExperienceRepository : depends
     GenerateResumeContent ..> JobDescriptionRepository : depends
     GenerateResumePdf ..> ProfileRepository : depends
-    GenerateResumePdf ..> HeadlineRepository : depends
     GenerateResumePdf ..> ExperienceRepository : depends
     GenerateResumePdf ..> EducationRepository : depends
     GenerateResumePdf ..> JobDescriptionRepository : depends
@@ -714,10 +669,6 @@ classDiagram
     style UnlinkCompanyFromExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style CreateHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style DeleteHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style ListHeadlines fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style UpdateHeadline fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -742,7 +693,6 @@ classDiagram
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style HeadlineDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobDescriptionDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobDescriptionParseResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginatedDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -760,6 +710,5 @@ classDiagram
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style EducationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
-    style HeadlineRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style JobDescriptionRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

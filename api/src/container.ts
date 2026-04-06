@@ -6,13 +6,11 @@ import {
   CreateCompany,
   CreateEducation,
   CreateExperience,
-  CreateHeadline,
   CreateJobDescription,
   DeleteAccomplishment,
   DeleteApplication,
   DeleteEducation,
   DeleteExperience,
-  DeleteHeadline,
   DeleteJobDescription,
   DiscoverCompanies,
   EnrichCompanyData,
@@ -28,7 +26,6 @@ import {
   ListCompanies,
   ListEducation,
   ListExperiences,
-  ListHeadlines,
   ListJobDescriptions,
   ParseJobDescription,
   UnlinkCompanyFromExperience,
@@ -38,7 +35,6 @@ import {
   UpdateCompany,
   UpdateEducation,
   UpdateExperience,
-  UpdateHeadline,
   UpdateJobDescription,
   UpdateProfile
 } from '@tailoredin/application';
@@ -55,7 +51,6 @@ import {
   PostgresCompanyRepository,
   PostgresEducationRepository,
   PostgresExperienceRepository,
-  PostgresHeadlineRepository,
   PostgresJobDescriptionRepository,
   PostgresProfileRepository,
   TypstResumeRendererFactory
@@ -87,25 +82,6 @@ container.bind({
 container.bind({
   provide: DI.Profile.UpdateProfile,
   useFactory: () => new UpdateProfile(container.get(DI.Profile.Repository))
-});
-
-// Headlines
-container.bind({ provide: DI.Headline.Repository, useClass: PostgresHeadlineRepository });
-container.bind({
-  provide: DI.Headline.List,
-  useFactory: () => new ListHeadlines(container.get(DI.Headline.Repository))
-});
-container.bind({
-  provide: DI.Headline.Create,
-  useFactory: () => new CreateHeadline(container.get(DI.Headline.Repository))
-});
-container.bind({
-  provide: DI.Headline.Update,
-  useFactory: () => new UpdateHeadline(container.get(DI.Headline.Repository))
-});
-container.bind({
-  provide: DI.Headline.Delete,
-  useFactory: () => new DeleteHeadline(container.get(DI.Headline.Repository))
 });
 
 // Education
@@ -266,7 +242,6 @@ container.bind({
   useFactory: () =>
     new GenerateResumeContent(
       container.get(DI.Profile.Repository),
-      container.get(DI.Headline.Repository),
       container.get(DI.Experience.Repository),
       container.get(DI.JobDescription.Repository),
       container.get(DI.Resume.Generator)
@@ -278,7 +253,6 @@ container.bind({
   useFactory: () =>
     new GenerateResumePdf(
       container.get(DI.Profile.Repository),
-      container.get(DI.Headline.Repository),
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.JobDescription.Repository),

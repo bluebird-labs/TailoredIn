@@ -69,5 +69,4 @@ In `src/index.ts`, resolve routes from the container:
 
 ```typescript
 app.use(container.get(ExperienceRoutes).plugin());
-app.use(container.get(HeadlineRoutes).plugin());
 ```

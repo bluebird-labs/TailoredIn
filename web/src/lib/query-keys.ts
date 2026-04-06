@@ -3,10 +3,6 @@ export const queryKeys = {
     all: ['profile'] as const,
     detail: () => [...queryKeys.profile.all, 'detail'] as const
   },
-  headlines: {
-    all: ['headlines'] as const,
-    list: () => [...queryKeys.headlines.all, 'list'] as const
-  },
   educations: {
     all: ['educations'] as const,
     list: () => [...queryKeys.educations.all, 'list'] as const

@@ -8,6 +8,7 @@ import { LlmJsonRequest } from './LlmJsonRequest.js';
 const PROMPT_PATH = resolve(import.meta.dir, '../prompts/generate-resume-bullets.md');
 
 const generateResumeBulletsSchema = z.object({
+  headline: z.string().min(10).max(200),
   experiences: z.array(
     z.object({
       experienceId: z.string(),
@@ -54,7 +55,6 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
       .replace('{{firstName}}', this.input.profile.firstName)
       .replace('{{lastName}}', this.input.profile.lastName)
       .replace('{{about}}', this.input.profile.about ?? '(not provided)')
-      .replace('{{headlineSummary}}', this.input.headline?.summaryText ?? '(not provided)')
       .replace('{{jdTitle}}', this.input.jobDescription.title)
       .replace('{{jdDescription}}', this.input.jobDescription.description)
       .replace('{{jdRawText}}', jdRawTextSection)

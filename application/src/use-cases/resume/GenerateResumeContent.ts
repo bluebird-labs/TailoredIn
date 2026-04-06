@@ -1,7 +1,6 @@
 import {
   EntityNotFoundError,
   type ExperienceRepository,
-  type HeadlineRepository,
   JobDescriptionId,
   type JobDescriptionRepository,
   type ProfileRepository
@@ -19,7 +18,6 @@ const BULLET_LIMITS = { min: 2, max: 20 };
 export class GenerateResumeContent {
   public constructor(
     private readonly profileRepository: ProfileRepository,
-    private readonly headlineRepository: HeadlineRepository,
     private readonly experienceRepository: ExperienceRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
     private readonly generator: ResumeContentGenerator
@@ -33,12 +31,6 @@ export class GenerateResumeContent {
 
     const profile = await this.profileRepository.findSingle();
 
-    const allHeadlines = await this.headlineRepository.findAll();
-    const headline =
-      allHeadlines
-        .filter(h => h.profileId === profile.id.value)
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0] ?? null;
-
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences
       .filter(e => e.profileId === profile.id.value)
@@ -50,7 +42,6 @@ export class GenerateResumeContent {
         lastName: profile.lastName,
         about: profile.about
       },
-      headline: headline ? { summaryText: headline.summaryText } : null,
       jobDescription: {
         title: jd.title,
         description: jd.description,
@@ -75,12 +66,13 @@ export class GenerateResumeContent {
 
     jd.resumeOutput = {
       schema: result.requestSchema,
-      output: { experiences: result.experiences },
+      output: { headline: result.headline, experiences: result.experiences },
       generatedAt: new Date()
     };
     await this.jobDescriptionRepository.save(jd);
 
     return {
+      headline: result.headline,
       experiences: result.experiences.map(e => ({
         experienceId: e.experienceId,
         experienceTitle: e.experienceTitle,

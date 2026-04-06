@@ -5,9 +5,6 @@ import {
   Experience,
   ExperienceId,
   type ExperienceRepository,
-  Headline,
-  HeadlineId,
-  type HeadlineRepository,
   JobDescription,
   JobDescriptionId,
   type JobDescriptionRepository,
@@ -36,17 +33,6 @@ function makeProfile() {
     websiteUrl: null,
     about: 'Engineer'
   };
-}
-
-function makeHeadline() {
-  return new Headline({
-    id: new HeadlineId('headline-0000-0000-0000-000000000001'),
-    profileId: 'profile-1',
-    label: 'Test Headline',
-    summaryText: 'Summary',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  });
 }
 
 function makeJd() {
@@ -88,7 +74,6 @@ function makeExperience() {
 }
 
 function makeEducation() {
-  // Plain object — avoids coupling to Education constructor shape
   return {
     id: { value: 'edu-00000000-0000-0000-0000-000000000001' },
     profileId: 'profile-1',
@@ -118,18 +103,17 @@ describe('GenerateResumePdf', () => {
 
     const fakeGenerator: ResumeContentGenerator = {
       generate: mock(async () => ({
+        headline: 'Staff Engineer | 5+ Years of Experience',
         experiences: [{ experienceId: 'exp-00000000-0000-0000-0000-000000000001', summary: null, bullets: ['Bullet'] }]
       }))
     };
 
     const jd = makeJd();
     const profile = makeProfile();
-    const headline = makeHeadline();
     const experience = makeExperience();
     const education = makeEducation();
 
     const profileRepo: ProfileRepository = { findSingle: mock(async () => profile) } as unknown as ProfileRepository;
-    const headlineRepo: HeadlineRepository = { findAll: mock(async () => [headline]) } as unknown as HeadlineRepository;
     const experienceRepo: ExperienceRepository = {
       findAll: mock(async () => [experience])
     } as unknown as ExperienceRepository;
@@ -140,7 +124,6 @@ describe('GenerateResumePdf', () => {
 
     const useCase = new GenerateResumePdf(
       profileRepo,
-      headlineRepo,
       experienceRepo,
       educationRepo,
       jdRepo,
@@ -148,14 +131,13 @@ describe('GenerateResumePdf', () => {
       fakeFactory
     );
 
-    return { useCase, fakeFactory, fakeRenderer };
+    return { useCase, fakeFactory, fakeRenderer, fakeGenerator };
   }
 
   test('calls factory.get with the provided theme', async () => {
     const { useCase, fakeFactory } = makeUseCase();
     await useCase.execute({
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
-      headlineId: 'headline-0000-0000-0000-000000000001',
       theme: 'imprecv'
     });
     expect(fakeFactory.get).toHaveBeenCalledWith('imprecv');
@@ -164,17 +146,25 @@ describe('GenerateResumePdf', () => {
   test('uses brilliant-cv when theme is omitted', async () => {
     const { useCase, fakeFactory } = makeUseCase();
     await useCase.execute({
-      jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
-      headlineId: 'headline-0000-0000-0000-000000000001'
+      jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
     });
     expect(fakeFactory.get).toHaveBeenCalledWith('brilliant-cv');
   });
 
+  test('passes LLM-generated headline as headlineSummary to renderer', async () => {
+    const { useCase, fakeRenderer } = makeUseCase();
+    await useCase.execute({
+      jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
+    });
+    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+      headlineSummary: string;
+    };
+    expect(renderInput.headlineSummary).toBe('Staff Engineer | 5+ Years of Experience');
+  });
+
   test('throws EntityNotFoundError when JD does not exist', async () => {
     const profile = makeProfile();
-    const headline = makeHeadline();
     const profileRepo: ProfileRepository = { findSingle: mock(async () => profile) } as unknown as ProfileRepository;
-    const headlineRepo: HeadlineRepository = { findAll: mock(async () => [headline]) } as unknown as HeadlineRepository;
     const experienceRepo: ExperienceRepository = { findAll: mock(async () => []) } as unknown as ExperienceRepository;
     const educationRepo: EducationRepository = { findAll: mock(async () => []) } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = {
@@ -183,6 +173,7 @@ describe('GenerateResumePdf', () => {
 
     const fakeGenerator: ResumeContentGenerator = {
       generate: mock(async () => ({
+        headline: 'Test Headline',
         experiences: [{ experienceId: 'exp-00000000-0000-0000-0000-000000000001', summary: null, bullets: ['Bullet'] }]
       }))
     };
@@ -197,15 +188,12 @@ describe('GenerateResumePdf', () => {
 
     const useCase = new GenerateResumePdf(
       profileRepo,
-      headlineRepo,
       experienceRepo,
       educationRepo,
       jdRepo,
       fakeGenerator,
       fakeFactory
     );
-    await expect(
-      useCase.execute({ jobDescriptionId: 'nonexistent', headlineId: 'headline-0000-0000-0000-000000000001' })
-    ).rejects.toThrow(EntityNotFoundError);
+    await expect(useCase.execute({ jobDescriptionId: 'nonexistent' })).rejects.toThrow(EntityNotFoundError);
   });
 });

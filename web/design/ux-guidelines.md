@@ -22,12 +22,12 @@ All data fields render as plain text by default. The user clicks a section to en
 
 Edit sections are scoped to the domain aggregate boundary:
 - **Profile page:** One section for the entire Profile aggregate
-- **List pages:** Each list item (headline, education, company) is its own editable section
+- **List pages:** Each list item (education, company) is its own editable section
 - **Complex entities (Experiences):** Click opens a modal instead of inline expand
 
 ### Inline Expand for Lists
 
-Simple-entity list items (Headlines, Education, Companies) expand in-place when clicked:
+Simple-entity list items (Education, Companies) expand in-place when clicked:
 - Card displays content in resting state
 - Click expands card to reveal form fields with Save/Discard
 - Only one card can be expanded at a time within a list
@@ -173,7 +173,7 @@ Use a dedicated detail page (full route) for entities that have:
 - Cross-entity references (e.g., experiences linking to companies)
 - Enough content to warrant tabbed organization
 
-Keep modal/inline editing for entities that are simple and flat (headlines, education).
+Keep modal/inline editing for entities that are simple and flat (education).
 
 ### Layout Structure
 

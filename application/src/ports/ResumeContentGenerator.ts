@@ -10,13 +10,13 @@ export type ResumeContentGeneratorExperience = {
 
 export type ResumeContentGeneratorInput = {
   profile: { firstName: string; lastName: string; about: string | null };
-  headline: { summaryText: string } | null;
   jobDescription: { title: string; description: string; rawText: string | null };
   experiences: ResumeContentGeneratorExperience[];
   additionalPrompt?: string;
 };
 
 export type ResumeContentGeneratorResult = {
+  headline: string;
   experiences: Array<{
     experienceId: string;
     experienceTitle: string;

@@ -13,9 +13,6 @@ function makeInput(overrides: Partial<ResumeContentGeneratorInput> = {}): Resume
       lastName: 'Smith',
       about: 'Pragmatic engineer focused on shipping value'
     },
-    headline: {
-      summaryText: 'Full-stack engineer with 8 years of experience'
-    },
     jobDescription: {
       title: 'Senior Software Engineer',
       description: 'Build scalable systems at high-growth startup',
@@ -54,9 +51,10 @@ function makeInput(overrides: Partial<ResumeContentGeneratorInput> = {}): Resume
 
 describe('GenerateResumeBulletsRequest', () => {
   describe('schema validation', () => {
-    test('validates correct structure with valid bullets', () => {
+    test('validates correct structure with headline and valid bullets', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const validPayload = {
+        headline: 'Staff Engineer | 8+ Years of Experience',
         experiences: [
           {
             experienceId: 'exp-aaa-111',
@@ -71,6 +69,22 @@ describe('GenerateResumeBulletsRequest', () => {
 
       const result = request.schema.safeParse(validPayload);
       expect(result.success).toBe(true);
+    });
+
+    test('rejects payload missing headline', () => {
+      const request = new GenerateResumeBulletsRequest(makeInput());
+      const payload = {
+        experiences: [
+          {
+            experienceId: 'exp-aaa-111',
+            summary: 'Summary text.',
+            bullets: ['A'.repeat(100)]
+          }
+        ]
+      };
+
+      const result = request.schema.safeParse(payload);
+      expect(result.success).toBe(false);
     });
 
     test('rejects bullets shorter than 80 characters', () => {
@@ -110,6 +124,7 @@ describe('GenerateResumeBulletsRequest', () => {
       const exactMin = 'A'.repeat(80);
       const exactMax = 'A'.repeat(350);
       const payload = {
+        headline: 'Staff Engineer | 8+ Years of Experience',
         experiences: [
           {
             experienceId: 'exp-aaa-111',
@@ -170,11 +185,12 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(prompt).toContain('Pragmatic engineer focused on shipping value');
     });
 
-    test('contains headlineSummary', () => {
+    test('contains headline generation instructions', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const prompt = request.prompt;
 
-      expect(prompt).toContain('Full-stack engineer with 8 years of experience');
+      expect(prompt).toContain('Headline');
+      expect(prompt).toContain('professional headline');
     });
 
     test('contains JD title and description', () => {
@@ -211,13 +227,6 @@ describe('GenerateResumeBulletsRequest', () => {
       // Rules from the prompt template
       expect(prompt).toContain('Do NOT invent');
       expect(prompt).toContain('Strict derivation');
-    });
-
-    test('includes null headline as (not provided) placeholder', () => {
-      const request = new GenerateResumeBulletsRequest(makeInput({ headline: null }));
-      const prompt = request.prompt;
-
-      expect(prompt).toContain('(not provided)');
     });
 
     test('includes null about as (not provided) placeholder', () => {
