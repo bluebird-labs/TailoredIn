@@ -7,7 +7,7 @@ import { Logger } from '@tailoredin/core';
 import { JobLevel, LocationType } from '@tailoredin/domain';
 import { z } from 'zod';
 import { DI } from '../DI.js';
-import type { ClaudeCliProvider } from './llm/ClaudeCliProvider.js';
+import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from './llm/LlmJsonRequest.js';
 
 const PROMPT_PATH = resolve(import.meta.dir, 'prompts/parse-job-description.md');
@@ -20,8 +20,8 @@ const jobDescriptionParseSchema = z.object({
   salaryMin: z.number().nullable(),
   salaryMax: z.number().nullable(),
   salaryCurrency: z.string().nullable(),
-  level: z.enum(Object.values(JobLevel) as [string, ...string[]]).nullable(),
-  locationType: z.enum(Object.values(LocationType) as [string, ...string[]]).nullable(),
+  level: z.nativeEnum(JobLevel).nullable(),
+  locationType: z.nativeEnum(LocationType).nullable(),
   postedAt: z.string().nullable()
 });
 
@@ -34,21 +34,15 @@ class JobDescriptionParseRequest extends LlmJsonRequest<typeof jobDescriptionPar
 
   public get prompt(): string {
     const template = readFileSync(PROMPT_PATH, 'utf-8');
-    const levels = Object.values(JobLevel).join(', ');
-    const locationTypes = Object.values(LocationType).join(', ');
-
-    return template
-      .replace('{{text}}', this.text)
-      .replace('{{levels}}', levels)
-      .replace('{{locationTypes}}', locationTypes);
+    return template.replace('{{text}}', this.text);
   }
 }
 
 @injectable()
-export class ClaudeCliJobDescriptionParser implements JobDescriptionParser {
+export class ClaudeApiJobDescriptionParser implements JobDescriptionParser {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeCliProvider = inject(DI.Llm.ClaudeCliProvider)) {}
+  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
 
   public async parseFromText(text: string): Promise<JobDescriptionParseResult> {
     this.log.info(`Parsing job description (${text.length} chars)`);
@@ -58,20 +52,11 @@ export class ClaudeCliJobDescriptionParser implements JobDescriptionParser {
     const duration = Date.now() - startTime;
 
     if (result.isErr) {
-      const exitCode = result.error.exitCode ?? 'unknown';
-      this.log.error(
-        `Job description parsing failed | exitCode=${exitCode} duration=${duration}ms error="${result.error.message}"`
-      );
-      throw new ExternalServiceError('Claude CLI', 'Job description parsing failed');
+      this.log.error(`Job description parsing failed | duration=${duration}ms error="${result.error.message}"`);
+      throw new ExternalServiceError('Claude API', result.error.message);
     }
 
-    const parsed: JobDescriptionParseResult = {
-      ...result.value,
-      level: result.value.level as JobLevel | null,
-      locationType: result.value.locationType as LocationType | null
-    };
-
-    this.log.info(`Job description parsed | title="${parsed.title}" duration=${duration}ms`);
-    return parsed;
+    this.log.info(`Job description parsed | title="${result.value.title}" duration=${duration}ms`);
+    return result.value;
   }
 }

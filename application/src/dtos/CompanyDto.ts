@@ -1,4 +1,4 @@
-import type { BusinessType, Company, CompanyStage, Industry } from '@tailoredin/domain';
+import type { BusinessType, Company, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 
 export type CompanyDto = {
   id: string;
@@ -10,6 +10,7 @@ export type CompanyDto = {
   businessType: BusinessType | null;
   industry: Industry | null;
   stage: CompanyStage | null;
+  status: CompanyStatus | null;
 };
 
 export function toCompanyDto(company: Company): CompanyDto {
@@ -22,6 +23,7 @@ export function toCompanyDto(company: Company): CompanyDto {
     linkedinLink: company.linkedinLink,
     businessType: company.businessType,
     industry: company.industry,
-    stage: company.stage
+    stage: company.stage,
+    status: company.status
   };
 }

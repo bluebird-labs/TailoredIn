@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "open-issue",
+  "owner": "synthesys-lab",
+  "repo": "agentize",
+  "path": ".claude-plugin/skills/open-issue",
+  "branch": "main",
+  "sha": "b18b724d4a7ea994559e3dccaa668d8a3134f4e4",
+  "source": "manual"
+}

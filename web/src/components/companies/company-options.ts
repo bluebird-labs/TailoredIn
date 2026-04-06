@@ -45,17 +45,26 @@ export const stageOptions: readonly SelectOption[] = [
   { label: 'Series D+', value: 'series_d_plus' },
   { label: 'Growth', value: 'growth' },
   { label: 'Public', value: 'public' },
-  { label: 'Bootstrapped', value: 'bootstrapped' },
-  { label: 'Acquired', value: 'acquired' }
+  { label: 'Bootstrapped', value: 'bootstrapped' }
+];
+
+export const statusOptions: readonly SelectOption[] = [
+  { label: 'Running', value: 'running' },
+  { label: 'Acquired', value: 'acquired' },
+  { label: 'Defunct', value: 'defunct' }
 ];
 
 const labelMaps = {
   businessType: Object.fromEntries(businessTypeOptions.map(o => [o.value, o.label])),
   industry: Object.fromEntries(industryOptions.map(o => [o.value, o.label])),
-  stage: Object.fromEntries(stageOptions.map(o => [o.value, o.label]))
+  stage: Object.fromEntries(stageOptions.map(o => [o.value, o.label])),
+  status: Object.fromEntries(statusOptions.map(o => [o.value, o.label]))
 };
 
-export function formatEnumLabel(type: 'businessType' | 'industry' | 'stage', value: string | null): string | null {
+export function formatEnumLabel(
+  type: 'businessType' | 'industry' | 'stage' | 'status',
+  value: string | null
+): string | null {
   if (!value) return null;
   return labelMaps[type][value] ?? value;
 }

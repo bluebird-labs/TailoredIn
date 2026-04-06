@@ -28,6 +28,7 @@ function CompanyDetailPage() {
   const initial = company.name.charAt(0).toUpperCase();
   const industryLabel = formatEnumLabel('industry', company.industry);
   const stageLabel = formatEnumLabel('stage', company.stage);
+  const statusLabel = formatEnumLabel('status', company.status);
   const businessTypeLabel = formatEnumLabel('businessType', company.businessType);
 
   return (
@@ -101,6 +102,7 @@ function CompanyDetailPage() {
               <InfoRow label="LinkedIn" value={company.linkedinLink} href={company.linkedinLink ?? undefined} />
               <InfoRow label="Industry" value={industryLabel} />
               <InfoRow label="Stage" value={stageLabel} />
+              <InfoRow label="Status" value={statusLabel} />
               <InfoRow label="Business Type" value={businessTypeLabel} />
             </InfoCard>
           </div>

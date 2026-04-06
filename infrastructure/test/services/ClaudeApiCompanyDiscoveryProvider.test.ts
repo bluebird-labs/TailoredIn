@@ -1,14 +1,14 @@
 import { describe, expect, mock, test } from 'bun:test';
 import { err, ok } from '@tailoredin/domain';
-import { ClaudeCliCompanyDiscoveryProvider } from '../../src/services/ClaudeCliCompanyDiscoveryProvider.js';
-import type { ClaudeCliProvider } from '../../src/services/llm/ClaudeCliProvider.js';
+import { ClaudeApiCompanyDiscoveryProvider } from '../../src/services/ClaudeApiCompanyDiscoveryProvider.js';
+import type { ClaudeApiProvider } from '../../src/services/llm/ClaudeApiProvider.js';
 import { LlmRequestError } from '../../src/services/llm/LlmRequestError.js';
 
 function createMockProvider(result: ReturnType<typeof ok> | ReturnType<typeof err>) {
-  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeCliProvider;
+  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeApiProvider;
 }
 
-describe('ClaudeCliCompanyDiscoveryProvider', () => {
+describe('ClaudeApiCompanyDiscoveryProvider', () => {
   test('returns companies from successful LLM response', async () => {
     const mockProvider = createMockProvider(
       ok({
@@ -19,7 +19,7 @@ describe('ClaudeCliCompanyDiscoveryProvider', () => {
       })
     );
 
-    const discoveryProvider = new ClaudeCliCompanyDiscoveryProvider(mockProvider);
+    const discoveryProvider = new ClaudeApiCompanyDiscoveryProvider(mockProvider);
     const results = await discoveryProvider.discover('stripe');
 
     expect(results).toHaveLength(2);
@@ -35,7 +35,7 @@ describe('ClaudeCliCompanyDiscoveryProvider', () => {
       })
     );
 
-    const discoveryProvider = new ClaudeCliCompanyDiscoveryProvider(mockProvider);
+    const discoveryProvider = new ClaudeApiCompanyDiscoveryProvider(mockProvider);
     const results = await discoveryProvider.discover('https://stripe.com');
 
     expect(results).toHaveLength(1);
@@ -43,11 +43,9 @@ describe('ClaudeCliCompanyDiscoveryProvider', () => {
   });
 
   test('throws ExternalServiceError on LLM failure', async () => {
-    const mockProvider = createMockProvider(
-      err(new LlmRequestError('CLI exited with code 1', ['claude'], 1, '', '', 100))
-    );
+    const mockProvider = createMockProvider(err(new LlmRequestError('API error', [], null, '', '', 100)));
 
-    const discoveryProvider = new ClaudeCliCompanyDiscoveryProvider(mockProvider);
+    const discoveryProvider = new ClaudeApiCompanyDiscoveryProvider(mockProvider);
 
     await expect(discoveryProvider.discover('test')).rejects.toThrow('Company discovery failed');
   });
@@ -55,7 +53,7 @@ describe('ClaudeCliCompanyDiscoveryProvider', () => {
   test('returns empty array when LLM returns empty companies', async () => {
     const mockProvider = createMockProvider(ok({ companies: [] }));
 
-    const discoveryProvider = new ClaudeCliCompanyDiscoveryProvider(mockProvider);
+    const discoveryProvider = new ClaudeApiCompanyDiscoveryProvider(mockProvider);
     const results = await discoveryProvider.discover('nonexistent');
 
     expect(results).toEqual([]);

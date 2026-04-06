@@ -4,7 +4,7 @@ import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { z } from 'zod';
 import { DI } from '../DI.js';
-import type { ClaudeCliProvider } from './llm/ClaudeCliProvider.js';
+import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from './llm/LlmJsonRequest.js';
 
 const companyDiscoverySchema = z.object({
@@ -39,10 +39,10 @@ class CompanyDiscoveryRequest extends LlmJsonRequest<typeof companyDiscoverySche
 }
 
 @injectable()
-export class ClaudeCliCompanyDiscoveryProvider implements CompanyDiscoveryProvider {
+export class ClaudeApiCompanyDiscoveryProvider implements CompanyDiscoveryProvider {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeCliProvider = inject(DI.Llm.ClaudeCliProvider)) {}
+  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
 
   public async discover(query: string): Promise<CompanyDiscoveryResult[]> {
     this.log.info(`Discovering companies for query: "${query}"`);
@@ -51,7 +51,7 @@ export class ClaudeCliCompanyDiscoveryProvider implements CompanyDiscoveryProvid
 
     if (result.isErr) {
       this.log.error(`Company discovery failed | query="${query}" error="${result.error.message}"`);
-      throw new ExternalServiceError('Claude CLI', 'Company discovery failed');
+      throw new ExternalServiceError('Claude API', result.error.message);
     }
 
     const companies = result.value.companies;

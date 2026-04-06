@@ -11,19 +11,14 @@ export { PostgresHeadlineRepository } from './repositories/PostgresHeadlineRepos
 export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDescriptionRepository.js';
 export { PostgresProfileRepository } from './repositories/PostgresProfileRepository.js';
 // Services
+export { ClaudeApiCompanyDataProvider } from './services/ClaudeApiCompanyDataProvider.js';
+export { ClaudeApiCompanyDiscoveryProvider } from './services/ClaudeApiCompanyDiscoveryProvider.js';
+export { ClaudeApiJobDescriptionParser } from './services/ClaudeApiJobDescriptionParser.js';
 export { ClaudeApiResumeContentGenerator } from './services/ClaudeApiResumeContentGenerator.js';
-export { ClaudeCliCompanyDataProvider } from './services/ClaudeCliCompanyDataProvider.js';
-export { ClaudeCliCompanyDiscoveryProvider } from './services/ClaudeCliCompanyDiscoveryProvider.js';
-export { ClaudeCliJobDescriptionParser } from './services/ClaudeCliJobDescriptionParser.js';
-export { ClaudeCliResumeContentGenerator } from './services/ClaudeCliResumeContentGenerator.js';
 // LLM
 export {
   BaseLlmApiProvider,
-  BaseLlmCliProvider,
   ClaudeApiProvider,
-  ClaudeCliProvider,
-  type ClaudeCliResponse,
-  claudeCliResponseSchema,
   LlmJsonRequest,
   LlmRequestError,
   type LlmRequestOptions

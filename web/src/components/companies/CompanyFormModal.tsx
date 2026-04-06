@@ -17,7 +17,7 @@ import {
 } from '@/hooks/use-companies';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import { type CompanyFormState, hasErrors, type ValidationErrors, validateCompany } from '@/lib/validation.js';
-import { businessTypeOptions, industryOptions, stageOptions } from './company-options.js';
+import { businessTypeOptions, industryOptions, stageOptions, statusOptions } from './company-options.js';
 
 interface Props {
   readonly open: boolean;
@@ -38,7 +38,8 @@ function emptyState(): CompanyFormState {
     linkedinLink: '',
     businessType: '',
     industry: '',
-    stage: ''
+    stage: '',
+    status: ''
   };
 }
 
@@ -51,7 +52,8 @@ function companyToFormState(company: Company): CompanyFormState {
     linkedinLink: company.linkedinLink ?? '',
     businessType: company.businessType ?? '',
     industry: company.industry ?? '',
-    stage: company.stage ?? ''
+    stage: company.stage ?? '',
+    status: company.status ?? ''
   };
 }
 
@@ -64,7 +66,8 @@ function enrichmentToFormState(result: CompanyEnrichmentResult): CompanyFormStat
     linkedinLink: result.linkedinLink ?? '',
     businessType: result.businessType ?? '',
     industry: result.industry ?? '',
-    stage: result.stage ?? ''
+    stage: result.stage ?? '',
+    status: result.status ?? ''
   };
 }
 
@@ -152,7 +155,8 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
       linkedin_link: current.linkedinLink.trim() || null,
       business_type: current.businessType || null,
       industry: current.industry || null,
-      stage: current.stage || null
+      stage: current.stage || null,
+      status: current.status || null
     };
 
     const options = {
@@ -417,6 +421,17 @@ function FormStep({
           options={stageOptions}
         />
       </div>
+
+      <EditableField
+        type="select"
+        label="Status"
+        value={current.status}
+        onChange={v => setField('status', v)}
+        isDirty={isDirtyField('status')}
+        disabled={isSaving}
+        placeholder="Select..."
+        options={statusOptions}
+      />
     </>
   );
 }

@@ -53,6 +53,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
     } catch (e) {
       if (e instanceof Anthropic.APIConnectionTimeoutError) throw new Error(`API call timed out after ${timeoutMs}ms`);
       if (e instanceof Anthropic.RateLimitError) throw new Error('API rate limit exceeded: 429');
+      if (e instanceof Anthropic.InternalServerError && e.status === 529) throw new Error('API service overloaded (529)');
       if (e instanceof Anthropic.InternalServerError) throw new Error(`API server error (${e.status}): ${e.message}`);
       if (e instanceof Anthropic.APIConnectionError) throw new Error(`API connection failed: ${e.message}`);
       throw e;

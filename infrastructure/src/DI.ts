@@ -56,13 +56,11 @@ import type {
   ProfileRepository
 } from '@tailoredin/domain';
 import type { ClaudeApiProvider } from './services/llm/ClaudeApiProvider.js';
-import type { ClaudeCliProvider } from './services/llm/ClaudeCliProvider.js';
 
 export const DI = {
   Llm: {
     ClaudeApiKey: new InjectionToken<string>('DI.Llm.ClaudeApiKey'),
-    ClaudeApiProvider: new InjectionToken<ClaudeApiProvider>('DI.Llm.ClaudeApiProvider'),
-    ClaudeCliProvider: new InjectionToken<ClaudeCliProvider>('DI.Llm.ClaudeCliProvider')
+    ClaudeApiProvider: new InjectionToken<ClaudeApiProvider>('DI.Llm.ClaudeApiProvider')
   },
 
   Application: {

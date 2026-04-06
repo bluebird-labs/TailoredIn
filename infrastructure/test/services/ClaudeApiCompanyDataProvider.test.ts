@@ -1,11 +1,11 @@
 import { describe, expect, mock, test } from 'bun:test';
 import { BusinessType, CompanyStage, err, Industry, ok } from '@tailoredin/domain';
-import { ClaudeCliCompanyDataProvider } from '../../src/services/ClaudeCliCompanyDataProvider.js';
-import type { ClaudeCliProvider } from '../../src/services/llm/ClaudeCliProvider.js';
+import { ClaudeApiCompanyDataProvider } from '../../src/services/ClaudeApiCompanyDataProvider.js';
+import type { ClaudeApiProvider } from '../../src/services/llm/ClaudeApiProvider.js';
 import { LlmRequestError } from '../../src/services/llm/LlmRequestError.js';
 
 function createMockProvider(result: ReturnType<typeof ok> | ReturnType<typeof err>) {
-  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeCliProvider;
+  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeApiProvider;
 }
 
 function fullLlmResponse(overrides: Record<string, unknown> = {}) {
@@ -22,7 +22,7 @@ function fullLlmResponse(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe('ClaudeCliCompanyDataProvider', () => {
+describe('ClaudeApiCompanyDataProvider', () => {
   describe('URL handling', () => {
     test('URLs from LLM are kept as-is (not cleared by HEAD validation)', async () => {
       const mockProvider = createMockProvider(
@@ -34,7 +34,7 @@ describe('ClaudeCliCompanyDataProvider', () => {
         )
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
       const result = await dataProvider.enrichFromUrl('https://github.com');
 
       expect(result.website).toBe('https://github.com');
@@ -51,7 +51,7 @@ describe('ClaudeCliCompanyDataProvider', () => {
         )
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
       const result = await dataProvider.enrichFromUrl('https://github.com');
 
       expect(result.website).toBe('https://github.com');
@@ -68,7 +68,7 @@ describe('ClaudeCliCompanyDataProvider', () => {
         )
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
       const result = await dataProvider.enrichFromUrl('https://example.com');
 
       expect(result.website).toBeNull();
@@ -78,11 +78,9 @@ describe('ClaudeCliCompanyDataProvider', () => {
 
   describe('error handling', () => {
     test('throws ExternalServiceError on LLM failure', async () => {
-      const mockProvider = createMockProvider(
-        err(new LlmRequestError('CLI exited with code 1', ['claude'], 1, '', '', 100))
-      );
+      const mockProvider = createMockProvider(err(new LlmRequestError('API error', [], null, '', '', 100)));
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
 
       await expect(dataProvider.enrichFromUrl('https://example.com')).rejects.toThrow('Company enrichment failed');
     });
@@ -101,7 +99,7 @@ describe('ClaudeCliCompanyDataProvider', () => {
         })
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
       const result = await dataProvider.enrichFromUrl('https://unknown.com');
 
       expect(result.name).toBeNull();
@@ -116,20 +114,22 @@ describe('ClaudeCliCompanyDataProvider', () => {
   });
 
   describe('logo provider chain', () => {
-    test('LLM-provided logoUrl is used directly (not overridden by provider chain)', async () => {
+    test('LLM-provided logoUrl is discarded when it fails image validation (dead/wrong URL)', async () => {
+      // A fake URL like this will fail the HEAD request — the new behavior discards it
       const mockProvider = createMockProvider(
         ok(
           fullLlmResponse({
             logoUrl: 'https://example.com/logo.png',
-            website: 'https://github.com'
+            website: null // no website → no fallback providers
           })
         )
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
-      const result = await dataProvider.enrichFromUrl('https://github.com');
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
+      const result = await dataProvider.enrichFromUrl('https://example.com');
 
-      expect(result.logoUrl).toBe('https://example.com/logo.png');
+      // Invalid/dead URL is discarded — result is null
+      expect(result.logoUrl).toBeNull();
     });
 
     test('falls back to domain-based providers when LLM provides no logo', async () => {
@@ -142,14 +142,14 @@ describe('ClaudeCliCompanyDataProvider', () => {
         )
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
       const result = await dataProvider.enrichFromUrl('https://github.com');
 
       // Result is either a string URL from a provider or null — can't control external services
       expect(result.logoUrl === null || typeof result.logoUrl === 'string').toBe(true);
     });
 
-    test('returns null logoUrl when no website available', async () => {
+    test('returns null logoUrl when no website and no valid LLM logo', async () => {
       const mockProvider = createMockProvider(
         ok(
           fullLlmResponse({
@@ -159,7 +159,7 @@ describe('ClaudeCliCompanyDataProvider', () => {
         )
       );
 
-      const dataProvider = new ClaudeCliCompanyDataProvider(mockProvider);
+      const dataProvider = new ClaudeApiCompanyDataProvider(mockProvider);
       const result = await dataProvider.enrichFromUrl('https://unknown.com');
 
       expect(result.logoUrl).toBeNull();

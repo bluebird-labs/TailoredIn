@@ -1,4 +1,4 @@
-import type { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import type { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import { Company, type CompanyRepository } from '@tailoredin/domain';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
@@ -12,6 +12,7 @@ export type CreateCompanyInput = {
   businessType: BusinessType | null;
   industry: Industry | null;
   stage: CompanyStage | null;
+  status: CompanyStatus | null;
 };
 
 export class CreateCompany {
@@ -26,7 +27,8 @@ export class CreateCompany {
       linkedinLink: input.linkedinLink,
       businessType: input.businessType,
       industry: input.industry,
-      stage: input.stage
+      stage: input.stage,
+      status: input.status
     });
     await this.companyRepository.save(company);
     return toCompanyDto(company);

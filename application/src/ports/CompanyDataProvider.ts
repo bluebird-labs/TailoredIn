@@ -1,5 +1,5 @@
 // application/src/ports/CompanyDataProvider.ts
-import type { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import type { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 
 export type CompanyEnrichmentResult = {
   name: string | null;
@@ -10,6 +10,7 @@ export type CompanyEnrichmentResult = {
   businessType: BusinessType | null;
   industry: Industry | null;
   stage: CompanyStage | null;
+  status: CompanyStatus | null;
 };
 
 export interface CompanyDataProvider {

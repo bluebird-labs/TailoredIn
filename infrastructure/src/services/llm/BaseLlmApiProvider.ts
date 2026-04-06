@@ -95,6 +95,7 @@ export abstract class BaseLlmApiProvider {
     const msg = error.message;
     if (msg.includes('API call timed out')) return true;
     if (msg.includes('API connection failed')) return true;
+    if (msg.includes('API service overloaded')) return true;
     if (msg.includes('API server error')) return true;
     if (msg.includes('API rate limit')) return true;
     return false;

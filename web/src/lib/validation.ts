@@ -104,6 +104,7 @@ interface CompanyFormState {
   businessType: string;
   industry: string;
   stage: string;
+  status: string;
 }
 
 function validateCompany(values: CompanyFormState): ValidationErrors<CompanyFormState> {

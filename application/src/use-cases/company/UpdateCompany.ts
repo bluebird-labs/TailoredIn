@@ -1,4 +1,4 @@
-import type { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import type { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import { CompanyId, type CompanyRepository } from '@tailoredin/domain';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
@@ -12,6 +12,7 @@ export type UpdateCompanyInput = {
   businessType: BusinessType | null;
   industry: Industry | null;
   stage: CompanyStage | null;
+  status: CompanyStatus | null;
 };
 
 export class UpdateCompany {
@@ -30,6 +31,7 @@ export class UpdateCompany {
     company.setBusinessType(input.businessType);
     company.setIndustry(input.industry);
     company.setStage(input.stage);
+    company.setStatus(input.status);
 
     await this.companyRepository.save(company);
     return toCompanyDto(company);

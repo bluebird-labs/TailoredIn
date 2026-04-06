@@ -39,7 +39,8 @@ export const Full: Story = {
       linkedinLink: 'https://linkedin.com/company/acme',
       businessType: 'b2b',
       industry: 'saas',
-      stage: 'series_b'
+      stage: 'series_b',
+      status: 'running'
     }
   }
 };
@@ -55,7 +56,8 @@ export const Minimal: Story = {
       linkedinLink: null,
       businessType: null,
       industry: null,
-      stage: null
+      stage: null,
+      status: null
     }
   }
 };

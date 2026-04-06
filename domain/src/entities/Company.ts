@@ -2,6 +2,7 @@ import { AggregateRoot } from '../AggregateRoot.js';
 import type { BusinessType } from '../value-objects/BusinessType.js';
 import { CompanyId } from '../value-objects/CompanyId.js';
 import type { CompanyStage } from '../value-objects/CompanyStage.js';
+import { CompanyStatus } from '../value-objects/CompanyStatus.js';
 import type { Industry } from '../value-objects/Industry.js';
 
 export type CompanyCreateProps = {
@@ -13,6 +14,7 @@ export type CompanyCreateProps = {
   businessType?: BusinessType | null;
   industry?: Industry | null;
   stage?: CompanyStage | null;
+  status?: CompanyStatus | null;
 };
 
 export class Company extends AggregateRoot<CompanyId> {
@@ -24,6 +26,7 @@ export class Company extends AggregateRoot<CompanyId> {
   public businessType: BusinessType | null;
   public industry: Industry | null;
   public stage: CompanyStage | null;
+  public status: CompanyStatus | null;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -37,6 +40,7 @@ export class Company extends AggregateRoot<CompanyId> {
     businessType: BusinessType | null;
     industry: Industry | null;
     stage: CompanyStage | null;
+    status: CompanyStatus | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -49,6 +53,7 @@ export class Company extends AggregateRoot<CompanyId> {
     this.businessType = props.businessType;
     this.industry = props.industry;
     this.stage = props.stage;
+    this.status = props.status;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -73,6 +78,11 @@ export class Company extends AggregateRoot<CompanyId> {
     this.updatedAt = new Date();
   }
 
+  public setStatus(value: CompanyStatus | null): void {
+    this.status = value;
+    this.updatedAt = new Date();
+  }
+
   public static create(props: CompanyCreateProps): Company {
     const now = new Date();
     return new Company({
@@ -85,6 +95,7 @@ export class Company extends AggregateRoot<CompanyId> {
       businessType: props.businessType ?? null,
       industry: props.industry ?? null,
       stage: props.stage ?? null,
+      status: props.status ?? CompanyStatus.RUNNING,
       createdAt: now,
       updatedAt: now
     });

@@ -40,6 +40,7 @@ export { ApplicationStatus } from './value-objects/ApplicationStatus.js';
 export { BusinessType } from './value-objects/BusinessType.js';
 export { CompanyId } from './value-objects/CompanyId.js';
 export { CompanyStage } from './value-objects/CompanyStage.js';
+export { CompanyStatus } from './value-objects/CompanyStatus.js';
 export { EducationId } from './value-objects/EducationId.js';
 export { ExperienceId } from './value-objects/ExperienceId.js';
 export { HeadlineId } from './value-objects/HeadlineId.js';

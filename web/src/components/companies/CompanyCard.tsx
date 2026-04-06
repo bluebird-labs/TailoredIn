@@ -10,6 +10,7 @@ interface CompanyCardProps {
 export function CompanyCard({ company }: CompanyCardProps) {
   const industryLabel = formatEnumLabel('industry', company.industry);
   const stageLabel = formatEnumLabel('stage', company.stage);
+  const statusLabel = formatEnumLabel('status', company.status);
   const businessTypeLabel = formatEnumLabel('businessType', company.businessType);
 
   return (
@@ -36,6 +37,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
           <div className="flex flex-wrap items-center gap-1.5 mt-2">
             {industryLabel && <Badge variant="secondary">{industryLabel}</Badge>}
             {stageLabel && <Badge variant="secondary">{stageLabel}</Badge>}
+            {statusLabel && <Badge variant="outline">{statusLabel}</Badge>}
             {businessTypeLabel && <Badge variant="outline">{businessTypeLabel}</Badge>}
           </div>
         </div>

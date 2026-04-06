@@ -13,6 +13,7 @@ export type Company = {
   businessType: string | null;
   industry: string | null;
   stage: string | null;
+  status: string | null;
 };
 
 export type CompanyDiscoveryResult = {
@@ -30,6 +31,7 @@ export type CompanyEnrichmentResult = {
   businessType: string | null;
   industry: string | null;
   stage: string | null;
+  status: string | null;
 };
 
 export function useCompanies() {
@@ -89,6 +91,7 @@ export function useUpdateCompany() {
       business_type?: string | null;
       industry?: string | null;
       stage?: string | null;
+      status?: string | null;
     }) => {
       const { id, ...body } = input;
       const segment = api.companies as EdenRouteSegment;
@@ -114,6 +117,7 @@ export function useCreateCompany() {
       business_type?: string | null;
       industry?: string | null;
       stage?: string | null;
+      status?: string | null;
     }) => {
       const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment.post(input);

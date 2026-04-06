@@ -27,8 +27,8 @@ Return ONLY a valid JSON object with these fields:
   "salaryMin": "number or null — minimum annual salary",
   "salaryMax": "number or null — maximum annual salary",
   "salaryCurrency": "string or null — three-letter currency code (e.g., USD, EUR, GBP)",
-  "level": "one of [{{levels}}] or null",
-  "locationType": "one of [{{locationTypes}}] or null",
+  "level": "seniority level enum or null",
+  "locationType": "work arrangement enum or null",
   "postedAt": "string or null — ISO 8601 date (YYYY-MM-DD)"
 }
 ```

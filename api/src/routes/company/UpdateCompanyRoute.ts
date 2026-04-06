@@ -1,6 +1,6 @@
 import { inject, injectable } from '@needle-di/core';
 import type { UpdateCompany } from '@tailoredin/application';
-import type { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import type { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
@@ -21,7 +21,8 @@ export class UpdateCompanyRoute {
             logoUrl: body.logo_url ?? null,
             businessType: (body.business_type as BusinessType) ?? null,
             industry: (body.industry as Industry) ?? null,
-            stage: (body.stage as CompanyStage) ?? null
+            stage: (body.stage as CompanyStage) ?? null,
+            status: (body.status as CompanyStatus) ?? null
           });
           return { data };
         } catch (e) {
@@ -41,7 +42,8 @@ export class UpdateCompanyRoute {
           logo_url: t.Optional(t.Nullable(t.String())),
           business_type: t.Optional(t.Nullable(t.String())),
           industry: t.Optional(t.Nullable(t.String())),
-          stage: t.Optional(t.Nullable(t.String()))
+          stage: t.Optional(t.Nullable(t.String())),
+          status: t.Optional(t.Nullable(t.String()))
         })
       }
     );

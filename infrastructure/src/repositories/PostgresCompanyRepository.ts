@@ -6,6 +6,7 @@ import {
   CompanyId,
   type CompanyRepository,
   type CompanyStage,
+  type CompanyStatus,
   Company as DomainCompany,
   type Industry
 } from '@tailoredin/domain';
@@ -44,6 +45,7 @@ export class PostgresCompanyRepository implements CompanyRepository {
       ormCompany.businessType = company.businessType;
       ormCompany.industry = company.industry;
       ormCompany.stage = company.stage;
+      ormCompany.status = company.status;
       ormCompany.updatedAt = company.updatedAt;
     } else {
       ormCompany = this.orm.em.create(OrmCompany, {
@@ -56,6 +58,7 @@ export class PostgresCompanyRepository implements CompanyRepository {
         businessType: company.businessType,
         industry: company.industry,
         stage: company.stage,
+        status: company.status,
         createdAt: company.createdAt,
         updatedAt: company.updatedAt
       });
@@ -76,6 +79,7 @@ export class PostgresCompanyRepository implements CompanyRepository {
       businessType: orm.businessType as BusinessType | null,
       industry: orm.industry as Industry | null,
       stage: orm.stage as CompanyStage | null,
+      status: orm.status as CompanyStatus | null,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });

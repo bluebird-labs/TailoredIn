@@ -6,6 +6,5 @@ export enum CompanyStage {
   SERIES_D_PLUS = 'series_d_plus',
   GROWTH = 'growth',
   PUBLIC = 'public',
-  BOOTSTRAPPED = 'bootstrapped',
-  ACQUIRED = 'acquired'
+  BOOTSTRAPPED = 'bootstrapped'
 }

@@ -44,12 +44,11 @@ import {
 } from '@tailoredin/application';
 import { env, envInt } from '@tailoredin/core';
 import {
+  ClaudeApiCompanyDataProvider,
+  ClaudeApiCompanyDiscoveryProvider,
+  ClaudeApiJobDescriptionParser,
   ClaudeApiProvider,
   ClaudeApiResumeContentGenerator,
-  ClaudeCliCompanyDataProvider,
-  ClaudeCliCompanyDiscoveryProvider,
-  ClaudeCliJobDescriptionParser,
-  ClaudeCliProvider,
   createOrmConfig,
   DI,
   PostgresApplicationRepository,
@@ -175,12 +174,11 @@ container.bind({
 // LLM
 container.bind({ provide: DI.Llm.ClaudeApiKey, useValue: env('CLAUDE_API_KEY') });
 container.bind({ provide: DI.Llm.ClaudeApiProvider, useClass: ClaudeApiProvider });
-container.bind({ provide: DI.Llm.ClaudeCliProvider, useClass: ClaudeCliProvider });
 
 // Company
 container.bind({ provide: DI.Company.Repository, useClass: PostgresCompanyRepository });
-container.bind({ provide: DI.Company.DataProvider, useClass: ClaudeCliCompanyDataProvider });
-container.bind({ provide: DI.Company.DiscoveryProvider, useClass: ClaudeCliCompanyDiscoveryProvider });
+container.bind({ provide: DI.Company.DataProvider, useClass: ClaudeApiCompanyDataProvider });
+container.bind({ provide: DI.Company.DiscoveryProvider, useClass: ClaudeApiCompanyDiscoveryProvider });
 container.bind({
   provide: DI.Company.Enrich,
   useFactory: () => new EnrichCompanyData(container.get(DI.Company.DataProvider))
@@ -235,7 +233,7 @@ container.bind({
 
 // Job Descriptions
 container.bind({ provide: DI.JobDescription.Repository, useClass: PostgresJobDescriptionRepository });
-container.bind({ provide: DI.JobDescription.Parser, useClass: ClaudeCliJobDescriptionParser });
+container.bind({ provide: DI.JobDescription.Parser, useClass: ClaudeApiJobDescriptionParser });
 container.bind({
   provide: DI.JobDescription.Parse,
   useFactory: () => new ParseJobDescription(container.get(DI.JobDescription.Parser))

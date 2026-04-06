@@ -14,13 +14,14 @@ export type CompanyProps = {
   businessType: string | null;
   industry: string | null;
   stage: string | null;
+  status: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
 
 export type CompanyCreateProps = Omit<
   CompanyProps,
-  'id' | 'createdAt' | 'updatedAt' | 'businessType' | 'industry' | 'stage'
+  'id' | 'createdAt' | 'updatedAt' | 'businessType' | 'industry' | 'stage' | 'status'
 >;
 
 @Entity({ tableName: 'companies', repository: () => CompanyOrmRepository })
@@ -54,6 +55,9 @@ export class Company extends BaseEntity {
   @Property({ fieldName: 'stage', type: 'text', nullable: true })
   public stage: string | null;
 
+  @Property({ fieldName: 'status', type: 'text', nullable: true })
+  public status: string | null;
+
   public constructor(props: CompanyProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
@@ -65,6 +69,7 @@ export class Company extends BaseEntity {
     this.businessType = props.businessType;
     this.industry = props.industry;
     this.stage = props.stage;
+    this.status = props.status;
   }
 
   public static create(props: CompanyCreateProps): Company {
@@ -75,6 +80,7 @@ export class Company extends BaseEntity {
       businessType: null,
       industry: null,
       stage: null,
+      status: 'running',
       createdAt: now,
       updatedAt: now
     });

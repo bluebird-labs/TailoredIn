@@ -4,10 +4,10 @@ import { inject, injectable } from '@needle-di/core';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
-import { BusinessType, CompanyStage, Industry } from '@tailoredin/domain';
+import { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import { z } from 'zod';
 import { DI } from '../DI.js';
-import type { ClaudeCliProvider } from './llm/ClaudeCliProvider.js';
+import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from './llm/LlmJsonRequest.js';
 
 const PROMPT_PATH = resolve(import.meta.dir, 'prompts/enrich-company.md');
@@ -21,9 +21,10 @@ const companyEnrichmentSchema = z.object({
     .regex(/^https:\/\/(www\.)?linkedin\.com\/company\/.+/)
     .nullable(),
   logoUrl: z.string().url().nullable(),
-  businessType: z.enum(Object.values(BusinessType) as [string, ...string[]]).nullable(),
-  industry: z.enum(Object.values(Industry) as [string, ...string[]]).nullable(),
-  stage: z.enum(Object.values(CompanyStage) as [string, ...string[]]).nullable()
+  businessType: z.nativeEnum(BusinessType).nullable(),
+  industry: z.nativeEnum(Industry).nullable(),
+  stage: z.nativeEnum(CompanyStage).nullable(),
+  status: z.nativeEnum(CompanyStatus).nullable()
 });
 
 class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSchema> {
@@ -53,10 +54,10 @@ class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSc
 }
 
 @injectable()
-export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
+export class ClaudeApiCompanyDataProvider implements CompanyDataProvider {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeCliProvider = inject(DI.Llm.ClaudeCliProvider)) {}
+  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
 
   public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
     this.log.info(`Enriching company data for URL: "${url}"`);
@@ -66,21 +67,15 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     const duration = Date.now() - startTime;
 
     if (result.isErr) {
-      const exitCode = result.error.exitCode ?? 'unknown';
-      this.log.error(
-        `Company enrichment failed | url="${url}" exitCode=${exitCode} duration=${duration}ms error="${result.error.message}"`
-      );
-      throw new ExternalServiceError('Claude CLI', 'Company enrichment failed');
+      this.log.error(`Company enrichment failed | url="${url}" duration=${duration}ms error="${result.error.message}"`);
+      throw new ExternalServiceError('Claude API', result.error.message);
     }
 
     const enrichment: CompanyEnrichmentResult = {
       ...result.value,
       website: this.normalizeUrl(result.value.website),
       linkedinLink: this.normalizeUrl(result.value.linkedinLink),
-      logoUrl: result.value.logoUrl,
-      businessType: result.value.businessType as BusinessType | null,
-      industry: result.value.industry as Industry | null,
-      stage: result.value.stage as CompanyStage | null
+      logoUrl: result.value.logoUrl
     };
 
     const enriched = await this.applyLogo(enrichment);
@@ -89,20 +84,25 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
   }
 
   private async applyLogo(result: CompanyEnrichmentResult): Promise<CompanyEnrichmentResult> {
+    // Validate LLM-provided logo — model often returns wrong/dead URLs
     if (result.logoUrl) {
-      this.log.debug(`Using LLM-provided logo URL: "${result.logoUrl}"`);
-      return result;
+      const isValid = await this.urlReturnsImage(result.logoUrl);
+      if (isValid) {
+        this.log.debug(`Using validated LLM-provided logo URL: "${result.logoUrl}"`);
+        return result;
+      }
+      this.log.debug(`LLM-provided logo URL failed validation, trying fallback providers: "${result.logoUrl}"`);
     }
 
     const websiteUrl = result.website;
-    if (!websiteUrl) return result;
+    if (!websiteUrl) return { ...result, logoUrl: null };
 
     let domain: string;
     try {
       domain = new URL(websiteUrl).hostname;
     } catch {
       this.log.debug(`Cannot extract domain from website URL: "${websiteUrl}"`);
-      return result;
+      return { ...result, logoUrl: null };
     }
 
     const providers = [
@@ -120,7 +120,7 @@ export class ClaudeCliCompanyDataProvider implements CompanyDataProvider {
     }
 
     this.log.debug(`No logo found for domain "${domain}" from any provider`);
-    return result;
+    return { ...result, logoUrl: null };
   }
 
   private normalizeUrl(url: string | null): string | null {
