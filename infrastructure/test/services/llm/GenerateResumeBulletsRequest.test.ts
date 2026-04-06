@@ -60,6 +60,7 @@ describe('GenerateResumeBulletsRequest', () => {
         experiences: [
           {
             experienceId: 'exp-aaa-111',
+            summary: 'Led platform engineering initiatives across distributed teams.',
             bullets: [
               'Reduced deployment time by 60% by introducing automated CI/CD pipelines with GitHub Actions and containerised builds',
               'Mentored four junior engineers through structured code reviews and weekly one-on-ones resulting in measurable skill growth'
@@ -112,6 +113,7 @@ describe('GenerateResumeBulletsRequest', () => {
         experiences: [
           {
             experienceId: 'exp-aaa-111',
+            summary: 'Summary text that is between 20 and 300 characters long for this test.',
             bullets: [exactMin, exactMax]
           }
         ]
