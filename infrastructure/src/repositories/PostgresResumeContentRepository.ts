@@ -44,16 +44,20 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
   }
 
   public async update(resumeContent: DomainResumeContent): Promise<void> {
-    const existing = await this.orm.em.findOneOrFail(OrmResumeContent, resumeContent.id.value);
-    existing.experiences = resumeContent.experiences.map(e => ({
-      experienceId: e.experienceId,
-      summary: e.summary,
-      bullets: e.bullets,
-      hiddenBulletIndices: e.hiddenBulletIndices
-    }));
-    existing.hiddenEducationIds = resumeContent.hiddenEducationIds;
-    existing.updatedAt = resumeContent.updatedAt;
-    await this.orm.em.flush();
+    const qb = this.orm.em.createQueryBuilder(OrmResumeContent);
+    await qb
+      .update({
+        experiences: resumeContent.experiences.map(e => ({
+          experienceId: e.experienceId,
+          summary: e.summary,
+          bullets: e.bullets,
+          hiddenBulletIndices: e.hiddenBulletIndices
+        })),
+        hiddenEducationIds: resumeContent.hiddenEducationIds,
+        updatedAt: resumeContent.updatedAt
+      })
+      .where({ id: resumeContent.id.value })
+      .execute();
   }
 
   private toDomain(orm: OrmResumeContent): DomainResumeContent {
