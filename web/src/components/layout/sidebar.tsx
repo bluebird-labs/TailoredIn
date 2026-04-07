@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Briefcase, Building2, GraduationCap, type LucideIcon, Moon, Sun, User } from 'lucide-react';
+import { Briefcase, Building2, FileText, GraduationCap, type LucideIcon, Moon, Sun, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,7 +28,10 @@ const resumeNav: NavItem[] = [
   { label: 'Education', to: '/education', icon: GraduationCap }
 ];
 
-const directoryNav: NavItem[] = [{ label: 'Companies', to: '/companies', icon: Building2 }];
+const directoryNav: NavItem[] = [
+  { label: 'Jobs', to: '/jobs', icon: FileText },
+  { label: 'Companies', to: '/companies', icon: Building2 }
+];
 
 export function AppSidebar() {
   const matchRoute = useMatchRoute();

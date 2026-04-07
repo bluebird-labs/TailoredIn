@@ -30,6 +30,8 @@ export type ResumeOutput = {
 export type JobDescription = {
   id: string;
   companyId: string;
+  companyName: string | null;
+  companyLogoUrl: string | null;
   title: string;
   description: string;
   url: string | null;
@@ -64,12 +66,13 @@ export type JobDescriptionParseResult = {
   soughtSoftSkills: string[] | null;
 };
 
-export function useJobDescriptions(companyId: string) {
+export function useJobDescriptions(companyId?: string) {
   return useQuery({
-    queryKey: queryKeys.jobDescriptions.list(companyId),
+    queryKey: companyId ? queryKeys.jobDescriptions.list(companyId) : queryKeys.jobDescriptions.listAll(),
     queryFn: async () => {
       const segment = api['job-descriptions'] as EdenRouteSegment;
-      const { data } = await segment.get({ query: { company_id: companyId } });
+      const query = companyId ? { company_id: companyId } : {};
+      const { data } = await segment.get({ query });
       return (data?.data ?? []) as JobDescription[];
     }
   });
@@ -136,6 +139,7 @@ export function useCreateJobDescription() {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(variables.company_id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.listAll() });
     }
   });
 }
@@ -167,6 +171,7 @@ export function useUpdateJobDescription(companyId: string) {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(companyId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.listAll() });
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(variables.id) });
     }
   });
@@ -182,6 +187,7 @@ export function useDeleteJobDescription(companyId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(companyId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.listAll() });
     }
   });
 }

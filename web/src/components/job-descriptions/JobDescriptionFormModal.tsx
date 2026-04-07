@@ -1,12 +1,14 @@
-import { FileUp, Loader2, Type } from 'lucide-react';
+import { Building2, FileUp, Loader2, Search, Type } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { DatePicker } from '@/components/shared/DatePicker.js';
 import { EditableField } from '@/components/shared/EditableField.js';
 import { FormModal } from '@/components/shared/FormModal.js';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useCompanies } from '@/hooks/use-companies.js';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import {
   type JobDescription,
@@ -28,11 +30,11 @@ import { currencyOptions, jobLevelOptions, locationTypeOptions } from './job-des
 interface Props {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
-  readonly companyId: string;
+  readonly companyId?: string;
   readonly jobDescription?: JobDescription;
 }
 
-type Step = 'source' | 'parsing' | 'form';
+type Step = 'company' | 'source' | 'parsing' | 'form';
 type SourceMode = 'file' | 'text';
 
 function todayIso(): string {
@@ -101,16 +103,19 @@ function parseResultToFormState(result: JobDescriptionParseResult): JobDescripti
   };
 }
 
-export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDescription }: Props) {
+export function JobDescriptionFormModal({ open, onOpenChange, companyId: companyIdProp, jobDescription }: Props) {
   const isEdit = !!jobDescription;
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(companyIdProp ?? null);
+  const effectiveCompanyId = companyIdProp ?? selectedCompanyId ?? '';
   const createJd = useCreateJobDescription();
-  const updateJd = useUpdateJobDescription(companyId);
-  const deleteJd = useDeleteJobDescription(companyId);
+  const updateJd = useUpdateJobDescription(effectiveCompanyId);
+  const deleteJd = useDeleteJobDescription(effectiveCompanyId);
   const parseJd = useParseJobDescription();
   const extractText = useExtractText();
   const isSaving = createJd.isPending || updateJd.isPending;
 
-  const [step, setStep] = useState<Step>(isEdit ? 'form' : 'source');
+  const needsCompanyPicker = !isEdit && !companyIdProp;
+  const [step, setStep] = useState<Step>(isEdit ? 'form' : needsCompanyPicker ? 'company' : 'source');
   const [sourceMode, setSourceMode] = useState<SourceMode>('text');
   const [pastedText, setPastedText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -126,7 +131,8 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
   const [errors, setErrors] = useState<ValidationErrors<JobDescriptionFormState>>({});
 
   function resetAll() {
-    setStep(isEdit ? 'form' : 'source');
+    setStep(isEdit ? 'form' : needsCompanyPicker ? 'company' : 'source');
+    setSelectedCompanyId(companyIdProp ?? null);
     setSourceMode('text');
     setPastedText('');
     setSelectedFile(null);
@@ -203,7 +209,7 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
     if (hasErrors(validationErrors)) return;
 
     const payload = {
-      company_id: companyId,
+      company_id: effectiveCompanyId,
       title: current.title.trim(),
       description: current.description.trim(),
       url: current.url.trim() || null,
@@ -261,11 +267,21 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
     onDiscard: handleDiscard,
     sourceHasInput,
     onParse: handleParse,
-    onBack: () => setStep('source')
+    onBackToSource: () => setStep('source'),
+    onBackToCompany: needsCompanyPicker ? () => setStep('company') : undefined
   });
 
   return (
     <FormModal open={open} onOpenChange={onOpenChange} {...modalProps}>
+      {step === 'company' && (
+        <CompanyPickerStep
+          onSelect={id => {
+            setSelectedCompanyId(id);
+            setStep('source');
+          }}
+        />
+      )}
+
       {step === 'source' && (
         <SourceStep
           sourceMode={sourceMode}
@@ -297,6 +313,71 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
 }
 
 // --- Step Components ---
+
+function CompanyPickerStep({ onSelect }: { onSelect: (companyId: string) => void }) {
+  const { data: companies = [], isLoading } = useCompanies();
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return companies;
+    const q = search.toLowerCase();
+    return companies.filter(c => c.name.toLowerCase().includes(q));
+  }, [companies, search]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (companies.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Building2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+        <p className="text-sm text-muted-foreground">No companies yet. Add a company first from the Companies page.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search companies..."
+          className="pl-9"
+        />
+      </div>
+      <div className="max-h-[300px] overflow-y-auto space-y-1.5">
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">No companies match your search.</p>
+        ) : (
+          filtered.map(company => (
+            <button
+              key={company.id}
+              type="button"
+              className="flex items-center gap-3 w-full rounded-[14px] border p-3 text-left transition-colors hover:bg-accent/40"
+              onClick={() => onSelect(company.id)}
+            >
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-accent text-[12px] font-medium text-accent-foreground overflow-hidden">
+                {company.logoUrl ? (
+                  <img src={company.logoUrl} alt={company.name} className="h-full w-full rounded-lg object-contain" />
+                ) : (
+                  company.name.charAt(0).toUpperCase()
+                )}
+              </div>
+              <span className="text-sm truncate">{company.name}</span>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
 
 function SourceStep({
   sourceMode,
@@ -544,7 +625,8 @@ function getModalProps(
     onDiscard: () => void;
     sourceHasInput: boolean;
     onParse: () => void;
-    onBack: () => void;
+    onBackToSource: () => void;
+    onBackToCompany?: () => void;
   }
 ) {
   const base = {
@@ -553,6 +635,14 @@ function getModalProps(
   };
 
   switch (step) {
+    case 'company':
+      return {
+        ...base,
+        description: 'Select a company for this job description.',
+        dirtyCount: 0,
+        isSaving: false,
+        onSave: () => {}
+      };
     case 'source':
       return {
         ...base,
@@ -561,7 +651,8 @@ function getModalProps(
         isSaving: false,
         onSave: ctx.onParse,
         saveLabel: 'Parse',
-        saveDisabled: !ctx.sourceHasInput
+        saveDisabled: !ctx.sourceHasInput,
+        backAction: ctx.onBackToCompany
       };
     case 'parsing':
       return {
@@ -578,7 +669,7 @@ function getModalProps(
         dirtyCount: ctx.dirtyCount,
         isSaving: ctx.isSaving,
         onSave: ctx.onSave,
-        backAction: ctx.isEdit ? undefined : ctx.onBack
+        backAction: ctx.isEdit ? undefined : ctx.onBackToSource
       };
   }
 }

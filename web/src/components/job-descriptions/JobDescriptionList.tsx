@@ -9,7 +9,7 @@ import { JobDescriptionCard } from './JobDescriptionCard.js';
 import { JobDescriptionFormModal } from './JobDescriptionFormModal.js';
 
 interface JobDescriptionListProps {
-  readonly companyId: string;
+  readonly companyId?: string;
 }
 
 export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
@@ -20,7 +20,9 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
   const filtered = useMemo(() => {
     if (!search.trim()) return jobDescriptions;
     const q = search.toLowerCase();
-    return jobDescriptions.filter(jd => jd.title.toLowerCase().includes(q));
+    return jobDescriptions.filter(
+      jd => jd.title.toLowerCase().includes(q) || jd.companyName?.toLowerCase().includes(q)
+    );
   }, [jobDescriptions, search]);
 
   if (isLoading) return <LoadingSkeleton variant="list" count={3} />;
@@ -48,7 +50,7 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
           {filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">No job descriptions match your search.</p>
           ) : (
-            filtered.map(jd => <JobDescriptionCard key={jd.id} jobDescription={jd} />)
+            filtered.map(jd => <JobDescriptionCard key={jd.id} jobDescription={jd} showCompany={!companyId} />)
           )}
 
           <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setCreateOpen(true)}>

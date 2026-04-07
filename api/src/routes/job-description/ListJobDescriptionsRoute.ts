@@ -16,7 +16,7 @@ export class ListJobDescriptionsRoute {
       },
       {
         query: t.Object({
-          company_id: t.String({ format: 'uuid' })
+          company_id: t.Optional(t.String({ format: 'uuid' }))
         })
       }
     );

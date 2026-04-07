@@ -17,6 +17,15 @@ import { JobDescription as OrmJobDescription } from '../db/entities/job-descript
 export class PostgresJobDescriptionRepository implements JobDescriptionRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
+  public async findAll(): Promise<DomainJobDescription[]> {
+    const ormEntities = await this.orm.em.find(
+      OrmJobDescription,
+      {},
+      { populate: ['company'], orderBy: { createdAt: 'DESC' } }
+    );
+    return ormEntities.map(e => this.toDomain(e));
+  }
+
   public async findById(id: JobDescriptionId): Promise<DomainJobDescription | null> {
     const orm = await this.orm.em.findOne(OrmJobDescription, id.value, { populate: ['company'] });
     return orm ? this.toDomain(orm) : null;

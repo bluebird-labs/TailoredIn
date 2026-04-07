@@ -6,6 +6,7 @@ import { formatEnumLabel } from './job-description-options.js';
 
 interface JobDescriptionCardProps {
   readonly jobDescription: JobDescription;
+  readonly showCompany?: boolean;
 }
 
 function formatSalary(jd: JobDescription): string | null {
@@ -19,19 +20,36 @@ function formatSalary(jd: JobDescription): string | null {
   return null;
 }
 
-export function JobDescriptionCard({ jobDescription }: JobDescriptionCardProps) {
+export function JobDescriptionCard({ jobDescription, showCompany }: JobDescriptionCardProps) {
   const levelLabel = formatEnumLabel('level', jobDescription.level);
   const locationTypeLabel = formatEnumLabel('locationType', jobDescription.locationType);
   const salary = formatSalary(jobDescription);
+  const companyInitial = jobDescription.companyName?.charAt(0).toUpperCase() ?? '';
 
   return (
     <Link
-      to="/job-descriptions/$jobDescriptionId"
+      to="/jobs/$jobDescriptionId"
       params={{ jobDescriptionId: jobDescription.id }}
       className="group block w-full text-left border rounded-[14px] p-4 transition-colors hover:bg-accent/40"
     >
       <div className="min-w-0">
         <p className="font-medium truncate">{jobDescription.title}</p>
+        {showCompany && jobDescription.companyName && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded bg-accent text-[10px] font-medium text-accent-foreground overflow-hidden">
+              {jobDescription.companyLogoUrl ? (
+                <img
+                  src={jobDescription.companyLogoUrl}
+                  alt={jobDescription.companyName}
+                  className="h-full w-full rounded object-contain"
+                />
+              ) : (
+                companyInitial
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground truncate">{jobDescription.companyName}</span>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
           {locationTypeLabel && <Badge variant="secondary">{locationTypeLabel}</Badge>}
           {levelLabel && <Badge variant="secondary">{levelLabel}</Badge>}

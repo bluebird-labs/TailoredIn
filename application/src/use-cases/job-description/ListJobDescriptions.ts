@@ -1,16 +1,35 @@
-import type { JobDescriptionRepository } from '@tailoredin/domain';
+import { CompanyId, type CompanyRepository, type JobDescriptionRepository } from '@tailoredin/domain';
+import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { JobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 import { toJobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 
 export type ListJobDescriptionsInput = {
-  companyId: string;
+  companyId?: string;
 };
 
 export class ListJobDescriptions {
-  public constructor(private readonly jobDescriptionRepository: JobDescriptionRepository) {}
+  public constructor(
+    private readonly jobDescriptionRepository: JobDescriptionRepository,
+    private readonly companyRepository: CompanyRepository
+  ) {}
 
   public async execute(input: ListJobDescriptionsInput): Promise<JobDescriptionDto[]> {
-    const jobDescriptions = await this.jobDescriptionRepository.findByCompanyId(input.companyId);
-    return jobDescriptions.map(jd => toJobDescriptionDto(jd));
+    const jobDescriptions = input.companyId
+      ? await this.jobDescriptionRepository.findByCompanyId(input.companyId)
+      : await this.jobDescriptionRepository.findAll();
+
+    const companyIds = [...new Set(jobDescriptions.map(jd => jd.companyId))];
+    const companies = await Promise.all(companyIds.map(id => this.companyRepository.findById(new CompanyId(id))));
+    const companyMap = new Map(companies.filter(Boolean).map(c => [c!.id.value, toCompanyDto(c!)]));
+
+    return jobDescriptions.map(jd => {
+      const company = companyMap.get(jd.companyId);
+      return toJobDescriptionDto(
+        jd,
+        null,
+        undefined,
+        company ? { name: company.name, logoUrl: company.logoUrl } : null
+      );
+    });
   }
 }

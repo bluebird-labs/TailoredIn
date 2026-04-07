@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as JobsIndexRouteImport } from './routes/jobs/index'
 import { Route as ExperiencesIndexRouteImport } from './routes/experiences/index'
 import { Route as EducationIndexRouteImport } from './routes/education/index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies/index'
+import { Route as JobsJobDescriptionIdRouteImport } from './routes/jobs/$jobDescriptionId'
 import { Route as JobDescriptionsJobDescriptionIdRouteImport } from './routes/job-descriptions/$jobDescriptionId'
 import { Route as ExperiencesExperienceIdRouteImport } from './routes/experiences/$experienceId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
@@ -26,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIndexRoute = JobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperiencesIndexRoute = ExperiencesIndexRouteImport.update({
@@ -41,6 +48,11 @@ const EducationIndexRoute = EducationIndexRouteImport.update({
 const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
   id: '/companies/',
   path: '/companies/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsJobDescriptionIdRoute = JobsJobDescriptionIdRouteImport.update({
+  id: '/jobs/$jobDescriptionId',
+  path: '/jobs/$jobDescriptionId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobDescriptionsJobDescriptionIdRoute =
@@ -65,9 +77,11 @@ export interface FileRoutesByFullPath {
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
+  '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
   '/companies/': typeof CompaniesIndexRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
+  '/jobs/': typeof JobsIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
@@ -75,9 +89,11 @@ export interface FileRoutesByTo {
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
+  '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
   '/companies': typeof CompaniesIndexRoute
   '/education': typeof EducationIndexRoute
   '/experiences': typeof ExperiencesIndexRoute
+  '/jobs': typeof JobsIndexRoute
   '/profile': typeof ProfileIndexRoute
 }
 export interface FileRoutesById {
@@ -86,9 +102,11 @@ export interface FileRoutesById {
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
+  '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
   '/companies/': typeof CompaniesIndexRoute
   '/education/': typeof EducationIndexRoute
   '/experiences/': typeof ExperiencesIndexRoute
+  '/jobs/': typeof JobsIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRouteTypes {
@@ -98,9 +116,11 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
+    | '/jobs/$jobDescriptionId'
     | '/companies/'
     | '/education/'
     | '/experiences/'
+    | '/jobs/'
     | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,9 +128,11 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
+    | '/jobs/$jobDescriptionId'
     | '/companies'
     | '/education'
     | '/experiences'
+    | '/jobs'
     | '/profile'
   id:
     | '__root__'
@@ -118,9 +140,11 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
+    | '/jobs/$jobDescriptionId'
     | '/companies/'
     | '/education/'
     | '/experiences/'
+    | '/jobs/'
     | '/profile/'
   fileRoutesById: FileRoutesById
 }
@@ -129,9 +153,11 @@ export interface RootRouteChildren {
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
   JobDescriptionsJobDescriptionIdRoute: typeof JobDescriptionsJobDescriptionIdRoute
+  JobsJobDescriptionIdRoute: typeof JobsJobDescriptionIdRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
   EducationIndexRoute: typeof EducationIndexRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
+  JobsIndexRoute: typeof JobsIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
@@ -149,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/': {
+      id: '/jobs/'
+      path: '/jobs'
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof JobsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiences/': {
@@ -170,6 +203,13 @@ declare module '@tanstack/react-router' {
       path: '/companies'
       fullPath: '/companies/'
       preLoaderRoute: typeof CompaniesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$jobDescriptionId': {
+      id: '/jobs/$jobDescriptionId'
+      path: '/jobs/$jobDescriptionId'
+      fullPath: '/jobs/$jobDescriptionId'
+      preLoaderRoute: typeof JobsJobDescriptionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/job-descriptions/$jobDescriptionId': {
@@ -201,9 +241,11 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
   JobDescriptionsJobDescriptionIdRoute: JobDescriptionsJobDescriptionIdRoute,
+  JobsJobDescriptionIdRoute: JobsJobDescriptionIdRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
   EducationIndexRoute: EducationIndexRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,
+  JobsIndexRoute: JobsIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport

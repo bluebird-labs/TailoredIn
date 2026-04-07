@@ -25,6 +25,8 @@ export type ResumeOutputDto = {
 export type JobDescriptionDto = {
   readonly id: string;
   readonly companyId: string;
+  readonly companyName: string | null;
+  readonly companyLogoUrl: string | null;
   readonly title: string;
   readonly description: string;
   readonly url: string | null;
@@ -47,11 +49,14 @@ export type JobDescriptionDto = {
 export function toJobDescriptionDto(
   jd: JobDescription,
   resumeContent?: ResumeContent | null,
-  experiences?: Experience[]
+  experiences?: Experience[],
+  company?: { name: string; logoUrl: string | null } | null
 ): JobDescriptionDto {
   return {
     id: jd.id.value,
     companyId: jd.companyId,
+    companyName: company?.name ?? null,
+    companyLogoUrl: company?.logoUrl ?? null,
     title: jd.title,
     description: jd.description,
     url: jd.url,

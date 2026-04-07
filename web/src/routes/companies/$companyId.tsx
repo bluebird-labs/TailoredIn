@@ -1,16 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { ExternalLink, Pencil } from 'lucide-react';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { ArrowRight, ExternalLink, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal.js';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
-import { JobDescriptionList } from '@/components/job-descriptions/JobDescriptionList.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCompany } from '@/hooks/use-companies';
 
 export const Route = createFileRoute('/companies/$companyId')({
@@ -81,39 +79,33 @@ function CompanyDetailPage() {
         }
       />
 
-      <Tabs defaultValue="overview">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="job-descriptions">Job Descriptions</TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-2 gap-5">
+        <InfoCard label="About">
+          {company.description ? (
+            <p className="text-[14px] leading-relaxed tracking-[0.01em]">{company.description}</p>
+          ) : (
+            <p className="text-[14px] italic text-muted-foreground">No description</p>
+          )}
+        </InfoCard>
 
-        <TabsContent value="overview">
-          <div className="mt-4 grid grid-cols-2 gap-5">
-            <InfoCard label="About">
-              {company.description ? (
-                <p className="text-[14px] leading-relaxed tracking-[0.01em]">{company.description}</p>
-              ) : (
-                <p className="text-[14px] italic text-muted-foreground">No description</p>
-              )}
-            </InfoCard>
+        <InfoCard label="Details">
+          <InfoRow label="Website" value={company.website} href={company.website ?? undefined} />
+          <InfoRow label="LinkedIn" value={company.linkedinLink} href={company.linkedinLink ?? undefined} />
+          <InfoRow label="Industry" value={industryLabel} />
+          <InfoRow label="Stage" value={stageLabel} />
+          <InfoRow label="Status" value={statusLabel} />
+          <InfoRow label="Business Type" value={businessTypeLabel} />
+        </InfoCard>
+      </div>
 
-            <InfoCard label="Details">
-              <InfoRow label="Website" value={company.website} href={company.website ?? undefined} />
-              <InfoRow label="LinkedIn" value={company.linkedinLink} href={company.linkedinLink ?? undefined} />
-              <InfoRow label="Industry" value={industryLabel} />
-              <InfoRow label="Stage" value={stageLabel} />
-              <InfoRow label="Status" value={statusLabel} />
-              <InfoRow label="Business Type" value={businessTypeLabel} />
-            </InfoCard>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="job-descriptions">
-          <div className="mt-4">
-            <JobDescriptionList companyId={companyId} />
-          </div>
-        </TabsContent>
-      </Tabs>
+      <Link
+        to="/jobs"
+        search={{ company: companyId }}
+        className="flex items-center gap-2 text-[13px] text-primary hover:underline"
+      >
+        View jobs at this company
+        <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
 
       {editOpen && (
         <CompanyFormModal
