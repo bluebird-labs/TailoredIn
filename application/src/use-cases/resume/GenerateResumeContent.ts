@@ -1,4 +1,5 @@
 import {
+  type EducationRepository,
   EntityNotFoundError,
   type ExperienceRepository,
   JobDescriptionId,
@@ -26,7 +27,8 @@ export class GenerateResumeContent {
     private readonly experienceRepository: ExperienceRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
     private readonly resumeContentRepository: ResumeContentRepository,
-    private readonly generator: ResumeContentGenerator
+    private readonly generator: ResumeContentGenerator,
+    private readonly educationRepository: EducationRepository
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
@@ -120,6 +122,14 @@ export class GenerateResumeContent {
 
     const isScoped = input.scope != null;
 
+    let hiddenEducationIds: string[];
+    if (existing) {
+      hiddenEducationIds = existing.hiddenEducationIds;
+    } else {
+      const allEducations = await this.educationRepository.findAll();
+      hiddenEducationIds = allEducations.filter(e => e.hiddenByDefault).map(e => e.id.value);
+    }
+
     const resumeContent = ResumeContent.create({
       profileId: profile.id.value,
       jobDescriptionId: jd.id.value,
@@ -130,7 +140,7 @@ export class GenerateResumeContent {
         bullets: e.bullets,
         hiddenBulletIndices: isScoped ? (existingHiddenBullets.get(e.experienceId) ?? []) : []
       })),
-      hiddenEducationIds: existing?.hiddenEducationIds ?? [],
+      hiddenEducationIds,
       prompt: result.requestPrompt,
       schema: result.requestSchema
     });

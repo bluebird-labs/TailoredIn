@@ -12,6 +12,7 @@ type EducationProps = {
   location: string | null;
   honors: string | null;
   ordinal: number;
+  hiddenByDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -44,6 +45,9 @@ export class Education extends BaseEntity {
   @Property({ name: 'ordinal', type: 'integer' })
   public ordinal: number;
 
+  @Property({ name: 'hidden_by_default', type: 'boolean' })
+  public hiddenByDefault: boolean;
+
   public constructor(props: EducationProps) {
     super({ createdAt: props.createdAt, updatedAt: props.updatedAt });
     this.id = props.id;
@@ -54,6 +58,7 @@ export class Education extends BaseEntity {
     this.location = props.location;
     this.honors = props.honors;
     this.ordinal = props.ordinal;
+    this.hiddenByDefault = props.hiddenByDefault;
   }
 
   public static create(props: EducationCreateProps): Education {

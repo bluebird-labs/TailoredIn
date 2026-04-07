@@ -1,5 +1,8 @@
 import { describe, expect, mock, test } from 'bun:test';
 import {
+  Education,
+  EducationId,
+  type EducationRepository,
   EntityNotFoundError,
   Experience,
   ExperienceId,
@@ -102,6 +105,31 @@ function mockJobDescriptionRepo(jd: ReturnType<typeof makeJobDescription> | null
   };
 }
 
+function makeEducation(overrides: { id?: string; hiddenByDefault?: boolean } = {}) {
+  return new Education({
+    id: new EducationId(overrides.id ?? 'edu-0000-0000-0000-000000000001'),
+    profileId: 'profile-1',
+    degreeTitle: 'B.S. Computer Science',
+    institutionName: 'MIT',
+    graduationYear: 2020,
+    location: 'Cambridge, MA',
+    honors: null,
+    ordinal: 0,
+    hiddenByDefault: overrides.hiddenByDefault ?? false,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-01')
+  });
+}
+
+function mockEducationRepo(educations: Education[] = []): EducationRepository {
+  return {
+    findAll: mock(() => Promise.resolve(educations)),
+    findByIdOrFail: mock(() => Promise.reject(new Error('Not implemented'))),
+    save: mock(() => Promise.resolve()),
+    delete: mock(() => Promise.resolve())
+  };
+}
+
 function mockGenerator(
   result: ReturnType<typeof makeGeneratorResult>
 ): ResumeContentGenerator & { generate: ReturnType<typeof mock> } {
@@ -149,7 +177,8 @@ describe('GenerateResumeContent', () => {
       mockExperienceRepo([exp1, exp2]),
       mockJobDescriptionRepo(jd),
       mockResumeContentRepo(),
-      generator
+      generator,
+      mockEducationRepo()
     );
 
     const result = await useCase.execute({ jobDescriptionId: 'jd-1' });
@@ -208,7 +237,8 @@ describe('GenerateResumeContent', () => {
       mockExperienceRepo([expOld, expNew, expMid]),
       mockJobDescriptionRepo(jd),
       mockResumeContentRepo(),
-      generator
+      generator,
+      mockEducationRepo()
     );
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });
@@ -244,7 +274,8 @@ describe('GenerateResumeContent', () => {
       mockExperienceRepo(experiences),
       mockJobDescriptionRepo(jd),
       mockResumeContentRepo(),
-      generator
+      generator,
+      mockEducationRepo()
     );
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });
@@ -263,7 +294,8 @@ describe('GenerateResumeContent', () => {
       mockExperienceRepo([]),
       mockJobDescriptionRepo(null),
       mockResumeContentRepo(),
-      mockGenerator(makeGeneratorResult([]))
+      mockGenerator(makeGeneratorResult([])),
+      mockEducationRepo()
     );
 
     await expect(useCase.execute({ jobDescriptionId: 'missing-jd' })).rejects.toThrow(EntityNotFoundError);
@@ -290,7 +322,8 @@ describe('GenerateResumeContent', () => {
       mockExperienceRepo([]),
       mockJobDescriptionRepo(jd),
       mockResumeContentRepo(),
-      generator
+      generator,
+      mockEducationRepo()
     );
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });
@@ -302,5 +335,29 @@ describe('GenerateResumeContent', () => {
       description: 'Lead architecture',
       rawText: 'Raw JD text'
     });
+  });
+
+  test('new resume content hides educations marked as hiddenByDefault', async () => {
+    const profile = makeProfile();
+    const jd = makeJobDescription();
+    const generator = mockGenerator(makeGeneratorResult([]));
+
+    const visibleEdu = makeEducation({ id: 'edu-visible', hiddenByDefault: false });
+    const hiddenEdu = makeEducation({ id: 'edu-hidden', hiddenByDefault: true });
+
+    const resumeContentRepo = mockResumeContentRepo();
+    const useCase = new GenerateResumeContent(
+      mockProfileRepo(profile),
+      mockExperienceRepo([]),
+      mockJobDescriptionRepo(jd),
+      resumeContentRepo,
+      generator,
+      mockEducationRepo([visibleEdu, hiddenEdu])
+    );
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    const savedResumeContent = (resumeContentRepo.save as ReturnType<typeof mock>).mock.calls[0][0];
+    expect(savedResumeContent.hiddenEducationIds).toEqual(['edu-hidden']);
   });
 });

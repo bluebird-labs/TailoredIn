@@ -169,7 +169,7 @@ export class E2eSeeder extends Seeder {
 
     // Educations
     await conn.execute(`
-      INSERT INTO educations (id, profile_id, degree_title, institution_name, graduation_year, location, honors, ordinal, created_at, updated_at)
+      INSERT INTO educations (id, profile_id, degree_title, institution_name, graduation_year, location, honors, ordinal, hidden_by_default, created_at, updated_at)
       VALUES
         (
           'eeeeeeee-0000-4000-8000-000000000001',
@@ -180,6 +180,7 @@ export class E2eSeeder extends Seeder {
           'Stanford, CA',
           'Magna Cum Laude',
           0,
+          false,
           NOW(), NOW()
         ),
         (
@@ -191,6 +192,7 @@ export class E2eSeeder extends Seeder {
           'Pittsburgh, PA',
           NULL,
           1,
+          false,
           NOW(), NOW()
         )
     `);

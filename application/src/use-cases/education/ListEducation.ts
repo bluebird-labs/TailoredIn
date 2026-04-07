@@ -14,7 +14,8 @@ export class ListEducation {
       graduationYear: e.graduationYear,
       location: e.location,
       honors: e.honors,
-      ordinal: e.ordinal
+      ordinal: e.ordinal,
+      hiddenByDefault: e.hiddenByDefault
     }));
   }
 }

@@ -39,6 +39,7 @@ export class PostgresEducationRepository implements EducationRepository {
       existing.location = education.location;
       existing.honors = education.honors;
       existing.ordinal = education.ordinal;
+      existing.hiddenByDefault = education.hiddenByDefault;
       existing.updatedAt = education.updatedAt;
       this.orm.em.persist(existing);
     } else {
@@ -51,6 +52,7 @@ export class PostgresEducationRepository implements EducationRepository {
         location: education.location,
         honors: education.honors,
         ordinal: education.ordinal,
+        hiddenByDefault: education.hiddenByDefault,
         createdAt: education.createdAt,
         updatedAt: education.updatedAt
       });
@@ -81,6 +83,7 @@ export class PostgresEducationRepository implements EducationRepository {
       location: orm.location,
       honors: orm.honors,
       ordinal: orm.ordinal,
+      hiddenByDefault: orm.hiddenByDefault,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt
     });

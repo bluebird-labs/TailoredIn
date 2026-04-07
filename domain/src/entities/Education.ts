@@ -9,6 +9,7 @@ export type EducationCreateProps = {
   location: string | null;
   honors: string | null;
   ordinal: number;
+  hiddenByDefault?: boolean;
 };
 
 export class Education extends AggregateRoot<EducationId> {
@@ -19,6 +20,7 @@ export class Education extends AggregateRoot<EducationId> {
   public location: string | null;
   public honors: string | null;
   public ordinal: number;
+  public hiddenByDefault: boolean;
   public readonly createdAt: Date;
   public updatedAt: Date;
 
@@ -31,6 +33,7 @@ export class Education extends AggregateRoot<EducationId> {
     location: string | null;
     honors: string | null;
     ordinal: number;
+    hiddenByDefault: boolean;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -42,6 +45,7 @@ export class Education extends AggregateRoot<EducationId> {
     this.location = props.location;
     this.honors = props.honors;
     this.ordinal = props.ordinal;
+    this.hiddenByDefault = props.hiddenByDefault;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -51,6 +55,7 @@ export class Education extends AggregateRoot<EducationId> {
     return new Education({
       id: EducationId.generate(),
       ...props,
+      hiddenByDefault: props.hiddenByDefault ?? false,
       createdAt: now,
       updatedAt: now
     });

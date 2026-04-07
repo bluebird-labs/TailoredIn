@@ -16,6 +16,7 @@ export type UpdateEducationInput = {
   location: string | null;
   honors: string | null;
   ordinal: number;
+  hiddenByDefault: boolean;
 };
 
 export class UpdateEducation {
@@ -36,6 +37,7 @@ export class UpdateEducation {
     education.location = input.location;
     education.honors = input.honors;
     education.ordinal = input.ordinal;
+    education.hiddenByDefault = input.hiddenByDefault;
     education.updatedAt = new Date();
 
     await this.educationRepository.save(education);
@@ -47,7 +49,8 @@ export class UpdateEducation {
       graduationYear: education.graduationYear,
       location: education.location,
       honors: education.honors,
-      ordinal: education.ordinal
+      ordinal: education.ordinal,
+      hiddenByDefault: education.hiddenByDefault
     });
   }
 }

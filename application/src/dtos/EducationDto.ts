@@ -6,4 +6,5 @@ export type EducationDto = {
   location: string | null;
   honors: string | null;
   ordinal: number;
+  hiddenByDefault: boolean;
 };

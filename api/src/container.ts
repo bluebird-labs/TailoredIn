@@ -258,7 +258,8 @@ container.bind({
       container.get(DI.Experience.Repository),
       container.get(DI.JobDescription.Repository),
       container.get(DI.ResumeContent.Repository),
-      container.get(DI.Resume.Generator)
+      container.get(DI.Resume.Generator),
+      container.get(DI.Education.Repository)
     )
 });
 container.bind({ provide: DI.Resume.RendererFactory, useClass: TypstResumeRendererFactory });
