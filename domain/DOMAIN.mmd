@@ -56,6 +56,7 @@ classDiagram
         +string? location
         +string? honors
         +number ordinal
+        +boolean hiddenByDefault
     }
 
     class Experience {
@@ -65,6 +66,7 @@ classDiagram
         +string title
         +string companyName
         +string? companyWebsite
+        +string? companyAccent
         +string? companyId
         +string location
         +string startDate
@@ -90,7 +92,7 @@ classDiagram
         +string[] hiddenEducationIds
         +string prompt
         +Record<string, unknown>? schema
-        +withExperienceBulletCount()
+        +withExperienceHiddenBullets()
         +withHiddenEducationIds()
     }
 
@@ -106,7 +108,7 @@ classDiagram
         +string experienceId
         +string summary
         +string[] bullets
-        +number? displayedBulletCount
+        +number[] hiddenBulletIndices
     }
 
     Profile "1" --> "*" ResumeContent : has

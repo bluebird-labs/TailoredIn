@@ -43,7 +43,7 @@ erDiagram
         uuid profile_id FK
         text key
         text label
-        uuid headline_id FK "nullable"
+        uuid headline_id "nullable"
         json content_selection "default: {}"
         text headline_text "default: empty"
     }
@@ -60,6 +60,7 @@ erDiagram
         text industry "nullable"
         text stage "nullable"
         text description "nullable"
+        text status "nullable"
     }
 
     educations {
@@ -73,6 +74,7 @@ erDiagram
         text location "nullable"
         text honors "nullable"
         integer ordinal "default: 0"
+        boolean hidden_by_default "default: false"
     }
 
     experiences {
@@ -89,16 +91,7 @@ erDiagram
         text summary "nullable"
         integer ordinal "default: 0"
         uuid company_id FK "nullable"
-    }
-
-    headlines {
-        uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid profile_id FK
-        text label
-        text summary_text
-        text status "default: active"
+        text company_accent "nullable"
     }
 
     job_descriptions {
@@ -118,6 +111,10 @@ erDiagram
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
         text raw_text "nullable"
+        bytea resume_pdf "nullable"
+        text resume_pdf_theme "nullable"
+        json sought_hard_skills "nullable"
+        json sought_soft_skills "nullable"
     }
 
     profiles {
@@ -135,20 +132,33 @@ erDiagram
         text about "nullable"
     }
 
+    resume_contents {
+        uuid id PK
+        uuid profile_id FK
+        uuid job_description_id FK
+        text headline
+        json experiences
+        text prompt
+        json schema "nullable"
+        timestamp created_at "default: now()"
+        timestamp updated_at "default: now()"
+        json hidden_education_ids "default: []"
+    }
+
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
 
     companies ||--o{ job_descriptions : "has"
-    profiles ||--o{ applications : "has"
     companies ||--o{ applications : "has"
     job_descriptions ||--o{ applications : "has"
     companies ||--o{ experiences : "has"
+    job_descriptions ||--o{ resume_contents : "has"
+    profiles ||--o{ resume_contents : "has"
+    profiles ||--o{ applications : "has"
     profiles ||--o{ experiences : "has"
-    profiles ||--o{ headlines : "has"
     profiles ||--o{ educations : "has"
     profiles ||--o{ archetypes : "has"
-    headlines ||--o{ archetypes : "has"
     archetypes ||--o| archetype_tag_weights : "has"
     experiences ||--o{ accomplishments : "has"
 
@@ -164,6 +174,6 @@ erDiagram
     class companies group0
     class educations group0
     class experiences group0
-    class headlines group0
     class job_descriptions group0
     class profiles group0
+    class resume_contents group0

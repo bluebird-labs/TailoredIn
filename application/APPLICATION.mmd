@@ -211,6 +211,7 @@ classDiagram
     class ListJobDescriptions {
         <<UseCase>>
         +JobDescriptionRepository jobDescriptionRepository
+        +CompanyRepository companyRepository
         +execute(ListJobDescriptionsInput) JobDescriptionDto[]
     }
 
@@ -261,6 +262,7 @@ classDiagram
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentRepository resumeContentRepository
         +ResumeContentGenerator generator
+        +EducationRepository educationRepository
         +execute(GenerateResumeContentInput) ResumeContentDto
     }
 
@@ -271,6 +273,7 @@ classDiagram
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentRepository resumeContentRepository
         +ResumeContentGenerator generator
+        +EducationRepository educationRepository
         +execute(GenerateResumeContentInput) ResumeContentDto
     }
 
@@ -420,6 +423,7 @@ classDiagram
         +string? location
         +string? honors
         +number ordinal
+        +boolean hiddenByDefault
     }
 
     class ExperienceDto {
@@ -428,6 +432,7 @@ classDiagram
         +string title
         +string companyName
         +string? companyWebsite
+        +string? companyAccent
         +string? companyId
         +CompanyDto? company
         +string location
@@ -442,6 +447,8 @@ classDiagram
         <<DTO>>
         +string id
         +string companyId
+        +string? companyName
+        +string? companyLogoUrl
         +string title
         +string description
         +string? url
@@ -554,8 +561,8 @@ classDiagram
     readonly endDate: string;
     readonly summary: string;
     readonly bullets: readonly string[];
-    readonly displayedBulletCount: number;
-  }[]? experiences
+    readonly hiddenBulletIndices: readonly number[];
+  }[] experiences
         +readonly string[] hiddenEducationIds
         +string generatedAt
     }
@@ -573,6 +580,7 @@ classDiagram
         <<DTO>>
         +string title
         +string companyName
+        +string? companyAccent
         +string location
         +string startDate
         +string? endDate
@@ -707,15 +715,18 @@ classDiagram
     GetJobDescription ..> ResumeContentRepository : depends
     GetJobDescription ..> ExperienceRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
+    ListJobDescriptions ..> CompanyRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
     GenerateResumeContentScope ..> ProfileRepository : depends
     GenerateResumeContentScope ..> ExperienceRepository : depends
     GenerateResumeContentScope ..> JobDescriptionRepository : depends
     GenerateResumeContentScope ..> ResumeContentRepository : depends
+    GenerateResumeContentScope ..> EducationRepository : depends
     GenerateResumeContent ..> ProfileRepository : depends
     GenerateResumeContent ..> ExperienceRepository : depends
     GenerateResumeContent ..> JobDescriptionRepository : depends
     GenerateResumeContent ..> ResumeContentRepository : depends
+    GenerateResumeContent ..> EducationRepository : depends
     GenerateResumePdf ..> ProfileRepository : depends
     GenerateResumePdf ..> ExperienceRepository : depends
     GenerateResumePdf ..> EducationRepository : depends
