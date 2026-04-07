@@ -72,8 +72,15 @@ export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerat
 
     const previousExperience = this.input.previousContent?.experiences?.find(e => e.experienceId === this.experienceId);
     if (previousExperience) {
-      const bulletList = previousExperience.bullets.map(b => `- ${b}`).join('\n');
-      prompt += `\n\nThe previous bullets for this experience were:\n${bulletList}\n\nProduce meaningfully different bullets. Vary phrasing, emphasis, and which accomplishments to highlight — do not make minor edits to the same bullets.`;
+      const bulletList = previousExperience.bullets.map((b, i) => `${i + 1}. ${b}`).join('\n');
+      prompt += `\n\nThe current bullets for this experience are:\n${bulletList}`;
+      if (this.input.additionalPrompt) {
+        prompt +=
+          '\n\nThe user provided specific instructions below. Follow them precisely — if they ask to change a specific bullet, keep the others as-is. Only modify what is requested.';
+      } else {
+        prompt +=
+          '\n\nNo specific instructions were given, so produce a meaningfully different version. Vary phrasing, emphasis, and which accomplishments to highlight.';
+      }
     }
 
     if (this.input.composedPrompt) {

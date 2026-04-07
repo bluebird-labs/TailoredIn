@@ -62,7 +62,14 @@ export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateH
     prompt += '\n\nIMPORTANT: Only regenerate the headline. Do NOT include experiences in your response.';
 
     if (this.input.previousContent?.headline) {
-      prompt += `\n\nThe previous headline was:\n"${this.input.previousContent.headline}"\n\nProduce a meaningfully different headline. Vary the structure, emphasis, and phrasing — do not make minor edits to the same sentence.`;
+      prompt += `\n\nThe current headline is:\n"${this.input.previousContent.headline}"`;
+      if (this.input.additionalPrompt) {
+        prompt +=
+          '\n\nThe user provided specific instructions below. Follow them precisely — if they ask for a targeted change, preserve the rest of the headline.';
+      } else {
+        prompt +=
+          '\n\nNo specific instructions were given, so produce a meaningfully different headline. Vary the structure, emphasis, and phrasing.';
+      }
     }
 
     if (this.input.composedPrompt) {
