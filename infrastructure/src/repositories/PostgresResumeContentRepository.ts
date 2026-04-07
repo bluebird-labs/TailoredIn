@@ -44,8 +44,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
       updatedAt: resumeContent.updatedAt
     });
 
-    this.orm.em.persist(ormEntity);
-    await this.orm.em.flush();
+    await this.orm.em.insertMany([ormEntity]);
   }
 
   public async update(resumeContent: DomainResumeContent): Promise<void> {
