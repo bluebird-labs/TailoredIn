@@ -57,7 +57,9 @@ import {
   PostgresApplicationRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
+  PostgresExperienceGenerationOverrideRepository,
   PostgresExperienceRepository,
+  PostgresGenerationSettingsRepository,
   PostgresJobDescriptionRepository,
   PostgresProfileRepository,
   PostgresResumeContentRepository,
@@ -252,18 +254,11 @@ container.bind({
 // Resume Content
 container.bind({ provide: DI.ResumeContent.Repository, useClass: PostgresResumeContentRepository });
 
-// Generation Settings (TODO: replace stubs with Postgres implementations in infrastructure stream)
-container.bind({
-  provide: DI.GenerationSettings.Repository,
-  useFactory: () => {
-    throw new Error('PostgresGenerationSettingsRepository not yet implemented');
-  }
-});
+// Generation Settings
+container.bind({ provide: DI.GenerationSettings.Repository, useClass: PostgresGenerationSettingsRepository });
 container.bind({
   provide: DI.ExperienceGenerationOverride.Repository,
-  useFactory: () => {
-    throw new Error('PostgresExperienceGenerationOverrideRepository not yet implemented');
-  }
+  useClass: PostgresExperienceGenerationOverrideRepository
 });
 container.bind({
   provide: DI.GenerationSettings.Get,
