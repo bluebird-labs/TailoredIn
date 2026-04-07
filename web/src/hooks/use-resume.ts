@@ -45,8 +45,18 @@ export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
+      // Regenerate the PDF with updated visibility, then refresh the cached PDF query
+      try {
+        await fetch('/api/resume/pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobDescriptionId })
+        });
+      } catch {
+        // PDF regeneration is best-effort
+      }
       queryClient.invalidateQueries({ queryKey: queryKeys.resume.cachedPdf(jobDescriptionId) });
     }
   });
