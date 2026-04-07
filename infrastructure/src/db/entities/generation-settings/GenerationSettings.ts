@@ -20,7 +20,7 @@ export class GenerationSettings extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Profile, { lazy: true, name: 'profile_id' })
+  @ManyToOne(() => Profile, { lazy: true, fieldName: 'profile_id' })
   public readonly profile: Ref<Profile> | Profile;
 
   @Property({ name: 'model_tier', type: 'text' })

@@ -17,7 +17,7 @@ export class ExperienceGenerationOverride extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Experience, { lazy: true, name: 'experience_id' })
+  @ManyToOne(() => Experience, { lazy: true, fieldName: 'experience_id' })
   public readonly experience: RefOrEntity<Experience>;
 
   @Property({ name: 'bullet_min', type: 'integer' })

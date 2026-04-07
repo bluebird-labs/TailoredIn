@@ -17,7 +17,7 @@ export class GenerationPrompt extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => GenerationSettings, { lazy: true, name: 'generation_settings_id' })
+  @ManyToOne(() => GenerationSettings, { lazy: true, fieldName: 'generation_settings_id' })
   public readonly generationSettings: RefOrEntity<GenerationSettings>;
 
   @Property({ name: 'scope', type: 'text' })
