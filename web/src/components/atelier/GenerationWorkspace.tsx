@@ -290,7 +290,10 @@ export function GenerationWorkspace({
   );
 
   return (
-    <div className="flex h-full min-w-0 flex-1 flex-col overflow-y-auto p-6">
+    <div
+      className="flex h-full min-w-0 flex-1 flex-col overflow-y-auto p-6"
+      style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: '13.3px', lineHeight: '1.3' }}
+    >
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <div className="flex-1">
