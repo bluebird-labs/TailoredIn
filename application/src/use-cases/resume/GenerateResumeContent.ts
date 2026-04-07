@@ -125,8 +125,11 @@ export class GenerateResumeContent {
       return { experienceTitle: exp?.title ?? '', companyName: exp?.companyName ?? '' };
     };
 
-    const existingHiddenBullets = new Map(
-      existing?.experiences.map(e => [e.experienceId, e.hiddenBulletIndices]) ?? []
+    const existingExperienceMap = new Map(
+      existing?.experiences.map(e => [
+        e.experienceId,
+        { bullets: e.bullets, hiddenBulletIndices: e.hiddenBulletIndices }
+      ]) ?? []
     );
 
     if (input.scope?.type === 'headline') {
@@ -178,7 +181,7 @@ export class GenerateResumeContent {
         experienceId: e.experienceId,
         summary: e.summary,
         bullets: e.bullets,
-        hiddenBulletIndices: isScoped ? (existingHiddenBullets.get(e.experienceId) ?? []) : []
+        hiddenBulletIndices: isScoped ? this.resolveHiddenIndices(e, existingExperienceMap.get(e.experienceId)) : []
       })),
       hiddenEducationIds,
       prompt: result.requestPrompt,
@@ -195,6 +198,17 @@ export class GenerateResumeContent {
         bullets: e.bullets
       }))
     };
+  }
+
+  private resolveHiddenIndices(
+    experience: { bullets: string[] },
+    existing?: { bullets: string[]; hiddenBulletIndices: number[] }
+  ): number[] {
+    if (!existing || existing.hiddenBulletIndices.length === 0) return [];
+    // Only preserve hidden status for bullets whose content is unchanged
+    return existing.hiddenBulletIndices.filter(
+      i => i < experience.bullets.length && i < existing.bullets.length && experience.bullets[i] === existing.bullets[i]
+    );
   }
 
   private composePrompt(
