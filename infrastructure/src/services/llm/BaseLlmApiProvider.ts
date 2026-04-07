@@ -76,9 +76,9 @@ export abstract class BaseLlmApiProvider {
 
     this.log.debug(`LLM API request | model: ${model} maxTokens: ${maxTokens}`);
 
-    let result: z.infer<T>;
+    let raw: z.infer<T>;
     try {
-      result = await this.callApi(request.prompt, request.schema, model, maxTokens, timeoutMs);
+      raw = await this.callApi(request.prompt, request.schema, model, maxTokens, timeoutMs);
     } catch (e) {
       const duration = Math.round(performance.now() - start);
       const msg = e instanceof Error ? e.message : String(e);
@@ -88,7 +88,14 @@ export abstract class BaseLlmApiProvider {
     const duration = Math.round(performance.now() - start);
     this.log.debug(`LLM API response | duration=${duration}ms`);
 
-    return ok(result);
+    const parsed = request.schema.safeParse(raw);
+    if (!parsed.success) {
+      const issues = parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ');
+      this.log.warn(`LLM response failed schema validation: ${issues}`);
+      return err(new LlmRequestError(`Schema validation failed: ${issues}`, descriptor, null, '', '', duration));
+    }
+
+    return ok(parsed.data);
   }
 
   private isRetryable(error: LlmRequestError): boolean {
@@ -98,6 +105,7 @@ export abstract class BaseLlmApiProvider {
     if (msg.includes('API service overloaded')) return true;
     if (msg.includes('API server error')) return true;
     if (msg.includes('API rate limit')) return true;
+    if (msg.includes('Schema validation failed')) return true;
     return false;
   }
 

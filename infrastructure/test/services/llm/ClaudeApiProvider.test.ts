@@ -127,9 +127,8 @@ describe('ClaudeApiProvider', () => {
 
     const result = await provider.request(new JobRequest(), { maxRetries: 1 });
 
-    // parsed_output is undefined — callApi returns undefined, BaseLlmApiProvider wraps as ok(undefined)
-    // The value will be undefined, not a structured error — this validates the flow doesn't throw
-    expect(result.isOk).toBe(true);
+    expect(result.isErr).toBe(true);
+    expect(result.error!.message).toContain('Schema validation failed');
   });
 
   test('returns err when API throws', async () => {

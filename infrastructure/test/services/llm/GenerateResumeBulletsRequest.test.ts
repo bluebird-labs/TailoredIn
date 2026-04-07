@@ -137,9 +137,9 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('rejects bullets longer than 350 characters', () => {
+    test('rejects bullets longer than 160 characters', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
-      const longBullet = 'A'.repeat(351);
+      const longBullet = 'A'.repeat(161);
       const payload = {
         experiences: [
           {
@@ -153,10 +153,10 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('accepts bullets at the boundary lengths (80 and 350 chars)', () => {
+    test('accepts bullets at the boundary lengths (80 and 160 chars)', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const exactMin = 'A'.repeat(80);
-      const exactMax = 'A'.repeat(350);
+      const exactMax = 'A'.repeat(160);
       const payload = {
         headline: 'Staff Engineer | 8+ Years of Experience',
         experiences: [
