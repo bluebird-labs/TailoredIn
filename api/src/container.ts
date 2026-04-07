@@ -262,7 +262,12 @@ container.bind({
 });
 container.bind({
   provide: DI.GenerationSettings.Get,
-  useFactory: () => new GetGenerationSettings(container.get(DI.GenerationSettings.Repository))
+  useFactory: () =>
+    new GetGenerationSettings(
+      container.get(DI.GenerationSettings.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.ExperienceGenerationOverride.Repository)
+    )
 });
 container.bind({
   provide: DI.GenerationSettings.Update,

@@ -1,5 +1,6 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Eye, EyeOff, Loader2, RotateCw, Sparkles } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -9,6 +10,7 @@ import { useRemoveExperienceOverride, useSetExperienceOverride } from '@/hooks/u
 import { useGenerationSettings } from '@/hooks/use-generation-settings';
 import { type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
 import { useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
+import { queryKeys } from '@/lib/query-keys';
 import { BulletRangePill } from './BulletRangePill.js';
 import { JobSelector } from './JobSelector.js';
 
@@ -162,9 +164,9 @@ export function GenerationWorkspace({
   selectedJobId: string | null;
   onSelectJob: (id: string | null) => void;
 }) {
+  const queryClient = useQueryClient();
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
-  const [overrideMap, setOverrideMap] = useState<Map<string, { min: number; max: number }>>(new Map());
 
   const { data: jd } = useJobDescription(selectedJobId ?? '', { enabled: !!selectedJobId });
   const { data: settings } = useGenerationSettings();
@@ -177,6 +179,14 @@ export function GenerationWorkspace({
   const resumeOutput = jd?.resumeOutput ?? null;
   const defaultBulletMin = settings?.bulletMin ?? 2;
   const defaultBulletMax = settings?.bulletMax ?? 5;
+
+  const overrideMap = useMemo(() => {
+    const map = new Map<string, { min: number; max: number }>();
+    for (const o of settings?.experienceOverrides ?? []) {
+      map.set(o.experienceId, { min: o.bulletMin, max: o.bulletMax });
+    }
+    return map;
+  }, [settings?.experienceOverrides]);
 
   function handleGenerate() {
     generate.mutate(
@@ -255,31 +265,27 @@ export function GenerationWorkspace({
         { experienceId, bullet_min: min, bullet_max: max },
         {
           onSuccess: () => {
-            setOverrideMap(prev => new Map(prev).set(experienceId, { min, max }));
+            queryClient.invalidateQueries({ queryKey: queryKeys.generationSettings.all });
             toast.success('Bullet range updated');
           },
           onError: err => toast.error(err instanceof Error ? err.message : 'Failed to update bullet range')
         }
       );
     },
-    [setOverride]
+    [setOverride, queryClient]
   );
 
   const handleBulletRangeReset = useCallback(
     (experienceId: string) => {
       removeOverride.mutate(experienceId, {
         onSuccess: () => {
-          setOverrideMap(prev => {
-            const next = new Map(prev);
-            next.delete(experienceId);
-            return next;
-          });
+          queryClient.invalidateQueries({ queryKey: queryKeys.generationSettings.all });
           toast.success('Bullet range reset to default');
         },
         onError: err => toast.error(err instanceof Error ? err.message : 'Failed to reset bullet range')
       });
     },
-    [removeOverride]
+    [removeOverride, queryClient]
   );
 
   return (

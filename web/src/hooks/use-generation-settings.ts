@@ -9,6 +9,12 @@ export type GenerationPromptDto = {
   content: string;
 };
 
+export type ExperienceOverrideDto = {
+  experienceId: string;
+  bulletMin: number;
+  bulletMax: number;
+};
+
 export type GenerationSettings = {
   id: string;
   profileId: string;
@@ -16,6 +22,7 @@ export type GenerationSettings = {
   bulletMin: number;
   bulletMax: number;
   prompts: GenerationPromptDto[];
+  experienceOverrides: ExperienceOverrideDto[];
 };
 
 type PromptScope = 'resume' | 'headline' | 'experience';
