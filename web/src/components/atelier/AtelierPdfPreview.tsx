@@ -153,7 +153,7 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
 
   return (
     <>
-      <div className="flex h-full w-[50%] shrink-0 flex-col border-l">
+      <div className="flex h-full min-w-0 flex-1 flex-col border-l">
         <div className="flex flex-col gap-4 p-5" style={{ height: '100%' }}>
           <div className="flex items-center justify-between">
             <p className="text-[14px] font-medium text-foreground">PDF Preview</p>
