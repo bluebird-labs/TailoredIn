@@ -119,8 +119,7 @@ export function generateProfessionalTyp(experiences: ResumeRenderExperience[]): 
       const summary = exp.summary ? `  _${escapeTypst(exp.summary)}_\n  #v(2pt)\n  ` : '  ';
       const bulletLines = exp.bullets.map(b => `      [${escapeTypst(b)}],`).join('\n');
 
-      return `#block(breakable: false)[
-#cv-entry(
+      return `#cv-entry(
   title: [${title}],
   society: [${society}],
   date: [${date}],
@@ -130,8 +129,7 @@ ${summary}#list(
 ${bulletLines}
     )
   ],
-)
-]`;
+)`;
     });
 
   if (entries.length === 0) {
@@ -158,15 +156,13 @@ export function generateEducationTyp(educations: ResumeRenderEducation[]): strin
     const location = escapeTypst(edu.location ?? '');
     const description = edu.honors ? `[_${escapeTypst(edu.honors)}_]` : '[]';
 
-    return `#block(breakable: false)[
-#cv-entry(
+    return `#cv-entry(
   title: [${title}],
   society: [${society}],
   date: [${date}],
   location: [${location}],
   description: ${description},
-)
-]`;
+)`;
   });
 
   return `#import "../helpers.typ": *
