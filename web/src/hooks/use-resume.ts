@@ -47,6 +47,7 @@ export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.resume.cachedPdf(jobDescriptionId) });
     }
   });
 }
