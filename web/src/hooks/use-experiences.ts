@@ -97,7 +97,7 @@ export function useUpdateExperience() {
       return (data as EdenRouteSegment)?.data as Experience;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
   });
 }

@@ -228,12 +228,10 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
           }))
         },
         {
-          onSuccess: updatedExperience => {
+          onSuccess: () => {
             setErrors({});
             reset();
-            if (updatedExperience) {
-              setLocalAccomplishments(toLocalAccomplishments(updatedExperience.accomplishments));
-            }
+            onOpenChange(false);
             toast.success('Changes saved');
           },
           onError: () => toast.error('Failed to save. Please try again.')
