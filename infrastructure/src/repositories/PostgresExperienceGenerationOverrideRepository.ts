@@ -13,15 +13,19 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByExperienceId(experienceId: string): Promise<DomainOverride | null> {
-    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId });
+    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId }, { populate: ['experience'] });
     if (!orm) return null;
     return this.toDomain(orm);
   }
 
   public async findByExperienceIds(experienceIds: string[]): Promise<DomainOverride[]> {
     if (experienceIds.length === 0) return [];
-    // biome-ignore lint/style/useNamingConvention: MikroORM query operator
-    const ormEntities = await this.orm.em.find(OrmOverride, { experience: { $in: experienceIds } });
+    const ormEntities = await this.orm.em.find(
+      OrmOverride,
+      // biome-ignore lint/style/useNamingConvention: MikroORM query operator
+      { experience: { $in: experienceIds } },
+      { populate: ['experience'] }
+    );
     return ormEntities.map(orm => this.toDomain(orm));
   }
 
