@@ -21,15 +21,19 @@ const regenerateExperienceSchema = z.object({
 
 export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerateExperienceSchema> {
   public readonly schema = regenerateExperienceSchema;
+  private readonly requestModel: Anthropic.Messages.Model;
+
   public get model(): Anthropic.Messages.Model {
-    return 'claude-opus-4-6';
+    return this.requestModel;
   }
 
   public constructor(
     private readonly input: ResumeContentGeneratorInput,
-    private readonly experienceId: string
+    private readonly experienceId: string,
+    model: Anthropic.Messages.Model = 'claude-opus-4-6'
   ) {
     super();
+    this.requestModel = model;
   }
 
   public get prompt(): string {
@@ -65,6 +69,10 @@ export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerat
       .replace('{{experiencesBlock}}', experiencesBlock);
 
     prompt += `\n\nIMPORTANT: Only regenerate the experience with ID "${this.experienceId}". Return exactly one experience entry in your response. Do NOT include a headline.`;
+
+    if (this.input.composedPrompt) {
+      prompt += `\n\n${this.input.composedPrompt}`;
+    }
 
     if (this.input.additionalPrompt) {
       prompt += `\n\nAdditional instructions: ${this.input.additionalPrompt}`;

@@ -1,3 +1,4 @@
+import type Anthropic from '@anthropic-ai/sdk';
 import { inject, injectable } from '@needle-di/core';
 import type {
   ResumeContentGenerator,
@@ -6,11 +7,18 @@ import type {
 } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
+import { ModelTier } from '@tailoredin/domain';
 import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 import { GenerateResumeBulletsRequest } from './llm/GenerateResumeBulletsRequest.js';
 import { RegenerateExperienceRequest } from './llm/RegenerateExperienceRequest.js';
 import { RegenerateHeadlineRequest } from './llm/RegenerateHeadlineRequest.js';
+
+const MODEL_TIER_MAP: Record<ModelTier, Anthropic.Messages.Model> = {
+  [ModelTier.FAST]: 'claude-haiku-4-5',
+  [ModelTier.BALANCED]: 'claude-sonnet-4-6',
+  [ModelTier.BEST]: 'claude-opus-4-6'
+};
 
 @injectable()
 export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
@@ -19,20 +27,30 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
   public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
 
   public async generate(input: ResumeContentGeneratorInput): Promise<ResumeContentGeneratorResult> {
+    const model = this.resolveModel(input.model);
+
     if (input.scope?.type === 'headline') {
-      return this.generateHeadline(input);
+      return this.generateHeadline(input, model);
     }
     if (input.scope?.type === 'experience') {
-      return this.generateExperience(input, input.scope.experienceId);
+      return this.generateExperience(input, input.scope.experienceId, model);
     }
-    return this.generateFull(input);
+    return this.generateFull(input, model);
   }
 
-  private async generateFull(input: ResumeContentGeneratorInput): Promise<ResumeContentGeneratorResult> {
+  private resolveModel(modelTier?: string): Anthropic.Messages.Model {
+    if (!modelTier) return 'claude-opus-4-6';
+    return MODEL_TIER_MAP[modelTier as ModelTier] ?? 'claude-opus-4-6';
+  }
+
+  private async generateFull(
+    input: ResumeContentGeneratorInput,
+    model: Anthropic.Messages.Model
+  ): Promise<ResumeContentGeneratorResult> {
     this.log.info(`Generating resume bullets for ${input.experiences.length} experience(s)`);
 
     const startTime = Date.now();
-    const request = new GenerateResumeBulletsRequest(input);
+    const request = new GenerateResumeBulletsRequest(input, model);
     const result = await this.provider.request(request, { timeoutMs: 300_000 });
     const duration = Date.now() - startTime;
 
@@ -49,11 +67,14 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
     return { headline: result.value.headline, experiences, requestPrompt: request.prompt, requestSchema };
   }
 
-  private async generateHeadline(input: ResumeContentGeneratorInput): Promise<ResumeContentGeneratorResult> {
+  private async generateHeadline(
+    input: ResumeContentGeneratorInput,
+    model: Anthropic.Messages.Model
+  ): Promise<ResumeContentGeneratorResult> {
     this.log.info('Regenerating headline only');
 
     const startTime = Date.now();
-    const request = new RegenerateHeadlineRequest(input);
+    const request = new RegenerateHeadlineRequest(input, model);
     const result = await this.provider.request(request, { timeoutMs: 300_000 });
     const duration = Date.now() - startTime;
 
@@ -74,12 +95,13 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
 
   private async generateExperience(
     input: ResumeContentGeneratorInput,
-    experienceId: string
+    experienceId: string,
+    model: Anthropic.Messages.Model
   ): Promise<ResumeContentGeneratorResult> {
     this.log.info(`Regenerating experience="${experienceId}"`);
 
     const startTime = Date.now();
-    const request = new RegenerateExperienceRequest(input, experienceId);
+    const request = new RegenerateExperienceRequest(input, experienceId, model);
     const result = await this.provider.request(request, { timeoutMs: 300_000 });
     const duration = Date.now() - startTime;
 

@@ -12,6 +12,9 @@ import { Company } from './entities/companies/Company.js';
 import { Education } from './entities/education/Education.js';
 import { Accomplishment as OrmAccomplishment } from './entities/experience/Accomplishment.js';
 import { Experience as OrmExperience } from './entities/experience/Experience.js';
+import { ExperienceGenerationOverride as OrmExperienceGenerationOverride } from './entities/experience/ExperienceGenerationOverride.js';
+import { GenerationPrompt as OrmGenerationPrompt } from './entities/generation-settings/GenerationPrompt.js';
+import { GenerationSettings as OrmGenerationSettings } from './entities/generation-settings/GenerationSettings.js';
 import { JobDescription as OrmJobDescription } from './entities/job-description/JobDescription.js';
 import { Profile } from './entities/profile/Profile.js';
 import { ResumeContent as OrmResumeContent } from './entities/resume-content/ResumeContent.js';
@@ -42,7 +45,10 @@ export function createOrmConfig(db: OrmDbConfig) {
       OrmAccomplishment,
       OrmApplication,
       OrmJobDescription,
-      OrmResumeContent
+      OrmResumeContent,
+      OrmGenerationSettings,
+      OrmGenerationPrompt,
+      OrmExperienceGenerationOverride
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

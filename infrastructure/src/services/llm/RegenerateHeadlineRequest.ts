@@ -13,12 +13,18 @@ const regenerateHeadlineSchema = z.object({
 
 export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateHeadlineSchema> {
   public readonly schema = regenerateHeadlineSchema;
+  private readonly requestModel: Anthropic.Messages.Model;
+
   public get model(): Anthropic.Messages.Model {
-    return 'claude-opus-4-6';
+    return this.requestModel;
   }
 
-  public constructor(private readonly input: ResumeContentGeneratorInput) {
+  public constructor(
+    private readonly input: ResumeContentGeneratorInput,
+    model: Anthropic.Messages.Model = 'claude-opus-4-6'
+  ) {
     super();
+    this.requestModel = model;
   }
 
   public get prompt(): string {
@@ -54,6 +60,10 @@ export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateH
       .replace('{{experiencesBlock}}', experiencesBlock);
 
     prompt += '\n\nIMPORTANT: Only regenerate the headline. Do NOT include experiences in your response.';
+
+    if (this.input.composedPrompt) {
+      prompt += `\n\n${this.input.composedPrompt}`;
+    }
 
     if (this.input.additionalPrompt) {
       prompt += `\n\nAdditional instructions: ${this.input.additionalPrompt}`;
