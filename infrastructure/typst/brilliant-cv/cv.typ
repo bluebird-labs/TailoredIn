@@ -1,14 +1,15 @@
 #import "@preview/brilliant-cv:3.3.0": cv-metadata, cv-entry, cv-skill, cv-section, h-bar, overwrite-fonts
+#import "@preview/fontawesome:0.6.0": fa-phone, fa-envelope, fa-linkedin, fa-square-github, fa-location-dot
 #import "./config.typ": cfg-body-font-size, cfg-leading, cfg-margin, cfg-header-font-size
 #let metadata = toml("./metadata.toml")
 
-// --- Custom icons (text labels instead of Font Awesome) ---
+// --- Custom icons (Font Awesome) ---
 #let custom-icons = (
-  github: box(width: 8pt, align(center, text(size: 7pt, "GH"))),
-  email: box(width: 8pt, align(center, text(size: 7pt, "✉"))),
-  linkedin: box(width: 8pt, align(center, text(size: 7pt, "in"))),
-  phone: box(width: 8pt, align(center, text(size: 7pt, "☎"))),
-  location: box(width: 8pt, align(center, text(size: 7pt, "⌂"))),
+  github: fa-square-github(),
+  email: fa-envelope(),
+  linkedin: fa-linkedin(),
+  phone: fa-phone(),
+  location: fa-location-dot(),
 )
 
 // --- Colors (replicated from package since they are private) ---
