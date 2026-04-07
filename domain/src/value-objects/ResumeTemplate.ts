@@ -15,7 +15,7 @@ export type ResumeTemplate = {
 export const DEFAULT_RESUME_TEMPLATE: ResumeTemplate = {
   id: 'brilliant-cv-default',
   pageSize: 'us-letter',
-  margins: { top: 1.2, bottom: 1.2, left: 1.2, right: 1.2 },
+  margins: { top: 1.0, bottom: 1.0, left: 1.0, right: 1.0 },
   bodyFontSizePt: 10,
   lineHeightEm: 0.65,
   headerFontSizePt: 26,
