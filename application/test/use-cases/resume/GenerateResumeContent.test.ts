@@ -5,9 +5,15 @@ import {
   type EducationRepository,
   EntityNotFoundError,
   Experience,
+  ExperienceGenerationOverride,
+  type ExperienceGenerationOverrideRepository,
   ExperienceId,
   type ExperienceRepository,
+  GenerationScope,
+  GenerationSettings,
+  type GenerationSettingsRepository,
   type JobDescriptionRepository,
+  ModelTier,
   type ProfileRepository,
   type ResumeContentRepository
 } from '@tailoredin/domain';
@@ -136,14 +142,49 @@ function mockGenerator(
   return { generate: mock(() => Promise.resolve(result)) };
 }
 
+function mockGenerationSettingsRepo(settings: GenerationSettings | null = null): GenerationSettingsRepository {
+  return {
+    findByProfileId: mock(() => Promise.resolve(settings)),
+    save: mock(() => Promise.resolve())
+  };
+}
+
+function mockOverrideRepo(overrides: ExperienceGenerationOverride[] = []): ExperienceGenerationOverrideRepository {
+  return {
+    findByExperienceId: mock(() => Promise.resolve(null)),
+    findByExperienceIds: mock(() => Promise.resolve(overrides)),
+    save: mock(() => Promise.resolve()),
+    delete: mock(() => Promise.resolve())
+  };
+}
+
+function createUseCase(opts: {
+  profile?: ReturnType<typeof makeProfile>;
+  experiences?: Experience[];
+  jd?: ReturnType<typeof makeJobDescription> | null;
+  generator?: ResumeContentGenerator;
+  educations?: Education[];
+  settings?: GenerationSettings | null;
+  overrides?: ExperienceGenerationOverride[];
+}) {
+  return new GenerateResumeContent(
+    mockProfileRepo(opts.profile ?? makeProfile()),
+    mockExperienceRepo(opts.experiences ?? []),
+    mockJobDescriptionRepo('jd' in opts ? opts.jd : makeJobDescription()),
+    mockResumeContentRepo(),
+    opts.generator ?? mockGenerator(makeGeneratorResult([])),
+    mockEducationRepo(opts.educations),
+    mockGenerationSettingsRepo(opts.settings ?? null),
+    mockOverrideRepo(opts.overrides)
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
 describe('GenerateResumeContent', () => {
   test('happy path: returns ResumeContentDto with headline and bullets from generator output', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
     const exp1 = makeExperience({
       id: 'exp-1111',
       title: 'Lead Engineer',
@@ -170,16 +211,10 @@ describe('GenerateResumeContent', () => {
       'Lead Engineer | 5+ Years of Experience'
     );
 
-    const generator = mockGenerator(generatorResult);
-
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockExperienceRepo([exp1, exp2]),
-      mockJobDescriptionRepo(jd),
-      mockResumeContentRepo(),
-      generator,
-      mockEducationRepo()
-    );
+    const useCase = createUseCase({
+      experiences: [exp1, exp2],
+      generator: mockGenerator(generatorResult)
+    });
 
     const result = await useCase.execute({ jobDescriptionId: 'jd-1' });
 
@@ -200,10 +235,6 @@ describe('GenerateResumeContent', () => {
   });
 
   test('experiences are sorted by startDate descending before passed to generator', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
-
-    // Intentionally in wrong order
     const expOld = makeExperience({
       id: 'exp-old',
       startDate: '2018-01',
@@ -232,14 +263,10 @@ describe('GenerateResumeContent', () => {
       })
     };
 
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockExperienceRepo([expOld, expNew, expMid]),
-      mockJobDescriptionRepo(jd),
-      mockResumeContentRepo(),
-      generator,
-      mockEducationRepo()
-    );
+    const useCase = createUseCase({
+      experiences: [expOld, expNew, expMid],
+      generator
+    });
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });
 
@@ -248,17 +275,10 @@ describe('GenerateResumeContent', () => {
     expect(ids).toEqual(['exp-new', 'exp-mid', 'exp-old']);
   });
 
-  test('all experiences get the same bullet limits {min:2, max:20}', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
-
+  test('uses default bullet limits (2, 5) when no settings exist', async () => {
     const experiences = [
       makeExperience({ id: 'e1', startDate: '2024-01' }),
-      makeExperience({ id: 'e2', startDate: '2023-01' }),
-      makeExperience({ id: 'e3', startDate: '2022-01' }),
-      makeExperience({ id: 'e4', startDate: '2021-01' }),
-      makeExperience({ id: 'e5', startDate: '2020-01' }),
-      makeExperience({ id: 'e6', startDate: '2019-01' })
+      makeExperience({ id: 'e2', startDate: '2023-01' })
     ];
 
     let capturedInput: ResumeContentGeneratorInput | null = null;
@@ -269,34 +289,135 @@ describe('GenerateResumeContent', () => {
       })
     };
 
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockExperienceRepo(experiences),
-      mockJobDescriptionRepo(jd),
-      mockResumeContentRepo(),
-      generator,
-      mockEducationRepo()
-    );
+    const useCase = createUseCase({ experiences, generator, settings: null });
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });
 
     expect(capturedInput).not.toBeNull();
     for (const exp of capturedInput!.experiences) {
-      expect(exp).toMatchObject({ minBullets: 2, maxBullets: 20 });
+      expect(exp).toMatchObject({ minBullets: 2, maxBullets: 5 });
     }
   });
 
-  test('JD not found: throws EntityNotFoundError', async () => {
-    const profile = makeProfile();
+  test('uses custom bullet limits from generation settings', async () => {
+    const settings = GenerationSettings.createDefault('profile-1');
+    settings.updateBulletRange(3, 8);
 
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockExperienceRepo([]),
-      mockJobDescriptionRepo(null),
-      mockResumeContentRepo(),
-      mockGenerator(makeGeneratorResult([])),
-      mockEducationRepo()
-    );
+    const experiences = [makeExperience({ id: 'e1', startDate: '2024-01' })];
+
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([]));
+      })
+    };
+
+    const useCase = createUseCase({ experiences, generator, settings });
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    expect(capturedInput).not.toBeNull();
+    expect(capturedInput!.experiences[0]).toMatchObject({ minBullets: 3, maxBullets: 8 });
+  });
+
+  test('per-experience override takes precedence over profile defaults', async () => {
+    const settings = GenerationSettings.createDefault('profile-1');
+    settings.updateBulletRange(3, 8);
+
+    const experiences = [
+      makeExperience({ id: 'exp-a', startDate: '2024-01' }),
+      makeExperience({ id: 'exp-b', startDate: '2023-01' })
+    ];
+
+    const overrides = [ExperienceGenerationOverride.create({ experienceId: 'exp-a', bulletMin: 1, bulletMax: 2 })];
+
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([]));
+      })
+    };
+
+    const useCase = createUseCase({ experiences, generator, settings, overrides });
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    expect(capturedInput).not.toBeNull();
+    const expA = capturedInput!.experiences.find(e => e.id === 'exp-a');
+    const expB = capturedInput!.experiences.find(e => e.id === 'exp-b');
+    expect(expA).toMatchObject({ minBullets: 1, maxBullets: 2 });
+    expect(expB).toMatchObject({ minBullets: 3, maxBullets: 8 });
+  });
+
+  test('model ID is resolved from settings tier and passed to generator', async () => {
+    const settings = GenerationSettings.createDefault('profile-1');
+    settings.updateModelTier(ModelTier.BEST);
+
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([]));
+      })
+    };
+
+    const useCase = createUseCase({ generator, settings });
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    expect(capturedInput).not.toBeNull();
+    expect(capturedInput!.model).toBe('claude-opus-4-6');
+  });
+
+  test('composed prompt layers resume + scope + additional prompts', async () => {
+    const settings = GenerationSettings.createDefault('profile-1');
+    settings.setPrompt(GenerationScope.RESUME, 'Always use past tense');
+    settings.setPrompt(GenerationScope.HEADLINE, 'Be concise');
+
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([], 'Test Headline'));
+      })
+    };
+
+    const useCase = createUseCase({ generator, settings });
+
+    await useCase.execute({
+      jobDescriptionId: 'jd-1',
+      additionalPrompt: 'Focus on leadership',
+      scope: { type: 'headline' }
+    });
+
+    expect(capturedInput).not.toBeNull();
+    expect(capturedInput!.composedPrompt).toBe('Always use past tense\n\nBe concise\n\nFocus on leadership');
+  });
+
+  test('composed prompt omits missing layers', async () => {
+    const settings = GenerationSettings.createDefault('profile-1');
+    // No prompts set
+
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([]));
+      })
+    };
+
+    const useCase = createUseCase({ generator, settings });
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    expect(capturedInput).not.toBeNull();
+    expect(capturedInput!.composedPrompt).toBeUndefined();
+  });
+
+  test('JD not found: throws EntityNotFoundError', async () => {
+    const useCase = createUseCase({ jd: null });
 
     await expect(useCase.execute({ jobDescriptionId: 'missing-jd' })).rejects.toThrow(EntityNotFoundError);
   });
@@ -317,14 +438,7 @@ describe('GenerateResumeContent', () => {
       })
     };
 
-    const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
-      mockExperienceRepo([]),
-      mockJobDescriptionRepo(jd),
-      mockResumeContentRepo(),
-      generator,
-      mockEducationRepo()
-    );
+    const useCase = createUseCase({ profile, jd, generator });
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });
 
@@ -338,8 +452,6 @@ describe('GenerateResumeContent', () => {
   });
 
   test('new resume content hides educations marked as hiddenByDefault', async () => {
-    const profile = makeProfile();
-    const jd = makeJobDescription();
     const generator = mockGenerator(makeGeneratorResult([]));
 
     const visibleEdu = makeEducation({ id: 'edu-visible', hiddenByDefault: false });
@@ -347,12 +459,14 @@ describe('GenerateResumeContent', () => {
 
     const resumeContentRepo = mockResumeContentRepo();
     const useCase = new GenerateResumeContent(
-      mockProfileRepo(profile),
+      mockProfileRepo(makeProfile()),
       mockExperienceRepo([]),
-      mockJobDescriptionRepo(jd),
+      mockJobDescriptionRepo(makeJobDescription()),
       resumeContentRepo,
       generator,
-      mockEducationRepo([visibleEdu, hiddenEdu])
+      mockEducationRepo([visibleEdu, hiddenEdu]),
+      mockGenerationSettingsRepo(null),
+      mockOverrideRepo()
     );
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });

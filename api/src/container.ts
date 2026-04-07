@@ -21,6 +21,7 @@ import {
   GetCachedResumePdf,
   GetCompany,
   GetExperience,
+  GetGenerationSettings,
   GetJobDescription,
   GetProfile,
   LinkCompanyToExperience,
@@ -30,6 +31,8 @@ import {
   ListExperiences,
   ListJobDescriptions,
   ParseJobDescription,
+  RemoveExperienceGenerationOverride,
+  SetExperienceGenerationOverride,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -37,6 +40,7 @@ import {
   UpdateCompany,
   UpdateEducation,
   UpdateExperience,
+  UpdateGenerationSettings,
   UpdateJobDescription,
   UpdateProfile,
   UpdateResumeDisplaySettings
@@ -248,6 +252,36 @@ container.bind({
 // Resume Content
 container.bind({ provide: DI.ResumeContent.Repository, useClass: PostgresResumeContentRepository });
 
+// Generation Settings (TODO: replace stubs with Postgres implementations in infrastructure stream)
+container.bind({
+  provide: DI.GenerationSettings.Repository,
+  useFactory: () => {
+    throw new Error('PostgresGenerationSettingsRepository not yet implemented');
+  }
+});
+container.bind({
+  provide: DI.ExperienceGenerationOverride.Repository,
+  useFactory: () => {
+    throw new Error('PostgresExperienceGenerationOverrideRepository not yet implemented');
+  }
+});
+container.bind({
+  provide: DI.GenerationSettings.Get,
+  useFactory: () => new GetGenerationSettings(container.get(DI.GenerationSettings.Repository))
+});
+container.bind({
+  provide: DI.GenerationSettings.Update,
+  useFactory: () => new UpdateGenerationSettings(container.get(DI.GenerationSettings.Repository))
+});
+container.bind({
+  provide: DI.ExperienceGenerationOverride.Set,
+  useFactory: () => new SetExperienceGenerationOverride(container.get(DI.ExperienceGenerationOverride.Repository))
+});
+container.bind({
+  provide: DI.ExperienceGenerationOverride.Remove,
+  useFactory: () => new RemoveExperienceGenerationOverride(container.get(DI.ExperienceGenerationOverride.Repository))
+});
+
 // Resume
 container.bind({ provide: DI.Resume.Generator, useClass: ClaudeApiResumeContentGenerator });
 container.bind({
@@ -259,7 +293,9 @@ container.bind({
       container.get(DI.JobDescription.Repository),
       container.get(DI.ResumeContent.Repository),
       container.get(DI.Resume.Generator),
-      container.get(DI.Education.Repository)
+      container.get(DI.Education.Repository),
+      container.get(DI.GenerationSettings.Repository),
+      container.get(DI.ExperienceGenerationOverride.Repository)
     )
 });
 container.bind({ provide: DI.Resume.RendererFactory, useClass: TypstResumeRendererFactory });

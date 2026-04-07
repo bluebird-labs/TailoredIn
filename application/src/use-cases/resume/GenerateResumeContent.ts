@@ -1,9 +1,14 @@
 import {
   type EducationRepository,
   EntityNotFoundError,
+  type ExperienceGenerationOverrideRepository,
   type ExperienceRepository,
+  GenerationScope,
+  GenerationSettings,
+  type GenerationSettingsRepository,
   JobDescriptionId,
   type JobDescriptionRepository,
+  ModelTier,
   type ProfileRepository,
   ResumeContent,
   type ResumeContentRepository
@@ -19,7 +24,16 @@ export type GenerateResumeContentInput = {
   scope?: GenerateResumeContentScope;
 };
 
-const BULLET_LIMITS = { min: 2, max: 20 };
+function resolveModelId(tier: ModelTier): string {
+  switch (tier) {
+    case ModelTier.FAST:
+      return 'claude-haiku-4-5';
+    case ModelTier.BALANCED:
+      return 'claude-sonnet-4-6';
+    case ModelTier.BEST:
+      return 'claude-opus-4-6';
+  }
+}
 
 export class GenerateResumeContent {
   public constructor(
@@ -28,7 +42,9 @@ export class GenerateResumeContent {
     private readonly jobDescriptionRepository: JobDescriptionRepository,
     private readonly resumeContentRepository: ResumeContentRepository,
     private readonly generator: ResumeContentGenerator,
-    private readonly educationRepository: EducationRepository
+    private readonly educationRepository: EducationRepository,
+    private readonly generationSettingsRepository: GenerationSettingsRepository,
+    private readonly experienceGenerationOverrideRepository: ExperienceGenerationOverrideRepository
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
@@ -39,10 +55,21 @@ export class GenerateResumeContent {
 
     const profile = await this.profileRepository.findSingle();
 
+    const settings =
+      (await this.generationSettingsRepository.findByProfileId(profile.id.value)) ??
+      GenerationSettings.createDefault(profile.id.value);
+
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences
       .filter(e => e.profileId === profile.id.value)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
+
+    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(
+      experiences.map(e => e.id.value)
+    );
+    const overrideMap = new Map(overrides.map(o => [o.experienceId, o]));
+
+    const composedPrompt = this.composePrompt(settings, input.scope, input.additionalPrompt);
 
     const generatorInput = {
       profile: {
@@ -56,6 +83,7 @@ export class GenerateResumeContent {
         rawText: jd.rawText
       },
       experiences: experiences.map(exp => {
+        const override = overrideMap.get(exp.id.value);
         return {
           id: exp.id.value,
           title: exp.title,
@@ -65,12 +93,14 @@ export class GenerateResumeContent {
             title: a.title,
             narrative: a.narrative
           })),
-          minBullets: BULLET_LIMITS.min,
-          maxBullets: BULLET_LIMITS.max
+          minBullets: override?.bulletMin ?? settings.bulletMin,
+          maxBullets: override?.bulletMax ?? settings.bulletMax
         };
       }),
       additionalPrompt: input.additionalPrompt,
-      scope: input.scope
+      scope: input.scope,
+      model: resolveModelId(settings.modelTier),
+      composedPrompt: composedPrompt ?? undefined
     };
 
     const result = await this.generator.generate(generatorInput);
@@ -155,5 +185,28 @@ export class GenerateResumeContent {
         bullets: e.bullets
       }))
     };
+  }
+
+  private composePrompt(
+    settings: GenerationSettings,
+    scope: GenerateResumeContentScope | undefined,
+    additionalPrompt: string | undefined
+  ): string | null {
+    const parts: string[] = [];
+
+    const resumePrompt = settings.getPrompt(GenerationScope.RESUME);
+    if (resumePrompt) parts.push(resumePrompt);
+
+    if (scope?.type === 'headline') {
+      const headlinePrompt = settings.getPrompt(GenerationScope.HEADLINE);
+      if (headlinePrompt) parts.push(headlinePrompt);
+    } else if (scope?.type === 'experience') {
+      const experiencePrompt = settings.getPrompt(GenerationScope.EXPERIENCE);
+      if (experiencePrompt) parts.push(experiencePrompt);
+    }
+
+    if (additionalPrompt) parts.push(additionalPrompt);
+
+    return parts.length > 0 ? parts.join('\n\n') : null;
   }
 }

@@ -16,6 +16,8 @@ export type ResumeContentGeneratorInput = {
   experiences: ResumeContentGeneratorExperience[];
   additionalPrompt?: string;
   scope?: ResumeContentGeneratorScope;
+  model?: string;
+  composedPrompt?: string;
 };
 
 export type ResumeContentGeneratorResult = {
