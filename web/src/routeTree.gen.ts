@@ -161,8 +161,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AtelierRoute: typeof AtelierRoute
   IndexRoute: typeof IndexRoute
+  AtelierRoute: typeof AtelierRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
   JobDescriptionsJobDescriptionIdRoute: typeof JobDescriptionsJobDescriptionIdRoute
@@ -176,18 +176,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/atelier': {
       id: '/atelier'
       path: '/atelier'
       fullPath: '/atelier'
       preLoaderRoute: typeof AtelierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile/': {
@@ -257,8 +257,8 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  AtelierRoute: AtelierRoute,
   IndexRoute: IndexRoute,
+  AtelierRoute: AtelierRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
   JobDescriptionsJobDescriptionIdRoute: JobDescriptionsJobDescriptionIdRoute,
