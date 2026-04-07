@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as AtelierRouteImport } from './routes/atelier'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
@@ -21,6 +22,11 @@ import { Route as JobDescriptionsJobDescriptionIdRouteImport } from './routes/jo
 import { Route as ExperiencesExperienceIdRouteImport } from './routes/experiences/$experienceId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AtelierRoute = AtelierRouteImport.update({
   id: '/atelier',
   path: '/atelier',
@@ -81,6 +87,7 @@ const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atelier': typeof AtelierRoute
+  '/settings': typeof SettingsRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atelier': typeof AtelierRoute
+  '/settings': typeof SettingsRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/atelier': typeof AtelierRoute
+  '/settings': typeof SettingsRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/atelier'
+    | '/settings'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/atelier'
+    | '/settings'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/atelier'
+    | '/settings'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
@@ -163,6 +175,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AtelierRoute: typeof AtelierRoute
+  SettingsRoute: typeof SettingsRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
   JobDescriptionsJobDescriptionIdRoute: typeof JobDescriptionsJobDescriptionIdRoute
@@ -176,6 +189,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/atelier': {
       id: '/atelier'
       path: '/atelier'
@@ -259,6 +279,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtelierRoute: AtelierRoute,
+  SettingsRoute: SettingsRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
   JobDescriptionsJobDescriptionIdRoute: JobDescriptionsJobDescriptionIdRoute,

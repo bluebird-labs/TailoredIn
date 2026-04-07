@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useCallback } from 'react';
 import { AtelierPdfPreview } from '@/components/atelier/AtelierPdfPreview.js';
-import { GenerationSettingsPanel } from '@/components/atelier/GenerationSettingsPanel.js';
 import { GenerationWorkspace } from '@/components/atelier/GenerationWorkspace.js';
 
 type AtelierSearch = { job?: string };
@@ -26,7 +25,6 @@ function AtelierPage() {
 
   return (
     <div className="-mx-9 -my-8 flex" style={{ height: 'calc(100vh)' }}>
-      <GenerationSettingsPanel />
       <GenerationWorkspace selectedJobId={selectedJobId ?? null} onSelectJob={setSelectedJobId} />
       <AtelierPdfPreview selectedJobId={selectedJobId ?? null} />
     </div>

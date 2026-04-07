@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { Eye, EyeOff, Loader2, RotateCw, Sparkles } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Eye, EyeOff, Loader2, RotateCw, Settings, Sparkles } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -291,7 +292,18 @@ export function GenerationWorkspace({
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col overflow-y-auto p-6">
       <div className="space-y-4">
-        <JobSelector value={selectedJobId} onChange={onSelectJob} />
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <JobSelector value={selectedJobId} onChange={onSelectJob} />
+          </div>
+          <Link
+            to="/settings"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            title="Generation settings"
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
+        </div>
 
         <div className="space-y-3">
           <Textarea
