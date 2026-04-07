@@ -17,7 +17,11 @@ export class PostgresGenerationSettingsRepository implements GenerationSettingsR
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByProfileId(profileId: string): Promise<DomainGenerationSettings | null> {
-    const orm = await this.orm.em.findOne(OrmGenerationSettings, { profile: profileId }, { populate: ['prompts'] });
+    const orm = await this.orm.em.findOne(
+      OrmGenerationSettings,
+      { profile: profileId },
+      { populate: ['prompts', 'profile'] }
+    );
     if (!orm) return null;
     return this.toDomain(orm);
   }
