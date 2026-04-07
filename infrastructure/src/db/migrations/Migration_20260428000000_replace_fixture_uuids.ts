@@ -88,7 +88,10 @@ ${jsonbCaseBranches}
     WHERE elem->>'experienceId' IN (${oldExpList})
   );
 
-  -- ── Step 5: Restore FK constraints to NOT DEFERRABLE ────────────
+  -- ── Step 5: Force deferred checks to run ───────────────────────
+  SET CONSTRAINTS ALL IMMEDIATE;
+
+  -- ── Step 6: Restore FK constraints to NOT DEFERRABLE ────────────
   FOR r IN
     SELECT con.conname, con.conrelid::regclass AS tbl
     FROM pg_constraint con
