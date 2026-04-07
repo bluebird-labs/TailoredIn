@@ -37,6 +37,8 @@ export type JobDescriptionDto = {
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly rawText: string | null;
+  readonly soughtHardSkills: string[] | null;
+  readonly soughtSoftSkills: string[] | null;
   readonly resumeOutput: ResumeOutputDto | null;
   readonly hasCachedPdf: boolean;
   readonly resumePdfTheme: string | null;
@@ -64,6 +66,8 @@ export function toJobDescriptionDto(
     createdAt: jd.createdAt.toISOString(),
     updatedAt: jd.updatedAt.toISOString(),
     rawText: jd.rawText,
+    soughtHardSkills: jd.soughtHardSkills,
+    soughtSoftSkills: jd.soughtSoftSkills,
     resumeOutput: resumeContent
       ? {
           headline: resumeContent.headline,

@@ -23,6 +23,8 @@ export type CreateJobDescriptionInput = {
   source: JobSource;
   postedAt?: Date | null;
   rawText?: string | null;
+  soughtHardSkills?: string[] | null;
+  soughtSoftSkills?: string[] | null;
 };
 
 export class CreateJobDescription {
@@ -49,7 +51,9 @@ export class CreateJobDescription {
       locationType: input.locationType,
       source: input.source,
       postedAt: input.postedAt,
-      rawText: input.rawText
+      rawText: input.rawText,
+      soughtHardSkills: input.soughtHardSkills,
+      soughtSoftSkills: input.soughtSoftSkills
     });
     await this.jobDescriptionRepository.save(jobDescription);
     return toJobDescriptionDto(jobDescription);

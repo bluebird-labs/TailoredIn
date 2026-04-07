@@ -115,6 +115,10 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
   const [pastedText, setPastedText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [rawText, setRawText] = useState<string | null>(null);
+  const [parsedSkills, setParsedSkills] = useState<{
+    soughtHardSkills: string[] | null;
+    soughtSoftSkills: string[] | null;
+  }>({ soughtHardSkills: null, soughtSoftSkills: null });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const savedState = useMemo(() => (isEdit ? jdToFormState(jobDescription) : emptyState()), [isEdit, jobDescription]);
@@ -127,6 +131,7 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
     setPastedText('');
     setSelectedFile(null);
     setRawText(null);
+    setParsedSkills({ soughtHardSkills: null, soughtSoftSkills: null });
     reset();
     setErrors({});
   }
@@ -147,6 +152,10 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
             {
               onSuccess: result => {
                 setRawText(extractedText);
+                setParsedSkills({
+                  soughtHardSkills: result.soughtHardSkills,
+                  soughtSoftSkills: result.soughtSoftSkills
+                });
                 setFields(parseResultToFormState(result));
                 setStep('form');
               },
@@ -170,6 +179,10 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
         {
           onSuccess: result => {
             setRawText(text);
+            setParsedSkills({
+              soughtHardSkills: result.soughtHardSkills,
+              soughtSoftSkills: result.soughtSoftSkills
+            });
             setFields(parseResultToFormState(result));
             setStep('form');
           },
@@ -202,7 +215,9 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId, jobDesc
       location_type: current.locationType || null,
       source: isEdit ? jobDescription.source : 'upload',
       posted_at: current.postedAt || null,
-      raw_text: rawText
+      raw_text: rawText,
+      sought_hard_skills: parsedSkills.soughtHardSkills,
+      sought_soft_skills: parsedSkills.soughtSoftSkills
     };
 
     const options = {

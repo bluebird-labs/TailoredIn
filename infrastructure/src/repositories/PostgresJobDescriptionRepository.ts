@@ -47,6 +47,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       ormJd.source = jd.source;
       ormJd.postedAt = jd.postedAt;
       ormJd.rawText = jd.rawText;
+      ormJd.soughtHardSkills = jd.soughtHardSkills;
+      ormJd.soughtSoftSkills = jd.soughtSoftSkills;
       ormJd.resumePdf = jd.resumePdf ? Buffer.from(jd.resumePdf) : null;
       ormJd.resumePdfTheme = jd.resumePdfTheme;
       ormJd.updatedAt = jd.updatedAt;
@@ -67,6 +69,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
         source: jd.source,
         postedAt: jd.postedAt,
         rawText: jd.rawText,
+        soughtHardSkills: jd.soughtHardSkills,
+        soughtSoftSkills: jd.soughtSoftSkills,
         resumePdf: jd.resumePdf ? Buffer.from(jd.resumePdf) : null,
         resumePdfTheme: jd.resumePdfTheme,
         createdAt: jd.createdAt,
@@ -108,6 +112,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
       source: orm.source as JobSource,
       postedAt: orm.postedAt,
       rawText: orm.rawText,
+      soughtHardSkills: orm.soughtHardSkills,
+      soughtSoftSkills: orm.soughtSoftSkills,
       resumePdf: orm.resumePdf ? new Uint8Array(orm.resumePdf) : null,
       resumePdfTheme: orm.resumePdfTheme ?? null,
       createdAt: orm.createdAt,

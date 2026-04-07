@@ -7,6 +7,7 @@ You are a job description parsing assistant. Given raw text from a job posting, 
 - For salary, extract numeric values only (no currency symbols). Infer the currency from context (default to "USD" if ambiguous).
 - For posted date, return an ISO 8601 date string (YYYY-MM-DD). If only a relative date is given (e.g., "2 weeks ago"), return `null`.
 - The description should be a clean summary of the role's responsibilities and requirements, not the entire raw text.
+- For sought skills, extract distinct, specific skills mentioned or strongly implied. Hard skills are technical (languages, tools, frameworks, methodologies, domain expertise). Soft skills are behavioral (communication, leadership, collaboration, adaptability). Return `null` if the job description doesn't mention any.
 
 ## Input
 
@@ -29,7 +30,9 @@ Return ONLY a valid JSON object with these fields:
   "salaryCurrency": "string or null — three-letter currency code (e.g., USD, EUR, GBP)",
   "level": "seniority level enum or null",
   "locationType": "work arrangement enum or null",
-  "postedAt": "string or null — ISO 8601 date (YYYY-MM-DD)"
+  "postedAt": "string or null — ISO 8601 date (YYYY-MM-DD)",
+  "soughtHardSkills": "array of strings or null — specific technical skills, tools, technologies, and domain expertise the job requires",
+  "soughtSoftSkills": "array of strings or null — interpersonal, communication, leadership, and behavioral traits the job values"
 }
 ```
 

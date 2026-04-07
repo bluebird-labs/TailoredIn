@@ -173,6 +173,40 @@ function ExperienceCard({
   );
 }
 
+function SoughtExpertisePanel({ jd }: { jd: JobDescription }) {
+  if (!jd.soughtHardSkills?.length && !jd.soughtSoftSkills?.length) return null;
+
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <p className="text-[12px] text-muted-foreground">What they're looking for</p>
+      {jd.soughtHardSkills && jd.soughtHardSkills.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] text-muted-foreground/70">Hard Skills</p>
+          <div className="flex flex-wrap gap-1.5">
+            {jd.soughtHardSkills.map(skill => (
+              <span key={skill} className="inline-flex items-center rounded-md border px-2 py-0.5 text-[12px]">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {jd.soughtSoftSkills && jd.soughtSoftSkills.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] text-muted-foreground/70">Soft Skills</p>
+          <div className="flex flex-wrap gap-1.5">
+            {jd.soughtSoftSkills.map(skill => (
+              <span key={skill} className="inline-flex items-center rounded-md border px-2 py-0.5 text-[12px]">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ResumeTab({ jd }: { jd: JobDescription }) {
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
@@ -262,7 +296,8 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
 
   if (!resumeOutput) {
     return (
-      <div className="mt-4">
+      <div className="mt-4 space-y-4">
+        <SoughtExpertisePanel jd={jd} />
         <div className="border rounded-lg p-4 space-y-3">
           <p className="text-[12px] text-muted-foreground">No resume content generated yet.</p>
           <Textarea
@@ -294,6 +329,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
   return (
     <div className="mt-4 grid grid-cols-[1fr_560px] gap-5">
       <div className="space-y-5">
+        <SoughtExpertisePanel jd={jd} />
         <div className="border rounded-lg p-4 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-[12px] text-muted-foreground">Generated{generatedAt ? ` on ${generatedAt}` : ''}</p>

@@ -87,8 +87,11 @@ classDiagram
         +string jobDescriptionId
         +string headline
         +ResumeExperience[] experiences
+        +string[] hiddenEducationIds
         +string prompt
         +Record<string, unknown>? schema
+        +withExperienceBulletCount()
+        +withHiddenEducationIds()
     }
 
     class ApplicationStatus {
@@ -103,6 +106,7 @@ classDiagram
         +string experienceId
         +string summary
         +string[] bullets
+        +number? displayedBulletCount
     }
 
     Profile "1" --> "*" ResumeContent : has
@@ -150,6 +154,10 @@ classDiagram
         +JobSource source
         +Date? postedAt
         +string? rawText
+        +string[]? soughtHardSkills
+        +string[]? soughtSoftSkills
+        +Uint8Array? resumePdf
+        +string? resumePdfTheme
     }
 
     class BusinessType {

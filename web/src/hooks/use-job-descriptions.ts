@@ -42,6 +42,8 @@ export type JobDescription = {
   createdAt: string;
   updatedAt: string;
   rawText: string | null;
+  soughtHardSkills: string[] | null;
+  soughtSoftSkills: string[] | null;
   resumeOutput: ResumeOutput | null;
   hasCachedPdf: boolean;
   resumePdfTheme: string | null;
@@ -58,6 +60,8 @@ export type JobDescriptionParseResult = {
   level: string | null;
   locationType: string | null;
   postedAt: string | null;
+  soughtHardSkills: string[] | null;
+  soughtSoftSkills: string[] | null;
 };
 
 export function useJobDescriptions(companyId: string) {
@@ -122,6 +126,8 @@ export function useCreateJobDescription() {
       source: string;
       posted_at?: string | null;
       raw_text?: string | null;
+      sought_hard_skills?: string[] | null;
+      sought_soft_skills?: string[] | null;
     }) => {
       const segment = api['job-descriptions'] as EdenRouteSegment;
       const { data, error } = await segment.post(input);

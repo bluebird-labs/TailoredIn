@@ -22,7 +22,9 @@ const jobDescriptionParseSchema = z.object({
   salaryCurrency: z.string().nullable(),
   level: z.nativeEnum(JobLevel).nullable(),
   locationType: z.nativeEnum(LocationType).nullable(),
-  postedAt: z.string().nullable()
+  postedAt: z.string().nullable(),
+  soughtHardSkills: z.array(z.string()).nullable(),
+  soughtSoftSkills: z.array(z.string()).nullable()
 });
 
 class JobDescriptionParseRequest extends LlmJsonRequest<typeof jobDescriptionParseSchema> {

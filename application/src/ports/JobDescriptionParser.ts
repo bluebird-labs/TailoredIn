@@ -11,6 +11,8 @@ export type JobDescriptionParseResult = {
   level: JobLevel | null;
   locationType: LocationType | null;
   postedAt: string | null;
+  soughtHardSkills: string[] | null;
+  soughtSoftSkills: string[] | null;
 };
 
 export interface JobDescriptionParser {

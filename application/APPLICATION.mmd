@@ -204,6 +204,7 @@ classDiagram
         <<UseCase>>
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentRepository resumeContentRepository
+        +ExperienceRepository experienceRepository
         +execute(GetJobDescriptionInput) JobDescriptionDto
     }
 
@@ -247,6 +248,12 @@ classDiagram
     %%  Resume Use Cases
     %% ──────────────────────────────────────────────
 
+    class CachedResumePdfResult {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(GetCachedResumePdfInput) CachedResumePdfResult | null
+    }
+
     class GenerateResumeContent {
         <<UseCase>>
         +ProfileRepository profileRepository
@@ -254,6 +261,23 @@ classDiagram
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentRepository resumeContentRepository
         +ResumeContentGenerator generator
+        +execute(GenerateResumeContentInput) ResumeContentDto
+    }
+
+    class GenerateResumeContentScope {
+        <<UseCase>>
+        +ProfileRepository profileRepository
+        +ExperienceRepository experienceRepository
+        +JobDescriptionRepository jobDescriptionRepository
+        +ResumeContentRepository resumeContentRepository
+        +ResumeContentGenerator generator
+        +execute(GenerateResumeContentInput) ResumeContentDto
+    }
+
+    class GenerateResumeContentWithPdf {
+        <<UseCase>>
+        +GenerateResumeContent generateContent
+        +GenerateResumePdf generatePdf
         +execute(GenerateResumeContentInput) ResumeContentDto
     }
 
@@ -268,6 +292,20 @@ classDiagram
         +execute(GenerateResumePdfInput) Uint8Array
     }
 
+    class GetCachedResumePdf {
+        <<UseCase>>
+        +JobDescriptionRepository jobDescriptionRepository
+        +execute(GetCachedResumePdfInput) CachedResumePdfResult | null
+    }
+
+    class UpdateResumeDisplaySettings {
+        <<UseCase>>
+        +ResumeContentRepository resumeContentRepository
+        +execute(UpdateResumeDisplaySettingsInput) void
+    }
+
+    GenerateResumeContentWithPdf ..> GenerateResumeContent : depends
+    GenerateResumeContentWithPdf ..> GenerateResumePdf : depends
 
     %% ──────────────────────────────────────────────
     %%  Ports
@@ -306,6 +344,7 @@ classDiagram
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
+    GenerateResumeContentScope ..> ResumeContentGenerator : depends
     GenerateResumeContent ..> ResumeContentGenerator : depends
     GenerateResumePdf ..> ResumeRendererFactory : depends
 
@@ -415,7 +454,11 @@ classDiagram
         +string createdAt
         +string updatedAt
         +string? rawText
+        +string[]? soughtHardSkills
+        +string[]? soughtSoftSkills
         +ResumeOutputDto? resumeOutput
+        +boolean hasCachedPdf
+        +string? resumePdfTheme
     }
 
     class JobDescriptionParseResult {
@@ -430,6 +473,8 @@ classDiagram
         +JobLevel? level
         +LocationType? locationType
         +string? postedAt
+        +string[]? soughtHardSkills
+        +string[]? soughtSoftSkills
     }
 
     class PaginatedDto {
@@ -485,6 +530,11 @@ classDiagram
         +Record<string, unknown> requestSchema
     }
 
+    class ResumeContentGeneratorScope {
+        <<DTO>>
+        +'headline' type
+    }
+
     class ResumeExperienceBulletsDto {
         <<DTO>>
         +string experienceId
@@ -498,9 +548,15 @@ classDiagram
         +string headline
         +Readonly{
     readonly experienceId: string;
+    readonly experienceTitle: string;
+    readonly companyName: string;
+    readonly startDate: string;
+    readonly endDate: string;
     readonly summary: string;
     readonly bullets: readonly string[];
-  }[] experiences
+    readonly displayedBulletCount: number;
+  }[]? experiences
+        +readonly string[] hiddenEducationIds
         +string generatedAt
     }
 
@@ -568,7 +624,9 @@ classDiagram
     ListJobDescriptions ..> JobDescriptionDto : returns
     ParseJobDescription ..> JobDescriptionParseResult : returns
     UpdateJobDescription ..> JobDescriptionDto : returns
+    GenerateResumeContentScope ..> ResumeContentDto : returns
     GenerateResumeContent ..> ResumeContentDto : returns
+    GenerateResumeContentWithPdf ..> ResumeContentDto : returns
     UpdateProfile ..> ProfileDto : returns
 
     %% ──────────────────────────────────────────────
@@ -647,8 +705,13 @@ classDiagram
     DeleteJobDescription ..> JobDescriptionRepository : depends
     GetJobDescription ..> JobDescriptionRepository : depends
     GetJobDescription ..> ResumeContentRepository : depends
+    GetJobDescription ..> ExperienceRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
+    GenerateResumeContentScope ..> ProfileRepository : depends
+    GenerateResumeContentScope ..> ExperienceRepository : depends
+    GenerateResumeContentScope ..> JobDescriptionRepository : depends
+    GenerateResumeContentScope ..> ResumeContentRepository : depends
     GenerateResumeContent ..> ProfileRepository : depends
     GenerateResumeContent ..> ExperienceRepository : depends
     GenerateResumeContent ..> JobDescriptionRepository : depends
@@ -658,6 +721,9 @@ classDiagram
     GenerateResumePdf ..> EducationRepository : depends
     GenerateResumePdf ..> JobDescriptionRepository : depends
     GenerateResumePdf ..> ResumeContentRepository : depends
+    CachedResumePdfResult ..> JobDescriptionRepository : depends
+    GetCachedResumePdf ..> JobDescriptionRepository : depends
+    UpdateResumeDisplaySettings ..> ResumeContentRepository : depends
     UpdateProfile ..> ProfileRepository : depends
 
     %% ──────────────────────────────────────────────
@@ -698,8 +764,13 @@ classDiagram
     style UpdateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style CachedResumePdfResult fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumeContent fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GenerateResumeContentScope fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GenerateResumeContentWithPdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style GetCachedResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style UpdateResumeDisplaySettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style JobDescriptionParser fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
@@ -722,6 +793,7 @@ classDiagram
     style ResumeContentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeContentGeneratorExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeContentGeneratorResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeContentGeneratorScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperienceBulletsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeOutputDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeRenderEducation fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px

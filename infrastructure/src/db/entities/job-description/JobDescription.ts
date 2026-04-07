@@ -48,6 +48,12 @@ export class JobDescription extends BaseEntity {
   @Property({ fieldName: 'raw_text', type: 'text', nullable: true })
   public rawText: string | null;
 
+  @Property({ fieldName: 'sought_hard_skills', type: 'jsonb', nullable: true })
+  public soughtHardSkills: string[] | null;
+
+  @Property({ fieldName: 'sought_soft_skills', type: 'jsonb', nullable: true })
+  public soughtSoftSkills: string[] | null;
+
   @Property({ fieldName: 'resume_pdf', type: 'blob', nullable: true })
   public resumePdf: Buffer | null;
 
@@ -69,6 +75,8 @@ export class JobDescription extends BaseEntity {
     source: string;
     postedAt: Date | null;
     rawText: string | null;
+    soughtHardSkills: string[] | null;
+    soughtSoftSkills: string[] | null;
     resumePdf: Buffer | null;
     resumePdfTheme: string | null;
     createdAt: Date;
@@ -89,6 +97,8 @@ export class JobDescription extends BaseEntity {
     this.source = props.source;
     this.postedAt = props.postedAt;
     this.rawText = props.rawText;
+    this.soughtHardSkills = props.soughtHardSkills;
+    this.soughtSoftSkills = props.soughtSoftSkills;
     this.resumePdf = props.resumePdf;
     this.resumePdfTheme = props.resumePdfTheme;
   }

@@ -17,6 +17,8 @@ export type JobDescriptionCreateProps = {
   source: JobSource;
   postedAt?: Date | null;
   rawText?: string | null;
+  soughtHardSkills?: string[] | null;
+  soughtSoftSkills?: string[] | null;
 };
 
 export class JobDescription extends AggregateRoot<JobDescriptionId> {
@@ -31,6 +33,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
   public source: JobSource;
   public postedAt: Date | null;
   public rawText: string | null;
+  public soughtHardSkills: string[] | null;
+  public soughtSoftSkills: string[] | null;
   public resumePdf: Uint8Array | null;
   public resumePdfTheme: string | null;
   public readonly createdAt: Date;
@@ -49,6 +53,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     source: JobSource;
     postedAt: Date | null;
     rawText: string | null;
+    soughtHardSkills: string[] | null;
+    soughtSoftSkills: string[] | null;
     resumePdf: Uint8Array | null;
     resumePdfTheme: string | null;
     createdAt: Date;
@@ -66,6 +72,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     this.source = props.source;
     this.postedAt = props.postedAt;
     this.rawText = props.rawText;
+    this.soughtHardSkills = props.soughtHardSkills;
+    this.soughtSoftSkills = props.soughtSoftSkills;
     this.resumePdf = props.resumePdf;
     this.resumePdfTheme = props.resumePdfTheme;
     this.createdAt = props.createdAt;
@@ -87,6 +95,8 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
       source: props.source,
       postedAt: props.postedAt ?? null,
       rawText: props.rawText ?? null,
+      soughtHardSkills: props.soughtHardSkills ?? null,
+      soughtSoftSkills: props.soughtSoftSkills ?? null,
       resumePdf: null,
       resumePdfTheme: null,
       createdAt: now,
