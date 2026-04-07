@@ -17,11 +17,7 @@ export class PostgresGenerationSettingsRepository implements GenerationSettingsR
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByProfileId(profileId: string): Promise<DomainGenerationSettings | null> {
-    const orm = await this.orm.em.findOne(
-      OrmGenerationSettings,
-      { profile: profileId },
-      { populate: ['prompts', 'profile'] }
-    );
+    const orm = await this.orm.em.findOne(OrmGenerationSettings, { profile: profileId }, { populate: ['prompts'] });
     if (!orm) return null;
     return this.toDomain(orm);
   }
@@ -30,34 +26,30 @@ export class PostgresGenerationSettingsRepository implements GenerationSettingsR
     const existing = await this.orm.em.findOne(OrmGenerationSettings, settings.id.value);
 
     if (existing) {
-      await this.orm.em
-        .createQueryBuilder(OrmGenerationSettings)
-        .update({
-          modelTier: settings.modelTier,
-          bulletMin: settings.bulletMin,
-          bulletMax: settings.bulletMax,
-          updatedAt: settings.updatedAt
-        })
-        .where({ id: settings.id.value })
-        .execute();
+      existing.modelTier = settings.modelTier;
+      existing.bulletMin = settings.bulletMin;
+      existing.bulletMax = settings.bulletMax;
+      existing.updatedAt = settings.updatedAt;
       await this.syncPrompts(settings);
     } else {
-      const settingsRef = this.orm.em.getReference(Profile, settings.profileId);
+      const profile = await this.orm.em.findOneOrFail(Profile, settings.profileId);
       const orm = new OrmGenerationSettings({
         id: settings.id.value,
-        profile: settingsRef,
+        profile,
         modelTier: settings.modelTier,
         bulletMin: settings.bulletMin,
         bulletMax: settings.bulletMax,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt
       });
-      await this.orm.em.insertMany([orm]);
+      this.orm.em.persist(orm);
 
       for (const prompt of settings.prompts) {
-        await this.insertPrompt(prompt, settings.id.value);
+        this.persistNewPrompt(prompt, orm);
       }
     }
+
+    await this.orm.em.flush();
   }
 
   private async syncPrompts(settings: DomainGenerationSettings): Promise<void> {
@@ -65,50 +57,39 @@ export class PostgresGenerationSettingsRepository implements GenerationSettingsR
     const domainIds = new Set(settings.prompts.map(p => p.id.value));
     const existingIds = new Set(existing.map(p => p.id));
 
-    // Delete removed prompts
-    const toDelete = existing.filter(orm => !domainIds.has(orm.id)).map(orm => orm.id);
-    if (toDelete.length > 0) {
-      await this.orm.em
-        .createQueryBuilder(OrmGenerationPrompt)
-        .delete()
-        // biome-ignore lint/style/useNamingConvention: MikroORM query operator
-        .where({ id: { $in: toDelete } })
-        .execute();
+    for (const orm of existing) {
+      if (!domainIds.has(orm.id)) {
+        this.orm.em.remove(orm);
+      }
     }
 
-    // Upsert prompts
     for (const prompt of settings.prompts) {
       if (existingIds.has(prompt.id.value)) {
-        await this.orm.em
-          .createQueryBuilder(OrmGenerationPrompt)
-          .update({
-            scope: prompt.scope,
-            content: prompt.content,
-            updatedAt: prompt.updatedAt
-          })
-          .where({ id: prompt.id.value })
-          .execute();
+        const ormPrompt = existing.find(p => p.id === prompt.id.value)!;
+        ormPrompt.scope = prompt.scope;
+        ormPrompt.content = prompt.content;
+        ormPrompt.updatedAt = prompt.updatedAt;
       } else {
-        await this.insertPrompt(prompt, settings.id.value);
+        const settingsRef = this.orm.em.getReference(OrmGenerationSettings, settings.id.value);
+        this.persistNewPrompt(prompt, settingsRef);
       }
     }
   }
 
-  private async insertPrompt(prompt: DomainGenerationPrompt, generationSettingsId: string): Promise<void> {
-    const settingsRef = this.orm.em.getReference(OrmGenerationSettings, generationSettingsId);
+  private persistNewPrompt(prompt: DomainGenerationPrompt, generationSettings: OrmGenerationSettings): void {
     const orm = new OrmGenerationPrompt({
       id: prompt.id.value,
-      generationSettings: settingsRef,
+      generationSettings,
       scope: prompt.scope,
       content: prompt.content,
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt
     });
-    await this.orm.em.insertMany([orm]);
+    this.orm.em.persist(orm);
   }
 
   private toDomain(orm: OrmGenerationSettings): DomainGenerationSettings {
-    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
+    const profileId = orm.profile.id;
 
     const prompts = orm.prompts.getItems().map(
       p =>

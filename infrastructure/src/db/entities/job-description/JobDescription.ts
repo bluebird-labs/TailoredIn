@@ -1,5 +1,4 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
-import type { Ref } from '@mikro-orm/postgresql';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 import { Company } from '../companies/Company.js';
@@ -9,8 +8,8 @@ export class JobDescription extends BaseEntity {
   @UuidPrimaryKey({ fieldName: 'id' })
   public id: string;
 
-  @ManyToOne(() => Company, { lazy: true, fieldName: 'company_id' })
-  public readonly company: Ref<Company> | Company;
+  @ManyToOne(() => Company, { fieldName: 'company_id' })
+  public readonly company: Company;
 
   @Property({ fieldName: 'title', type: 'text' })
   public title: string;
@@ -62,7 +61,7 @@ export class JobDescription extends BaseEntity {
 
   public constructor(props: {
     id: string;
-    company: Ref<Company> | Company;
+    company: Company;
     title: string;
     description: string;
     url: string | null;

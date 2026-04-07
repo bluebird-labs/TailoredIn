@@ -1,5 +1,4 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
-import type { Ref } from '@mikro-orm/postgresql';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 import { Company } from '../companies/Company.js';
@@ -11,14 +10,14 @@ export class Application extends BaseEntity {
   @UuidPrimaryKey({ fieldName: 'id' })
   public id: string;
 
-  @ManyToOne(() => Profile, { lazy: true, fieldName: 'profile_id' })
-  public readonly profile: Ref<Profile> | Profile;
+  @ManyToOne(() => Profile, { fieldName: 'profile_id' })
+  public readonly profile: Profile;
 
-  @ManyToOne(() => Company, { lazy: true, fieldName: 'company_id' })
-  public readonly company: Ref<Company> | Company;
+  @ManyToOne(() => Company, { fieldName: 'company_id' })
+  public readonly company: Company;
 
-  @ManyToOne(() => JobDescription, { lazy: true, fieldName: 'job_description_id', nullable: true })
-  public jobDescription: Ref<JobDescription> | JobDescription | null;
+  @ManyToOne(() => JobDescription, { fieldName: 'job_description_id', nullable: true })
+  public jobDescription: JobDescription | null;
 
   @Property({ fieldName: 'status', type: 'text' })
   public status: string;
@@ -31,9 +30,9 @@ export class Application extends BaseEntity {
 
   public constructor(props: {
     id: string;
-    profile: Ref<Profile> | Profile;
-    company: Ref<Company> | Company;
-    jobDescription: Ref<JobDescription> | JobDescription | null;
+    profile: Profile;
+    company: Company;
+    jobDescription: JobDescription | null;
     status: string;
     notes: string | null;
     appliedAt: Date;

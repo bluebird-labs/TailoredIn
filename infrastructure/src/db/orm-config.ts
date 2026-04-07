@@ -34,7 +34,7 @@ export type OrmDbConfig = {
 export function createOrmConfig(db: OrmDbConfig) {
   return defineConfig({
     debug: false,
-    allowGlobalContext: true,
+    allowGlobalContext: false,
 
     entities: [
       BaseEntity,
@@ -58,7 +58,7 @@ export function createOrmConfig(db: OrmDbConfig) {
     metadataCache: { options: { cacheDir: Path.resolve(PACKAGE_DIR, '../../.mikroorm-cache') } },
     highlighter: new SqlHighlighter(),
     forceUtcTimezone: true,
-    implicitTransactions: false,
+    implicitTransactions: true,
     ensureDatabase: true,
     preferTs: true,
     forceEntityConstructor: true,

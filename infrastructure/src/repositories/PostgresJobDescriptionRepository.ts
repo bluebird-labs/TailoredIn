@@ -18,16 +18,12 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findAll(): Promise<DomainJobDescription[]> {
-    const ormEntities = await this.orm.em.find(
-      OrmJobDescription,
-      {},
-      { populate: ['company'], orderBy: { createdAt: 'DESC' } }
-    );
+    const ormEntities = await this.orm.em.find(OrmJobDescription, {}, { orderBy: { createdAt: 'DESC' } });
     return ormEntities.map(e => this.toDomain(e));
   }
 
   public async findById(id: JobDescriptionId): Promise<DomainJobDescription | null> {
-    const orm = await this.orm.em.findOne(OrmJobDescription, id.value, { populate: ['company'] });
+    const orm = await this.orm.em.findOne(OrmJobDescription, id.value);
     return orm ? this.toDomain(orm) : null;
   }
 
@@ -35,7 +31,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
     const ormEntities = await this.orm.em.find(
       OrmJobDescription,
       { company: companyId },
-      { populate: ['company'], orderBy: { createdAt: 'DESC' } }
+      { orderBy: { createdAt: 'DESC' } }
     );
     return ormEntities.map(e => this.toDomain(e));
   }
@@ -85,9 +81,9 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
         createdAt: jd.createdAt,
         updatedAt: jd.updatedAt
       });
+      this.orm.em.persist(ormJd);
     }
 
-    this.orm.em.persist(ormJd);
     await this.orm.em.flush();
   }
 
@@ -101,7 +97,7 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
   }
 
   private toDomain(orm: OrmJobDescription): DomainJobDescription {
-    const companyId = typeof orm.company === 'string' ? orm.company : (orm.company as { id: string }).id;
+    const companyId = orm.company.id;
 
     const salaryRange =
       orm.salaryCurrency != null

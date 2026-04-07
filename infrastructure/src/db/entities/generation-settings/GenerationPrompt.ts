@@ -1,11 +1,11 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
-import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { UuidPrimaryKey } from '../../helpers.js';
 import { GenerationSettings } from './GenerationSettings.js';
 
 type GenerationPromptProps = {
   id: string;
-  generationSettings: RefOrEntity<GenerationSettings>;
+  generationSettings: GenerationSettings;
   scope: string;
   content: string;
   createdAt: Date;
@@ -17,8 +17,8 @@ export class GenerationPrompt extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => GenerationSettings, { lazy: true, fieldName: 'generation_settings_id' })
-  public readonly generationSettings: RefOrEntity<GenerationSettings>;
+  @ManyToOne(() => GenerationSettings, { fieldName: 'generation_settings_id' })
+  public readonly generationSettings: GenerationSettings;
 
   @Property({ name: 'scope', type: 'text' })
   public scope: string;

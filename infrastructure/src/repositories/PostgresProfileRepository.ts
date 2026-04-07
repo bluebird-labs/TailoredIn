@@ -25,7 +25,6 @@ export class PostgresProfileRepository implements ProfileRepository {
     orm.githubUrl = profile.githubUrl;
     orm.websiteUrl = profile.websiteUrl;
     orm.updatedAt = profile.updatedAt;
-    this.orm.em.persist(orm);
     await this.orm.em.flush();
   }
 

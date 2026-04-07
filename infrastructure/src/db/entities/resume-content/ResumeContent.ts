@@ -1,5 +1,4 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
-import type { Ref } from '@mikro-orm/postgresql';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
 import { JobDescription } from '../job-description/JobDescription.js';
@@ -17,11 +16,11 @@ export class ResumeContent extends BaseEntity {
   @UuidPrimaryKey({ fieldName: 'id' })
   public id: string;
 
-  @ManyToOne(() => Profile, { lazy: true, fieldName: 'profile_id' })
-  public readonly profile: Ref<Profile> | Profile;
+  @ManyToOne(() => Profile, { fieldName: 'profile_id' })
+  public readonly profile: Profile;
 
-  @ManyToOne(() => JobDescription, { lazy: true, fieldName: 'job_description_id' })
-  public readonly jobDescription: Ref<JobDescription> | JobDescription;
+  @ManyToOne(() => JobDescription, { fieldName: 'job_description_id' })
+  public readonly jobDescription: JobDescription;
 
   @Property({ fieldName: 'headline', type: 'text' })
   public headline: string;
@@ -40,8 +39,8 @@ export class ResumeContent extends BaseEntity {
 
   public constructor(props: {
     id: string;
-    profile: Ref<Profile> | Profile;
-    jobDescription: Ref<JobDescription> | JobDescription;
+    profile: Profile;
+    jobDescription: JobDescription;
     headline: string;
     experiences: ResumeExperienceJson[];
     hiddenEducationIds: string[];

@@ -28,6 +28,7 @@ export async function setupTestDatabase(): Promise<MikroORM> {
     port: state.container.getMappedPort(5432)
   });
 
+  config.allowGlobalContext = true;
   state.orm = await MikroORM.init(config);
   await state.orm.migrator.up();
 

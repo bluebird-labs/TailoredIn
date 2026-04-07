@@ -5,6 +5,8 @@ import {
   ResumeContentId,
   type ResumeContentRepository
 } from '@tailoredin/domain';
+import { JobDescription as OrmJobDescription } from '../db/entities/job-description/JobDescription.js';
+import { Profile as OrmProfile } from '../db/entities/profile/Profile.js';
 import { ResumeContent as OrmResumeContent } from '../db/entities/resume-content/ResumeContent.js';
 
 @injectable()
@@ -15,55 +17,53 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
     const orm = await this.orm.em.findOne(
       OrmResumeContent,
       { jobDescription: jobDescriptionId },
-      { populate: ['profile', 'jobDescription'], orderBy: { createdAt: 'DESC' }, refresh: true }
+      { populate: ['profile', 'jobDescription'], orderBy: { createdAt: 'DESC' } }
     );
     return orm ? this.toDomain(orm) : null;
   }
 
   public async save(resumeContent: DomainResumeContent): Promise<void> {
-    const qb = this.orm.em.createQueryBuilder(OrmResumeContent);
-    await qb
-      .insert({
-        id: resumeContent.id.value,
-        profile: resumeContent.profileId,
-        jobDescription: resumeContent.jobDescriptionId,
-        headline: resumeContent.headline,
-        experiences: resumeContent.experiences.map(e => ({
-          experienceId: e.experienceId,
-          summary: e.summary,
-          bullets: e.bullets,
-          hiddenBulletIndices: e.hiddenBulletIndices
-        })),
-        hiddenEducationIds: resumeContent.hiddenEducationIds,
-        prompt: resumeContent.prompt,
-        schema: resumeContent.schema,
-        createdAt: resumeContent.createdAt,
-        updatedAt: resumeContent.updatedAt
-      })
-      .execute();
+    const profileRef = this.orm.em.getReference(OrmProfile, resumeContent.profileId);
+    const jdRef = this.orm.em.getReference(OrmJobDescription, resumeContent.jobDescriptionId);
+
+    const entity = new OrmResumeContent({
+      id: resumeContent.id.value,
+      profile: profileRef,
+      jobDescription: jdRef,
+      headline: resumeContent.headline,
+      experiences: resumeContent.experiences.map(e => ({
+        experienceId: e.experienceId,
+        summary: e.summary,
+        bullets: e.bullets,
+        hiddenBulletIndices: e.hiddenBulletIndices
+      })),
+      hiddenEducationIds: resumeContent.hiddenEducationIds,
+      prompt: resumeContent.prompt,
+      schema: resumeContent.schema,
+      createdAt: resumeContent.createdAt,
+      updatedAt: resumeContent.updatedAt
+    });
+
+    this.orm.em.persist(entity);
+    await this.orm.em.flush();
   }
 
   public async update(resumeContent: DomainResumeContent): Promise<void> {
-    const qb = this.orm.em.createQueryBuilder(OrmResumeContent);
-    await qb
-      .update({
-        experiences: resumeContent.experiences.map(e => ({
-          experienceId: e.experienceId,
-          summary: e.summary,
-          bullets: e.bullets,
-          hiddenBulletIndices: e.hiddenBulletIndices
-        })),
-        hiddenEducationIds: resumeContent.hiddenEducationIds,
-        updatedAt: resumeContent.updatedAt
-      })
-      .where({ id: resumeContent.id.value })
-      .execute();
+    const existing = await this.orm.em.findOneOrFail(OrmResumeContent, resumeContent.id.value);
+    existing.experiences = resumeContent.experiences.map(e => ({
+      experienceId: e.experienceId,
+      summary: e.summary,
+      bullets: e.bullets,
+      hiddenBulletIndices: e.hiddenBulletIndices
+    }));
+    existing.hiddenEducationIds = resumeContent.hiddenEducationIds;
+    existing.updatedAt = resumeContent.updatedAt;
+    await this.orm.em.flush();
   }
 
   private toDomain(orm: OrmResumeContent): DomainResumeContent {
-    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
-    const jobDescriptionId =
-      typeof orm.jobDescription === 'string' ? orm.jobDescription : (orm.jobDescription as { id: string }).id;
+    const profileId = orm.profile.id;
+    const jobDescriptionId = orm.jobDescription.id;
 
     return new DomainResumeContent({
       id: new ResumeContentId(orm.id),

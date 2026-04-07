@@ -1,11 +1,11 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
-import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { UuidPrimaryKey } from '../../helpers.js';
 import { Experience } from './Experience.js';
 
 type ExperienceGenerationOverrideProps = {
   id: string;
-  experience: RefOrEntity<Experience>;
+  experience: Experience;
   bulletMin: number;
   bulletMax: number;
   createdAt: Date;
@@ -17,8 +17,8 @@ export class ExperienceGenerationOverride extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Experience, { lazy: true, fieldName: 'experience_id' })
-  public readonly experience: RefOrEntity<Experience>;
+  @ManyToOne(() => Experience, { fieldName: 'experience_id' })
+  public readonly experience: Experience;
 
   @Property({ name: 'bullet_min', type: 'integer' })
   public bulletMin: number;

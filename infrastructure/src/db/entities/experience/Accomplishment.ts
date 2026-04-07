@@ -1,11 +1,11 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
-import { type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { UuidPrimaryKey } from '../../helpers.js';
 import { Experience } from './Experience.js';
 
 type AccomplishmentProps = {
   id: string;
-  experience: RefOrEntity<Experience>;
+  experience: Experience;
   title: string;
   narrative: string;
   ordinal: number;
@@ -18,8 +18,8 @@ export class Accomplishment extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Experience, { lazy: true, name: 'experience_id' })
-  public readonly experience: RefOrEntity<Experience>;
+  @ManyToOne(() => Experience, { name: 'experience_id' })
+  public readonly experience: Experience;
 
   @Property({ name: 'title', type: 'text' })
   public title: string;

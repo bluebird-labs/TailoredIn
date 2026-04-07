@@ -20,7 +20,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
   public async findByIdOrFail(id: string): Promise<DomainExperience> {
     try {
-      const orm = await this.orm.em.findOneOrFail(OrmExperience, id, { populate: ['profile', 'company'] });
+      const orm = await this.orm.em.findOneOrFail(OrmExperience, id, { populate: ['accomplishments'] });
       return this.toDomain(orm);
     } catch (e) {
       if (e instanceof NotFoundError) throw new EntityNotFoundError('Experience', id);
@@ -32,9 +32,9 @@ export class PostgresExperienceRepository implements ExperienceRepository {
     const ormEntities = await this.orm.em.find(
       OrmExperience,
       {},
-      { orderBy: { ordinal: 'ASC' }, populate: ['profile', 'company'] }
+      { orderBy: { ordinal: 'ASC' }, populate: ['accomplishments'] }
     );
-    return Promise.all(ormEntities.map(e => this.toDomain(e)));
+    return ormEntities.map(e => this.toDomain(e));
   }
 
   public async save(experience: DomainExperience): Promise<void> {
@@ -52,7 +52,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       existing.summary = experience.summary;
       existing.ordinal = experience.ordinal;
       existing.updatedAt = experience.updatedAt;
-      this.orm.em.persist(existing);
       await this.syncAccomplishments(experience);
     } else {
       const profile = await this.orm.em.findOneOrFail(Profile, experience.profileId);
@@ -111,7 +110,6 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         ormAcc.narrative = acc.narrative;
         ormAcc.ordinal = acc.ordinal;
         ormAcc.updatedAt = acc.updatedAt;
-        this.orm.em.persist(ormAcc);
       } else {
         const expRef = this.orm.em.getReference(OrmExperience, domain.id.value);
         this.persistNewAccomplishment(acc, expRef);
@@ -132,18 +130,8 @@ export class PostgresExperienceRepository implements ExperienceRepository {
     this.orm.em.persist(ormAcc);
   }
 
-  private async toDomain(orm: OrmExperience): Promise<DomainExperience> {
-    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
-    const companyId =
-      orm.company == null ? null : typeof orm.company === 'string' ? orm.company : (orm.company as { id: string }).id;
-
-    const ormAccomplishments = await this.orm.em.find(
-      OrmAccomplishment,
-      { experience: orm.id },
-      { orderBy: { ordinal: 'ASC' } }
-    );
-
-    const accomplishments: DomainAccomplishment[] = ormAccomplishments.map(
+  private toDomain(orm: OrmExperience): DomainExperience {
+    const accomplishments: DomainAccomplishment[] = orm.accomplishments.getItems().map(
       a =>
         new DomainAccomplishment({
           id: new AccomplishmentId(a.id),
@@ -158,12 +146,12 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
     return new DomainExperience({
       id: new ExperienceId(orm.id),
-      profileId,
+      profileId: orm.profile.id,
       title: orm.title,
       companyName: orm.companyName,
       companyWebsite: orm.companyWebsite,
       companyAccent: orm.companyAccent,
-      companyId,
+      companyId: orm.company?.id ?? null,
       location: orm.location,
       startDate: orm.startDate,
       endDate: orm.endDate,

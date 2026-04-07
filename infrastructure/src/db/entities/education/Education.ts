@@ -1,11 +1,11 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
-import { generateUuid, type RefOrEntity, UuidPrimaryKey } from '../../helpers.js';
+import { generateUuid, UuidPrimaryKey } from '../../helpers.js';
 import { Profile } from '../profile/Profile.js';
 
 type EducationProps = {
   id: string;
-  profile: RefOrEntity<Profile>;
+  profile: Profile;
   degreeTitle: string;
   institutionName: string;
   graduationYear: number;
@@ -24,8 +24,8 @@ export class Education extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Profile, { lazy: true, name: 'profile_id' })
-  public readonly profile: RefOrEntity<Profile>;
+  @ManyToOne(() => Profile, { name: 'profile_id' })
+  public readonly profile: Profile;
 
   @Property({ name: 'degree_title', type: 'text' })
   public degreeTitle: string;

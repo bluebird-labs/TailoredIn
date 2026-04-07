@@ -57,9 +57,9 @@ export class PostgresApplicationRepository implements ApplicationRepository {
         createdAt: application.appliedAt,
         updatedAt: application.updatedAt
       });
+      this.orm.em.persist(ormApp);
     }
 
-    this.orm.em.persist(ormApp);
     await this.orm.em.flush();
   }
 
@@ -73,13 +73,9 @@ export class PostgresApplicationRepository implements ApplicationRepository {
   }
 
   private toDomain(orm: OrmApplication): DomainApplication {
-    const profileId = typeof orm.profile === 'string' ? orm.profile : (orm.profile as { id: string }).id;
-    const companyId = typeof orm.company === 'string' ? orm.company : (orm.company as { id: string }).id;
-    const jobDescriptionId = orm.jobDescription
-      ? typeof orm.jobDescription === 'string'
-        ? orm.jobDescription
-        : (orm.jobDescription as { id: string }).id
-      : null;
+    const profileId = orm.profile.id;
+    const companyId = orm.company.id;
+    const jobDescriptionId = orm.jobDescription?.id ?? null;
 
     return new DomainApplication({
       id: new ApplicationId(orm.id),

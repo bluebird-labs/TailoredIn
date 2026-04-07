@@ -62,9 +62,9 @@ export class PostgresCompanyRepository implements CompanyRepository {
         createdAt: company.createdAt,
         updatedAt: company.updatedAt
       });
+      this.orm.em.persist(ormCompany);
     }
 
-    this.orm.em.persist(ormCompany);
     await this.orm.em.flush();
   }
 

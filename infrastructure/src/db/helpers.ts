@@ -1,14 +1,11 @@
 import Crypto from 'node:crypto';
 import type { PrimaryKeyOptions } from '@mikro-orm/core';
 import { PrimaryKey } from '@mikro-orm/decorators/es';
-import type { EntityManager, Ref } from '@mikro-orm/postgresql';
-import type { BaseEntity } from './BaseEntity.js';
+import type { EntityManager } from '@mikro-orm/postgresql';
 
 export type QueryOpts = {
   em?: EntityManager;
 };
-
-export type RefOrEntity<E extends BaseEntity> = Ref<E> | E;
 
 export const UuidPrimaryKey = <T extends object>(
   options: Omit<PrimaryKeyOptions<T>, 'type' | 'default' | 'defaultRaw'> = {}

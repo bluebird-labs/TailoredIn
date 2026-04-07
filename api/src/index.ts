@@ -75,10 +75,7 @@ const orm = container.get(MikroORM);
 const app = new Elysia()
   .onRequest(({ request }) => {
     startTimes.set(request, performance.now());
-  })
-  .derive(() => {
     RequestContext.enter(orm.em);
-    return {};
   })
   .onAfterResponse(({ request, set }) => {
     const status = (set as { status?: number }).status ?? 200;

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration_20260407000000_add_resume_pdf_cache extends Migration {
+export class Migration_20260417000001_add_resume_pdf_cache extends Migration {
   override async up(): Promise<void> {
     this.addSql(`
       ALTER TABLE job_descriptions

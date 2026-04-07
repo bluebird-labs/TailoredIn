@@ -1,4 +1,4 @@
-import { Collection, type Ref } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
 import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
@@ -8,12 +8,12 @@ import { Accomplishment } from './Accomplishment.js';
 
 type ExperienceProps = {
   id: string;
-  profile: Ref<Profile> | Profile;
+  profile: Profile;
   title: string;
   companyName: string;
   companyWebsite: string | null;
   companyAccent: string | null;
-  company: Ref<Company> | Company | null;
+  company: Company | null;
   location: string;
   startDate: string;
   endDate: string;
@@ -28,8 +28,8 @@ export class Experience extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Profile, { lazy: true, name: 'profile_id' })
-  public readonly profile: Ref<Profile> | Profile;
+  @ManyToOne(() => Profile, { name: 'profile_id' })
+  public readonly profile: Profile;
 
   @Property({ name: 'title', type: 'text' })
   public title: string;
@@ -43,8 +43,8 @@ export class Experience extends BaseEntity {
   @Property({ name: 'company_accent', type: 'text', nullable: true })
   public companyAccent: string | null;
 
-  @ManyToOne(() => Company, { lazy: true, name: 'company_id', nullable: true })
-  public company: Ref<Company> | Company | null;
+  @ManyToOne(() => Company, { name: 'company_id', nullable: true })
+  public company: Company | null;
 
   @Property({ name: 'location', type: 'text' })
   public location: string;

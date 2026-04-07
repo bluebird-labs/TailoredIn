@@ -1,4 +1,4 @@
-import { Collection, type Ref } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
 import { Entity, ManyToOne, OneToMany, Property } from '@mikro-orm/decorators/es';
 import { BaseEntity } from '../../BaseEntity.js';
 import { UuidPrimaryKey } from '../../helpers.js';
@@ -7,7 +7,7 @@ import { GenerationPrompt } from './GenerationPrompt.js';
 
 type GenerationSettingsProps = {
   id: string;
-  profile: Ref<Profile> | Profile;
+  profile: Profile;
   modelTier: string;
   bulletMin: number;
   bulletMax: number;
@@ -20,8 +20,8 @@ export class GenerationSettings extends BaseEntity {
   @UuidPrimaryKey({ name: 'id' })
   public readonly id: string;
 
-  @ManyToOne(() => Profile, { lazy: true, fieldName: 'profile_id' })
-  public readonly profile: Ref<Profile> | Profile;
+  @ManyToOne(() => Profile, { fieldName: 'profile_id' })
+  public readonly profile: Profile;
 
   @Property({ name: 'model_tier', type: 'text' })
   public modelTier: string;

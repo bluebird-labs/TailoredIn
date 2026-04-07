@@ -13,7 +13,7 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByExperienceId(experienceId: string): Promise<DomainOverride | null> {
-    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId }, { populate: ['experience'] });
+    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId });
     if (!orm) return null;
     return this.toDomain(orm);
   }
@@ -23,8 +23,7 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
     const ormEntities = await this.orm.em.find(
       OrmOverride,
       // biome-ignore lint/style/useNamingConvention: MikroORM query operator
-      { experience: { $in: experienceIds } },
-      { populate: ['experience'] }
+      { experience: { $in: experienceIds } }
     );
     return ormEntities.map(orm => this.toDomain(orm));
   }
@@ -33,15 +32,9 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
     const existing = await this.orm.em.findOne(OrmOverride, override.id.value);
 
     if (existing) {
-      await this.orm.em
-        .createQueryBuilder(OrmOverride)
-        .update({
-          bulletMin: override.bulletMin,
-          bulletMax: override.bulletMax,
-          updatedAt: override.updatedAt
-        })
-        .where({ id: override.id.value })
-        .execute();
+      existing.bulletMin = override.bulletMin;
+      existing.bulletMax = override.bulletMax;
+      existing.updatedAt = override.updatedAt;
     } else {
       const experience = this.orm.em.getReference(OrmExperience, override.experienceId);
       const orm = new OrmOverride({
@@ -52,16 +45,22 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
         createdAt: override.createdAt,
         updatedAt: override.updatedAt
       });
-      await this.orm.em.insertMany([orm]);
+      this.orm.em.persist(orm);
     }
+
+    await this.orm.em.flush();
   }
 
   public async delete(experienceId: string): Promise<void> {
-    await this.orm.em.createQueryBuilder(OrmOverride).delete().where({ experience: experienceId }).execute();
+    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId });
+    if (orm) {
+      this.orm.em.remove(orm);
+      await this.orm.em.flush();
+    }
   }
 
   private toDomain(orm: OrmOverride): DomainOverride {
-    const experienceId = typeof orm.experience === 'string' ? orm.experience : (orm.experience as { id: string }).id;
+    const experienceId = orm.experience.id;
 
     return new DomainOverride({
       id: new ExperienceGenerationOverrideId(orm.id),
