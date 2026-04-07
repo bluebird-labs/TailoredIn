@@ -40,6 +40,9 @@
 // Bump job-title smallcaps from package default 8pt to 9pt for readability
 #show smallcaps: it => text(size: 9pt, it)
 
+// Prevent experience entries from splitting across pages
+#set block(breakable: false)
+
 // --- Header (inlined from package _cv-header) ---
 #let header-info-font-size = eval(metadata.layout.header.at("info_font_size", default: "10pt"))
 #let personal-info = metadata.personal.info
