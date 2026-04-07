@@ -173,11 +173,19 @@ export class GenerateResumeContent {
       hiddenEducationIds = allEducations.filter(e => e.hiddenByDefault).map(e => e.id.value);
     }
 
+    // Deduplicate experiences by ID (keep first occurrence)
+    const seen = new Set<string>();
+    const deduped = mergedExperiences.filter(e => {
+      if (seen.has(e.experienceId)) return false;
+      seen.add(e.experienceId);
+      return true;
+    });
+
     const resumeContent = ResumeContent.create({
       profileId: profile.id.value,
       jobDescriptionId: jd.id.value,
       headline,
-      experiences: mergedExperiences.map(e => ({
+      experiences: deduped.map(e => ({
         experienceId: e.experienceId,
         summary: e.summary,
         bullets: e.bullets,
