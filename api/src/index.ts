@@ -26,11 +26,15 @@ import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute
 import { GetExperienceRoute } from './routes/experience/GetExperienceRoute.js';
 import { LinkCompanyRoute } from './routes/experience/LinkCompanyRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
+import { RemoveExperienceGenerationOverrideRoute } from './routes/experience/RemoveExperienceGenerationOverrideRoute.js';
+import { SetExperienceGenerationOverrideRoute } from './routes/experience/SetExperienceGenerationOverrideRoute.js';
 import { UnlinkCompanyRoute } from './routes/experience/UnlinkCompanyRoute.js';
 import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
 import { ExtractTextRoute } from './routes/factory/ExtractTextRoute.js';
 import { GetProfileRoute } from './routes/GetProfileRoute.js';
+import { GetGenerationSettingsRoute } from './routes/generation-settings/GetGenerationSettingsRoute.js';
+import { UpdateGenerationSettingsRoute } from './routes/generation-settings/UpdateGenerationSettingsRoute.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { CreateJobDescriptionRoute } from './routes/job-description/CreateJobDescriptionRoute.js';
 import { DeleteJobDescriptionRoute } from './routes/job-description/DeleteJobDescriptionRoute.js';
@@ -123,6 +127,11 @@ const app = new Elysia()
   .use(container.get(DeleteAccomplishmentRoute).plugin())
   .use(container.get(LinkCompanyRoute).plugin())
   .use(container.get(UnlinkCompanyRoute).plugin())
+  .use(container.get(SetExperienceGenerationOverrideRoute).plugin())
+  .use(container.get(RemoveExperienceGenerationOverrideRoute).plugin())
+  // Generation Settings
+  .use(container.get(GetGenerationSettingsRoute).plugin())
+  .use(container.get(UpdateGenerationSettingsRoute).plugin())
   // Factory
   .use(container.get(ExtractTextRoute).plugin())
   // Companies

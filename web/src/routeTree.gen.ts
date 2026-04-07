@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AtelierRouteImport } from './routes/atelier'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs/index'
@@ -20,6 +21,11 @@ import { Route as JobDescriptionsJobDescriptionIdRouteImport } from './routes/jo
 import { Route as ExperiencesExperienceIdRouteImport } from './routes/experiences/$experienceId'
 import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$companyId'
 
+const AtelierRoute = AtelierRouteImport.update({
+  id: '/atelier',
+  path: '/atelier',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -74,6 +80,7 @@ const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atelier': typeof AtelierRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atelier': typeof AtelierRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atelier': typeof AtelierRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atelier'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atelier'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/atelier'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AtelierRoute: typeof AtelierRoute
   IndexRoute: typeof IndexRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atelier': {
+      id: '/atelier'
+      path: '/atelier'
+      fullPath: '/atelier'
+      preLoaderRoute: typeof AtelierRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile/': {
@@ -237,6 +257,7 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AtelierRoute: AtelierRoute,
   IndexRoute: IndexRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
