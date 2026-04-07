@@ -33,10 +33,15 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
     const existing = await this.orm.em.findOne(OrmOverride, override.id.value);
 
     if (existing) {
-      existing.bulletMin = override.bulletMin;
-      existing.bulletMax = override.bulletMax;
-      existing.updatedAt = override.updatedAt;
-      this.orm.em.persist(existing);
+      await this.orm.em
+        .createQueryBuilder(OrmOverride)
+        .update({
+          bulletMin: override.bulletMin,
+          bulletMax: override.bulletMax,
+          updatedAt: override.updatedAt
+        })
+        .where({ id: override.id.value })
+        .execute();
     } else {
       const experience = this.orm.em.getReference(OrmExperience, override.experienceId);
       const orm = new OrmOverride({
@@ -47,18 +52,12 @@ export class PostgresExperienceGenerationOverrideRepository implements Experienc
         createdAt: override.createdAt,
         updatedAt: override.updatedAt
       });
-      this.orm.em.persist(orm);
+      await this.orm.em.insertMany([orm]);
     }
-
-    await this.orm.em.flush();
   }
 
   public async delete(experienceId: string): Promise<void> {
-    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId });
-    if (orm) {
-      this.orm.em.remove(orm);
-      await this.orm.em.flush();
-    }
+    await this.orm.em.createQueryBuilder(OrmOverride).delete().where({ experience: experienceId }).execute();
   }
 
   private toDomain(orm: OrmOverride): DomainOverride {

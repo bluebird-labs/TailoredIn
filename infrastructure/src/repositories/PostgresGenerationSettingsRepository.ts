@@ -30,31 +30,34 @@ export class PostgresGenerationSettingsRepository implements GenerationSettingsR
     const existing = await this.orm.em.findOne(OrmGenerationSettings, settings.id.value);
 
     if (existing) {
-      existing.modelTier = settings.modelTier;
-      existing.bulletMin = settings.bulletMin;
-      existing.bulletMax = settings.bulletMax;
-      existing.updatedAt = settings.updatedAt;
-      this.orm.em.persist(existing);
+      await this.orm.em
+        .createQueryBuilder(OrmGenerationSettings)
+        .update({
+          modelTier: settings.modelTier,
+          bulletMin: settings.bulletMin,
+          bulletMax: settings.bulletMax,
+          updatedAt: settings.updatedAt
+        })
+        .where({ id: settings.id.value })
+        .execute();
       await this.syncPrompts(settings);
     } else {
-      const profile = await this.orm.em.findOneOrFail(Profile, settings.profileId);
+      const settingsRef = this.orm.em.getReference(Profile, settings.profileId);
       const orm = new OrmGenerationSettings({
         id: settings.id.value,
-        profile,
+        profile: settingsRef,
         modelTier: settings.modelTier,
         bulletMin: settings.bulletMin,
         bulletMax: settings.bulletMax,
         createdAt: settings.createdAt,
         updatedAt: settings.updatedAt
       });
-      this.orm.em.persist(orm);
+      await this.orm.em.insertMany([orm]);
 
       for (const prompt of settings.prompts) {
-        this.persistNewPrompt(prompt, orm);
+        await this.insertPrompt(prompt, settings.id.value);
       }
     }
-
-    await this.orm.em.flush();
   }
 
   private async syncPrompts(settings: DomainGenerationSettings): Promise<void> {
@@ -62,36 +65,46 @@ export class PostgresGenerationSettingsRepository implements GenerationSettingsR
     const domainIds = new Set(settings.prompts.map(p => p.id.value));
     const existingIds = new Set(existing.map(p => p.id));
 
-    for (const orm of existing) {
-      if (!domainIds.has(orm.id)) {
-        this.orm.em.remove(orm);
-      }
+    // Delete removed prompts
+    const toDelete = existing.filter(orm => !domainIds.has(orm.id)).map(orm => orm.id);
+    if (toDelete.length > 0) {
+      await this.orm.em
+        .createQueryBuilder(OrmGenerationPrompt)
+        .delete()
+        // biome-ignore lint/style/useNamingConvention: MikroORM query operator
+        .where({ id: { $in: toDelete } })
+        .execute();
     }
 
+    // Upsert prompts
     for (const prompt of settings.prompts) {
       if (existingIds.has(prompt.id.value)) {
-        const ormPrompt = existing.find(p => p.id === prompt.id.value)!;
-        ormPrompt.scope = prompt.scope;
-        ormPrompt.content = prompt.content;
-        ormPrompt.updatedAt = prompt.updatedAt;
-        this.orm.em.persist(ormPrompt);
+        await this.orm.em
+          .createQueryBuilder(OrmGenerationPrompt)
+          .update({
+            scope: prompt.scope,
+            content: prompt.content,
+            updatedAt: prompt.updatedAt
+          })
+          .where({ id: prompt.id.value })
+          .execute();
       } else {
-        const settingsRef = this.orm.em.getReference(OrmGenerationSettings, settings.id.value);
-        this.persistNewPrompt(prompt, settingsRef);
+        await this.insertPrompt(prompt, settings.id.value);
       }
     }
   }
 
-  private persistNewPrompt(prompt: DomainGenerationPrompt, generationSettings: OrmGenerationSettings): void {
+  private async insertPrompt(prompt: DomainGenerationPrompt, generationSettingsId: string): Promise<void> {
+    const settingsRef = this.orm.em.getReference(OrmGenerationSettings, generationSettingsId);
     const orm = new OrmGenerationPrompt({
       id: prompt.id.value,
-      generationSettings,
+      generationSettings: settingsRef,
       scope: prompt.scope,
       content: prompt.content,
       createdAt: prompt.createdAt,
       updatedAt: prompt.updatedAt
     });
-    this.orm.em.persist(orm);
+    await this.orm.em.insertMany([orm]);
   }
 
   private toDomain(orm: OrmGenerationSettings): DomainGenerationSettings {
