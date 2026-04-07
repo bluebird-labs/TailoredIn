@@ -1,4 +1,4 @@
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, RefreshCw, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { EditableField } from '@/components/shared/EditableField.js';
@@ -142,6 +142,26 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
     );
   }
 
+  function handleReenrich() {
+    const url = current.website.trim() || company?.website;
+    if (!url) return;
+
+    setStep('enriching');
+    enrichCompany.mutate(
+      { url, context: current.name || company?.name },
+      {
+        onSuccess: result => {
+          setFields(enrichmentToFormState(result));
+          setStep('form');
+        },
+        onError: () => {
+          toast.error('Re-enrichment failed — your changes are preserved.');
+          setStep('form');
+        }
+      }
+    );
+  }
+
   function handleSave() {
     const validationErrors = validateCompany(current);
     setErrors(validationErrors);
@@ -209,7 +229,11 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
         />
       )}
 
-      {step === 'enriching' && <EnrichingStep candidateName={candidates[selectedIndex ?? 0]?.name ?? 'company'} />}
+      {step === 'enriching' && (
+        <EnrichingStep
+          candidateName={candidates[selectedIndex ?? 0]?.name ?? (current.name || company?.name) ?? 'company'}
+        />
+      )}
 
       {step === 'form' && (
         <FormStep
@@ -218,6 +242,7 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
           isDirtyField={isDirtyField}
           errors={errors}
           isSaving={isSaving}
+          onReenrich={isEdit && (current.website.trim() || company?.website) ? handleReenrich : undefined}
         />
       )}
     </FormModal>
@@ -312,16 +337,25 @@ function FormStep({
   setField,
   isDirtyField,
   errors,
-  isSaving
+  isSaving,
+  onReenrich
 }: {
   current: CompanyFormState;
   setField: (key: keyof CompanyFormState, value: string) => void;
   isDirtyField: (key: keyof CompanyFormState) => boolean;
   errors: ValidationErrors<CompanyFormState>;
   isSaving: boolean;
+  onReenrich?: () => void;
 }) {
   return (
     <>
+      {onReenrich && (
+        <Button variant="outline" size="sm" onClick={onReenrich} disabled={isSaving}>
+          <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+          Re-enrich
+        </Button>
+      )}
+
       {current.logoUrl && (
         <div className="flex justify-center">
           <img
