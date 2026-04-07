@@ -48,6 +48,7 @@ export function ResumePdfPreview({
       const url = URL.createObjectURL(blob);
       prevBlobRef.current = url;
       setPdfBlobUrl(url);
+      hasGeneratedRef.current = true;
     }
   }, [cachedPdf.data]);
 
@@ -112,8 +113,7 @@ export function ResumePdfPreview({
 
   const placeholder = (
     <div
-      className="flex items-center justify-center border rounded-lg bg-muted/30"
-      style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
+      className="flex flex-1 items-center justify-center border rounded-lg bg-muted/30"
     >
       {isLoading ? (
         <div className="flex flex-col items-center gap-3">
@@ -130,7 +130,7 @@ export function ResumePdfPreview({
 
   return (
     <>
-      <div className="space-y-4 sticky top-5">
+      <div className="flex flex-col gap-4 sticky top-5" style={{ height: 'calc(100vh - 40px)' }}>
         <div className="flex items-center justify-between">
           <p className="text-[14px] font-medium text-foreground">PDF Preview</p>
           <Button
@@ -153,8 +153,7 @@ export function ResumePdfPreview({
           <iframe
             src={pdfBlobUrl}
             title="Resume PDF preview"
-            className="w-full border rounded-lg"
-            style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
+            className="w-full flex-1 border rounded-lg"
           />
         ) : (
           placeholder
