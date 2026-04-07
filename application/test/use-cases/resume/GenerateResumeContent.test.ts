@@ -15,6 +15,7 @@ import {
   type JobDescriptionRepository,
   ModelTier,
   type ProfileRepository,
+  ResumeContent,
   type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeContentGenerator, ResumeContentGeneratorInput } from '../../../src/ports/ResumeContentGenerator.js';
@@ -473,5 +474,72 @@ describe('GenerateResumeContent', () => {
 
     const savedResumeContent = (resumeContentRepo.save as ReturnType<typeof mock>).mock.calls[0][0];
     expect(savedResumeContent.hiddenEducationIds).toEqual(['edu-hidden']);
+  });
+
+  test('passes previousContent to generator when existing resume content exists', async () => {
+    const existingContent = ResumeContent.create({
+      profileId: 'profile-1',
+      jobDescriptionId: 'jd-1',
+      headline: 'Previous Headline',
+      experiences: [
+        {
+          experienceId: 'exp-1',
+          summary: 'Old summary',
+          bullets: ['Old bullet 1', 'Old bullet 2'],
+          hiddenBulletIndices: []
+        }
+      ],
+      prompt: 'old prompt',
+      schema: {}
+    });
+
+    const resumeContentRepo = mockResumeContentRepo();
+    (resumeContentRepo.findLatestByJobDescriptionId as ReturnType<typeof mock>).mockResolvedValue(existingContent);
+
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([], 'New Headline'));
+      })
+    };
+
+    const exp = makeExperience({ id: 'exp-1', startDate: '2024-01' });
+
+    const useCase = new GenerateResumeContent(
+      mockProfileRepo(makeProfile()),
+      mockExperienceRepo([exp]),
+      mockJobDescriptionRepo(makeJobDescription()),
+      resumeContentRepo,
+      generator,
+      mockEducationRepo(),
+      mockGenerationSettingsRepo(null),
+      mockOverrideRepo()
+    );
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    expect(capturedInput).not.toBeNull();
+    expect(capturedInput!.previousContent).toEqual({
+      headline: 'Previous Headline',
+      experiences: [{ experienceId: 'exp-1', summary: 'Old summary', bullets: ['Old bullet 1', 'Old bullet 2'] }]
+    });
+  });
+
+  test('previousContent is undefined when no existing resume content exists', async () => {
+    let capturedInput: ResumeContentGeneratorInput | null = null;
+    const generator: ResumeContentGenerator = {
+      generate: mock((input: ResumeContentGeneratorInput) => {
+        capturedInput = input;
+        return Promise.resolve(makeGeneratorResult([]));
+      })
+    };
+
+    const useCase = createUseCase({ generator });
+
+    await useCase.execute({ jobDescriptionId: 'jd-1' });
+
+    expect(capturedInput).not.toBeNull();
+    expect(capturedInput!.previousContent).toBeUndefined();
   });
 });

@@ -66,6 +66,23 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
       .replace('{{jdRawText}}', jdRawTextSection)
       .replace('{{experiencesBlock}}', experiencesBlock);
 
+    if (this.input.previousContent) {
+      const parts: string[] = [
+        '\n\n## Previous Version',
+        'The previous resume content is shown below. Produce a meaningfully different version — vary structure, emphasis, and phrasing throughout.'
+      ];
+      if (this.input.previousContent.headline) {
+        parts.push(`\nPrevious headline: "${this.input.previousContent.headline}"`);
+      }
+      for (const exp of this.input.previousContent.experiences ?? []) {
+        const matchingExp = this.input.experiences.find(e => e.id === exp.experienceId);
+        const label = matchingExp ? `${matchingExp.title} at ${matchingExp.companyName}` : exp.experienceId;
+        const bulletList = exp.bullets.map(b => `- ${b}`).join('\n');
+        parts.push(`\nPrevious bullets for ${label}:\n${bulletList}`);
+      }
+      prompt += parts.join('\n');
+    }
+
     if (this.input.composedPrompt) {
       prompt += `\n\n${this.input.composedPrompt}`;
     }

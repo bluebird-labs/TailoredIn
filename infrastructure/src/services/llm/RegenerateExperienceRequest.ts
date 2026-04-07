@@ -70,6 +70,12 @@ export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerat
 
     prompt += `\n\nIMPORTANT: Only regenerate the experience with ID "${this.experienceId}". Return exactly one experience entry in your response. Do NOT include a headline.`;
 
+    const previousExperience = this.input.previousContent?.experiences?.find(e => e.experienceId === this.experienceId);
+    if (previousExperience) {
+      const bulletList = previousExperience.bullets.map(b => `- ${b}`).join('\n');
+      prompt += `\n\nThe previous bullets for this experience were:\n${bulletList}\n\nProduce meaningfully different bullets. Vary phrasing, emphasis, and which accomplishments to highlight — do not make minor edits to the same bullets.`;
+    }
+
     if (this.input.composedPrompt) {
       prompt += `\n\n${this.input.composedPrompt}`;
     }

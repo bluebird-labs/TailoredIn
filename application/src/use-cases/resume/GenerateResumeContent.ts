@@ -71,6 +71,8 @@ export class GenerateResumeContent {
 
     const composedPrompt = this.composePrompt(settings, input.scope, input.additionalPrompt);
 
+    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
+
     const generatorInput = {
       profile: {
         firstName: profile.firstName,
@@ -100,12 +102,20 @@ export class GenerateResumeContent {
       additionalPrompt: input.additionalPrompt,
       scope: input.scope,
       model: resolveModelId(settings.modelTier),
-      composedPrompt: composedPrompt ?? undefined
+      composedPrompt: composedPrompt ?? undefined,
+      previousContent: existing
+        ? {
+            headline: existing.headline,
+            experiences: existing.experiences.map(e => ({
+              experienceId: e.experienceId,
+              summary: e.summary,
+              bullets: e.bullets
+            }))
+          }
+        : undefined
     };
 
     const result = await this.generator.generate(generatorInput);
-
-    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
 
     let headline: string;
     let mergedExperiences: typeof result.experiences;
