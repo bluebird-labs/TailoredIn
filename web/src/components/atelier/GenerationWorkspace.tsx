@@ -291,7 +291,7 @@ export function GenerationWorkspace({
 
   return (
     <div
-      className="flex h-full w-[700px] shrink-0 flex-col overflow-y-auto p-6"
+      className="flex h-full w-[760px] shrink-0 flex-col overflow-y-auto p-6"
       style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: '13.3px', lineHeight: '1.3' }}
     >
       <div className="space-y-4">
