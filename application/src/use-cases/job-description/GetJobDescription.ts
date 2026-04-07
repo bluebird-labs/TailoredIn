@@ -1,4 +1,6 @@
 import {
+  CompanyId,
+  type CompanyRepository,
   type ExperienceRepository,
   JobDescriptionId,
   type JobDescriptionRepository,
@@ -15,7 +17,8 @@ export class GetJobDescription {
   public constructor(
     private readonly jobDescriptionRepository: JobDescriptionRepository,
     private readonly resumeContentRepository: ResumeContentRepository,
-    private readonly experienceRepository: ExperienceRepository
+    private readonly experienceRepository: ExperienceRepository,
+    private readonly companyRepository: CompanyRepository
   ) {}
 
   public async execute(input: GetJobDescriptionInput): Promise<JobDescriptionDto> {
@@ -25,6 +28,12 @@ export class GetJobDescription {
     }
     const resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
     const experiences = resumeContent ? await this.experienceRepository.findAll() : [];
-    return toJobDescriptionDto(jd, resumeContent, experiences);
+    const company = jd.companyId ? await this.companyRepository.findById(new CompanyId(jd.companyId)) : null;
+    return toJobDescriptionDto(
+      jd,
+      resumeContent,
+      experiences,
+      company ? { name: company.name, logoUrl: company.logoUrl } : null
+    );
   }
 }

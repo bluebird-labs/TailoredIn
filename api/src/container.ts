@@ -234,7 +234,8 @@ container.bind({
     new GetJobDescription(
       container.get(DI.JobDescription.Repository),
       container.get(DI.ResumeContent.Repository),
-      container.get(DI.Experience.Repository)
+      container.get(DI.Experience.Repository),
+      container.get(DI.Company.Repository)
     )
 });
 container.bind({
