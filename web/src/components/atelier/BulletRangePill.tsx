@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { Minus, Plus } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
 export function BulletRangePill({
@@ -15,87 +17,102 @@ export function BulletRangePill({
   onSave: (min: number, max: number) => void;
   onReset?: () => void;
 }) {
-  const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const [editMin, setEditMin] = useState(min);
   const [editMax, setEditMax] = useState(max);
-  const containerRef = useRef<HTMLFieldSetElement>(null);
+  const didResetRef = useRef(false);
 
-  useEffect(() => {
-    if (!editing) return;
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        onSave(editMin, editMax);
-        setEditing(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [editing, editMin, editMax, onSave]);
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') {
-      onSave(editMin, editMax);
-      setEditing(false);
-    }
-    if (e.key === 'Escape') {
+  function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen) {
       setEditMin(min);
       setEditMax(max);
-      setEditing(false);
+      didResetRef.current = false;
+    } else if (!didResetRef.current && (editMin !== min || editMax !== max)) {
+      onSave(editMin, editMax);
     }
+    setOpen(nextOpen);
   }
 
-  if (editing) {
-    return (
-      <fieldset ref={containerRef} className="flex items-center gap-1 border-0 p-0 m-0" onKeyDown={handleKeyDown}>
-        <Input
-          type="number"
-          min={1}
-          max={20}
-          value={editMin}
-          onChange={e => setEditMin(Number(e.target.value))}
-          className="h-5 w-10 px-1 text-[11px] text-center"
-          autoFocus
-        />
-        <span className="text-[11px] text-muted-foreground">–</span>
-        <Input
-          type="number"
-          min={1}
-          max={20}
-          value={editMax}
-          onChange={e => setEditMax(Number(e.target.value))}
-          className="h-5 w-10 px-1 text-[11px] text-center"
-        />
-        {isOverridden && onReset && (
-          <button
-            type="button"
-            onClick={() => {
-              onReset();
-              setEditing(false);
-            }}
-            className="ml-1 text-[10px] text-muted-foreground hover:text-destructive transition-colors"
-          >
-            Reset
-          </button>
-        )}
-      </fieldset>
-    );
-  }
+  const label = min === max ? `${min}` : `${min}–${max}`;
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        setEditMin(min);
-        setEditMax(max);
-        setEditing(true);
-      }}
-      className={cn(
-        'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] transition-colors hover:bg-accent/40',
-        isOverridden ? 'border-primary/60 text-accent-foreground' : 'border-border text-muted-foreground'
-      )}
-      title={isOverridden ? 'Overridden bullet range (click to edit)' : 'Default bullet range (click to override)'}
-    >
-      {min}–{max}
-    </button>
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <PopoverTrigger
+        render={<button type="button" />}
+        className={cn(
+          'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] transition-colors hover:bg-accent/40',
+          isOverridden ? 'border-primary/60 text-accent-foreground' : 'border-border text-muted-foreground'
+        )}
+        title={isOverridden ? 'Overridden bullet range (click to edit)' : 'Default bullet range (click to override)'}
+      >
+        {label}
+      </PopoverTrigger>
+      <PopoverContent className="w-auto shadow-none ring-1 ring-border" align="start" sideOffset={6}>
+        <div className="flex gap-4">
+          <Stepper
+            label="Min"
+            value={editMin}
+            onDecrement={() => setEditMin(v => Math.max(1, v - 1))}
+            onIncrement={() => setEditMin(v => Math.min(editMax, v + 1))}
+            decrementDisabled={editMin <= 1}
+            incrementDisabled={editMin >= editMax}
+          />
+          <Stepper
+            label="Max"
+            value={editMax}
+            onDecrement={() => setEditMax(v => Math.max(editMin, v - 1))}
+            onIncrement={() => setEditMax(v => Math.min(20, v + 1))}
+            decrementDisabled={editMax <= editMin}
+            incrementDisabled={editMax >= 20}
+          />
+        </div>
+        {isOverridden && onReset && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                didResetRef.current = true;
+                onReset();
+                setOpen(false);
+              }}
+              className="text-[11px] text-muted-foreground transition-colors hover:text-destructive"
+            >
+              Reset to default
+            </button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function Stepper({
+  label,
+  value,
+  onDecrement,
+  onIncrement,
+  decrementDisabled,
+  incrementDisabled
+}: {
+  label: string;
+  value: number;
+  onDecrement: () => void;
+  onIncrement: () => void;
+  decrementDisabled: boolean;
+  incrementDisabled: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-[11px] tracking-wide text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon-xs" onClick={onDecrement} disabled={decrementDisabled}>
+          <Minus className="size-3" />
+        </Button>
+        <span className="w-5 text-center text-[13px] tabular-nums">{value}</span>
+        <Button variant="ghost" size="icon-xs" onClick={onIncrement} disabled={incrementDisabled}>
+          <Plus className="size-3" />
+        </Button>
+      </div>
+    </div>
   );
 }
