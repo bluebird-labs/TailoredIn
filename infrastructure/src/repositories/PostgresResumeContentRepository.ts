@@ -44,8 +44,29 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
       updatedAt: resumeContent.updatedAt
     });
 
-    this.orm.em.persist(ormEntity);
-    await this.orm.em.flush();
+    await this.orm.em.getConnection().execute(
+      `INSERT INTO resume_contents (id, profile_id, job_description_id, headline, experiences, hidden_education_ids, prompt, schema, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb, ?, ?::jsonb, ?, ?)`,
+      [
+        resumeContent.id.value,
+        resumeContent.profileId,
+        resumeContent.jobDescriptionId,
+        resumeContent.headline,
+        JSON.stringify(
+          resumeContent.experiences.map(e => ({
+            experienceId: e.experienceId,
+            summary: e.summary,
+            bullets: e.bullets,
+            hiddenBulletIndices: e.hiddenBulletIndices
+          }))
+        ),
+        JSON.stringify(resumeContent.hiddenEducationIds),
+        resumeContent.prompt,
+        resumeContent.schema ? JSON.stringify(resumeContent.schema) : null,
+        resumeContent.createdAt,
+        resumeContent.updatedAt
+      ]
+    );
   }
 
   public async update(resumeContent: DomainResumeContent): Promise<void> {
