@@ -33,6 +33,7 @@ function emptyState(): ExperienceFormState {
     title: '',
     companyName: '',
     companyWebsite: '',
+    companyAccent: '',
     location: '',
     startDate: '',
     endDate: '',
@@ -45,6 +46,7 @@ function stateFromExperience(exp: Experience): ExperienceFormState {
     title: exp.title,
     companyName: exp.companyName,
     companyWebsite: exp.companyWebsite ?? '',
+    companyAccent: exp.companyAccent ?? '',
     location: exp.location,
     startDate: exp.startDate,
     endDate: exp.endDate,
@@ -188,6 +190,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
           title: current.title.trim(),
           company_name: current.companyName.trim(),
           company_website: current.companyWebsite.trim() || undefined,
+          company_accent: current.companyAccent.trim() || undefined,
           location: current.location.trim(),
           start_date: current.startDate.trim(),
           end_date: current.endDate.trim(),
@@ -211,6 +214,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
           title: current.title.trim(),
           company_name: current.companyName.trim(),
           company_website: current.companyWebsite.trim() || undefined,
+          company_accent: current.companyAccent.trim() || undefined,
           location: current.location.trim(),
           start_date: current.startDate.trim(),
           end_date: current.endDate.trim(),
@@ -306,15 +310,26 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
         </div>
       </div>
 
-      <EditableField
-        type="text"
-        label="Company Website"
-        value={current.companyWebsite}
-        onChange={v => setField('companyWebsite', v)}
-        isDirty={isDirtyField('companyWebsite')}
-        disabled={isSaving}
-        placeholder="https://..."
-      />
+      <div className="grid grid-cols-2 gap-3">
+        <EditableField
+          type="text"
+          label="Company Website"
+          value={current.companyWebsite}
+          onChange={v => setField('companyWebsite', v)}
+          isDirty={isDirtyField('companyWebsite')}
+          disabled={isSaving}
+          placeholder="https://..."
+        />
+        <EditableField
+          type="text"
+          label="Company Accent"
+          value={current.companyAccent}
+          onChange={v => setField('companyAccent', v)}
+          isDirty={isDirtyField('companyAccent')}
+          disabled={isSaving}
+          placeholder="e.g. acquired by Volvo Cars"
+        />
+      </div>
       {linkedCompany?.website && linkedCompany.website !== current.companyWebsite && (
         <button
           type="button"

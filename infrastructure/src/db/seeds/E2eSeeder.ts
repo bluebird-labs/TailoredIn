@@ -44,7 +44,7 @@ export class E2eSeeder extends Seeder {
 
     // Experiences
     await conn.execute(`
-      INSERT INTO experiences (id, profile_id, title, company_name, company_website, location, start_date, end_date, summary, ordinal, created_at, updated_at)
+      INSERT INTO experiences (id, profile_id, title, company_name, company_website, company_accent, location, start_date, end_date, summary, ordinal, created_at, updated_at)
       VALUES
         (
           'bbbbbbbb-0000-4000-8000-000000000001',
@@ -52,6 +52,7 @@ export class E2eSeeder extends Seeder {
           'Senior Engineer',
           'Acme Corp',
           'https://acme.com',
+          NULL,
           'San Francisco, CA',
           '2022-01',
           '2024-06',
@@ -65,6 +66,7 @@ export class E2eSeeder extends Seeder {
           'Software Engineer',
           'StartupCo',
           NULL,
+          NULL,
           'Remote',
           '2020-03',
           '2022-01',
@@ -77,6 +79,7 @@ export class E2eSeeder extends Seeder {
           'aaaaaaaa-0000-4000-8000-000000000001',
           'QA Analyst',
           'ScratchCorp',
+          NULL,
           NULL,
           'Austin, TX',
           '2019-01',

@@ -7,6 +7,7 @@ export type CreateExperienceInput = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyAccent: string | null;
   location: string;
   startDate: string;
   endDate: string;

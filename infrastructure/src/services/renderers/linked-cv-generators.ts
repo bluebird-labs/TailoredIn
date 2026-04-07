@@ -87,9 +87,13 @@ export function generateLinkedCvTyp(input: ResumeRenderInput): string {
 
   const experienceBlocks = groups.map(group => {
     const roles = group.roles.map(renderRole).join(',\n');
+    const firstRole = group.roles[0];
+    const companyLabel = firstRole?.companyAccent
+      ? `${group.companyName} · ${firstRole.companyAccent}`
+      : group.companyName;
     return `#components.employer-info(
   none,
-  name: "${escapeTypst(group.companyName)}",
+  name: "${escapeTypst(companyLabel)}",
   duration: ("${group.overallStart}", "${group.overallEnd}"),
 )
 

@@ -17,6 +17,7 @@ const makeExperience = (overrides: Partial<ConstructorParameters<typeof Experien
     title: 'Software Engineer',
     companyName: 'Acme Corp',
     companyWebsite: 'https://acme.com',
+    companyAccent: null,
     companyId: null,
     location: 'New York, NY',
     startDate: '2022-01',

@@ -9,6 +9,7 @@ export type Experience = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyAccent: string | null;
   companyId: string | null;
   company: Company | null;
   location: string;
@@ -55,6 +56,7 @@ export function useCreateExperience() {
       title: string;
       company_name: string;
       company_website?: string;
+      company_accent?: string;
       location: string;
       start_date: string;
       end_date: string;
@@ -80,6 +82,7 @@ export function useUpdateExperience() {
       title: string;
       company_name: string;
       company_website?: string;
+      company_accent?: string;
       location: string;
       start_date: string;
       end_date: string;

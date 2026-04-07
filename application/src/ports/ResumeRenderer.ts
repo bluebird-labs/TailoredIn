@@ -3,6 +3,7 @@ import type { ResumeTemplate } from '@tailoredin/domain';
 export type ResumeRenderExperience = {
   title: string;
   companyName: string;
+  companyAccent: string | null;
   location: string;
   startDate: string; // "YYYY-MM-DD"
   endDate: string | null; // null = current

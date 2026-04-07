@@ -51,6 +51,7 @@ interface ExperienceFormState {
   title: string;
   companyName: string;
   companyWebsite: string;
+  companyAccent: string;
   location: string;
   startDate: string;
   endDate: string;

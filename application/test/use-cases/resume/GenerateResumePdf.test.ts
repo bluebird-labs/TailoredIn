@@ -97,6 +97,7 @@ function makeExperience() {
     title: 'Engineer',
     companyName: 'Acme',
     companyWebsite: null,
+    companyAccent: null,
     companyId: null,
     location: 'NY',
     startDate: '2022-01',

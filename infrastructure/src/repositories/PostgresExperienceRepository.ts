@@ -44,6 +44,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       existing.title = experience.title;
       existing.companyName = experience.companyName;
       existing.companyWebsite = experience.companyWebsite;
+      existing.companyAccent = experience.companyAccent;
       existing.company = experience.companyId ? this.orm.em.getReference(OrmCompany, experience.companyId) : null;
       existing.location = experience.location;
       existing.startDate = experience.startDate;
@@ -61,6 +62,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
         title: experience.title,
         companyName: experience.companyName,
         companyWebsite: experience.companyWebsite,
+        companyAccent: experience.companyAccent,
         company: experience.companyId ? this.orm.em.getReference(OrmCompany, experience.companyId) : null,
         location: experience.location,
         startDate: experience.startDate,
@@ -160,6 +162,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
       title: orm.title,
       companyName: orm.companyName,
       companyWebsite: orm.companyWebsite,
+      companyAccent: orm.companyAccent,
       companyId,
       location: orm.location,
       startDate: orm.startDate,

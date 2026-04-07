@@ -12,6 +12,7 @@ function makeExp(overrides: Partial<ResumeRenderExperience> = {}): ResumeRenderE
   return {
     title: 'Staff Engineer',
     companyName: 'Acme Corp',
+    companyAccent: null,
     location: 'New York, NY',
     startDate: '2022-01-15',
     endDate: null,

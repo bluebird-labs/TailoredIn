@@ -37,7 +37,8 @@ export function generateImprecvYaml(input: ResumeRenderInput): string {
       const startDate = isoDateToImprecvDate(exp.startDate);
       const endDate = exp.endDate ? `"${isoDateToImprecvDate(exp.endDate)}"` : '"present"';
       const highlights = exp.bullets.map(b => `          - "${escapeYamlString(b)}"`).join('\n');
-      return `  - organization: "${escapeYamlString(exp.companyName)}"
+      const company = exp.companyAccent ? `${exp.companyName} · ${exp.companyAccent}` : exp.companyName;
+      return `  - organization: "${escapeYamlString(company)}"
     url: ""
     location: "${escapeYamlString(exp.location)}"
     positions:

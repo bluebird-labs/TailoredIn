@@ -19,12 +19,13 @@ export function generateModernCvTyp(input: ResumeRenderInput): string {
     .filter(exp => exp.bullets.length > 0)
     .map(exp => {
       const date = escapeAuthorField(formatDateRange(exp.startDate, exp.endDate));
+      const company = exp.companyAccent ? `${exp.companyName} · ${exp.companyAccent}` : exp.companyName;
       const bullets = exp.bullets.map(b => `  - ${escapeTypst(b)}`).join('\n');
       return `#resume-entry(
   title: "${escapeAuthorField(exp.title)}",
   location: "${escapeAuthorField(exp.location)}",
   date: "${date}",
-  description: "${escapeAuthorField(exp.companyName)}",
+  description: "${escapeAuthorField(company)}",
 )
 
 #resume-item[

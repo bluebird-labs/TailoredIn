@@ -8,6 +8,7 @@ export type ExperienceCreateProps = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyAccent: string | null;
   companyId: string | null;
   location: string;
   startDate: string;
@@ -21,6 +22,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   public title: string;
   public companyName: string;
   public companyWebsite: string | null;
+  public companyAccent: string | null;
   public companyId: string | null;
   public location: string;
   public startDate: string;
@@ -37,6 +39,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     title: string;
     companyName: string;
     companyWebsite: string | null;
+    companyAccent: string | null;
     companyId: string | null;
     location: string;
     startDate: string;
@@ -52,6 +55,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     this.title = props.title;
     this.companyName = props.companyName;
     this.companyWebsite = props.companyWebsite;
+    this.companyAccent = props.companyAccent;
     this.companyId = props.companyId;
     this.location = props.location;
     this.startDate = props.startDate;

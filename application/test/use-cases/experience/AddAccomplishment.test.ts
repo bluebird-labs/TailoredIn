@@ -7,6 +7,7 @@ const fakeExperience = Experience.create({
   title: 'Eng',
   companyName: 'ACME',
   companyWebsite: null,
+  companyAccent: null,
   location: 'Remote',
   startDate: '2020',
   endDate: '2023',

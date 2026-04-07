@@ -12,6 +12,7 @@ type ExperienceProps = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyAccent: string | null;
   company: Ref<Company> | Company | null;
   location: string;
   startDate: string;
@@ -38,6 +39,9 @@ export class Experience extends BaseEntity {
 
   @Property({ name: 'company_website', type: 'text', nullable: true })
   public companyWebsite: string | null;
+
+  @Property({ name: 'company_accent', type: 'text', nullable: true })
+  public companyAccent: string | null;
 
   @ManyToOne(() => Company, { lazy: true, name: 'company_id', nullable: true })
   public company: Ref<Company> | Company | null;
@@ -71,6 +75,7 @@ export class Experience extends BaseEntity {
     this.title = props.title;
     this.companyName = props.companyName;
     this.companyWebsite = props.companyWebsite;
+    this.companyAccent = props.companyAccent;
     this.company = props.company;
     this.location = props.location;
     this.startDate = props.startDate;

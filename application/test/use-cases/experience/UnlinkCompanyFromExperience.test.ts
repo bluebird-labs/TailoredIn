@@ -9,6 +9,7 @@ const makeLinkedExperience = () =>
     title: 'Engineer',
     companyName: 'Acme Corp',
     companyWebsite: null,
+    companyAccent: null,
     companyId: 'company-1',
     location: 'NYC',
     startDate: '2022-01',

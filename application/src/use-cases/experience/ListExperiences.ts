@@ -33,6 +33,7 @@ export function toExperienceDto(exp: Experience, company?: CompanyDto | null): E
     title: exp.title,
     companyName: exp.companyName,
     companyWebsite: exp.companyWebsite,
+    companyAccent: exp.companyAccent,
     companyId: exp.companyId,
     company: company ?? null,
     location: exp.location,

@@ -113,7 +113,10 @@ export function generateProfessionalTyp(experiences: ResumeRenderExperience[]): 
     .filter(exp => exp.bullets.length > 0)
     .map(exp => {
       const title = escapeTypst(exp.title);
-      const society = escapeTypst(exp.companyName);
+      const companyName = escapeTypst(exp.companyName);
+      const society = exp.companyAccent
+        ? `${companyName} #h(4pt) #text(weight: "regular", style: "italic", fill: rgb("#6c757d"))[· ${escapeTypst(exp.companyAccent)}]`
+        : companyName;
       const date = escapeTypst(formatDateRange(exp.startDate, exp.endDate));
       const location = escapeTypst(exp.location);
       const summary = exp.summary ? `  _${escapeTypst(exp.summary)}_\n  #v(2pt)\n  ` : '  ';

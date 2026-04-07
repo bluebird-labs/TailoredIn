@@ -17,6 +17,7 @@ const makeExperience = () =>
     title: 'Engineer',
     companyName: 'Acme Corp',
     companyWebsite: null,
+    companyAccent: null,
     companyId: null,
     location: 'NYC',
     startDate: '2022-01',

@@ -21,6 +21,7 @@ export type UpdateExperienceInput = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyAccent: string | null;
   location: string;
   startDate: string;
   endDate: string;
@@ -44,6 +45,7 @@ export class UpdateExperience {
     experience.title = input.title;
     experience.companyName = input.companyName;
     experience.companyWebsite = input.companyWebsite;
+    experience.companyAccent = input.companyAccent;
     experience.location = input.location;
     experience.startDate = input.startDate;
     experience.endDate = input.endDate;

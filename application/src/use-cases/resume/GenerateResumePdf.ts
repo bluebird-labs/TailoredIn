@@ -89,6 +89,7 @@ export class GenerateResumePdf {
         return {
           title: exp.title,
           companyName: exp.companyName,
+          companyAccent: exp.companyAccent,
           location: exp.location,
           startDate: exp.startDate,
           endDate: exp.endDate || null,

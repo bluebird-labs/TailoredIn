@@ -8,6 +8,7 @@ export type ExperienceDto = {
   title: string;
   companyName: string;
   companyWebsite: string | null;
+  companyAccent: string | null;
   companyId: string | null;
   company: CompanyDto | null;
   location: string;

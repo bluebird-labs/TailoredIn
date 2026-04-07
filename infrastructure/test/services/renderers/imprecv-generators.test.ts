@@ -24,6 +24,7 @@ function makeInput(overrides: Partial<ResumeRenderInput> = {}): ResumeRenderInpu
       {
         title: 'Staff Engineer',
         companyName: 'Acme Corp',
+        companyAccent: null,
         location: 'New York, NY',
         startDate: '2022-01-15',
         endDate: null,

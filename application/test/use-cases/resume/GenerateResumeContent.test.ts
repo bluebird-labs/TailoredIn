@@ -34,6 +34,7 @@ function makeExperience(
     title: overrides.title ?? 'Software Engineer',
     companyName: overrides.companyName ?? 'Acme Corp',
     companyWebsite: null,
+    companyAccent: null,
     companyId: null,
     location: 'New York, NY',
     startDate: overrides.startDate ?? '2023-01',

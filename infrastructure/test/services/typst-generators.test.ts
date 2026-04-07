@@ -38,6 +38,7 @@ function makeExperience(overrides: Partial<ResumeRenderExperience> = {}): Resume
   return {
     title: 'Software Engineer',
     companyName: 'Acme Corp',
+    companyAccent: null,
     location: 'New York, NY',
     startDate: '2022-01-01',
     endDate: null,
@@ -109,6 +110,20 @@ describe('generateProfessionalTyp', () => {
   test('skips experiences with no bullets', () => {
     const result = generateProfessionalTyp([makeExperience({ bullets: [] })]);
     expect(result).not.toContain('cv-entry');
+  });
+
+  test('renders company accent with styled Typst markup', () => {
+    const result = generateProfessionalTyp([makeExperience({ companyAccent: 'acquired by Volvo Cars' })]);
+    expect(result).toContain('Acme Corp #h(4pt)');
+    expect(result).toContain('· acquired by Volvo Cars');
+    expect(result).toContain('weight: "regular"');
+    expect(result).toContain('style: "italic"');
+  });
+
+  test('renders plain company name when accent is null', () => {
+    const result = generateProfessionalTyp([makeExperience({ companyAccent: null })]);
+    expect(result).toContain('society: [Acme Corp]');
+    expect(result).not.toContain('#h(4pt)');
   });
 });
 
