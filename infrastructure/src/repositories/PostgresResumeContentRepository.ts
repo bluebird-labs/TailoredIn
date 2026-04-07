@@ -35,7 +35,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
         experienceId: e.experienceId,
         summary: e.summary,
         bullets: e.bullets,
-        displayedBulletCount: e.displayedBulletCount
+        hiddenBulletIndices: e.hiddenBulletIndices
       })),
       hiddenEducationIds: resumeContent.hiddenEducationIds,
       prompt: resumeContent.prompt,
@@ -54,7 +54,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
       experienceId: e.experienceId,
       summary: e.summary,
       bullets: e.bullets,
-      displayedBulletCount: e.displayedBulletCount
+      hiddenBulletIndices: e.hiddenBulletIndices
     }));
     existing.hiddenEducationIds = resumeContent.hiddenEducationIds;
     existing.updatedAt = resumeContent.updatedAt;
@@ -75,7 +75,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
         experienceId: e.experienceId,
         summary: e.summary,
         bullets: e.bullets,
-        displayedBulletCount: e.displayedBulletCount ?? null
+        hiddenBulletIndices: e.hiddenBulletIndices ?? []
       })),
       hiddenEducationIds: orm.hiddenEducationIds ?? [],
       prompt: orm.prompt,

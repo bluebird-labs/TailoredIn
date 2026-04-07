@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Eye, EyeOff, Loader2, Minus, Pencil, Plus, RefreshCw, RotateCw, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Pencil, RefreshCw, RotateCw, Sparkles } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
@@ -108,19 +108,17 @@ function ExperienceCard({
   exp,
   onRegenerate,
   isRegenerating,
-  onBulletCountChange
+  onToggleBullet
 }: {
   exp: ResumeOutputExperience;
   onRegenerate: (prompt: string) => void;
   isRegenerating: boolean;
-  onBulletCountChange: (count: number | null) => void;
+  onToggleBullet: (bulletIndex: number) => void;
 }) {
-  const total = exp.bullets.length;
-  const displayed = exp.displayedBulletCount ?? total;
-
   const startFormatted = formatMonthYear(exp.startDate);
   const endFormatted = formatMonthYear(exp.endDate);
   const dateRange = startFormatted && endFormatted ? `${startFormatted} — ${endFormatted}` : '';
+  const hiddenSet = new Set(exp.hiddenBulletIndices);
 
   return (
     <Collapsible defaultOpen={false}>
@@ -136,37 +134,7 @@ function ExperienceCard({
         </CollapsibleTrigger>
         <CollapsiblePanel>
           <div className="pt-3 space-y-3">
-            <div className="flex items-center justify-end gap-1">
-              <div className="flex items-center gap-0.5 border rounded-md px-1 h-7">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-5 w-5"
-                  onClick={() => onBulletCountChange(Math.max(0, displayed - 1))}
-                  disabled={displayed <= 0}
-                  title="Show fewer bullets"
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <button
-                  type="button"
-                  className="text-[12px] text-muted-foreground tabular-nums min-w-[40px] text-center hover:text-foreground transition-colors"
-                  onClick={() => onBulletCountChange(null)}
-                  title="Reset to show all bullets"
-                >
-                  {displayed}/{total}
-                </button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-5 w-5"
-                  onClick={() => onBulletCountChange(Math.min(total, displayed + 1))}
-                  disabled={displayed >= total}
-                  title="Show more bullets"
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
+            <div className="flex items-center justify-end">
               <RegeneratePopover
                 isRegenerating={isRegenerating}
                 onRegenerate={onRegenerate}
@@ -174,17 +142,29 @@ function ExperienceCard({
               />
             </div>
             {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
-            <ul className="space-y-1.5">
-              {exp.bullets.map((bullet, i) => (
-                <li
-                  // biome-ignore lint/suspicious/noArrayIndexKey: static ordered list
-                  key={i}
-                  className={`flex gap-2 text-[13px] leading-relaxed${i >= displayed ? ' opacity-30' : ''}`}
-                >
-                  <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
-                  <span>{bullet}</span>
-                </li>
-              ))}
+            <ul className="space-y-1">
+              {exp.bullets.map((bullet, i) => {
+                const isHidden = hiddenSet.has(i);
+                return (
+                  <li
+                    // biome-ignore lint/suspicious/noArrayIndexKey: static ordered list
+                    key={i}
+                    className={`flex items-start gap-2 text-[13px] leading-relaxed${isHidden ? ' opacity-40' : ''}`}
+                  >
+                    <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
+                    <span className="flex-1">{bullet}</span>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 shrink-0"
+                      onClick={() => onToggleBullet(i)}
+                      title={isHidden ? 'Show in resume' : 'Hide from resume'}
+                    >
+                      {isHidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                    </Button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </CollapsiblePanel>
@@ -207,14 +187,17 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
   const hiddenEducationIds = resumeOutput?.hiddenEducationIds ?? [];
   const generatedAt = resumeOutput ? formatDate(resumeOutput.generatedAt) : null;
 
-  const handleBulletCountChange = useCallback(
-    (experienceId: string, count: number | null) => {
+  const handleToggleBullet = useCallback(
+    (experienceId: string, bulletIndex: number) => {
+      const exp = experiences.find(e => e.experienceId === experienceId);
+      const current = exp?.hiddenBulletIndices ?? [];
+      const next = current.includes(bulletIndex) ? current.filter(i => i !== bulletIndex) : [...current, bulletIndex];
       updateSettings.mutate(
-        { experienceBulletCounts: [{ experienceId, displayedBulletCount: count }] },
+        { experienceHiddenBullets: [{ experienceId, hiddenBulletIndices: next }] },
         { onSuccess: () => setRefreshKey(k => k + 1) }
       );
     },
-    [updateSettings]
+    [updateSettings, experiences]
   );
 
   const handleToggleEducation = useCallback(
@@ -359,7 +342,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
               exp={exp}
               onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
               isRegenerating={regeneratingId === exp.experienceId}
-              onBulletCountChange={count => handleBulletCountChange(exp.experienceId, count)}
+              onToggleBullet={bulletIndex => handleToggleBullet(exp.experienceId, bulletIndex)}
             />
           ))}
         </div>

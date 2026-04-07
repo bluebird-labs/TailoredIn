@@ -63,9 +63,9 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
     });
   }
 
-  public withExperienceBulletCount(experienceId: string, count: number | null): ResumeContent {
+  public withExperienceHiddenBullets(experienceId: string, hiddenBulletIndices: number[]): ResumeContent {
     const experiences = this.experiences.map(e =>
-      e.experienceId === experienceId ? { ...e, displayedBulletCount: count } : e
+      e.experienceId === experienceId ? { ...e, hiddenBulletIndices } : e
     );
     return new ResumeContent({
       id: this.id,

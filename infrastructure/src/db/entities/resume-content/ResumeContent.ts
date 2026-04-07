@@ -9,7 +9,7 @@ type ResumeExperienceJson = {
   experienceId: string;
   summary: string;
   bullets: string[];
-  displayedBulletCount?: number | null;
+  hiddenBulletIndices?: number[];
 };
 
 @Entity({ tableName: 'resume_contents' })

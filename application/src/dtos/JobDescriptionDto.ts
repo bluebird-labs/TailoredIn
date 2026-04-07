@@ -16,7 +16,7 @@ export type ResumeOutputDto = {
     readonly endDate: string;
     readonly summary: string;
     readonly bullets: readonly string[];
-    readonly displayedBulletCount: number | null;
+    readonly hiddenBulletIndices: readonly number[];
   }>;
   readonly hiddenEducationIds: readonly string[];
   readonly generatedAt: string;
@@ -77,7 +77,7 @@ export function toJobDescriptionDto(
               endDate: exp?.endDate ?? '',
               summary: e.summary,
               bullets: e.bullets,
-              displayedBulletCount: e.displayedBulletCount
+              hiddenBulletIndices: e.hiddenBulletIndices
             };
           }),
           hiddenEducationIds: resumeContent.hiddenEducationIds,

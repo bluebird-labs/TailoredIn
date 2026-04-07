@@ -83,8 +83,8 @@ export class GenerateResumeContent {
       return { experienceTitle: exp?.title ?? '', companyName: exp?.companyName ?? '' };
     };
 
-    const existingBulletCounts = new Map(
-      existing?.experiences.map(e => [e.experienceId, e.displayedBulletCount]) ?? []
+    const existingHiddenBullets = new Map(
+      existing?.experiences.map(e => [e.experienceId, e.hiddenBulletIndices]) ?? []
     );
 
     if (input.scope?.type === 'headline') {
@@ -128,7 +128,7 @@ export class GenerateResumeContent {
         experienceId: e.experienceId,
         summary: e.summary,
         bullets: e.bullets,
-        displayedBulletCount: isScoped ? (existingBulletCounts.get(e.experienceId) ?? null) : null
+        hiddenBulletIndices: isScoped ? (existingHiddenBullets.get(e.experienceId) ?? []) : []
       })),
       hiddenEducationIds: existing?.hiddenEducationIds ?? [],
       prompt: result.requestPrompt,

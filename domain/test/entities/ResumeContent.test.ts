@@ -9,8 +9,8 @@ function makeResumeContent() {
     jobDescriptionId: 'jd-1',
     headline: 'Senior Engineer',
     experiences: [
-      { experienceId: 'exp-1', summary: 'Built systems', bullets: ['A', 'B', 'C'], displayedBulletCount: null },
-      { experienceId: 'exp-2', summary: 'Led teams', bullets: ['D', 'E'], displayedBulletCount: null }
+      { experienceId: 'exp-1', summary: 'Built systems', bullets: ['A', 'B', 'C'], hiddenBulletIndices: [] },
+      { experienceId: 'exp-2', summary: 'Led teams', bullets: ['D', 'E'], hiddenBulletIndices: [] }
     ],
     hiddenEducationIds: [],
     prompt: 'test',
@@ -26,57 +26,57 @@ describe('ResumeContent', () => {
       profileId: 'p1',
       jobDescriptionId: 'jd1',
       headline: 'Test',
-      experiences: [{ experienceId: 'e1', summary: '', bullets: ['x'], displayedBulletCount: null }],
+      experiences: [{ experienceId: 'e1', summary: '', bullets: ['x'], hiddenBulletIndices: [] }],
       prompt: 'p',
       schema: null
     });
     expect(rc.hiddenEducationIds).toEqual([]);
   });
 
-  describe('withExperienceBulletCount', () => {
-    test('returns a new instance with updated count', () => {
+  describe('withExperienceHiddenBullets', () => {
+    test('returns a new instance with updated hidden indices', () => {
       const original = makeResumeContent();
-      const updated = original.withExperienceBulletCount('exp-1', 2);
+      const updated = original.withExperienceHiddenBullets('exp-1', [1, 2]);
 
       expect(updated).not.toBe(original);
-      expect(updated.experiences[0].displayedBulletCount).toBe(2);
-      expect(updated.experiences[1].displayedBulletCount).toBeNull();
+      expect(updated.experiences[0].hiddenBulletIndices).toEqual([1, 2]);
+      expect(updated.experiences[1].hiddenBulletIndices).toEqual([]);
     });
 
     test('preserves original instance unchanged', () => {
       const original = makeResumeContent();
-      original.withExperienceBulletCount('exp-1', 1);
+      original.withExperienceHiddenBullets('exp-1', [0]);
 
-      expect(original.experiences[0].displayedBulletCount).toBeNull();
+      expect(original.experiences[0].hiddenBulletIndices).toEqual([]);
     });
 
     test('preserves same id', () => {
       const original = makeResumeContent();
-      const updated = original.withExperienceBulletCount('exp-1', 2);
+      const updated = original.withExperienceHiddenBullets('exp-1', [1]);
 
       expect(updated.id.value).toBe(original.id.value);
     });
 
     test('refreshes updatedAt', () => {
       const original = makeResumeContent();
-      const updated = original.withExperienceBulletCount('exp-1', 2);
+      const updated = original.withExperienceHiddenBullets('exp-1', [0]);
 
       expect(updated.updatedAt.getTime()).toBeGreaterThanOrEqual(original.updatedAt.getTime());
     });
 
-    test('can reset to null (show all)', () => {
-      const original = makeResumeContent().withExperienceBulletCount('exp-1', 2);
-      const reset = original.withExperienceBulletCount('exp-1', null);
+    test('can reset to empty (show all)', () => {
+      const original = makeResumeContent().withExperienceHiddenBullets('exp-1', [1, 2]);
+      const reset = original.withExperienceHiddenBullets('exp-1', []);
 
-      expect(reset.experiences[0].displayedBulletCount).toBeNull();
+      expect(reset.experiences[0].hiddenBulletIndices).toEqual([]);
     });
 
     test('leaves unmatched experiences unchanged', () => {
       const original = makeResumeContent();
-      const updated = original.withExperienceBulletCount('nonexistent', 5);
+      const updated = original.withExperienceHiddenBullets('nonexistent', [0]);
 
-      expect(updated.experiences[0].displayedBulletCount).toBeNull();
-      expect(updated.experiences[1].displayedBulletCount).toBeNull();
+      expect(updated.experiences[0].hiddenBulletIndices).toEqual([]);
+      expect(updated.experiences[1].hiddenBulletIndices).toEqual([]);
     });
   });
 

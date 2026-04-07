@@ -2,7 +2,7 @@ import { EntityNotFoundError, type ResumeContentRepository } from '@tailoredin/d
 
 export type UpdateResumeDisplaySettingsInput = {
   jobDescriptionId: string;
-  experienceBulletCounts?: Array<{ experienceId: string; displayedBulletCount: number | null }>;
+  experienceHiddenBullets?: Array<{ experienceId: string; hiddenBulletIndices: number[] }>;
   hiddenEducationIds?: string[];
 };
 
@@ -15,9 +15,9 @@ export class UpdateResumeDisplaySettings {
       throw new EntityNotFoundError('ResumeContent', input.jobDescriptionId);
     }
 
-    if (input.experienceBulletCounts) {
-      for (const { experienceId, displayedBulletCount } of input.experienceBulletCounts) {
-        resumeContent = resumeContent.withExperienceBulletCount(experienceId, displayedBulletCount);
+    if (input.experienceHiddenBullets) {
+      for (const { experienceId, hiddenBulletIndices } of input.experienceHiddenBullets) {
+        resumeContent = resumeContent.withExperienceHiddenBullets(experienceId, hiddenBulletIndices);
       }
     }
 

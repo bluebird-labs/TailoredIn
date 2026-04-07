@@ -9,8 +9,8 @@ function makeResumeContent() {
     jobDescriptionId: 'jd-1',
     headline: 'Senior Engineer',
     experiences: [
-      { experienceId: 'exp-1', summary: 'Built systems', bullets: ['A', 'B', 'C'], displayedBulletCount: null },
-      { experienceId: 'exp-2', summary: 'Led teams', bullets: ['D', 'E'], displayedBulletCount: null }
+      { experienceId: 'exp-1', summary: 'Built systems', bullets: ['A', 'B', 'C'], hiddenBulletIndices: [] },
+      { experienceId: 'exp-2', summary: 'Led teams', bullets: ['D', 'E'], hiddenBulletIndices: [] }
     ],
     hiddenEducationIds: [],
     prompt: 'test',
@@ -29,19 +29,19 @@ function mockRepo(resumeContent: ResumeContent | null): ResumeContentRepository 
 }
 
 describe('UpdateResumeDisplaySettings', () => {
-  test('updates experience bullet counts', async () => {
+  test('updates experience hidden bullets', async () => {
     const repo = mockRepo(makeResumeContent());
     const useCase = new UpdateResumeDisplaySettings(repo);
 
     await useCase.execute({
       jobDescriptionId: 'jd-1',
-      experienceBulletCounts: [{ experienceId: 'exp-1', displayedBulletCount: 2 }]
+      experienceHiddenBullets: [{ experienceId: 'exp-1', hiddenBulletIndices: [1, 2] }]
     });
 
     expect(repo.update).toHaveBeenCalledTimes(1);
     const saved = (repo.update as ReturnType<typeof mock>).mock.calls[0][0] as ResumeContent;
-    expect(saved.experiences[0].displayedBulletCount).toBe(2);
-    expect(saved.experiences[1].displayedBulletCount).toBeNull();
+    expect(saved.experiences[0].hiddenBulletIndices).toEqual([1, 2]);
+    expect(saved.experiences[1].hiddenBulletIndices).toEqual([]);
   });
 
   test('updates hidden education IDs', async () => {
@@ -64,12 +64,12 @@ describe('UpdateResumeDisplaySettings', () => {
 
     await useCase.execute({
       jobDescriptionId: 'jd-1',
-      experienceBulletCounts: [{ experienceId: 'exp-2', displayedBulletCount: 1 }],
+      experienceHiddenBullets: [{ experienceId: 'exp-2', hiddenBulletIndices: [0] }],
       hiddenEducationIds: ['edu-1']
     });
 
     const saved = (repo.update as ReturnType<typeof mock>).mock.calls[0][0] as ResumeContent;
-    expect(saved.experiences[1].displayedBulletCount).toBe(1);
+    expect(saved.experiences[1].hiddenBulletIndices).toEqual([0]);
     expect(saved.hiddenEducationIds).toEqual(['edu-1']);
   });
 
@@ -80,7 +80,7 @@ describe('UpdateResumeDisplaySettings', () => {
     await expect(
       useCase.execute({
         jobDescriptionId: 'jd-1',
-        experienceBulletCounts: [{ experienceId: 'exp-1', displayedBulletCount: 2 }]
+        experienceHiddenBullets: [{ experienceId: 'exp-1', hiddenBulletIndices: [1] }]
       })
     ).rejects.toThrow(EntityNotFoundError);
   });

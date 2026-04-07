@@ -66,7 +66,7 @@ export class GenerateResumePdf {
 
     const generatedByExperienceId = new Map<
       string,
-      { summary: string; bullets: string[]; displayedBulletCount: number | null }
+      { summary: string; bullets: string[]; hiddenBulletIndices: number[] }
     >();
     for (const e of resumeContent.experiences) {
       generatedByExperienceId.set(e.experienceId, e);
@@ -93,7 +93,7 @@ export class GenerateResumePdf {
           startDate: exp.startDate,
           endDate: exp.endDate || null,
           summary: gen?.summary ?? null,
-          bullets: gen ? gen.bullets.slice(0, gen.displayedBulletCount ?? gen.bullets.length) : []
+          bullets: gen ? gen.bullets.filter((_, i) => !gen.hiddenBulletIndices.includes(i)) : []
         };
       }),
       educations: educations

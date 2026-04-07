@@ -29,7 +29,7 @@ export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: {
-      experienceBulletCounts?: Array<{ experienceId: string; displayedBulletCount: number | null }>;
+      experienceHiddenBullets?: Array<{ experienceId: string; hiddenBulletIndices: number[] }>;
       hiddenEducationIds?: string[];
     }) => {
       const response = await fetch('/api/resume/display-settings', {

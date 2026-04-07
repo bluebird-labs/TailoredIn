@@ -63,7 +63,7 @@ function makeResumeContent(
     experienceId: string;
     summary: string;
     bullets: string[];
-    displayedBulletCount?: number | null;
+    hiddenBulletIndices?: number[];
   }> = DEFAULT_EXPERIENCES,
   headline = 'Staff Engineer | 5+ Years of Experience',
   hiddenEducationIds: string[] = []
@@ -73,7 +73,7 @@ function makeResumeContent(
     profileId: 'profile-1',
     jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
     headline,
-    experiences: experiences.map(e => ({ ...e, displayedBulletCount: e.displayedBulletCount ?? null })),
+    experiences: experiences.map(e => ({ ...e, hiddenBulletIndices: e.hiddenBulletIndices ?? [] })),
     hiddenEducationIds,
     prompt: 'test prompt',
     schema: {},
@@ -259,13 +259,13 @@ describe('GenerateResumePdf', () => {
     );
   });
 
-  test('slices bullets when displayedBulletCount is set', async () => {
+  test('filters out hidden bullets by index', async () => {
     const rc = makeResumeContent([
       {
         experienceId: 'exp-00000000-0000-0000-0000-000000000001',
         summary: 'Built things',
         bullets: ['Bullet 1', 'Bullet 2', 'Bullet 3'],
-        displayedBulletCount: 2
+        hiddenBulletIndices: [1]
       }
     ]);
     const { useCase, fakeRenderer } = makeUseCase(rc);
@@ -274,16 +274,16 @@ describe('GenerateResumePdf', () => {
     const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
       experiences: Array<{ bullets: string[] }>;
     };
-    expect(renderInput.experiences[0].bullets).toEqual(['Bullet 1', 'Bullet 2']);
+    expect(renderInput.experiences[0].bullets).toEqual(['Bullet 1', 'Bullet 3']);
   });
 
-  test('shows all bullets when displayedBulletCount is null', async () => {
+  test('shows all bullets when no indices are hidden', async () => {
     const rc = makeResumeContent([
       {
         experienceId: 'exp-00000000-0000-0000-0000-000000000001',
         summary: 'Built things',
         bullets: ['Bullet 1', 'Bullet 2', 'Bullet 3'],
-        displayedBulletCount: null
+        hiddenBulletIndices: []
       }
     ]);
     const { useCase, fakeRenderer } = makeUseCase(rc);

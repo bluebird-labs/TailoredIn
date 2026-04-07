@@ -17,7 +17,7 @@ export type ResumeOutputExperience = {
   endDate: string;
   summary: string;
   bullets: string[];
-  displayedBulletCount: number | null;
+  hiddenBulletIndices: number[];
 };
 
 export type ResumeOutput = {

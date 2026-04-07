@@ -17,7 +17,7 @@ export class UpdateResumeDisplaySettingsRoute {
         try {
           await this.updateDisplaySettings.execute({
             jobDescriptionId: body.jobDescriptionId,
-            experienceBulletCounts: body.experienceBulletCounts,
+            experienceHiddenBullets: body.experienceHiddenBullets,
             hiddenEducationIds: body.hiddenEducationIds
           });
           return { data: { success: true } };
@@ -32,11 +32,11 @@ export class UpdateResumeDisplaySettingsRoute {
       {
         body: t.Object({
           jobDescriptionId: t.String(),
-          experienceBulletCounts: t.Optional(
+          experienceHiddenBullets: t.Optional(
             t.Array(
               t.Object({
                 experienceId: t.String(),
-                displayedBulletCount: t.Union([t.Integer({ minimum: 0 }), t.Null()])
+                hiddenBulletIndices: t.Array(t.Integer({ minimum: 0 }))
               })
             )
           ),
