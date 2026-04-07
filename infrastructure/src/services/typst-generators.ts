@@ -120,11 +120,11 @@ export function generateProfessionalTyp(experiences: ResumeRenderExperience[]): 
 
     let descriptionContent: string;
     if (exp.bullets.length > 0) {
-      const summary = exp.summary ? `  _${escapeTypst(exp.summary)}_\n  #v(2pt)\n  ` : '  ';
+      const summary = exp.summary ? `  #v(-2pt)\n  _${escapeTypst(exp.summary)}_\n  #v(1pt)\n  ` : '  #v(-2pt)\n  ';
       const bulletLines = exp.bullets.map(b => `      [${escapeTypst(b)}],`).join('\n');
       descriptionContent = `${summary}#list(\n${bulletLines}\n    )`;
     } else {
-      descriptionContent = exp.summary ? `  _${escapeTypst(exp.summary)}_` : '';
+      descriptionContent = exp.summary ? `  #v(-2pt)\n  _${escapeTypst(exp.summary)}_` : '';
     }
 
     return `#cv-entry(
