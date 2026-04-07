@@ -1,3 +1,4 @@
+import { MikroORM, RequestContext } from '@mikro-orm/postgresql';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
 import { Elysia } from 'elysia';
@@ -69,9 +70,15 @@ function logRequest(request: Request, status: number, start?: number) {
   else log.info(msg);
 }
 
+const orm = container.get(MikroORM);
+
 const app = new Elysia()
   .onRequest(({ request }) => {
     startTimes.set(request, performance.now());
+  })
+  .derive(() => {
+    RequestContext.enter(orm.em);
+    return {};
   })
   .onAfterResponse(({ request, set }) => {
     const status = (set as { status?: number }).status ?? 200;
