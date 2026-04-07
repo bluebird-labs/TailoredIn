@@ -13,6 +13,7 @@ import { LinkedEntityCard } from '@/components/shared/LinkedEntityCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useCompany } from '@/hooks/use-companies';
@@ -51,6 +52,58 @@ function formatMonthYear(value: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
+function RegeneratePopover({
+  isRegenerating,
+  onRegenerate,
+  triggerTitle
+}: {
+  isRegenerating: boolean;
+  onRegenerate: (prompt: string) => void;
+  triggerTitle: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [prompt, setPrompt] = useState('');
+
+  function handleSubmit() {
+    onRegenerate(prompt.trim());
+    setOpen(false);
+    setPrompt('');
+  }
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={nextOpen => {
+        setOpen(nextOpen);
+        if (!nextOpen) setPrompt('');
+      }}
+    >
+      <PopoverTrigger
+        render={<button type="button" />}
+        className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors disabled:pointer-events-none disabled:opacity-50"
+        disabled={isRegenerating}
+        title={triggerTitle}
+      >
+        {isRegenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
+      </PopoverTrigger>
+      <PopoverContent className="w-64 shadow-none border" align="end">
+        <Textarea
+          placeholder="Optional instructions…"
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          className="text-[13px] min-h-[56px] resize-none"
+        />
+        <div className="flex justify-end">
+          <Button size="sm" variant="outline" onClick={handleSubmit}>
+            <RotateCw className="mr-1.5 h-3.5 w-3.5" />
+            Regenerate
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function ExperienceCard({
   exp,
   onRegenerate,
@@ -58,7 +111,7 @@ function ExperienceCard({
   onBulletCountChange
 }: {
   exp: ResumeOutputExperience;
-  onRegenerate: () => void;
+  onRegenerate: (prompt: string) => void;
   isRegenerating: boolean;
   onBulletCountChange: (count: number | null) => void;
 }) {
@@ -114,20 +167,11 @@ function ExperienceCard({
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                onClick={onRegenerate}
-                disabled={isRegenerating}
-                title="Regenerate this experience"
-              >
-                {isRegenerating ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <RotateCw className="h-3.5 w-3.5" />
-                )}
-              </Button>
+              <RegeneratePopover
+                isRegenerating={isRegenerating}
+                onRegenerate={onRegenerate}
+                triggerTitle="Regenerate this experience"
+              />
             </div>
             {exp.summary && <p className="text-[13px] text-muted-foreground italic">{exp.summary}</p>}
             <ul className="space-y-1.5">
@@ -199,10 +243,10 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
     );
   }
 
-  function handleRegenerateHeadline() {
+  function handleRegenerateHeadline(prompt: string) {
     setRegeneratingId('headline');
     generate.mutate(
-      { additionalPrompt: additionalPrompt.trim() || undefined, scope: { type: 'headline' } },
+      { additionalPrompt: prompt || undefined, scope: { type: 'headline' } },
       {
         onSuccess: () => {
           setRegeneratingId(null);
@@ -216,10 +260,10 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
     );
   }
 
-  function handleRegenerateExperience(experienceId: string) {
+  function handleRegenerateExperience(experienceId: string, prompt: string) {
     setRegeneratingId(experienceId);
     generate.mutate(
-      { additionalPrompt: additionalPrompt.trim() || undefined, scope: { type: 'experience', experienceId } },
+      { additionalPrompt: prompt || undefined, scope: { type: 'experience', experienceId } },
       {
         onSuccess: () => {
           setRegeneratingId(null);
@@ -298,20 +342,11 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-1">
               <p className="text-[12px] text-muted-foreground">Headline</p>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                onClick={handleRegenerateHeadline}
-                disabled={generate.isPending}
-                title="Regenerate headline"
-              >
-                {regeneratingId === 'headline' ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <RotateCw className="h-3.5 w-3.5" />
-                )}
-              </Button>
+              <RegeneratePopover
+                isRegenerating={regeneratingId === 'headline'}
+                onRegenerate={prompt => handleRegenerateHeadline(prompt)}
+                triggerTitle="Regenerate headline"
+              />
             </div>
             <p className="text-[15px] text-foreground">{headline}</p>
           </div>
@@ -322,7 +357,7 @@ function ResumeTab({ jd }: { jd: JobDescription }) {
             <ExperienceCard
               key={exp.experienceId}
               exp={exp}
-              onRegenerate={() => handleRegenerateExperience(exp.experienceId)}
+              onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
               isRegenerating={regeneratingId === exp.experienceId}
               onBulletCountChange={count => handleBulletCountChange(exp.experienceId, count)}
             />
