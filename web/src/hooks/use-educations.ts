@@ -11,6 +11,7 @@ export type Education = {
   location: string | null;
   honors: string | null;
   ordinal: number;
+  hiddenByDefault: boolean;
 };
 
 export function useEducations() {
@@ -33,6 +34,7 @@ export function useCreateEducation() {
       location: string | null;
       honors: string | null;
       ordinal: number;
+      hidden_by_default?: boolean;
     }) => {
       const segment = api.educations as EdenRouteSegment;
       const { data, error } = await segment.post(input);
@@ -59,6 +61,7 @@ export function useUpdateEducation() {
       location: string | null;
       honors: string | null;
       ordinal: number;
+      hidden_by_default: boolean;
     }) => {
       const segment = api.educations as EdenRouteSegment;
       const { error } = await segment({ id: input.id }).put({
@@ -67,7 +70,8 @@ export function useUpdateEducation() {
         graduation_year: input.graduation_year,
         location: input.location,
         honors: input.honors,
-        ordinal: input.ordinal
+        ordinal: input.ordinal,
+        hidden_by_default: input.hidden_by_default
       });
       if (error)
         throw new Error(

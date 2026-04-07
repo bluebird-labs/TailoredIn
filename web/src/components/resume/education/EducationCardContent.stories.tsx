@@ -21,7 +21,8 @@ export const Full: Story = {
       graduationYear: 2018,
       location: 'Stanford, CA',
       honors: 'Magna Cum Laude',
-      ordinal: 0
+      ordinal: 0,
+      hiddenByDefault: false
     }
   }
 };
@@ -35,7 +36,8 @@ export const Minimal: Story = {
       graduationYear: 2020,
       location: null,
       honors: null,
-      ordinal: 1
+      ordinal: 1,
+      hiddenByDefault: false
     }
   }
 };

@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { EditableField } from '@/components/shared/EditableField.js';
@@ -8,6 +8,9 @@ import { EmptyState } from '@/components/shared/EmptyState.js';
 import { FormModal } from '@/components/shared/FormModal.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import {
   type Education,
@@ -24,8 +27,31 @@ const EMPTY_EDUCATION: EducationFormState = {
   degreeTitle: '',
   graduationYear: '',
   location: '',
-  honors: ''
+  honors: '',
+  hiddenByDefault: 'false'
 };
+
+function HiddenByDefaultCheckbox({
+  checked,
+  onChange,
+  isDirty,
+  disabled
+}: {
+  readonly checked: boolean;
+  readonly onChange: (checked: boolean) => void;
+  readonly isDirty?: boolean;
+  readonly disabled?: boolean;
+}) {
+  const fieldId = useId();
+  return (
+    <div className={cn('flex items-center gap-2 py-1', isDirty && 'border-l-2 border-primary/30 pl-3')}>
+      <Checkbox id={fieldId} checked={checked} onCheckedChange={onChange} disabled={disabled} />
+      <Label htmlFor={fieldId} className="text-sm leading-none">
+        Hidden by default on new resumes
+      </Label>
+    </div>
+  );
+}
 
 function EducationEditor({ education }: { readonly education: Education }) {
   const update = useUpdateEducation();
@@ -38,9 +64,17 @@ function EducationEditor({ education }: { readonly education: Education }) {
       degreeTitle: education.degreeTitle,
       graduationYear: String(education.graduationYear),
       location: education.location ?? '',
-      honors: education.honors ?? ''
+      honors: education.honors ?? '',
+      hiddenByDefault: String(education.hiddenByDefault)
     }),
-    [education.institutionName, education.degreeTitle, education.graduationYear, education.location, education.honors]
+    [
+      education.institutionName,
+      education.degreeTitle,
+      education.graduationYear,
+      education.location,
+      education.honors,
+      education.hiddenByDefault
+    ]
   );
 
   const { current, setField, isDirtyField, isDirty, reset } = useDirtyTracking(savedState);
@@ -59,7 +93,8 @@ function EducationEditor({ education }: { readonly education: Education }) {
         graduation_year: year,
         location: current.location.trim() || null,
         honors: current.honors.trim() || null,
-        ordinal: education.ordinal
+        ordinal: education.ordinal,
+        hidden_by_default: current.hiddenByDefault === 'true'
       },
       {
         onSuccess: () => {
@@ -136,6 +171,12 @@ function EducationEditor({ education }: { readonly education: Education }) {
                 disabled={update.isPending}
                 placeholder="e.g. Magna Cum Laude"
               />
+              <HiddenByDefaultCheckbox
+                checked={current.hiddenByDefault === 'true'}
+                onChange={v => setField('hiddenByDefault', String(v))}
+                isDirty={isDirtyField('hiddenByDefault')}
+                disabled={update.isPending}
+              />
             </div>
             <ConfirmDialog
               title="Delete education?"
@@ -181,7 +222,8 @@ function CreateEducationModal({
         graduation_year: year,
         location: current.location.trim() || null,
         honors: current.honors.trim() || null,
-        ordinal: educationCount
+        ordinal: educationCount,
+        hidden_by_default: current.hiddenByDefault === 'true'
       },
       {
         onSuccess: () => {
@@ -255,6 +297,12 @@ function CreateEducationModal({
         onChange={v => setField('honors', v)}
         isDirty={isDirtyField('honors')}
         placeholder="e.g. Magna Cum Laude"
+      />
+      <HiddenByDefaultCheckbox
+        checked={current.hiddenByDefault === 'true'}
+        onChange={v => setField('hiddenByDefault', String(v))}
+        isDirty={isDirtyField('hiddenByDefault')}
+        disabled={createEducation.isPending}
       />
     </FormModal>
   );

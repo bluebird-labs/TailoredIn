@@ -34,6 +34,7 @@ interface EducationFormState {
   graduationYear: string;
   location: string;
   honors: string;
+  hiddenByDefault: string;
 }
 
 function validateEducation(values: EducationFormState): ValidationErrors<EducationFormState> {
