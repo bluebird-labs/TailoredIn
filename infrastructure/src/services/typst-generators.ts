@@ -109,31 +109,34 @@ ${github ? `    github = "${github}"\n` : ''}
 }
 
 export function generateProfessionalTyp(experiences: ResumeRenderExperience[]): string {
-  const entries = experiences
-    .filter(exp => exp.bullets.length > 0)
-    .map(exp => {
-      const title = escapeTypst(exp.title);
-      const companyName = escapeTypst(exp.companyName);
-      const society = exp.companyAccent
-        ? `${companyName} #h(4pt) #text(weight: "regular", style: "italic", fill: rgb("#6c757d"))[· ${escapeTypst(exp.companyAccent)}]`
-        : companyName;
-      const date = escapeTypst(formatDateRange(exp.startDate, exp.endDate));
-      const location = escapeTypst(exp.location);
+  const entries = experiences.map(exp => {
+    const title = escapeTypst(exp.title);
+    const companyName = escapeTypst(exp.companyName);
+    const society = exp.companyAccent
+      ? `${companyName} #h(4pt) #text(weight: "regular", style: "italic", fill: rgb("#6c757d"))[· ${escapeTypst(exp.companyAccent)}]`
+      : companyName;
+    const date = escapeTypst(formatDateRange(exp.startDate, exp.endDate));
+    const location = escapeTypst(exp.location);
+
+    let descriptionContent: string;
+    if (exp.bullets.length > 0) {
       const summary = exp.summary ? `  _${escapeTypst(exp.summary)}_\n  #v(2pt)\n  ` : '  ';
       const bulletLines = exp.bullets.map(b => `      [${escapeTypst(b)}],`).join('\n');
+      descriptionContent = `${summary}#list(\n${bulletLines}\n    )`;
+    } else {
+      descriptionContent = exp.summary ? `  _${escapeTypst(exp.summary)}_` : '';
+    }
 
-      return `#cv-entry(
+    return `#cv-entry(
   title: [${title}],
   society: [${society}],
   date: [${date}],
   location: [${location}],
   description: [
-${summary}#list(
-${bulletLines}
-    )
+${descriptionContent}
   ],
 )`;
-    });
+  });
 
   if (entries.length === 0) {
     return '#import "../helpers.typ": *\n';

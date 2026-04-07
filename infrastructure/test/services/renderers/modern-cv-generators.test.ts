@@ -77,11 +77,12 @@ describe('generateModernCvTyp', () => {
     expect(typ).toContain('- Reduced latency by 40%');
   });
 
-  test('skips experiences with no bullets', () => {
+  test('includes experiences with no bullets without resume-item block', () => {
     const input = makeInput();
     input.experiences[0].bullets = [];
     const typ = generateModernCvTyp(input);
-    expect(typ).not.toContain('Acme Corp');
+    expect(typ).toContain('Acme Corp');
+    expect(typ).not.toContain('#resume-item');
   });
 
   test('formats date range correctly', () => {

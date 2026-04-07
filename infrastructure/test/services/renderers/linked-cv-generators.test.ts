@@ -86,10 +86,11 @@ describe('groupExperiencesByCompany', () => {
     expect(groups[1].companyName).toBe('Beta');
   });
 
-  test('skips experiences with no bullets', () => {
+  test('includes experiences with no bullets', () => {
     const exps = [makeExp({ bullets: [] })];
     const groups = groupExperiencesByCompany(exps);
-    expect(groups).toHaveLength(0);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].roles[0].bullets).toHaveLength(0);
   });
 
   test('sets overallStart to the earliest role start date', () => {

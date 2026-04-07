@@ -31,23 +31,23 @@ export function generateImprecvYaml(input: ResumeRenderInput): string {
     );
   }
 
-  const workEntries = experiences
-    .filter(exp => exp.bullets.length > 0)
-    .map(exp => {
-      const startDate = isoDateToImprecvDate(exp.startDate);
-      const endDate = exp.endDate ? `"${isoDateToImprecvDate(exp.endDate)}"` : '"present"';
-      const highlights = exp.bullets.map(b => `          - "${escapeYamlString(b)}"`).join('\n');
-      const company = exp.companyAccent ? `${exp.companyName} · ${exp.companyAccent}` : exp.companyName;
-      return `  - organization: "${escapeYamlString(company)}"
+  const workEntries = experiences.map(exp => {
+    const startDate = isoDateToImprecvDate(exp.startDate);
+    const endDate = exp.endDate ? `"${isoDateToImprecvDate(exp.endDate)}"` : '"present"';
+    const company = exp.companyAccent ? `${exp.companyName} · ${exp.companyAccent}` : exp.companyName;
+    const highlightsBlock =
+      exp.bullets.length > 0
+        ? `        highlights:\n${exp.bullets.map(b => `          - "${escapeYamlString(b)}"`).join('\n')}`
+        : '        highlights: []';
+    return `  - organization: "${escapeYamlString(company)}"
     url: ""
     location: "${escapeYamlString(exp.location)}"
     positions:
       - position: "${escapeYamlString(exp.title)}"
         startDate: "${startDate}"
         endDate: ${endDate}
-        highlights:
-${highlights}`;
-    });
+${highlightsBlock}`;
+  });
 
   const educationEntries = educations.map(edu => {
     return `  - institution: "${escapeYamlString(edu.institutionName)}"

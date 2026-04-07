@@ -85,9 +85,9 @@ describe('generateConfigTyp', () => {
 // ---------------------------------------------------------------------------
 
 describe('generateProfessionalTyp', () => {
-  test('wraps each entry in block(breakable: false)', () => {
+  test('renders cv-entry for each experience', () => {
     const result = generateProfessionalTyp([makeExperience()]);
-    expect(result).toContain('block(breakable: false)');
+    expect(result).toContain('#cv-entry');
   });
 
   test('includes all bullet text', () => {
@@ -107,9 +107,10 @@ describe('generateProfessionalTyp', () => {
     expect(result).not.toContain('cv-section');
   });
 
-  test('skips experiences with no bullets', () => {
+  test('includes experiences with no bullets without list block', () => {
     const result = generateProfessionalTyp([makeExperience({ bullets: [] })]);
-    expect(result).not.toContain('cv-entry');
+    expect(result).toContain('cv-entry');
+    expect(result).not.toContain('#list');
   });
 
   test('renders company accent with styled Typst markup', () => {
@@ -132,9 +133,9 @@ describe('generateProfessionalTyp', () => {
 // ---------------------------------------------------------------------------
 
 describe('generateEducationTyp', () => {
-  test('wraps each entry in block(breakable: false)', () => {
+  test('renders cv-entry for each education', () => {
     const result = generateEducationTyp([makeEducation()]);
-    expect(result).toContain('block(breakable: false)');
+    expect(result).toContain('#cv-entry');
   });
 
   test('renders honors as italic description when present', () => {

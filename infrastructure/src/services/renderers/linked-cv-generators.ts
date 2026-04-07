@@ -32,8 +32,6 @@ export function groupExperiencesByCompany(experiences: ResumeRenderExperience[])
   const indexByCompany = new Map<string, number>();
 
   for (const exp of experiences) {
-    if (exp.bullets.length === 0) continue;
-
     const existing = indexByCompany.get(exp.companyName);
     if (existing !== undefined) {
       groups[existing].roles.push(exp);
@@ -79,6 +77,7 @@ function renderRole(exp: ResumeRenderExperience): string {
 ${bullets}
     ]
   )`;
+
 }
 
 export function generateLinkedCvTyp(input: ResumeRenderInput): string {

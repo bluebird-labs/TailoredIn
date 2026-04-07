@@ -105,11 +105,12 @@ describe('generateImprecvYaml', () => {
     expect(yaml).toContain('Reduced latency by 40%');
   });
 
-  test('skips experiences with no bullets', () => {
+  test('includes experiences with no bullets using empty highlights', () => {
     const input = makeInput();
     input.experiences[0].bullets = [];
     const yaml = generateImprecvYaml(input);
-    expect(yaml).not.toContain('position: "Staff Engineer"');
+    expect(yaml).toContain('position: "Staff Engineer"');
+    expect(yaml).toContain('highlights: []');
   });
 
   test('includes education institution', () => {

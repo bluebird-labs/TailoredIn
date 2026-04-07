@@ -15,23 +15,23 @@ export function generateModernCvTyp(input: ResumeRenderInput): string {
 
   const positions = headlineSummary ? `("${escapeAuthorField(headlineSummary)}")` : '()';
 
-  const experienceEntries = experiences
-    .filter(exp => exp.bullets.length > 0)
-    .map(exp => {
-      const date = escapeAuthorField(formatDateRange(exp.startDate, exp.endDate));
-      const company = exp.companyAccent ? `${exp.companyName} · ${exp.companyAccent}` : exp.companyName;
-      const bullets = exp.bullets.map(b => `  - ${escapeTypst(b)}`).join('\n');
-      return `#resume-entry(
+  const experienceEntries = experiences.map(exp => {
+    const date = escapeAuthorField(formatDateRange(exp.startDate, exp.endDate));
+    const company = exp.companyAccent ? `${exp.companyName} · ${exp.companyAccent}` : exp.companyName;
+    const entry = `#resume-entry(
   title: "${escapeAuthorField(exp.title)}",
   location: "${escapeAuthorField(exp.location)}",
   date: "${date}",
   description: "${escapeAuthorField(company)}",
-)
+)`;
+    if (exp.bullets.length === 0) return entry;
+    const bullets = exp.bullets.map(b => `  - ${escapeTypst(b)}`).join('\n');
+    return `${entry}
 
 #resume-item[
 ${bullets}
 ]`;
-    });
+  });
 
   const educationEntries = educations.map(edu => {
     return `#resume-entry(
