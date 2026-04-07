@@ -78,7 +78,7 @@ export function useJobDescriptions(companyId?: string) {
   });
 }
 
-export function useJobDescription(id: string) {
+export function useJobDescription(id: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.jobDescriptions.detail(id),
     queryFn: async () => {
@@ -86,7 +86,8 @@ export function useJobDescription(id: string) {
       const { data, error } = await segment({ id }).get();
       if (error) throw new Error(extractApiError(error, `Could not load job description ${id}`));
       return data?.data as JobDescription;
-    }
+    },
+    enabled: options?.enabled
   });
 }
 

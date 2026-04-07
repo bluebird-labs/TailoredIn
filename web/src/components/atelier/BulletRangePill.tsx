@@ -6,12 +6,14 @@ export function BulletRangePill({
   min,
   max,
   isOverridden,
-  onSave
+  onSave,
+  onReset
 }: {
   min: number;
   max: number;
   isOverridden: boolean;
   onSave: (min: number, max: number) => void;
+  onReset?: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [editMin, setEditMin] = useState(min);
@@ -63,6 +65,18 @@ export function BulletRangePill({
           onChange={e => setEditMax(Number(e.target.value))}
           className="h-5 w-10 px-1 text-[11px] text-center"
         />
+        {isOverridden && onReset && (
+          <button
+            type="button"
+            onClick={() => {
+              onReset();
+              setEditing(false);
+            }}
+            className="ml-1 text-[10px] text-muted-foreground hover:text-destructive transition-colors"
+          >
+            Reset
+          </button>
+        )}
       </fieldset>
     );
   }

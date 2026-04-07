@@ -4,9 +4,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
+import { useEducations } from '@/hooks/use-educations';
+import { useRemoveExperienceOverride, useSetExperienceOverride } from '@/hooks/use-experience-overrides';
+import { useGenerationSettings } from '@/hooks/use-generation-settings';
+import { type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
+import { useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
 import { BulletRangePill } from './BulletRangePill.js';
 import { JobSelector } from './JobSelector.js';
-import { MOCK_RESUME_OUTPUT, MOCK_SETTINGS, type MockExperience, type MockResumeOutput } from './mock-data.js';
 
 function formatMonthYear(value: string): string {
   if (!value) return '';
@@ -72,34 +76,33 @@ function ExperienceCard({
   exp,
   defaultBulletMin,
   defaultBulletMax,
+  bulletOverride,
   onToggleBullet,
-  onBulletRangeSave
+  onBulletRangeSave,
+  onBulletRangeReset,
+  onRegenerate,
+  isRegenerating
 }: {
-  exp: MockExperience;
+  exp: ResumeOutputExperience;
   defaultBulletMin: number;
   defaultBulletMax: number;
+  bulletOverride: { min: number; max: number } | null;
   onToggleBullet: (experienceId: string, bulletIndex: number) => void;
   onBulletRangeSave: (experienceId: string, min: number, max: number) => void;
+  onBulletRangeReset: (experienceId: string) => void;
+  onRegenerate: (prompt: string) => void;
+  isRegenerating: boolean;
 }) {
-  const [regenerating, setRegenerating] = useState(false);
   const startFormatted = formatMonthYear(exp.startDate);
   const endFormatted = formatMonthYear(exp.endDate);
   const dateRange = startFormatted && endFormatted ? `${startFormatted} — ${endFormatted}` : '';
   const hiddenSet = new Set(exp.hiddenBulletIndices);
-  const isOverridden = exp.bulletOverride !== null;
-  const bulletMin = exp.bulletOverride?.min ?? defaultBulletMin;
-  const bulletMax = exp.bulletOverride?.max ?? defaultBulletMax;
-
-  function handleRegenerate(_prompt: string) {
-    setRegenerating(true);
-    setTimeout(() => {
-      setRegenerating(false);
-      toast.success(`Regenerated ${exp.experienceTitle}`);
-    }, 500);
-  }
+  const isOverridden = bulletOverride !== null;
+  const bulletMin = bulletOverride?.min ?? defaultBulletMin;
+  const bulletMax = bulletOverride?.max ?? defaultBulletMax;
 
   return (
-    <div className="rounded-lg border p-4 space-y-3">
+    <div className="space-y-3 rounded-lg border p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
@@ -109,6 +112,7 @@ function ExperienceCard({
               max={bulletMax}
               isOverridden={isOverridden}
               onSave={(min, max) => onBulletRangeSave(exp.experienceId, min, max)}
+              onReset={isOverridden ? () => onBulletRangeReset(exp.experienceId) : undefined}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -117,8 +121,8 @@ function ExperienceCard({
           </div>
         </div>
         <RegeneratePopover
-          isRegenerating={regenerating}
-          onRegenerate={handleRegenerate}
+          isRegenerating={isRegenerating}
+          onRegenerate={onRegenerate}
           triggerTitle="Regenerate this experience"
         />
       </div>
@@ -151,83 +155,137 @@ function ExperienceCard({
   );
 }
 
-export function GenerationWorkspace() {
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+export function GenerationWorkspace({
+  selectedJobId,
+  onSelectJob
+}: {
+  selectedJobId: string | null;
+  onSelectJob: (id: string | null) => void;
+}) {
   const [additionalPrompt, setAdditionalPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [resumeOutput, setResumeOutput] = useState<MockResumeOutput | null>(null);
-  const [headlineRegenerating, setHeadlineRegenerating] = useState(false);
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+  const [overrideMap, setOverrideMap] = useState<Map<string, { min: number; max: number }>>(new Map());
+
+  const { data: jd } = useJobDescription(selectedJobId ?? '', { enabled: !!selectedJobId });
+  const { data: settings } = useGenerationSettings();
+  const { data: educations } = useEducations();
+  const generate = useGenerateResumeContent(selectedJobId ?? '');
+  const updateDisplaySettings = useUpdateResumeDisplaySettings(selectedJobId ?? '');
+  const setOverride = useSetExperienceOverride();
+  const removeOverride = useRemoveExperienceOverride();
+
+  const resumeOutput = jd?.resumeOutput ?? null;
+  const defaultBulletMin = settings?.bulletMin ?? 2;
+  const defaultBulletMax = settings?.bulletMax ?? 5;
 
   function handleGenerate() {
-    setIsGenerating(true);
-    setTimeout(() => {
-      setResumeOutput({ ...MOCK_RESUME_OUTPUT });
-      setIsGenerating(false);
-      setAdditionalPrompt('');
-      toast.success('Resume content generated');
-    }, 500);
+    generate.mutate(
+      { additionalPrompt: additionalPrompt.trim() || undefined },
+      {
+        onSuccess: () => {
+          setAdditionalPrompt('');
+          toast.success('Resume content generated');
+        },
+        onError: err => toast.error(err instanceof Error ? err.message : 'Generation failed')
+      }
+    );
   }
 
-  function handleRegenerateHeadline(_prompt: string) {
-    setHeadlineRegenerating(true);
-    setTimeout(() => {
-      setHeadlineRegenerating(false);
-      toast.success('Headline regenerated');
-    }, 500);
+  function handleRegenerateHeadline(prompt: string) {
+    setRegeneratingId('headline');
+    generate.mutate(
+      { additionalPrompt: prompt || undefined, scope: { type: 'headline' } },
+      {
+        onSuccess: () => {
+          setRegeneratingId(null);
+          toast.success('Headline regenerated');
+        },
+        onError: err => {
+          setRegeneratingId(null);
+          toast.error(err instanceof Error ? err.message : 'Headline regeneration failed');
+        }
+      }
+    );
+  }
+
+  function handleRegenerateExperience(experienceId: string, prompt: string) {
+    setRegeneratingId(experienceId);
+    generate.mutate(
+      { additionalPrompt: prompt || undefined, scope: { type: 'experience', experienceId } },
+      {
+        onSuccess: () => {
+          setRegeneratingId(null);
+          toast.success('Experience regenerated');
+        },
+        onError: err => {
+          setRegeneratingId(null);
+          toast.error(err instanceof Error ? err.message : 'Experience regeneration failed');
+        }
+      }
+    );
   }
 
   const handleToggleBullet = useCallback(
     (experienceId: string, bulletIndex: number) => {
       if (!resumeOutput) return;
-      setResumeOutput(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          experiences: prev.experiences.map(exp => {
-            if (exp.experienceId !== experienceId) return exp;
-            const current = exp.hiddenBulletIndices;
-            const next = current.includes(bulletIndex)
-              ? current.filter(i => i !== bulletIndex)
-              : [...current, bulletIndex];
-            return { ...exp, hiddenBulletIndices: next };
-          })
-        };
-      });
+      const exp = resumeOutput.experiences.find(e => e.experienceId === experienceId);
+      const current = exp?.hiddenBulletIndices ?? [];
+      const next = current.includes(bulletIndex) ? current.filter(i => i !== bulletIndex) : [...current, bulletIndex];
+      updateDisplaySettings.mutate({ experienceHiddenBullets: [{ experienceId, hiddenBulletIndices: next }] });
     },
-    [resumeOutput]
+    [resumeOutput, updateDisplaySettings]
   );
 
-  const handleBulletRangeSave = useCallback((experienceId: string, min: number, max: number) => {
-    setResumeOutput(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        experiences: prev.experiences.map(exp => {
-          if (exp.experienceId !== experienceId) return exp;
-          return { ...exp, bulletOverride: { min, max } };
-        })
-      };
-    });
-    toast.success('Bullet range updated');
-  }, []);
+  const handleToggleEducation = useCallback(
+    (educationId: string) => {
+      if (!resumeOutput) return;
+      const hiddenEducationIds = resumeOutput.hiddenEducationIds;
+      const isHidden = hiddenEducationIds.includes(educationId);
+      const next = isHidden
+        ? hiddenEducationIds.filter(id => id !== educationId)
+        : [...hiddenEducationIds, educationId];
+      updateDisplaySettings.mutate({ hiddenEducationIds: next });
+    },
+    [resumeOutput, updateDisplaySettings]
+  );
 
-  const handleToggleEducation = useCallback((educationId: string) => {
-    setResumeOutput(prev => {
-      if (!prev) return prev;
-      const isHidden = prev.hiddenEducationIds.includes(educationId);
-      return {
-        ...prev,
-        hiddenEducationIds: isHidden
-          ? prev.hiddenEducationIds.filter(id => id !== educationId)
-          : [...prev.hiddenEducationIds, educationId]
-      };
-    });
-  }, []);
+  const handleBulletRangeSave = useCallback(
+    (experienceId: string, min: number, max: number) => {
+      setOverride.mutate(
+        { experienceId, bullet_min: min, bullet_max: max },
+        {
+          onSuccess: () => {
+            setOverrideMap(prev => new Map(prev).set(experienceId, { min, max }));
+            toast.success('Bullet range updated');
+          },
+          onError: err => toast.error(err instanceof Error ? err.message : 'Failed to update bullet range')
+        }
+      );
+    },
+    [setOverride]
+  );
+
+  const handleBulletRangeReset = useCallback(
+    (experienceId: string) => {
+      removeOverride.mutate(experienceId, {
+        onSuccess: () => {
+          setOverrideMap(prev => {
+            const next = new Map(prev);
+            next.delete(experienceId);
+            return next;
+          });
+          toast.success('Bullet range reset to default');
+        },
+        onError: err => toast.error(err instanceof Error ? err.message : 'Failed to reset bullet range')
+      });
+    },
+    [removeOverride]
+  );
 
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col overflow-y-auto p-6">
       <div className="space-y-4">
-        <JobSelector value={selectedJobId} onChange={setSelectedJobId} />
+        <JobSelector value={selectedJobId} onChange={onSelectJob} />
 
         <div className="space-y-3">
           <Textarea
@@ -237,8 +295,8 @@ export function GenerationWorkspace() {
             className="min-h-[72px] resize-none text-[13px]"
           />
           <div className="flex justify-end">
-            <Button size="sm" onClick={handleGenerate} disabled={!selectedJobId || isGenerating}>
-              {isGenerating ? (
+            <Button size="sm" onClick={handleGenerate} disabled={!selectedJobId || generate.isPending}>
+              {generate.isPending ? (
                 <>
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                   Generating...
@@ -261,7 +319,7 @@ export function GenerationWorkspace() {
               <div className="mb-1 flex items-center justify-between">
                 <p className="text-[12px] text-muted-foreground">Headline</p>
                 <RegeneratePopover
-                  isRegenerating={headlineRegenerating}
+                  isRegenerating={regeneratingId === 'headline'}
                   onRegenerate={handleRegenerateHeadline}
                   triggerTitle="Regenerate headline"
                 />
@@ -275,19 +333,23 @@ export function GenerationWorkspace() {
               <ExperienceCard
                 key={exp.experienceId}
                 exp={exp}
-                defaultBulletMin={MOCK_SETTINGS.bulletMin}
-                defaultBulletMax={MOCK_SETTINGS.bulletMax}
+                defaultBulletMin={defaultBulletMin}
+                defaultBulletMax={defaultBulletMax}
+                bulletOverride={overrideMap.get(exp.experienceId) ?? null}
                 onToggleBullet={handleToggleBullet}
                 onBulletRangeSave={handleBulletRangeSave}
+                onBulletRangeReset={handleBulletRangeReset}
+                onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
+                isRegenerating={regeneratingId === exp.experienceId}
               />
             ))}
           </div>
 
-          {resumeOutput.educations.length > 0 && (
+          {educations && educations.length > 0 && (
             <div className="space-y-3 rounded-lg border p-4">
               <p className="text-[12px] text-muted-foreground">Education</p>
               <div className="space-y-2">
-                {resumeOutput.educations.map(edu => {
+                {educations.map(edu => {
                   const isHidden = resumeOutput.hiddenEducationIds.includes(edu.id);
                   return (
                     <div

@@ -29,5 +29,9 @@ export const queryKeys = {
   },
   resume: {
     cachedPdf: (jobDescriptionId: string) => ['resume', 'cachedPdf', jobDescriptionId] as const
+  },
+  generationSettings: {
+    all: ['generationSettings'] as const,
+    detail: () => ['generationSettings', 'detail'] as const
   }
 };
