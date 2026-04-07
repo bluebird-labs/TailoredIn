@@ -1,11 +1,19 @@
-import { FileText, Loader2, Maximize2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Download, FileText, Loader2, Maximize2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useJobDescription } from '@/hooks/use-job-descriptions';
+import { useProfile } from '@/hooks/use-profile';
 import { type ResumeTheme, useCachedResumePdf, useGenerateResumePdf } from '@/hooks/use-resume';
+
+function slugify(text: string | null | undefined): string {
+  return (text ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
   { value: 'brilliant-cv', label: 'Brilliant CV' },
@@ -15,6 +23,7 @@ const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
 ];
 
 export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | null }) {
+  const { data: profile } = useProfile();
   const { data: jd } = useJobDescription(selectedJobId ?? '', { enabled: !!selectedJobId });
   const generatePdf = useGenerateResumePdf();
   const cachedPdf = useCachedResumePdf(selectedJobId ?? '', !!selectedJobId && !!jd?.hasCachedPdf);
@@ -75,6 +84,22 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
   const canGenerate = !!selectedJobId && !!jd?.resumeOutput;
   const isLoading = generatePdf.isPending || cachedPdf.isLoading;
 
+  const downloadFilename = useMemo(() => {
+    const namePart = slugify(`${profile?.firstName ?? ''} ${profile?.lastName ?? ''}`);
+    const companyPart = slugify(jd?.companyName);
+    const jobPart = slugify(jd?.title);
+    const datePart = new Date().toISOString().slice(0, 10);
+    return [namePart, companyPart, jobPart, datePart].filter(Boolean).join('-') + '.pdf';
+  }, [profile?.firstName, profile?.lastName, jd?.companyName, jd?.title]);
+
+  const handleDownload = useCallback(() => {
+    if (!pdfBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = pdfBlobUrl;
+    a.download = downloadFilename;
+    a.click();
+  }, [pdfBlobUrl, downloadFilename]);
+
   const themeSelector = (
     <Select value={theme} onValueChange={v => setTheme(v as ResumeTheme)}>
       <SelectTrigger size="sm">
@@ -112,15 +137,26 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
         <div className="flex flex-col gap-4 p-5" style={{ height: '100%' }}>
           <div className="flex items-center justify-between">
             <p className="text-[14px] font-medium text-foreground">PDF Preview</p>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setFullPage(true)}
-              disabled={!pdfBlobUrl}
-              title="View full page"
-            >
-              <Maximize2 className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={handleDownload}
+                disabled={!pdfBlobUrl}
+                title="Download PDF"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setFullPage(true)}
+                disabled={!pdfBlobUrl}
+                title="View full page"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
