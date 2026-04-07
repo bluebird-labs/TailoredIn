@@ -7,17 +7,17 @@
 
 | Stream | Branch | Status | Worktree |
 |--------|--------|--------|----------|
-| 1: Domain + Application | `feat/atelier-domain-app` | In progress | — |
-| 2a: Migration + ORM entities | `feat/atelier-infra` | Not started | — |
-| 4a: Frontend shell (mock data) | `feat/atelier-web` | Not started | — |
+| 1: Domain + Application | `feat/atelier-domain-app` | Done (ab3f4bf) | `buzzing-hugging-zebra` |
+| 2a: Migration + ORM entities | `feat/atelier-infra` | Done (976f4c2) | `eager-discovering-shore` |
+| 4a: Frontend shell (mock data) | `feat/atelier-web` | Done (2c3b123) | `fluttering-greeting-reddy` |
 
 ## Phase 2 — After Stream 1 merges
 
 | Stream | Branch | Status | Worktree |
 |--------|--------|--------|----------|
-| 2b: Repos + Generator changes | `feat/atelier-infra` | Blocked by Stream 1 | — |
-| 3: API routes + DI wiring | `feat/atelier-api` | Blocked by Stream 1 | — |
-| 4b: Connect frontend to API | `feat/atelier-web` | Blocked by Streams 2b + 3 | — |
+| 2b: Repos + Generator changes | `feat/atelier-infra` | Done (cf90a67) | `eager-discovering-shore` |
+| 3: API routes + DI wiring | `feat/atelier-api` | Done (2c3b123) | (same session as 4a) |
+| 4b: Connect frontend to API | `feat/atelier-web` | Done (ededf57) | `idempotent-puzzling-babbage` |
 
 ## Merge Order
 
@@ -29,4 +29,8 @@
 
 | # | Stream | Started | Completed | Notes |
 |---|--------|---------|-----------|-------|
-| 1 | Stream 1: Domain + App | 2026-04-07 | — | Branch: feat/atelier-domain-app |
+| 1 | Stream 1: Domain + App | 2026-04-07 | Done | Landed ab3f4bf on main |
+| 2 | Stream 2a: Migration + ORM | 2026-04-07 | Done | Worktree: eager-discovering-shore, commit 976f4c2 |
+| 4 | Stream 2b: Repos + Generator | 2026-04-07 | Done | Landed cf90a67 on main |
+| 5 | Stream 4b: Connect frontend | 2026-04-07 | Done | Landed ededf57 on main |
+| 3 | Stream 4a + 3: Frontend + API | 2026-04-07 | Done | Landed 2c3b123 on main |
