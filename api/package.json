@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "bun test --pass-with-no-tests",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
     "@mikro-orm/postgresql": "^7.0.0",

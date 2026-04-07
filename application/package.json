@@ -10,7 +10,7 @@
   "scripts": {
     "test": "bun test",
     "test:coverage": "bun test --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
     "@tailoredin/domain": "workspace:*"
