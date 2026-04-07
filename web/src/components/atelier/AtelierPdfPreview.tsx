@@ -92,8 +92,28 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
     return [namePart, companyPart, jobPart, datePart].filter(Boolean).join('-') + '.pdf';
   }, [profile?.firstName, profile?.lastName, jd?.companyName, jd?.title]);
 
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
     if (!pdfBlobUrl) return;
+    const response = await fetch(pdfBlobUrl);
+    const blob = await response.blob();
+
+    const w = window as Window & { showSaveFilePicker?: (opts: unknown) => Promise<FileSystemFileHandle> };
+    if (w.showSaveFilePicker) {
+      try {
+        const handle = await w.showSaveFilePicker({
+          suggestedName: downloadFilename,
+          types: [{ description: 'PDF Document', accept: { 'application/pdf': ['.pdf'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback for browsers without File System Access API
     const a = document.createElement('a');
     a.href = pdfBlobUrl;
     a.download = downloadFilename;
