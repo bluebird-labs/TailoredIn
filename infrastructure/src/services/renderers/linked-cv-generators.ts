@@ -77,7 +77,6 @@ function renderRole(exp: ResumeRenderExperience): string {
 ${bullets}
     ]
   )`;
-
 }
 
 export function generateLinkedCvTyp(input: ResumeRenderInput): string {

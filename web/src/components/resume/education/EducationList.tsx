@@ -10,7 +10,6 @@ import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import {
   type Education,
@@ -19,6 +18,7 @@ import {
   useEducations,
   useUpdateEducation
 } from '@/hooks/use-educations';
+import { cn } from '@/lib/utils';
 import { type EducationFormState, hasErrors, type ValidationErrors, validateEducation } from '@/lib/validation.js';
 import { EducationCardContent } from './EducationCardContent.js';
 

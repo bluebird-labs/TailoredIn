@@ -112,9 +112,7 @@ export function ResumePdfPreview({
   );
 
   const placeholder = (
-    <div
-      className="flex flex-1 items-center justify-center border rounded-lg bg-muted/30"
-    >
+    <div className="flex flex-1 items-center justify-center border rounded-lg bg-muted/30">
       {isLoading ? (
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -150,11 +148,7 @@ export function ResumePdfPreview({
         </div>
 
         {pdfBlobUrl ? (
-          <iframe
-            src={pdfBlobUrl}
-            title="Resume PDF preview"
-            className="w-full flex-1 border rounded-lg"
-          />
+          <iframe src={pdfBlobUrl} title="Resume PDF preview" className="w-full flex-1 border rounded-lg" />
         ) : (
           placeholder
         )}
