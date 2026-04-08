@@ -33,7 +33,7 @@ function ExperienceDetailPage() {
 
   return (
     <div className="space-y-5">
-      <Breadcrumb parentLabel="Experiences" parentTo="/experiences" current={experience.title} />
+      <Breadcrumb parentLabel="Profile" parentTo="/profile" current={experience.title} />
 
       <DetailPageHeader
         logo={

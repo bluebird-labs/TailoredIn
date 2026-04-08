@@ -1,16 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import {
-  Briefcase,
-  Building2,
-  FileText,
-  GraduationCap,
-  type LucideIcon,
-  Moon,
-  Palette,
-  Settings,
-  Sun,
-  User
-} from 'lucide-react';
+import { Building2, FileText, type LucideIcon, Moon, Palette, Settings, Sun, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,8 +25,6 @@ interface NavItem {
 const resumeNav: NavItem[] = [
   { label: 'Atelier', to: '/atelier', icon: Palette },
   { label: 'Profile', to: '/profile', icon: User },
-  { label: 'Experiences', to: '/experiences', icon: Briefcase },
-  { label: 'Education', to: '/education', icon: GraduationCap },
   { label: 'Settings', to: '/settings', icon: Settings }
 ];
 

@@ -14,8 +14,6 @@ import { Route as AtelierRouteImport } from './routes/atelier'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs/index'
-import { Route as ExperiencesIndexRouteImport } from './routes/experiences/index'
-import { Route as EducationIndexRouteImport } from './routes/education/index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies/index'
 import { Route as JobsJobDescriptionIdRouteImport } from './routes/jobs/$jobDescriptionId'
 import { Route as JobDescriptionsJobDescriptionIdRouteImport } from './routes/job-descriptions/$jobDescriptionId'
@@ -45,16 +43,6 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
 const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExperiencesIndexRoute = ExperiencesIndexRouteImport.update({
-  id: '/experiences/',
-  path: '/experiences/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EducationIndexRoute = EducationIndexRouteImport.update({
-  id: '/education/',
-  path: '/education/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
@@ -93,8 +81,6 @@ export interface FileRoutesByFullPath {
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
   '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
   '/companies/': typeof CompaniesIndexRoute
-  '/education/': typeof EducationIndexRoute
-  '/experiences/': typeof ExperiencesIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
@@ -107,8 +93,6 @@ export interface FileRoutesByTo {
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
   '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
   '/companies': typeof CompaniesIndexRoute
-  '/education': typeof EducationIndexRoute
-  '/experiences': typeof ExperiencesIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/profile': typeof ProfileIndexRoute
 }
@@ -122,8 +106,6 @@ export interface FileRoutesById {
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
   '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
   '/companies/': typeof CompaniesIndexRoute
-  '/education/': typeof EducationIndexRoute
-  '/experiences/': typeof ExperiencesIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
@@ -138,8 +120,6 @@ export interface FileRouteTypes {
     | '/job-descriptions/$jobDescriptionId'
     | '/jobs/$jobDescriptionId'
     | '/companies/'
-    | '/education/'
-    | '/experiences/'
     | '/jobs/'
     | '/profile/'
   fileRoutesByTo: FileRoutesByTo
@@ -152,8 +132,6 @@ export interface FileRouteTypes {
     | '/job-descriptions/$jobDescriptionId'
     | '/jobs/$jobDescriptionId'
     | '/companies'
-    | '/education'
-    | '/experiences'
     | '/jobs'
     | '/profile'
   id:
@@ -166,8 +144,6 @@ export interface FileRouteTypes {
     | '/job-descriptions/$jobDescriptionId'
     | '/jobs/$jobDescriptionId'
     | '/companies/'
-    | '/education/'
-    | '/experiences/'
     | '/jobs/'
     | '/profile/'
   fileRoutesById: FileRoutesById
@@ -181,8 +157,6 @@ export interface RootRouteChildren {
   JobDescriptionsJobDescriptionIdRoute: typeof JobDescriptionsJobDescriptionIdRoute
   JobsJobDescriptionIdRoute: typeof JobsJobDescriptionIdRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
-  EducationIndexRoute: typeof EducationIndexRoute
-  ExperiencesIndexRoute: typeof ExperiencesIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
@@ -222,20 +196,6 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs/'
       preLoaderRoute: typeof JobsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/experiences/': {
-      id: '/experiences/'
-      path: '/experiences'
-      fullPath: '/experiences/'
-      preLoaderRoute: typeof ExperiencesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/education/': {
-      id: '/education/'
-      path: '/education'
-      fullPath: '/education/'
-      preLoaderRoute: typeof EducationIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/companies/': {
@@ -285,8 +245,6 @@ const rootRouteChildren: RootRouteChildren = {
   JobDescriptionsJobDescriptionIdRoute: JobDescriptionsJobDescriptionIdRoute,
   JobsJobDescriptionIdRoute: JobsJobDescriptionIdRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
-  EducationIndexRoute: EducationIndexRoute,
-  ExperiencesIndexRoute: ExperiencesIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }
