@@ -101,6 +101,14 @@ bun test <path/to/test.ts>   # run a single test file
 bun run domain:diagram       # regenerate domain/DOMAIN.mmd
 bun run app:diagram          # regenerate application/APPLICATION.mmd
 bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running, main only)
+bun run diags                # regenerate all three diagrams in parallel
+```
+
+### Storybook
+
+```bash
+bun run web:storybook        # launch Storybook dev server
+bun run web:storybook:build  # build static Storybook
 ```
 
 ### Dev servers (for manual use — prefer `dev:up` / `wt:up`)
