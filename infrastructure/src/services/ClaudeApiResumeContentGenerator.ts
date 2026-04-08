@@ -38,9 +38,12 @@ export class ClaudeApiResumeContentGenerator implements ResumeContentGenerator {
     return this.generateFull(input, model);
   }
 
-  private resolveModel(modelTier?: string): Anthropic.Messages.Model {
-    if (!modelTier) return 'claude-opus-4-6';
-    return MODEL_TIER_MAP[modelTier as ModelTier] ?? 'claude-opus-4-6';
+  private resolveModel(model?: string): Anthropic.Messages.Model {
+    if (!model) return 'claude-opus-4-6';
+    // The use case already resolves ModelTier → model ID, so check both:
+    // 1. If it's a tier name (e.g. 'fast'), map it to a model ID
+    // 2. If it's already a model ID (e.g. 'claude-haiku-4-5'), use it directly
+    return MODEL_TIER_MAP[model as ModelTier] ?? (model as Anthropic.Messages.Model);
   }
 
   private async generateFull(

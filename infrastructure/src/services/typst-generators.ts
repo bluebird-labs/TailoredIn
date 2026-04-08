@@ -127,7 +127,8 @@ export function generateProfessionalTyp(experiences: ResumeRenderExperience[]): 
       descriptionContent = exp.summary ? `  #v(-2pt)\n  _${escapeTypst(exp.summary)}_` : '';
     }
 
-    return `#cv-entry(
+    return `#block(breakable: false)[
+#cv-entry(
   title: [${title}],
   society: [${society}],
   date: [${date}],
@@ -135,7 +136,8 @@ export function generateProfessionalTyp(experiences: ResumeRenderExperience[]): 
   description: [
 ${descriptionContent}
   ],
-)`;
+)
+]`;
   });
 
   if (entries.length === 0) {

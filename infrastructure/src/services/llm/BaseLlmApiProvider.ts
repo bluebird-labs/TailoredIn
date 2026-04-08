@@ -1,9 +1,14 @@
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { Logger } from '@tailoredin/core';
 import { err, ok, type Result } from '@tailoredin/domain';
 import type { z } from 'zod';
 import type { LlmJsonRequest } from './LlmJsonRequest.js';
 import { LlmRequestError } from './LlmRequestError.js';
 import type { LlmRequestOptions } from './LlmRequestOptions.js';
+
+const LOG_DIR = resolve(import.meta.dir, '../../../../logs/llm');
+const IS_TEST = process.env.NODE_ENV === 'test';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
 
@@ -57,6 +62,11 @@ export abstract class BaseLlmApiProvider {
         this.log.info(
           `LLM API request failed (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${lastError.message}`
         );
+
+        if (lastError.message.startsWith('Schema validation failed:')) {
+          request.previousValidationErrors.push(lastError.message.replace('Schema validation failed: ', ''));
+        }
+
         await this.sleep(delay);
       }
     }
@@ -82,6 +92,7 @@ export abstract class BaseLlmApiProvider {
     } catch (e) {
       const duration = Math.round(performance.now() - start);
       const msg = e instanceof Error ? e.message : String(e);
+      this.logToFile(request, model, maxTokens, duration, { error: msg });
       return err(new LlmRequestError(msg, descriptor, null, '', '', duration));
     }
 
@@ -92,9 +103,13 @@ export abstract class BaseLlmApiProvider {
     if (!parsed.success) {
       const issues = parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ');
       this.log.warn(`LLM response failed schema validation: ${issues}`);
+      this.logToFile(request, model, maxTokens, duration, {
+        error: `Schema validation failed: ${issues}\n\nRaw response:\n${JSON.stringify(raw, null, 2)}`
+      });
       return err(new LlmRequestError(`Schema validation failed: ${issues}`, descriptor, null, '', '', duration));
     }
 
+    this.logToFile(request, model, maxTokens, duration, { data: parsed.data });
     return ok(parsed.data);
   }
 
@@ -111,5 +126,58 @@ export abstract class BaseLlmApiProvider {
 
   protected sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private logToFile<T extends z.ZodObject<z.ZodRawShape>>(
+    request: LlmJsonRequest<T>,
+    model: string,
+    maxTokens: number,
+    durationMs: number,
+    result: { data: z.infer<T> } | { error: string }
+  ): void {
+    if (IS_TEST) return;
+    try {
+      if (!existsSync(LOG_DIR)) {
+        mkdirSync(LOG_DIR, { recursive: true });
+      }
+
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, '-');
+      const requestClass = request.constructor.name;
+      const filename = `${timestamp}_${requestClass}.md`;
+
+      const input = request.getInput();
+
+      const sections = [
+        `# ${requestClass}`,
+        `**Date:** ${now.toISOString()}`,
+        `**Model:** ${model}`,
+        `**Max Tokens:** ${maxTokens}`,
+        `**Duration:** ${durationMs}ms`,
+        `**Status:** ${'data' in result ? 'SUCCESS' : 'FAILURE'}`,
+        '',
+        '## Input',
+        '',
+        input ? `\`\`\`json\n${JSON.stringify(input, null, 2)}\n\`\`\`` : '*No structured input available*',
+        '',
+        '## Output Schema',
+        '',
+        `\`\`\`json\n${JSON.stringify(request.getJsonSchema(), null, 2)}\n\`\`\``,
+        '',
+        '## Prompt',
+        '',
+        request.prompt,
+        '',
+        '## Response',
+        '',
+        'data' in result ? `\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`` : `**Error:** ${result.error}`
+      ];
+
+      const filePath = resolve(LOG_DIR, filename);
+      writeFileSync(filePath, sections.join('\n'), 'utf-8');
+      this.log.debug(`LLM log written: ${filePath}`);
+    } catch {
+      this.log.warn('Failed to write LLM prompt log file');
+    }
   }
 }

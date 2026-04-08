@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type Anthropic from '@anthropic-ai/sdk';
 import type { ResumeContentGeneratorInput } from '@tailoredin/application';
+import { ResumeConstraints } from '@tailoredin/domain';
 import { z } from 'zod';
 import { LlmJsonRequest } from './LlmJsonRequest.js';
 
@@ -12,8 +13,8 @@ const regenerateExperienceSchema = z.object({
     .array(
       z.object({
         experienceId: z.string(),
-        summary: z.string().min(20).max(300),
-        bullets: z.array(z.string().min(80).max(160))
+        summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH),
+        bullets: z.array(z.string().min(ResumeConstraints.BULLET_MIN_LENGTH).max(ResumeConstraints.BULLET_MAX_LENGTH))
       })
     )
     .length(1)
@@ -34,6 +35,17 @@ export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerat
   ) {
     super();
     this.requestModel = model;
+  }
+
+  public getInput(): Record<string, unknown> {
+    return {
+      profile: this.input.profile,
+      jobDescription: this.input.jobDescription,
+      experiences: this.input.experiences,
+      experienceId: this.experienceId,
+      additionalPrompt: this.input.additionalPrompt ?? null,
+      composedPrompt: this.input.composedPrompt ?? null
+    };
   }
 
   public get prompt(): string {
@@ -66,22 +78,15 @@ export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerat
       .replace('{{jdTitle}}', this.input.jobDescription.title)
       .replace('{{jdDescription}}', this.input.jobDescription.description)
       .replace('{{jdRawText}}', jdRawTextSection)
-      .replace('{{experiencesBlock}}', experiencesBlock);
+      .replace('{{experiencesBlock}}', experiencesBlock)
+      .replaceAll('{{headlineMinLength}}', String(ResumeConstraints.HEADLINE_MIN_LENGTH))
+      .replaceAll('{{headlineMaxLength}}', String(ResumeConstraints.HEADLINE_MAX_LENGTH))
+      .replaceAll('{{bulletMinLength}}', String(ResumeConstraints.BULLET_MIN_LENGTH))
+      .replaceAll('{{bulletMaxLength}}', String(ResumeConstraints.BULLET_MAX_LENGTH))
+      .replaceAll('{{summaryMinLength}}', String(ResumeConstraints.SUMMARY_MIN_LENGTH))
+      .replaceAll('{{summaryMaxLength}}', String(ResumeConstraints.SUMMARY_MAX_LENGTH));
 
     prompt += `\n\nIMPORTANT: Only regenerate the experience with ID "${this.experienceId}". Return exactly one experience entry in your response. Do NOT include a headline.`;
-
-    const previousExperience = this.input.previousContent?.experiences?.find(e => e.experienceId === this.experienceId);
-    if (previousExperience) {
-      const bulletList = previousExperience.bullets.map((b, i) => `${i + 1}. ${b}`).join('\n');
-      prompt += `\n\nThe current bullets for this experience are:\n${bulletList}`;
-      if (this.input.additionalPrompt) {
-        prompt +=
-          '\n\nThe user provided specific instructions below. Follow them precisely — if they ask to change a specific bullet, keep the others as-is. Only modify what is requested.';
-      } else {
-        prompt +=
-          '\n\nNo specific instructions were given, so produce a meaningfully different version. Vary phrasing, emphasis, and which accomplishments to highlight.';
-      }
-    }
 
     if (this.input.composedPrompt) {
       prompt += `\n\n${this.input.composedPrompt}`;
@@ -90,6 +95,8 @@ export class RegenerateExperienceRequest extends LlmJsonRequest<typeof regenerat
     if (this.input.additionalPrompt) {
       prompt += `\n\nAdditional instructions: ${this.input.additionalPrompt}`;
     }
+
+    prompt += this.buildValidationErrorsSuffix();
 
     return prompt;
   }

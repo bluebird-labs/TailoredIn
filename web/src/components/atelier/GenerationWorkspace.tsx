@@ -23,22 +23,38 @@ function formatMonthYear(value: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
+function formatCurrentContent(summary: string | undefined, bullets: string[]): string {
+  const parts: string[] = [];
+  if (summary) parts.push(`Summary: ${summary}`);
+  for (const [i, b] of bullets.entries()) parts.push(`${i + 1}. ${b}`);
+  return parts.join('\n');
+}
+
 function RegeneratePopover({
   isRegenerating,
   onRegenerate,
-  triggerTitle
+  triggerTitle,
+  currentContent
 }: {
   isRegenerating: boolean;
   onRegenerate: (prompt: string) => void;
   triggerTitle: string;
+  currentContent?: { summary?: string; bullets: string[] };
 }) {
   const [open, setOpen] = useState(false);
   const [prompt, setPrompt] = useState('');
+  const [includeCurrentVersion, setIncludeCurrentVersion] = useState(false);
 
   function handleSubmit() {
-    onRegenerate(prompt.trim());
+    let finalPrompt = prompt.trim();
+    if (includeCurrentVersion && currentContent) {
+      const content = formatCurrentContent(currentContent.summary, currentContent.bullets);
+      finalPrompt = `Current version:\n${content}${finalPrompt ? `\n\nInstructions: ${finalPrompt}` : ''}`;
+    }
+    onRegenerate(finalPrompt);
     setOpen(false);
     setPrompt('');
+    setIncludeCurrentVersion(false);
   }
 
   return (
@@ -46,7 +62,10 @@ function RegeneratePopover({
       open={open}
       onOpenChange={nextOpen => {
         setOpen(nextOpen);
-        if (!nextOpen) setPrompt('');
+        if (!nextOpen) {
+          setPrompt('');
+          setIncludeCurrentVersion(false);
+        }
       }}
     >
       <PopoverTrigger
@@ -57,13 +76,24 @@ function RegeneratePopover({
       >
         {isRegenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
       </PopoverTrigger>
-      <PopoverContent className="w-64 border shadow-none" align="end">
+      <PopoverContent className="w-72 border shadow-none" align="end">
         <Textarea
           placeholder="Optional instructions..."
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           className="min-h-[56px] resize-none text-[13px]"
         />
+        {currentContent && (
+          <label className="flex cursor-pointer items-center gap-2 py-1 text-[12px] text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={includeCurrentVersion}
+              onChange={e => setIncludeCurrentVersion(e.target.checked)}
+              className="rounded"
+            />
+            Include current version as reference
+          </label>
+        )}
         <div className="flex justify-end">
           <Button size="sm" variant="outline" onClick={handleSubmit}>
             <RotateCw className="mr-1.5 h-3.5 w-3.5" />
@@ -127,6 +157,7 @@ function ExperienceCard({
           isRegenerating={isRegenerating}
           onRegenerate={onRegenerate}
           triggerTitle="Regenerate this experience"
+          currentContent={{ summary: exp.summary, bullets: exp.bullets }}
         />
       </div>
       {exp.summary && <p className="text-[13px] italic text-muted-foreground">{exp.summary}</p>}

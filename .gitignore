@@ -45,3 +45,6 @@ e2e/test-results/
 
 # Storybook build output
 storybook-static
+
+# LLM prompt/response logs
+logs/

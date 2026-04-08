@@ -2,18 +2,19 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type Anthropic from '@anthropic-ai/sdk';
 import type { ResumeContentGeneratorInput } from '@tailoredin/application';
+import { ResumeConstraints } from '@tailoredin/domain';
 import { z } from 'zod';
 import { LlmJsonRequest } from './LlmJsonRequest.js';
 
 const PROMPT_PATH = resolve(import.meta.dir, '../prompts/generate-resume-bullets.md');
 
 const generateResumeBulletsSchema = z.object({
-  headline: z.string().min(10).max(400),
+  headline: z.string().min(ResumeConstraints.HEADLINE_MIN_LENGTH).max(ResumeConstraints.HEADLINE_MAX_LENGTH),
   experiences: z.array(
     z.object({
       experienceId: z.string(),
-      summary: z.string().min(20).max(300),
-      bullets: z.array(z.string().min(80).max(160))
+      summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH),
+      bullets: z.array(z.string().min(ResumeConstraints.BULLET_MIN_LENGTH).max(ResumeConstraints.BULLET_MAX_LENGTH))
     })
   )
 });
@@ -32,6 +33,16 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
   ) {
     super();
     this.requestModel = model;
+  }
+
+  public getInput(): Record<string, unknown> {
+    return {
+      profile: this.input.profile,
+      jobDescription: this.input.jobDescription,
+      experiences: this.input.experiences,
+      additionalPrompt: this.input.additionalPrompt ?? null,
+      composedPrompt: this.input.composedPrompt ?? null
+    };
   }
 
   public get prompt(): string {
@@ -64,24 +75,13 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
       .replace('{{jdTitle}}', this.input.jobDescription.title)
       .replace('{{jdDescription}}', this.input.jobDescription.description)
       .replace('{{jdRawText}}', jdRawTextSection)
-      .replace('{{experiencesBlock}}', experiencesBlock);
-
-    if (this.input.previousContent) {
-      const parts: string[] = [
-        '\n\n## Previous Version',
-        'The previous resume content is shown below. Produce a meaningfully different version — vary structure, emphasis, and phrasing throughout.'
-      ];
-      if (this.input.previousContent.headline) {
-        parts.push(`\nPrevious headline: "${this.input.previousContent.headline}"`);
-      }
-      for (const exp of this.input.previousContent.experiences ?? []) {
-        const matchingExp = this.input.experiences.find(e => e.id === exp.experienceId);
-        const label = matchingExp ? `${matchingExp.title} at ${matchingExp.companyName}` : exp.experienceId;
-        const bulletList = exp.bullets.map(b => `- ${b}`).join('\n');
-        parts.push(`\nPrevious bullets for ${label}:\n${bulletList}`);
-      }
-      prompt += parts.join('\n');
-    }
+      .replace('{{experiencesBlock}}', experiencesBlock)
+      .replaceAll('{{headlineMinLength}}', String(ResumeConstraints.HEADLINE_MIN_LENGTH))
+      .replaceAll('{{headlineMaxLength}}', String(ResumeConstraints.HEADLINE_MAX_LENGTH))
+      .replaceAll('{{bulletMinLength}}', String(ResumeConstraints.BULLET_MIN_LENGTH))
+      .replaceAll('{{bulletMaxLength}}', String(ResumeConstraints.BULLET_MAX_LENGTH))
+      .replaceAll('{{summaryMinLength}}', String(ResumeConstraints.SUMMARY_MIN_LENGTH))
+      .replaceAll('{{summaryMaxLength}}', String(ResumeConstraints.SUMMARY_MAX_LENGTH));
 
     if (this.input.composedPrompt) {
       prompt += `\n\n${this.input.composedPrompt}`;
@@ -90,6 +90,8 @@ export class GenerateResumeBulletsRequest extends LlmJsonRequest<typeof generate
     if (this.input.additionalPrompt) {
       prompt += `\n\nAdditional instructions: ${this.input.additionalPrompt}`;
     }
+
+    prompt += this.buildValidationErrorsSuffix();
 
     return prompt;
   }

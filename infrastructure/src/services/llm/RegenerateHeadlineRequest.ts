@@ -2,13 +2,14 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type Anthropic from '@anthropic-ai/sdk';
 import type { ResumeContentGeneratorInput } from '@tailoredin/application';
+import { ResumeConstraints } from '@tailoredin/domain';
 import { z } from 'zod';
 import { LlmJsonRequest } from './LlmJsonRequest.js';
 
 const PROMPT_PATH = resolve(import.meta.dir, '../prompts/generate-resume-bullets.md');
 
 const regenerateHeadlineSchema = z.object({
-  headline: z.string().min(10).max(400)
+  headline: z.string().min(ResumeConstraints.HEADLINE_MIN_LENGTH).max(ResumeConstraints.HEADLINE_MAX_LENGTH)
 });
 
 export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateHeadlineSchema> {
@@ -25,6 +26,16 @@ export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateH
   ) {
     super();
     this.requestModel = model;
+  }
+
+  public getInput(): Record<string, unknown> {
+    return {
+      profile: this.input.profile,
+      jobDescription: this.input.jobDescription,
+      experiences: this.input.experiences,
+      additionalPrompt: this.input.additionalPrompt ?? null,
+      composedPrompt: this.input.composedPrompt ?? null
+    };
   }
 
   public get prompt(): string {
@@ -57,20 +68,15 @@ export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateH
       .replace('{{jdTitle}}', this.input.jobDescription.title)
       .replace('{{jdDescription}}', this.input.jobDescription.description)
       .replace('{{jdRawText}}', jdRawTextSection)
-      .replace('{{experiencesBlock}}', experiencesBlock);
+      .replace('{{experiencesBlock}}', experiencesBlock)
+      .replaceAll('{{headlineMinLength}}', String(ResumeConstraints.HEADLINE_MIN_LENGTH))
+      .replaceAll('{{headlineMaxLength}}', String(ResumeConstraints.HEADLINE_MAX_LENGTH))
+      .replaceAll('{{bulletMinLength}}', String(ResumeConstraints.BULLET_MIN_LENGTH))
+      .replaceAll('{{bulletMaxLength}}', String(ResumeConstraints.BULLET_MAX_LENGTH))
+      .replaceAll('{{summaryMinLength}}', String(ResumeConstraints.SUMMARY_MIN_LENGTH))
+      .replaceAll('{{summaryMaxLength}}', String(ResumeConstraints.SUMMARY_MAX_LENGTH));
 
     prompt += '\n\nIMPORTANT: Only regenerate the headline. Do NOT include experiences in your response.';
-
-    if (this.input.previousContent?.headline) {
-      prompt += `\n\nThe current headline is:\n"${this.input.previousContent.headline}"`;
-      if (this.input.additionalPrompt) {
-        prompt +=
-          '\n\nThe user provided specific instructions below. Follow them precisely — if they ask for a targeted change, preserve the rest of the headline.';
-      } else {
-        prompt +=
-          '\n\nNo specific instructions were given, so produce a meaningfully different headline. Vary the structure, emphasis, and phrasing.';
-      }
-    }
 
     if (this.input.composedPrompt) {
       prompt += `\n\n${this.input.composedPrompt}`;
@@ -79,6 +85,8 @@ export class RegenerateHeadlineRequest extends LlmJsonRequest<typeof regenerateH
     if (this.input.additionalPrompt) {
       prompt += `\n\nAdditional instructions: ${this.input.additionalPrompt}`;
     }
+
+    prompt += this.buildValidationErrorsSuffix();
 
     return prompt;
   }

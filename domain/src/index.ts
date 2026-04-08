@@ -63,6 +63,7 @@ export type { BlockLayout, LayoutAnalysis } from './value-objects/LayoutAnalysis
 export { LocationType } from './value-objects/LocationType.js';
 export { ModelTier } from './value-objects/ModelTier.js';
 export { ProfileId } from './value-objects/ProfileId.js';
+export { ResumeConstraints } from './value-objects/ResumeConstraints.js';
 export { ResumeContentId } from './value-objects/ResumeContentId.js';
 export type { ResumeExperience } from './value-objects/ResumeExperience.js';
 export type { ResumeTemplate } from './value-objects/ResumeTemplate.js';

@@ -37,6 +37,10 @@ class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSc
     super();
   }
 
+  public getInput(): Record<string, unknown> {
+    return { url: this.url, context: this.context ?? null };
+  }
+
   public get prompt(): string {
     const template = readFileSync(PROMPT_PATH, 'utf-8');
 

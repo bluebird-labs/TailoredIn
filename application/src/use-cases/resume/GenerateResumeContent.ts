@@ -102,17 +102,7 @@ export class GenerateResumeContent {
       additionalPrompt: input.additionalPrompt,
       scope: input.scope,
       model: resolveModelId(settings.modelTier),
-      composedPrompt: composedPrompt ?? undefined,
-      previousContent: existing
-        ? {
-            headline: existing.headline,
-            experiences: existing.experiences.map(e => ({
-              experienceId: e.experienceId,
-              summary: e.summary,
-              bullets: e.bullets
-            }))
-          }
-        : undefined
+      composedPrompt: composedPrompt ?? undefined
     };
 
     const result = await this.generator.generate(generatorInput);

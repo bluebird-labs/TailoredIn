@@ -89,7 +89,8 @@ export function generateLinkedCvTyp(input: ResumeRenderInput): string {
     const companyLabel = firstRole?.companyAccent
       ? `${group.companyName} · ${firstRole.companyAccent}`
       : group.companyName;
-    return `#components.employer-info(
+    return `#block(breakable: false)[
+#components.employer-info(
   none,
   name: "${escapeTypst(companyLabel)}",
   duration: ("${group.overallStart}", "${group.overallEnd}"),
@@ -98,7 +99,8 @@ export function generateLinkedCvTyp(input: ResumeRenderInput): string {
 #frame.connected-frames(
   "${group.companySlug}",
 ${roles},
-)`;
+)
+]`;
   });
 
   const educationEntries = educations.map(edu => {

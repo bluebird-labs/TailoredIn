@@ -24,12 +24,14 @@ export function generateModernCvTyp(input: ResumeRenderInput): string {
   date: "${date}",
   description: "${escapeAuthorField(company)}",
 )`;
-    if (exp.bullets.length === 0) return entry;
+    if (exp.bullets.length === 0) return `#block(breakable: false)[${entry}]`;
     const bullets = exp.bullets.map(b => `  - ${escapeTypst(b)}`).join('\n');
-    return `${entry}
+    return `#block(breakable: false)[
+${entry}
 
 #resume-item[
 ${bullets}
+]
 ]`;
   });
 

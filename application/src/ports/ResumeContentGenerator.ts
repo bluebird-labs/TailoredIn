@@ -18,14 +18,6 @@ export type ResumeContentGeneratorInput = {
   scope?: ResumeContentGeneratorScope;
   model?: string;
   composedPrompt?: string;
-  previousContent?: {
-    headline?: string;
-    experiences?: Array<{
-      experienceId: string;
-      summary: string;
-      bullets: string[];
-    }>;
-  };
 };
 
 export type ResumeContentGeneratorResult = {

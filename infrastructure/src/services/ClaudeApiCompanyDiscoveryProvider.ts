@@ -26,6 +26,10 @@ class CompanyDiscoveryRequest extends LlmJsonRequest<typeof companyDiscoverySche
     super();
   }
 
+  public getInput(): Record<string, unknown> {
+    return { query: this.query };
+  }
+
   public get prompt(): string {
     const lines = [
       `Given this query: "${this.query}"`,

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import type { ResumeContentGeneratorInput } from '@tailoredin/application';
+import { ResumeConstraints } from '@tailoredin/domain';
 import { GenerateResumeBulletsRequest } from '../../../src/services/llm/GenerateResumeBulletsRequest.js';
 
 // ---------------------------------------------------------------------------
@@ -54,15 +55,12 @@ describe('GenerateResumeBulletsRequest', () => {
     test('validates correct structure with headline and valid bullets', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const validPayload = {
-        headline: 'Staff Engineer | 8+ Years of Experience',
+        headline: 'A'.repeat(ResumeConstraints.HEADLINE_MIN_LENGTH),
         experiences: [
           {
             experienceId: 'exp-aaa-111',
             summary: 'Led platform engineering initiatives across distributed teams.',
-            bullets: [
-              'Reduced deployment time by 60% by introducing automated CI/CD pipelines with GitHub Actions and containerised builds',
-              'Mentored four junior engineers through structured code reviews and weekly one-on-ones resulting in measurable skill growth'
-            ]
+            bullets: ['A'.repeat(ResumeConstraints.BULLET_MIN_LENGTH), 'A'.repeat(ResumeConstraints.BULLET_MAX_LENGTH)]
           }
         ]
       };
@@ -71,15 +69,15 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(true);
     });
 
-    test('accepts headline at the maximum length (400 chars)', () => {
+    test('accepts headline at the maximum length', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const payload = {
-        headline: 'A'.repeat(400),
+        headline: 'A'.repeat(ResumeConstraints.HEADLINE_MAX_LENGTH),
         experiences: [
           {
             experienceId: 'exp-aaa-111',
             summary: 'Summary text that is between 20 and 300 characters long for this test.',
-            bullets: ['A'.repeat(100)]
+            bullets: ['A'.repeat(ResumeConstraints.BULLET_MIN_LENGTH)]
           }
         ]
       };
@@ -88,15 +86,15 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(true);
     });
 
-    test('rejects headline exceeding maximum length (401 chars)', () => {
+    test('rejects headline exceeding maximum length', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
       const payload = {
-        headline: 'A'.repeat(401),
+        headline: 'A'.repeat(ResumeConstraints.HEADLINE_MAX_LENGTH + 1),
         experiences: [
           {
             experienceId: 'exp-aaa-111',
             summary: 'Summary text that is between 20 and 300 characters long for this test.',
-            bullets: ['A'.repeat(100)]
+            bullets: ['A'.repeat(ResumeConstraints.BULLET_MIN_LENGTH)]
           }
         ]
       };
@@ -112,7 +110,7 @@ describe('GenerateResumeBulletsRequest', () => {
           {
             experienceId: 'exp-aaa-111',
             summary: 'Summary text.',
-            bullets: ['A'.repeat(100)]
+            bullets: ['A'.repeat(ResumeConstraints.BULLET_MIN_LENGTH)]
           }
         ]
       };
@@ -121,14 +119,13 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('rejects bullets shorter than 80 characters', () => {
+    test('rejects bullets shorter than minimum length', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
-      const shortBullet = 'Too short bullet'; // < 80 chars
       const payload = {
         experiences: [
           {
             experienceId: 'exp-aaa-111',
-            bullets: [shortBullet]
+            bullets: ['Too short bullet']
           }
         ]
       };
@@ -137,14 +134,13 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('rejects bullets longer than 160 characters', () => {
+    test('rejects bullets longer than maximum length', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
-      const longBullet = 'A'.repeat(161);
       const payload = {
         experiences: [
           {
             experienceId: 'exp-aaa-111',
-            bullets: [longBullet]
+            bullets: ['A'.repeat(ResumeConstraints.BULLET_MAX_LENGTH + 1)]
           }
         ]
       };
@@ -153,17 +149,15 @@ describe('GenerateResumeBulletsRequest', () => {
       expect(result.success).toBe(false);
     });
 
-    test('accepts bullets at the boundary lengths (80 and 160 chars)', () => {
+    test('accepts bullets at the boundary lengths', () => {
       const request = new GenerateResumeBulletsRequest(makeInput());
-      const exactMin = 'A'.repeat(80);
-      const exactMax = 'A'.repeat(160);
       const payload = {
-        headline: 'Staff Engineer | 8+ Years of Experience',
+        headline: 'A'.repeat(ResumeConstraints.HEADLINE_MIN_LENGTH),
         experiences: [
           {
             experienceId: 'exp-aaa-111',
             summary: 'Summary text that is between 20 and 300 characters long for this test.',
-            bullets: [exactMin, exactMax]
+            bullets: ['A'.repeat(ResumeConstraints.BULLET_MIN_LENGTH), 'A'.repeat(ResumeConstraints.BULLET_MAX_LENGTH)]
           }
         ]
       };
