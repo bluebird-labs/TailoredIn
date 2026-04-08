@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { Download } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { EducationList } from '@/components/resume/education/EducationList.js';
 import { ExperienceList } from '@/components/resume/experience/ExperienceList.js';
@@ -9,9 +10,12 @@ import { EditableSection } from '@/components/shared/EditableSection.js';
 import { EditableSectionProvider } from '@/components/shared/EditableSectionContext.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { Button } from '@/components/ui/button.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.js';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
+import type { Education } from '@/hooks/use-educations.js';
 import { useEducations } from '@/hooks/use-educations.js';
+import type { Experience } from '@/hooks/use-experiences.js';
 import { useExperiences } from '@/hooks/use-experiences.js';
 import { useNavGuard } from '@/hooks/use-nav-guard.js';
 import { useProfile, useUpdateProfile } from '@/hooks/use-profile';
@@ -21,6 +25,103 @@ export const Route = createFileRoute('/profile/')({
   component: ProfilePage
 });
 
+function formatMonthYear(value: string): string {
+  if (!value) return '';
+  const [year, month] = value.split('-');
+  if (!year || !month) return value;
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+function generateProfileMarkdown(profile: ProfileData, experiences: Experience[], educations: Education[]): string {
+  const lines: string[] = [];
+
+  lines.push(`# ${profile.firstName} ${profile.lastName}`);
+  lines.push('');
+
+  const contactParts: string[] = [];
+  if (profile.location) contactParts.push(profile.location);
+  if (profile.email) contactParts.push(profile.email);
+  if (profile.phone) contactParts.push(profile.phone);
+  if (contactParts.length > 0) {
+    lines.push(contactParts.join(' | '));
+    lines.push('');
+  }
+
+  if (profile.about) {
+    lines.push('## About');
+    lines.push('');
+    lines.push(profile.about);
+    lines.push('');
+  }
+
+  const links: string[] = [];
+  if (profile.linkedinUrl) links.push(`- [LinkedIn](${profile.linkedinUrl})`);
+  if (profile.githubUrl) links.push(`- [GitHub](${profile.githubUrl})`);
+  if (profile.websiteUrl) links.push(`- [Website](${profile.websiteUrl})`);
+  if (links.length > 0) {
+    lines.push('## Links');
+    lines.push('');
+    lines.push(...links);
+    lines.push('');
+  }
+
+  const sortedExperiences = [...experiences].sort((a, b) => a.ordinal - b.ordinal);
+  if (sortedExperiences.length > 0) {
+    lines.push('## Experience');
+    lines.push('');
+
+    for (const exp of sortedExperiences) {
+      lines.push(`### ${exp.title} — ${exp.companyName}`);
+      lines.push('');
+
+      const meta: string[] = [];
+      if (exp.location) meta.push(exp.location);
+      const start = formatMonthYear(exp.startDate);
+      const end = formatMonthYear(exp.endDate);
+      if (start && end) meta.push(`${start} — ${end}`);
+      if (meta.length > 0) {
+        lines.push(meta.join(' | '));
+        lines.push('');
+      }
+
+      if (exp.summary) {
+        lines.push(exp.summary);
+        lines.push('');
+      }
+
+      const sortedAccomplishments = [...exp.accomplishments].sort((a, b) => a.ordinal - b.ordinal);
+      if (sortedAccomplishments.length > 0) {
+        lines.push('**Accomplishments:**');
+        lines.push('');
+        for (const acc of sortedAccomplishments) {
+          lines.push(`- **${acc.title}**: ${acc.narrative}`);
+        }
+        lines.push('');
+      }
+    }
+  }
+
+  const sortedEducations = [...educations].sort((a, b) => a.ordinal - b.ordinal);
+  if (sortedEducations.length > 0) {
+    lines.push('## Education');
+    lines.push('');
+
+    for (const edu of sortedEducations) {
+      lines.push(`### ${edu.degreeTitle} — ${edu.institutionName}`);
+      lines.push('');
+
+      const eduMeta: string[] = [String(edu.graduationYear)];
+      if (edu.location) eduMeta.push(edu.location);
+      if (edu.honors) eduMeta.push(edu.honors);
+      lines.push(eduMeta.join(' | '));
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n').trimEnd() + '\n';
+}
+
 function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: experiences = [] } = useExperiences();
@@ -29,7 +130,7 @@ function ProfilePage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader />
+        <PageHeader profile={null} experiences={[]} educations={[]} />
         <LoadingSkeleton variant="form" />
       </div>
     );
@@ -38,7 +139,7 @@ function ProfilePage() {
   if (!profile) {
     return (
       <div className="space-y-6">
-        <PageHeader />
+        <PageHeader profile={null} experiences={[]} educations={[]} />
         <EmptyState message="No profile found." />
       </div>
     );
@@ -50,7 +151,7 @@ function ProfilePage() {
   return (
     <EditableSectionProvider>
       <div className="space-y-6">
-        <PageHeader />
+        <PageHeader profile={profile} experiences={experiences} educations={educations} />
 
         <Tabs defaultValue="profile">
           <TabsList>
@@ -94,11 +195,57 @@ function ProfilePage() {
   );
 }
 
-function PageHeader() {
+function PageHeader({
+  profile,
+  experiences,
+  educations
+}: {
+  readonly profile: ProfileData | null;
+  readonly experiences: Experience[];
+  readonly educations: Education[];
+}) {
+  const handleDownload = useCallback(async () => {
+    if (!profile) return;
+
+    const markdown = generateProfileMarkdown(profile, experiences, educations);
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const filename = `${timestamp}-${profile.firstName.toLowerCase()}-${profile.lastName.toLowerCase()}-profile.md`;
+
+    const w = window as Window & { showSaveFilePicker?: (opts: unknown) => Promise<FileSystemFileHandle> };
+    if (w.showSaveFilePicker) {
+      try {
+        const handle = await w.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: 'Markdown Document', accept: { 'text/markdown': ['.md'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+      } catch {
+        // User cancelled the picker — do nothing
+        return;
+      }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [profile, experiences, educations]);
+
   return (
-    <div>
-      <h1 className="page-heading">Profile</h1>
-      <p className="text-muted-foreground text-sm">Your professional identity.</p>
+    <div className="flex items-center justify-between">
+      <div>
+        <h1 className="page-heading">Profile</h1>
+        <p className="text-muted-foreground text-sm">Your professional identity.</p>
+      </div>
+      <Button variant="ghost" size="icon-sm" onClick={handleDownload} disabled={!profile} title="Download as Markdown">
+        <Download className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
