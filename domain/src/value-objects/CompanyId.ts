@@ -2,6 +2,8 @@ import { ValueObject } from '../ValueObject.js';
 
 export class CompanyId extends ValueObject<{ value: string }> {
   public constructor(value: string) {
+    // Handle mapToPk runtime conversion: MikroORM may pass a ValueObject instead of string
+    if (typeof value !== 'string') value = (value as any).value;
     super({ value });
   }
 
