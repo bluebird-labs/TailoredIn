@@ -52,10 +52,6 @@ export { UpdateExperience } from './experience/UpdateExperience.js';
 export { GetProfile } from './GetProfile.js';
 export type { GetGenerationSettingsInput } from './generation-settings/GetGenerationSettings.js';
 export { GetGenerationSettings } from './generation-settings/GetGenerationSettings.js';
-export type { RemoveExperienceGenerationOverrideInput } from './generation-settings/RemoveExperienceGenerationOverride.js';
-export { RemoveExperienceGenerationOverride } from './generation-settings/RemoveExperienceGenerationOverride.js';
-export type { SetExperienceGenerationOverrideInput } from './generation-settings/SetExperienceGenerationOverride.js';
-export { SetExperienceGenerationOverride } from './generation-settings/SetExperienceGenerationOverride.js';
 export type { UpdateGenerationSettingsInput } from './generation-settings/UpdateGenerationSettings.js';
 export { UpdateGenerationSettings } from './generation-settings/UpdateGenerationSettings.js';
 export type { CreateJobDescriptionInput } from './job-description/CreateJobDescription.js';
@@ -70,7 +66,11 @@ export type { ParseJobDescriptionInput } from './job-description/ParseJobDescrip
 export { ParseJobDescription } from './job-description/ParseJobDescription.js';
 export type { UpdateJobDescriptionInput } from './job-description/UpdateJobDescription.js';
 export { UpdateJobDescription } from './job-description/UpdateJobDescription.js';
-export type { GenerateResumeContentInput, GenerateResumeContentScope } from './resume/GenerateResumeContent.js';
+export type {
+  BulletOverride,
+  GenerateResumeContentInput,
+  GenerateResumeContentScope
+} from './resume/GenerateResumeContent.js';
 export { GenerateResumeContent } from './resume/GenerateResumeContent.js';
 export { GenerateResumeContentWithPdf } from './resume/GenerateResumeContentWithPdf.js';
 export type { GenerateResumePdfInput } from './resume/GenerateResumePdf.js';

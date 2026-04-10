@@ -27,7 +27,8 @@ export class GenerateResumeContentRoute {
           const data = await this.generateResumeContent.execute({
             jobDescriptionId: body.jobDescriptionId,
             additionalPrompt: body.additionalPrompt,
-            scope: body.scope
+            scope: body.scope,
+            bulletOverrides: body.bulletOverrides
           });
           return { data };
         } catch (e) {
@@ -47,6 +48,15 @@ export class GenerateResumeContentRoute {
               t.Object({ type: t.Literal('headline') }),
               t.Object({ type: t.Literal('experience'), experienceId: t.String() })
             ])
+          ),
+          bulletOverrides: t.Optional(
+            t.Array(
+              t.Object({
+                experienceId: t.String(),
+                min: t.Number({ minimum: 1, maximum: 20 }),
+                max: t.Number({ minimum: 1, maximum: 20 })
+              })
+            )
           )
         })
       }

@@ -34,10 +34,8 @@ import type {
   ListExperiences,
   ListJobDescriptions,
   ParseJobDescription,
-  RemoveExperienceGenerationOverride,
   ResumeContentGenerator,
   ResumeRendererFactory,
-  SetExperienceGenerationOverride,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -54,7 +52,6 @@ import type {
   ApplicationRepository,
   CompanyRepository,
   EducationRepository,
-  ExperienceGenerationOverrideRepository,
   ExperienceRepository,
   GenerationSettingsRepository,
   JobDescriptionRepository,
@@ -122,14 +119,6 @@ export const DI = {
     Repository: new InjectionToken<GenerationSettingsRepository>('DI.GenerationSettings.Repository'),
     Get: new InjectionToken<GetGenerationSettings>('DI.GenerationSettings.Get'),
     Update: new InjectionToken<UpdateGenerationSettings>('DI.GenerationSettings.Update')
-  },
-
-  ExperienceGenerationOverride: {
-    Repository: new InjectionToken<ExperienceGenerationOverrideRepository>(
-      'DI.ExperienceGenerationOverride.Repository'
-    ),
-    Set: new InjectionToken<SetExperienceGenerationOverride>('DI.ExperienceGenerationOverride.Set'),
-    Remove: new InjectionToken<RemoveExperienceGenerationOverride>('DI.ExperienceGenerationOverride.Remove')
   },
 
   ResumeContent: {

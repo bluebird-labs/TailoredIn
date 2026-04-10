@@ -28,6 +28,8 @@ export type UpdateExperienceInput = {
   summary: string | null;
   ordinal: number;
   accomplishments: AccomplishmentInput[];
+  bulletMin?: number;
+  bulletMax?: number;
 };
 
 export class UpdateExperience {
@@ -53,6 +55,10 @@ export class UpdateExperience {
     experience.ordinal = input.ordinal;
     experience.updatedAt = new Date();
     experience.syncAccomplishments(input.accomplishments);
+
+    if (input.bulletMin !== undefined && input.bulletMax !== undefined) {
+      experience.updateBulletRange(input.bulletMin, input.bulletMax);
+    }
 
     await this.experienceRepository.save(experience);
     return ok(toExperienceDto(experience));

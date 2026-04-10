@@ -1,7 +1,6 @@
 import {
   type EducationRepository,
   EntityNotFoundError,
-  type ExperienceGenerationOverrideRepository,
   type ExperienceRepository,
   GenerationScope,
   GenerationSettings,
@@ -17,10 +16,13 @@ import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.
 
 export type GenerateResumeContentScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
 
+export type BulletOverride = { experienceId: string; min: number; max: number };
+
 export type GenerateResumeContentInput = {
   jobDescriptionId: string;
   additionalPrompt?: string;
   scope?: GenerateResumeContentScope;
+  bulletOverrides?: BulletOverride[];
 };
 
 function resolveModelId(tier: ModelTier): string {
@@ -42,8 +44,7 @@ export class GenerateResumeContent {
     private readonly resumeContentRepository: ResumeContentRepository,
     private readonly generator: ResumeContentGenerator,
     private readonly educationRepository: EducationRepository,
-    private readonly generationSettingsRepository: GenerationSettingsRepository,
-    private readonly experienceGenerationOverrideRepository: ExperienceGenerationOverrideRepository
+    private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
@@ -63,8 +64,7 @@ export class GenerateResumeContent {
       .filter(e => e.profileId === profile.id)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(experiences.map(e => e.id));
-    const overrideMap = new Map(overrides.map(o => [o.experienceId, o]));
+    const overrideMap = new Map((input.bulletOverrides ?? []).map(o => [o.experienceId, o]));
 
     const composedPrompt = this.composePrompt(settings, input.scope, input.additionalPrompt);
 
@@ -92,8 +92,8 @@ export class GenerateResumeContent {
             title: a.title,
             narrative: a.narrative
           })),
-          minBullets: override?.bulletMin ?? settings.bulletMin,
-          maxBullets: override?.bulletMax ?? settings.bulletMax
+          minBullets: override?.min ?? exp.bulletMin,
+          maxBullets: override?.max ?? exp.bulletMax
         };
       }),
       additionalPrompt: input.additionalPrompt,

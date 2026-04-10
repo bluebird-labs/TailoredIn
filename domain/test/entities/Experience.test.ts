@@ -14,7 +14,9 @@ describe('Experience', () => {
       startDate: '2022-01',
       endDate: 'Present',
       summary: 'Led platform team',
-      ordinal: 0
+      ordinal: 0,
+      bulletMin: 2,
+      bulletMax: 5
     });
 
   test('creates with empty accomplishments', () => {

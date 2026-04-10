@@ -89,6 +89,8 @@ function makeExperience() {
     endDate: 'Present',
     summary: null,
     ordinal: 0,
+    bulletMin: 2,
+    bulletMax: 5,
     createdAt: new Date(),
     updatedAt: new Date()
   });

@@ -6,8 +6,6 @@ export type { CompanyDto } from './CompanyDto.js';
 export { toCompanyDto } from './CompanyDto.js';
 export type { EducationDto } from './EducationDto.js';
 export type { ExperienceDto } from './ExperienceDto.js';
-export type { ExperienceGenerationOverrideDto } from './ExperienceGenerationOverrideDto.js';
-export { toExperienceGenerationOverrideDto } from './ExperienceGenerationOverrideDto.js';
 export type { GenerationPromptDto, GenerationSettingsDto } from './GenerationSettingsDto.js';
 export { toGenerationSettingsDto } from './GenerationSettingsDto.js';
 export type { JobDescriptionDto, ResumeOutputDto, SalaryRangeDto } from './JobDescriptionDto.js';

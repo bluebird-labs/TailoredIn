@@ -11,7 +11,6 @@ import {
   Company,
   Education,
   Experience,
-  ExperienceGenerationOverride,
   GenerationPrompt,
   GenerationSettings,
   JobDescription,
@@ -47,8 +46,7 @@ export function createOrmConfig(db: OrmDbConfig) {
       JobDescription,
       ResumeContent,
       GenerationSettings,
-      GenerationPrompt,
-      ExperienceGenerationOverride
+      GenerationPrompt
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
@@ -61,7 +59,6 @@ export function createOrmConfig(db: OrmDbConfig) {
     implicitTransactions: true,
     ensureDatabase: true,
     preferTs: true,
-    forceEntityConstructor: true,
     multipleStatements: true,
     useBatchInserts: true,
     useBatchUpdates: true,

@@ -22,6 +22,8 @@ const makeExperience = (overrides: Partial<ConstructorParameters<typeof Experien
     endDate: '2023-06',
     summary: 'Built cool things',
     ordinal: 0,
+    bulletMin: 2,
+    bulletMax: 5,
     accomplishments: [],
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),

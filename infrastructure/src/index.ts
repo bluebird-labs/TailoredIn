@@ -6,7 +6,6 @@ export { createOrmConfig } from './db/orm-config.js';
 export { PostgresApplicationRepository } from './repositories/PostgresApplicationRepository.js';
 export { PostgresCompanyRepository } from './repositories/PostgresCompanyRepository.js';
 export { PostgresEducationRepository } from './repositories/PostgresEducationRepository.js';
-export { PostgresExperienceGenerationOverrideRepository } from './repositories/PostgresExperienceGenerationOverrideRepository.js';
 export { PostgresExperienceRepository } from './repositories/PostgresExperienceRepository.js';
 export { PostgresGenerationSettingsRepository } from './repositories/PostgresGenerationSettingsRepository.js';
 export { PostgresJobDescriptionRepository } from './repositories/PostgresJobDescriptionRepository.js';

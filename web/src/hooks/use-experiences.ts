@@ -17,6 +17,8 @@ export type Experience = {
   endDate: string;
   summary: string | null;
   ordinal: number;
+  bulletMin: number;
+  bulletMax: number;
   accomplishments: AccomplishmentDto[];
 };
 
@@ -89,6 +91,8 @@ export function useUpdateExperience() {
       summary?: string;
       ordinal: number;
       accomplishments: { id: string | null; title: string; narrative: string; ordinal: number }[];
+      bullet_min?: number;
+      bullet_max?: number;
     }) => {
       const { id, ...body } = input;
       const { data, error } = await api.experiences({ id }).put(body);

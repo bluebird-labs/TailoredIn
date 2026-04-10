@@ -23,7 +23,7 @@ erDiagram
         uuid profile_id FK
         uuid company_id FK
         uuid job_description_id FK "nullable"
-        text status "default: draft"
+        application_status status "default: draft"
         text notes "nullable"
         timestamp applied_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
@@ -56,11 +56,12 @@ erDiagram
         text logo_url "nullable"
         text linkedin_link UK "nullable"
         text website "nullable"
-        text business_type "nullable"
-        text industry "nullable"
-        text stage "nullable"
+        business_type business_type "default: unknown"
+        industry industry "default: unknown"
+        company_stage stage "default: unknown"
         text description "nullable"
-        text status "nullable"
+        company_status status "default: unknown"
+        text domain_name
     }
 
     educations {
@@ -92,6 +93,27 @@ erDiagram
         integer ordinal "default: 0"
         uuid company_id FK "nullable"
         text company_accent "nullable"
+        integer bullet_min
+        integer bullet_max
+    }
+
+    generation_prompts {
+        uuid id PK
+        uuid generation_settings_id FK "unique"
+        generation_scope scope UK
+        text content
+        timestamp created_at "default: now()"
+        timestamp updated_at "default: now()"
+    }
+
+    generation_settings {
+        uuid id PK
+        uuid profile_id FK "unique"
+        model_tier model_tier "default: balanced"
+        integer bullet_min "default: 2"
+        integer bullet_max "default: 5"
+        timestamp created_at "default: now()"
+        timestamp updated_at "default: now()"
     }
 
     job_descriptions {
@@ -104,9 +126,9 @@ erDiagram
         integer salary_min "nullable"
         integer salary_max "nullable"
         text salary_currency "nullable"
-        text level "nullable"
-        text location_type "nullable"
-        text source
+        job_level level "default: unknown"
+        location_type location_type "default: unknown"
+        job_source source
         timestamp posted_at "nullable"
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
@@ -149,18 +171,20 @@ erDiagram
     %%  Relationships
     %% ──────────────────────────────────────────────
 
-    companies ||--o{ job_descriptions : "has"
-    companies ||--o{ applications : "has"
     job_descriptions ||--o{ applications : "has"
     companies ||--o{ experiences : "has"
     job_descriptions ||--o{ resume_contents : "has"
     profiles ||--o{ resume_contents : "has"
     profiles ||--o{ applications : "has"
+    profiles ||--o| generation_settings : "has"
+    generation_settings ||--o| generation_prompts : "has"
     profiles ||--o{ experiences : "has"
     profiles ||--o{ educations : "has"
     profiles ||--o{ archetypes : "has"
     archetypes ||--o| archetype_tag_weights : "has"
     experiences ||--o{ accomplishments : "has"
+    companies ||--o{ job_descriptions : "has"
+    companies ||--o{ applications : "has"
 
     %% ──────────────────────────────────────────────
     %%  Styles
@@ -174,6 +198,8 @@ erDiagram
     class companies group0
     class educations group0
     class experiences group0
+    class generation_prompts group0
+    class generation_settings group0
     class job_descriptions group0
     class profiles group0
     class resume_contents group0

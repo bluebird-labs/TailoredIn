@@ -4,8 +4,6 @@ import {
   type EducationRepository,
   EntityNotFoundError,
   Experience,
-  ExperienceGenerationOverride,
-  type ExperienceGenerationOverrideRepository,
   type ExperienceRepository,
   GenerationScope,
   GenerationSettings,
@@ -33,7 +31,15 @@ function makeProfile(overrides: Record<string, unknown> = {}) {
 }
 
 function makeExperience(
-  overrides: { id?: string; startDate?: string; title?: string; companyName?: string; profileId?: string } = {}
+  overrides: {
+    id?: string;
+    startDate?: string;
+    title?: string;
+    companyName?: string;
+    profileId?: string;
+    bulletMin?: number;
+    bulletMax?: number;
+  } = {}
 ) {
   return new Experience({
     id: overrides.id ?? 'exp-aaaa-0000-0000-0000-000000000001',
@@ -48,7 +54,8 @@ function makeExperience(
     endDate: '2024-01',
     summary: null,
     ordinal: 0,
-    accomplishments: [],
+    bulletMin: overrides.bulletMin ?? 2,
+    bulletMax: overrides.bulletMax ?? 5,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   });
@@ -147,15 +154,6 @@ function mockGenerationSettingsRepo(settings: GenerationSettings | null = null):
   };
 }
 
-function mockOverrideRepo(overrides: ExperienceGenerationOverride[] = []): ExperienceGenerationOverrideRepository {
-  return {
-    findByExperienceId: mock(() => Promise.resolve(null)),
-    findByExperienceIds: mock(() => Promise.resolve(overrides)),
-    save: mock(() => Promise.resolve()),
-    delete: mock(() => Promise.resolve())
-  };
-}
-
 function createUseCase(opts: {
   profile?: ReturnType<typeof makeProfile>;
   experiences?: Experience[];
@@ -163,7 +161,6 @@ function createUseCase(opts: {
   generator?: ResumeContentGenerator;
   educations?: Education[];
   settings?: GenerationSettings | null;
-  overrides?: ExperienceGenerationOverride[];
 }) {
   return new GenerateResumeContent(
     mockProfileRepo(opts.profile ?? makeProfile()),
@@ -172,8 +169,7 @@ function createUseCase(opts: {
     mockResumeContentRepo(),
     opts.generator ?? mockGenerator(makeGeneratorResult([])),
     mockEducationRepo(opts.educations),
-    mockGenerationSettingsRepo(opts.settings ?? null),
-    mockOverrideRepo(opts.overrides)
+    mockGenerationSettingsRepo(opts.settings ?? null)
   );
 }
 
@@ -273,10 +269,10 @@ describe('GenerateResumeContent', () => {
     expect(ids).toEqual(['exp-new', 'exp-mid', 'exp-old']);
   });
 
-  test('uses default bullet limits (2, 5) when no settings exist', async () => {
+  test('uses experience-level bullet limits', async () => {
     const experiences = [
-      makeExperience({ id: 'e1', startDate: '2024-01' }),
-      makeExperience({ id: 'e2', startDate: '2023-01' })
+      makeExperience({ id: 'e1', startDate: '2024-01', bulletMin: 3, bulletMax: 7 }),
+      makeExperience({ id: 'e2', startDate: '2023-01', bulletMin: 1, bulletMax: 4 })
     ];
 
     let capturedInput: ResumeContentGeneratorInput | null = null;
@@ -292,44 +288,18 @@ describe('GenerateResumeContent', () => {
     await useCase.execute({ jobDescriptionId: 'jd-1' });
 
     expect(capturedInput).not.toBeNull();
-    for (const exp of capturedInput!.experiences) {
-      expect(exp).toMatchObject({ minBullets: 2, maxBullets: 5 });
-    }
+    const e1 = capturedInput!.experiences.find(e => e.id === 'e1');
+    const e2 = capturedInput!.experiences.find(e => e.id === 'e2');
+    expect(e1).toMatchObject({ minBullets: 3, maxBullets: 7 });
+    expect(e2).toMatchObject({ minBullets: 1, maxBullets: 4 });
   });
 
-  test('uses custom bullet limits from generation settings', async () => {
-    const settings = GenerationSettings.createDefault('profile-1');
-    settings.updateBulletRange(3, 8);
-
-    const experiences = [makeExperience({ id: 'e1', startDate: '2024-01' })];
-
-    let capturedInput: ResumeContentGeneratorInput | null = null;
-    const generator: ResumeContentGenerator = {
-      generate: mock((input: ResumeContentGeneratorInput) => {
-        capturedInput = input;
-        return Promise.resolve(makeGeneratorResult([]));
-      })
-    };
-
-    const useCase = createUseCase({ experiences, generator, settings });
-
-    await useCase.execute({ jobDescriptionId: 'jd-1' });
-
-    expect(capturedInput).not.toBeNull();
-    expect(capturedInput!.experiences[0]).toMatchObject({ minBullets: 3, maxBullets: 8 });
-  });
-
-  test('per-experience override takes precedence over profile defaults', async () => {
-    const settings = GenerationSettings.createDefault('profile-1');
-    settings.updateBulletRange(3, 8);
-
+  test('session bullet overrides take precedence over experience defaults', async () => {
     const experiences = [
-      makeExperience({ id: 'exp-a', startDate: '2024-01' }),
-      makeExperience({ id: 'exp-b', startDate: '2023-01' })
+      makeExperience({ id: 'exp-a', startDate: '2024-01', bulletMin: 3, bulletMax: 8 }),
+      makeExperience({ id: 'exp-b', startDate: '2023-01', bulletMin: 3, bulletMax: 8 })
     ];
 
-    const overrides = [ExperienceGenerationOverride.create({ experienceId: 'exp-a', bulletMin: 1, bulletMax: 2 })];
-
     let capturedInput: ResumeContentGeneratorInput | null = null;
     const generator: ResumeContentGenerator = {
       generate: mock((input: ResumeContentGeneratorInput) => {
@@ -338,9 +308,12 @@ describe('GenerateResumeContent', () => {
       })
     };
 
-    const useCase = createUseCase({ experiences, generator, settings, overrides });
+    const useCase = createUseCase({ experiences, generator });
 
-    await useCase.execute({ jobDescriptionId: 'jd-1' });
+    await useCase.execute({
+      jobDescriptionId: 'jd-1',
+      bulletOverrides: [{ experienceId: 'exp-a', min: 1, max: 2 }]
+    });
 
     expect(capturedInput).not.toBeNull();
     const expA = capturedInput!.experiences.find(e => e.id === 'exp-a');
@@ -463,8 +436,7 @@ describe('GenerateResumeContent', () => {
       resumeContentRepo,
       generator,
       mockEducationRepo([visibleEdu, hiddenEdu]),
-      mockGenerationSettingsRepo(null),
-      mockOverrideRepo()
+      mockGenerationSettingsRepo(null)
     );
 
     await useCase.execute({ jobDescriptionId: 'jd-1' });

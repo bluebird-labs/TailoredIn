@@ -1,15 +1,9 @@
-import type { ExperienceGenerationOverride, GenerationSettings } from '@tailoredin/domain';
+import type { GenerationSettings } from '@tailoredin/domain';
 
 export type GenerationPromptDto = {
   readonly id: string;
   readonly scope: string;
   readonly content: string;
-};
-
-export type ExperienceOverrideDto = {
-  readonly experienceId: string;
-  readonly bulletMin: number;
-  readonly bulletMax: number;
 };
 
 export type GenerationSettingsDto = {
@@ -19,13 +13,9 @@ export type GenerationSettingsDto = {
   readonly bulletMin: number;
   readonly bulletMax: number;
   readonly prompts: GenerationPromptDto[];
-  readonly experienceOverrides: ExperienceOverrideDto[];
 };
 
-export function toGenerationSettingsDto(
-  settings: GenerationSettings,
-  overrides: ExperienceGenerationOverride[] = []
-): GenerationSettingsDto {
+export function toGenerationSettingsDto(settings: GenerationSettings): GenerationSettingsDto {
   return {
     id: settings.id,
     profileId: settings.profileId,
@@ -36,11 +26,6 @@ export function toGenerationSettingsDto(
       id: p.id,
       scope: p.scope,
       content: p.content
-    })),
-    experienceOverrides: overrides.map(o => ({
-      experienceId: o.experienceId,
-      bulletMin: o.bulletMin,
-      bulletMax: o.bulletMax
     }))
   };
 }

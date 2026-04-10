@@ -17,6 +17,8 @@ export type ExperienceCreateProps = {
   endDate: string;
   summary: string | null;
   ordinal: number;
+  bulletMin: number;
+  bulletMax: number;
 };
 
 @Entity({ tableName: 'experiences' })
@@ -57,6 +59,12 @@ export class Experience extends AggregateRoot {
   @Property({ fieldName: 'ordinal', type: 'integer' })
   public ordinal: number;
 
+  @Property({ fieldName: 'bullet_min', type: 'integer' })
+  public bulletMin: number;
+
+  @Property({ fieldName: 'bullet_max', type: 'integer' })
+  public bulletMax: number;
+
   @OneToMany(
     () => Accomplishment,
     acc => acc.experienceId,
@@ -83,6 +91,8 @@ export class Experience extends AggregateRoot {
     endDate: string;
     summary: string | null;
     ordinal: number;
+    bulletMin: number;
+    bulletMax: number;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -97,6 +107,8 @@ export class Experience extends AggregateRoot {
       throw new ValidationError('startDate', 'must be between 1 and 50 characters');
     if (!props.endDate || props.endDate.length > 50)
       throw new ValidationError('endDate', 'must be between 1 and 50 characters');
+    if (props.bulletMin <= 0) throw new ValidationError('bulletMin', 'must be greater than 0');
+    if (props.bulletMax < props.bulletMin) throw new ValidationError('bulletMax', 'must be >= bulletMin');
     this.id = props.id;
     this.profileId = props.profileId;
     this.title = props.title;
@@ -109,6 +121,8 @@ export class Experience extends AggregateRoot {
     this.endDate = props.endDate;
     this.summary = props.summary;
     this.ordinal = props.ordinal;
+    this.bulletMin = props.bulletMin;
+    this.bulletMax = props.bulletMax;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -141,6 +155,14 @@ export class Experience extends AggregateRoot {
 
   public unlinkCompany(): void {
     this.companyId = null;
+    this.updatedAt = new Date();
+  }
+
+  public updateBulletRange(min: number, max: number): void {
+    if (min <= 0) throw new ValidationError('bulletMin', 'must be greater than 0');
+    if (max < min) throw new ValidationError('bulletMax', 'must be >= bulletMin');
+    this.bulletMin = min;
+    this.bulletMax = max;
     this.updatedAt = new Date();
   }
 

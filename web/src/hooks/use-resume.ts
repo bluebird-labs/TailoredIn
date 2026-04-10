@@ -76,7 +76,13 @@ type ResumeGenerationScope = { type: 'headline' } | { type: 'experience'; experi
 export function useGenerateResumeContent(jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { additionalPrompt?: string; scope?: ResumeGenerationScope } = {}) => {
+    mutationFn: async (
+      input: {
+        additionalPrompt?: string;
+        scope?: ResumeGenerationScope;
+        bulletOverrides?: Array<{ experienceId: string; min: number; max: number }>;
+      } = {}
+    ) => {
       const response = await fetch('/api/resume/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

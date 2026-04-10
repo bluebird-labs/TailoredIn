@@ -43,6 +43,8 @@ export const Full: Story = {
       endDate: '2024-03',
       summary: 'Led the migration of the billing system to microservices.',
       ordinal: 0,
+      bulletMin: 2,
+      bulletMax: 5,
       accomplishments: [
         { id: 'a1', title: 'Reduced latency by 40%', narrative: '', ordinal: 0 },
         { id: 'a2', title: 'Mentored 3 junior engineers', narrative: '', ordinal: 1 }
@@ -66,6 +68,8 @@ export const Minimal: Story = {
       endDate: '2021-12',
       summary: null,
       ordinal: 0,
+      bulletMin: 2,
+      bulletMax: 5,
       accomplishments: []
     }
   }

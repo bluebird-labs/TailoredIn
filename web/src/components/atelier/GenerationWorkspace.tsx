@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Eye, EyeOff, Loader2, RotateCw, Settings, Sparkles } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -7,11 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { useEducations } from '@/hooks/use-educations';
-import { useRemoveExperienceOverride, useSetExperienceOverride } from '@/hooks/use-experience-overrides';
-import { useGenerationSettings } from '@/hooks/use-generation-settings';
+import { useExperiences } from '@/hooks/use-experiences';
 import { type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
 import { useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
-import { queryKeys } from '@/lib/query-keys';
 import { BulletRangePill } from './BulletRangePill.js';
 import { JobSelector } from './JobSelector.js';
 
@@ -196,33 +193,34 @@ export function GenerationWorkspace({
   selectedJobId: string | null;
   onSelectJob: (id: string | null) => void;
 }) {
-  const queryClient = useQueryClient();
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+  const [sessionOverrides, setSessionOverrides] = useState<Map<string, { min: number; max: number }>>(new Map());
 
   const { data: jd } = useJobDescription(selectedJobId ?? '', { enabled: !!selectedJobId });
-  const { data: settings } = useGenerationSettings();
+  const { data: experiences } = useExperiences();
   const { data: educations } = useEducations();
   const generate = useGenerateResumeContent(selectedJobId ?? '');
   const updateDisplaySettings = useUpdateResumeDisplaySettings(selectedJobId ?? '');
-  const setOverride = useSetExperienceOverride();
-  const removeOverride = useRemoveExperienceOverride();
 
   const resumeOutput = jd?.resumeOutput ?? null;
-  const defaultBulletMin = settings?.bulletMin ?? 2;
-  const defaultBulletMax = settings?.bulletMax ?? 5;
 
-  const overrideMap = useMemo(() => {
+  const experienceBulletMap = useMemo(() => {
     const map = new Map<string, { min: number; max: number }>();
-    for (const o of settings?.experienceOverrides ?? []) {
-      map.set(o.experienceId, { min: o.bulletMin, max: o.bulletMax });
+    for (const exp of experiences ?? []) {
+      map.set(exp.id, { min: exp.bulletMin, max: exp.bulletMax });
     }
     return map;
-  }, [settings?.experienceOverrides]);
+  }, [experiences]);
+
+  function buildBulletOverrides(): Array<{ experienceId: string; min: number; max: number }> | undefined {
+    if (sessionOverrides.size === 0) return undefined;
+    return [...sessionOverrides.entries()].map(([experienceId, { min, max }]) => ({ experienceId, min, max }));
+  }
 
   function handleGenerate() {
     generate.mutate(
-      { additionalPrompt: additionalPrompt.trim() || undefined },
+      { additionalPrompt: additionalPrompt.trim() || undefined, bulletOverrides: buildBulletOverrides() },
       {
         onSuccess: () => {
           setAdditionalPrompt('');
@@ -236,7 +234,7 @@ export function GenerationWorkspace({
   function handleRegenerateHeadline(prompt: string) {
     setRegeneratingId('headline');
     generate.mutate(
-      { additionalPrompt: prompt || undefined, scope: { type: 'headline' } },
+      { additionalPrompt: prompt || undefined, scope: { type: 'headline' }, bulletOverrides: buildBulletOverrides() },
       {
         onSuccess: () => {
           setRegeneratingId(null);
@@ -253,7 +251,11 @@ export function GenerationWorkspace({
   function handleRegenerateExperience(experienceId: string, prompt: string) {
     setRegeneratingId(experienceId);
     generate.mutate(
-      { additionalPrompt: prompt || undefined, scope: { type: 'experience', experienceId } },
+      {
+        additionalPrompt: prompt || undefined,
+        scope: { type: 'experience', experienceId },
+        bulletOverrides: buildBulletOverrides()
+      },
       {
         onSuccess: () => {
           setRegeneratingId(null);
@@ -291,34 +293,23 @@ export function GenerationWorkspace({
     [resumeOutput, updateDisplaySettings]
   );
 
-  const handleBulletRangeSave = useCallback(
-    (experienceId: string, min: number, max: number) => {
-      setOverride.mutate(
-        { experienceId, bullet_min: min, bullet_max: max },
-        {
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.generationSettings.all });
-            toast.success('Bullet range updated');
-          },
-          onError: err => toast.error(err instanceof Error ? err.message : 'Failed to update bullet range')
-        }
-      );
-    },
-    [setOverride, queryClient]
-  );
+  const handleBulletRangeSave = useCallback((experienceId: string, min: number, max: number) => {
+    setSessionOverrides(prev => {
+      const next = new Map(prev);
+      next.set(experienceId, { min, max });
+      return next;
+    });
+    toast.success('Bullet range updated for this session');
+  }, []);
 
-  const handleBulletRangeReset = useCallback(
-    (experienceId: string) => {
-      removeOverride.mutate(experienceId, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: queryKeys.generationSettings.all });
-          toast.success('Bullet range reset to default');
-        },
-        onError: err => toast.error(err instanceof Error ? err.message : 'Failed to reset bullet range')
-      });
-    },
-    [removeOverride, queryClient]
-  );
+  const handleBulletRangeReset = useCallback((experienceId: string) => {
+    setSessionOverrides(prev => {
+      const next = new Map(prev);
+      next.delete(experienceId);
+      return next;
+    });
+    toast.success('Bullet range reset to experience default');
+  }, []);
 
   return (
     <div
@@ -381,20 +372,23 @@ export function GenerationWorkspace({
           )}
 
           <div className="space-y-3">
-            {resumeOutput.experiences.map(exp => (
-              <ExperienceCard
-                key={exp.experienceId}
-                exp={exp}
-                defaultBulletMin={defaultBulletMin}
-                defaultBulletMax={defaultBulletMax}
-                bulletOverride={overrideMap.get(exp.experienceId) ?? null}
-                onToggleBullet={handleToggleBullet}
-                onBulletRangeSave={handleBulletRangeSave}
-                onBulletRangeReset={handleBulletRangeReset}
-                onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
-                isRegenerating={regeneratingId === exp.experienceId}
-              />
-            ))}
+            {resumeOutput.experiences.map(exp => {
+              const expDefaults = experienceBulletMap.get(exp.experienceId);
+              return (
+                <ExperienceCard
+                  key={exp.experienceId}
+                  exp={exp}
+                  defaultBulletMin={expDefaults?.min ?? 2}
+                  defaultBulletMax={expDefaults?.max ?? 5}
+                  bulletOverride={sessionOverrides.get(exp.experienceId) ?? null}
+                  onToggleBullet={handleToggleBullet}
+                  onBulletRangeSave={handleBulletRangeSave}
+                  onBulletRangeReset={handleBulletRangeReset}
+                  onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
+                  isRegenerating={regeneratingId === exp.experienceId}
+                />
+              );
+            })}
           </div>
 
           {educations && educations.length > 0 && (

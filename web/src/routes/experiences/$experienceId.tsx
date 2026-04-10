@@ -137,6 +137,7 @@ function ExperienceDetailPage() {
 
               <InfoCard label="Quick Stats">
                 <InfoRow label="Accomplishments" value={String(accomplishmentCount)} />
+                <InfoRow label="Bullet Range" value={`${experience.bulletMin}–${experience.bulletMax}`} />
               </InfoCard>
             </div>
           </div>

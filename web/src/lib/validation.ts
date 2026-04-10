@@ -57,6 +57,8 @@ interface ExperienceFormState {
   startDate: string;
   endDate: string;
   summary: string;
+  bulletMin: number;
+  bulletMax: number;
 }
 
 function validateExperience(values: ExperienceFormState): ValidationErrors<ExperienceFormState> {
@@ -66,6 +68,8 @@ function validateExperience(values: ExperienceFormState): ValidationErrors<Exper
   if (!values.location.trim()) errors.location = 'Location is required';
   if (!values.startDate.trim()) errors.startDate = 'Start date is required';
   if (!values.endDate.trim()) errors.endDate = 'End date is required';
+  if (values.bulletMin < 1) errors.bulletMin = 'Min must be at least 1';
+  if (values.bulletMax < values.bulletMin) errors.bulletMax = 'Max must be >= min';
   return errors;
 }
 

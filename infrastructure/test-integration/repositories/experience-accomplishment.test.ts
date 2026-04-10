@@ -46,13 +46,17 @@ describe('PostgresExperienceRepository — accomplishments', () => {
       startDate: '2020-01',
       endDate: '2023-01',
       summary: null,
-      ordinal: 0
+      ordinal: 0,
+      bulletMin: 2,
+      bulletMax: 5
     });
 
     exp.addAccomplishment({
       title: 'Billing sharding',
       narrative: 'Led hash-based sharding migration, reducing P99 by 40%.',
-      ordinal: 0
+      ordinal: 0,
+      bulletMin: 2,
+      bulletMax: 5
     });
 
     await repo.save(exp);
@@ -74,7 +78,9 @@ describe('PostgresExperienceRepository — accomplishments', () => {
       startDate: '2020',
       endDate: '2022',
       summary: null,
-      ordinal: 1
+      ordinal: 1,
+      bulletMin: 2,
+      bulletMax: 5
     });
     exp.addAccomplishment({ title: 'A', narrative: 'N', ordinal: 0 });
     await repo.save(exp);

@@ -59,20 +59,15 @@ classDiagram
         +string endDate
         +string? summary
         +number ordinal
+        +number bulletMin
+        +number bulletMax
         +addAccomplishment()
         +removeAccomplishment()
         +findAccomplishmentOrFail()
         +linkCompany()
         +unlinkCompany()
-        +syncAccomplishments()
-    }
-
-    class ExperienceGenerationOverride {
-        <<AggregateRoot>>
-        +string experienceId
-        +number bulletMin
-        +number bulletMax
         +updateBulletRange()
+        +syncAccomplishments()
     }
 
     class GenerationSettings {
@@ -125,7 +120,6 @@ classDiagram
     GenerationSettings --> ModelTier
     Profile "1" --> "*" ResumeContent : has
     ResumeContent "1" *-- "*" ResumeExperience : contains
-    Experience "1" --> "*" ExperienceGenerationOverride : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
@@ -143,11 +137,12 @@ classDiagram
         +string? website
         +string? logoUrl
         +string? linkedinLink
-        +BusinessType? businessType
-        +Industry? industry
-        +CompanyStage? stage
-        +CompanyStatus? status
+        +BusinessType businessType
+        +Industry industry
+        +CompanyStage stage
+        +CompanyStatus status
         +setDomainName()
+        +setLinkedinLink()
         +setWebsite()
         +setBusinessType()
         +setIndustry()
@@ -165,8 +160,8 @@ classDiagram
         +number? salaryMin
         +number? salaryMax
         +string? salaryCurrency
-        +JobLevel? level
-        +LocationType? locationType
+        +JobLevel level
+        +LocationType locationType
         +JobSource source
         +Date? postedAt
         +string? rawText
@@ -181,7 +176,7 @@ classDiagram
         <<enumeration>>
         B2B · B2C · B2B2C
         B2G · D2C · MARKETPLACE
-        PLATFORM · ENTERPRISE
+        PLATFORM · ENTERPRISE · UNKNOWN
     }
 
     class CompanyStage {
@@ -189,13 +184,13 @@ classDiagram
         PRE_SEED · SEED · SERIES_A
         SERIES_B · SERIES_C · SERIES_D_PLUS
         LATE_STAGE · IPO · PUBLIC
-        PRIVATE_EQUITY · BOOTSTRAPPED
+        PRIVATE_EQUITY · BOOTSTRAPPED · UNKNOWN
     }
 
     class CompanyStatus {
         <<enumeration>>
         RUNNING · ACQUIRED · MERGED
-        DEFUNCT · STEALTH
+        DEFUNCT · STEALTH · UNKNOWN
     }
 
     class Industry {
@@ -212,6 +207,7 @@ classDiagram
         MANUFACTURING · ENTERTAINMENT · NONPROFIT
         CONSULTING · SEMICONDUCTOR · CLIMATE_TECH
         FINTECH · CRYPTO_WEB3 · TRANSPORTATION
+        UNKNOWN
     }
 
     class JobLevel {
@@ -219,7 +215,7 @@ classDiagram
         INTERNSHIP · ENTRY_LEVEL · ASSOCIATE
         SENIOR · STAFF · PRINCIPAL
         MANAGER · DIRECTOR · VP
-        EXECUTIVE
+        EXECUTIVE · UNKNOWN
     }
 
     class JobSource {
@@ -233,7 +229,7 @@ classDiagram
     class LocationType {
         <<enumeration>>
         REMOTE · REMOTE_FIRST · HYBRID
-        FLEXIBLE · ONSITE
+        FLEXIBLE · ONSITE · UNKNOWN
     }
 
     JobDescription "1" --> "*" ResumeContent : has
@@ -303,7 +299,6 @@ classDiagram
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style ExperienceGenerationOverride fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style GenerationSettings fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px

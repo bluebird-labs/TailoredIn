@@ -22,6 +22,8 @@ const makeExperience = () =>
     endDate: '2023-01',
     summary: null,
     ordinal: 0,
+    bulletMin: 2,
+    bulletMax: 5,
     accomplishments: [],
     createdAt: new Date(),
     updatedAt: new Date()

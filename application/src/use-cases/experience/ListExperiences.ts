@@ -35,6 +35,8 @@ export function toExperienceDto(exp: Experience, company?: CompanyDto | null): E
     endDate: exp.endDate,
     summary: exp.summary,
     ordinal: exp.ordinal,
+    bulletMin: exp.bulletMin,
+    bulletMax: exp.bulletMax,
     accomplishments: exp.accomplishments.map(toAccomplishmentDto)
   };
 }

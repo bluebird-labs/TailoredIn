@@ -32,8 +32,6 @@ import {
   ListExperiences,
   ListJobDescriptions,
   ParseJobDescription,
-  RemoveExperienceGenerationOverride,
-  SetExperienceGenerationOverride,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -58,7 +56,6 @@ import {
   PostgresApplicationRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
-  PostgresExperienceGenerationOverrideRepository,
   PostgresExperienceRepository,
   PostgresGenerationSettingsRepository,
   PostgresJobDescriptionRepository,
@@ -122,7 +119,8 @@ container.bind({
 });
 container.bind({
   provide: DI.Experience.Create,
-  useFactory: () => new CreateExperience(container.get(DI.Experience.Repository))
+  useFactory: () =>
+    new CreateExperience(container.get(DI.Experience.Repository), container.get(DI.GenerationSettings.Repository))
 });
 container.bind({
   provide: DI.Experience.Update,
@@ -263,29 +261,12 @@ container.bind({ provide: DI.ResumeContent.Repository, useClass: PostgresResumeC
 // Generation Settings
 container.bind({ provide: DI.GenerationSettings.Repository, useClass: PostgresGenerationSettingsRepository });
 container.bind({
-  provide: DI.ExperienceGenerationOverride.Repository,
-  useClass: PostgresExperienceGenerationOverrideRepository
-});
-container.bind({
   provide: DI.GenerationSettings.Get,
-  useFactory: () =>
-    new GetGenerationSettings(
-      container.get(DI.GenerationSettings.Repository),
-      container.get(DI.Experience.Repository),
-      container.get(DI.ExperienceGenerationOverride.Repository)
-    )
+  useFactory: () => new GetGenerationSettings(container.get(DI.GenerationSettings.Repository))
 });
 container.bind({
   provide: DI.GenerationSettings.Update,
   useFactory: () => new UpdateGenerationSettings(container.get(DI.GenerationSettings.Repository))
-});
-container.bind({
-  provide: DI.ExperienceGenerationOverride.Set,
-  useFactory: () => new SetExperienceGenerationOverride(container.get(DI.ExperienceGenerationOverride.Repository))
-});
-container.bind({
-  provide: DI.ExperienceGenerationOverride.Remove,
-  useFactory: () => new RemoveExperienceGenerationOverride(container.get(DI.ExperienceGenerationOverride.Repository))
 });
 
 // Resume
@@ -300,8 +281,7 @@ container.bind({
       container.get(DI.ResumeContent.Repository),
       container.get(DI.Resume.Generator),
       container.get(DI.Education.Repository),
-      container.get(DI.GenerationSettings.Repository),
-      container.get(DI.ExperienceGenerationOverride.Repository)
+      container.get(DI.GenerationSettings.Repository)
     )
 });
 container.bind({ provide: DI.Resume.RendererFactory, useClass: TypstResumeRendererFactory });

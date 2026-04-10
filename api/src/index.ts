@@ -28,8 +28,6 @@ import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute
 import { GetExperienceRoute } from './routes/experience/GetExperienceRoute.js';
 import { LinkCompanyRoute } from './routes/experience/LinkCompanyRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
-import { RemoveExperienceGenerationOverrideRoute } from './routes/experience/RemoveExperienceGenerationOverrideRoute.js';
-import { SetExperienceGenerationOverrideRoute } from './routes/experience/SetExperienceGenerationOverrideRoute.js';
 import { UnlinkCompanyRoute } from './routes/experience/UnlinkCompanyRoute.js';
 import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
@@ -132,8 +130,6 @@ const app = new Elysia()
   .use(container.get(DeleteAccomplishmentRoute).plugin())
   .use(container.get(LinkCompanyRoute).plugin())
   .use(container.get(UnlinkCompanyRoute).plugin())
-  .use(container.get(SetExperienceGenerationOverrideRoute).plugin())
-  .use(container.get(RemoveExperienceGenerationOverrideRoute).plugin())
   // Generation Settings
   .use(container.get(GetGenerationSettingsRoute).plugin())
   .use(container.get(UpdateGenerationSettingsRoute).plugin())

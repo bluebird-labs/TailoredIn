@@ -4,7 +4,6 @@ import { Application } from '../src/entities/Application.js';
 import { Company } from '../src/entities/Company.js';
 import { Education } from '../src/entities/Education.js';
 import { Experience } from '../src/entities/Experience.js';
-import { ExperienceGenerationOverride } from '../src/entities/ExperienceGenerationOverride.js';
 import { GenerationPrompt } from '../src/entities/GenerationPrompt.js';
 import { GenerationSettings } from '../src/entities/GenerationSettings.js';
 import { JobDescription } from '../src/entities/JobDescription.js';
@@ -21,7 +20,6 @@ await MikroORM.init(
       Company,
       Experience,
       Accomplishment,
-      ExperienceGenerationOverride,
       GenerationPrompt,
       GenerationSettings,
       Application,

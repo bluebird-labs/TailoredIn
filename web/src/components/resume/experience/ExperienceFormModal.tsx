@@ -37,7 +37,9 @@ function emptyState(): ExperienceFormState {
     location: '',
     startDate: '',
     endDate: '',
-    summary: ''
+    summary: '',
+    bulletMin: 2,
+    bulletMax: 5
   };
 }
 
@@ -50,7 +52,9 @@ function stateFromExperience(exp: Experience): ExperienceFormState {
     location: exp.location,
     startDate: exp.startDate,
     endDate: exp.endDate,
-    summary: exp.summary ?? ''
+    summary: exp.summary ?? '',
+    bulletMin: exp.bulletMin,
+    bulletMax: exp.bulletMax
   };
 }
 
@@ -225,7 +229,9 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
             title: acc.title.trim(),
             narrative: acc.narrative.trim(),
             ordinal: index
-          }))
+          })),
+          bullet_min: current.bulletMin,
+          bullet_max: current.bulletMax
         },
         {
           onSuccess: () => {
@@ -379,6 +385,27 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
         disabled={isSaving}
         placeholder="Brief role summary..."
       />
+
+      <div className="grid grid-cols-2 gap-3">
+        <EditableField
+          type="number"
+          label="Bullet Min"
+          value={String(current.bulletMin)}
+          onChange={v => setField('bulletMin', Math.max(1, Number(v)))}
+          isDirty={isDirtyField('bulletMin')}
+          error={errors.bulletMin}
+          disabled={isSaving}
+        />
+        <EditableField
+          type="number"
+          label="Bullet Max"
+          value={String(current.bulletMax)}
+          onChange={v => setField('bulletMax', Math.max(1, Number(v)))}
+          isDirty={isDirtyField('bulletMax')}
+          error={errors.bulletMax}
+          disabled={isSaving}
+        />
+      </div>
 
       {experience && (
         <div className="pt-2 border-t">

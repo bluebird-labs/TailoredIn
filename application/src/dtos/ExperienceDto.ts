@@ -16,5 +16,7 @@ export type ExperienceDto = {
   endDate: string;
   summary: string | null;
   ordinal: number;
+  bulletMin: number;
+  bulletMax: number;
   accomplishments: AccomplishmentDto[];
 };

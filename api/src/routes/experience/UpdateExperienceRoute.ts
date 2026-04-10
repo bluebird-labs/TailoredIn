@@ -27,7 +27,9 @@ export class UpdateExperienceRoute {
             title: a.title,
             narrative: a.narrative,
             ordinal: a.ordinal
-          }))
+          })),
+          bulletMin: body.bullet_min,
+          bulletMax: body.bullet_max
         });
         if (!result.isOk) {
           set.status = 404;
@@ -54,7 +56,9 @@ export class UpdateExperienceRoute {
               narrative: t.String(),
               ordinal: t.Integer({ minimum: 0 })
             })
-          )
+          ),
+          bullet_min: t.Optional(t.Integer({ minimum: 1, maximum: 20 })),
+          bullet_max: t.Optional(t.Integer({ minimum: 1, maximum: 20 }))
         })
       }
     );
