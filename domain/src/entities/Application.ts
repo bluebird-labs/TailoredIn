@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ApplicationIdType } from '../orm-types/ApplicationIdType.js';
 import { ApplicationId } from '../value-objects/ApplicationId.js';
@@ -18,17 +18,20 @@ export type ApplicationCreateProps = {
 @Entity({ tableName: 'applications' })
 export class Application extends AggregateRoot<ApplicationId> {
   @PrimaryKey({ type: ApplicationIdType, fieldName: 'id' })
-  public declare readonly id: ApplicationId;
+  public readonly id!: ApplicationId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Company, { fieldName: 'company_id', mapToPk: true })
   public readonly companyId: string;
 
   @Property({ fieldName: 'status', type: 'text' })
   public status: ApplicationStatus;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => JobDescription, { fieldName: 'job_description_id', mapToPk: true, nullable: true })
   public jobDescriptionId: string | null;
 
@@ -56,6 +59,7 @@ export class Application extends AggregateRoot<ApplicationId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.profileId = props.profileId;
     this.companyId = props.companyId;
     this.status = props.status;

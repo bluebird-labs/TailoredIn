@@ -1,5 +1,5 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { GenerationSettingsIdType } from '../orm-types/GenerationSettingsIdType.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
@@ -18,8 +18,9 @@ export type GenerationSettingsCreateProps = {
 @Entity({ tableName: 'generation_settings' })
 export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
   @PrimaryKey({ type: GenerationSettingsIdType, fieldName: 'id' })
-  public declare readonly id: GenerationSettingsId;
+  public readonly id!: GenerationSettingsId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
 
@@ -55,6 +56,7 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.profileId = props.profileId;
     this.modelTier = props.modelTier;
     this.bulletMin = props.bulletMin;

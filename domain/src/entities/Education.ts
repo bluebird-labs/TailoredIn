@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { EducationIdType } from '../orm-types/EducationIdType.js';
 import { EducationId } from '../value-objects/EducationId.js';
@@ -18,8 +18,9 @@ export type EducationCreateProps = {
 @Entity({ tableName: 'educations' })
 export class Education extends AggregateRoot<EducationId> {
   @PrimaryKey({ type: EducationIdType, fieldName: 'id' })
-  public declare readonly id: EducationId;
+  public readonly id!: EducationId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
 
@@ -64,6 +65,7 @@ export class Education extends AggregateRoot<EducationId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.profileId = props.profileId;
     this.degreeTitle = props.degreeTitle;
     this.institutionName = props.institutionName;

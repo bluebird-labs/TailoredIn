@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { CompanyIdType } from '../orm-types/CompanyIdType.js';
 import type { BusinessType } from '../value-objects/BusinessType.js';
@@ -22,7 +22,7 @@ export type CompanyCreateProps = {
 @Entity({ tableName: 'companies' })
 export class Company extends AggregateRoot<CompanyId> {
   @PrimaryKey({ type: CompanyIdType, fieldName: 'id' })
-  public declare readonly id: CompanyId;
+  public readonly id!: CompanyId;
 
   @Property({ fieldName: 'name', type: 'text' })
   public name: string;
@@ -72,6 +72,7 @@ export class Company extends AggregateRoot<CompanyId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.name = props.name;
     this.description = props.description;
     this.website = props.website;

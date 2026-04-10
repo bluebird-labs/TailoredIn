@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ProfileIdType } from '../orm-types/ProfileIdType.js';
 import { ProfileId } from '../value-objects/ProfileId.js';
@@ -18,7 +18,7 @@ export type ProfileCreateProps = {
 @Entity({ tableName: 'profiles' })
 export class Profile extends AggregateRoot<ProfileId> {
   @PrimaryKey({ type: ProfileIdType, fieldName: 'id' })
-  public declare readonly id: ProfileId;
+  public readonly id!: ProfileId;
 
   @Property({ fieldName: 'email', type: 'text' })
   public email: string;
@@ -68,6 +68,7 @@ export class Profile extends AggregateRoot<ProfileId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.email = props.email;
     this.firstName = props.firstName;
     this.lastName = props.lastName;

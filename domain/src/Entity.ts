@@ -1,10 +1,13 @@
 import type { ValueObject } from './ValueObject.js';
 
 export abstract class Entity<TId extends ValueObject<{ value: string }>> {
-  public readonly id: TId;
+  public abstract readonly id: TId;
 
-  protected constructor(id: TId) {
-    this.id = id;
+  // biome-ignore lint/correctness/noUnusedVariables: parameter kept for constructor signature compatibility
+  protected constructor(_id: TId) {
+    // id is assigned by concrete entity constructors, not here.
+    // Stage 3 class field initializers run after super(), so parent
+    // assignment would be overwritten by the child's @PrimaryKey field.
   }
 
   public equals(other: Entity<TId>): boolean {

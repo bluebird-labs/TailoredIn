@@ -1,5 +1,5 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { EntityNotFoundError } from '../EntityNotFoundError.js';
 import { ExperienceIdType } from '../orm-types/ExperienceIdType.js';
@@ -25,8 +25,9 @@ export type ExperienceCreateProps = {
 @Entity({ tableName: 'experiences' })
 export class Experience extends AggregateRoot<ExperienceId> {
   @PrimaryKey({ type: ExperienceIdType, fieldName: 'id' })
-  public declare readonly id: ExperienceId;
+  public readonly id!: ExperienceId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
 
@@ -42,6 +43,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   @Property({ fieldName: 'company_accent', type: 'text', nullable: true })
   public companyAccent: string | null;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Company, { fieldName: 'company_id', mapToPk: true, nullable: true })
   public companyId: string | null;
 
@@ -90,6 +92,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.profileId = props.profileId;
     this.title = props.title;
     this.companyName = props.companyName;

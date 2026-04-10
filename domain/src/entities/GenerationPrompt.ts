@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { Entity as DomainEntity } from '../Entity.js';
 import { GenerationPromptIdType } from '../orm-types/GenerationPromptIdType.js';
 import { GenerationPromptId } from '../value-objects/GenerationPromptId.js';
@@ -14,8 +14,9 @@ export type GenerationPromptCreateProps = {
 @Entity({ tableName: 'generation_prompts' })
 export class GenerationPrompt extends DomainEntity<GenerationPromptId> {
   @PrimaryKey({ type: GenerationPromptIdType, fieldName: 'id' })
-  public declare readonly id: GenerationPromptId;
+  public readonly id!: GenerationPromptId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => GenerationSettings, { fieldName: 'generation_settings_id', mapToPk: true })
   public readonly generationSettingsId: string;
 
@@ -40,6 +41,7 @@ export class GenerationPrompt extends DomainEntity<GenerationPromptId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.generationSettingsId = props.generationSettingsId;
     this.scope = props.scope;
     this.content = props.content;

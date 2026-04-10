@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { Entity as DomainEntity } from '../Entity.js';
 import { AccomplishmentIdType } from '../orm-types/AccomplishmentIdType.js';
 import { AccomplishmentId } from '../value-objects/AccomplishmentId.js';
@@ -14,8 +14,9 @@ export type AccomplishmentCreateProps = {
 @Entity({ tableName: 'accomplishments' })
 export class Accomplishment extends DomainEntity<AccomplishmentId> {
   @PrimaryKey({ type: AccomplishmentIdType, fieldName: 'id' })
-  public declare readonly id: AccomplishmentId;
+  public readonly id!: AccomplishmentId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Experience, { fieldName: 'experience_id', mapToPk: true })
   public readonly experienceId: string;
 
@@ -44,6 +45,7 @@ export class Accomplishment extends DomainEntity<AccomplishmentId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.experienceId = props.experienceId;
     this.title = props.title;
     this.narrative = props.narrative;

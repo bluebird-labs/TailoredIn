@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ExperienceGenerationOverrideIdType } from '../orm-types/ExperienceGenerationOverrideIdType.js';
 import { ExperienceGenerationOverrideId } from '../value-objects/ExperienceGenerationOverrideId.js';
@@ -13,8 +13,9 @@ export type ExperienceGenerationOverrideCreateProps = {
 @Entity({ tableName: 'experience_generation_overrides' })
 export class ExperienceGenerationOverride extends AggregateRoot<ExperienceGenerationOverrideId> {
   @PrimaryKey({ type: ExperienceGenerationOverrideIdType, fieldName: 'id' })
-  public declare readonly id: ExperienceGenerationOverrideId;
+  public readonly id!: ExperienceGenerationOverrideId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Experience, { fieldName: 'experience_id', mapToPk: true })
   public readonly experienceId: string;
 
@@ -39,6 +40,7 @@ export class ExperienceGenerationOverride extends AggregateRoot<ExperienceGenera
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.experienceId = props.experienceId;
     this.bulletMin = props.bulletMin;
     this.bulletMax = props.bulletMax;

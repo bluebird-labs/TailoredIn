@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ResumeContentIdType } from '../orm-types/ResumeContentIdType.js';
 import { ResumeContentId } from '../value-objects/ResumeContentId.js';
@@ -19,11 +19,13 @@ export type ResumeContentCreateProps = {
 @Entity({ tableName: 'resume_contents' })
 export class ResumeContent extends AggregateRoot<ResumeContentId> {
   @PrimaryKey({ type: ResumeContentIdType, fieldName: 'id' })
-  public declare readonly id: ResumeContentId;
+  public readonly id!: ResumeContentId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => JobDescription, { fieldName: 'job_description_id', mapToPk: true })
   public readonly jobDescriptionId: string;
 
@@ -61,6 +63,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.profileId = props.profileId;
     this.jobDescriptionId = props.jobDescriptionId;
     this.headline = props.headline;

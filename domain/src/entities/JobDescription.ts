@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { JobDescriptionIdType } from '../orm-types/JobDescriptionIdType.js';
 import { JobDescriptionId } from '../value-objects/JobDescriptionId.js';
@@ -27,8 +27,9 @@ export type JobDescriptionCreateProps = {
 @Entity({ tableName: 'job_descriptions' })
 export class JobDescription extends AggregateRoot<JobDescriptionId> {
   @PrimaryKey({ type: JobDescriptionIdType, fieldName: 'id' })
-  public declare readonly id: JobDescriptionId;
+  public readonly id!: JobDescriptionId;
 
+  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
   @ManyToOne(() => Company, { fieldName: 'company_id', mapToPk: true })
   public readonly companyId: string;
 
@@ -118,6 +119,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     updatedAt: Date;
   }) {
     super(props.id);
+    this.id = props.id;
     this.companyId = props.companyId;
     this.title = props.title;
     this.description = props.description;
