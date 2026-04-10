@@ -1,12 +1,9 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { JobDescriptionIdType } from '../orm-types/JobDescriptionIdType.js';
-import { JobDescriptionId } from '../value-objects/JobDescriptionId.js';
 import type { JobLevel } from '../value-objects/JobLevel.js';
 import type { JobSource } from '../value-objects/JobSource.js';
 import type { LocationType } from '../value-objects/LocationType.js';
 import { SalaryRange } from '../value-objects/SalaryRange.js';
-import { Company } from './Company.js';
 
 export type JobDescriptionCreateProps = {
   companyId: string;
@@ -25,12 +22,11 @@ export type JobDescriptionCreateProps = {
 };
 
 @Entity({ tableName: 'job_descriptions' })
-export class JobDescription extends AggregateRoot<JobDescriptionId> {
-  @PrimaryKey({ type: JobDescriptionIdType, fieldName: 'id' })
-  public readonly id!: JobDescriptionId;
+export class JobDescription extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Company, { fieldName: 'company_id', mapToPk: true })
+  @Property({ fieldName: 'company_id', type: 'uuid' })
   public readonly companyId: string;
 
   @Property({ fieldName: 'title', type: 'text' })
@@ -99,7 +95,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: JobDescriptionId;
+    id: string;
     companyId: string;
     title: string;
     description: string;
@@ -118,7 +114,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.companyId = props.companyId;
     this.title = props.title;
@@ -144,7 +140,7 @@ export class JobDescription extends AggregateRoot<JobDescriptionId> {
   public static create(props: JobDescriptionCreateProps): JobDescription {
     const now = new Date();
     return new JobDescription({
-      id: JobDescriptionId.generate(),
+      id: crypto.randomUUID(),
       companyId: props.companyId,
       title: props.title,
       description: props.description,

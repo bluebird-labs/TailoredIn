@@ -1,10 +1,8 @@
-import {
-  CompanyId,
-  type CompanyRepository,
-  type ExperienceRepository,
-  JobDescriptionId,
-  type JobDescriptionRepository,
-  type ResumeContentRepository
+import type {
+  CompanyRepository,
+  ExperienceRepository,
+  JobDescriptionRepository,
+  ResumeContentRepository
 } from '@tailoredin/domain';
 import type { JobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 import { toJobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
@@ -22,13 +20,13 @@ export class GetJobDescription {
   ) {}
 
   public async execute(input: GetJobDescriptionInput): Promise<JobDescriptionDto> {
-    const jd = await this.jobDescriptionRepository.findById(new JobDescriptionId(input.jobDescriptionId));
+    const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);
     if (!jd) {
       throw new Error(`JobDescription not found: ${input.jobDescriptionId}`);
     }
-    const resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
+    const resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id);
     const experiences = resumeContent ? await this.experienceRepository.findAll() : [];
-    const company = jd.companyId ? await this.companyRepository.findById(new CompanyId(jd.companyId)) : null;
+    const company = jd.companyId ? await this.companyRepository.findById(jd.companyId) : null;
     return toJobDescriptionDto(
       jd,
       resumeContent,

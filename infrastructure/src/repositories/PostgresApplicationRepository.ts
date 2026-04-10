@@ -1,14 +1,13 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import { Application, type ApplicationId, type ApplicationRepository, EntityNotFoundError } from '@tailoredin/domain';
+import { Application, type ApplicationRepository, EntityNotFoundError } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresApplicationRepository implements ApplicationRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
-  public async findById(id: ApplicationId): Promise<Application | null> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    return this.orm.em.findOne(Application, { id: id.value } as any);
+  public async findById(id: string): Promise<Application | null> {
+    return this.orm.em.findOne(Application, { id });
   }
 
   public async findByProfileId(profileId: string): Promise<Application[]> {
@@ -20,13 +19,12 @@ export class PostgresApplicationRepository implements ApplicationRepository {
     await this.orm.em.flush();
   }
 
-  public async delete(id: ApplicationId): Promise<void> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    const orm = await this.orm.em.findOne(Application, { id: id.value } as any);
-    if (!orm) {
-      throw new EntityNotFoundError('Application', id.value);
+  public async delete(id: string): Promise<void> {
+    const entity = await this.orm.em.findOne(Application, { id });
+    if (!entity) {
+      throw new EntityNotFoundError('Application', id);
     }
-    this.orm.em.remove(orm);
+    this.orm.em.remove(entity);
     await this.orm.em.flush();
   }
 }

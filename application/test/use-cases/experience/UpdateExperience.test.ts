@@ -53,7 +53,7 @@ describe('UpdateExperience', () => {
 
   it('keeps existing accomplishment when passed with its id', async () => {
     const exp = makeExperience();
-    const accId = exp.accomplishments[0].id.value;
+    const accId = exp.accomplishments[0].id;
     const uc = new UpdateExperience(mockRepo(exp));
     const result = await uc.execute({
       ...baseInput,
@@ -73,7 +73,7 @@ describe('UpdateExperience', () => {
 
   it('adds new accomplishment when id is null', async () => {
     const exp = makeExperience();
-    const accId = exp.accomplishments[0].id.value;
+    const accId = exp.accomplishments[0].id;
     const uc = new UpdateExperience(mockRepo(exp));
     const result = await uc.execute({
       ...baseInput,

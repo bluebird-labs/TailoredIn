@@ -13,7 +13,7 @@ export type ApplicationDto = {
 
 export function toApplicationDto(application: Application): ApplicationDto {
   return {
-    id: application.id.value,
+    id: application.id,
     profileId: application.profileId,
     companyId: application.companyId,
     status: application.status,

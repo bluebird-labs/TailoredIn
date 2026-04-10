@@ -16,8 +16,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
   }
 
   public async update(resumeContent: ResumeContent): Promise<void> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    const existing = await this.orm.em.findOneOrFail(ResumeContent, { id: resumeContent.id.value } as any);
+    const existing = await this.orm.em.findOneOrFail(ResumeContent, { id: resumeContent.id });
     this.orm.em.assign(existing, {
       experiences: resumeContent.experiences,
       hiddenEducationIds: resumeContent.hiddenEducationIds,

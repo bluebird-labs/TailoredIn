@@ -18,7 +18,7 @@ describe('Profile', () => {
 
   test('creates with generated id and timestamps', () => {
     const profile = makeProfile();
-    expect(profile.id.value).toBeDefined();
+    expect(profile.id).toBeDefined();
     expect(profile.email).toBe('john@example.com');
     expect(profile.firstName).toBe('John');
     expect(profile.lastName).toBe('Doe');

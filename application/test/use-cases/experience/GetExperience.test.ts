@@ -12,7 +12,7 @@ import { GetExperience } from '../../../src/use-cases/experience/GetExperience.j
 
 const makeExperience = (overrides: Partial<ConstructorParameters<typeof Experience>[0]> = {}) =>
   new Experience({
-    id: new ExperienceId('exp-aaaa-1111-2222-3333-444444444444'),
+    id: 'exp-aaaa-1111-2222-3333-444444444444',
     profileId: 'profile-1',
     title: 'Software Engineer',
     companyName: 'Acme Corp',
@@ -32,7 +32,7 @@ const makeExperience = (overrides: Partial<ConstructorParameters<typeof Experien
 
 const makeCompany = () =>
   new Company({
-    id: new CompanyId('company-bbbb-1111-2222-3333-444444444444'),
+    id: 'company-bbbb-1111-2222-3333-444444444444',
     name: 'Acme Corp',
     description: 'A great company',
     website: 'https://acme.com',
@@ -48,7 +48,7 @@ const makeCompany = () =>
 describe('GetExperience', () => {
   test('returns an experience DTO with linked company when companyId is set', async () => {
     const company = makeCompany();
-    const experience = makeExperience({ companyId: company.id.value });
+    const experience = makeExperience({ companyId: company.id });
 
     const experienceRepo: ExperienceRepository = {
       findByIdOrFail: mock(() => Promise.resolve(experience)),

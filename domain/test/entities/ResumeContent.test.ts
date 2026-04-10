@@ -1,10 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { ResumeContent } from '../../src/entities/ResumeContent.js';
-import { ResumeContentId } from '../../src/value-objects/ResumeContentId.js';
 
 function makeResumeContent() {
   return new ResumeContent({
-    id: new ResumeContentId('rc-1'),
+    id: 'rc-1',
     profileId: 'profile-1',
     jobDescriptionId: 'jd-1',
     headline: 'Senior Engineer',
@@ -54,7 +53,7 @@ describe('ResumeContent', () => {
       const original = makeResumeContent();
       const updated = original.withExperienceHiddenBullets('exp-1', [1]);
 
-      expect(updated.id.value).toBe(original.id.value);
+      expect(updated.id).toBe(original.id);
     });
 
     test('refreshes updatedAt', () => {
@@ -100,7 +99,7 @@ describe('ResumeContent', () => {
       const original = makeResumeContent();
       const updated = original.withHiddenEducationIds(['edu-1']);
 
-      expect(updated.id.value).toBe(original.id.value);
+      expect(updated.id).toBe(original.id);
     });
 
     test('refreshes updatedAt', () => {

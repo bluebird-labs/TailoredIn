@@ -1,7 +1,5 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { Entity as DomainEntity } from '../Entity.js';
-import { AccomplishmentIdType } from '../orm-types/AccomplishmentIdType.js';
-import { AccomplishmentId } from '../value-objects/AccomplishmentId.js';
 import { Experience } from './Experience.js';
 
 export type AccomplishmentCreateProps = {
@@ -12,11 +10,11 @@ export type AccomplishmentCreateProps = {
 };
 
 @Entity({ tableName: 'accomplishments' })
-export class Accomplishment extends DomainEntity<AccomplishmentId> {
-  @PrimaryKey({ type: AccomplishmentIdType, fieldName: 'id' })
-  public readonly id!: AccomplishmentId;
+export class Accomplishment extends DomainEntity {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
+  // @ts-expect-error — MikroORM decorator types don't support mapToPk with string PKs; required for @OneToMany on Experience
   @ManyToOne(() => Experience, { fieldName: 'experience_id', mapToPk: true })
   public readonly experienceId: string;
 
@@ -36,7 +34,7 @@ export class Accomplishment extends DomainEntity<AccomplishmentId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: AccomplishmentId;
+    id: string;
     experienceId: string;
     title: string;
     narrative: string;
@@ -44,7 +42,7 @@ export class Accomplishment extends DomainEntity<AccomplishmentId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.experienceId = props.experienceId;
     this.title = props.title;
@@ -64,7 +62,7 @@ export class Accomplishment extends DomainEntity<AccomplishmentId> {
   public static create(props: AccomplishmentCreateProps): Accomplishment {
     const now = new Date();
     return new Accomplishment({
-      id: AccomplishmentId.generate(),
+      id: crypto.randomUUID(),
       ...props,
       createdAt: now,
       updatedAt: now

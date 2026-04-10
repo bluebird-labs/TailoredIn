@@ -11,7 +11,7 @@ export function toExperienceGenerationOverrideDto(
   override: ExperienceGenerationOverride
 ): ExperienceGenerationOverrideDto {
   return {
-    id: override.id.value,
+    id: override.id,
     experienceId: override.experienceId,
     bulletMin: override.bulletMin,
     bulletMax: override.bulletMax

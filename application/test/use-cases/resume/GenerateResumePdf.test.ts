@@ -24,7 +24,7 @@ import { GenerateResumePdf } from '../../../src/use-cases/resume/GenerateResumeP
 
 function makeProfile() {
   return {
-    id: { value: 'profile-1' },
+    id: 'profile-1',
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@example.com',
@@ -39,7 +39,7 @@ function makeProfile() {
 
 function makeJd() {
   return new JobDescription({
-    id: new JobDescriptionId('jd-00000000-0000-0000-0000-000000000001'),
+    id: 'jd-00000000-0000-0000-0000-000000000001',
     companyId: 'company-1',
     title: 'Staff Engineer',
     description: 'Build things',
@@ -69,7 +69,7 @@ function makeResumeContent(
   hiddenEducationIds: string[] = []
 ) {
   return new ResumeContent({
-    id: new ResumeContentId('rc-00000000-0000-0000-0000-000000000001'),
+    id: 'rc-00000000-0000-0000-0000-000000000001',
     profileId: 'profile-1',
     jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
     headline,
@@ -92,7 +92,7 @@ const DEFAULT_EXPERIENCES = [
 
 function makeExperience() {
   return new Experience({
-    id: new ExperienceId('exp-00000000-0000-0000-0000-000000000001'),
+    id: 'exp-00000000-0000-0000-0000-000000000001',
     profileId: 'profile-1',
     title: 'Engineer',
     companyName: 'Acme',
@@ -112,7 +112,7 @@ function makeExperience() {
 
 function makeEducation() {
   return {
-    id: { value: 'edu-00000000-0000-0000-0000-000000000001' },
+    id: 'edu-00000000-0000-0000-0000-000000000001',
     profileId: 'profile-1',
     degreeTitle: 'BSc CS',
     institutionName: 'MIT',

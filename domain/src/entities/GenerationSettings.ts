@@ -1,12 +1,9 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { GenerationSettingsIdType } from '../orm-types/GenerationSettingsIdType.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
-import { GenerationSettingsId } from '../value-objects/GenerationSettingsId.js';
 import { ModelTier } from '../value-objects/ModelTier.js';
 import { GenerationPrompt } from './GenerationPrompt.js';
-import { Profile } from './Profile.js';
 
 export type GenerationSettingsCreateProps = {
   profileId: string;
@@ -16,12 +13,11 @@ export type GenerationSettingsCreateProps = {
 };
 
 @Entity({ tableName: 'generation_settings' })
-export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
-  @PrimaryKey({ type: GenerationSettingsIdType, fieldName: 'id' })
-  public readonly id!: GenerationSettingsId;
+export class GenerationSettings extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
+  @Property({ fieldName: 'profile_id', type: 'uuid' })
   public readonly profileId: string;
 
   @Property({ fieldName: 'model_tier', type: 'text' })
@@ -47,7 +43,7 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: GenerationSettingsId;
+    id: string;
     profileId: string;
     modelTier: ModelTier;
     bulletMin: number;
@@ -55,7 +51,7 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.profileId = props.profileId;
     this.modelTier = props.modelTier;
@@ -83,7 +79,7 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
     if (existing) {
       existing.updateContent(content);
     } else {
-      this.prompts.add(GenerationPrompt.create({ generationSettingsId: this.id.value, scope, content }));
+      this.prompts.add(GenerationPrompt.create({ generationSettingsId: this.id, scope, content }));
     }
     this.updatedAt = new Date();
   }
@@ -104,7 +100,7 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
   public static createDefault(profileId: string): GenerationSettings {
     const now = new Date();
     return new GenerationSettings({
-      id: GenerationSettingsId.generate(),
+      id: crypto.randomUUID(),
       profileId,
       modelTier: ModelTier.BALANCED,
       bulletMin: 2,

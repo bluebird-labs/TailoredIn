@@ -27,13 +27,13 @@ export function toGenerationSettingsDto(
   overrides: ExperienceGenerationOverride[] = []
 ): GenerationSettingsDto {
   return {
-    id: settings.id.value,
+    id: settings.id,
     profileId: settings.profileId,
     modelTier: settings.modelTier,
     bulletMin: settings.bulletMin,
     bulletMax: settings.bulletMax,
     prompts: settings.prompts.map(p => ({
-      id: p.id.value,
+      id: p.id,
       scope: p.scope,
       content: p.content
     })),

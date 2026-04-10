@@ -1,10 +1,10 @@
 import { describe, expect, mock, test } from 'bun:test';
-import { EntityNotFoundError, Experience, ExperienceId, type ExperienceRepository } from '@tailoredin/domain';
+import { EntityNotFoundError, Experience, type ExperienceRepository } from '@tailoredin/domain';
 import { UnlinkCompanyFromExperience } from '../../../src/use-cases/experience/UnlinkCompanyFromExperience.js';
 
 const makeLinkedExperience = () =>
   new Experience({
-    id: new ExperienceId('exp-1'),
+    id: 'exp-1',
     profileId: 'profile-1',
     title: 'Engineer',
     companyName: 'Acme Corp',

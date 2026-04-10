@@ -1,7 +1,5 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { Entity as DomainEntity } from '../Entity.js';
-import { GenerationPromptIdType } from '../orm-types/GenerationPromptIdType.js';
-import { GenerationPromptId } from '../value-objects/GenerationPromptId.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
 import { GenerationSettings } from './GenerationSettings.js';
 
@@ -12,11 +10,11 @@ export type GenerationPromptCreateProps = {
 };
 
 @Entity({ tableName: 'generation_prompts' })
-export class GenerationPrompt extends DomainEntity<GenerationPromptId> {
-  @PrimaryKey({ type: GenerationPromptIdType, fieldName: 'id' })
-  public readonly id!: GenerationPromptId;
+export class GenerationPrompt extends DomainEntity {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
+  // @ts-expect-error — MikroORM decorator types don't support mapToPk with string PKs; required for @OneToMany on GenerationSettings
   @ManyToOne(() => GenerationSettings, { fieldName: 'generation_settings_id', mapToPk: true })
   public readonly generationSettingsId: string;
 
@@ -33,14 +31,14 @@ export class GenerationPrompt extends DomainEntity<GenerationPromptId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: GenerationPromptId;
+    id: string;
     generationSettingsId: string;
     scope: GenerationScope;
     content: string;
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.generationSettingsId = props.generationSettingsId;
     this.scope = props.scope;
@@ -57,7 +55,7 @@ export class GenerationPrompt extends DomainEntity<GenerationPromptId> {
   public static create(props: GenerationPromptCreateProps): GenerationPrompt {
     const now = new Date();
     return new GenerationPrompt({
-      id: GenerationPromptId.generate(),
+      id: crypto.randomUUID(),
       ...props,
       createdAt: now,
       updatedAt: now

@@ -1,8 +1,5 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { ExperienceGenerationOverrideIdType } from '../orm-types/ExperienceGenerationOverrideIdType.js';
-import { ExperienceGenerationOverrideId } from '../value-objects/ExperienceGenerationOverrideId.js';
-import { Experience } from './Experience.js';
 
 export type ExperienceGenerationOverrideCreateProps = {
   experienceId: string;
@@ -11,12 +8,11 @@ export type ExperienceGenerationOverrideCreateProps = {
 };
 
 @Entity({ tableName: 'experience_generation_overrides' })
-export class ExperienceGenerationOverride extends AggregateRoot<ExperienceGenerationOverrideId> {
-  @PrimaryKey({ type: ExperienceGenerationOverrideIdType, fieldName: 'id' })
-  public readonly id!: ExperienceGenerationOverrideId;
+export class ExperienceGenerationOverride extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Experience, { fieldName: 'experience_id', mapToPk: true })
+  @Property({ fieldName: 'experience_id', type: 'uuid' })
   public readonly experienceId: string;
 
   @Property({ fieldName: 'bullet_min', type: 'integer' })
@@ -32,14 +28,14 @@ export class ExperienceGenerationOverride extends AggregateRoot<ExperienceGenera
   public updatedAt: Date;
 
   public constructor(props: {
-    id: ExperienceGenerationOverrideId;
+    id: string;
     experienceId: string;
     bulletMin: number;
     bulletMax: number;
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.experienceId = props.experienceId;
     this.bulletMin = props.bulletMin;
@@ -59,7 +55,7 @@ export class ExperienceGenerationOverride extends AggregateRoot<ExperienceGenera
   public static create(props: ExperienceGenerationOverrideCreateProps): ExperienceGenerationOverride {
     const now = new Date();
     return new ExperienceGenerationOverride({
-      id: ExperienceGenerationOverrideId.generate(),
+      id: crypto.randomUUID(),
       ...props,
       createdAt: now,
       updatedAt: now

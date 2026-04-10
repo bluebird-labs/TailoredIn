@@ -1,10 +1,4 @@
-import {
-  type Accomplishment,
-  CompanyId,
-  type CompanyRepository,
-  type Experience,
-  type ExperienceRepository
-} from '@tailoredin/domain';
+import type { Accomplishment, CompanyRepository, Experience, ExperienceRepository } from '@tailoredin/domain';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { AccomplishmentDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
@@ -18,10 +12,10 @@ export class ListExperiences {
   public async execute(): Promise<ExperienceDto[]> {
     const experiences = await this.experienceRepository.findAll();
     const companyIds = [...new Set(experiences.map(e => e.companyId).filter(Boolean))] as string[];
-    const companies = await Promise.all(companyIds.map(id => this.companyRepository.findById(new CompanyId(id))));
+    const companies = await Promise.all(companyIds.map(id => this.companyRepository.findById(id)));
     const companyMap = new Map<string, CompanyDto>();
     for (const company of companies) {
-      if (company) companyMap.set(company.id.value, toCompanyDto(company));
+      if (company) companyMap.set(company.id, toCompanyDto(company));
     }
     return experiences.map(exp => toExperienceDto(exp, exp.companyId ? companyMap.get(exp.companyId) : null));
   }
@@ -29,7 +23,7 @@ export class ListExperiences {
 
 export function toExperienceDto(exp: Experience, company?: CompanyDto | null): ExperienceDto {
   return {
-    id: exp.id.value,
+    id: exp.id,
     title: exp.title,
     companyName: exp.companyName,
     companyWebsite: exp.companyWebsite,
@@ -47,7 +41,7 @@ export function toExperienceDto(exp: Experience, company?: CompanyDto | null): E
 
 function toAccomplishmentDto(accomplishment: Accomplishment): AccomplishmentDto {
   return {
-    id: accomplishment.id.value,
+    id: accomplishment.id,
     title: accomplishment.title,
     narrative: accomplishment.narrative,
     ordinal: accomplishment.ordinal

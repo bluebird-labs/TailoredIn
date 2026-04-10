@@ -1,11 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import {
-  EntityNotFoundError,
-  JobDescription,
-  type JobDescriptionId,
-  type JobDescriptionRepository
-} from '@tailoredin/domain';
+import { EntityNotFoundError, JobDescription, type JobDescriptionRepository } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresJobDescriptionRepository implements JobDescriptionRepository {
@@ -15,9 +10,8 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
     return this.orm.em.find(JobDescription, {}, { orderBy: { createdAt: 'DESC' } });
   }
 
-  public async findById(id: JobDescriptionId): Promise<JobDescription | null> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    return this.orm.em.findOne(JobDescription, { id: id.value } as any);
+  public async findById(id: string): Promise<JobDescription | null> {
+    return this.orm.em.findOne(JobDescription, { id });
   }
 
   public async findByCompanyId(companyId: string): Promise<JobDescription[]> {
@@ -29,13 +23,12 @@ export class PostgresJobDescriptionRepository implements JobDescriptionRepositor
     await this.orm.em.flush();
   }
 
-  public async delete(id: JobDescriptionId): Promise<void> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    const orm = await this.orm.em.findOne(JobDescription, { id: id.value } as any);
-    if (!orm) {
-      throw new EntityNotFoundError('JobDescription', id.value);
+  public async delete(id: string): Promise<void> {
+    const entity = await this.orm.em.findOne(JobDescription, { id });
+    if (!entity) {
+      throw new EntityNotFoundError('JobDescription', id);
     }
-    this.orm.em.remove(orm);
+    this.orm.em.remove(entity);
     await this.orm.em.flush();
   }
 }

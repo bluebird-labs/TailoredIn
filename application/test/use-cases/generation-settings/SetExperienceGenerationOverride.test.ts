@@ -37,7 +37,7 @@ describe('SetExperienceGenerationOverride', () => {
 
     expect(result.bulletMin).toBe(5);
     expect(result.bulletMax).toBe(10);
-    expect(result.id).toBe(existing.id.value);
+    expect(result.id).toBe(existing.id);
     expect(repo.save).toHaveBeenCalledTimes(1);
   });
 });

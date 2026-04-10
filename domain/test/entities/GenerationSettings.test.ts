@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { GenerationPrompt } from '../../src/entities/GenerationPrompt.js';
 import { GenerationSettings } from '../../src/entities/GenerationSettings.js';
-import { GenerationPromptId } from '../../src/value-objects/GenerationPromptId.js';
 import { GenerationScope } from '../../src/value-objects/GenerationScope.js';
 import { ModelTier } from '../../src/value-objects/ModelTier.js';
 
@@ -15,7 +14,7 @@ describe('GenerationSettings', () => {
       expect(settings.bulletMin).toBe(2);
       expect(settings.bulletMax).toBe(5);
       expect(settings.prompts).toHaveLength(0);
-      expect(settings.id.value).toBeDefined();
+      expect(settings.id).toBeDefined();
       expect(settings.createdAt).toBeInstanceOf(Date);
       expect(settings.updatedAt).toBeInstanceOf(Date);
     });
@@ -144,13 +143,13 @@ describe('GenerationPrompt', () => {
 
     expect(prompt.scope).toBe(GenerationScope.RESUME);
     expect(prompt.content).toBe('Use active voice');
-    expect(prompt.id.value).toBeDefined();
+    expect(prompt.id).toBeDefined();
     expect(prompt.createdAt).toBeInstanceOf(Date);
   });
 
   test('updateContent changes content and updatedAt', () => {
     const prompt = new GenerationPrompt({
-      id: GenerationPromptId.generate(),
+      id: crypto.randomUUID(),
       scope: GenerationScope.HEADLINE,
       content: 'Original',
       createdAt: new Date('2024-01-01'),

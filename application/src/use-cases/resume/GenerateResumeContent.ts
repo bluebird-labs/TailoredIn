@@ -6,7 +6,6 @@ import {
   GenerationScope,
   GenerationSettings,
   type GenerationSettingsRepository,
-  JobDescriptionId,
   type JobDescriptionRepository,
   ModelTier,
   type ProfileRepository,
@@ -48,7 +47,7 @@ export class GenerateResumeContent {
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
-    const jd = await this.jobDescriptionRepository.findById(new JobDescriptionId(input.jobDescriptionId));
+    const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);
     if (!jd) {
       throw new EntityNotFoundError('JobDescription', input.jobDescriptionId);
     }
@@ -56,22 +55,20 @@ export class GenerateResumeContent {
     const profile = await this.profileRepository.findSingle();
 
     const settings =
-      (await this.generationSettingsRepository.findByProfileId(profile.id.value)) ??
-      GenerationSettings.createDefault(profile.id.value);
+      (await this.generationSettingsRepository.findByProfileId(profile.id)) ??
+      GenerationSettings.createDefault(profile.id);
 
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences
-      .filter(e => e.profileId === profile.id.value)
+      .filter(e => e.profileId === profile.id)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(
-      experiences.map(e => e.id.value)
-    );
+    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(experiences.map(e => e.id));
     const overrideMap = new Map(overrides.map(o => [o.experienceId, o]));
 
     const composedPrompt = this.composePrompt(settings, input.scope, input.additionalPrompt);
 
-    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
+    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id);
 
     const generatorInput = {
       profile: {
@@ -85,9 +82,9 @@ export class GenerateResumeContent {
         rawText: jd.rawText
       },
       experiences: experiences.map(exp => {
-        const override = overrideMap.get(exp.id.value);
+        const override = overrideMap.get(exp.id);
         return {
-          id: exp.id.value,
+          id: exp.id,
           title: exp.title,
           companyName: exp.companyName,
           summary: exp.summary,
@@ -111,7 +108,7 @@ export class GenerateResumeContent {
     let mergedExperiences: typeof result.experiences;
 
     const resolveExperienceMeta = (experienceId: string) => {
-      const exp = experiences.find(e => e.id.value === experienceId);
+      const exp = experiences.find(e => e.id === experienceId);
       return { experienceTitle: exp?.title ?? '', companyName: exp?.companyName ?? '' };
     };
 
@@ -160,7 +157,7 @@ export class GenerateResumeContent {
       hiddenEducationIds = existing.hiddenEducationIds;
     } else {
       const allEducations = await this.educationRepository.findAll();
-      hiddenEducationIds = allEducations.filter(e => e.hiddenByDefault).map(e => e.id.value);
+      hiddenEducationIds = allEducations.filter(e => e.hiddenByDefault).map(e => e.id);
     }
 
     // Deduplicate experiences by ID (keep first occurrence)
@@ -172,8 +169,8 @@ export class GenerateResumeContent {
     });
 
     const resumeContent = ResumeContent.create({
-      profileId: profile.id.value,
-      jobDescriptionId: jd.id.value,
+      profileId: profile.id,
+      jobDescriptionId: jd.id,
       headline,
       experiences: deduped.map(e => ({
         experienceId: e.experienceId,

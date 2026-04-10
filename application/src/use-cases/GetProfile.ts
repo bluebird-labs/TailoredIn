@@ -8,7 +8,7 @@ export class GetProfile {
     const profile = await this.profileRepository.findSingle();
 
     return {
-      id: profile.id.value,
+      id: profile.id,
       email: profile.email,
       firstName: profile.firstName,
       lastName: profile.lastName,

@@ -26,7 +26,7 @@ import { GenerateResumeContent } from '../../../src/use-cases/resume/GenerateRes
 
 function makeProfile(overrides: Record<string, unknown> = {}) {
   return {
-    id: { value: 'profile-1' },
+    id: 'profile-1',
     firstName: 'John',
     lastName: 'Doe',
     about: 'Experienced software engineer',
@@ -38,7 +38,7 @@ function makeExperience(
   overrides: { id?: string; startDate?: string; title?: string; companyName?: string; profileId?: string } = {}
 ) {
   return new Experience({
-    id: new ExperienceId(overrides.id ?? 'exp-aaaa-0000-0000-0000-000000000001'),
+    id: overrides.id ?? 'exp-aaaa-0000-0000-0000-000000000001',
     profileId: overrides.profileId ?? 'profile-1',
     title: overrides.title ?? 'Software Engineer',
     companyName: overrides.companyName ?? 'Acme Corp',
@@ -58,7 +58,7 @@ function makeExperience(
 
 function makeJobDescription(overrides: Record<string, unknown> = {}) {
   return {
-    id: { value: 'jd-1' },
+    id: 'jd-1',
     title: 'Senior Engineer',
     description: 'Build great things',
     rawText: 'Full raw text of the job posting',
@@ -113,7 +113,7 @@ function mockJobDescriptionRepo(jd: ReturnType<typeof makeJobDescription> | null
 
 function makeEducation(overrides: { id?: string; hiddenByDefault?: boolean } = {}) {
   return new Education({
-    id: new EducationId(overrides.id ?? 'edu-0000-0000-0000-000000000001'),
+    id: overrides.id ?? 'edu-0000-0000-0000-000000000001',
     profileId: 'profile-1',
     degreeTitle: 'B.S. Computer Science',
     institutionName: 'MIT',

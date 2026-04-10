@@ -43,7 +43,7 @@ export class UpdateEducation {
     await this.educationRepository.save(education);
 
     return ok({
-      id: education.id.value,
+      id: education.id,
       degreeTitle: education.degreeTitle,
       institutionName: education.institutionName,
       graduationYear: education.graduationYear,

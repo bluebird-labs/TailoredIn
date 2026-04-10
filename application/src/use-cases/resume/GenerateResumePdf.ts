@@ -3,7 +3,6 @@ import {
   type EducationRepository,
   EntityNotFoundError,
   type ExperienceRepository,
-  JobDescriptionId,
   type JobDescriptionRepository,
   type ProfileRepository,
   type ResumeContentRepository
@@ -41,7 +40,7 @@ export class GenerateResumePdf {
   ) {}
 
   public async execute(input: GenerateResumePdfInput): Promise<Uint8Array> {
-    const jd = await this.jobDescriptionRepository.findById(new JobDescriptionId(input.jobDescriptionId));
+    const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);
     if (!jd) {
       throw new EntityNotFoundError('JobDescription', input.jobDescriptionId);
     }
@@ -50,15 +49,15 @@ export class GenerateResumePdf {
 
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences
-      .filter(e => e.profileId === profile.id.value)
+      .filter(e => e.profileId === profile.id)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
     const allEducations = await this.educationRepository.findAll();
     const educations = allEducations
-      .filter(e => e.profileId === profile.id.value)
+      .filter(e => e.profileId === profile.id)
       .sort((a, b) => b.graduationYear - a.graduationYear);
 
-    const resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id.value);
+    const resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id);
 
     if (!resumeContent) {
       throw new Error('Resume content has not been generated yet. Generate content before creating a PDF.');
@@ -85,7 +84,7 @@ export class GenerateResumePdf {
       },
       headlineSummary: resumeContent.headline,
       experiences: experiences.map(exp => {
-        const gen = generatedByExperienceId.get(exp.id.value);
+        const gen = generatedByExperienceId.get(exp.id);
         return {
           title: exp.title,
           companyName: exp.companyName,
@@ -98,7 +97,7 @@ export class GenerateResumePdf {
         };
       }),
       educations: educations
-        .filter(edu => !resumeContent.hiddenEducationIds.includes(edu.id.value))
+        .filter(edu => !resumeContent.hiddenEducationIds.includes(edu.id))
         .map(edu => ({
           degreeTitle: edu.degreeTitle,
           institutionName: edu.institutionName,

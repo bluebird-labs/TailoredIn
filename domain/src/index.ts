@@ -26,21 +26,6 @@ export type { ProfileCreateProps } from './entities/Profile.js';
 export { Profile } from './entities/Profile.js';
 export type { ResumeContentCreateProps } from './entities/ResumeContent.js';
 export { ResumeContent } from './entities/ResumeContent.js';
-// ORM types
-export {
-  AccomplishmentIdType,
-  ApplicationIdType,
-  CompanyIdType,
-  EducationIdType,
-  ExperienceGenerationOverrideIdType,
-  ExperienceIdType,
-  GenerationPromptIdType,
-  GenerationSettingsIdType,
-  JobDescriptionIdType,
-  ProfileIdType,
-  ResumeContentIdType,
-  ValueObjectIdType
-} from './orm-types/index.js';
 // Ports — repository interfaces
 export type { ApplicationRepository } from './ports/ApplicationRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
@@ -54,31 +39,19 @@ export type { ResumeContentRepository } from './ports/ResumeContentRepository.js
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
 export { ValueObject } from './ValueObject.js';
-// Value objects — IDs
-export { AccomplishmentId } from './value-objects/AccomplishmentId.js';
-export { ApplicationId } from './value-objects/ApplicationId.js';
-// Value objects — domain
+// Value objects
 export { ApplicationStatus } from './value-objects/ApplicationStatus.js';
 export { BusinessType } from './value-objects/BusinessType.js';
-export { CompanyId } from './value-objects/CompanyId.js';
 export { CompanyStage } from './value-objects/CompanyStage.js';
 export { CompanyStatus } from './value-objects/CompanyStatus.js';
-export { EducationId } from './value-objects/EducationId.js';
-export { ExperienceGenerationOverrideId } from './value-objects/ExperienceGenerationOverrideId.js';
-export { ExperienceId } from './value-objects/ExperienceId.js';
-export { GenerationPromptId } from './value-objects/GenerationPromptId.js';
 export { GenerationScope } from './value-objects/GenerationScope.js';
-export { GenerationSettingsId } from './value-objects/GenerationSettingsId.js';
 export { Industry } from './value-objects/Industry.js';
-export { JobDescriptionId } from './value-objects/JobDescriptionId.js';
 export { JobLevel } from './value-objects/JobLevel.js';
 export { JobSource } from './value-objects/JobSource.js';
 export type { BlockLayout, LayoutAnalysis } from './value-objects/LayoutAnalysis.js';
 export { LocationType } from './value-objects/LocationType.js';
 export { ModelTier } from './value-objects/ModelTier.js';
-export { ProfileId } from './value-objects/ProfileId.js';
 export { ResumeConstraints } from './value-objects/ResumeConstraints.js';
-export { ResumeContentId } from './value-objects/ResumeContentId.js';
 export type { ResumeExperience } from './value-objects/ResumeExperience.js';
 export type { ResumeTemplate } from './value-objects/ResumeTemplate.js';
 export { DEFAULT_RESUME_TEMPLATE } from './value-objects/ResumeTemplate.js';

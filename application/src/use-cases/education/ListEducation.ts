@@ -8,7 +8,7 @@ export class ListEducation {
     const entries = await this.educationRepository.findAll();
 
     return entries.map(e => ({
-      id: e.id.value,
+      id: e.id,
       degreeTitle: e.degreeTitle,
       institutionName: e.institutionName,
       graduationYear: e.graduationYear,

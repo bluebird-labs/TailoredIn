@@ -35,7 +35,7 @@ export class AddAccomplishment {
     await this.experienceRepository.save(experience);
 
     return ok({
-      id: acc.id.value,
+      id: acc.id,
       title: acc.title,
       narrative: acc.narrative,
       ordinal: acc.ordinal

@@ -33,7 +33,7 @@ export class UpdateProfile {
     await this.profileRepository.save(profile);
 
     return {
-      id: profile.id.value,
+      id: profile.id,
       email: profile.email,
       firstName: profile.firstName,
       lastName: profile.lastName,

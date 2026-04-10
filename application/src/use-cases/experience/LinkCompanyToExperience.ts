@@ -1,5 +1,4 @@
 import {
-  CompanyId,
   type CompanyRepository,
   EntityNotFoundError,
   type Experience,
@@ -32,7 +31,7 @@ export class LinkCompanyToExperience {
       throw e;
     }
 
-    const company = await this.companyRepository.findById(new CompanyId(input.companyId));
+    const company = await this.companyRepository.findById(input.companyId);
     if (!company) return err(new EntityNotFoundError('Company', input.companyId));
 
     experience.linkCompany(input.companyId);

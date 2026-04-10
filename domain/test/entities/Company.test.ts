@@ -17,7 +17,7 @@ describe('Company', () => {
 
   test('creates with generated id and timestamps', () => {
     const company = makeCompany();
-    expect(company.id.value).toBeDefined();
+    expect(company.id).toBeDefined();
     expect(company.name).toBe('Acme Corp');
     expect(company.description).toBe('A test company');
     expect(company.website).toBe('https://acme.com');

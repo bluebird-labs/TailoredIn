@@ -53,7 +53,7 @@ export function toJobDescriptionDto(
   company?: { name: string; logoUrl: string | null } | null
 ): JobDescriptionDto {
   return {
-    id: jd.id.value,
+    id: jd.id,
     companyId: jd.companyId,
     companyName: company?.name ?? null,
     companyLogoUrl: company?.logoUrl ?? null,
@@ -77,7 +77,7 @@ export function toJobDescriptionDto(
       ? {
           headline: resumeContent.headline,
           experiences: resumeContent.experiences.map(e => {
-            const exp = experiences?.find(x => x.id.value === e.experienceId);
+            const exp = experiences?.find(x => x.id === e.experienceId);
             return {
               experienceId: e.experienceId,
               experienceTitle: exp?.title ?? '',

@@ -1,8 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { CompanyIdType } from '../orm-types/CompanyIdType.js';
 import type { BusinessType } from '../value-objects/BusinessType.js';
-import { CompanyId } from '../value-objects/CompanyId.js';
 import type { CompanyStage } from '../value-objects/CompanyStage.js';
 import { CompanyStatus } from '../value-objects/CompanyStatus.js';
 import type { Industry } from '../value-objects/Industry.js';
@@ -20,9 +18,9 @@ export type CompanyCreateProps = {
 };
 
 @Entity({ tableName: 'companies' })
-export class Company extends AggregateRoot<CompanyId> {
-  @PrimaryKey({ type: CompanyIdType, fieldName: 'id' })
-  public readonly id!: CompanyId;
+export class Company extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
   @Property({ fieldName: 'name', type: 'text' })
   public name: string;
@@ -58,7 +56,7 @@ export class Company extends AggregateRoot<CompanyId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: CompanyId;
+    id: string;
     name: string;
     description: string | null;
     website: string | null;
@@ -71,7 +69,7 @@ export class Company extends AggregateRoot<CompanyId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.name = props.name;
     this.description = props.description;
@@ -114,7 +112,7 @@ export class Company extends AggregateRoot<CompanyId> {
   public static create(props: CompanyCreateProps): Company {
     const now = new Date();
     return new Company({
-      id: CompanyId.generate(),
+      id: crypto.randomUUID(),
       name: props.name,
       description: props.description ?? null,
       website: props.website,

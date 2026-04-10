@@ -1,8 +1,5 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { EducationIdType } from '../orm-types/EducationIdType.js';
-import { EducationId } from '../value-objects/EducationId.js';
-import { Profile } from './Profile.js';
 
 export type EducationCreateProps = {
   profileId: string;
@@ -16,12 +13,11 @@ export type EducationCreateProps = {
 };
 
 @Entity({ tableName: 'educations' })
-export class Education extends AggregateRoot<EducationId> {
-  @PrimaryKey({ type: EducationIdType, fieldName: 'id' })
-  public readonly id!: EducationId;
+export class Education extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
+  @Property({ fieldName: 'profile_id', type: 'uuid' })
   public readonly profileId: string;
 
   @Property({ fieldName: 'degree_title', type: 'text' })
@@ -52,7 +48,7 @@ export class Education extends AggregateRoot<EducationId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: EducationId;
+    id: string;
     profileId: string;
     degreeTitle: string;
     institutionName: string;
@@ -64,7 +60,7 @@ export class Education extends AggregateRoot<EducationId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.profileId = props.profileId;
     this.degreeTitle = props.degreeTitle;
@@ -81,7 +77,7 @@ export class Education extends AggregateRoot<EducationId> {
   public static create(props: EducationCreateProps): Education {
     const now = new Date();
     return new Education({
-      id: EducationId.generate(),
+      id: crypto.randomUUID(),
       ...props,
       hiddenByDefault: props.hiddenByDefault ?? false,
       createdAt: now,

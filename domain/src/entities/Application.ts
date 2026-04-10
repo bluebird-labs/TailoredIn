@@ -1,11 +1,6 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { ApplicationIdType } from '../orm-types/ApplicationIdType.js';
-import { ApplicationId } from '../value-objects/ApplicationId.js';
 import { ApplicationStatus } from '../value-objects/ApplicationStatus.js';
-import { Company } from './Company.js';
-import { JobDescription } from './JobDescription.js';
-import { Profile } from './Profile.js';
 
 export type ApplicationCreateProps = {
   profileId: string;
@@ -16,23 +11,20 @@ export type ApplicationCreateProps = {
 };
 
 @Entity({ tableName: 'applications' })
-export class Application extends AggregateRoot<ApplicationId> {
-  @PrimaryKey({ type: ApplicationIdType, fieldName: 'id' })
-  public readonly id!: ApplicationId;
+export class Application extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
+  @Property({ fieldName: 'profile_id', type: 'uuid' })
   public readonly profileId: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Company, { fieldName: 'company_id', mapToPk: true })
+  @Property({ fieldName: 'company_id', type: 'uuid' })
   public readonly companyId: string;
 
   @Property({ fieldName: 'status', type: 'text' })
   public status: ApplicationStatus;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => JobDescription, { fieldName: 'job_description_id', mapToPk: true, nullable: true })
+  @Property({ fieldName: 'job_description_id', type: 'uuid', nullable: true })
   public jobDescriptionId: string | null;
 
   @Property({ fieldName: 'notes', type: 'text', nullable: true })
@@ -48,7 +40,7 @@ export class Application extends AggregateRoot<ApplicationId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: ApplicationId;
+    id: string;
     profileId: string;
     companyId: string;
     status: ApplicationStatus;
@@ -58,7 +50,7 @@ export class Application extends AggregateRoot<ApplicationId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.profileId = props.profileId;
     this.companyId = props.companyId;
@@ -78,7 +70,7 @@ export class Application extends AggregateRoot<ApplicationId> {
   public static create(props: ApplicationCreateProps): Application {
     const now = new Date();
     return new Application({
-      id: ApplicationId.generate(),
+      id: crypto.randomUUID(),
       profileId: props.profileId,
       companyId: props.companyId,
       status: props.status ?? ApplicationStatus.DRAFT,

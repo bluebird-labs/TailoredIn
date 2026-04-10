@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import { Company, type CompanyCreateProps, type CompanyId, type CompanyRepository } from '@tailoredin/domain';
+import { Company, type CompanyCreateProps, type CompanyRepository } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresCompanyRepository implements CompanyRepository {
@@ -10,9 +10,8 @@ export class PostgresCompanyRepository implements CompanyRepository {
     return this.orm.em.find(Company, {}, { orderBy: { name: 'ASC' } });
   }
 
-  public async findById(id: CompanyId): Promise<Company | null> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    return this.orm.em.findOne(Company, { id: id.value } as any);
+  public async findById(id: string): Promise<Company | null> {
+    return this.orm.em.findOne(Company, { id });
   }
 
   public async upsertByLinkedinLink(props: CompanyCreateProps): Promise<Company> {

@@ -30,7 +30,7 @@ export class CreateEducation {
     await this.educationRepository.save(education);
 
     return {
-      id: education.id.value,
+      id: education.id,
       degreeTitle: education.degreeTitle,
       institutionName: education.institutionName,
       graduationYear: education.graduationYear,

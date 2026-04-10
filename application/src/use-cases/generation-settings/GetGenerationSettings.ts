@@ -26,7 +26,7 @@ export class GetGenerationSettings {
     }
 
     const allExperiences = await this.experienceRepository.findAll();
-    const experienceIds = allExperiences.filter(e => e.profileId === input.profileId).map(e => e.id.value);
+    const experienceIds = allExperiences.filter(e => e.profileId === input.profileId).map(e => e.id);
     const overrides = await this.experienceOverrideRepository.findByExperienceIds(experienceIds);
 
     return toGenerationSettingsDto(settings, overrides);

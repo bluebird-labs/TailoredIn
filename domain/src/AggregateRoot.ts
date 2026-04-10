@@ -1,8 +1,7 @@
 import type { DomainEvent } from './DomainEvent.js';
 import { Entity } from './Entity.js';
-import type { ValueObject } from './ValueObject.js';
 
-export abstract class AggregateRoot<TId extends ValueObject<{ value: string }>> extends Entity<TId> {
+export abstract class AggregateRoot extends Entity {
   private _domainEvents: DomainEvent[] = [];
 
   public get domainEvents(): ReadonlyArray<DomainEvent> {

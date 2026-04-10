@@ -31,21 +31,21 @@ describe('Experience', () => {
     expect(accomplishment.title).toBe('T');
     // MikroORM Collection propagation converts experienceId to ExperienceId
     // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
-    expect((accomplishment.experienceId as any).value ?? accomplishment.experienceId).toBe(exp.id.value);
+    expect((accomplishment.experienceId as any).value ?? accomplishment.experienceId).toBe(exp.id);
   });
 
   test('removes an accomplishment', () => {
     const exp = makeExperience();
     const accomplishment = exp.addAccomplishment({ title: 'T', narrative: 'N', ordinal: 0 });
-    exp.removeAccomplishment(accomplishment.id.value);
+    exp.removeAccomplishment(accomplishment.id);
     expect(exp.accomplishments).toHaveLength(0);
   });
 
   test('finds accomplishment or fails', () => {
     const exp = makeExperience();
     const accomplishment = exp.addAccomplishment({ title: 'T', narrative: 'N', ordinal: 0 });
-    const found = exp.findAccomplishmentOrFail(accomplishment.id.value);
-    expect(found.id.equals(accomplishment.id)).toBe(true);
+    const found = exp.findAccomplishmentOrFail(accomplishment.id);
+    expect(found.id).toBe(accomplishment.id);
   });
 
   test('throws when removing non-existent accomplishment', () => {
@@ -105,7 +105,7 @@ describe('Experience', () => {
 
     it('adds a new accomplishment when id is null', () => {
       const exp = makeExperienceWithAccomplishments();
-      const existingIds = exp.accomplishments.map(a => a.id.value);
+      const existingIds = exp.accomplishments.map(a => a.id);
       exp.syncAccomplishments([
         { id: existingIds[0], title: 'First', narrative: 'Narrative 1', ordinal: 0 },
         { id: existingIds[1], title: 'Second', narrative: 'Narrative 2', ordinal: 1 },
@@ -117,8 +117,8 @@ describe('Experience', () => {
 
     it('updates title and narrative of an existing accomplishment', () => {
       const exp = makeExperienceWithAccomplishments();
-      const id0 = exp.accomplishments[0].id.value;
-      const id1 = exp.accomplishments[1].id.value;
+      const id0 = exp.accomplishments[0].id;
+      const id1 = exp.accomplishments[1].id;
       exp.syncAccomplishments([
         { id: id0, title: 'Updated title', narrative: 'Updated narrative', ordinal: 0 },
         { id: id1, title: 'Second', narrative: 'Narrative 2', ordinal: 1 }
@@ -129,21 +129,21 @@ describe('Experience', () => {
 
     it('removes accomplishments absent from input', () => {
       const exp = makeExperienceWithAccomplishments();
-      const id0 = exp.accomplishments[0].id.value;
+      const id0 = exp.accomplishments[0].id;
       exp.syncAccomplishments([{ id: id0, title: 'First', narrative: 'Narrative 1', ordinal: 0 }]);
       expect(exp.accomplishments).toHaveLength(1);
-      expect(exp.accomplishments[0].id.value).toBe(id0);
+      expect(exp.accomplishments[0].id).toBe(id0);
     });
 
     it('handles reorder by updating ordinals', () => {
       const exp = makeExperienceWithAccomplishments();
-      const id0 = exp.accomplishments[0].id.value;
-      const id1 = exp.accomplishments[1].id.value;
+      const id0 = exp.accomplishments[0].id;
+      const id1 = exp.accomplishments[1].id;
       exp.syncAccomplishments([
         { id: id1, title: 'Second', narrative: 'Narrative 2', ordinal: 0 },
         { id: id0, title: 'First', narrative: 'Narrative 1', ordinal: 1 }
       ]);
-      const a = exp.accomplishments.find(a => a.id.value === id1)!;
+      const a = exp.accomplishments.find(a => a.id === id1)!;
       expect(a.ordinal).toBe(0);
     });
 

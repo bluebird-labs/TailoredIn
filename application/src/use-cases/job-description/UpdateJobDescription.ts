@@ -1,5 +1,4 @@
 import {
-  JobDescriptionId,
   type JobDescriptionRepository,
   type JobLevel,
   type JobSource,
@@ -29,7 +28,7 @@ export class UpdateJobDescription {
   public constructor(private readonly jobDescriptionRepository: JobDescriptionRepository) {}
 
   public async execute(input: UpdateJobDescriptionInput): Promise<JobDescriptionDto> {
-    const jd = await this.jobDescriptionRepository.findById(new JobDescriptionId(input.jobDescriptionId));
+    const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);
     if (!jd) {
       throw new Error(`JobDescription not found: ${input.jobDescriptionId}`);
     }

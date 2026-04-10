@@ -1,10 +1,10 @@
 import { describe, expect, mock, test } from 'bun:test';
-import { EntityNotFoundError, ResumeContent, ResumeContentId, type ResumeContentRepository } from '@tailoredin/domain';
+import { EntityNotFoundError, ResumeContent, type ResumeContentRepository } from '@tailoredin/domain';
 import { UpdateResumeDisplaySettings } from '../../../src/use-cases/resume/UpdateResumeDisplaySettings.js';
 
 function makeResumeContent() {
   return new ResumeContent({
-    id: new ResumeContentId('rc-1'),
+    id: 'rc-1',
     profileId: 'profile-1',
     jobDescriptionId: 'jd-1',
     headline: 'Senior Engineer',

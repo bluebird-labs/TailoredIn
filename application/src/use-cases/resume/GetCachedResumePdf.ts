@@ -1,4 +1,4 @@
-import { JobDescriptionId, type JobDescriptionRepository } from '@tailoredin/domain';
+import type { JobDescriptionRepository } from '@tailoredin/domain';
 
 export type GetCachedResumePdfInput = {
   jobDescriptionId: string;
@@ -13,7 +13,7 @@ export class GetCachedResumePdf {
   public constructor(private readonly jobDescriptionRepository: JobDescriptionRepository) {}
 
   public async execute(input: GetCachedResumePdfInput): Promise<CachedResumePdfResult | null> {
-    const jd = await this.jobDescriptionRepository.findById(new JobDescriptionId(input.jobDescriptionId));
+    const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);
     if (!jd?.resumePdf) return null;
     return { pdf: jd.resumePdf, theme: jd.resumePdfTheme ?? 'brilliant-cv' };
   }

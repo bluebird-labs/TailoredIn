@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { Education } from '../../src/entities/Education.js';
-import { EducationId } from '../../src/value-objects/EducationId.js';
 
 describe('Education', () => {
   const createProps = {
+    profileId: 'profile-1',
     degreeTitle: 'B.S. in Computer Science',
     institutionName: 'MIT',
     graduationYear: 2020,
@@ -15,7 +15,7 @@ describe('Education', () => {
   test('create generates id and timestamps', () => {
     const edu = Education.create(createProps);
 
-    expect(edu.id).toBeInstanceOf(EducationId);
+    expect(typeof edu.id).toBe('string');
     expect(edu.degreeTitle).toBe('B.S. in Computer Science');
     expect(edu.institutionName).toBe('MIT');
     expect(edu.graduationYear).toBe(2020);
@@ -34,11 +34,11 @@ describe('Education', () => {
   });
 
   test('constructor reconstitutes from full props', () => {
-    const id = new EducationId('fixed-id');
+    const id = 'fixed-id';
     const now = new Date('2025-01-01');
-    const edu = new Education({ id, ...createProps, createdAt: now, updatedAt: now });
+    const edu = new Education({ id, ...createProps, hiddenByDefault: false, createdAt: now, updatedAt: now });
 
-    expect(edu.id.value).toBe('fixed-id');
+    expect(edu.id).toBe('fixed-id');
     expect(edu.degreeTitle).toBe('B.S. in Computer Science');
     expect(edu.graduationYear).toBe(2020);
   });

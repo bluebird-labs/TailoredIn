@@ -1,4 +1,4 @@
-import { CompanyId, type CompanyRepository, type JobDescriptionRepository } from '@tailoredin/domain';
+import type { CompanyRepository, JobDescriptionRepository } from '@tailoredin/domain';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { JobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 import { toJobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
@@ -19,8 +19,8 @@ export class ListJobDescriptions {
       : await this.jobDescriptionRepository.findAll();
 
     const companyIds = [...new Set(jobDescriptions.map(jd => jd.companyId))];
-    const companies = await Promise.all(companyIds.map(id => this.companyRepository.findById(new CompanyId(id))));
-    const companyMap = new Map(companies.filter(Boolean).map(c => [c!.id.value, toCompanyDto(c!)]));
+    const companies = await Promise.all(companyIds.map(id => this.companyRepository.findById(id)));
+    const companyMap = new Map(companies.filter(Boolean).map(c => [c!.id, toCompanyDto(c!)]));
 
     return jobDescriptions.map(jd => {
       const company = companyMap.get(jd.companyId);

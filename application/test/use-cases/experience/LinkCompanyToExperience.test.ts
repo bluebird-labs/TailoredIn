@@ -12,7 +12,7 @@ import { LinkCompanyToExperience } from '../../../src/use-cases/experience/LinkC
 
 const makeExperience = () =>
   new Experience({
-    id: new ExperienceId('exp-1'),
+    id: 'exp-1',
     profileId: 'profile-1',
     title: 'Engineer',
     companyName: 'Acme Corp',
@@ -31,7 +31,7 @@ const makeExperience = () =>
 
 const makeCompany = () =>
   new Company({
-    id: new CompanyId('company-1'),
+    id: 'company-1',
     name: 'Acme Corp',
     description: null,
     website: 'https://acme.com',

@@ -13,8 +13,7 @@ export class PostgresEducationRepository implements EducationRepository {
 
   public async findByIdOrFail(id: string): Promise<Education> {
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-      return await this.orm.em.findOneOrFail(Education, { id } as any);
+      return await this.orm.em.findOneOrFail(Education, { id });
     } catch (e) {
       if (e instanceof NotFoundError) throw new EntityNotFoundError('Education', id);
       throw e;
@@ -28,8 +27,7 @@ export class PostgresEducationRepository implements EducationRepository {
 
   public async delete(id: string): Promise<void> {
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-      const orm = await this.orm.em.findOneOrFail(Education, { id } as any);
+      const orm = await this.orm.em.findOneOrFail(Education, { id });
       this.orm.em.remove(orm);
       await this.orm.em.flush();
     } catch (e) {

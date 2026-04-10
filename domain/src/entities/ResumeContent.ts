@@ -1,10 +1,6 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { ResumeContentIdType } from '../orm-types/ResumeContentIdType.js';
-import { ResumeContentId } from '../value-objects/ResumeContentId.js';
 import type { ResumeExperience } from '../value-objects/ResumeExperience.js';
-import { JobDescription } from './JobDescription.js';
-import { Profile } from './Profile.js';
 
 export type ResumeContentCreateProps = {
   profileId: string;
@@ -17,16 +13,14 @@ export type ResumeContentCreateProps = {
 };
 
 @Entity({ tableName: 'resume_contents' })
-export class ResumeContent extends AggregateRoot<ResumeContentId> {
-  @PrimaryKey({ type: ResumeContentIdType, fieldName: 'id' })
-  public readonly id!: ResumeContentId;
+export class ResumeContent extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
+  @Property({ fieldName: 'profile_id', type: 'uuid' })
   public readonly profileId: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => JobDescription, { fieldName: 'job_description_id', mapToPk: true })
+  @Property({ fieldName: 'job_description_id', type: 'uuid' })
   public readonly jobDescriptionId: string;
 
   @Property({ fieldName: 'headline', type: 'text' })
@@ -51,7 +45,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
   public readonly updatedAt: Date;
 
   public constructor(props: {
-    id: ResumeContentId;
+    id: string;
     profileId: string;
     jobDescriptionId: string;
     headline: string;
@@ -62,7 +56,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.profileId = props.profileId;
     this.jobDescriptionId = props.jobDescriptionId;
@@ -78,7 +72,7 @@ export class ResumeContent extends AggregateRoot<ResumeContentId> {
   public static create(props: ResumeContentCreateProps): ResumeContent {
     const now = new Date();
     return new ResumeContent({
-      id: ResumeContentId.generate(),
+      id: crypto.randomUUID(),
       profileId: props.profileId,
       jobDescriptionId: props.jobDescriptionId,
       headline: props.headline,

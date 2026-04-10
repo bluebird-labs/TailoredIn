@@ -1,10 +1,10 @@
 import { describe, expect, mock, test } from 'bun:test';
-import { JobDescription, JobDescriptionId, type JobDescriptionRepository, JobSource } from '@tailoredin/domain';
+import { JobDescription, type JobDescriptionRepository, JobSource } from '@tailoredin/domain';
 import { GetCachedResumePdf } from '../../../src/use-cases/resume/GetCachedResumePdf.js';
 
 function makeJd(pdf: Uint8Array | null, theme: string | null) {
   return new JobDescription({
-    id: new JobDescriptionId('jd-00000000-0000-0000-0000-000000000001'),
+    id: 'jd-00000000-0000-0000-0000-000000000001',
     companyId: 'company-1',
     title: 'Staff Engineer',
     description: 'Build things',

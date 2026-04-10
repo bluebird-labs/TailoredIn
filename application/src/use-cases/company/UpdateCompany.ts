@@ -1,5 +1,4 @@
-import type { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
-import { CompanyId, type CompanyRepository } from '@tailoredin/domain';
+import type { BusinessType, CompanyRepository, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 
@@ -19,7 +18,7 @@ export class UpdateCompany {
   public constructor(private readonly companyRepository: CompanyRepository) {}
 
   public async execute(input: UpdateCompanyInput): Promise<CompanyDto> {
-    const company = await this.companyRepository.findById(new CompanyId(input.companyId));
+    const company = await this.companyRepository.findById(input.companyId);
     if (!company) {
       throw new Error(`Company not found: ${input.companyId}`);
     }

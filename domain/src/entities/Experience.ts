@@ -1,12 +1,8 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { EntityNotFoundError } from '../EntityNotFoundError.js';
-import { ExperienceIdType } from '../orm-types/ExperienceIdType.js';
-import { ExperienceId } from '../value-objects/ExperienceId.js';
 import { Accomplishment } from './Accomplishment.js';
-import { Company } from './Company.js';
-import { Profile } from './Profile.js';
 
 export type ExperienceCreateProps = {
   profileId: string;
@@ -23,12 +19,11 @@ export type ExperienceCreateProps = {
 };
 
 @Entity({ tableName: 'experiences' })
-export class Experience extends AggregateRoot<ExperienceId> {
-  @PrimaryKey({ type: ExperienceIdType, fieldName: 'id' })
-  public readonly id!: ExperienceId;
+export class Experience extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
+  @Property({ fieldName: 'profile_id', type: 'uuid' })
   public readonly profileId: string;
 
   @Property({ fieldName: 'title', type: 'text' })
@@ -43,8 +38,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   @Property({ fieldName: 'company_accent', type: 'text', nullable: true })
   public companyAccent: string | null;
 
-  // @ts-expect-error — mapToPk narrows to string but decorator expects entity type
-  @ManyToOne(() => Company, { fieldName: 'company_id', mapToPk: true, nullable: true })
+  @Property({ fieldName: 'company_id', type: 'uuid', nullable: true })
   public companyId: string | null;
 
   @Property({ fieldName: 'location', type: 'text' })
@@ -76,7 +70,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: ExperienceId;
+    id: string;
     profileId: string;
     title: string;
     companyName: string;
@@ -91,7 +85,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.profileId = props.profileId;
     this.title = props.title;
@@ -109,14 +103,14 @@ export class Experience extends AggregateRoot<ExperienceId> {
   }
 
   public addAccomplishment(props: { title: string; narrative: string; ordinal: number }): Accomplishment {
-    const accomplishment = Accomplishment.create({ experienceId: this.id.value, ...props });
+    const accomplishment = Accomplishment.create({ experienceId: this.id, ...props });
     this.accomplishments.add(accomplishment);
     this.updatedAt = new Date();
     return accomplishment;
   }
 
   public removeAccomplishment(accomplishmentId: string): void {
-    const index = this.accomplishments.getItems().findIndex(a => a.id.value === accomplishmentId);
+    const index = this.accomplishments.getItems().findIndex(a => a.id === accomplishmentId);
     if (index === -1) throw new EntityNotFoundError('Accomplishment', accomplishmentId);
     const item = this.accomplishments.getItems()[index];
     this.accomplishments.remove(item);
@@ -124,7 +118,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   }
 
   public findAccomplishmentOrFail(accomplishmentId: string): Accomplishment {
-    const acc = this.accomplishments.getItems().find(a => a.id.value === accomplishmentId);
+    const acc = this.accomplishments.getItems().find(a => a.id === accomplishmentId);
     if (!acc) throw new EntityNotFoundError('Accomplishment', accomplishmentId);
     return acc;
   }
@@ -143,7 +137,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
     const inputIds = new Set(items.filter(i => i.id !== null).map(i => i.id as string));
 
     // Remove accomplishments absent from the input list
-    const toRemove = this.accomplishments.getItems().filter(a => !inputIds.has(a.id.value));
+    const toRemove = this.accomplishments.getItems().filter(a => !inputIds.has(a.id));
     for (const item of toRemove) {
       this.accomplishments.remove(item);
     }
@@ -153,7 +147,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
       if (item.id === null) {
         this.accomplishments.add(
           Accomplishment.create({
-            experienceId: this.id.value,
+            experienceId: this.id,
             title: item.title,
             narrative: item.narrative,
             ordinal: item.ordinal
@@ -174,7 +168,7 @@ export class Experience extends AggregateRoot<ExperienceId> {
   public static create(props: ExperienceCreateProps): Experience {
     const now = new Date();
     return new Experience({
-      id: ExperienceId.generate(),
+      id: crypto.randomUUID(),
       ...props,
       createdAt: now,
       updatedAt: now

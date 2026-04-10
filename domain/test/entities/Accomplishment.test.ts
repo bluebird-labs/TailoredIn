@@ -9,7 +9,7 @@ describe('Accomplishment', () => {
       narrative: 'Led the migration of billing engine to hash-based sharding.',
       ordinal: 0
     });
-    expect(a.id.value).toBeString();
+    expect(a.id).toBeString();
     expect(a.title).toBe('Billing sharding');
     expect(a.narrative).toBe('Led the migration of billing engine to hash-based sharding.');
   });

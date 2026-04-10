@@ -24,7 +24,7 @@ describe('UpdateApplicationStatus', () => {
     const useCase = new UpdateApplicationStatus(mockApplicationRepo(app));
 
     const dto = await useCase.execute({
-      applicationId: app.id.value,
+      applicationId: app.id,
       status: ApplicationStatus.INTERVIEWING
     });
 

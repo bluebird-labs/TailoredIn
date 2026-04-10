@@ -1,7 +1,5 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import { ProfileIdType } from '../orm-types/ProfileIdType.js';
-import { ProfileId } from '../value-objects/ProfileId.js';
 
 export type ProfileCreateProps = {
   email: string;
@@ -16,9 +14,9 @@ export type ProfileCreateProps = {
 };
 
 @Entity({ tableName: 'profiles' })
-export class Profile extends AggregateRoot<ProfileId> {
-  @PrimaryKey({ type: ProfileIdType, fieldName: 'id' })
-  public readonly id!: ProfileId;
+export class Profile extends AggregateRoot {
+  @PrimaryKey({ type: 'uuid', fieldName: 'id' })
+  public readonly id!: string;
 
   @Property({ fieldName: 'email', type: 'text' })
   public email: string;
@@ -54,7 +52,7 @@ export class Profile extends AggregateRoot<ProfileId> {
   public updatedAt: Date;
 
   public constructor(props: {
-    id: ProfileId;
+    id: string;
     email: string;
     firstName: string;
     lastName: string;
@@ -67,7 +65,7 @@ export class Profile extends AggregateRoot<ProfileId> {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    super(props.id);
+    super();
     this.id = props.id;
     this.email = props.email;
     this.firstName = props.firstName;
@@ -89,7 +87,7 @@ export class Profile extends AggregateRoot<ProfileId> {
   public static create(props: ProfileCreateProps): Profile {
     const now = new Date();
     return new Profile({
-      id: ProfileId.generate(),
+      id: crypto.randomUUID(),
       ...props,
       createdAt: now,
       updatedAt: now

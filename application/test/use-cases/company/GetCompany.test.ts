@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'bun:test';
-import { Company, CompanyId, type CompanyRepository } from '@tailoredin/domain';
+import { Company, type CompanyRepository } from '@tailoredin/domain';
 import { GetCompany } from '../../../src/use-cases/company/GetCompany.js';
 
 function makeCompany(overrides: Partial<ConstructorParameters<typeof Company>[0]> = {}): Company {
   return new Company({
-    id: new CompanyId('aaaaaaaa-1111-2222-3333-444444444444'),
+    id: 'aaaaaaaa-1111-2222-3333-444444444444',
     name: 'Acme Corp',
     description: 'Leading SaaS platform',
     website: 'https://acme.com',

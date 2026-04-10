@@ -26,7 +26,7 @@ describe('AddAccomplishment', () => {
   it('adds accomplishment and returns dto', async () => {
     const useCase = new AddAccomplishment(mockRepo as unknown as ExperienceRepository);
     const result = await useCase.execute({
-      experienceId: fakeExperience.id.value,
+      experienceId: fakeExperience.id,
       title: 'Billing sharding',
       narrative: 'Led hash-based sharding project.',
       ordinal: 0

@@ -1,4 +1,4 @@
-import { ApplicationId, type ApplicationRepository } from '@tailoredin/domain';
+import type { ApplicationRepository } from '@tailoredin/domain';
 import type { ApplicationDto } from '../../dtos/ApplicationDto.js';
 import { toApplicationDto } from '../../dtos/ApplicationDto.js';
 
@@ -10,7 +10,7 @@ export class GetApplication {
   public constructor(private readonly applicationRepository: ApplicationRepository) {}
 
   public async execute(input: GetApplicationInput): Promise<ApplicationDto> {
-    const application = await this.applicationRepository.findById(new ApplicationId(input.applicationId));
+    const application = await this.applicationRepository.findById(input.applicationId);
     if (!application) {
       throw new Error(`Application not found: ${input.applicationId}`);
     }

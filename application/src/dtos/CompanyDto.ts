@@ -15,7 +15,7 @@ export type CompanyDto = {
 
 export function toCompanyDto(company: Company): CompanyDto {
   return {
-    id: company.id.value,
+    id: company.id,
     name: company.name,
     description: company.description,
     website: company.website,

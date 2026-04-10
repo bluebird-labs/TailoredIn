@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test';
 import { ExperienceGenerationOverride } from '../../src/entities/ExperienceGenerationOverride.js';
-import { ExperienceGenerationOverrideId } from '../../src/value-objects/ExperienceGenerationOverrideId.js';
 
 describe('ExperienceGenerationOverride', () => {
   describe('create', () => {
@@ -14,7 +13,7 @@ describe('ExperienceGenerationOverride', () => {
       expect(override.experienceId).toBe('exp-1');
       expect(override.bulletMin).toBe(3);
       expect(override.bulletMax).toBe(6);
-      expect(override.id.value).toBeDefined();
+      expect(override.id).toBeDefined();
       expect(override.createdAt).toBeInstanceOf(Date);
       expect(override.updatedAt).toBeInstanceOf(Date);
     });
@@ -36,7 +35,7 @@ describe('ExperienceGenerationOverride', () => {
 
     test('updates timestamp', () => {
       const override = new ExperienceGenerationOverride({
-        id: ExperienceGenerationOverrideId.generate(),
+        id: crypto.randomUUID(),
         experienceId: 'exp-1',
         bulletMin: 2,
         bulletMax: 5,

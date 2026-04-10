@@ -9,8 +9,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
   public async findByIdOrFail(id: string): Promise<Experience> {
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-      return await this.orm.em.findOneOrFail(Experience, { id } as any, { populate: ['accomplishments'] });
+      return await this.orm.em.findOneOrFail(Experience, { id }, { populate: ['accomplishments'] });
     } catch (e) {
       if (e instanceof NotFoundError) throw new EntityNotFoundError('Experience', id);
       throw e;
@@ -28,8 +27,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
   public async delete(id: string): Promise<void> {
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-      const exp = await this.orm.em.findOneOrFail(Experience, { id } as any);
+      const exp = await this.orm.em.findOneOrFail(Experience, { id });
       this.orm.em.remove(exp);
       await this.orm.em.flush();
     } catch (e) {
