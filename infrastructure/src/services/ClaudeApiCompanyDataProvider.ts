@@ -53,6 +53,7 @@ class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSc
       prompt = prompt.replace(/\{\{#context\}\}[\s\S]*?\{\{\/context\}\}/g, '');
     }
 
+    prompt += this.buildValidationErrorsSuffix();
     return prompt;
   }
 }

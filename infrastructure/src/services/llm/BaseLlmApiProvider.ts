@@ -121,6 +121,7 @@ export abstract class BaseLlmApiProvider {
     if (msg.includes('API server error')) return true;
     if (msg.includes('API rate limit')) return true;
     if (msg.includes('Schema validation failed')) return true;
+    if (msg.includes('Failed to parse structured output')) return true;
     return false;
   }
 

@@ -39,7 +39,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
   ): Promise<z.infer<T>> {
     try {
       // biome-ignore lint/suspicious/noExplicitAny: zodToJsonSchema return type doesn't match SDK's JsonSchema type
-      const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' }) as any;
+      const jsonSchema = zodToJsonSchema(schema, { target: 'jsonSchema7' }) as any;
       const message = await this.getClient().messages.parse(
         {
           model,

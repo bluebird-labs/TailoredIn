@@ -40,7 +40,7 @@ class JobDescriptionParseRequest extends LlmJsonRequest<typeof jobDescriptionPar
 
   public get prompt(): string {
     const template = readFileSync(PROMPT_PATH, 'utf-8');
-    return template.replace('{{text}}', this.text);
+    return template.replace('{{text}}', this.text) + this.buildValidationErrorsSuffix();
   }
 }
 

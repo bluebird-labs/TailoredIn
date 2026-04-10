@@ -38,7 +38,7 @@ class CompanyDiscoveryRequest extends LlmJsonRequest<typeof companyDiscoverySche
       'Return only companies you are confident actually exist. If uncertain, return fewer results or an empty list.',
       'Order by likelihood of match (best match first).'
     ];
-    return lines.join('\n');
+    return lines.join('\n') + this.buildValidationErrorsSuffix();
   }
 }
 
