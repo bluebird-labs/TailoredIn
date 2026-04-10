@@ -188,8 +188,8 @@ function teardown(): void {
   try {
     Object.assign(process.env, toProcessEnv(session));
     composeDown(ctx, true);
-  } catch {
-    /* best effort */
+  } catch (error) {
+    log.warn('Teardown cleanup failed', { error });
   }
   deleteSession();
 }

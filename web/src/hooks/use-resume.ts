@@ -3,6 +3,17 @@ import { queryKeys } from '@/lib/query-keys';
 
 export type ResumeTheme = 'brilliant-cv' | 'imprecv' | 'modern-cv' | 'linked-cv';
 
+async function tryParseErrorBody(response: Response): Promise<string | null> {
+  try {
+    const json = (await response.json()) as { error?: { message?: string } };
+    return json?.error?.message ?? null;
+  } catch (parseError) {
+    // biome-ignore lint/suspicious/noConsole: intentional error reporting for debugging non-JSON error responses
+    console.error('Failed to parse error response body:', parseError);
+    return null;
+  }
+}
+
 export function useGenerateResumePdf() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -13,8 +24,8 @@ export function useGenerateResumePdf() {
         body: JSON.stringify(input)
       });
       if (!response.ok) {
-        const json = await response.json().catch(() => null);
-        throw new Error((json as { error?: { message?: string } } | null)?.error?.message ?? 'Failed to generate PDF');
+        const message = await tryParseErrorBody(response);
+        throw new Error(message ?? 'Failed to generate PDF');
       }
       return response.arrayBuffer();
     },
@@ -38,10 +49,8 @@ export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
         body: JSON.stringify({ jobDescriptionId, ...input })
       });
       if (!response.ok) {
-        const json = await response.json().catch(() => null);
-        throw new Error(
-          (json as { error?: { message?: string } } | null)?.error?.message ?? 'Failed to update display settings'
-        );
+        const message = await tryParseErrorBody(response);
+        throw new Error(message ?? 'Failed to update display settings');
       }
       return response.json();
     },
@@ -74,10 +83,8 @@ export function useGenerateResumeContent(jobDescriptionId: string) {
         body: JSON.stringify({ jobDescriptionId, ...input })
       });
       if (!response.ok) {
-        const json = await response.json().catch(() => null);
-        throw new Error(
-          (json as { error?: { message?: string } } | null)?.error?.message ?? 'Failed to generate resume content'
-        );
+        const message = await tryParseErrorBody(response);
+        throw new Error(message ?? 'Failed to generate resume content');
       }
       return response.json() as Promise<{ data: unknown }>;
     },

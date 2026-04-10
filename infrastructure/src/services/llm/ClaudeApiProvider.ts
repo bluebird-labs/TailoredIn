@@ -7,6 +7,8 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DI } from '../../DI.js';
 import { BaseLlmApiProvider } from './BaseLlmApiProvider.js';
 
+type JsonSchemaOutputInput = Parameters<typeof jsonSchemaOutputFormat>[0];
+
 type LoggerInstance = ReturnType<typeof Logger.create>;
 
 @injectable()
@@ -38,8 +40,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
     timeoutMs: number
   ): Promise<z.infer<T>> {
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: zodToJsonSchema return type doesn't match SDK's JsonSchema type
-      const jsonSchema = zodToJsonSchema(schema, { target: 'jsonSchema7' }) as any;
+      const jsonSchema = zodToJsonSchema(schema, { target: 'jsonSchema7' }) as unknown as JsonSchemaOutputInput;
       const message = await this.getClient().messages.parse(
         {
           model,

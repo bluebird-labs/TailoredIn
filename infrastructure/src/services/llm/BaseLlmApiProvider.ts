@@ -177,8 +177,8 @@ export abstract class BaseLlmApiProvider {
       const filePath = resolve(LOG_DIR, filename);
       writeFileSync(filePath, sections.join('\n'), 'utf-8');
       this.log.debug(`LLM log written: ${filePath}`);
-    } catch {
-      this.log.warn('Failed to write LLM prompt log file');
+    } catch (error) {
+      this.log.warn('Failed to write LLM prompt log file', { error });
     }
   }
 }

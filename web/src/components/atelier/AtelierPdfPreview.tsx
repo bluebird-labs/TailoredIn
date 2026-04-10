@@ -110,6 +110,7 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
         return;
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
+        throw err;
       }
     }
 

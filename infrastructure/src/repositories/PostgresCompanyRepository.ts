@@ -15,8 +15,7 @@ export class PostgresCompanyRepository implements CompanyRepository {
   }
 
   public async upsertByLinkedinLink(props: CompanyCreateProps): Promise<Company> {
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
-    const company = await this.orm.em.upsert(Company, props as any, {
+    const company = await this.orm.em.upsert(Company, props, {
       onConflictAction: 'merge',
       onConflictFields: ['linkedinLink'],
       onConflictExcludeFields: ['createdAt']

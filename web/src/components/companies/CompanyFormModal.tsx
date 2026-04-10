@@ -188,23 +188,28 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
       status: current.status || undefined
     };
 
-    const options = {
-      // biome-ignore lint/suspicious/noExplicitAny: mutation result type varies between create/update
-      onSuccess: (result: any) => {
-        resetAll();
-        onOpenChange(false);
-        toast.success(isEdit ? 'Company updated' : 'Company created');
-        if (!isEdit && onCreated && result) {
-          onCreated(result as Company);
-        }
-      },
-      onError: () => toast.error(isEdit ? 'Failed to update company' : 'Failed to create company')
+    const onSaveSuccess = (result?: Company) => {
+      resetAll();
+      onOpenChange(false);
+      toast.success(isEdit ? 'Company updated' : 'Company created');
+      if (!isEdit && onCreated && result) {
+        onCreated(result);
+      }
     };
 
     if (isEdit) {
-      updateCompany.mutate({ id: company.id, ...payload }, options);
+      updateCompany.mutate(
+        { id: company.id, ...payload },
+        {
+          onSuccess: () => onSaveSuccess(),
+          onError: () => toast.error('Failed to update company')
+        }
+      );
     } else {
-      createCompany.mutate(payload, options);
+      createCompany.mutate(payload, {
+        onSuccess: result => onSaveSuccess(result as Company),
+        onError: () => toast.error('Failed to create company')
+      });
     }
   }
 

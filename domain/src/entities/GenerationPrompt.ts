@@ -40,8 +40,6 @@ export class GenerationPrompt extends DomainEntity {
     updatedAt: Date;
   }) {
     super();
-    if (!props.content || props.content.length > 10000)
-      throw new ValidationError('content', 'must be between 1 and 10000 characters');
     this.id = props.id;
     this.generationSettingsId = props.generationSettingsId;
     this.scope = props.scope;
@@ -58,6 +56,8 @@ export class GenerationPrompt extends DomainEntity {
   }
 
   public static create(props: GenerationPromptCreateProps): GenerationPrompt {
+    if (!props.content || props.content.length > 10000)
+      throw new ValidationError('content', 'must be between 1 and 10000 characters');
     const now = new Date();
     return new GenerationPrompt({
       id: crypto.randomUUID(),

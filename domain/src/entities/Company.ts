@@ -1,3 +1,4 @@
+import { OptionalProps } from '@mikro-orm/core';
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ValidationError } from '../ValidationError.js';
@@ -21,6 +22,7 @@ export type CompanyCreateProps = {
 
 @Entity({ tableName: 'companies' })
 export class Company extends AggregateRoot {
+  public [OptionalProps]?: 'id' | 'createdAt' | 'updatedAt' | 'businessType' | 'industry' | 'stage' | 'status';
   @PrimaryKey({ type: 'uuid', fieldName: 'id' })
   public readonly id!: string;
 
