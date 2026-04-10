@@ -125,7 +125,7 @@ function JobDetailPage() {
         }
         actions={
           <div className="flex items-center gap-2">
-            <Link to="/atelier">
+            <Link to="/atelier" search={{ job: jobDescriptionId }}>
               <Button size="sm" variant="outline">
                 <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                 Open in Atelier
