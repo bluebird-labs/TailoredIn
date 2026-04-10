@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { type JobDescription, type JobDescriptionRepository, JobSource } from '@tailoredin/domain';
+import { type JobDescription, type JobDescriptionRepository, JobLevel, JobSource, LocationType } from '@tailoredin/domain';
 import { CreateJobDescription } from '../../../src/use-cases/job-description/CreateJobDescription.js';
 
 function mockJobDescriptionRepo(onSave?: (jd: JobDescription) => void): JobDescriptionRepository {
@@ -37,8 +37,8 @@ describe('CreateJobDescription', () => {
     expect(dto.description).toBe('Build great things');
     expect(dto.source).toBe('linkedin');
     expect(dto.salaryRange).toBeNull();
-    expect(dto.level).toBeNull();
-    expect(dto.locationType).toBeNull();
+    expect(dto.level).toBe(JobLevel.UNKNOWN);
+    expect(dto.locationType).toBe(LocationType.UNKNOWN);
     expect(dto.createdAt).toBeString();
     expect(saved).toBeDefined();
   });

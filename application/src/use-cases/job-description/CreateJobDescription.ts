@@ -18,8 +18,8 @@ export type CreateJobDescriptionInput = {
   salaryMin?: number | null;
   salaryMax?: number | null;
   salaryCurrency?: string | null;
-  level?: JobLevel | null;
-  locationType?: LocationType | null;
+  level?: JobLevel;
+  locationType?: LocationType;
   source: JobSource;
   postedAt?: Date | null;
   rawText?: string | null;

@@ -37,8 +37,8 @@ export type JobDescription = {
   url: string | null;
   location: string | null;
   salaryRange: SalaryRangeDto | null;
-  level: string | null;
-  locationType: string | null;
+  level: string;
+  locationType: string;
   source: string;
   postedAt: string | null;
   createdAt: string;
@@ -125,8 +125,8 @@ export function useCreateJobDescription() {
       salary_min?: number | null;
       salary_max?: number | null;
       salary_currency?: string | null;
-      level?: string | null;
-      location_type?: string | null;
+      level?: string;
+      location_type?: string;
       source: string;
       posted_at?: string | null;
       raw_text?: string | null;
@@ -158,8 +158,8 @@ export function useUpdateJobDescription(companyId: string) {
       salary_min?: number | null;
       salary_max?: number | null;
       salary_currency?: string | null;
-      level?: string | null;
-      location_type?: string | null;
+      level?: string;
+      location_type?: string;
       source: string;
       posted_at?: string | null;
       raw_text?: string | null;

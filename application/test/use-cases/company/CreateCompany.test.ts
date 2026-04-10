@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { BusinessType, type Company, type CompanyRepository, Industry } from '@tailoredin/domain';
+import { BusinessType, type Company, type CompanyRepository, CompanyStage, Industry } from '@tailoredin/domain';
 import { CreateCompany } from '../../../src/use-cases/company/CreateCompany.js';
 
 function mockCompanyRepo(onSave?: (c: Company) => void): CompanyRepository {
@@ -31,7 +31,7 @@ describe('CreateCompany', () => {
       linkedinLink: 'https://linkedin.com/company/github',
       businessType: BusinessType.PLATFORM,
       industry: Industry.SOFTWARE,
-      stage: null
+      stage: CompanyStage.LATE_STAGE
     });
 
     expect(dto.id).toBeString();
@@ -42,7 +42,7 @@ describe('CreateCompany', () => {
     expect(dto.linkedinLink).toBe('https://linkedin.com/company/github');
     expect(dto.businessType).toBe(BusinessType.PLATFORM);
     expect(dto.industry).toBe(Industry.SOFTWARE);
-    expect(dto.stage).toBeNull();
+    expect(dto.stage).toBe(CompanyStage.LATE_STAGE);
     expect(saved).toBeDefined();
   });
 
@@ -54,9 +54,9 @@ describe('CreateCompany', () => {
       website: null,
       logoUrl: null,
       linkedinLink: null,
-      businessType: null,
-      industry: null,
-      stage: null
+      businessType: BusinessType.UNKNOWN,
+      industry: Industry.UNKNOWN,
+      stage: CompanyStage.UNKNOWN
     });
 
     expect(dto.name).toBe('SomeCo');

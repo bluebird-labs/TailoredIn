@@ -22,8 +22,8 @@ describe('JobDescription', () => {
     expect(jd.url).toBeNull();
     expect(jd.location).toBeNull();
     expect(jd.salaryRange).toBeNull();
-    expect(jd.level).toBeNull();
-    expect(jd.locationType).toBeNull();
+    expect(jd.level).toBe(JobLevel.UNKNOWN);
+    expect(jd.locationType).toBe(LocationType.UNKNOWN);
     expect(jd.postedAt).toBeNull();
     expect(jd.createdAt).toBeInstanceOf(Date);
     expect(jd.updatedAt).toBeInstanceOf(Date);

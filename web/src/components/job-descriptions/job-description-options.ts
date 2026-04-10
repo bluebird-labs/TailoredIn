@@ -10,7 +10,8 @@ export const jobLevelOptions: readonly SelectOption[] = [
   { label: 'Manager', value: 'manager' },
   { label: 'Director', value: 'director' },
   { label: 'VP', value: 'vp' },
-  { label: 'Executive', value: 'executive' }
+  { label: 'Executive', value: 'executive' },
+  { label: 'Unknown', value: 'unknown' }
 ];
 
 export const locationTypeOptions: readonly SelectOption[] = [
@@ -18,7 +19,8 @@ export const locationTypeOptions: readonly SelectOption[] = [
   { label: 'Remote-First', value: 'remote_first' },
   { label: 'Hybrid', value: 'hybrid' },
   { label: 'Flexible', value: 'flexible' },
-  { label: 'Onsite', value: 'onsite' }
+  { label: 'Onsite', value: 'onsite' },
+  { label: 'Unknown', value: 'unknown' }
 ];
 
 export const currencyOptions: readonly SelectOption[] = [
@@ -34,7 +36,6 @@ const labelMaps = {
   locationType: Object.fromEntries(locationTypeOptions.map(o => [o.value, o.label]))
 };
 
-export function formatEnumLabel(type: 'level' | 'locationType', value: string | null): string | null {
-  if (!value) return null;
+export function formatEnumLabel(type: 'level' | 'locationType', value: string): string {
   return labelMaps[type][value] ?? value;
 }

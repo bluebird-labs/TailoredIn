@@ -34,5 +34,6 @@ export enum Industry {
   CLIMATE_TECH = 'climate_tech',
   FINTECH = 'fintech',
   CRYPTO_WEB3 = 'crypto_web3',
-  TRANSPORTATION = 'transportation'
+  TRANSPORTATION = 'transportation',
+  UNKNOWN = 'unknown'
 }

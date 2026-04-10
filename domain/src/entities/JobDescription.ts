@@ -1,8 +1,8 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import type { JobLevel } from '../value-objects/JobLevel.js';
+import { JobLevel } from '../value-objects/JobLevel.js';
 import type { JobSource } from '../value-objects/JobSource.js';
-import type { LocationType } from '../value-objects/LocationType.js';
+import { LocationType } from '../value-objects/LocationType.js';
 import { SalaryRange } from '../value-objects/SalaryRange.js';
 
 export type JobDescriptionCreateProps = {
@@ -12,8 +12,8 @@ export type JobDescriptionCreateProps = {
   url?: string | null;
   location?: string | null;
   salaryRange?: SalaryRange | null;
-  level?: JobLevel | null;
-  locationType?: LocationType | null;
+  level?: JobLevel;
+  locationType?: LocationType;
   source: JobSource;
   postedAt?: Date | null;
   rawText?: string | null;
@@ -61,11 +61,11 @@ export class JobDescription extends AggregateRoot {
     this.salaryCurrency = value?.currency ?? null;
   }
 
-  @Property({ fieldName: 'level', type: 'text', nullable: true })
-  public level: JobLevel | null;
+  @Property({ fieldName: 'level', type: 'text' })
+  public level: JobLevel;
 
-  @Property({ fieldName: 'location_type', type: 'text', nullable: true })
-  public locationType: LocationType | null;
+  @Property({ fieldName: 'location_type', type: 'text' })
+  public locationType: LocationType;
 
   @Property({ fieldName: 'source', type: 'text' })
   public source: JobSource;
@@ -102,8 +102,8 @@ export class JobDescription extends AggregateRoot {
     url: string | null;
     location: string | null;
     salaryRange: SalaryRange | null;
-    level: JobLevel | null;
-    locationType: LocationType | null;
+    level: JobLevel;
+    locationType: LocationType;
     source: JobSource;
     postedAt: Date | null;
     rawText: string | null;
@@ -147,8 +147,8 @@ export class JobDescription extends AggregateRoot {
       url: props.url ?? null,
       location: props.location ?? null,
       salaryRange: props.salaryRange ?? null,
-      level: props.level ?? null,
-      locationType: props.locationType ?? null,
+      level: props.level ?? JobLevel.UNKNOWN,
+      locationType: props.locationType ?? LocationType.UNKNOWN,
       source: props.source,
       postedAt: props.postedAt ?? null,
       rawText: props.rawText ?? null,

@@ -1,9 +1,9 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
-import type { BusinessType } from '../value-objects/BusinessType.js';
-import type { CompanyStage } from '../value-objects/CompanyStage.js';
+import { BusinessType } from '../value-objects/BusinessType.js';
+import { CompanyStage } from '../value-objects/CompanyStage.js';
 import { CompanyStatus } from '../value-objects/CompanyStatus.js';
-import type { Industry } from '../value-objects/Industry.js';
+import { Industry } from '../value-objects/Industry.js';
 
 export type CompanyCreateProps = {
   name: string;
@@ -11,10 +11,10 @@ export type CompanyCreateProps = {
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string | null;
-  businessType?: BusinessType | null;
-  industry?: Industry | null;
-  stage?: CompanyStage | null;
-  status?: CompanyStatus | null;
+  businessType?: BusinessType;
+  industry?: Industry;
+  stage?: CompanyStage;
+  status?: CompanyStatus;
 };
 
 @Entity({ tableName: 'companies' })
@@ -37,17 +37,17 @@ export class Company extends AggregateRoot {
   @Property({ fieldName: 'linkedin_link', type: 'text', nullable: true, unique: 'companies_linkedin_link_key' })
   public readonly linkedinLink: string | null;
 
-  @Property({ fieldName: 'business_type', type: 'text', nullable: true })
-  public businessType: BusinessType | null;
+  @Property({ fieldName: 'business_type', type: 'text' })
+  public businessType: BusinessType;
 
-  @Property({ fieldName: 'industry', type: 'text', nullable: true })
-  public industry: Industry | null;
+  @Property({ fieldName: 'industry', type: 'text' })
+  public industry: Industry;
 
-  @Property({ fieldName: 'stage', type: 'text', nullable: true })
-  public stage: CompanyStage | null;
+  @Property({ fieldName: 'stage', type: 'text' })
+  public stage: CompanyStage;
 
-  @Property({ fieldName: 'status', type: 'text', nullable: true })
-  public status: CompanyStatus | null;
+  @Property({ fieldName: 'status', type: 'text' })
+  public status: CompanyStatus;
 
   @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
@@ -62,10 +62,10 @@ export class Company extends AggregateRoot {
     website: string | null;
     logoUrl: string | null;
     linkedinLink: string | null;
-    businessType: BusinessType | null;
-    industry: Industry | null;
-    stage: CompanyStage | null;
-    status: CompanyStatus | null;
+    businessType: BusinessType;
+    industry: Industry;
+    stage: CompanyStage;
+    status: CompanyStatus;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -89,22 +89,22 @@ export class Company extends AggregateRoot {
     this.updatedAt = new Date();
   }
 
-  public setBusinessType(value: BusinessType | null): void {
+  public setBusinessType(value: BusinessType): void {
     this.businessType = value;
     this.updatedAt = new Date();
   }
 
-  public setIndustry(value: Industry | null): void {
+  public setIndustry(value: Industry): void {
     this.industry = value;
     this.updatedAt = new Date();
   }
 
-  public setStage(value: CompanyStage | null): void {
+  public setStage(value: CompanyStage): void {
     this.stage = value;
     this.updatedAt = new Date();
   }
 
-  public setStatus(value: CompanyStatus | null): void {
+  public setStatus(value: CompanyStatus): void {
     this.status = value;
     this.updatedAt = new Date();
   }
@@ -118,9 +118,9 @@ export class Company extends AggregateRoot {
       website: props.website,
       logoUrl: props.logoUrl,
       linkedinLink: props.linkedinLink,
-      businessType: props.businessType ?? null,
-      industry: props.industry ?? null,
-      stage: props.stage ?? null,
+      businessType: props.businessType ?? BusinessType.UNKNOWN,
+      industry: props.industry ?? Industry.UNKNOWN,
+      stage: props.stage ?? CompanyStage.UNKNOWN,
       status: props.status ?? CompanyStatus.RUNNING,
       createdAt: now,
       updatedAt: now

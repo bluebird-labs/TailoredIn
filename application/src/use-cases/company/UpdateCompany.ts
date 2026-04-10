@@ -8,10 +8,10 @@ export type UpdateCompanyInput = {
   description: string | null;
   website: string | null;
   logoUrl: string | null;
-  businessType: BusinessType | null;
-  industry: Industry | null;
-  stage: CompanyStage | null;
-  status: CompanyStatus | null;
+  businessType: BusinessType;
+  industry: Industry;
+  stage: CompanyStage;
+  status: CompanyStatus;
 };
 
 export class UpdateCompany {

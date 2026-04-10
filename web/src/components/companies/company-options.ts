@@ -8,7 +8,8 @@ export const businessTypeOptions: readonly SelectOption[] = [
   { label: 'D2C', value: 'd2c' },
   { label: 'Marketplace', value: 'marketplace' },
   { label: 'Platform', value: 'platform' },
-  { label: 'Enterprise', value: 'enterprise' }
+  { label: 'Enterprise', value: 'enterprise' },
+  { label: 'Unknown', value: 'unknown' }
 ];
 
 export const industryOptions: readonly SelectOption[] = [
@@ -47,7 +48,8 @@ export const industryOptions: readonly SelectOption[] = [
   { label: 'Software', value: 'software' },
   { label: 'Telecom', value: 'telecom' },
   { label: 'Transportation', value: 'transportation' },
-  { label: 'Travel', value: 'travel' }
+  { label: 'Travel', value: 'travel' },
+  { label: 'Unknown', value: 'unknown' }
 ];
 
 export const stageOptions: readonly SelectOption[] = [
@@ -61,7 +63,8 @@ export const stageOptions: readonly SelectOption[] = [
   { label: 'IPO', value: 'ipo' },
   { label: 'Public', value: 'public' },
   { label: 'Private Equity', value: 'private_equity' },
-  { label: 'Bootstrapped', value: 'bootstrapped' }
+  { label: 'Bootstrapped', value: 'bootstrapped' },
+  { label: 'Unknown', value: 'unknown' }
 ];
 
 export const statusOptions: readonly SelectOption[] = [
@@ -69,7 +72,8 @@ export const statusOptions: readonly SelectOption[] = [
   { label: 'Acquired', value: 'acquired' },
   { label: 'Merged', value: 'merged' },
   { label: 'Defunct', value: 'defunct' },
-  { label: 'Stealth', value: 'stealth' }
+  { label: 'Stealth', value: 'stealth' },
+  { label: 'Unknown', value: 'unknown' }
 ];
 
 const labelMaps = {
@@ -79,10 +83,6 @@ const labelMaps = {
   status: Object.fromEntries(statusOptions.map(o => [o.value, o.label]))
 };
 
-export function formatEnumLabel(
-  type: 'businessType' | 'industry' | 'stage' | 'status',
-  value: string | null
-): string | null {
-  if (!value) return null;
+export function formatEnumLabel(type: 'businessType' | 'industry' | 'stage' | 'status', value: string): string {
   return labelMaps[type][value] ?? value;
 }

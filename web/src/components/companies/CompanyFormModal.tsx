@@ -173,10 +173,10 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
       website: current.website.trim() || null,
       logo_url: current.logoUrl.trim() || null,
       linkedin_link: current.linkedinLink.trim() || null,
-      business_type: current.businessType || null,
-      industry: current.industry || null,
-      stage: current.stage || null,
-      status: current.status || null
+      business_type: current.businessType || undefined,
+      industry: current.industry || undefined,
+      stage: current.stage || undefined,
+      status: current.status || undefined
     };
 
     const options = {

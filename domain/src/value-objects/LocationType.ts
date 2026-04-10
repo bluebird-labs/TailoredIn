@@ -3,5 +3,6 @@ export enum LocationType {
   REMOTE_FIRST = 'remote_first',
   HYBRID = 'hybrid',
   FLEXIBLE = 'flexible',
-  ONSITE = 'onsite'
+  ONSITE = 'onsite',
+  UNKNOWN = 'unknown'
 }

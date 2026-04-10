@@ -32,8 +32,8 @@ export type JobDescriptionDto = {
   readonly url: string | null;
   readonly location: string | null;
   readonly salaryRange: SalaryRangeDto | null;
-  readonly level: JobLevel | null;
-  readonly locationType: LocationType | null;
+  readonly level: JobLevel;
+  readonly locationType: LocationType;
   readonly source: JobSource;
   readonly postedAt: string | null;
   readonly createdAt: string;

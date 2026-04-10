@@ -8,5 +8,6 @@ export enum JobLevel {
   MANAGER = 'manager',
   DIRECTOR = 'director',
   VP = 'vp',
-  EXECUTIVE = 'executive'
+  EXECUTIVE = 'executive',
+  UNKNOWN = 'unknown'
 }

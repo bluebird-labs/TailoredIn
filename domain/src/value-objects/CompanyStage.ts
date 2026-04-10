@@ -9,5 +9,6 @@ export enum CompanyStage {
   IPO = 'ipo',
   PUBLIC = 'public',
   PRIVATE_EQUITY = 'private_equity',
-  BOOTSTRAPPED = 'bootstrapped'
+  BOOTSTRAPPED = 'bootstrapped',
+  UNKNOWN = 'unknown'
 }

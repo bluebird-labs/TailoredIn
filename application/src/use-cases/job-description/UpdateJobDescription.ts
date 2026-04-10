@@ -17,8 +17,8 @@ export type UpdateJobDescriptionInput = {
   salaryMin?: number | null;
   salaryMax?: number | null;
   salaryCurrency?: string | null;
-  level?: JobLevel | null;
-  locationType?: LocationType | null;
+  level?: JobLevel;
+  locationType?: LocationType;
   source: JobSource;
   postedAt?: Date | null;
   rawText?: string | null;
@@ -37,8 +37,8 @@ export class UpdateJobDescription {
     jd.description = input.description;
     jd.url = input.url ?? null;
     jd.location = input.location ?? null;
-    jd.level = input.level ?? null;
-    jd.locationType = input.locationType ?? null;
+    if (input.level !== undefined) jd.level = input.level;
+    if (input.locationType !== undefined) jd.locationType = input.locationType;
     jd.source = input.source;
     jd.postedAt = input.postedAt ?? null;
     if (input.rawText !== undefined) jd.rawText = input.rawText;

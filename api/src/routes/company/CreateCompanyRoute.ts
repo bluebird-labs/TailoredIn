@@ -1,6 +1,6 @@
 import { inject, injectable } from '@needle-di/core';
 import type { CreateCompany } from '@tailoredin/application';
-import type { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
+import { BusinessType, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
 
@@ -18,10 +18,10 @@ export class CreateCompanyRoute {
           website: body.website ?? null,
           logoUrl: body.logo_url ?? null,
           linkedinLink: body.linkedin_link ?? null,
-          businessType: (body.business_type as BusinessType) ?? null,
-          industry: (body.industry as Industry) ?? null,
-          stage: (body.stage as CompanyStage) ?? null,
-          status: (body.status as CompanyStatus) ?? null
+          businessType: (body.business_type as BusinessType) ?? BusinessType.UNKNOWN,
+          industry: (body.industry as Industry) ?? Industry.UNKNOWN,
+          stage: (body.stage as CompanyStage) ?? CompanyStage.UNKNOWN,
+          status: (body.status as CompanyStatus) ?? CompanyStatus.UNKNOWN
         });
         set.status = 201;
         return { data };

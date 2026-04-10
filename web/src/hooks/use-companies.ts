@@ -10,10 +10,10 @@ export type Company = {
   website: string | null;
   logoUrl: string | null;
   linkedinLink: string | null;
-  businessType: string | null;
-  industry: string | null;
-  stage: string | null;
-  status: string | null;
+  businessType: string;
+  industry: string;
+  stage: string;
+  status: string;
 };
 
 export type CompanyDiscoveryResult = {
@@ -88,10 +88,10 @@ export function useUpdateCompany() {
       website?: string | null;
       logo_url?: string | null;
       linkedin_link?: string | null;
-      business_type?: string | null;
-      industry?: string | null;
-      stage?: string | null;
-      status?: string | null;
+      business_type?: string;
+      industry?: string;
+      stage?: string;
+      status?: string;
     }) => {
       const { id, ...body } = input;
       const segment = api.companies as EdenRouteSegment;
@@ -114,10 +114,10 @@ export function useCreateCompany() {
       website?: string | null;
       logo_url?: string | null;
       linkedin_link?: string | null;
-      business_type?: string | null;
-      industry?: string | null;
-      stage?: string | null;
-      status?: string | null;
+      business_type?: string;
+      industry?: string;
+      stage?: string;
+      status?: string;
     }) => {
       const segment = api.companies as EdenRouteSegment;
       const { data, error } = await segment.post(input);

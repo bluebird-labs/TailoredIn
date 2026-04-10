@@ -22,8 +22,8 @@ export class UpdateJobDescriptionRoute {
             salaryMin: body.salary_min,
             salaryMax: body.salary_max,
             salaryCurrency: body.salary_currency,
-            level: body.level as JobLevel | undefined,
-            locationType: body.location_type as LocationType | undefined,
+            level: body.level ? (body.level as JobLevel) : undefined,
+            locationType: body.location_type ? (body.location_type as LocationType) : undefined,
             source: body.source as JobSource,
             postedAt: body.posted_at ? new Date(body.posted_at) : null,
             rawText: body.raw_text

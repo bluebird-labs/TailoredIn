@@ -54,10 +54,10 @@ export const Minimal: Story = {
       website: null,
       logoUrl: null,
       linkedinLink: null,
-      businessType: null,
-      industry: null,
-      stage: null,
-      status: null
+      businessType: 'unknown',
+      industry: 'unknown',
+      stage: 'unknown',
+      status: 'unknown'
     }
   }
 };

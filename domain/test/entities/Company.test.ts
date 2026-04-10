@@ -25,11 +25,11 @@ describe('Company', () => {
     expect(company.updatedAt).toBeInstanceOf(Date);
   });
 
-  test('defaults optional fields to null', () => {
+  test('defaults optional enum fields to UNKNOWN', () => {
     const company = makeCompany();
-    expect(company.businessType).toBeNull();
-    expect(company.industry).toBeNull();
-    expect(company.stage).toBeNull();
+    expect(company.businessType).toBe(BusinessType.UNKNOWN);
+    expect(company.industry).toBe(Industry.UNKNOWN);
+    expect(company.stage).toBe(CompanyStage.UNKNOWN);
   });
 
   test('accepts optional enum fields', () => {
