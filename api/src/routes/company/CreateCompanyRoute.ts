@@ -14,6 +14,7 @@ export class CreateCompanyRoute {
       async ({ body, set }) => {
         const data = await this.createCompany.execute({
           name: body.name,
+          domainName: body.domain_name,
           description: body.description ?? null,
           website: body.website ?? null,
           logoUrl: body.logo_url ?? null,
@@ -29,6 +30,7 @@ export class CreateCompanyRoute {
       {
         body: t.Object({
           name: t.String({ minLength: 1 }),
+          domain_name: t.String({ minLength: 1 }),
           description: t.Optional(t.Nullable(t.String())),
           website: t.Optional(t.Nullable(t.String())),
           logo_url: t.Optional(t.Nullable(t.String())),

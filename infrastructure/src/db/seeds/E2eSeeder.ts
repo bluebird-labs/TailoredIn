@@ -127,11 +127,12 @@ export class E2eSeeder extends Seeder {
 
     // Companies
     await conn.execute(`
-      INSERT INTO companies (id, name, description, website, logo_url, linkedin_link, business_type, industry, stage, created_at, updated_at)
+      INSERT INTO companies (id, name, domain_name, description, website, logo_url, linkedin_link, business_type, industry, stage, created_at, updated_at)
       VALUES
         (
           'ffffffff-0000-4000-8000-000000000001',
           'Acme Corp',
+          'acme.com',
           'Leading provider of innovative cloud solutions.',
           'https://acme.com',
           NULL,
@@ -144,6 +145,7 @@ export class E2eSeeder extends Seeder {
         (
           'ffffffff-0000-4000-8000-000000000002',
           'StartupCo',
+          'startupco.io',
           'Early-stage fintech startup.',
           'https://startupco.io',
           NULL,
@@ -156,6 +158,7 @@ export class E2eSeeder extends Seeder {
         (
           'ffffffff-0000-4000-8000-000000000003',
           'Big Bank Inc.',
+          'bigbank.com',
           'Global financial services corporation.',
           'https://bigbank.com',
           NULL,

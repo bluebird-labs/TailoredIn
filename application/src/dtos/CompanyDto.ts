@@ -3,6 +3,7 @@ import type { BusinessType, Company, CompanyStage, CompanyStatus, Industry } fro
 export type CompanyDto = {
   id: string;
   name: string;
+  domainName: string;
   description: string | null;
   website: string | null;
   logoUrl: string | null;
@@ -17,6 +18,7 @@ export function toCompanyDto(company: Company): CompanyDto {
   return {
     id: company.id,
     name: company.name,
+    domainName: company.domainName,
     description: company.description,
     website: company.website,
     logoUrl: company.logoUrl,

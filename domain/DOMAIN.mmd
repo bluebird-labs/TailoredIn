@@ -11,7 +11,6 @@ classDiagram
 
     class Profile {
         <<AggregateRoot>>
-        +ProfileId id
         +string email
         +string firstName
         +string lastName
@@ -26,7 +25,6 @@ classDiagram
 
     class Application {
         <<AggregateRoot>>
-        +ApplicationId id
         +string profileId
         +string companyId
         +ApplicationStatus status
@@ -38,7 +36,6 @@ classDiagram
 
     class Education {
         <<AggregateRoot>>
-        +EducationId id
         +string profileId
         +string degreeTitle
         +string institutionName
@@ -51,7 +48,6 @@ classDiagram
 
     class Experience {
         <<AggregateRoot>>
-        +ExperienceId id
         +string profileId
         +string title
         +string companyName
@@ -73,7 +69,6 @@ classDiagram
 
     class ExperienceGenerationOverride {
         <<AggregateRoot>>
-        +ExperienceGenerationOverrideId id
         +string experienceId
         +number bulletMin
         +number bulletMax
@@ -82,7 +77,6 @@ classDiagram
 
     class GenerationSettings {
         <<AggregateRoot>>
-        +GenerationSettingsId id
         +string profileId
         +ModelTier modelTier
         +number bulletMin
@@ -96,7 +90,6 @@ classDiagram
 
     class ResumeContent {
         <<AggregateRoot>>
-        +ResumeContentId id
         +string profileId
         +string jobDescriptionId
         +string headline
@@ -110,9 +103,9 @@ classDiagram
 
     class ApplicationStatus {
         <<enumeration>>
-        DRAFT · APPLIED · INTERVIEWING
-        OFFERED · REJECTED · WITHDRAWN
-        ACCEPTED
+        DRAFT · APPLIED · SCREENING
+        INTERVIEWING · OFFERED · REJECTED
+        WITHDRAWN · ACCEPTED · ARCHIVED
     }
 
     class ModelTier {
@@ -144,8 +137,8 @@ classDiagram
 
     class Company {
         <<AggregateRoot>>
-        +CompanyId id
         +string name
+        +string domainName
         +string? description
         +string? website
         +string? logoUrl
@@ -154,6 +147,7 @@ classDiagram
         +Industry? industry
         +CompanyStage? stage
         +CompanyStatus? status
+        +setDomainName()
         +setWebsite()
         +setBusinessType()
         +setIndustry()
@@ -163,7 +157,6 @@ classDiagram
 
     class JobDescription {
         <<AggregateRoot>>
-        +JobDescriptionId id
         +string companyId
         +string title
         +string description
@@ -188,48 +181,59 @@ classDiagram
         <<enumeration>>
         B2B · B2C · B2B2C
         B2G · D2C · MARKETPLACE
-        PLATFORM
+        PLATFORM · ENTERPRISE
     }
 
     class CompanyStage {
         <<enumeration>>
-        SEED · SERIES_A · SERIES_B
-        SERIES_C · SERIES_D_PLUS · GROWTH
-        PUBLIC · BOOTSTRAPPED
+        PRE_SEED · SEED · SERIES_A
+        SERIES_B · SERIES_C · SERIES_D_PLUS
+        LATE_STAGE · IPO · PUBLIC
+        PRIVATE_EQUITY · BOOTSTRAPPED
     }
 
     class CompanyStatus {
         <<enumeration>>
-        RUNNING · ACQUIRED · DEFUNCT
+        RUNNING · ACQUIRED · MERGED
+        DEFUNCT · STEALTH
     }
 
     class Industry {
         <<enumeration>>
-        AUTOMOBILE · SECURITY · FINANCE
+        AUTOMOBILE · CYBERSECURITY · FINANCE
         HEALTHCARE · EDUCATION · E_COMMERCE
         REAL_ESTATE · MEDIA · LOGISTICS
         ENERGY · AGRICULTURE · TRAVEL
-        FOOD · LEGAL · HR
-        MARKETING · SAAS · AI_ML
+        FOOD · LEGAL · HR_TECH
+        MARTECH · SOFTWARE · AI
         GAMING · TELECOM · INSURANCE
         RETAIL · CONSTRUCTION · GOVERNMENT
+        BIOTECH · PHARMA · AEROSPACE_DEFENSE
+        MANUFACTURING · ENTERTAINMENT · NONPROFIT
+        CONSULTING · SEMICONDUCTOR · CLIMATE_TECH
+        FINTECH · CRYPTO_WEB3 · TRANSPORTATION
     }
 
     class JobLevel {
         <<enumeration>>
         INTERNSHIP · ENTRY_LEVEL · ASSOCIATE
-        MID_SENIOR · DIRECTOR · EXECUTIVE
+        SENIOR · STAFF · PRINCIPAL
+        MANAGER · DIRECTOR · VP
+        EXECUTIVE
     }
 
     class JobSource {
         <<enumeration>>
         LINKEDIN · PARAFORM · GREENHOUSE
+        LEVER · WORKDAY · WELLFOUND
+        ASHBY · COMPANY_WEBSITE · REFERRAL
         UPLOAD
     }
 
     class LocationType {
         <<enumeration>>
-        REMOTE · HYBRID · ONSITE
+        REMOTE · REMOTE_FIRST · HYBRID
+        FLEXIBLE · ONSITE
     }
 
     JobDescription "1" --> "*" ResumeContent : has

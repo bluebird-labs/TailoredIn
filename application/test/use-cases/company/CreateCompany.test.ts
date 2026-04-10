@@ -26,6 +26,7 @@ describe('CreateCompany', () => {
 
     const dto = await useCase.execute({
       name: 'GitHub',
+      domainName: 'github.com',
       website: 'https://github.com',
       logoUrl: 'https://logo.com/gh.png',
       linkedinLink: 'https://linkedin.com/company/github',
@@ -37,6 +38,7 @@ describe('CreateCompany', () => {
     expect(dto.id).toBeString();
     expect(dto.id).toMatch(/^[0-9a-f-]{36}$/);
     expect(dto.name).toBe('GitHub');
+    expect(dto.domainName).toBe('github.com');
     expect(dto.website).toBe('https://github.com');
     expect(dto.logoUrl).toBe('https://logo.com/gh.png');
     expect(dto.linkedinLink).toBe('https://linkedin.com/company/github');
@@ -51,6 +53,7 @@ describe('CreateCompany', () => {
 
     const dto = await useCase.execute({
       name: 'SomeCo',
+      domainName: 'someco.com',
       website: null,
       logoUrl: null,
       linkedinLink: null,

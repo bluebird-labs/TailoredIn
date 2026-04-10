@@ -86,6 +86,7 @@ function validateAccomplishment(values: AccomplishmentFormState): ValidationErro
 
 interface CompanyFormState {
   name: string;
+  domainName: string;
   description: string;
   website: string;
   logoUrl: string;
@@ -99,6 +100,7 @@ interface CompanyFormState {
 function validateCompany(values: CompanyFormState): ValidationErrors<CompanyFormState> {
   const errors: ValidationErrors<CompanyFormState> = {};
   if (!values.name.trim()) errors.name = 'Company name is required';
+  if (!values.domainName.trim()) errors.domainName = 'Domain name is required';
   return errors;
 }
 

@@ -33,6 +33,7 @@ export const Full: Story = {
     company: {
       id: '1',
       name: 'Acme Corp',
+      domainName: 'acme.com',
       description: 'Leading provider of innovative solutions.',
       website: 'https://acme.com',
       logoUrl: null,
@@ -50,6 +51,7 @@ export const Minimal: Story = {
     company: {
       id: '2',
       name: 'Tiny Startup',
+      domainName: 'tinystartup.com',
       description: null,
       website: null,
       logoUrl: null,

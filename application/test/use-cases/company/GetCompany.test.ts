@@ -6,6 +6,7 @@ function makeCompany(overrides: Partial<ConstructorParameters<typeof Company>[0]
   return new Company({
     id: 'aaaaaaaa-1111-2222-3333-444444444444',
     name: 'Acme Corp',
+    domainName: 'acme.com',
     description: 'Leading SaaS platform',
     website: 'https://acme.com',
     logoUrl: null,

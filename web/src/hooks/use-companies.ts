@@ -6,6 +6,7 @@ import { queryKeys } from '@/lib/query-keys';
 export type Company = {
   id: string;
   name: string;
+  domainName: string;
   description: string | null;
   website: string | null;
   logoUrl: string | null;
@@ -84,6 +85,7 @@ export function useUpdateCompany() {
     mutationFn: async (input: {
       id: string;
       name: string;
+      domain_name: string;
       description?: string | null;
       website?: string | null;
       logo_url?: string | null;
@@ -110,6 +112,7 @@ export function useCreateCompany() {
   return useMutation({
     mutationFn: async (input: {
       name: string;
+      domain_name: string;
       description?: string | null;
       website?: string | null;
       logo_url?: string | null;

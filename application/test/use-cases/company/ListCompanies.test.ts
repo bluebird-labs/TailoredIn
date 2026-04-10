@@ -24,6 +24,7 @@ describe('ListCompanies', () => {
     const companies = [
       Company.create({
         name: 'GitHub',
+        domainName: 'github.com',
         website: 'https://github.com',
         logoUrl: null,
         linkedinLink: null,
@@ -33,6 +34,7 @@ describe('ListCompanies', () => {
       }),
       Company.create({
         name: 'Stripe',
+        domainName: 'stripe.com',
         website: 'https://stripe.com',
         logoUrl: null,
         linkedinLink: 'https://linkedin.com/company/stripe',

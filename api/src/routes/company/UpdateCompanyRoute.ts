@@ -16,6 +16,7 @@ export class UpdateCompanyRoute {
           const data = await this.updateCompany.execute({
             companyId: params.id,
             name: body.name,
+            domainName: body.domain_name,
             description: body.description ?? null,
             website: body.website ?? null,
             logoUrl: body.logo_url ?? null,
@@ -37,6 +38,7 @@ export class UpdateCompanyRoute {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
         body: t.Object({
           name: t.String({ minLength: 1 }),
+          domain_name: t.String({ minLength: 1 }),
           description: t.Optional(t.Nullable(t.String())),
           website: t.Optional(t.Nullable(t.String())),
           logo_url: t.Optional(t.Nullable(t.String())),

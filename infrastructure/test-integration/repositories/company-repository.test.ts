@@ -19,6 +19,7 @@ describe('PostgresCompanyRepository', () => {
   test('upsertByLinkedinLink inserts a new company', async () => {
     const company = await repo.upsertByLinkedinLink({
       name: 'Acme Inc',
+      domainName: 'acme.com',
       linkedinLink: 'https://linkedin.com/company/acme',
       website: 'https://acme.com',
       logoUrl: null
@@ -35,6 +36,7 @@ describe('PostgresCompanyRepository', () => {
   test('upsertByLinkedinLink updates on conflict', async () => {
     const first = await repo.upsertByLinkedinLink({
       name: 'Beta Corp',
+      domainName: 'beta.com',
       linkedinLink: 'https://linkedin.com/company/beta',
       website: null,
       logoUrl: null
@@ -42,6 +44,7 @@ describe('PostgresCompanyRepository', () => {
 
     const second = await repo.upsertByLinkedinLink({
       name: 'Beta Corporation',
+      domainName: 'beta.com',
       linkedinLink: 'https://linkedin.com/company/beta',
       website: 'https://beta.com',
       logoUrl: 'https://logo.com/beta.png'
@@ -56,6 +59,7 @@ describe('PostgresCompanyRepository', () => {
   test('save updates company fields', async () => {
     const company = await repo.upsertByLinkedinLink({
       name: 'Gamma LLC',
+      domainName: 'gamma.io',
       linkedinLink: 'https://linkedin.com/company/gamma',
       website: null,
       logoUrl: null
@@ -68,6 +72,7 @@ describe('PostgresCompanyRepository', () => {
 
     const updated = await repo.upsertByLinkedinLink({
       name: 'Gamma Inc',
+      domainName: 'gamma.io',
       linkedinLink: 'https://linkedin.com/company/gamma',
       website: 'https://gamma.io',
       logoUrl: null

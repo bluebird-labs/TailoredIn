@@ -5,6 +5,7 @@ import { toCompanyDto } from '../../dtos/CompanyDto.js';
 export type UpdateCompanyInput = {
   companyId: string;
   name: string;
+  domainName: string;
   description: string | null;
   website: string | null;
   logoUrl: string | null;
@@ -24,6 +25,7 @@ export class UpdateCompany {
     }
 
     company.name = input.name;
+    company.setDomainName(input.domainName);
     company.description = input.description;
     company.website = input.website;
     company.logoUrl = input.logoUrl;

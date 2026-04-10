@@ -32,6 +32,7 @@ type Step = 'discovery' | 'enriching' | 'form';
 function emptyState(): CompanyFormState {
   return {
     name: '',
+    domainName: '',
     description: '',
     website: '',
     logoUrl: '',
@@ -46,6 +47,7 @@ function emptyState(): CompanyFormState {
 function companyToFormState(company: Company): CompanyFormState {
   return {
     name: company.name,
+    domainName: company.domainName,
     description: company.description ?? '',
     website: company.website ?? '',
     logoUrl: company.logoUrl ?? '',
@@ -57,9 +59,15 @@ function companyToFormState(company: Company): CompanyFormState {
   };
 }
 
+function extractDomain(url: string | null): string {
+  if (!url) return '';
+  return url.replace(/^https?:\/\/(www\.)?/, '').replace(/[:/?#].*$/, '');
+}
+
 function enrichmentToFormState(result: CompanyEnrichmentResult): CompanyFormState {
   return {
     name: result.name ?? '',
+    domainName: extractDomain(result.website),
     description: result.description ?? '',
     website: result.website ?? '',
     logoUrl: result.logoUrl ?? '',
@@ -169,6 +177,7 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
 
     const payload = {
       name: current.name.trim(),
+      domain_name: current.domainName.trim(),
       description: current.description.trim() || null,
       website: current.website.trim() || null,
       logo_url: current.logoUrl.trim() || null,
@@ -379,6 +388,18 @@ function FormStep({
         error={errors.name}
         disabled={isSaving}
         placeholder="e.g. Acme Corp"
+      />
+
+      <EditableField
+        type="text"
+        label="Domain Name"
+        required
+        value={current.domainName}
+        onChange={v => setField('domainName', v)}
+        isDirty={isDirtyField('domainName')}
+        error={errors.domainName}
+        disabled={isSaving}
+        placeholder="e.g. acme.com"
       />
 
       <EditableField

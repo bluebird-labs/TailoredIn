@@ -7,6 +7,7 @@ import { Industry } from '../value-objects/Industry.js';
 
 export type CompanyCreateProps = {
   name: string;
+  domainName: string;
   description: string | null;
   website: string | null;
   logoUrl: string | null;
@@ -24,6 +25,9 @@ export class Company extends AggregateRoot {
 
   @Property({ fieldName: 'name', type: 'text' })
   public name: string;
+
+  @Property({ fieldName: 'domain_name', type: 'text', unique: 'companies_domain_name_key' })
+  public domainName: string;
 
   @Property({ fieldName: 'description', type: 'text', nullable: true })
   public description: string | null;
@@ -58,6 +62,7 @@ export class Company extends AggregateRoot {
   public constructor(props: {
     id: string;
     name: string;
+    domainName: string;
     description: string | null;
     website: string | null;
     logoUrl: string | null;
@@ -72,6 +77,7 @@ export class Company extends AggregateRoot {
     super();
     this.id = props.id;
     this.name = props.name;
+    this.domainName = props.domainName;
     this.description = props.description;
     this.website = props.website;
     this.logoUrl = props.logoUrl;
@@ -82,6 +88,11 @@ export class Company extends AggregateRoot {
     this.status = props.status;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
+  }
+
+  public setDomainName(value: string): void {
+    this.domainName = value;
+    this.updatedAt = new Date();
   }
 
   public setWebsite(value: string): void {
@@ -114,6 +125,7 @@ export class Company extends AggregateRoot {
     return new Company({
       id: crypto.randomUUID(),
       name: props.name,
+      domainName: props.domainName,
       description: props.description ?? null,
       website: props.website,
       logoUrl: props.logoUrl,
