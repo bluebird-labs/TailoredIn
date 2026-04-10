@@ -37,7 +37,7 @@ export class Company extends BaseEntity {
   @Property({ fieldName: 'description', type: 'text', nullable: true })
   public description: string | null;
 
-  @Property({ fieldName: 'website', type: 'text', nullable: true })
+  @Property({ fieldName: 'website', type: 'text', nullable: true, unique: 'companies_website_key' })
   public website: string | null;
 
   @Property({ fieldName: 'logo_url', type: 'text', nullable: true })
