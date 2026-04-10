@@ -1,8 +1,7 @@
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useJobDescriptions } from '@/hooks/use-job-descriptions';
 import { JobDescriptionCard } from './JobDescriptionCard.js';
@@ -10,11 +9,12 @@ import { JobDescriptionFormModal } from './JobDescriptionFormModal.js';
 
 interface JobDescriptionListProps {
   readonly companyId?: string;
+  readonly createOpen: boolean;
+  readonly onCreateOpenChange: (open: boolean) => void;
 }
 
-export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
+export function JobDescriptionList({ companyId, createOpen, onCreateOpenChange }: JobDescriptionListProps) {
   const { data: jobDescriptions = [], isLoading } = useJobDescriptions(companyId);
-  const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
@@ -33,7 +33,7 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
         <EmptyState
           message="No job descriptions yet."
           actionLabel="Add job description"
-          onAction={() => setCreateOpen(true)}
+          onAction={() => onCreateOpenChange(true)}
         />
       ) : (
         <div className="space-y-3">
@@ -52,11 +52,6 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
           ) : (
             filtered.map(jd => <JobDescriptionCard key={jd.id} jobDescription={jd} showCompany={!companyId} />)
           )}
-
-          <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-3 w-3 mr-1" />
-            Add job description
-          </Button>
         </div>
       )}
 
@@ -65,7 +60,7 @@ export function JobDescriptionList({ companyId }: JobDescriptionListProps) {
           open
           companyId={companyId}
           onOpenChange={next => {
-            if (!next) setCreateOpen(false);
+            if (!next) onCreateOpenChange(false);
           }}
         />
       )}

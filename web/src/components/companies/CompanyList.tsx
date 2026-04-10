@@ -1,16 +1,19 @@
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCompanies } from '@/hooks/use-companies';
 import { CompanyCard } from './CompanyCard.js';
 import { CompanyFormModal } from './CompanyFormModal.js';
 
-export function CompanyList() {
+interface CompanyListProps {
+  readonly createOpen: boolean;
+  readonly onCreateOpenChange: (open: boolean) => void;
+}
+
+export function CompanyList({ createOpen, onCreateOpenChange }: CompanyListProps) {
   const { data: companies = [], isLoading } = useCompanies();
-  const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
@@ -24,7 +27,7 @@ export function CompanyList() {
   return (
     <>
       {companies.length === 0 && !createOpen ? (
-        <EmptyState message="No companies yet." actionLabel="Add company" onAction={() => setCreateOpen(true)} />
+        <EmptyState message="No companies yet." actionLabel="Add company" onAction={() => onCreateOpenChange(true)} />
       ) : (
         <div className="space-y-3">
           <div className="relative">
@@ -42,11 +45,6 @@ export function CompanyList() {
           ) : (
             filtered.map(company => <CompanyCard key={company.id} company={company} />)
           )}
-
-          <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-3 w-3 mr-1" />
-            Add company
-          </Button>
         </div>
       )}
 
@@ -54,7 +52,7 @@ export function CompanyList() {
         <CompanyFormModal
           open
           onOpenChange={next => {
-            if (!next) setCreateOpen(false);
+            if (!next) onCreateOpenChange(false);
           }}
         />
       )}

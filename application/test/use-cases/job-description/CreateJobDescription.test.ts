@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test';
-import { type JobDescription, type JobDescriptionRepository, JobLevel, JobSource, LocationType } from '@tailoredin/domain';
+import {
+  type JobDescription,
+  type JobDescriptionRepository,
+  JobLevel,
+  JobSource,
+  LocationType
+} from '@tailoredin/domain';
 import { CreateJobDescription } from '../../../src/use-cases/job-description/CreateJobDescription.js';
 
 function mockJobDescriptionRepo(onSave?: (jd: JobDescription) => void): JobDescriptionRepository {
