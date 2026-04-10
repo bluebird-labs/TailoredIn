@@ -57,7 +57,9 @@ export function DatePicker({
           aria-invalid={!!error || undefined}
         >
           <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-          {value || (placeholder ?? 'Pick a date')}
+          {selected
+            ? selected.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : (placeholder ?? 'Pick a date')}
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
