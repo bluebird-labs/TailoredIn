@@ -69,7 +69,7 @@ export function useCreateExperience() {
       return data?.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
   });
 }
@@ -111,7 +111,7 @@ export function useDeleteExperience() {
       if (error) throw new Error(extractApiError(error, `Could not delete experience ${id}`));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
   });
 }
@@ -130,7 +130,7 @@ export function useLinkCompany() {
       return (data as EdenRouteSegment)?.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
   });
 }
@@ -147,7 +147,7 @@ export function useUnlinkCompany() {
       return (data as EdenRouteSegment)?.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
   });
 }

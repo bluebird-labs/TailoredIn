@@ -102,7 +102,7 @@ export function useUpdateCompany() {
       return data?.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.companies.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     }
   });
 }
@@ -128,7 +128,7 @@ export function useCreateCompany() {
       return data?.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.companies.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     }
   });
 }
