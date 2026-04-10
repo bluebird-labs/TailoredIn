@@ -18,13 +18,9 @@ export function JobSelector({ value, onChange }: { value: string | null; onChang
       <p className="text-[11px] uppercase tracking-[0.06em] text-muted-foreground">Job Description</p>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
-          render={
-            <Button variant="outline" className="w-full justify-between font-normal" disabled={isLoading} />
-          }
+          render={<Button variant="outline" className="w-full justify-between font-normal" disabled={isLoading} />}
         >
-          <span className="truncate">
-            {isLoading ? 'Loading jobs...' : label ?? 'Select a job description...'}
-          </span>
+          <span className="truncate">{isLoading ? 'Loading jobs...' : (label ?? 'Select a job description...')}</span>
           <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
         </PopoverTrigger>
         <PopoverContent className="w-[--anchor-width] p-0" align="start">
