@@ -40,7 +40,7 @@ export class Company extends AggregateRoot {
   public logoUrl: string | null;
 
   @Property({ fieldName: 'linkedin_link', type: 'text', nullable: true, unique: 'companies_linkedin_link_key' })
-  public readonly linkedinLink: string | null;
+  public linkedinLink: string | null;
 
   @Property({ fieldName: 'business_type', type: 'text' })
   public businessType: BusinessType;
@@ -95,6 +95,11 @@ export class Company extends AggregateRoot {
 
   public setDomainName(value: string): void {
     this.domainName = value;
+    this.updatedAt = new Date();
+  }
+
+  public setLinkedinLink(value: string | null): void {
+    this.linkedinLink = value;
     this.updatedAt = new Date();
   }
 

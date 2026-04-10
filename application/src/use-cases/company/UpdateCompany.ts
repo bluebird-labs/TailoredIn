@@ -9,6 +9,7 @@ export type UpdateCompanyInput = {
   description: string | null;
   website: string | null;
   logoUrl: string | null;
+  linkedinLink: string | null;
   businessType: BusinessType;
   industry: Industry;
   stage: CompanyStage;
@@ -29,6 +30,7 @@ export class UpdateCompany {
     company.description = input.description;
     company.website = input.website;
     company.logoUrl = input.logoUrl;
+    company.setLinkedinLink(input.linkedinLink);
     company.setBusinessType(input.businessType);
     company.setIndustry(input.industry);
     company.setStage(input.stage);
