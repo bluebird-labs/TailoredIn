@@ -78,6 +78,8 @@ export class Migration20260502000000_add_check_constraints extends Migration {
     );
 
     // ── job_descriptions ──
+    // Fix existing rows with empty descriptions before adding constraint
+    this.addSql(`UPDATE job_descriptions SET description = title WHERE length(description) = 0;`);
     this.addSql(`ALTER TABLE job_descriptions ADD CONSTRAINT job_descriptions_title_check CHECK (length(title) BETWEEN 1 AND 1000);`);
     this.addSql(
       `ALTER TABLE job_descriptions ADD CONSTRAINT job_descriptions_description_check CHECK (length(description) BETWEEN 1 AND 100000);`
