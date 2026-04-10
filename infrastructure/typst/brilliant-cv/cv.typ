@@ -49,6 +49,14 @@
 #let first-name = metadata.personal.first_name
 #let last-name = metadata.personal.last_name
 #let header-quote = metadata.lang.at(metadata.language).at("header_quote", default: none)
+#let current-company = metadata.personal.at("current_company", default: none)
+
+// PDF document metadata for ATS systems
+#set document(
+  title: first-name + " " + last-name + " — Resume",
+  author: first-name + " " + last-name,
+  keywords: if current-company != none { ("resume", current-company) } else { ("resume",) },
+)
 
 #let make-header-info(personal-info) = {
   // Collect only non-empty entries so h-bar separators are placed correctly
@@ -61,7 +69,8 @@
       if k == "email" { link("mailto:" + v)[#v] }
       else if k == "linkedin" { link("https://www.linkedin.com/in/" + v)[#v] }
       else if k == "github" { link("https://github.com/" + v)[#v] }
-      else if k == "phone" { link("tel:" + v.replace(" ", ""))[#v] }
+      else if k == "phone" { link("tel:" + v.replace(regex("[^\\d+]"), ""))[#v] }
+      else if k == "location" { link("https://www.google.com/maps/search/" + v.replace(" ", "+").replace(",", "%2C"))[#v] }
       else { v }
     })
     if n != entries.len() { h-bar() }

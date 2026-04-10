@@ -40,9 +40,10 @@ export class BrilliantCvRenderer implements ResumeRenderer {
     }
 
     await writeFile(join(tmpDir, 'config.typ'), generateConfigTyp(input.template));
+    const currentCompany = input.experiences.find(e => !e.endDate)?.companyName ?? null;
     await writeFile(
       join(tmpDir, 'metadata.toml'),
-      generateMetadataToml(input.personal, input.headlineSummary, input.template)
+      generateMetadataToml(input.personal, input.headlineSummary, input.template, currentCompany)
     );
   }
 

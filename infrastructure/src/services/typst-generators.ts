@@ -55,7 +55,8 @@ export function generateMetadataToml(
     website: string | null;
   },
   headlineSummary: string | null,
-  template: ResumeTemplate
+  template: ResumeTemplate,
+  currentCompany?: string | null
 ): string {
   const firstName = escapeTomValue(personal.firstName);
   const lastName = escapeTomValue(personal.lastName);
@@ -66,6 +67,8 @@ export function generateMetadataToml(
   const github = escapeTomValue(personal.github ?? '');
   const quote = escapeTomValue(headlineSummary ?? '');
   const descriptionSkip = Math.max(1, Math.floor(template.entrySpacingPt / 2));
+
+  const company = currentCompany ? escapeTomValue(currentCompany) : '';
 
   return `language = "en"
 
@@ -95,7 +98,7 @@ export function generateMetadataToml(
 [personal]
   first_name = "${firstName}"
   last_name = "${lastName}"
-  [personal.info]
+${company ? `  current_company = "${company}"\n` : ''}  [personal.info]
     linkedin = "${linkedin}"
     email = "${email}"
     phone = "${phone}"

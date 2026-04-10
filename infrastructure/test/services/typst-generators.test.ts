@@ -5,6 +5,7 @@ import {
   analyzeLayout,
   generateConfigTyp,
   generateEducationTyp,
+  generateMetadataToml,
   generateProfessionalTyp
 } from '../../src/services/typst-generators.js';
 
@@ -58,6 +59,64 @@ function makeEducation(overrides: Partial<ResumeRenderEducation> = {}): ResumeRe
     ...overrides
   };
 }
+
+const PERSONAL = {
+  firstName: 'Sylvain',
+  lastName: 'Estevez',
+  email: 'test@example.com',
+  phone: '(415) 619 7821',
+  location: 'New York, NY',
+  linkedin: 'sylvain-estevez',
+  github: 'SylvainEstevez',
+  website: null
+};
+
+// ---------------------------------------------------------------------------
+// generateMetadataToml
+// ---------------------------------------------------------------------------
+
+describe('generateMetadataToml', () => {
+  test('includes personal info fields in TOML output', () => {
+    const result = generateMetadataToml(PERSONAL, 'A headline', TEMPLATE);
+    expect(result).toContain('first_name = "Sylvain"');
+    expect(result).toContain('last_name = "Estevez"');
+    expect(result).toContain('email = "test@example.com"');
+    expect(result).toContain('phone = "(415) 619 7821"');
+    expect(result).toContain('location = "New York, NY"');
+    expect(result).toContain('linkedin = "sylvain-estevez"');
+    expect(result).toContain('github = "SylvainEstevez"');
+  });
+
+  test('includes current_company when provided', () => {
+    const result = generateMetadataToml(PERSONAL, null, TEMPLATE, 'ResortPass');
+    expect(result).toContain('current_company = "ResortPass"');
+  });
+
+  test('omits current_company when not provided', () => {
+    const result = generateMetadataToml(PERSONAL, null, TEMPLATE);
+    expect(result).not.toContain('current_company');
+  });
+
+  test('omits current_company when null', () => {
+    const result = generateMetadataToml(PERSONAL, null, TEMPLATE, null);
+    expect(result).not.toContain('current_company');
+  });
+
+  test('escapes special characters in current_company', () => {
+    const result = generateMetadataToml(PERSONAL, null, TEMPLATE, 'O\'Reilly & "Sons"');
+    expect(result).toContain('current_company = "O\'Reilly & \\"Sons\\""');
+  });
+
+  test('includes headline as header_quote', () => {
+    const result = generateMetadataToml(PERSONAL, 'Engineering leader with 15+ years', TEMPLATE);
+    expect(result).toContain('header_quote = "Engineering leader with 15+ years"');
+  });
+
+  test('omits github line when github is null', () => {
+    const result = generateMetadataToml({ ...PERSONAL, github: null }, null, TEMPLATE);
+    expect(result).not.toContain('github');
+  });
+});
 
 // ---------------------------------------------------------------------------
 // generateConfigTyp
