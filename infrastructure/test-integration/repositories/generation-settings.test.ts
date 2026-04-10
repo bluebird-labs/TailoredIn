@@ -1,7 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
-import { GenerationScope, GenerationSettings, ModelTier } from '@tailoredin/domain';
-import { Profile } from '../../src/db/entities/profile/Profile.js';
+import { GenerationScope, GenerationSettings, ModelTier, Profile } from '@tailoredin/domain';
 import { PostgresGenerationSettingsRepository } from '../../src/repositories/PostgresGenerationSettingsRepository.js';
 import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase.js';
 
@@ -10,6 +9,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
     email: `test-${crypto.randomUUID()}@example.com`,
     firstName: 'Test',
     lastName: 'User',
+    about: null,
     phone: null,
     location: null,
     linkedinUrl: null,
@@ -18,7 +18,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
   });
   orm.em.persist(profile);
   await orm.em.flush();
-  return profile.id;
+  return profile.id.value;
 }
 
 describe('PostgresGenerationSettingsRepository', () => {
@@ -48,7 +48,8 @@ describe('PostgresGenerationSettingsRepository', () => {
 
     const loaded = await repo.findByProfileId(profileId);
     expect(loaded).not.toBeNull();
-    expect(loaded!.profileId).toBe(profileId);
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
+    expect((loaded!.profileId as any).value ?? loaded!.profileId).toBe(profileId);
     expect(loaded!.modelTier).toBe(ModelTier.BALANCED);
     expect(loaded!.bulletMin).toBe(2);
     expect(loaded!.bulletMax).toBe(5);

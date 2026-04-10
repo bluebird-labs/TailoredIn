@@ -9,7 +9,7 @@ module.exports = {
       from: {},
       to: {
         circular: true,
-        pathNot: '^infrastructure/src/db/entities/[^/]+/'
+        pathNot: '^(infrastructure/src/db/entities/[^/]+/|domain/src/entities/)'
       }
     },
 

@@ -1,86 +1,28 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import {
-  ResumeContent as DomainResumeContent,
-  ResumeContentId,
-  type ResumeContentRepository
-} from '@tailoredin/domain';
-import { JobDescription as OrmJobDescription } from '../db/entities/job-description/JobDescription.js';
-import { Profile as OrmProfile } from '../db/entities/profile/Profile.js';
-import { ResumeContent as OrmResumeContent } from '../db/entities/resume-content/ResumeContent.js';
+import { ResumeContent, type ResumeContentRepository } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresResumeContentRepository implements ResumeContentRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
-  public async findLatestByJobDescriptionId(jobDescriptionId: string): Promise<DomainResumeContent | null> {
-    const orm = await this.orm.em.findOne(
-      OrmResumeContent,
-      { jobDescription: jobDescriptionId },
-      { populate: ['profile', 'jobDescription'], orderBy: { createdAt: 'DESC' } }
-    );
-    return orm ? this.toDomain(orm) : null;
+  public async findLatestByJobDescriptionId(jobDescriptionId: string): Promise<ResumeContent | null> {
+    return this.orm.em.findOne(ResumeContent, { jobDescriptionId }, { orderBy: { createdAt: 'DESC' } });
   }
 
-  public async save(resumeContent: DomainResumeContent): Promise<void> {
-    const profileRef = this.orm.em.getReference(OrmProfile, resumeContent.profileId);
-    const jdRef = this.orm.em.getReference(OrmJobDescription, resumeContent.jobDescriptionId);
+  public async save(resumeContent: ResumeContent): Promise<void> {
+    this.orm.em.persist(resumeContent);
+    await this.orm.em.flush();
+  }
 
-    const entity = new OrmResumeContent({
-      id: resumeContent.id.value,
-      profile: profileRef,
-      jobDescription: jdRef,
-      headline: resumeContent.headline,
-      experiences: resumeContent.experiences.map(e => ({
-        experienceId: e.experienceId,
-        summary: e.summary,
-        bullets: e.bullets,
-        hiddenBulletIndices: e.hiddenBulletIndices
-      })),
+  public async update(resumeContent: ResumeContent): Promise<void> {
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
+    const existing = await this.orm.em.findOneOrFail(ResumeContent, { id: resumeContent.id.value } as any);
+    this.orm.em.assign(existing, {
+      experiences: resumeContent.experiences,
       hiddenEducationIds: resumeContent.hiddenEducationIds,
-      prompt: resumeContent.prompt,
-      schema: resumeContent.schema,
-      createdAt: resumeContent.createdAt,
       updatedAt: resumeContent.updatedAt
     });
-
-    this.orm.em.persist(entity);
     await this.orm.em.flush();
-  }
-
-  public async update(resumeContent: DomainResumeContent): Promise<void> {
-    const existing = await this.orm.em.findOneOrFail(OrmResumeContent, resumeContent.id.value);
-    existing.experiences = resumeContent.experiences.map(e => ({
-      experienceId: e.experienceId,
-      summary: e.summary,
-      bullets: e.bullets,
-      hiddenBulletIndices: e.hiddenBulletIndices
-    }));
-    existing.hiddenEducationIds = resumeContent.hiddenEducationIds;
-    existing.updatedAt = resumeContent.updatedAt;
-    await this.orm.em.flush();
-  }
-
-  private toDomain(orm: OrmResumeContent): DomainResumeContent {
-    const profileId = orm.profile.id;
-    const jobDescriptionId = orm.jobDescription.id;
-
-    return new DomainResumeContent({
-      id: new ResumeContentId(orm.id),
-      profileId,
-      jobDescriptionId,
-      headline: orm.headline,
-      experiences: orm.experiences.map(e => ({
-        experienceId: e.experienceId,
-        summary: e.summary,
-        bullets: e.bullets,
-        hiddenBulletIndices: e.hiddenBulletIndices ?? []
-      })),
-      hiddenEducationIds: orm.hiddenEducationIds ?? [],
-      prompt: orm.prompt,
-      schema: orm.schema,
-      createdAt: orm.createdAt,
-      updatedAt: orm.updatedAt
-    });
   }
 }

@@ -26,6 +26,21 @@ export type { ProfileCreateProps } from './entities/Profile.js';
 export { Profile } from './entities/Profile.js';
 export type { ResumeContentCreateProps } from './entities/ResumeContent.js';
 export { ResumeContent } from './entities/ResumeContent.js';
+// ORM types
+export {
+  AccomplishmentIdType,
+  ApplicationIdType,
+  CompanyIdType,
+  EducationIdType,
+  ExperienceGenerationOverrideIdType,
+  ExperienceIdType,
+  GenerationPromptIdType,
+  GenerationSettingsIdType,
+  JobDescriptionIdType,
+  ProfileIdType,
+  ResumeContentIdType,
+  ValueObjectIdType
+} from './orm-types/index.js';
 // Ports — repository interfaces
 export type { ApplicationRepository } from './ports/ApplicationRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
@@ -39,7 +54,6 @@ export type { ResumeContentRepository } from './ports/ResumeContentRepository.js
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
 export { ValueObject } from './ValueObject.js';
-
 // Value objects — IDs
 export { AccomplishmentId } from './value-objects/AccomplishmentId.js';
 export { ApplicationId } from './value-objects/ApplicationId.js';

@@ -191,6 +191,8 @@ classDiagram
     class GetGenerationSettings {
         <<UseCase>>
         +GenerationSettingsRepository generationSettingsRepository
+        +ExperienceRepository experienceRepository
+        +ExperienceGenerationOverrideRepository experienceOverrideRepository
         +execute(GetGenerationSettingsInput) GenerationSettingsDto
     }
 
@@ -234,6 +236,7 @@ classDiagram
         +JobDescriptionRepository jobDescriptionRepository
         +ResumeContentRepository resumeContentRepository
         +ExperienceRepository experienceRepository
+        +CompanyRepository companyRepository
         +execute(GetJobDescriptionInput) JobDescriptionDto
     }
 
@@ -499,6 +502,7 @@ classDiagram
         +number bulletMin
         +number bulletMax
         +GenerationPromptDto[] prompts
+        +ExperienceOverrideDto[] experienceOverrides
     }
 
     class JobDescriptionDto {
@@ -780,6 +784,8 @@ classDiagram
     UpdateExperience ..> ExperienceRepository : depends
     GetProfile ..> ProfileRepository : depends
     GetGenerationSettings ..> GenerationSettingsRepository : depends
+    GetGenerationSettings ..> ExperienceRepository : depends
+    GetGenerationSettings ..> ExperienceGenerationOverrideRepository : depends
     RemoveExperienceGenerationOverride ..> ExperienceGenerationOverrideRepository : depends
     SetExperienceGenerationOverride ..> ExperienceGenerationOverrideRepository : depends
     UpdateGenerationSettings ..> GenerationSettingsRepository : depends
@@ -788,6 +794,7 @@ classDiagram
     GetJobDescription ..> JobDescriptionRepository : depends
     GetJobDescription ..> ResumeContentRepository : depends
     GetJobDescription ..> ExperienceRepository : depends
+    GetJobDescription ..> CompanyRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
     ListJobDescriptions ..> CompanyRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends

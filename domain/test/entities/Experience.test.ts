@@ -21,7 +21,7 @@ describe('Experience', () => {
     const exp = makeExperience();
     expect(exp.title).toBe('Staff Engineer');
     expect(exp.companyName).toBe('Acme Corp');
-    expect(exp.accomplishments).toEqual([]);
+    expect(exp.accomplishments).toHaveLength(0);
   });
 
   test('adds an accomplishment', () => {
@@ -29,7 +29,9 @@ describe('Experience', () => {
     const accomplishment = exp.addAccomplishment({ title: 'T', narrative: 'N', ordinal: 0 });
     expect(exp.accomplishments).toHaveLength(1);
     expect(accomplishment.title).toBe('T');
-    expect(accomplishment.experienceId).toBe(exp.id.value);
+    // MikroORM Collection propagation converts experienceId to ExperienceId
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
+    expect((accomplishment.experienceId as any).value ?? accomplishment.experienceId).toBe(exp.id.value);
   });
 
   test('removes an accomplishment', () => {

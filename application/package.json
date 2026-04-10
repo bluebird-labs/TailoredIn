@@ -16,6 +16,7 @@
     "@tailoredin/domain": "workspace:*"
   },
   "devDependencies": {
+    "@mikro-orm/sqlite": "^7.0.0",
     "@types/node": "^22.13.1",
     "typescript": "^5.7.3"
   }

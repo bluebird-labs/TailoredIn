@@ -15,7 +15,6 @@ import {
   type JobDescriptionRepository,
   ModelTier,
   type ProfileRepository,
-  ResumeContent,
   type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeContentGenerator, ResumeContentGeneratorInput } from '../../../src/ports/ResumeContentGenerator.js';

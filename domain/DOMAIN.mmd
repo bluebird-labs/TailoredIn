@@ -24,16 +24,6 @@ classDiagram
         +fullName()
     }
 
-    class Accomplishment {
-        <<Entity>>
-        +AccomplishmentId id
-        +string experienceId
-        +string title
-        +string narrative
-        +number ordinal
-        +update()
-    }
-
     class Application {
         <<AggregateRoot>>
         +ApplicationId id
@@ -73,7 +63,6 @@ classDiagram
         +string endDate
         +string? summary
         +number ordinal
-        +Accomplishment[] accomplishments
         +addAccomplishment()
         +removeAccomplishment()
         +findAccomplishmentOrFail()
@@ -98,7 +87,6 @@ classDiagram
         +ModelTier modelTier
         +number bulletMin
         +number bulletMax
-        +GenerationPrompt[] prompts
         +updateModelTier()
         +updateBulletRange()
         +setPrompt()
@@ -149,7 +137,6 @@ classDiagram
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
     Profile "1" --> "*" Experience : has
-    Experience "1" *-- "*" Accomplishment : contains
 
     %% ──────────────────────────────────────────────
     %%  Company Subdomain
@@ -182,7 +169,9 @@ classDiagram
         +string description
         +string? url
         +string? location
-        +SalaryRange? salaryRange
+        +number? salaryMin
+        +number? salaryMax
+        +string? salaryCurrency
         +JobLevel? level
         +LocationType? locationType
         +JobSource source
@@ -190,8 +179,9 @@ classDiagram
         +string? rawText
         +string[]? soughtHardSkills
         +string[]? soughtSoftSkills
-        +Uint8Array? resumePdf
+        +Buffer? resumePdf
         +string? resumePdfTheme
+        +salaryRange()
     }
 
     class BusinessType {
@@ -242,16 +232,8 @@ classDiagram
         REMOTE · HYBRID · ONSITE
     }
 
-    class SalaryRange {
-        <<ValueObject>>
-        +min()
-        +max()
-        +currency()
-    }
-
     JobDescription "1" --> "*" ResumeContent : has
     Company "1" --> "*" JobDescription : has
-    JobDescription *-- SalaryRange
     JobDescription --> JobLevel
     JobDescription --> LocationType
     JobDescription --> JobSource
@@ -264,26 +246,6 @@ classDiagram
     Company --> CompanyStatus
 
     %% ──────────────────────────────────────────────
-    %%  GenerationPrompt Subdomain
-    %% ──────────────────────────────────────────────
-
-    class GenerationPrompt {
-        <<Entity>>
-        +GenerationPromptId id
-        +GenerationScope scope
-        +string content
-        +updateContent()
-    }
-
-    class GenerationScope {
-        <<enumeration>>
-        RESUME · HEADLINE · EXPERIENCE
-    }
-
-    GenerationSettings "1" *-- "*" GenerationPrompt : contains
-    GenerationPrompt --> GenerationScope
-
-    %% ──────────────────────────────────────────────
     %%  Enums & Types
     %% ──────────────────────────────────────────────
 
@@ -291,6 +253,11 @@ classDiagram
         <<ValueObject>>
         +number lineCount
         +number[] pageNumbers
+    }
+
+    class GenerationScope {
+        <<enumeration>>
+        RESUME · HEADLINE · EXPERIENCE
     }
 
     class LayoutAnalysis {
@@ -314,6 +281,14 @@ classDiagram
         +number entrySpacingPt
     }
 
+    class SalaryRange {
+        <<ValueObject>>
+        +min()
+        +max()
+        +currency()
+        +toJSON()
+    }
+
     LayoutAnalysis "1" *-- "*" BlockLayout : contains
 
     %% ──────────────────────────────────────────────
@@ -321,7 +296,6 @@ classDiagram
     %% ──────────────────────────────────────────────
 
     style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
@@ -340,9 +314,8 @@ classDiagram
     style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style GenerationPrompt fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
-    style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ResumeTemplate fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px

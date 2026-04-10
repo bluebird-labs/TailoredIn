@@ -1,24 +1,48 @@
+import { Collection } from '@mikro-orm/core';
+import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { GenerationSettingsIdType } from '../orm-types/GenerationSettingsIdType.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
 import { GenerationSettingsId } from '../value-objects/GenerationSettingsId.js';
 import { ModelTier } from '../value-objects/ModelTier.js';
 import { GenerationPrompt } from './GenerationPrompt.js';
+import { Profile } from './Profile.js';
 
 export type GenerationSettingsCreateProps = {
   profileId: string;
   modelTier: ModelTier;
   bulletMin: number;
   bulletMax: number;
-  prompts: GenerationPrompt[];
 };
 
+@Entity({ tableName: 'generation_settings' })
 export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
+  @PrimaryKey({ type: GenerationSettingsIdType, fieldName: 'id' })
+  public declare readonly id: GenerationSettingsId;
+
+  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
+
+  @Property({ fieldName: 'model_tier', type: 'text' })
   public modelTier: ModelTier;
+
+  @Property({ fieldName: 'bullet_min', type: 'integer' })
   public bulletMin: number;
+
+  @Property({ fieldName: 'bullet_max', type: 'integer' })
   public bulletMax: number;
-  public readonly prompts: GenerationPrompt[];
+
+  @OneToMany(
+    () => GenerationPrompt,
+    p => p.generationSettingsId,
+    { orphanRemoval: true }
+  )
+  public readonly prompts = new Collection<GenerationPrompt>(this);
+
+  @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
+
+  @Property({ fieldName: 'updated_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public updatedAt: Date;
 
   public constructor(props: {
@@ -27,7 +51,6 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
     modelTier: ModelTier;
     bulletMin: number;
     bulletMax: number;
-    prompts: GenerationPrompt[];
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -36,7 +59,6 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
     this.modelTier = props.modelTier;
     this.bulletMin = props.bulletMin;
     this.bulletMax = props.bulletMax;
-    this.prompts = props.prompts;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -55,25 +77,26 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
   }
 
   public setPrompt(scope: GenerationScope, content: string): void {
-    const existing = this.prompts.find(p => p.scope === scope);
+    const existing = this.prompts.getItems().find(p => p.scope === scope);
     if (existing) {
       existing.updateContent(content);
     } else {
-      this.prompts.push(GenerationPrompt.create({ scope, content }));
+      this.prompts.add(GenerationPrompt.create({ generationSettingsId: this.id.value, scope, content }));
     }
     this.updatedAt = new Date();
   }
 
   public removePrompt(scope: GenerationScope): void {
-    const index = this.prompts.findIndex(p => p.scope === scope);
+    const index = this.prompts.getItems().findIndex(p => p.scope === scope);
     if (index !== -1) {
-      this.prompts.splice(index, 1);
+      const item = this.prompts.getItems()[index];
+      this.prompts.remove(item);
       this.updatedAt = new Date();
     }
   }
 
   public getPrompt(scope: GenerationScope): string | null {
-    return this.prompts.find(p => p.scope === scope)?.content ?? null;
+    return this.prompts.getItems().find(p => p.scope === scope)?.content ?? null;
   }
 
   public static createDefault(profileId: string): GenerationSettings {
@@ -84,7 +107,6 @@ export class GenerationSettings extends AggregateRoot<GenerationSettingsId> {
       modelTier: ModelTier.BALANCED,
       bulletMin: 2,
       bulletMax: 5,
-      prompts: [],
       createdAt: now,
       updatedAt: now
     });

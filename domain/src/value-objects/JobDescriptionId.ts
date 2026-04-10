@@ -9,6 +9,10 @@ export class JobDescriptionId extends ValueObject<{ value: string }> {
     return this.props.value;
   }
 
+  public toJSON(): string {
+    return this.value;
+  }
+
   public static generate(): JobDescriptionId {
     return new JobDescriptionId(crypto.randomUUID());
   }

@@ -1,5 +1,8 @@
-import { Entity } from '../Entity.js';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import { Entity as DomainEntity } from '../Entity.js';
+import { AccomplishmentIdType } from '../orm-types/AccomplishmentIdType.js';
 import { AccomplishmentId } from '../value-objects/AccomplishmentId.js';
+import { Experience } from './Experience.js';
 
 export type AccomplishmentCreateProps = {
   experienceId: string;
@@ -8,12 +11,27 @@ export type AccomplishmentCreateProps = {
   ordinal: number;
 };
 
-export class Accomplishment extends Entity<AccomplishmentId> {
+@Entity({ tableName: 'accomplishments' })
+export class Accomplishment extends DomainEntity<AccomplishmentId> {
+  @PrimaryKey({ type: AccomplishmentIdType, fieldName: 'id' })
+  public declare readonly id: AccomplishmentId;
+
+  @ManyToOne(() => Experience, { fieldName: 'experience_id', mapToPk: true })
   public readonly experienceId: string;
+
+  @Property({ fieldName: 'title', type: 'text' })
   public title: string;
+
+  @Property({ fieldName: 'narrative', type: 'text' })
   public narrative: string;
+
+  @Property({ fieldName: 'ordinal', type: 'integer' })
   public ordinal: number;
+
+  @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
+
+  @Property({ fieldName: 'updated_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public updatedAt: Date;
 
   public constructor(props: {

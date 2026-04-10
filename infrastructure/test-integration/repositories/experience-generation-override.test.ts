@@ -1,7 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
-import { Experience, ExperienceGenerationOverride } from '@tailoredin/domain';
-import { Profile } from '../../src/db/entities/profile/Profile.js';
+import { Experience, ExperienceGenerationOverride, Profile } from '@tailoredin/domain';
 import { PostgresExperienceGenerationOverrideRepository } from '../../src/repositories/PostgresExperienceGenerationOverrideRepository.js';
 import { PostgresExperienceRepository } from '../../src/repositories/PostgresExperienceRepository.js';
 import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase.js';
@@ -11,6 +10,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
     email: `test-${crypto.randomUUID()}@example.com`,
     firstName: 'Test',
     lastName: 'User',
+    about: null,
     phone: null,
     location: null,
     linkedinUrl: null,
@@ -19,7 +19,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
   });
   orm.em.persist(profile);
   await orm.em.flush();
-  return profile.id;
+  return profile.id.value;
 }
 
 async function seedExperience(orm: MikroORM, profileId: string): Promise<string> {
@@ -69,7 +69,8 @@ describe('PostgresExperienceGenerationOverrideRepository', () => {
 
     const loaded = await repo.findByExperienceId(experienceId);
     expect(loaded).not.toBeNull();
-    expect(loaded!.experienceId).toBe(experienceId);
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
+    expect((loaded!.experienceId as any).value ?? loaded!.experienceId).toBe(experienceId);
     expect(loaded!.bulletMin).toBe(3);
     expect(loaded!.bulletMax).toBe(6);
   });
@@ -107,7 +108,8 @@ describe('PostgresExperienceGenerationOverrideRepository', () => {
     const results = await repo.findByExperienceIds([expId1, expId2, expId3]);
     expect(results).toHaveLength(2);
 
-    const ids = results.map(r => r.experienceId).sort();
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
+    const ids = results.map(r => (r.experienceId as any).value ?? r.experienceId).sort();
     expect(ids).toEqual([expId1, expId3].sort());
   });
 

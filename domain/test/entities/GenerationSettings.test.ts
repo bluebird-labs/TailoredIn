@@ -14,7 +14,7 @@ describe('GenerationSettings', () => {
       expect(settings.modelTier).toBe(ModelTier.BALANCED);
       expect(settings.bulletMin).toBe(2);
       expect(settings.bulletMax).toBe(5);
-      expect(settings.prompts).toEqual([]);
+      expect(settings.prompts).toHaveLength(0);
       expect(settings.id.value).toBeDefined();
       expect(settings.createdAt).toBeInstanceOf(Date);
       expect(settings.updatedAt).toBeInstanceOf(Date);

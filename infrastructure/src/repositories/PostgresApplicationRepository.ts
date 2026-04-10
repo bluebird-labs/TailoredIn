@@ -1,91 +1,32 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import {
-  ApplicationId,
-  type ApplicationRepository,
-  type ApplicationStatus,
-  Application as DomainApplication,
-  EntityNotFoundError
-} from '@tailoredin/domain';
-import { Application as OrmApplication } from '../db/entities/application/Application.js';
-import { Company as OrmCompany } from '../db/entities/companies/Company.js';
-import { JobDescription as OrmJobDescription } from '../db/entities/job-description/JobDescription.js';
-import { Profile as OrmProfile } from '../db/entities/profile/Profile.js';
+import { Application, type ApplicationId, type ApplicationRepository, EntityNotFoundError } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresApplicationRepository implements ApplicationRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
-  public async findById(id: ApplicationId): Promise<DomainApplication | null> {
-    const orm = await this.orm.em.findOne(OrmApplication, id.value);
-    return orm ? this.toDomain(orm) : null;
+  public async findById(id: ApplicationId): Promise<Application | null> {
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
+    return this.orm.em.findOne(Application, { id: id.value } as any);
   }
 
-  public async findByProfileId(profileId: string): Promise<DomainApplication[]> {
-    const ormEntities = await this.orm.em.find(
-      OrmApplication,
-      { profile: profileId },
-      { orderBy: { appliedAt: 'DESC' } }
-    );
-    return ormEntities.map(e => this.toDomain(e));
+  public async findByProfileId(profileId: string): Promise<Application[]> {
+    return this.orm.em.find(Application, { profileId }, { orderBy: { appliedAt: 'DESC' } });
   }
 
-  public async save(application: DomainApplication): Promise<void> {
-    let ormApp = await this.orm.em.findOne(OrmApplication, application.id.value);
-
-    if (ormApp) {
-      ormApp.status = application.status;
-      ormApp.notes = application.notes;
-      ormApp.jobDescription = application.jobDescriptionId
-        ? this.orm.em.getReference(OrmJobDescription, application.jobDescriptionId)
-        : null;
-      ormApp.updatedAt = application.updatedAt;
-    } else {
-      const profileRef = this.orm.em.getReference(OrmProfile, application.profileId);
-      const companyRef = this.orm.em.getReference(OrmCompany, application.companyId);
-      const jdRef = application.jobDescriptionId
-        ? this.orm.em.getReference(OrmJobDescription, application.jobDescriptionId)
-        : null;
-      ormApp = new OrmApplication({
-        id: application.id.value,
-        profile: profileRef,
-        company: companyRef,
-        jobDescription: jdRef,
-        status: application.status,
-        notes: application.notes,
-        appliedAt: application.appliedAt,
-        createdAt: application.appliedAt,
-        updatedAt: application.updatedAt
-      });
-      this.orm.em.persist(ormApp);
-    }
-
+  public async save(application: Application): Promise<void> {
+    this.orm.em.persist(application);
     await this.orm.em.flush();
   }
 
   public async delete(id: ApplicationId): Promise<void> {
-    const orm = await this.orm.em.findOne(OrmApplication, id.value);
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
+    const orm = await this.orm.em.findOne(Application, { id: id.value } as any);
     if (!orm) {
       throw new EntityNotFoundError('Application', id.value);
     }
     this.orm.em.remove(orm);
     await this.orm.em.flush();
-  }
-
-  private toDomain(orm: OrmApplication): DomainApplication {
-    const profileId = orm.profile.id;
-    const companyId = orm.company.id;
-    const jobDescriptionId = orm.jobDescription?.id ?? null;
-
-    return new DomainApplication({
-      id: new ApplicationId(orm.id),
-      profileId,
-      companyId,
-      status: orm.status as ApplicationStatus,
-      jobDescriptionId,
-      notes: orm.notes,
-      appliedAt: orm.appliedAt,
-      updatedAt: orm.updatedAt
-    });
   }
 }

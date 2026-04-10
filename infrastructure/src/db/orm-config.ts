@@ -5,19 +5,20 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SeedManager } from '@mikro-orm/seeder';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
+import {
+  Accomplishment,
+  Application,
+  Company,
+  Education,
+  Experience,
+  ExperienceGenerationOverride,
+  GenerationPrompt,
+  GenerationSettings,
+  JobDescription,
+  Profile,
+  ResumeContent
+} from '@tailoredin/domain';
 import { StatusCode } from '@tselect/status-code';
-import { BaseEntity } from './BaseEntity.js';
-import { Application as OrmApplication } from './entities/application/Application.js';
-import { Company } from './entities/companies/Company.js';
-import { Education } from './entities/education/Education.js';
-import { Accomplishment as OrmAccomplishment } from './entities/experience/Accomplishment.js';
-import { Experience as OrmExperience } from './entities/experience/Experience.js';
-import { ExperienceGenerationOverride as OrmExperienceGenerationOverride } from './entities/experience/ExperienceGenerationOverride.js';
-import { GenerationPrompt as OrmGenerationPrompt } from './entities/generation-settings/GenerationPrompt.js';
-import { GenerationSettings as OrmGenerationSettings } from './entities/generation-settings/GenerationSettings.js';
-import { JobDescription as OrmJobDescription } from './entities/job-description/JobDescription.js';
-import { Profile } from './entities/profile/Profile.js';
-import { ResumeContent as OrmResumeContent } from './entities/resume-content/ResumeContent.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -37,18 +38,17 @@ export function createOrmConfig(db: OrmDbConfig) {
     allowGlobalContext: false,
 
     entities: [
-      BaseEntity,
       Profile,
       Education,
       Company,
-      OrmExperience,
-      OrmAccomplishment,
-      OrmApplication,
-      OrmJobDescription,
-      OrmResumeContent,
-      OrmGenerationSettings,
-      OrmGenerationPrompt,
-      OrmExperienceGenerationOverride
+      Experience,
+      Accomplishment,
+      Application,
+      JobDescription,
+      ResumeContent,
+      GenerationSettings,
+      GenerationPrompt,
+      ExperienceGenerationOverride
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

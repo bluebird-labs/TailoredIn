@@ -1,4 +1,6 @@
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { CompanyIdType } from '../orm-types/CompanyIdType.js';
 import type { BusinessType } from '../value-objects/BusinessType.js';
 import { CompanyId } from '../value-objects/CompanyId.js';
 import type { CompanyStage } from '../value-objects/CompanyStage.js';
@@ -17,17 +19,42 @@ export type CompanyCreateProps = {
   status?: CompanyStatus | null;
 };
 
+@Entity({ tableName: 'companies' })
 export class Company extends AggregateRoot<CompanyId> {
+  @PrimaryKey({ type: CompanyIdType, fieldName: 'id' })
+  public declare readonly id: CompanyId;
+
+  @Property({ fieldName: 'name', type: 'text' })
   public name: string;
+
+  @Property({ fieldName: 'description', type: 'text', nullable: true })
   public description: string | null;
+
+  @Property({ fieldName: 'website', type: 'text', nullable: true, unique: 'companies_website_key' })
   public website: string | null;
+
+  @Property({ fieldName: 'logo_url', type: 'text', nullable: true })
   public logoUrl: string | null;
+
+  @Property({ fieldName: 'linkedin_link', type: 'text', nullable: true, unique: 'companies_linkedin_link_key' })
   public readonly linkedinLink: string | null;
+
+  @Property({ fieldName: 'business_type', type: 'text', nullable: true })
   public businessType: BusinessType | null;
+
+  @Property({ fieldName: 'industry', type: 'text', nullable: true })
   public industry: Industry | null;
+
+  @Property({ fieldName: 'stage', type: 'text', nullable: true })
   public stage: CompanyStage | null;
+
+  @Property({ fieldName: 'status', type: 'text', nullable: true })
   public status: CompanyStatus | null;
+
+  @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
+
+  @Property({ fieldName: 'updated_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public updatedAt: Date;
 
   public constructor(props: {

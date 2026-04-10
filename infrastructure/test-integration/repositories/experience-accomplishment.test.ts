@@ -1,7 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
-import { Experience } from '@tailoredin/domain';
-import { Profile } from '../../src/db/entities/profile/Profile.js';
+import { Experience, Profile } from '@tailoredin/domain';
 import { PostgresExperienceRepository } from '../../src/repositories/PostgresExperienceRepository.js';
 import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase.js';
 
@@ -10,6 +9,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
     email: `test-${crypto.randomUUID()}@example.com`,
     firstName: 'Test',
     lastName: 'User',
+    about: null,
     phone: null,
     location: null,
     linkedinUrl: null,
@@ -18,7 +18,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
   });
   orm.em.persist(profile);
   await orm.em.flush();
-  return profile.id;
+  return profile.id.value;
 }
 
 describe('PostgresExperienceRepository — accomplishments', () => {

@@ -13,50 +13,40 @@ Concrete implementations of all application ports: database repositories. Also o
 ```
 infrastructure/src/
 ├── db/
-│   ├── entities/        ← MikroORM entities (separate from domain entities)
-│   │   ├── companies/
-│   │   ├── education/
-│   │   ├── experience/
-│   │   └── profile/
-│   ├── migrations/      ← Timestamped Kysely migrations
-│   ├── seeds/           ← DatabaseSeeder + per-domain seeders
-│   ├── BaseEntity.ts
-│   ├── BaseRepository.ts
-│   └── orm-config.ts
+│   ├── migrations/      ← Timestamped MikroORM migrations
+│   ├── seeds/           ← DatabaseSeeder + E2eSeeder
+│   └── orm-config.ts    ← MikroORM config (imports entities from @tailoredin/domain)
 ├── repositories/        ← Postgres<Entity>Repository implementations
+├── services/            ← External service adapters (LLM, etc.)
 ├── DI.ts                ← All DI tokens
 └── index.ts
 ```
 
-## ORM entities vs domain entities
+## Entities
 
-They are **always separate**. ORM entities in `db/entities/` are MikroORM-decorated classes. Domain entities in `domain/src/entities/` are plain TypeScript. Repositories map between them:
+Domain entities in `domain/src/entities/` carry MikroORM decorators directly — there is no separate ORM entity layer. The `orm-config.ts` imports all entities from `@tailoredin/domain`.
 
-```typescript
-// ORM entity — infrastructure only
-@Entity({ tableName: 'experience' })
-class ExperienceOrm extends BaseEntity { ... }
+## Repository pattern
 
-// Domain entity — pure TypeScript
-class Experience extends AggregateRoot<ExperienceId> { ... }
-
-// Repository maps between them
-class PostgresExperienceRepository implements ExperienceRepository {
-  private toDomain(orm: ExperienceOrm): Experience { ... }
-  private toOrm(domain: Experience): ExperienceOrm { ... }
-}
-```
-
-## Repository naming
-
-`Postgres<Entity>Repository` — one file per aggregate root:
+`Postgres<Entity>Repository` — thin wrappers around `EntityManager`. One file per aggregate root:
 
 ```typescript
 @injectable()
 export class PostgresExperienceRepository implements ExperienceRepository {
-  public constructor(@inject(DI.Orm.EntityManager) private readonly em: EntityManager) {}
+  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+
+  public async findByIdOrFail(id: string): Promise<Experience> {
+    return this.orm.em.findOneOrFail(Experience, { id } as any, { populate: ['accomplishments'] });
+  }
+
+  public async save(experience: Experience): Promise<void> {
+    this.orm.em.persist(experience);
+    await this.orm.em.flush();
+  }
 }
 ```
+
+No `toDomain()`/`toORM()` mapping — entities are used directly.
 
 ## DI tokens
 

@@ -9,6 +9,10 @@ export class CompanyId extends ValueObject<{ value: string }> {
     return this.props.value;
   }
 
+  public toJSON(): string {
+    return this.value;
+  }
+
   public static generate(): CompanyId {
     return new CompanyId(crypto.randomUUID());
   }

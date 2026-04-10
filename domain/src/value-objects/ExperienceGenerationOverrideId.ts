@@ -9,6 +9,10 @@ export class ExperienceGenerationOverrideId extends ValueObject<{ value: string 
     return this.props.value;
   }
 
+  public toJSON(): string {
+    return this.value;
+  }
+
   public static generate(): ExperienceGenerationOverrideId {
     return new ExperienceGenerationOverrideId(crypto.randomUUID());
   }

@@ -1,128 +1,41 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import {
-  JobDescription as DomainJobDescription,
   EntityNotFoundError,
-  JobDescriptionId,
-  type JobDescriptionRepository,
-  type JobLevel,
-  type JobSource,
-  type LocationType,
-  SalaryRange
+  JobDescription,
+  type JobDescriptionId,
+  type JobDescriptionRepository
 } from '@tailoredin/domain';
-import { Company as OrmCompany } from '../db/entities/companies/Company.js';
-import { JobDescription as OrmJobDescription } from '../db/entities/job-description/JobDescription.js';
 
 @injectable()
 export class PostgresJobDescriptionRepository implements JobDescriptionRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
-  public async findAll(): Promise<DomainJobDescription[]> {
-    const ormEntities = await this.orm.em.find(OrmJobDescription, {}, { orderBy: { createdAt: 'DESC' } });
-    return ormEntities.map(e => this.toDomain(e));
+  public async findAll(): Promise<JobDescription[]> {
+    return this.orm.em.find(JobDescription, {}, { orderBy: { createdAt: 'DESC' } });
   }
 
-  public async findById(id: JobDescriptionId): Promise<DomainJobDescription | null> {
-    const orm = await this.orm.em.findOne(OrmJobDescription, id.value);
-    return orm ? this.toDomain(orm) : null;
+  public async findById(id: JobDescriptionId): Promise<JobDescription | null> {
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
+    return this.orm.em.findOne(JobDescription, { id: id.value } as any);
   }
 
-  public async findByCompanyId(companyId: string): Promise<DomainJobDescription[]> {
-    const ormEntities = await this.orm.em.find(
-      OrmJobDescription,
-      { company: companyId },
-      { orderBy: { createdAt: 'DESC' } }
-    );
-    return ormEntities.map(e => this.toDomain(e));
+  public async findByCompanyId(companyId: string): Promise<JobDescription[]> {
+    return this.orm.em.find(JobDescription, { companyId }, { orderBy: { createdAt: 'DESC' } });
   }
 
-  public async save(jd: DomainJobDescription): Promise<void> {
-    let ormJd = await this.orm.em.findOne(OrmJobDescription, jd.id.value);
-
-    if (ormJd) {
-      ormJd.title = jd.title;
-      ormJd.description = jd.description;
-      ormJd.url = jd.url;
-      ormJd.location = jd.location;
-      ormJd.salaryMin = jd.salaryRange?.min ?? null;
-      ormJd.salaryMax = jd.salaryRange?.max ?? null;
-      ormJd.salaryCurrency = jd.salaryRange?.currency ?? null;
-      ormJd.level = jd.level;
-      ormJd.locationType = jd.locationType;
-      ormJd.source = jd.source;
-      ormJd.postedAt = jd.postedAt;
-      ormJd.rawText = jd.rawText;
-      ormJd.soughtHardSkills = jd.soughtHardSkills;
-      ormJd.soughtSoftSkills = jd.soughtSoftSkills;
-      ormJd.resumePdf = jd.resumePdf ? Buffer.from(jd.resumePdf) : null;
-      ormJd.resumePdfTheme = jd.resumePdfTheme;
-      ormJd.updatedAt = jd.updatedAt;
-    } else {
-      const companyRef = this.orm.em.getReference(OrmCompany, jd.companyId);
-      ormJd = new OrmJobDescription({
-        id: jd.id.value,
-        company: companyRef,
-        title: jd.title,
-        description: jd.description,
-        url: jd.url,
-        location: jd.location,
-        salaryMin: jd.salaryRange?.min ?? null,
-        salaryMax: jd.salaryRange?.max ?? null,
-        salaryCurrency: jd.salaryRange?.currency ?? null,
-        level: jd.level,
-        locationType: jd.locationType,
-        source: jd.source,
-        postedAt: jd.postedAt,
-        rawText: jd.rawText,
-        soughtHardSkills: jd.soughtHardSkills,
-        soughtSoftSkills: jd.soughtSoftSkills,
-        resumePdf: jd.resumePdf ? Buffer.from(jd.resumePdf) : null,
-        resumePdfTheme: jd.resumePdfTheme,
-        createdAt: jd.createdAt,
-        updatedAt: jd.updatedAt
-      });
-      this.orm.em.persist(ormJd);
-    }
-
+  public async save(jd: JobDescription): Promise<void> {
+    this.orm.em.persist(jd);
     await this.orm.em.flush();
   }
 
   public async delete(id: JobDescriptionId): Promise<void> {
-    const orm = await this.orm.em.findOne(OrmJobDescription, id.value);
+    // biome-ignore lint/suspicious/noExplicitAny: MikroORM FilterQuery type mismatch with custom PK
+    const orm = await this.orm.em.findOne(JobDescription, { id: id.value } as any);
     if (!orm) {
       throw new EntityNotFoundError('JobDescription', id.value);
     }
     this.orm.em.remove(orm);
     await this.orm.em.flush();
-  }
-
-  private toDomain(orm: OrmJobDescription): DomainJobDescription {
-    const companyId = orm.company.id;
-
-    const salaryRange =
-      orm.salaryCurrency != null
-        ? new SalaryRange({ min: orm.salaryMin, max: orm.salaryMax, currency: orm.salaryCurrency })
-        : null;
-
-    return new DomainJobDescription({
-      id: new JobDescriptionId(orm.id),
-      companyId,
-      title: orm.title,
-      description: orm.description,
-      url: orm.url,
-      location: orm.location,
-      salaryRange,
-      level: orm.level as JobLevel | null,
-      locationType: orm.locationType as LocationType | null,
-      source: orm.source as JobSource,
-      postedAt: orm.postedAt,
-      rawText: orm.rawText,
-      soughtHardSkills: orm.soughtHardSkills,
-      soughtSoftSkills: orm.soughtSoftSkills,
-      resumePdf: orm.resumePdf ? new Uint8Array(orm.resumePdf) : null,
-      resumePdfTheme: orm.resumePdfTheme ?? null,
-      createdAt: orm.createdAt,
-      updatedAt: orm.updatedAt
-    });
   }
 }

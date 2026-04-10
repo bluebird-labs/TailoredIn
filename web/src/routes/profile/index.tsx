@@ -119,7 +119,7 @@ function generateProfileMarkdown(profile: ProfileData, experiences: Experience[]
     }
   }
 
-  return lines.join('\n').trimEnd() + '\n';
+  return `${lines.join('\n').trimEnd()}\n`;
 }
 
 function ProfilePage() {

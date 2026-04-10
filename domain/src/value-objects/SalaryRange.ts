@@ -17,4 +17,8 @@ export class SalaryRange extends ValueObject<{ min: number | null; max: number |
   public get currency(): string {
     return this.props.currency;
   }
+
+  public toJSON(): { min: number | null; max: number | null; currency: string } {
+    return { min: this.min, max: this.max, currency: this.currency };
+  }
 }

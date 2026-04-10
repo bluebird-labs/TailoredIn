@@ -9,6 +9,10 @@ export class ExperienceId extends ValueObject<{ value: string }> {
     return this.props.value;
   }
 
+  public toJSON(): string {
+    return this.value;
+  }
+
   public static generate(): ExperienceId {
     return new ExperienceId(crypto.randomUUID());
   }

@@ -113,7 +113,7 @@ export class GenerateResumePdf {
     const renderer = this.rendererFactory.get(theme);
     const pdfBytes = await renderer.render(renderInput);
 
-    jd.resumePdf = pdfBytes;
+    jd.resumePdf = Buffer.from(pdfBytes);
     jd.resumePdfTheme = theme;
     jd.updatedAt = new Date();
     await this.jobDescriptionRepository.save(jd);

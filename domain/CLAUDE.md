@@ -5,17 +5,19 @@ Package: `@tailoredin/domain`
 The pure domain layer — aggregates, entities, value objects, domain services, and repository port interfaces.
 
 **Hard rules:**
-- No framework dependencies (`@injectable`, `inject`, MikroORM, Elysia, etc.)
+- MikroORM decorators (`@Entity`, `@Property`, `@ManyToOne`, `@OneToMany`, `@PrimaryKey`) are allowed — they are inert metadata with no I/O
+- No other framework dependencies (`@injectable`, `inject`, Elysia, etc.)
 - No I/O (no database, HTTP, file system)
 - No imports from `@tailoredin/application` or `@tailoredin/infrastructure`
-- Only `@tailoredin/core` utilities are allowed as an external dep
+- Only `@tailoredin/core` utilities and `@mikro-orm/core` / `@mikro-orm/decorators` are allowed as external deps
 
 ## Directory structure
 
 ```
 domain/src/
-├── entities/          ← Aggregate roots and entities
+├── entities/          ← Aggregate roots and entities (with MikroORM decorators)
 ├── value-objects/     ← Value objects, ID types, enums
+├── orm-types/         ← MikroORM custom Type classes for ValueObject IDs
 ├── domain-services/   ← Stateless domain services
 ├── ports/             ← Repository interfaces (not implementations)
 ├── AggregateRoot.ts

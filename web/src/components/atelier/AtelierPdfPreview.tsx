@@ -89,7 +89,7 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
     const companyPart = slugify(jd?.companyName);
     const jobPart = slugify(jd?.title);
     const datePart = new Date().toISOString().slice(0, 10);
-    return [namePart, companyPart, jobPart, datePart].filter(Boolean).join('-') + '.pdf';
+    return `${[namePart, companyPart, jobPart, datePart].filter(Boolean).join('-')}.pdf`;
   }, [profile?.firstName, profile?.lastName, jd?.companyName, jd?.title]);
 
   const handleDownload = useCallback(async () => {

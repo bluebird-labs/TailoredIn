@@ -9,6 +9,10 @@ export class AccomplishmentId extends ValueObject<{ value: string }> {
     return this.props.value;
   }
 
+  public toJSON(): string {
+    return this.value;
+  }
+
   public static generate(): AccomplishmentId {
     return new AccomplishmentId(crypto.randomUUID());
   }

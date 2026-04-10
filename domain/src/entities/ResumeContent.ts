@@ -1,6 +1,10 @@
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ResumeContentIdType } from '../orm-types/ResumeContentIdType.js';
 import { ResumeContentId } from '../value-objects/ResumeContentId.js';
 import type { ResumeExperience } from '../value-objects/ResumeExperience.js';
+import { JobDescription } from './JobDescription.js';
+import { Profile } from './Profile.js';
 
 export type ResumeContentCreateProps = {
   profileId: string;
@@ -12,15 +16,36 @@ export type ResumeContentCreateProps = {
   schema: Record<string, unknown> | null;
 };
 
+@Entity({ tableName: 'resume_contents' })
 export class ResumeContent extends AggregateRoot<ResumeContentId> {
+  @PrimaryKey({ type: ResumeContentIdType, fieldName: 'id' })
+  public declare readonly id: ResumeContentId;
+
+  @ManyToOne(() => Profile, { fieldName: 'profile_id', mapToPk: true })
   public readonly profileId: string;
+
+  @ManyToOne(() => JobDescription, { fieldName: 'job_description_id', mapToPk: true })
   public readonly jobDescriptionId: string;
+
+  @Property({ fieldName: 'headline', type: 'text' })
   public readonly headline: string;
+
+  @Property({ fieldName: 'experiences', type: 'jsonb' })
   public readonly experiences: ResumeExperience[];
+
+  @Property({ fieldName: 'hidden_education_ids', type: 'jsonb' })
   public readonly hiddenEducationIds: string[];
+
+  @Property({ fieldName: 'prompt', type: 'text' })
   public readonly prompt: string;
+
+  @Property({ fieldName: 'schema', type: 'jsonb', nullable: true })
   public readonly schema: Record<string, unknown> | null;
+
+  @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
+
+  @Property({ fieldName: 'updated_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly updatedAt: Date;
 
   public constructor(props: {

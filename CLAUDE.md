@@ -166,7 +166,7 @@ See **`CONVENTIONS.md`** for detailed coding standards: OOP-first design, DI pat
 ## Key Design Decisions
 
 - **Plain application layer**: use cases are plain TypeScript classes — no `@injectable()`, no `inject()`. The DI framework (`@needle-di/core`) is only used in `infrastructure/` and the composition root (`api/`).
-- **Separate ORM entities**: MikroORM entities in `infrastructure/src/db/entities/` are distinct from domain entities in `domain/src/entities/`. Repositories map between them.
+- **Merged domain + ORM entities**: Domain entities in `domain/src/entities/` carry MikroORM decorators directly. There is no separate ORM entity layer. Repositories are thin wrappers around `EntityManager` (persist + flush).
 - **DI tokens & wiring**: see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for the full workflow of adding new services.
 
 ## Entry Points

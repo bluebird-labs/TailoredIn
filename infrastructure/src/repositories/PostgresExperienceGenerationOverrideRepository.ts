@@ -1,74 +1,34 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import {
-  ExperienceGenerationOverride as DomainOverride,
-  ExperienceGenerationOverrideId,
-  type ExperienceGenerationOverrideRepository
-} from '@tailoredin/domain';
-import { Experience as OrmExperience } from '../db/entities/experience/Experience.js';
-import { ExperienceGenerationOverride as OrmOverride } from '../db/entities/experience/ExperienceGenerationOverride.js';
+import { ExperienceGenerationOverride, type ExperienceGenerationOverrideRepository } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresExperienceGenerationOverrideRepository implements ExperienceGenerationOverrideRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
-  public async findByExperienceId(experienceId: string): Promise<DomainOverride | null> {
-    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId });
-    if (!orm) return null;
-    return this.toDomain(orm);
+  public async findByExperienceId(experienceId: string): Promise<ExperienceGenerationOverride | null> {
+    return this.orm.em.findOne(ExperienceGenerationOverride, { experienceId });
   }
 
-  public async findByExperienceIds(experienceIds: string[]): Promise<DomainOverride[]> {
+  public async findByExperienceIds(experienceIds: string[]): Promise<ExperienceGenerationOverride[]> {
     if (experienceIds.length === 0) return [];
-    const ormEntities = await this.orm.em.find(
-      OrmOverride,
+    return this.orm.em.find(
+      ExperienceGenerationOverride,
       // biome-ignore lint/style/useNamingConvention: MikroORM query operator
-      { experience: { $in: experienceIds } }
+      { experienceId: { $in: experienceIds } }
     );
-    return ormEntities.map(orm => this.toDomain(orm));
   }
 
-  public async save(override: DomainOverride): Promise<void> {
-    const existing = await this.orm.em.findOne(OrmOverride, override.id.value);
-
-    if (existing) {
-      existing.bulletMin = override.bulletMin;
-      existing.bulletMax = override.bulletMax;
-      existing.updatedAt = override.updatedAt;
-    } else {
-      const experience = this.orm.em.getReference(OrmExperience, override.experienceId);
-      const orm = new OrmOverride({
-        id: override.id.value,
-        experience,
-        bulletMin: override.bulletMin,
-        bulletMax: override.bulletMax,
-        createdAt: override.createdAt,
-        updatedAt: override.updatedAt
-      });
-      this.orm.em.persist(orm);
-    }
-
+  public async save(override: ExperienceGenerationOverride): Promise<void> {
+    this.orm.em.persist(override);
     await this.orm.em.flush();
   }
 
   public async delete(experienceId: string): Promise<void> {
-    const orm = await this.orm.em.findOne(OrmOverride, { experience: experienceId });
+    const orm = await this.orm.em.findOne(ExperienceGenerationOverride, { experienceId });
     if (orm) {
       this.orm.em.remove(orm);
       await this.orm.em.flush();
     }
-  }
-
-  private toDomain(orm: OrmOverride): DomainOverride {
-    const experienceId = orm.experience.id;
-
-    return new DomainOverride({
-      id: new ExperienceGenerationOverrideId(orm.id),
-      experienceId,
-      bulletMin: orm.bulletMin,
-      bulletMax: orm.bulletMax,
-      createdAt: orm.createdAt,
-      updatedAt: orm.updatedAt
-    });
   }
 }
