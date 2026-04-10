@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ValidationError } from '../ValidationError.js';
 
 export type ProfileCreateProps = {
   email: string;
@@ -66,6 +67,12 @@ export class Profile extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (!props.email || !/^.+@.+\..+$/.test(props.email))
+      throw new ValidationError('email', 'must be a valid email address');
+    if (!props.firstName || props.firstName.length > 500)
+      throw new ValidationError('firstName', 'must be between 1 and 500 characters');
+    if (!props.lastName || props.lastName.length > 500)
+      throw new ValidationError('lastName', 'must be between 1 and 500 characters');
     this.id = props.id;
     this.email = props.email;
     this.firstName = props.firstName;

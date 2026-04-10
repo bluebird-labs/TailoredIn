@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ValidationError } from '../ValidationError.js';
 
 export type ExperienceGenerationOverrideCreateProps = {
   experienceId: string;
@@ -36,6 +37,9 @@ export class ExperienceGenerationOverride extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (props.bulletMin <= 0) throw new ValidationError('bulletMin', 'must be greater than 0');
+    if (props.bulletMax < props.bulletMin)
+      throw new ValidationError('bulletMax', 'must be greater than or equal to bulletMin');
     this.id = props.id;
     this.experienceId = props.experienceId;
     this.bulletMin = props.bulletMin;

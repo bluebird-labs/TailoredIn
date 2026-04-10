@@ -1,6 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ValidationError } from '../ValidationError.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
 import { ModelTier } from '../value-objects/ModelTier.js';
 import { GenerationPrompt } from './GenerationPrompt.js';
@@ -52,6 +53,9 @@ export class GenerationSettings extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (props.bulletMin <= 0) throw new ValidationError('bulletMin', 'must be greater than 0');
+    if (props.bulletMax < props.bulletMin)
+      throw new ValidationError('bulletMax', 'must be greater than or equal to bulletMin');
     this.id = props.id;
     this.profileId = props.profileId;
     this.modelTier = props.modelTier;

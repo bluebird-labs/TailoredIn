@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ValidationError } from '../ValidationError.js';
 import { JobLevel } from '../value-objects/JobLevel.js';
 import type { JobSource } from '../value-objects/JobSource.js';
 import { LocationType } from '../value-objects/LocationType.js';
@@ -115,6 +116,10 @@ export class JobDescription extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (!props.title || props.title.length > 1000)
+      throw new ValidationError('title', 'must be between 1 and 1000 characters');
+    if (!props.description || props.description.length > 100000)
+      throw new ValidationError('description', 'must be between 1 and 100000 characters');
     this.id = props.id;
     this.companyId = props.companyId;
     this.title = props.title;

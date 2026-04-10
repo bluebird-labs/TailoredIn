@@ -1,5 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { Entity as DomainEntity } from '../Entity.js';
+import { ValidationError } from '../ValidationError.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
 import { GenerationSettings } from './GenerationSettings.js';
 
@@ -39,6 +40,8 @@ export class GenerationPrompt extends DomainEntity {
     updatedAt: Date;
   }) {
     super();
+    if (!props.content || props.content.length > 10000)
+      throw new ValidationError('content', 'must be between 1 and 10000 characters');
     this.id = props.id;
     this.generationSettingsId = props.generationSettingsId;
     this.scope = props.scope;
@@ -48,6 +51,8 @@ export class GenerationPrompt extends DomainEntity {
   }
 
   public updateContent(content: string): void {
+    if (!content || content.length > 10000)
+      throw new ValidationError('content', 'must be between 1 and 10000 characters');
     this.content = content;
     this.updatedAt = new Date();
   }

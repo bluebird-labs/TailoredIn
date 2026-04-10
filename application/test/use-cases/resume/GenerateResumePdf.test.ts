@@ -35,23 +35,11 @@ function makeProfile() {
 }
 
 function makeJd() {
-  return new JobDescription({
-    id: 'jd-00000000-0000-0000-0000-000000000001',
+  return JobDescription.create({
     companyId: 'company-1',
     title: 'Staff Engineer',
     description: 'Build things',
-    rawText: null,
-    url: null,
-    location: null,
-    salaryRange: null,
-    level: null,
-    locationType: null,
-    source: JobSource.UPLOAD,
-    postedAt: null,
-    resumePdf: null,
-    resumePdfTheme: null,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
+    source: JobSource.UPLOAD
   });
 }
 
@@ -98,10 +86,9 @@ function makeExperience() {
     companyId: null,
     location: 'NY',
     startDate: '2022-01',
-    endDate: null,
+    endDate: 'Present',
     summary: null,
     ordinal: 0,
-    accomplishments: [],
     createdAt: new Date(),
     updatedAt: new Date()
   });

@@ -38,6 +38,7 @@ export type { ProfileRepository } from './ports/ProfileRepository.js';
 export type { ResumeContentRepository } from './ports/ResumeContentRepository.js';
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
+export { ValidationError } from './ValidationError.js';
 export { ValueObject } from './ValueObject.js';
 // Value objects
 export { ApplicationStatus } from './value-objects/ApplicationStatus.js';

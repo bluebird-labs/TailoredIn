@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ValidationError } from '../ValidationError.js';
 
 export type EducationCreateProps = {
   profileId: string;
@@ -61,6 +62,12 @@ export class Education extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (!props.degreeTitle || props.degreeTitle.length > 500)
+      throw new ValidationError('degreeTitle', 'must be between 1 and 500 characters');
+    if (!props.institutionName || props.institutionName.length > 500)
+      throw new ValidationError('institutionName', 'must be between 1 and 500 characters');
+    if (props.graduationYear < 1900 || props.graduationYear > 2100)
+      throw new ValidationError('graduationYear', 'must be between 1900 and 2100');
     this.id = props.id;
     this.profileId = props.profileId;
     this.degreeTitle = props.degreeTitle;

@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
+import { ValidationError } from '../ValidationError.js';
 import { BusinessType } from '../value-objects/BusinessType.js';
 import { CompanyStage } from '../value-objects/CompanyStage.js';
 import { CompanyStatus } from '../value-objects/CompanyStatus.js';
@@ -75,6 +76,8 @@ export class Company extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (!props.name || props.name.length > 500)
+      throw new ValidationError('name', 'must be between 1 and 500 characters');
     this.id = props.id;
     this.name = props.name;
     this.domainName = props.domainName;

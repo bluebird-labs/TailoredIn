@@ -2,6 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { EntityNotFoundError } from '../EntityNotFoundError.js';
+import { ValidationError } from '../ValidationError.js';
 import { Accomplishment } from './Accomplishment.js';
 
 export type ExperienceCreateProps = {
@@ -86,6 +87,16 @@ export class Experience extends AggregateRoot {
     updatedAt: Date;
   }) {
     super();
+    if (!props.title || props.title.length > 500)
+      throw new ValidationError('title', 'must be between 1 and 500 characters');
+    if (!props.companyName || props.companyName.length > 500)
+      throw new ValidationError('companyName', 'must be between 1 and 500 characters');
+    if (!props.location || props.location.length > 500)
+      throw new ValidationError('location', 'must be between 1 and 500 characters');
+    if (!props.startDate || props.startDate.length > 50)
+      throw new ValidationError('startDate', 'must be between 1 and 50 characters');
+    if (!props.endDate || props.endDate.length > 50)
+      throw new ValidationError('endDate', 'must be between 1 and 50 characters');
     this.id = props.id;
     this.profileId = props.profileId;
     this.title = props.title;

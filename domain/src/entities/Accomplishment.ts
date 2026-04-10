@@ -1,5 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { Entity as DomainEntity } from '../Entity.js';
+import { ValidationError } from '../ValidationError.js';
 import { Experience } from './Experience.js';
 
 export type AccomplishmentCreateProps = {
@@ -43,6 +44,10 @@ export class Accomplishment extends DomainEntity {
     updatedAt: Date;
   }) {
     super();
+    if (!props.title || props.title.length > 500)
+      throw new ValidationError('title', 'must be between 1 and 500 characters');
+    if (!props.narrative || props.narrative.length > 5000)
+      throw new ValidationError('narrative', 'must be between 1 and 5000 characters');
     this.id = props.id;
     this.experienceId = props.experienceId;
     this.title = props.title;
@@ -53,8 +58,16 @@ export class Accomplishment extends DomainEntity {
   }
 
   public update(props: Partial<{ title: string; narrative: string; ordinal: number }>): void {
-    if (props.title !== undefined) this.title = props.title;
-    if (props.narrative !== undefined) this.narrative = props.narrative;
+    if (props.title !== undefined) {
+      if (!props.title || props.title.length > 500)
+        throw new ValidationError('title', 'must be between 1 and 500 characters');
+      this.title = props.title;
+    }
+    if (props.narrative !== undefined) {
+      if (!props.narrative || props.narrative.length > 5000)
+        throw new ValidationError('narrative', 'must be between 1 and 5000 characters');
+      this.narrative = props.narrative;
+    }
     if (props.ordinal !== undefined) this.ordinal = props.ordinal;
     this.updatedAt = new Date();
   }
