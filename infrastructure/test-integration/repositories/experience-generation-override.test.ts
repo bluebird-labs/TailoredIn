@@ -19,7 +19,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
   });
   orm.em.persist(profile);
   await orm.em.flush();
-  return profile.id.value;
+  return profile.id;
 }
 
 async function seedExperience(orm: MikroORM, profileId: string): Promise<string> {
@@ -37,7 +37,7 @@ async function seedExperience(orm: MikroORM, profileId: string): Promise<string>
     ordinal: 0
   });
   await expRepo.save(exp);
-  return exp.id.value;
+  return exp.id;
 }
 
 describe('PostgresExperienceGenerationOverrideRepository', () => {
@@ -69,8 +69,7 @@ describe('PostgresExperienceGenerationOverrideRepository', () => {
 
     const loaded = await repo.findByExperienceId(experienceId);
     expect(loaded).not.toBeNull();
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
-    expect((loaded!.experienceId as any).value ?? loaded!.experienceId).toBe(experienceId);
+    expect(loaded!.experienceId).toBe(experienceId);
     expect(loaded!.bulletMin).toBe(3);
     expect(loaded!.bulletMax).toBe(6);
   });
@@ -108,8 +107,7 @@ describe('PostgresExperienceGenerationOverrideRepository', () => {
     const results = await repo.findByExperienceIds([expId1, expId2, expId3]);
     expect(results).toHaveLength(2);
 
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
-    const ids = results.map(r => (r.experienceId as any).value ?? r.experienceId).sort();
+    const ids = results.map(r => r.experienceId).sort();
     expect(ids).toEqual([expId1, expId3].sort());
   });
 
@@ -156,13 +154,13 @@ describe('PostgresExperienceGenerationOverrideRepository', () => {
     await expRepo.save(exp);
     orm.em.clear();
 
-    await repo.save(ExperienceGenerationOverride.create({ experienceId: exp.id.value, bulletMin: 1, bulletMax: 2 }));
+    await repo.save(ExperienceGenerationOverride.create({ experienceId: exp.id, bulletMin: 1, bulletMax: 2 }));
     orm.em.clear();
 
-    await expRepo.delete(exp.id.value);
+    await expRepo.delete(exp.id);
     orm.em.clear();
 
-    const result = await repo.findByExperienceId(exp.id.value);
+    const result = await repo.findByExperienceId(exp.id);
     expect(result).toBeNull();
   });
 });

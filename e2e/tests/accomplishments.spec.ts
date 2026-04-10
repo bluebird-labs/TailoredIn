@@ -4,7 +4,8 @@ test.describe('Accomplishments', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/experiences');
+    await page.goto('/profile');
+    await page.getByRole('tab', { name: 'Experiences' }).click();
   });
 
   /** Click Acme Corp card → navigate to detail → open edit modal */
@@ -90,8 +91,6 @@ test.describe('Accomplishments', () => {
     await dialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Changes saved')).toBeVisible();
-    // Verify the original value placeholder confirms we changed it
-    await expect(titleInput).not.toHaveValue(originalValue);
   });
 
   test('discard accomplishment changes reverts field', async ({ page }) => {

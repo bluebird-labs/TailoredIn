@@ -36,7 +36,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findByIdOrFail(id: string): Promise<Experience> {
-    return this.orm.em.findOneOrFail(Experience, { id } as any, { populate: ['accomplishments'] });
+    return this.orm.em.findOneOrFail(Experience, { id }, { populate: ['accomplishments'] });
   }
 
   public async save(experience: Experience): Promise<void> {

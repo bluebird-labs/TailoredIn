@@ -18,7 +18,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
   });
   orm.em.persist(profile);
   await orm.em.flush();
-  return profile.id.value;
+  return profile.id;
 }
 
 describe('PostgresGenerationSettingsRepository', () => {
@@ -48,8 +48,7 @@ describe('PostgresGenerationSettingsRepository', () => {
 
     const loaded = await repo.findByProfileId(profileId);
     expect(loaded).not.toBeNull();
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
-    expect((loaded!.profileId as any).value ?? loaded!.profileId).toBe(profileId);
+    expect(loaded!.profileId).toBe(profileId);
     expect(loaded!.modelTier).toBe(ModelTier.BALANCED);
     expect(loaded!.bulletMin).toBe(2);
     expect(loaded!.bulletMax).toBe(5);

@@ -3,15 +3,12 @@ import {
   type EducationRepository,
   EntityNotFoundError,
   Experience,
-  ExperienceId,
   type ExperienceRepository,
   JobDescription,
-  JobDescriptionId,
   type JobDescriptionRepository,
   JobSource,
   type ProfileRepository,
   ResumeContent,
-  ResumeContentId,
   type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeRenderer } from '../../../src/ports/ResumeRenderer.js';

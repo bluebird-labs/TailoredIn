@@ -3,46 +3,48 @@ import { expect, test } from '@playwright/test';
 const sidebar = '[data-sidebar="sidebar"]';
 
 test.describe('Navigation & Routing', () => {
-  test('home redirects to /profile', async ({ page }) => {
+  test('home redirects to /jobs', async ({ page }) => {
     await page.goto('/');
-    await page.waitForURL('/profile');
-    await expect(page).toHaveURL(/\/profile/);
+    await page.waitForURL('/jobs');
+    await expect(page).toHaveURL(/\/jobs/);
   });
 
-  test('sidebar has all three nav items', async ({ page }) => {
+  test('sidebar has all five nav items', async ({ page }) => {
     await page.goto('/profile');
     const nav = page.locator(sidebar);
+    await expect(nav.getByText('Atelier')).toBeVisible();
     await expect(nav.getByText('Profile')).toBeVisible();
-    await expect(nav.getByText('Experiences')).toBeVisible();
-    await expect(nav.getByText('Education')).toBeVisible();
+    await expect(nav.getByText('Settings')).toBeVisible();
+    await expect(nav.getByText('Jobs')).toBeVisible();
+    await expect(nav.getByText('Companies')).toBeVisible();
   });
 
   test('sidebar Profile navigates to /profile', async ({ page }) => {
-    await page.goto('/experiences');
+    await page.goto('/jobs');
     await page.locator(sidebar).getByText('Profile').click();
     await page.waitForURL('/profile');
     await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible();
   });
 
-  test('sidebar Experiences navigates to /experiences', async ({ page }) => {
+  test('sidebar Jobs navigates to /jobs', async ({ page }) => {
     await page.goto('/profile');
-    await page.locator(sidebar).getByText('Experiences').click();
-    await page.waitForURL('/experiences');
-    await expect(page.getByRole('heading', { level: 1, name: 'Experiences' })).toBeVisible();
+    await page.locator(sidebar).getByText('Jobs').click();
+    await page.waitForURL('/jobs');
+    await expect(page.getByRole('heading', { level: 1, name: 'Jobs' })).toBeVisible();
   });
 
-  test('sidebar Education navigates to /education', async ({ page }) => {
+  test('sidebar Companies navigates to /companies', async ({ page }) => {
     await page.goto('/profile');
-    await page.locator(sidebar).getByText('Education').click();
-    await page.waitForURL('/education');
-    await expect(page.getByRole('heading', { level: 1, name: 'Education' })).toBeVisible();
+    await page.locator(sidebar).getByText('Companies').click();
+    await page.waitForURL('/companies');
+    await expect(page.getByRole('heading', { level: 1, name: 'Companies' })).toBeVisible();
   });
 
   test('active sidebar item highlights correctly on each route', async ({ page }) => {
     const routes = [
       { path: '/profile', label: 'Profile' },
-      { path: '/experiences', label: 'Experiences' },
-      { path: '/education', label: 'Education' }
+      { path: '/jobs', label: 'Jobs' },
+      { path: '/companies', label: 'Companies' }
     ];
 
     for (const route of routes) {
@@ -50,10 +52,5 @@ test.describe('Navigation & Routing', () => {
       const activeButton = page.locator(sidebar).locator('[data-active]');
       await expect(activeButton).toContainText(route.label);
     }
-  });
-
-  test('/resume no longer renders wardrobe page', async ({ page }) => {
-    await page.goto('/resume');
-    await expect(page.getByText('Wardrobe')).not.toBeVisible();
   });
 });

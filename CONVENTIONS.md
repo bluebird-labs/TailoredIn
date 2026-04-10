@@ -51,8 +51,8 @@ api/cli → infrastructure → application → domain → core
 
 ## Domain Layer
 
-- Entities extend `AggregateRoot<TId>` or `Entity<TId>`
-- ID value objects: `<Entity>Id extends ValueObject`, with `static generate()` factory
+- Entities extend `AggregateRoot` or `Entity`
+- IDs are plain `string` UUIDs (`public readonly id!: string`), generated via `crypto.randomUUID()` in `static create()` factories
 - Enums for domain concepts (`JobStatus`, `Archetype`, `SkillAffinity`)
 - Repository ports: **interfaces** in `domain/src/ports/`, with domain-focused methods (not generic CRUD)
 - Domain events implement the `DomainEvent` interface
@@ -68,8 +68,7 @@ api/cli → infrastructure → application → domain → core
 ## Infrastructure Layer
 
 - **Services**: `@injectable()` classes implementing application ports
-- **ORM entities**: separate from domain entities in `infrastructure/src/db/entities/`, mapped in repository implementations
-- **Repository implementations**: `Postgres<Entity>Repository`, handle ORM ↔ domain mapping
+- **Repository implementations**: `Postgres<Entity>Repository`, thin wrappers around `EntityManager` (no ORM ↔ domain mapping — domain entities carry MikroORM decorators directly)
 - **DI tokens**: namespaced in `infrastructure/src/DI.ts` as `DI.Job.*`, `DI.Resume.*`
 
 ## API Layer

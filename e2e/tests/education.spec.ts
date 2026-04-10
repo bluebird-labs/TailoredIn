@@ -4,11 +4,12 @@ test.describe('Education Page', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/education');
+    await page.goto('/profile');
+    await page.getByRole('tab', { name: 'Education' }).click();
   });
 
-  test('displays page heading', async ({ page }) => {
-    await expect(page.getByRole('heading', { level: 1, name: 'Education' })).toBeVisible();
+  test('displays education tab content', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: 'Education', selected: true })).toBeVisible();
   });
 
   test('lists all seeded educations', async ({ page }) => {

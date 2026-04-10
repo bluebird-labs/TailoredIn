@@ -4,11 +4,12 @@ test.describe('Experiences Page', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/experiences');
+    await page.goto('/profile');
+    await page.getByRole('tab', { name: 'Experiences' }).click();
   });
 
-  test('displays page heading', async ({ page }) => {
-    await expect(page.getByRole('heading', { level: 1, name: 'Experiences' })).toBeVisible();
+  test('displays experiences tab content', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: 'Experiences', selected: true })).toBeVisible();
   });
 
   test('lists all seeded experience cards', async ({ page }) => {

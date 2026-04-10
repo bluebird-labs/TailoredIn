@@ -43,24 +43,20 @@ Color legend:
 
 | Base class | When to use | Identity |
 |---|---|---|
-| `AggregateRoot<TId>` | Top-level consistency boundary; owns child entities | Identity by ID |
-| `Entity<TId>` | Has lifecycle and identity but lives within an aggregate's boundary | Identity by ID |
+| `AggregateRoot` | Top-level consistency boundary; owns child entities | Identity by ID |
+| `Entity` | Has lifecycle and identity but lives within an aggregate's boundary | Identity by ID |
 | `ValueObject` | Immutable, no identity, compared by value | Equality by value |
 
-## ID value objects
+## Entity IDs
 
-Each aggregate/entity gets its own ID type:
+All entity IDs are **plain `string` UUIDs** — no `<Entity>Id` value object wrappers:
 
 ```typescript
-export class ExperienceId extends ValueObject {
-  public constructor(public readonly value: string) { super(); }
-  public static generate(): ExperienceId {
-    return new ExperienceId(crypto.randomUUID());
-  }
-}
+@PrimaryKey({ type: 'uuid', fieldName: 'id' })
+public readonly id!: string;
 ```
 
-Always use `<Entity>Id.generate()` in factories — never generate raw UUIDs in use cases.
+Generate IDs via `crypto.randomUUID()` in `static create()` factories.
 
 ## Repository ports
 
@@ -101,7 +97,7 @@ All aggregates expose a `static create(props)` factory that generates the ID and
 ```typescript
 public static create(props: ExperienceCreateProps): Experience {
   const now = new Date();
-  return new Experience({ id: ExperienceId.generate(), ...props, createdAt: now, updatedAt: now });
+  return new Experience({ id: crypto.randomUUID(), ...props, createdAt: now, updatedAt: now });
 }
 ```
 

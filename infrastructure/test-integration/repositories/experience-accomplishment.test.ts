@@ -18,7 +18,7 @@ async function seedProfile(orm: MikroORM): Promise<string> {
   });
   orm.em.persist(profile);
   await orm.em.flush();
-  return profile.id.value;
+  return profile.id;
 }
 
 describe('PostgresExperienceRepository — accomplishments', () => {
@@ -57,7 +57,7 @@ describe('PostgresExperienceRepository — accomplishments', () => {
 
     await repo.save(exp);
 
-    const loaded = await repo.findByIdOrFail(exp.id.value);
+    const loaded = await repo.findByIdOrFail(exp.id);
     expect(loaded.accomplishments).toHaveLength(1);
     expect(loaded.accomplishments[0].title).toBe('Billing sharding');
   });
@@ -79,10 +79,10 @@ describe('PostgresExperienceRepository — accomplishments', () => {
     exp.addAccomplishment({ title: 'A', narrative: 'N', ordinal: 0 });
     await repo.save(exp);
 
-    exp.removeAccomplishment(exp.accomplishments[0].id.value);
+    exp.removeAccomplishment(exp.accomplishments[0].id);
     await repo.save(exp);
 
-    const loaded = await repo.findByIdOrFail(exp.id.value);
+    const loaded = await repo.findByIdOrFail(exp.id);
     expect(loaded.accomplishments).toHaveLength(0);
   });
 });

@@ -1,11 +1,9 @@
 import { describe, expect, mock, test } from 'bun:test';
 import {
   Company,
-  CompanyId,
   type CompanyRepository,
   EntityNotFoundError,
   Experience,
-  ExperienceId,
   type ExperienceRepository
 } from '@tailoredin/domain';
 import { LinkCompanyToExperience } from '../../../src/use-cases/experience/LinkCompanyToExperience.js';

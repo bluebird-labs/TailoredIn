@@ -1,13 +1,11 @@
 import { describe, expect, mock, test } from 'bun:test';
 import {
   Education,
-  EducationId,
   type EducationRepository,
   EntityNotFoundError,
   Experience,
   ExperienceGenerationOverride,
   type ExperienceGenerationOverrideRepository,
-  ExperienceId,
   type ExperienceRepository,
   GenerationScope,
   GenerationSettings,

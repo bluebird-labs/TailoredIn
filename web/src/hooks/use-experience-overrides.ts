@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 
-export type ExperienceGenerationOverride = {
+type ExperienceGenerationOverride = {
   id: string;
   experienceId: string;
   bulletMin: number;

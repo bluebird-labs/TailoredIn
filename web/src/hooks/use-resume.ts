@@ -62,7 +62,7 @@ export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
   });
 }
 
-export type ResumeGenerationScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
+type ResumeGenerationScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
 
 export function useGenerateResumeContent(jobDescriptionId: string) {
   const queryClient = useQueryClient();

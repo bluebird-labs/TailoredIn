@@ -28,9 +28,7 @@ describe('PostgresCompanyRepository', () => {
     expect(company.name).toBe('Acme Inc');
     expect(company.linkedinLink).toBe('https://linkedin.com/company/acme');
     expect(company.website).toBe('https://acme.com');
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
-    const companyIdValue = (company.id as any).value ?? company.id;
-    expect(companyIdValue).toBeString();
+    expect(company.id).toBeString();
   });
 
   test('upsertByLinkedinLink updates on conflict', async () => {
@@ -50,8 +48,7 @@ describe('PostgresCompanyRepository', () => {
       logoUrl: 'https://logo.com/beta.png'
     });
 
-    // biome-ignore lint/suspicious/noExplicitAny: MikroORM Collection propagation converts FK to ValueObject
-    expect((second.id as any).value ?? second.id).toBe((first.id as any).value ?? first.id);
+    expect(second.id).toBe(first.id);
     expect(second.name).toBe('Beta Corporation');
     expect(second.website).toBe('https://beta.com');
   });

@@ -167,12 +167,30 @@ See **`CONVENTIONS.md`** for detailed coding standards: OOP-first design, DI pat
 
 - **Plain application layer**: use cases are plain TypeScript classes — no `@injectable()`, no `inject()`. The DI framework (`@needle-di/core`) is only used in `infrastructure/` and the composition root (`api/`).
 - **Merged domain + ORM entities**: Domain entities in `domain/src/entities/` carry MikroORM decorators directly. There is no separate ORM entity layer. Repositories are thin wrappers around `EntityManager` (persist + flush).
+- **Plain string IDs**: All entity IDs are plain `string` UUIDs (`public readonly id!: string`). There are no `<Entity>Id` value objects — IDs were simplified to plain strings. Use `crypto.randomUUID()` in factories.
 - **DI tokens & wiring**: see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for the full workflow of adding new services.
 
 ## Entry Points
 
 - `api/src/index.ts` — starts Elysia server on port 8000
+- `web/src/main.tsx` — React SPA entry point
 - PostgreSQL via MikroORM — see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for database conventions
+
+## Frontend Route Structure
+
+The web app uses file-based routing (TanStack Router). Key routes:
+
+- `/` → redirects to `/jobs`
+- `/profile` — Profile page with **tabbed layout**: Profile, Experiences, Education tabs
+- `/experiences/$experienceId` — Experience detail page (no index route — list is in Profile tab)
+- `/jobs` — Job descriptions list
+- `/jobs/$jobDescriptionId` — Job detail
+- `/companies` — Companies list
+- `/companies/$companyId` — Company detail
+- `/atelier` — Resume generation workspace
+- `/settings` — Generation settings
+
+Sidebar groups: **Resume** (Atelier, Profile, Settings) and **Directory** (Jobs, Companies).
 
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):
