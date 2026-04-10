@@ -5,5 +5,6 @@ export enum BusinessType {
   B2G = 'b2g',
   D2C = 'd2c',
   MARKETPLACE = 'marketplace',
-  PLATFORM = 'platform'
+  PLATFORM = 'platform',
+  ENTERPRISE = 'enterprise'
 }

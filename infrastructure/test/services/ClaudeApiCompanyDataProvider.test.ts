@@ -16,7 +16,7 @@ function fullLlmResponse(overrides: Record<string, unknown> = {}) {
     linkedinLink: 'https://linkedin.com/company/github',
     logoUrl: null as string | null,
     businessType: BusinessType.PLATFORM,
-    industry: Industry.SAAS,
+    industry: Industry.SOFTWARE,
     stage: CompanyStage.ACQUIRED,
     ...overrides
   };

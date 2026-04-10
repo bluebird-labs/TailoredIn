@@ -11,7 +11,7 @@ function makeCompany(overrides: Partial<ConstructorParameters<typeof Company>[0]
     logoUrl: null,
     linkedinLink: 'https://linkedin.com/company/acme',
     businessType: 'b2b',
-    industry: 'saas',
+    industry: 'software',
     stage: 'series_b',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),

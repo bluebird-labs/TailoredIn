@@ -17,7 +17,7 @@ function fullLlmResponse(overrides: Record<string, unknown> = {}) {
     salaryMin: 150000,
     salaryMax: 200000,
     salaryCurrency: 'USD',
-    level: JobLevel.MID_SENIOR,
+    level: JobLevel.SENIOR,
     locationType: LocationType.HYBRID,
     postedAt: '2026-01-01',
     ...overrides
@@ -32,7 +32,7 @@ describe('ClaudeApiJobDescriptionParser', () => {
     const result = await parser.parseFromText('some job description text');
 
     expect(result.title).toBe('Senior Software Engineer');
-    expect(result.level).toBe(JobLevel.MID_SENIOR);
+    expect(result.level).toBe(JobLevel.SENIOR);
     expect(result.locationType).toBe(LocationType.HYBRID);
     expect(result.salaryMin).toBe(150000);
     expect(result.salaryMax).toBe(200000);

@@ -28,7 +28,7 @@ describe('ListCompanies', () => {
         logoUrl: null,
         linkedinLink: null,
         businessType: BusinessType.PLATFORM,
-        industry: Industry.SAAS,
+        industry: Industry.SOFTWARE,
         stage: null
       }),
       Company.create({
@@ -38,7 +38,7 @@ describe('ListCompanies', () => {
         linkedinLink: 'https://linkedin.com/company/stripe',
         businessType: BusinessType.B2B,
         industry: Industry.FINANCE,
-        stage: CompanyStage.GROWTH
+        stage: CompanyStage.LATE_STAGE
       })
     ];
 
@@ -49,7 +49,7 @@ describe('ListCompanies', () => {
     expect(result[0].name).toBe('GitHub');
     expect(result[0].businessType).toBe(BusinessType.PLATFORM);
     expect(result[1].name).toBe('Stripe');
-    expect(result[1].stage).toBe(CompanyStage.GROWTH);
+    expect(result[1].stage).toBe(CompanyStage.LATE_STAGE);
     expect(result[1].linkedinLink).toBe('https://linkedin.com/company/stripe');
   });
 });

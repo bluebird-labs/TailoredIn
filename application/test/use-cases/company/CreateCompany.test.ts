@@ -30,7 +30,7 @@ describe('CreateCompany', () => {
       logoUrl: 'https://logo.com/gh.png',
       linkedinLink: 'https://linkedin.com/company/github',
       businessType: BusinessType.PLATFORM,
-      industry: Industry.SAAS,
+      industry: Industry.SOFTWARE,
       stage: null
     });
 
@@ -41,7 +41,7 @@ describe('CreateCompany', () => {
     expect(dto.logoUrl).toBe('https://logo.com/gh.png');
     expect(dto.linkedinLink).toBe('https://linkedin.com/company/github');
     expect(dto.businessType).toBe(BusinessType.PLATFORM);
-    expect(dto.industry).toBe(Industry.SAAS);
+    expect(dto.industry).toBe(Industry.SOFTWARE);
     expect(dto.stage).toBeNull();
     expect(saved).toBeDefined();
   });

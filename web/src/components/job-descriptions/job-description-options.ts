@@ -4,14 +4,20 @@ export const jobLevelOptions: readonly SelectOption[] = [
   { label: 'Internship', value: 'internship' },
   { label: 'Entry Level', value: 'entry_level' },
   { label: 'Associate', value: 'associate' },
-  { label: 'Mid-Senior', value: 'mid_senior' },
+  { label: 'Senior', value: 'senior' },
+  { label: 'Staff', value: 'staff' },
+  { label: 'Principal', value: 'principal' },
+  { label: 'Manager', value: 'manager' },
   { label: 'Director', value: 'director' },
+  { label: 'VP', value: 'vp' },
   { label: 'Executive', value: 'executive' }
 ];
 
 export const locationTypeOptions: readonly SelectOption[] = [
   { label: 'Remote', value: 'remote' },
+  { label: 'Remote-First', value: 'remote_first' },
   { label: 'Hybrid', value: 'hybrid' },
+  { label: 'Flexible', value: 'flexible' },
   { label: 'Onsite', value: 'onsite' }
 ];
 

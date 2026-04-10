@@ -1,5 +1,7 @@
 export enum CompanyStatus {
   RUNNING = 'running',
   ACQUIRED = 'acquired',
-  DEFUNCT = 'defunct'
+  MERGED = 'merged',
+  DEFUNCT = 'defunct',
+  STEALTH = 'stealth'
 }

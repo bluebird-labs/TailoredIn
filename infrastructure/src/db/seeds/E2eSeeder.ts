@@ -137,7 +137,7 @@ export class E2eSeeder extends Seeder {
           NULL,
           'https://linkedin.com/company/acme',
           'b2b',
-          'saas',
+          'software',
           'series_b',
           NOW(), NOW()
         ),

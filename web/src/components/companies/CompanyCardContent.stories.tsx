@@ -38,7 +38,7 @@ export const Full: Story = {
       logoUrl: null,
       linkedinLink: 'https://linkedin.com/company/acme',
       businessType: 'b2b',
-      industry: 'saas',
+      industry: 'software',
       stage: 'series_b',
       status: 'running'
     }

@@ -35,12 +35,12 @@ describe('Company', () => {
   test('accepts optional enum fields', () => {
     const company = makeCompany({
       businessType: BusinessType.B2B,
-      industry: Industry.SAAS,
-      stage: CompanyStage.GROWTH
+      industry: Industry.SOFTWARE,
+      stage: CompanyStage.LATE_STAGE
     });
     expect(company.businessType).toBe(BusinessType.B2B);
-    expect(company.industry).toBe(Industry.SAAS);
-    expect(company.stage).toBe(CompanyStage.GROWTH);
+    expect(company.industry).toBe(Industry.SOFTWARE);
+    expect(company.stage).toBe(CompanyStage.LATE_STAGE);
   });
 
   test('setWebsite updates website and updatedAt', () => {

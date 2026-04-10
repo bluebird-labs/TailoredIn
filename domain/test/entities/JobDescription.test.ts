@@ -40,7 +40,7 @@ describe('JobDescription', () => {
       url: 'https://example.com/jobs/1',
       location: 'San Francisco, CA',
       salaryRange: salary,
-      level: JobLevel.MID_SENIOR,
+      level: JobLevel.SENIOR,
       locationType: LocationType.HYBRID,
       source: JobSource.GREENHOUSE,
       postedAt
@@ -52,7 +52,7 @@ describe('JobDescription', () => {
     expect(jd.salaryRange!.min).toBe(150000);
     expect(jd.salaryRange!.max).toBe(200000);
     expect(jd.salaryRange!.currency).toBe('USD');
-    expect(jd.level).toBe(JobLevel.MID_SENIOR);
+    expect(jd.level).toBe(JobLevel.SENIOR);
     expect(jd.locationType).toBe(LocationType.HYBRID);
     expect(jd.postedAt).toEqual(postedAt);
   });
