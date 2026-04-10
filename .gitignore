@@ -20,11 +20,8 @@ build/
 .vscode/
 nimbalyst-local/
 
-# Generated resume PDFs and ephemeral Typst compilation workspace
+# Generated resume PDFs
 cli/Resumes/
-infrastructure/typst/
-!infrastructure/typst/fonts/
-!infrastructure/typst/fonts/**
 infrastructure/resumes/
 
 # LinkedIn Playwright session (sensitive auth cookies)
