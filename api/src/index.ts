@@ -11,6 +11,7 @@ import { UpdateApplicationRoute } from './routes/application/UpdateApplicationRo
 import { UpdateApplicationStatusRoute } from './routes/application/UpdateApplicationStatusRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
 import { CreateCompanyRoute } from './routes/company/CreateCompanyRoute.js';
+import { DeleteCompanyRoute } from './routes/company/DeleteCompanyRoute.js';
 import { DiscoverCompaniesRoute } from './routes/company/DiscoverCompaniesRoute.js';
 import { EnrichCompanyRoute } from './routes/company/EnrichCompanyRoute.js';
 import { GetCompanyRoute } from './routes/company/GetCompanyRoute.js';
@@ -145,6 +146,7 @@ const app = new Elysia()
   .use(container.get(CreateCompanyRoute).plugin())
   .use(container.get(UpdateCompanyRoute).plugin())
   .use(container.get(GetCompanyRoute).plugin())
+  .use(container.get(DeleteCompanyRoute).plugin())
   // Applications
   .use(container.get(CreateApplicationRoute).plugin())
   .use(container.get(GetApplicationRoute).plugin())

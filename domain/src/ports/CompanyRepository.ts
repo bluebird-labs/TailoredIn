@@ -5,4 +5,5 @@ export interface CompanyRepository {
   findById(id: string): Promise<Company | null>;
   upsertByLinkedinLink(props: CompanyCreateProps): Promise<Company>;
   save(company: Company): Promise<void>;
+  delete(id: string): Promise<void>;
 }

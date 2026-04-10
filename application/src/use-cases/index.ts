@@ -12,6 +12,8 @@ export type { UpdateApplicationStatusInput } from './application/UpdateApplicati
 export { UpdateApplicationStatus } from './application/UpdateApplicationStatus.js';
 export type { CreateCompanyInput } from './company/CreateCompany.js';
 export { CreateCompany } from './company/CreateCompany.js';
+export type { DeleteCompanyInput } from './company/DeleteCompany.js';
+export { DeleteCompany } from './company/DeleteCompany.js';
 export type { DiscoverCompaniesInput } from './company/DiscoverCompanies.js';
 export { DiscoverCompanies } from './company/DiscoverCompanies.js';
 export type { EnrichCompanyDataInput } from './company/EnrichCompanyData.js';

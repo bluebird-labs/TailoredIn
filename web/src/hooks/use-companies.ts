@@ -107,6 +107,21 @@ export function useUpdateCompany() {
   });
 }
 
+export function useDeleteCompany() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const segment = api.companies as EdenRouteSegment;
+      const { error } = await segment({ id }).delete();
+      if (error) throw new Error(extractApiError(error, `Could not delete company ${id}`));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.all });
+    }
+  });
+}
+
 export function useCreateCompany() {
   const queryClient = useQueryClient();
   return useMutation({

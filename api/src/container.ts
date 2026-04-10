@@ -9,6 +9,7 @@ import {
   CreateJobDescription,
   DeleteAccomplishment,
   DeleteApplication,
+  DeleteCompany,
   DeleteEducation,
   DeleteExperience,
   DeleteJobDescription,
@@ -188,6 +189,10 @@ container.bind({
 container.bind({
   provide: DI.Company.Get,
   useFactory: () => new GetCompany(container.get(DI.Company.Repository))
+});
+container.bind({
+  provide: DI.Company.Delete,
+  useFactory: () => new DeleteCompany(container.get(DI.Company.Repository))
 });
 
 // Application (job applications)

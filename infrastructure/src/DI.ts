@@ -10,6 +10,7 @@ import type {
   CreateJobDescription,
   DeleteAccomplishment,
   DeleteApplication,
+  DeleteCompany,
   DeleteEducation,
   DeleteExperience,
   DeleteJobDescription,
@@ -154,6 +155,7 @@ export const DI = {
     Discover: new InjectionToken<DiscoverCompanies>('DI.Company.Discover'),
     Create: new InjectionToken<CreateCompany>('DI.Company.Create'),
     Update: new InjectionToken<UpdateCompany>('DI.Company.Update'),
-    Get: new InjectionToken<GetCompany>('DI.Company.Get')
+    Get: new InjectionToken<GetCompany>('DI.Company.Get'),
+    Delete: new InjectionToken<DeleteCompany>('DI.Company.Delete')
   }
 };

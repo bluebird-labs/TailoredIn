@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
-import { Company, type CompanyCreateProps, type CompanyRepository } from '@tailoredin/domain';
+import { Company, type CompanyCreateProps, type CompanyRepository, EntityNotFoundError } from '@tailoredin/domain';
 
 @injectable()
 export class PostgresCompanyRepository implements CompanyRepository {
@@ -27,6 +27,15 @@ export class PostgresCompanyRepository implements CompanyRepository {
 
   public async save(company: Company): Promise<void> {
     this.orm.em.persist(company);
+    await this.orm.em.flush();
+  }
+
+  public async delete(id: string): Promise<void> {
+    const entity = await this.orm.em.findOne(Company, { id });
+    if (!entity) {
+      throw new EntityNotFoundError('Company', id);
+    }
+    this.orm.em.remove(entity);
     await this.orm.em.flush();
   }
 }

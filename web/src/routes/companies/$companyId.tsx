@@ -1,15 +1,16 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowRight, ExternalLink, Pencil } from 'lucide-react';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { ArrowRight, ExternalLink, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal.js';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
-import { useCompany } from '@/hooks/use-companies';
+import { useCompany, useDeleteCompany } from '@/hooks/use-companies';
 
 export const Route = createFileRoute('/companies/$companyId')({
   component: CompanyDetailPage
@@ -18,6 +19,8 @@ export const Route = createFileRoute('/companies/$companyId')({
 function CompanyDetailPage() {
   const { companyId } = Route.useParams();
   const { data: company, isLoading } = useCompany(companyId);
+  const deleteCompany = useDeleteCompany();
+  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
@@ -75,6 +78,21 @@ function CompanyDetailPage() {
               <Pencil className="mr-1.5 h-3.5 w-3.5" />
               Edit
             </Button>
+            <ConfirmDialog
+              title="Delete company?"
+              description="This company and all its job descriptions and applications will be permanently removed. Experiences linked to this company will be unlinked but preserved."
+              onConfirm={() =>
+                deleteCompany.mutate(company.id, {
+                  onSuccess: () => navigate({ to: '/companies' })
+                })
+              }
+              trigger={
+                <Button size="sm" variant="ghost" className="text-destructive">
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  Delete
+                </Button>
+              }
+            />
           </>
         }
       />
