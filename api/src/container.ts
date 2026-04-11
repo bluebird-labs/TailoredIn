@@ -34,8 +34,6 @@ import {
   ListJobDescriptions,
   ParseJobDescription,
   PromptRegistry,
-  RemoveExperienceGenerationOverride,
-  SetExperienceGenerationOverride,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -324,8 +322,7 @@ container.bind({
       container.get(DI.Experience.Repository),
       container.get(DI.Education.Repository),
       container.get(DI.Company.Repository),
-      container.get(DI.GenerationSettings.Repository),
-      container.get(DI.ExperienceGenerationOverride.Repository)
+      container.get(DI.GenerationSettings.Repository)
     )
 });
 container.bind({

@@ -36,7 +36,6 @@ import type {
   ListJobDescriptions,
   ParseJobDescription,
   PromptRegistry,
-  RemoveExperienceGenerationOverride,
   ResumeElementGenerator,
   ResumeRendererFactory,
   UnlinkCompanyFromExperience,

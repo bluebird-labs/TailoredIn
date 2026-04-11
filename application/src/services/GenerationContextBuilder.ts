@@ -2,7 +2,6 @@ import {
   type CompanyRepository,
   type EducationRepository,
   EntityNotFoundError,
-  type ExperienceGenerationOverrideRepository,
   type ExperienceRepository,
   type GenerationContext,
   type GenerationScope,
@@ -19,8 +18,7 @@ export class GenerationContextBuilder {
     private readonly experienceRepository: ExperienceRepository,
     private readonly educationRepository: EducationRepository,
     private readonly companyRepository: CompanyRepository,
-    private readonly generationSettingsRepository: GenerationSettingsRepository,
-    private readonly experienceGenerationOverrideRepository: ExperienceGenerationOverrideRepository
+    private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
   public async build(jobDescriptionId: string, userInstructions?: string): Promise<GenerationContext> {
@@ -37,9 +35,6 @@ export class GenerationContextBuilder {
     const experiences = allExperiences
       .filter(e => e.profileId === profile.id)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
-
-    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(experiences.map(e => e.id));
-    const overrideMap = new Map(overrides.map(o => [o.experienceId, o]));
 
     const companyIds = experiences.map(e => e.companyId).filter((id): id is string => id !== null);
     const uniqueCompanyIds = [...new Set(companyIds)];
@@ -70,25 +65,22 @@ export class GenerationContextBuilder {
         soughtSoftSkills: jd.soughtSoftSkills ?? [],
         level: jd.level
       },
-      experiences: experiences.map(exp => {
-        const override = overrideMap.get(exp.id);
-        return {
-          id: exp.id,
-          title: exp.title,
-          companyName: exp.companyName,
-          summary: exp.summary,
-          accomplishments: exp.accomplishments.getItems().map(a => ({
-            title: a.title,
-            narrative: a.narrative
-          })),
-          startDate: exp.startDate,
-          endDate: exp.endDate,
-          location: exp.location,
-          bulletMin: override?.bulletMin ?? settings.bulletMin,
-          bulletMax: override?.bulletMax ?? settings.bulletMax,
-          companyId: exp.companyId
-        };
-      }),
+      experiences: experiences.map(exp => ({
+        id: exp.id,
+        title: exp.title,
+        companyName: exp.companyName,
+        summary: exp.summary,
+        accomplishments: exp.accomplishments.getItems().map(a => ({
+          title: a.title,
+          narrative: a.narrative
+        })),
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        location: exp.location,
+        bulletMin: settings.bulletMin,
+        bulletMax: settings.bulletMax,
+        companyId: exp.companyId
+      })),
       companies: companies
         .filter((c): c is NonNullable<typeof c> => c !== null)
         .map(c => ({
