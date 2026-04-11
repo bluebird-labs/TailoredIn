@@ -56,6 +56,7 @@ export function JobSelector({ value, onChange }: { value: string | null; onChang
             variant="outline"
             size="icon"
             className="shrink-0"
+            nativeButton={false}
             render={<Link to="/jobs/$jobDescriptionId" params={{ jobDescriptionId: value }} />}
           >
             <ExternalLink className="h-3.5 w-3.5" />
