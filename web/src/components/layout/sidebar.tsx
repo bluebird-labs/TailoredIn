@@ -1,5 +1,5 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Building2, FileText, type LucideIcon, Moon, Palette, Settings, Sun, User } from 'lucide-react';
+import { Building2, FileText, KanbanSquare, type LucideIcon, Moon, Palette, Settings, Sun, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +29,7 @@ const resumeNav: NavItem[] = [
 ];
 
 const directoryNav: NavItem[] = [
+  { label: 'Applications', to: '/applications', icon: KanbanSquare },
   { label: 'Jobs', to: '/jobs', icon: FileText },
   { label: 'Companies', to: '/companies', icon: Building2 }
 ];

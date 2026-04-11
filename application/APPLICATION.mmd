@@ -135,6 +135,7 @@ classDiagram
     class CreateExperience {
         <<UseCase>>
         +ExperienceRepository experienceRepository
+        +GenerationSettingsRepository generationSettingsRepository
         +execute(CreateExperienceInput) ExperienceDto
     }
 
@@ -197,21 +198,7 @@ classDiagram
     class GetGenerationSettings {
         <<UseCase>>
         +GenerationSettingsRepository generationSettingsRepository
-        +ExperienceRepository experienceRepository
-        +ExperienceGenerationOverrideRepository experienceOverrideRepository
         +execute(GetGenerationSettingsInput) GenerationSettingsDto
-    }
-
-    class RemoveExperienceGenerationOverride {
-        <<UseCase>>
-        +ExperienceGenerationOverrideRepository experienceGenerationOverrideRepository
-        +execute(RemoveExperienceGenerationOverrideInput) void
-    }
-
-    class SetExperienceGenerationOverride {
-        <<UseCase>>
-        +ExperienceGenerationOverrideRepository experienceGenerationOverrideRepository
-        +execute(SetExperienceGenerationOverrideInput) ExperienceGenerationOverrideDto
     }
 
     class UpdateGenerationSettings {
@@ -477,15 +464,9 @@ classDiagram
         +string endDate
         +string? summary
         +number ordinal
-        +AccomplishmentDto[] accomplishments
-    }
-
-    class ExperienceGenerationOverrideDto {
-        <<DTO>>
-        +string id
-        +string experienceId
         +number bulletMin
         +number bulletMax
+        +AccomplishmentDto[] accomplishments
     }
 
     class GenerationPromptDto {
@@ -503,7 +484,6 @@ classDiagram
         +number bulletMin
         +number bulletMax
         +GenerationPromptDto[] prompts
-        +ExperienceOverrideDto[] experienceOverrides
     }
 
     class JobDescriptionDto {
@@ -604,6 +584,7 @@ classDiagram
   }[] experiences
         +readonly string[] hiddenEducationIds
         +string generatedAt
+        +Record<string, string> scopedInstructions
     }
 
     class ResumeRenderEducation {
@@ -667,7 +648,6 @@ classDiagram
     UpdateExperience ..> ExperienceDto : returns
     GetProfile ..> ProfileDto : returns
     GetGenerationSettings ..> GenerationSettingsDto : returns
-    SetExperienceGenerationOverride ..> ExperienceGenerationOverrideDto : returns
     UpdateGenerationSettings ..> GenerationSettingsDto : returns
     CreateJobDescription ..> JobDescriptionDto : returns
     GetJobDescription ..> JobDescriptionDto : returns
@@ -704,10 +684,6 @@ classDiagram
     }
 
     class EducationRepository {
-        <<DomainPort>>
-    }
-
-    class ExperienceGenerationOverrideRepository {
         <<DomainPort>>
     }
 
@@ -756,6 +732,7 @@ classDiagram
     UpdateEducation ..> EducationRepository : depends
     AddAccomplishment ..> ExperienceRepository : depends
     CreateExperience ..> ExperienceRepository : depends
+    CreateExperience ..> GenerationSettingsRepository : depends
     DeleteAccomplishment ..> ExperienceRepository : depends
     DeleteExperience ..> ExperienceRepository : depends
     GetExperience ..> ExperienceRepository : depends
@@ -769,10 +746,6 @@ classDiagram
     UpdateExperience ..> ExperienceRepository : depends
     GetProfile ..> ProfileRepository : depends
     GetGenerationSettings ..> GenerationSettingsRepository : depends
-    GetGenerationSettings ..> ExperienceRepository : depends
-    GetGenerationSettings ..> ExperienceGenerationOverrideRepository : depends
-    RemoveExperienceGenerationOverride ..> ExperienceGenerationOverrideRepository : depends
-    SetExperienceGenerationOverride ..> ExperienceGenerationOverrideRepository : depends
     UpdateGenerationSettings ..> GenerationSettingsRepository : depends
     CreateJobDescription ..> JobDescriptionRepository : depends
     DeleteJobDescription ..> JobDescriptionRepository : depends
@@ -833,8 +806,6 @@ classDiagram
     style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetGenerationSettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style RemoveExperienceGenerationOverride fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style SetExperienceGenerationOverride fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateGenerationSettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -865,7 +836,6 @@ classDiagram
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style ExperienceGenerationOverrideDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationPromptDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationSettingsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobDescriptionDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -883,7 +853,6 @@ classDiagram
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style EducationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
-    style ExperienceGenerationOverrideRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style GenerationContextBuilder fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style GenerationSettingsRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

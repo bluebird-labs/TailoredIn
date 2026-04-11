@@ -59,20 +59,15 @@ classDiagram
         +string endDate
         +string? summary
         +number ordinal
+        +number bulletMin
+        +number bulletMax
         +addAccomplishment()
         +removeAccomplishment()
         +findAccomplishmentOrFail()
         +linkCompany()
         +unlinkCompany()
-        +syncAccomplishments()
-    }
-
-    class ExperienceGenerationOverride {
-        <<AggregateRoot>>
-        +string experienceId
-        +number bulletMin
-        +number bulletMax
         +updateBulletRange()
+        +syncAccomplishments()
     }
 
     class GenerationSettings {
@@ -119,7 +114,6 @@ classDiagram
     Profile "1" --> "*" GenerationSettings : has
     Profile "1" --> "*" ResumeContent : has
     ResumeContent "1" *-- "*" ResumeExperience : contains
-    Experience "1" --> "*" ExperienceGenerationOverride : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
@@ -403,7 +397,6 @@ classDiagram
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style ExperienceGenerationOverride fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style GenerationSettings fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
