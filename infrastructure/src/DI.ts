@@ -60,7 +60,7 @@ import type {
   ProfileRepository,
   ResumeContentRepository
 } from '@tailoredin/domain';
-import type { ClaudeApiProvider } from './services/llm/ClaudeApiProvider.js';
+import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 
 export const DI = {
   Llm: {
