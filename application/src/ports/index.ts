@@ -8,6 +8,7 @@ export type {
   ResumeContentGeneratorResult,
   ResumeContentGeneratorScope
 } from './ResumeContentGenerator.js';
+export type { ResumeElementGenerator } from './ResumeElementGenerator.js';
 export type {
   ResumeRenderEducation,
   ResumeRenderExperience,
