@@ -5,7 +5,7 @@ import {
   type ExperienceGenerationOverrideRepository,
   type ExperienceRepository,
   type GenerationContext,
-  GenerationScope,
+  type GenerationScope,
   GenerationSettings,
   type GenerationSettingsRepository,
   type JobDescriptionRepository,
@@ -38,16 +38,12 @@ export class GenerationContextBuilder {
       .filter(e => e.profileId === profile.id)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(
-      experiences.map(e => e.id)
-    );
+    const overrides = await this.experienceGenerationOverrideRepository.findByExperienceIds(experiences.map(e => e.id));
     const overrideMap = new Map(overrides.map(o => [o.experienceId, o]));
 
     const companyIds = experiences.map(e => e.companyId).filter((id): id is string => id !== null);
     const uniqueCompanyIds = [...new Set(companyIds)];
-    const companies = await Promise.all(
-      uniqueCompanyIds.map(id => this.companyRepository.findById(id))
-    );
+    const companies = await Promise.all(uniqueCompanyIds.map(id => this.companyRepository.findById(id)));
 
     const allEducation = await this.educationRepository.findAll();
     const education = allEducation.filter(e => e.profileId === profile.id);

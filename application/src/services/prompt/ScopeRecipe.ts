@@ -7,7 +7,9 @@ export class ScopeRecipe {
   public constructor(
     public readonly scope: GenerationScope,
     public readonly sections: PromptSection[],
-    public readonly model: string
+    public readonly model: string,
+    /** Opaque output schema — passed through to ComposedPrompt for infrastructure validation. */
+    public readonly outputSchema: unknown
   ) {}
 
   public compose(context: GenerationContext): ComposedPrompt {
@@ -36,6 +38,13 @@ export class ScopeRecipe {
       }
     }
 
-    return { systemBlocks, profileBlocks, sessionBlocks, requestBlocks, model: this.model };
+    return {
+      systemBlocks,
+      profileBlocks,
+      sessionBlocks,
+      requestBlocks,
+      model: this.model,
+      outputSchema: this.outputSchema
+    };
   }
 }

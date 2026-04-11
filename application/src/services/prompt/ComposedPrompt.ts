@@ -6,4 +6,6 @@ export type ComposedPrompt = {
   readonly sessionBlocks: PromptBlock[];
   readonly requestBlocks: PromptBlock[];
   readonly model: string;
+  /** Opaque output schema — used by the infrastructure generator for validation. */
+  readonly outputSchema: unknown;
 };

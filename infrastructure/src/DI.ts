@@ -129,7 +129,6 @@ export const DI = {
   },
 
   Resume: {
-    Generator: new InjectionToken<ResumeContentGenerator>('DI.Resume.Generator'),
     ElementGenerator: new InjectionToken<ResumeElementGenerator>('DI.Resume.ElementGenerator'),
     PromptRegistry: new InjectionToken<PromptRegistry>('DI.Resume.PromptRegistry'),
     ContextBuilder: new InjectionToken<GenerationContextBuilder>('DI.Resume.ContextBuilder'),

@@ -41,6 +41,8 @@ export { ValueObject } from './ValueObject.js';
 export { ApplicationStatus } from './value-objects/ApplicationStatus.js';
 export { BusinessType } from './value-objects/BusinessType.js';
 export { CacheTier } from './value-objects/CacheTier.js';
+export { CompanyStage } from './value-objects/CompanyStage.js';
+export { CompanyStatus } from './value-objects/CompanyStatus.js';
 export type {
   AccomplishmentSnapshot,
   CompanySnapshot,
@@ -51,8 +53,6 @@ export type {
   ProfileSnapshot,
   SettingsSnapshot
 } from './value-objects/GenerationContext.js';
-export { CompanyStage } from './value-objects/CompanyStage.js';
-export { CompanyStatus } from './value-objects/CompanyStatus.js';
 export { GenerationScope } from './value-objects/GenerationScope.js';
 export { Industry } from './value-objects/Industry.js';
 export { JobLevel } from './value-objects/JobLevel.js';

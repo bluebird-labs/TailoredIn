@@ -1,5 +1,5 @@
-import { PromptSection } from '@tailoredin/application';
 import type { PromptBlock } from '@tailoredin/application';
+import { PromptSection } from '@tailoredin/application';
 import { CacheTier, type GenerationContext } from '@tailoredin/domain';
 
 export class ExperienceDetailSection extends PromptSection {

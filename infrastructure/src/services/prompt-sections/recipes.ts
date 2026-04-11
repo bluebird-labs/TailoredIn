@@ -49,7 +49,17 @@ export const bulletOutputSchema = z.object({
 export function createHeadlineRecipe(s: AllSections, model: string): ScopeRecipe {
   return new ScopeRecipe(
     GenerationScope.HEADLINE,
-    [s.rules, s.outputConstraints, s.profile, s.tone, s.education, s.settings, s.jobDescription, s.otherExperiences, s.userInstructions],
+    [
+      s.rules,
+      s.outputConstraints,
+      s.profile,
+      s.tone,
+      s.education,
+      s.settings,
+      s.jobDescription,
+      s.otherExperiences,
+      s.userInstructions
+    ],
     model,
     headlineOutputSchema
   );
@@ -58,7 +68,18 @@ export function createHeadlineRecipe(s: AllSections, model: string): ScopeRecipe
 export function createExperienceBulletsRecipe(s: AllSections, model: string): ScopeRecipe {
   return new ScopeRecipe(
     GenerationScope.EXPERIENCE,
-    [s.rules, s.outputConstraints, s.profile, s.tone, s.companyContext, s.settings, s.jobDescription, s.experienceDetail, s.otherExperiences, s.userInstructions],
+    [
+      s.rules,
+      s.outputConstraints,
+      s.profile,
+      s.tone,
+      s.companyContext,
+      s.settings,
+      s.jobDescription,
+      s.experienceDetail,
+      s.otherExperiences,
+      s.userInstructions
+    ],
     model,
     experienceBulletsOutputSchema
   );
@@ -67,7 +88,17 @@ export function createExperienceBulletsRecipe(s: AllSections, model: string): Sc
 export function createExperienceSummaryRecipe(s: AllSections, model: string): ScopeRecipe {
   return new ScopeRecipe(
     GenerationScope.EXPERIENCE_SUMMARY,
-    [s.rules, s.outputConstraints, s.profile, s.tone, s.companyContext, s.settings, s.jobDescription, s.experienceDetail, s.userInstructions],
+    [
+      s.rules,
+      s.outputConstraints,
+      s.profile,
+      s.tone,
+      s.companyContext,
+      s.settings,
+      s.jobDescription,
+      s.experienceDetail,
+      s.userInstructions
+    ],
     model,
     experienceSummaryOutputSchema
   );
@@ -76,7 +107,18 @@ export function createExperienceSummaryRecipe(s: AllSections, model: string): Sc
 export function createBulletRecipe(s: AllSections, model: string): ScopeRecipe {
   return new ScopeRecipe(
     GenerationScope.BULLET,
-    [s.rules, s.outputConstraints, s.profile, s.tone, s.companyContext, s.settings, s.jobDescription, s.experienceDetail, s.bulletParams, s.userInstructions],
+    [
+      s.rules,
+      s.outputConstraints,
+      s.profile,
+      s.tone,
+      s.companyContext,
+      s.settings,
+      s.jobDescription,
+      s.experienceDetail,
+      s.bulletParams,
+      s.userInstructions
+    ],
     model,
     bulletOutputSchema
   );

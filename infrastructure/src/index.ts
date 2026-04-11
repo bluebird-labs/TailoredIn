@@ -15,10 +15,7 @@ export { PostgresResumeContentRepository } from './repositories/PostgresResumeCo
 export { ClaudeApiCompanyDataProvider } from './services/ClaudeApiCompanyDataProvider.js';
 export { ClaudeApiCompanyDiscoveryProvider } from './services/ClaudeApiCompanyDiscoveryProvider.js';
 export { ClaudeApiJobDescriptionParser } from './services/ClaudeApiJobDescriptionParser.js';
-export { ClaudeApiResumeContentGenerator } from './services/ClaudeApiResumeContentGenerator.js';
 export { ClaudeApiResumeElementGenerator } from './services/ClaudeApiResumeElementGeneratorNew.js';
-// Prompt sections
-export * from './services/prompt-sections/index.js';
 // LLM
 export {
   BaseLlmApiProvider,
@@ -27,4 +24,6 @@ export {
   LlmRequestError,
   type LlmRequestOptions
 } from './services/llm/index.js';
+// Prompt sections
+export * from './services/prompt-sections/index.js';
 export { TypstResumeRendererFactory } from './services/TypstResumeRendererFactory.js';

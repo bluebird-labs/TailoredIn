@@ -49,19 +49,17 @@ import {
   UpdateResumeDisplaySettings
 } from '@tailoredin/application';
 import { env, envInt, envOptional } from '@tailoredin/core';
-import { ModelTier } from '@tailoredin/domain';
 import {
   BulletParamsSection,
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
   ClaudeApiJobDescriptionParser,
   ClaudeApiProvider,
-  ClaudeApiResumeContentGenerator,
   ClaudeApiResumeElementGenerator,
   CompanyContextSection,
+  createBulletRecipe,
   createExperienceBulletsRecipe,
   createExperienceSummaryRecipe,
-  createBulletRecipe,
   createHeadlineRecipe,
   createOrmConfig,
   DI,
@@ -330,8 +328,6 @@ container.bind({
       container.get(DI.ExperienceGenerationOverride.Repository)
     )
 });
-// Legacy generator — kept for now, will be removed in cleanup phase
-container.bind({ provide: DI.Resume.Generator, useClass: ClaudeApiResumeContentGenerator });
 container.bind({
   provide: DI.Resume.Generate,
   useFactory: () =>
