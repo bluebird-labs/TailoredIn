@@ -2,9 +2,11 @@ import { ScopeRecipe } from '@tailoredin/application';
 import { type GenerationContext, GenerationScope, ResumeConstraints } from '@tailoredin/domain';
 import { z } from 'zod';
 import type { BulletParamsSection } from './BulletParamsSection.js';
+import type { CareerTimelineSection } from './CareerTimelineSection.js';
 import type { CompanyContextSection } from './CompanyContextSection.js';
 import type { EducationSection } from './EducationSection.js';
 import type { ExperienceDetailSection } from './ExperienceDetailSection.js';
+import type { HeadlineInstructionsSection } from './HeadlineInstructionsSection.js';
 import type { JobDescriptionSection } from './JobDescriptionSection.js';
 import type { OtherExperiencesSection } from './OtherExperiencesSection.js';
 import type { OutputConstraintsSection } from './OutputConstraintsSection.js';
@@ -27,6 +29,8 @@ export type AllSections = {
   otherExperiences: OtherExperiencesSection;
   userInstructions: UserInstructionsSection;
   bulletParams: BulletParamsSection;
+  headlineInstructions: HeadlineInstructionsSection;
+  careerTimeline: CareerTimelineSection;
 };
 
 export const headlineOutputSchema = z.object({
@@ -62,14 +66,14 @@ export function createHeadlineRecipe(s: AllSections, model: string): ScopeRecipe
   return new ScopeRecipe(
     GenerationScope.HEADLINE,
     [
-      s.rules,
+      s.headlineInstructions,
       s.outputConstraints,
       s.profile,
       s.tone,
       s.education,
       s.settings,
       s.jobDescription,
-      s.otherExperiences,
+      s.careerTimeline,
       s.userInstructions
     ],
     model,

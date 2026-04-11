@@ -49,6 +49,7 @@ import {
 import { env, envInt, envOptional } from '@tailoredin/core';
 import {
   BulletParamsSection,
+  CareerTimelineSection,
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
   ClaudeApiJobDescriptionParser,
@@ -63,6 +64,7 @@ import {
   DI,
   EducationSection,
   ExperienceDetailSection,
+  HeadlineInstructionsSection,
   JobDescriptionSection,
   OtherExperiencesSection,
   OutputConstraintsSection,
@@ -300,7 +302,9 @@ const sections = {
   experienceDetail: new ExperienceDetailSection(),
   otherExperiences: new OtherExperiencesSection(),
   userInstructions: new UserInstructionsSection(),
-  bulletParams: new BulletParamsSection()
+  bulletParams: new BulletParamsSection(),
+  headlineInstructions: new HeadlineInstructionsSection(),
+  careerTimeline: new CareerTimelineSection()
 };
 
 const defaultModel = 'claude-sonnet-4-6';
