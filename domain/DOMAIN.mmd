@@ -59,15 +59,20 @@ classDiagram
         +string endDate
         +string? summary
         +number ordinal
-        +number bulletMin
-        +number bulletMax
         +addAccomplishment()
         +removeAccomplishment()
         +findAccomplishmentOrFail()
         +linkCompany()
         +unlinkCompany()
-        +updateBulletRange()
         +syncAccomplishments()
+    }
+
+    class ExperienceGenerationOverride {
+        <<AggregateRoot>>
+        +string experienceId
+        +number bulletMin
+        +number bulletMax
+        +updateBulletRange()
     }
 
     class GenerationSettings {
@@ -103,11 +108,6 @@ classDiagram
         WITHDRAWN · ACCEPTED · ARCHIVED
     }
 
-    class ModelTier {
-        <<enumeration>>
-        FAST · BALANCED · BEST
-    }
-
     class ResumeExperience {
         <<ValueObject>>
         +string experienceId
@@ -117,9 +117,9 @@ classDiagram
     }
 
     Profile "1" --> "*" GenerationSettings : has
-    GenerationSettings --> ModelTier
     Profile "1" --> "*" ResumeContent : has
     ResumeContent "1" *-- "*" ResumeExperience : contains
+    Experience "1" --> "*" ExperienceGenerationOverride : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
@@ -172,11 +172,72 @@ classDiagram
         +salaryRange()
     }
 
+    class CompanyStatus {
+        <<enumeration>>
+        RUNNING · ACQUIRED · MERGED
+        DEFUNCT · STEALTH · UNKNOWN
+    }
+
+    class JobSource {
+        <<enumeration>>
+        LINKEDIN · PARAFORM · GREENHOUSE
+        LEVER · WORKDAY · WELLFOUND
+        ASHBY · COMPANY_WEBSITE · REFERRAL
+        UPLOAD
+    }
+
+    class LocationType {
+        <<enumeration>>
+        REMOTE · REMOTE_FIRST · HYBRID
+        FLEXIBLE · ONSITE · UNKNOWN
+    }
+
+    JobDescription "1" --> "*" ResumeContent : has
+    Company "1" --> "*" JobDescription : has
+    JobDescription --> LocationType
+    JobDescription --> JobSource
+    Company "1" --> "*" Application : has
+    JobDescription "1" --> "*" Application : has
+    Company "1" --> "*" Experience : has
+    Company --> CompanyStatus
+
+    %% ──────────────────────────────────────────────
+    %%  Enums & Types
+    %% ──────────────────────────────────────────────
+
+    class AccomplishmentSnapshot {
+        <<ValueObject>>
+        +string title
+        +string narrative
+    }
+
+    class BlockLayout {
+        <<ValueObject>>
+        +number lineCount
+        +number[] pageNumbers
+    }
+
     class BusinessType {
         <<enumeration>>
         B2B · B2C · B2B2C
         B2G · D2C · MARKETPLACE
         PLATFORM · ENTERPRISE · UNKNOWN
+    }
+
+    class CacheTier {
+        <<enumeration>>
+        SYSTEM_STABLE · PROFILE_STABLE · SESSION_STABLE
+        REQUEST_VARIABLE
+    }
+
+    class CompanySnapshot {
+        <<ValueObject>>
+        +string id
+        +string name
+        +string? description
+        +Industry industry
+        +CompanyStage stage
+        +BusinessType businessType
     }
 
     class CompanyStage {
@@ -187,10 +248,45 @@ classDiagram
         PRIVATE_EQUITY · BOOTSTRAPPED · UNKNOWN
     }
 
-    class CompanyStatus {
+    class EducationSnapshot {
+        <<ValueObject>>
+        +string id
+        +string degreeTitle
+        +string institutionName
+        +number graduationYear
+        +string? honors
+    }
+
+    class ExperienceSnapshot {
+        <<ValueObject>>
+        +string id
+        +string title
+        +string companyName
+        +string? summary
+        +AccomplishmentSnapshot[] accomplishments
+        +string startDate
+        +string endDate
+        +string location
+        +number bulletMin
+        +number bulletMax
+        +string? companyId
+    }
+
+    class GenerationContext {
+        <<ValueObject>>
+        +ProfileSnapshot profile
+        +JDSnapshot jobDescription
+        +ExperienceSnapshot[] experiences
+        +CompanySnapshot[] companies
+        +EducationSnapshot[] education
+        +SettingsSnapshot settings
+        +string? userInstructions
+    }
+
+    class GenerationScope {
         <<enumeration>>
-        RUNNING · ACQUIRED · MERGED
-        DEFUNCT · STEALTH · UNKNOWN
+        RESUME · HEADLINE · EXPERIENCE
+        EXPERIENCE_SUMMARY · BULLET
     }
 
     class Industry {
@@ -210,54 +306,23 @@ classDiagram
         UNKNOWN
     }
 
+    class JDSnapshot {
+        <<ValueObject>>
+        +string id
+        +string title
+        +string description
+        +string? rawText
+        +string[] soughtHardSkills
+        +string[] soughtSoftSkills
+        +JobLevel? level
+    }
+
     class JobLevel {
         <<enumeration>>
         INTERNSHIP · ENTRY_LEVEL · ASSOCIATE
         SENIOR · STAFF · PRINCIPAL
         MANAGER · DIRECTOR · VP
         EXECUTIVE · UNKNOWN
-    }
-
-    class JobSource {
-        <<enumeration>>
-        LINKEDIN · PARAFORM · GREENHOUSE
-        LEVER · WORKDAY · WELLFOUND
-        ASHBY · COMPANY_WEBSITE · REFERRAL
-        UPLOAD
-    }
-
-    class LocationType {
-        <<enumeration>>
-        REMOTE · REMOTE_FIRST · HYBRID
-        FLEXIBLE · ONSITE · UNKNOWN
-    }
-
-    JobDescription "1" --> "*" ResumeContent : has
-    Company "1" --> "*" JobDescription : has
-    JobDescription --> JobLevel
-    JobDescription --> LocationType
-    JobDescription --> JobSource
-    Company "1" --> "*" Application : has
-    JobDescription "1" --> "*" Application : has
-    Company "1" --> "*" Experience : has
-    Company --> BusinessType
-    Company --> Industry
-    Company --> CompanyStage
-    Company --> CompanyStatus
-
-    %% ──────────────────────────────────────────────
-    %%  Enums & Types
-    %% ──────────────────────────────────────────────
-
-    class BlockLayout {
-        <<ValueObject>>
-        +number lineCount
-        +number[] pageNumbers
-    }
-
-    class GenerationScope {
-        <<enumeration>>
-        RESUME · HEADLINE · EXPERIENCE
     }
 
     class LayoutAnalysis {
@@ -267,6 +332,20 @@ classDiagram
         +object experiences
         +BlockLayout[] education
         +BlockLayout[] skills
+    }
+
+    class ModelTier {
+        <<enumeration>>
+        FAST · BALANCED · BEST
+    }
+
+    class ProfileSnapshot {
+        <<ValueObject>>
+        +string id
+        +string firstName
+        +string lastName
+        +string? about
+        +string? location
     }
 
     class ResumeTemplate {
@@ -289,7 +368,32 @@ classDiagram
         +toJSON()
     }
 
+    class SettingsSnapshot {
+        <<ValueObject>>
+        +ModelTier modelTier
+        +number bulletMin
+        +number bulletMax
+        +ReadonlyMap<GenerationScope, string> adminPrompts
+    }
+
+    GenerationSettings --> ModelTier
+    JobDescription --> JobLevel
+    Company --> BusinessType
+    Company --> Industry
+    Company --> CompanyStage
     LayoutAnalysis "1" *-- "*" BlockLayout : contains
+    JDSnapshot --> JobLevel
+    ExperienceSnapshot "1" *-- "*" AccomplishmentSnapshot : contains
+    CompanySnapshot --> Industry
+    CompanySnapshot --> CompanyStage
+    CompanySnapshot --> BusinessType
+    SettingsSnapshot --> ModelTier
+    GenerationContext *-- ProfileSnapshot
+    GenerationContext *-- JDSnapshot
+    GenerationContext "1" *-- "*" ExperienceSnapshot : contains
+    GenerationContext "1" *-- "*" CompanySnapshot : contains
+    GenerationContext "1" *-- "*" EducationSnapshot : contains
+    GenerationContext *-- SettingsSnapshot
 
     %% ──────────────────────────────────────────────
     %%  Apply Styles
@@ -299,22 +403,32 @@ classDiagram
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ExperienceGenerationOverride fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style GenerationSettings fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style ModelTier fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperience fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style AccomplishmentSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CacheTier fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style CompanySnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style CompanyStage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style EducationSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ExperienceSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style GenerationContext fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style JDSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ModelTier fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ProfileSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ResumeTemplate fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style SettingsSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
