@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Input } from '@/components/ui/input';
@@ -8,13 +8,14 @@ import { CompanyCard } from './CompanyCard.js';
 import { CompanyFormModal } from './CompanyFormModal.js';
 
 interface CompanyListProps {
+  readonly search: string;
+  readonly onSearchChange: (value: string) => void;
   readonly createOpen: boolean;
   readonly onCreateOpenChange: (open: boolean) => void;
 }
 
-export function CompanyList({ createOpen, onCreateOpenChange }: CompanyListProps) {
+export function CompanyList({ search, onSearchChange, createOpen, onCreateOpenChange }: CompanyListProps) {
   const { data: companies = [], isLoading } = useCompanies();
-  const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
     if (!search.trim()) return companies;
@@ -34,7 +35,7 @@ export function CompanyList({ createOpen, onCreateOpenChange }: CompanyListProps
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => onSearchChange(e.target.value)}
               placeholder="Search companies..."
               className="pl-9"
             />

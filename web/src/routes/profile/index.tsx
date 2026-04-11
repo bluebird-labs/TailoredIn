@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, retainSearchParams, useNavigate } from '@tanstack/react-router';
 import { Download } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ import type { Experience } from '@/hooks/use-experiences.js';
 import { useExperiences } from '@/hooks/use-experiences.js';
 import { useNavGuard } from '@/hooks/use-nav-guard.js';
 import { useProfile, useUpdateProfile } from '@/hooks/use-profile';
+import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
 import { hasErrors, type ProfileFormState, type ValidationErrors, validateProfile } from '@/lib/validation.js';
 
 const PROFILE_TABS = ['profile', 'experiences', 'education'] as const;
@@ -33,6 +34,9 @@ export const Route = createFileRoute('/profile/')({
       return { tab: tab as ProfileTab };
     }
     return {};
+  },
+  search: {
+    middlewares: [persistSearchParams<ProfileSearch>('/profile', ['tab']), retainSearchParams(['tab'])]
   }
 });
 
@@ -134,9 +138,10 @@ function generateProfileMarkdown(profile: ProfileData, experiences: Experience[]
 }
 
 function ProfilePage() {
-  const { tab } = Route.useSearch();
+  const search = Route.useSearch();
+  useSearchPersistence('/profile', search, ['tab']);
   const navigate = useNavigate();
-  const activeTab = tab ?? 'profile';
+  const activeTab = search.tab ?? 'profile';
 
   const setActiveTab = useCallback(
     (value: string | null) => {

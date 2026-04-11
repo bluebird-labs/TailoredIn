@@ -1,15 +1,34 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, retainSearchParams, useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CompanyList } from '@/components/companies/CompanyList';
 import { Button } from '@/components/ui/button';
+import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
+
+type CompaniesSearch = { search?: string };
 
 export const Route = createFileRoute('/companies/')({
-  component: CompaniesPage
+  component: CompaniesPage,
+  validateSearch: (search: Record<string, unknown>): CompaniesSearch => ({
+    search: typeof search.search === 'string' ? search.search : undefined
+  }),
+  search: {
+    middlewares: [persistSearchParams<CompaniesSearch>('/companies', ['search']), retainSearchParams(['search'])]
+  }
 });
 
 function CompaniesPage() {
+  const searchParams = Route.useSearch();
+  useSearchPersistence('/companies', searchParams, ['search']);
+  const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+
+  const setSearch = useCallback(
+    (value: string) => {
+      navigate({ to: '/companies', search: value ? { search: value } : {}, replace: true });
+    },
+    [navigate]
+  );
 
   return (
     <div className="space-y-6">
@@ -23,7 +42,12 @@ function CompaniesPage() {
           Add company
         </Button>
       </div>
-      <CompanyList createOpen={createOpen} onCreateOpenChange={setCreateOpen} />
+      <CompanyList
+        search={searchParams.search ?? ''}
+        onSearchChange={setSearch}
+        createOpen={createOpen}
+        onCreateOpenChange={setCreateOpen}
+      />
     </div>
   );
 }

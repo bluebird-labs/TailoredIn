@@ -1,15 +1,35 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, retainSearchParams, useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { JobDescriptionList } from '@/components/job-descriptions/JobDescriptionList';
 import { Button } from '@/components/ui/button';
+import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
+
+type JobsSearch = { search?: string; company?: string };
 
 export const Route = createFileRoute('/jobs/')({
-  component: JobsPage
+  component: JobsPage,
+  validateSearch: (search: Record<string, unknown>): JobsSearch => ({
+    search: typeof search.search === 'string' ? search.search : undefined,
+    company: typeof search.company === 'string' ? search.company : undefined
+  }),
+  search: {
+    middlewares: [persistSearchParams<JobsSearch>('/jobs', ['search']), retainSearchParams(['search', 'company'])]
+  }
 });
 
 function JobsPage() {
+  const searchParams = Route.useSearch();
+  useSearchPersistence('/jobs', searchParams, ['search']);
+  const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+
+  const setSearch = useCallback(
+    (value: string) => {
+      navigate({ to: '/jobs', search: value ? { search: value } : {}, replace: true });
+    },
+    [navigate]
+  );
 
   return (
     <div className="space-y-6">
@@ -23,7 +43,13 @@ function JobsPage() {
           Add job description
         </Button>
       </div>
-      <JobDescriptionList createOpen={createOpen} onCreateOpenChange={setCreateOpen} />
+      <JobDescriptionList
+        companyId={searchParams.company}
+        search={searchParams.search ?? ''}
+        onSearchChange={setSearch}
+        createOpen={createOpen}
+        onCreateOpenChange={setCreateOpen}
+      />
     </div>
   );
 }
