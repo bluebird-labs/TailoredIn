@@ -19,6 +19,7 @@ import type {
   GenerateResumeContent,
   GenerateResumeContentWithPdf,
   GenerateResumePdf,
+  GenerationContextBuilder,
   GetApplication,
   GetCachedResumePdf,
   GetCompany,
@@ -34,7 +35,8 @@ import type {
   ListExperiences,
   ListJobDescriptions,
   ParseJobDescription,
-  ResumeContentGenerator,
+  PromptRegistry,
+  ResumeElementGenerator,
   ResumeRendererFactory,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -126,7 +128,9 @@ export const DI = {
   },
 
   Resume: {
-    Generator: new InjectionToken<ResumeContentGenerator>('DI.Resume.Generator'),
+    ElementGenerator: new InjectionToken<ResumeElementGenerator>('DI.Resume.ElementGenerator'),
+    PromptRegistry: new InjectionToken<PromptRegistry>('DI.Resume.PromptRegistry'),
+    ContextBuilder: new InjectionToken<GenerationContextBuilder>('DI.Resume.ContextBuilder'),
     Generate: new InjectionToken<GenerateResumeContent>('DI.Resume.Generate'),
     RendererFactory: new InjectionToken<ResumeRendererFactory>('DI.Resume.RendererFactory'),
     GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf'),

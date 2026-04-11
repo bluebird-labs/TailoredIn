@@ -67,7 +67,6 @@ export { ParseJobDescription } from './job-description/ParseJobDescription.js';
 export type { UpdateJobDescriptionInput } from './job-description/UpdateJobDescription.js';
 export { UpdateJobDescription } from './job-description/UpdateJobDescription.js';
 export type {
-  BulletOverride,
   GenerateResumeContentInput,
   GenerateResumeContentScope
 } from './resume/GenerateResumeContent.js';

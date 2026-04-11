@@ -23,8 +23,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
     super();
   }
 
-  // Protected to allow test subclasses to inject a mock client
-  protected getClient(): Anthropic {
+  public getClient(): Anthropic {
     this._client ??= new Anthropic({
       apiKey: this.apiKey,
       maxRetries: 0 // BaseLlmApiProvider owns the retry loop

@@ -1,5 +1,15 @@
 import type { Experience, JobDescription, JobLevel, JobSource, LocationType, ResumeContent } from '@tailoredin/domain';
 
+function parseScopedInstructions(prompt: string): Record<string, string> {
+  if (!prompt) return {};
+  try {
+    const parsed = JSON.parse(prompt);
+    return typeof parsed === 'object' && parsed !== null ? parsed : {};
+  } catch {
+    return { resume: prompt };
+  }
+}
+
 export type SalaryRangeDto = {
   readonly min: number | null;
   readonly max: number | null;
@@ -20,6 +30,7 @@ export type ResumeOutputDto = {
   }>;
   readonly hiddenEducationIds: readonly string[];
   readonly generatedAt: string;
+  readonly scopedInstructions: Record<string, string>;
 };
 
 export type JobDescriptionDto = {
@@ -90,7 +101,8 @@ export function toJobDescriptionDto(
             };
           }),
           hiddenEducationIds: resumeContent.hiddenEducationIds,
-          generatedAt: resumeContent.createdAt.toISOString()
+          generatedAt: resumeContent.createdAt.toISOString(),
+          scopedInstructions: parseScopedInstructions(resumeContent.prompt)
         }
       : null,
     hasCachedPdf: jd.resumePdf !== null,

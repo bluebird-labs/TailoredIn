@@ -135,7 +135,6 @@ classDiagram
     class CreateExperience {
         <<UseCase>>
         +ExperienceRepository experienceRepository
-        +GenerationSettingsRepository generationSettingsRepository
         +execute(CreateExperienceInput) ExperienceDto
     }
 
@@ -198,7 +197,21 @@ classDiagram
     class GetGenerationSettings {
         <<UseCase>>
         +GenerationSettingsRepository generationSettingsRepository
+        +ExperienceRepository experienceRepository
+        +ExperienceGenerationOverrideRepository experienceOverrideRepository
         +execute(GetGenerationSettingsInput) GenerationSettingsDto
+    }
+
+    class RemoveExperienceGenerationOverride {
+        <<UseCase>>
+        +ExperienceGenerationOverrideRepository experienceGenerationOverrideRepository
+        +execute(RemoveExperienceGenerationOverrideInput) void
+    }
+
+    class SetExperienceGenerationOverride {
+        <<UseCase>>
+        +ExperienceGenerationOverrideRepository experienceGenerationOverrideRepository
+        +execute(SetExperienceGenerationOverrideInput) ExperienceGenerationOverrideDto
     }
 
     class UpdateGenerationSettings {
@@ -274,18 +287,6 @@ classDiagram
     %%  Resume Use Cases
     %% ──────────────────────────────────────────────
 
-    class BulletOverride {
-        <<UseCase>>
-        +ProfileRepository profileRepository
-        +ExperienceRepository experienceRepository
-        +JobDescriptionRepository jobDescriptionRepository
-        +ResumeContentRepository resumeContentRepository
-        +ResumeContentGenerator generator
-        +EducationRepository educationRepository
-        +GenerationSettingsRepository generationSettingsRepository
-        +execute(GenerateResumeContentInput) ResumeContentDto
-    }
-
     class CachedResumePdfResult {
         <<UseCase>>
         +JobDescriptionRepository jobDescriptionRepository
@@ -294,25 +295,21 @@ classDiagram
 
     class GenerateResumeContent {
         <<UseCase>>
-        +ProfileRepository profileRepository
-        +ExperienceRepository experienceRepository
-        +JobDescriptionRepository jobDescriptionRepository
+        +GenerationContextBuilder contextBuilder
+        +PromptRegistry registry
+        +ResumeElementGenerator elementGenerator
         +ResumeContentRepository resumeContentRepository
-        +ResumeContentGenerator generator
         +EducationRepository educationRepository
-        +GenerationSettingsRepository generationSettingsRepository
         +execute(GenerateResumeContentInput) ResumeContentDto
     }
 
     class GenerateResumeContentScope {
         <<UseCase>>
-        +ProfileRepository profileRepository
-        +ExperienceRepository experienceRepository
-        +JobDescriptionRepository jobDescriptionRepository
+        +GenerationContextBuilder contextBuilder
+        +PromptRegistry registry
+        +ResumeElementGenerator elementGenerator
         +ResumeContentRepository resumeContentRepository
-        +ResumeContentGenerator generator
         +EducationRepository educationRepository
-        +GenerationSettingsRepository generationSettingsRepository
         +execute(GenerateResumeContentInput) ResumeContentDto
     }
 
@@ -368,9 +365,9 @@ classDiagram
         +parseFromText(text) Promise<JobDescriptionParseResult>
     }
 
-    class ResumeContentGenerator {
+    class ResumeElementGenerator {
         <<Port>>
-        +generate(input) Promise<ResumeContentGeneratorResult>
+        +generate(composedPrompt) Promise<unknown>
     }
 
     class ResumeRenderer {
@@ -386,9 +383,8 @@ classDiagram
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
-    BulletOverride ..> ResumeContentGenerator : depends
-    GenerateResumeContentScope ..> ResumeContentGenerator : depends
-    GenerateResumeContent ..> ResumeContentGenerator : depends
+    GenerateResumeContentScope ..> ResumeElementGenerator : depends
+    GenerateResumeContent ..> ResumeElementGenerator : depends
     GenerateResumePdf ..> ResumeRendererFactory : depends
 
     %% ──────────────────────────────────────────────
@@ -481,9 +477,15 @@ classDiagram
         +string endDate
         +string? summary
         +number ordinal
+        +AccomplishmentDto[] accomplishments
+    }
+
+    class ExperienceGenerationOverrideDto {
+        <<DTO>>
+        +string id
+        +string experienceId
         +number bulletMin
         +number bulletMax
-        +AccomplishmentDto[] accomplishments
     }
 
     class GenerationPromptDto {
@@ -501,6 +503,7 @@ classDiagram
         +number bulletMin
         +number bulletMax
         +GenerationPromptDto[] prompts
+        +ExperienceOverrideDto[] experienceOverrides
     }
 
     class JobDescriptionDto {
@@ -578,30 +581,6 @@ classDiagram
         +ResumeExperienceBulletsDto[] experiences
     }
 
-    class ResumeContentGeneratorExperience {
-        <<DTO>>
-        +string id
-        +string title
-        +string companyName
-        +string? summary
-        +object? accomplishments
-        +number minBullets
-        +number maxBullets
-    }
-
-    class ResumeContentGeneratorResult {
-        <<DTO>>
-        +string headline
-        +object experiences
-        +string requestPrompt
-        +Record<string, unknown> requestSchema
-    }
-
-    class ResumeContentGeneratorScope {
-        <<DTO>>
-        +'headline' type
-    }
-
     class ResumeExperienceBulletsDto {
         <<DTO>>
         +string experienceId
@@ -665,7 +644,6 @@ classDiagram
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
     CompanyDiscoveryProvider ..> CompanyDiscoveryResult : produces
     JobDescriptionParser ..> JobDescriptionParseResult : produces
-    ResumeContentGenerator ..> ResumeContentGeneratorResult : produces
     CreateApplication ..> ApplicationDto : returns
     GetApplication ..> ApplicationDto : returns
     ListApplications ..> ApplicationDto : returns
@@ -689,13 +667,13 @@ classDiagram
     UpdateExperience ..> ExperienceDto : returns
     GetProfile ..> ProfileDto : returns
     GetGenerationSettings ..> GenerationSettingsDto : returns
+    SetExperienceGenerationOverride ..> ExperienceGenerationOverrideDto : returns
     UpdateGenerationSettings ..> GenerationSettingsDto : returns
     CreateJobDescription ..> JobDescriptionDto : returns
     GetJobDescription ..> JobDescriptionDto : returns
     ListJobDescriptions ..> JobDescriptionDto : returns
     ParseJobDescription ..> JobDescriptionParseResult : returns
     UpdateJobDescription ..> JobDescriptionDto : returns
-    BulletOverride ..> ResumeContentDto : returns
     GenerateResumeContentScope ..> ResumeContentDto : returns
     GenerateResumeContent ..> ResumeContentDto : returns
     GenerateResumeContentWithPdf ..> ResumeContentDto : returns
@@ -729,7 +707,15 @@ classDiagram
         <<DomainPort>>
     }
 
+    class ExperienceGenerationOverrideRepository {
+        <<DomainPort>>
+    }
+
     class ExperienceRepository {
+        <<DomainPort>>
+    }
+
+    class GenerationContextBuilder {
         <<DomainPort>>
     }
 
@@ -742,6 +728,10 @@ classDiagram
     }
 
     class ProfileRepository {
+        <<DomainPort>>
+    }
+
+    class PromptRegistry {
         <<DomainPort>>
     }
 
@@ -766,7 +756,6 @@ classDiagram
     UpdateEducation ..> EducationRepository : depends
     AddAccomplishment ..> ExperienceRepository : depends
     CreateExperience ..> ExperienceRepository : depends
-    CreateExperience ..> GenerationSettingsRepository : depends
     DeleteAccomplishment ..> ExperienceRepository : depends
     DeleteExperience ..> ExperienceRepository : depends
     GetExperience ..> ExperienceRepository : depends
@@ -780,6 +769,10 @@ classDiagram
     UpdateExperience ..> ExperienceRepository : depends
     GetProfile ..> ProfileRepository : depends
     GetGenerationSettings ..> GenerationSettingsRepository : depends
+    GetGenerationSettings ..> ExperienceRepository : depends
+    GetGenerationSettings ..> ExperienceGenerationOverrideRepository : depends
+    RemoveExperienceGenerationOverride ..> ExperienceGenerationOverrideRepository : depends
+    SetExperienceGenerationOverride ..> ExperienceGenerationOverrideRepository : depends
     UpdateGenerationSettings ..> GenerationSettingsRepository : depends
     CreateJobDescription ..> JobDescriptionRepository : depends
     DeleteJobDescription ..> JobDescriptionRepository : depends
@@ -790,24 +783,14 @@ classDiagram
     ListJobDescriptions ..> JobDescriptionRepository : depends
     ListJobDescriptions ..> CompanyRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
-    BulletOverride ..> ProfileRepository : depends
-    BulletOverride ..> ExperienceRepository : depends
-    BulletOverride ..> JobDescriptionRepository : depends
-    BulletOverride ..> ResumeContentRepository : depends
-    BulletOverride ..> EducationRepository : depends
-    BulletOverride ..> GenerationSettingsRepository : depends
-    GenerateResumeContentScope ..> ProfileRepository : depends
-    GenerateResumeContentScope ..> ExperienceRepository : depends
-    GenerateResumeContentScope ..> JobDescriptionRepository : depends
+    GenerateResumeContentScope ..> GenerationContextBuilder : depends
+    GenerateResumeContentScope ..> PromptRegistry : depends
     GenerateResumeContentScope ..> ResumeContentRepository : depends
     GenerateResumeContentScope ..> EducationRepository : depends
-    GenerateResumeContentScope ..> GenerationSettingsRepository : depends
-    GenerateResumeContent ..> ProfileRepository : depends
-    GenerateResumeContent ..> ExperienceRepository : depends
-    GenerateResumeContent ..> JobDescriptionRepository : depends
+    GenerateResumeContent ..> GenerationContextBuilder : depends
+    GenerateResumeContent ..> PromptRegistry : depends
     GenerateResumeContent ..> ResumeContentRepository : depends
     GenerateResumeContent ..> EducationRepository : depends
-    GenerateResumeContent ..> GenerationSettingsRepository : depends
     GenerateResumePdf ..> ProfileRepository : depends
     GenerateResumePdf ..> ExperienceRepository : depends
     GenerateResumePdf ..> EducationRepository : depends
@@ -850,6 +833,8 @@ classDiagram
     style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetGenerationSettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style RemoveExperienceGenerationOverride fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style SetExperienceGenerationOverride fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateGenerationSettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -859,7 +844,6 @@ classDiagram
     style UpdateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style BulletOverride fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CachedResumePdfResult fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumeContent fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumeContentScope fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -870,7 +854,7 @@ classDiagram
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style JobDescriptionParser fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
-    style ResumeContentGenerator fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style ResumeElementGenerator fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeRenderer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeRendererFactory fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -881,6 +865,7 @@ classDiagram
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ExperienceGenerationOverrideDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationPromptDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationSettingsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobDescriptionDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -889,9 +874,6 @@ classDiagram
     style PaginationMeta fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ProfileDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeContentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style ResumeContentGeneratorExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style ResumeContentGeneratorResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style ResumeContentGeneratorScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperienceBulletsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeOutputDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeRenderEducation fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -901,8 +883,11 @@ classDiagram
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style EducationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style ExperienceGenerationOverrideRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style GenerationContextBuilder fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style GenerationSettingsRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style JobDescriptionRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style PromptRegistry fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ResumeContentRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

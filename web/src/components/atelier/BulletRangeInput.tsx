@@ -22,7 +22,7 @@ export function BulletRangeInput({
           <Input
             id="bullet-min"
             type="number"
-            min={1}
+            min={0}
             max={20}
             value={min}
             onChange={e => onMinChange(Number(e.target.value))}
@@ -36,7 +36,7 @@ export function BulletRangeInput({
           <Input
             id="bullet-max"
             type="number"
-            min={1}
+            min={0}
             max={20}
             value={max}
             onChange={e => onMaxChange(Number(e.target.value))}

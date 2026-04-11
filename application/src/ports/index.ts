@@ -1,13 +1,7 @@
 export type { CompanyDataProvider, CompanyEnrichmentResult } from './CompanyDataProvider.js';
 export type { CompanyDiscoveryProvider, CompanyDiscoveryResult } from './CompanyDiscoveryProvider.js';
 export type { JobDescriptionParseResult, JobDescriptionParser } from './JobDescriptionParser.js';
-export type {
-  ResumeContentGenerator,
-  ResumeContentGeneratorExperience,
-  ResumeContentGeneratorInput,
-  ResumeContentGeneratorResult,
-  ResumeContentGeneratorScope
-} from './ResumeContentGenerator.js';
+export type { ResumeElementGenerator } from './ResumeElementGenerator.js';
 export type {
   ResumeRenderEducation,
   ResumeRenderExperience,

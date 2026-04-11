@@ -107,7 +107,7 @@ export class Experience extends AggregateRoot {
       throw new ValidationError('startDate', 'must be between 1 and 50 characters');
     if (!props.endDate || props.endDate.length > 50)
       throw new ValidationError('endDate', 'must be between 1 and 50 characters');
-    if (props.bulletMin <= 0) throw new ValidationError('bulletMin', 'must be greater than 0');
+    if (props.bulletMin < 0) throw new ValidationError('bulletMin', 'must be >= 0');
     if (props.bulletMax < props.bulletMin) throw new ValidationError('bulletMax', 'must be >= bulletMin');
     this.id = props.id;
     this.profileId = props.profileId;
@@ -159,7 +159,7 @@ export class Experience extends AggregateRoot {
   }
 
   public updateBulletRange(min: number, max: number): void {
-    if (min <= 0) throw new ValidationError('bulletMin', 'must be greater than 0');
+    if (min < 0) throw new ValidationError('bulletMin', 'must be >= 0');
     if (max < min) throw new ValidationError('bulletMax', 'must be >= bulletMin');
     this.bulletMin = min;
     this.bulletMax = max;

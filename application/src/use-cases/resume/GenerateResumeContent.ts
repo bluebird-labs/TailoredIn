@@ -1,192 +1,188 @@
 import {
   type EducationRepository,
-  EntityNotFoundError,
-  type ExperienceRepository,
+  type GenerationContext,
   GenerationScope,
-  GenerationSettings,
-  type GenerationSettingsRepository,
-  type JobDescriptionRepository,
-  ModelTier,
-  type ProfileRepository,
   ResumeContent,
   type ResumeContentRepository
 } from '@tailoredin/domain';
 import type { ResumeContentDto } from '../../dtos/ResumeContentDto.js';
-import type { ResumeContentGenerator } from '../../ports/ResumeContentGenerator.js';
+import type { ResumeElementGenerator } from '../../ports/ResumeElementGenerator.js';
+import type { GenerationContextBuilder } from '../../services/GenerationContextBuilder.js';
+import type { PromptRegistry } from '../../services/prompt/PromptRegistry.js';
 
-export type GenerateResumeContentScope = { type: 'headline' } | { type: 'experience'; experienceId: string };
-
-export type BulletOverride = { experienceId: string; min: number; max: number };
+export type GenerateResumeContentScope =
+  | { type: 'headline' }
+  | { type: 'experience'; experienceId: string }
+  | { type: 'summary'; experienceId: string }
+  | { type: 'bullet'; experienceId: string; bulletIndex: number; instructions: string };
 
 export type GenerateResumeContentInput = {
   jobDescriptionId: string;
   additionalPrompt?: string;
   scope?: GenerateResumeContentScope;
-  bulletOverrides?: BulletOverride[];
 };
 
-function resolveModelId(tier: ModelTier): string {
-  switch (tier) {
-    case ModelTier.FAST:
-      return 'claude-haiku-4-5';
-    case ModelTier.BALANCED:
-      return 'claude-sonnet-4-6';
-    case ModelTier.BEST:
-      return 'claude-opus-4-6';
+type HeadlineResult = { headline: string };
+type ExperienceBulletsResult = { summary: string; bullets: string[] };
+type SummaryResult = { summary: string };
+type BulletResult = { bullet: string };
+
+type ScopedInstructions = Record<string, string>;
+
+function parseScopedInstructions(prompt: string): ScopedInstructions {
+  if (!prompt) return {};
+  try {
+    const parsed = JSON.parse(prompt);
+    return typeof parsed === 'object' && parsed !== null ? parsed : {};
+  } catch {
+    // Legacy format — treat as resume-level instructions
+    return { resume: prompt };
+  }
+}
+
+function buildScopeKey(scope: GenerateResumeContentScope | undefined): string {
+  if (!scope) return 'resume';
+  switch (scope.type) {
+    case 'headline':
+      return 'headline';
+    case 'experience':
+    case 'summary':
+    case 'bullet':
+      return `experience:${scope.experienceId}`;
   }
 }
 
 export class GenerateResumeContent {
   public constructor(
-    private readonly profileRepository: ProfileRepository,
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly jobDescriptionRepository: JobDescriptionRepository,
+    private readonly contextBuilder: GenerationContextBuilder,
+    private readonly registry: PromptRegistry,
+    private readonly elementGenerator: ResumeElementGenerator,
     private readonly resumeContentRepository: ResumeContentRepository,
-    private readonly generator: ResumeContentGenerator,
-    private readonly educationRepository: EducationRepository,
-    private readonly generationSettingsRepository: GenerationSettingsRepository
+    private readonly educationRepository: EducationRepository
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
-    const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);
-    if (!jd) {
-      throw new EntityNotFoundError('JobDescription', input.jobDescriptionId);
+    const context = await this.contextBuilder.build(input.jobDescriptionId, input.additionalPrompt);
+    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(input.jobDescriptionId);
+
+    const previousInstructions = parseScopedInstructions(existing?.prompt ?? '');
+    const scopeKey = buildScopeKey(input.scope);
+    const scopedInstructions = { ...previousInstructions };
+    if (input.additionalPrompt) {
+      scopedInstructions[scopeKey] = input.additionalPrompt;
+    } else {
+      delete scopedInstructions[scopeKey];
     }
-
-    const profile = await this.profileRepository.findSingle();
-
-    const settings =
-      (await this.generationSettingsRepository.findByProfileId(profile.id)) ??
-      GenerationSettings.createDefault(profile.id);
-
-    const allExperiences = await this.experienceRepository.findAll();
-    const experiences = allExperiences
-      .filter(e => e.profileId === profile.id)
-      .sort((a, b) => b.startDate.localeCompare(a.startDate));
-
-    const overrideMap = new Map((input.bulletOverrides ?? []).map(o => [o.experienceId, o]));
-
-    const composedPrompt = this.composePrompt(settings, input.scope, input.additionalPrompt);
-
-    const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(jd.id);
-
-    const generatorInput = {
-      profile: {
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        about: profile.about
-      },
-      jobDescription: {
-        title: jd.title,
-        description: jd.description,
-        rawText: jd.rawText
-      },
-      experiences: experiences.map(exp => {
-        const override = overrideMap.get(exp.id);
-        return {
-          id: exp.id,
-          title: exp.title,
-          companyName: exp.companyName,
-          summary: exp.summary,
-          accomplishments: exp.accomplishments.map(a => ({
-            title: a.title,
-            narrative: a.narrative
-          })),
-          minBullets: override?.min ?? exp.bulletMin,
-          maxBullets: override?.max ?? exp.bulletMax
-        };
-      }),
-      additionalPrompt: input.additionalPrompt,
-      scope: input.scope,
-      model: resolveModelId(settings.modelTier),
-      composedPrompt: composedPrompt ?? undefined
-    };
-
-    const result = await this.generator.generate(generatorInput);
-
-    let headline: string;
-    let mergedExperiences: typeof result.experiences;
-
-    const resolveExperienceMeta = (experienceId: string) => {
-      const exp = experiences.find(e => e.id === experienceId);
-      return { experienceTitle: exp?.title ?? '', companyName: exp?.companyName ?? '' };
-    };
-
-    const existingExperienceMap = new Map(
-      existing?.experiences.map(e => [
-        e.experienceId,
-        { bullets: e.bullets, hiddenBulletIndices: e.hiddenBulletIndices }
-      ]) ?? []
-    );
+    const promptJson = JSON.stringify(scopedInstructions);
 
     if (input.scope?.type === 'headline') {
-      headline = result.headline;
-      mergedExperiences = existing
-        ? existing.experiences.map(e => ({
-            experienceId: e.experienceId,
-            ...resolveExperienceMeta(e.experienceId),
-            summary: e.summary,
-            bullets: e.bullets
+      return this.generateHeadline(context, existing, promptJson);
+    }
+    if (input.scope?.type === 'experience') {
+      return this.generateExperience(context, input.scope.experienceId, existing, promptJson);
+    }
+    if (input.scope?.type === 'summary') {
+      return this.generateSummary(context, input.scope.experienceId, existing, promptJson);
+    }
+    if (input.scope?.type === 'bullet') {
+      return this.generateBullet(
+        context,
+        input.scope.experienceId,
+        input.scope.bulletIndex,
+        input.scope.instructions,
+        existing,
+        promptJson
+      );
+    }
+
+    return this.generateFull(context, existing, promptJson);
+  }
+
+  private async generateFull(
+    context: GenerationContext,
+    existing: ResumeContent | null,
+    promptJson: string
+  ): Promise<ResumeContentDto> {
+    const headlineRecipe = this.registry.getRecipe(GenerationScope.HEADLINE);
+    const experienceRecipe = this.registry.getRecipe(GenerationScope.EXPERIENCE);
+    const runId = new Date().toISOString().replace(/[:.]/g, '-');
+
+    const headlinePromise = this.elementGenerator
+      .generate(headlineRecipe.compose(context, runId))
+      .then(raw => raw as HeadlineResult);
+
+    const summaryRecipe = this.registry.getRecipe(GenerationScope.EXPERIENCE_SUMMARY);
+
+    const experiencePromises = context.experiences.map(exp => {
+      const expContext = this.withTargetExperience(context, exp.id);
+      if (exp.bulletMax === 0) {
+        return this.elementGenerator
+          .generate(summaryRecipe.compose(expContext, runId))
+          .then(raw => ({
+            experienceId: exp.id,
+            result: { ...(raw as SummaryResult), bullets: [] } as ExperienceBulletsResult
           }))
-        : [];
-    } else if (input.scope?.type === 'experience') {
-      headline = existing?.headline ?? result.headline;
-      const prev = existing
-        ? existing.experiences.map(e => ({
-            experienceId: e.experienceId,
-            ...resolveExperienceMeta(e.experienceId),
-            summary: e.summary,
-            bullets: e.bullets
-          }))
-        : [];
-      const regenerated = result.experiences[0];
-      if (regenerated) {
-        mergedExperiences = prev.map(e => (e.experienceId === regenerated.experienceId ? regenerated : e));
-      } else {
-        mergedExperiences = prev;
+          .catch(error => ({
+            experienceId: exp.id,
+            error: error instanceof Error ? error.message : String(error)
+          }));
       }
-    } else {
-      headline = result.headline;
-      mergedExperiences = result.experiences;
-    }
-
-    const isScoped = input.scope != null;
-
-    let hiddenEducationIds: string[];
-    if (existing) {
-      hiddenEducationIds = existing.hiddenEducationIds;
-    } else {
-      const allEducations = await this.educationRepository.findAll();
-      hiddenEducationIds = allEducations.filter(e => e.hiddenByDefault).map(e => e.id);
-    }
-
-    // Deduplicate experiences by ID (keep first occurrence)
-    const seen = new Set<string>();
-    const deduped = mergedExperiences.filter(e => {
-      if (seen.has(e.experienceId)) return false;
-      seen.add(e.experienceId);
-      return true;
+      return this.elementGenerator
+        .generate(experienceRecipe.compose(expContext, runId))
+        .then(raw => ({ experienceId: exp.id, result: raw as ExperienceBulletsResult }))
+        .catch(error => ({
+          experienceId: exp.id,
+          error: error instanceof Error ? error.message : String(error)
+        }));
     });
 
+    const [headlineResult, ...experienceResults] = await Promise.all([headlinePromise, ...experiencePromises]);
+
+    const experiences = experienceResults.map(r => {
+      if ('error' in r) {
+        const existingExp = existing?.experiences.find(e => e.experienceId === r.experienceId);
+        const exp = context.experiences.find(e => e.id === r.experienceId)!;
+        return {
+          experienceId: r.experienceId,
+          experienceTitle: exp.title,
+          companyName: exp.companyName,
+          summary: existingExp?.summary ?? '',
+          bullets: existingExp?.bullets ?? [],
+          hiddenBulletIndices: existingExp?.hiddenBulletIndices ?? []
+        };
+      }
+      const exp = context.experiences.find(e => e.id === r.experienceId)!;
+      return {
+        experienceId: r.experienceId,
+        experienceTitle: exp.title,
+        companyName: exp.companyName,
+        summary: r.result.summary,
+        bullets: r.result.bullets,
+        hiddenBulletIndices: []
+      };
+    });
+
+    const hiddenEducationIds = existing ? existing.hiddenEducationIds : await this.resolveDefaultHiddenEducationIds();
+
     const resumeContent = ResumeContent.create({
-      profileId: profile.id,
-      jobDescriptionId: jd.id,
-      headline,
-      experiences: deduped.map(e => ({
+      profileId: context.profile.id,
+      jobDescriptionId: context.jobDescription.id,
+      headline: headlineResult.headline,
+      experiences: experiences.map(e => ({
         experienceId: e.experienceId,
         summary: e.summary,
         bullets: e.bullets,
-        hiddenBulletIndices: isScoped ? this.resolveHiddenIndices(e, existingExperienceMap.get(e.experienceId)) : []
+        hiddenBulletIndices: e.hiddenBulletIndices
       })),
       hiddenEducationIds,
-      prompt: result.requestPrompt,
-      schema: result.requestSchema
+      prompt: promptJson,
+      schema: null
     });
     await this.resumeContentRepository.save(resumeContent);
 
     return {
-      headline,
-      experiences: mergedExperiences.map(e => ({
+      headline: headlineResult.headline,
+      experiences: experiences.map(e => ({
         experienceId: e.experienceId,
         experienceTitle: e.experienceTitle,
         companyName: e.companyName,
@@ -195,37 +191,202 @@ export class GenerateResumeContent {
     };
   }
 
-  private resolveHiddenIndices(
-    experience: { bullets: string[] },
-    existing?: { bullets: string[]; hiddenBulletIndices: number[] }
-  ): number[] {
-    if (!existing || existing.hiddenBulletIndices.length === 0) return [];
-    // Only preserve hidden status for bullets whose content is unchanged
-    return existing.hiddenBulletIndices.filter(
-      i => i < experience.bullets.length && i < existing.bullets.length && experience.bullets[i] === existing.bullets[i]
+  private async generateHeadline(
+    context: GenerationContext,
+    existing: ResumeContent | null,
+    promptJson: string
+  ): Promise<ResumeContentDto> {
+    const recipe = this.registry.getRecipe(GenerationScope.HEADLINE);
+    const raw = await this.elementGenerator.generate(recipe.compose(context));
+    const result = raw as HeadlineResult;
+
+    const experiences = existing
+      ? existing.experiences
+      : context.experiences.map(e => ({
+          experienceId: e.id,
+          summary: '',
+          bullets: [] as string[],
+          hiddenBulletIndices: [] as number[]
+        }));
+
+    const hiddenEducationIds = existing?.hiddenEducationIds ?? (await this.resolveDefaultHiddenEducationIds());
+
+    const resumeContent = ResumeContent.create({
+      profileId: context.profile.id,
+      jobDescriptionId: context.jobDescription.id,
+      headline: result.headline,
+      experiences,
+      hiddenEducationIds,
+      prompt: promptJson,
+      schema: null
+    });
+    await this.resumeContentRepository.save(resumeContent);
+
+    return {
+      headline: result.headline,
+      experiences: experiences.map(e => {
+        const exp = context.experiences.find(x => x.id === e.experienceId);
+        return {
+          experienceId: e.experienceId,
+          experienceTitle: exp?.title ?? '',
+          companyName: exp?.companyName ?? '',
+          bullets: e.bullets
+        };
+      })
+    };
+  }
+
+  private async generateExperience(
+    context: GenerationContext,
+    experienceId: string,
+    existing: ResumeContent | null,
+    promptJson: string
+  ): Promise<ResumeContentDto> {
+    const recipe = this.registry.getRecipe(GenerationScope.EXPERIENCE);
+    const expContext = this.withTargetExperience(context, experienceId);
+    const raw = await this.elementGenerator.generate(recipe.compose(expContext));
+    const result = raw as ExperienceBulletsResult;
+
+    return this.mergeExperienceResult(context, existing, experienceId, result, promptJson);
+  }
+
+  private async generateSummary(
+    context: GenerationContext,
+    experienceId: string,
+    existing: ResumeContent | null,
+    promptJson: string
+  ): Promise<ResumeContentDto> {
+    const recipe = this.registry.getRecipe(GenerationScope.EXPERIENCE_SUMMARY);
+    const expContext = this.withTargetExperience(context, experienceId);
+    const raw = await this.elementGenerator.generate(recipe.compose(expContext));
+    const result = raw as SummaryResult;
+
+    const existingExp = existing?.experiences.find(e => e.experienceId === experienceId);
+    return this.mergeExperienceResult(
+      context,
+      existing,
+      experienceId,
+      {
+        summary: result.summary,
+        bullets: existingExp?.bullets ?? []
+      },
+      promptJson
     );
   }
 
-  private composePrompt(
-    settings: GenerationSettings,
-    scope: GenerateResumeContentScope | undefined,
-    additionalPrompt: string | undefined
-  ): string | null {
-    const parts: string[] = [];
+  private async generateBullet(
+    context: GenerationContext,
+    experienceId: string,
+    bulletIndex: number,
+    instructions: string,
+    existing: ResumeContent | null,
+    promptJson: string
+  ): Promise<ResumeContentDto> {
+    const recipe = this.registry.getRecipe(GenerationScope.BULLET);
+    const existingExp = existing?.experiences.find(e => e.experienceId === experienceId);
+    const existingBullets = existingExp?.bullets ?? [];
 
-    const resumePrompt = settings.getPrompt(GenerationScope.RESUME);
-    if (resumePrompt) parts.push(resumePrompt);
+    const bulletContext: GenerationContext = {
+      ...this.withTargetExperience(context, experienceId),
+      userInstructions: instructions
+    };
 
-    if (scope?.type === 'headline') {
-      const headlinePrompt = settings.getPrompt(GenerationScope.HEADLINE);
-      if (headlinePrompt) parts.push(headlinePrompt);
-    } else if (scope?.type === 'experience') {
-      const experiencePrompt = settings.getPrompt(GenerationScope.EXPERIENCE);
-      if (experiencePrompt) parts.push(experiencePrompt);
+    const raw = await this.elementGenerator.generate(recipe.compose(bulletContext));
+    const result = raw as BulletResult;
+
+    const updatedBullets = [...existingBullets];
+    if (bulletIndex < updatedBullets.length) {
+      updatedBullets[bulletIndex] = result.bullet;
+    } else {
+      updatedBullets.push(result.bullet);
     }
 
-    if (additionalPrompt) parts.push(additionalPrompt);
+    return this.mergeExperienceResult(
+      context,
+      existing,
+      experienceId,
+      {
+        summary: existingExp?.summary ?? '',
+        bullets: updatedBullets
+      },
+      promptJson
+    );
+  }
 
-    return parts.length > 0 ? parts.join('\n\n') : null;
+  private async mergeExperienceResult(
+    context: GenerationContext,
+    existing: ResumeContent | null,
+    experienceId: string,
+    result: { summary: string; bullets: string[] },
+    promptJson: string
+  ): Promise<ResumeContentDto> {
+    const headline = existing?.headline ?? '';
+
+    const experiences = existing
+      ? existing.experiences.map(e =>
+          e.experienceId === experienceId
+            ? {
+                ...e,
+                summary: result.summary,
+                bullets: result.bullets,
+                hiddenBulletIndices: this.resolveHiddenIndices(result.bullets, e)
+              }
+            : e
+        )
+      : context.experiences.map(e =>
+          e.id === experienceId
+            ? { experienceId: e.id, summary: result.summary, bullets: result.bullets, hiddenBulletIndices: [] }
+            : { experienceId: e.id, summary: '', bullets: [], hiddenBulletIndices: [] }
+        );
+
+    const hiddenEducationIds = existing?.hiddenEducationIds ?? (await this.resolveDefaultHiddenEducationIds());
+
+    const resumeContent = ResumeContent.create({
+      profileId: context.profile.id,
+      jobDescriptionId: context.jobDescription.id,
+      headline,
+      experiences,
+      hiddenEducationIds,
+      prompt: promptJson,
+      schema: null
+    });
+    await this.resumeContentRepository.save(resumeContent);
+
+    return {
+      headline,
+      experiences: experiences.map(e => {
+        const exp = context.experiences.find(x => x.id === e.experienceId);
+        return {
+          experienceId: e.experienceId,
+          experienceTitle: exp?.title ?? '',
+          companyName: exp?.companyName ?? '',
+          bullets: e.bullets
+        };
+      })
+    };
+  }
+
+  private withTargetExperience(context: GenerationContext, experienceId: string): GenerationContext {
+    const target = context.experiences.find(e => e.id === experienceId);
+    if (!target) throw new Error(`Experience not found: ${experienceId}`);
+    return {
+      ...context,
+      experiences: [target, ...context.experiences.filter(e => e.id !== experienceId)]
+    };
+  }
+
+  private resolveHiddenIndices(
+    newBullets: string[],
+    existing: { bullets: string[]; hiddenBulletIndices: number[] }
+  ): number[] {
+    if (existing.hiddenBulletIndices.length === 0) return [];
+    return existing.hiddenBulletIndices.filter(
+      i => i < newBullets.length && i < existing.bullets.length && newBullets[i] === existing.bullets[i]
+    );
+  }
+
+  private async resolveDefaultHiddenEducationIds(): Promise<string[]> {
+    const allEducation = await this.educationRepository.findAll();
+    return allEducation.filter(e => e.hiddenByDefault).map(e => e.id);
   }
 }
