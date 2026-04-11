@@ -1,0 +1,28 @@
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+
+@Entity({ tableName: 'esco_occupation_collections' })
+export class EscoOccupationCollectionEntity {
+  @PrimaryKey({ type: 'text' })
+  public conceptUri!: string;
+
+  @Property({ type: 'text' })
+  public conceptType!: string;
+
+  @Property({ type: 'text' })
+  public preferredLabel!: string;
+
+  @Property({ type: 'text' })
+  public status!: string;
+
+  @Property({ type: 'text', nullable: true })
+  public altLabels: string | null = null;
+
+  @Property({ type: 'text', nullable: true })
+  public description: string | null = null;
+
+  @Property({ type: 'text', nullable: true })
+  public broaderConceptUri: string | null = null;
+
+  @Property({ type: 'text', nullable: true })
+  public broaderConceptPt: string | null = null;
+}

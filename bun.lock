@@ -81,6 +81,7 @@
         "@anthropic-ai/sdk": "^0.82.0",
         "@mikro-orm/cli": "^7.0.0",
         "@mikro-orm/core": "^7.0.0",
+        "@mikro-orm/decorators": "^7.0.0",
         "@mikro-orm/migrations": "^7.0.0",
         "@mikro-orm/postgresql": "^7.0.0",
         "@mikro-orm/reflection": "^7.0.0",

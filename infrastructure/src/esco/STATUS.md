@@ -64,8 +64,25 @@ infrastructure/src/esco/
 ├── EscoDataset.ts           ← Result type (19 readonly typed arrays)
 ├── EscoDatasetParser.ts     ← Orchestrator (parses all 19 files)
 ├── EscoDirectoryLoader.ts   ← Directory scanner + file validation
+├── EscoImporter.ts          ← Bulk import to PostgreSQL (raw SQL, batched upserts)
 ├── index.ts                 ← Barrel exports
 ├── zod-csv.d.ts             ← Ambient types for zod-csv
+├── entities/
+│   ├── index.ts
+│   ├── EscoBroaderRelationOccPillarEntity.ts
+│   ├── EscoBroaderRelationSkillPillarEntity.ts
+│   ├── EscoConceptSchemeEntity.ts
+│   ├── EscoDictionaryEntity.ts
+│   ├── EscoGreenShareOccupationEntity.ts
+│   ├── EscoIscoGroupEntity.ts
+│   ├── EscoOccupationCollectionEntity.ts
+│   ├── EscoOccupationEntity.ts
+│   ├── EscoOccupationSkillRelationEntity.ts
+│   ├── EscoSkillCollectionEntity.ts
+│   ├── EscoSkillEntity.ts
+│   ├── EscoSkillGroupEntity.ts
+│   ├── EscoSkillSkillRelationEntity.ts
+│   └── EscoSkillsHierarchyEntity.ts
 └── schemas/
     ├── broader-relation-occ-pillar.ts
     ├── broader-relation-skill-pillar.ts
@@ -83,11 +100,41 @@ infrastructure/src/esco/
     └── skills-hierarchy.ts
 ```
 
+### Stage 3: Database schema + bulk import (`EscoImporter`)
+
+14 PostgreSQL tables created via `Migration_20260506000000_create_esco_tables`:
+
+**Concept tables** (PK = `concept_uri` text, with `esco_version`, `created_at`, `updated_at`):
+- `esco_skills`, `esco_occupations`, `esco_isco_groups`, `esco_skill_groups`
+- `esco_concept_schemes` (PK = `concept_scheme_uri`)
+- `esco_dictionary` (composite PK: `filename`, `data_header`)
+
+**Relationship tables** (composite PKs, no timestamps):
+- `esco_occupation_skill_relations` (FK → occupations + skills)
+- `esco_skill_skill_relations` (FK → skills ×2)
+- `esco_broader_relations_occ_pillar`, `esco_broader_relations_skill_pillar` (polymorphic, no FK)
+- `esco_skills_hierarchy` (auto-increment PK)
+
+**Collection tables:**
+- `esco_skill_collections` (composite PK: `concept_uri` + `collection_type`, FK → skills)
+- `esco_occupation_collections` (FK → occupations)
+- `esco_green_share_occupations` (polymorphic, no FK)
+
+`EscoImporter` performs idempotent bulk import via raw SQL with `INSERT ... ON CONFLICT DO UPDATE`. Skills hierarchy uses DELETE + INSERT (no natural unique key). Batches of 500 rows. Logs per-table row counts and duration.
+
+**CLI:** `bun esco:import <path-to-esco-directory>` (script at `scripts/esco-import.ts`)
+
+### Integration tests
+
+4 integration tests in `test-integration/esco/esco-import.test.ts`:
+- Import populates all 14 tables
+- Idempotency: running twice yields same row counts
+- Collection type discriminator values are correct
+- FK constraints exist on relationship tables
+
 ## What does not exist yet
 
-- **No database tables or migrations** — the parsed data stays in memory as `EscoDataset`
-- **No persistence layer** — no repositories, no ORM entities, no write path to Postgres
 - **No use case** — nothing in the application layer orchestrates or consumes the pipeline
-- **No CLI or API trigger** — no way to kick off the import from outside
-- **No deduplication or incremental import** — every run parses the full dataset from scratch
+- **No API trigger** — import is CLI-only
+- **No embeddings or vector columns** — planned for a separate session
 - **No DI wiring** — `EscoCsvParser` and `EscoDatasetParser` have `@injectable()` but are not bound in the composition root yet

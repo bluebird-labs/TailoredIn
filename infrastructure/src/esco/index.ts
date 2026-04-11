@@ -4,6 +4,8 @@ export type { EscoDataset } from './EscoDataset.js';
 export { EscoDatasetParser } from './EscoDatasetParser.js';
 export type { EscoDirectory } from './EscoDirectoryLoader.js';
 export { EscoDirectoryLoader, EscoDirectorySchema } from './EscoDirectoryLoader.js';
+export { EscoImporter } from './EscoImporter.js';
+export * from './entities/index.js';
 export type { BroaderRelationOccPillar } from './schemas/broader-relation-occ-pillar.js';
 export { BroaderRelationOccPillarSchema, OccPillarConceptTypeEnum } from './schemas/broader-relation-occ-pillar.js';
 export type { BroaderRelationSkillPillar } from './schemas/broader-relation-skill-pillar.js';

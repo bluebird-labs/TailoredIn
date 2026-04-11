@@ -18,6 +18,22 @@ import {
   ResumeContent
 } from '@tailoredin/domain';
 import { StatusCode } from '@tselect/status-code';
+import {
+  EscoBroaderRelationOccPillarEntity,
+  EscoBroaderRelationSkillPillarEntity,
+  EscoConceptSchemeEntity,
+  EscoDictionaryEntity,
+  EscoGreenShareOccupationEntity,
+  EscoIscoGroupEntity,
+  EscoOccupationCollectionEntity,
+  EscoOccupationEntity,
+  EscoOccupationSkillRelationEntity,
+  EscoSkillCollectionEntity,
+  EscoSkillEntity,
+  EscoSkillGroupEntity,
+  EscoSkillSkillRelationEntity,
+  EscoSkillsHierarchyEntity
+} from '../esco/entities/index.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -37,6 +53,7 @@ export function createOrmConfig(db: OrmDbConfig) {
     allowGlobalContext: false,
 
     entities: [
+      // Domain entities
       Profile,
       Education,
       Company,
@@ -46,7 +63,22 @@ export function createOrmConfig(db: OrmDbConfig) {
       JobDescription,
       ResumeContent,
       GenerationSettings,
-      GenerationPrompt
+      GenerationPrompt,
+      // ESCO reference data
+      EscoSkillEntity,
+      EscoOccupationEntity,
+      EscoIscoGroupEntity,
+      EscoSkillGroupEntity,
+      EscoConceptSchemeEntity,
+      EscoDictionaryEntity,
+      EscoOccupationSkillRelationEntity,
+      EscoSkillSkillRelationEntity,
+      EscoBroaderRelationOccPillarEntity,
+      EscoBroaderRelationSkillPillarEntity,
+      EscoSkillsHierarchyEntity,
+      EscoSkillCollectionEntity,
+      EscoOccupationCollectionEntity,
+      EscoGreenShareOccupationEntity
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

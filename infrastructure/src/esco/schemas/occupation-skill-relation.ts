@@ -7,7 +7,7 @@ export const OccupationSkillRelationSchema = z.object({
   occupationUri: z.string().url(),
   occupationLabel: z.string(),
   relationType: RelationTypeEnum,
-  skillType: SkillTypeEnum,
+  skillType: SkillTypeEnum.optional(),
   skillUri: z.string().url(),
   skillLabel: z.string()
 });

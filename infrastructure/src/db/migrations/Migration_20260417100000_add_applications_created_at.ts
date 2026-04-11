@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration_20260411000000_add_applications_created_at extends Migration {
+export class Migration_20260417100000_add_applications_created_at extends Migration {
   public override async up(): Promise<void> {
     this.addSql(`ALTER TABLE "applications" ADD COLUMN IF NOT EXISTS "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;`);
   }
