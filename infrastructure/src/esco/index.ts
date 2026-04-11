@@ -1,3 +1,7 @@
+export { EscoCsvParseError } from './EscoCsvParseError.js';
+export { EscoCsvParser } from './EscoCsvParser.js';
+export type { EscoDataset } from './EscoDataset.js';
+export { EscoDatasetParser } from './EscoDatasetParser.js';
 export type { EscoDirectory } from './EscoDirectoryLoader.js';
 export { EscoDirectoryLoader, EscoDirectorySchema } from './EscoDirectoryLoader.js';
 export type { BroaderRelationOccPillar } from './schemas/broader-relation-occ-pillar.js';

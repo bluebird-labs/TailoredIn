@@ -19,3 +19,4 @@ SkillGroup,http://data.europa.eu/esco/isced-f/0113,teacher training without subj
 SkillGroup,http://data.europa.eu/esco/isced-f/0114,teacher training with subject specialisation,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
 SkillGroup,http://data.europa.eu/esco/isced-f/0119,education not elsewhere classified,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
 SkillGroup,http://data.europa.eu/esco/isced-f/018,inter-disciplinary programmes and qualifications involving education,SkillGroup,http://data.europa.eu/esco/isced-f/01,education
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0005c151-5b5a-4a66-8aac-60e734beb1ab,manage musical staff,SkillGroup,http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills

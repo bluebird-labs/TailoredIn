@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SkillTypeEnum = z.enum(['skill/competence', 'knowledge']);
-export const ReuseLevelEnum = z.enum(['sector-specific', 'cross-sector', 'transversal']);
+export const ReuseLevelEnum = z.enum(['sector-specific', 'occupation-specific', 'cross-sector', 'transversal']);
 
 export const SkillSchema = z.object({
   conceptType: z.literal('KnowledgeSkillCompetence'),

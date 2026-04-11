@@ -5,7 +5,7 @@ export const ConceptSchemeSchema = z.object({
   conceptSchemeUri: z.string().url(),
   preferredLabel: z.string(),
   title: z.string().optional(),
-  status: z.string(),
+  status: z.string().optional(),
   description: z.string().optional(),
   hasTopConcept: z.string().optional()
 });
