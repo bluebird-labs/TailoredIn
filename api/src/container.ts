@@ -18,6 +18,7 @@ import {
   GenerateResumeContent,
   GenerateResumeContentWithPdf,
   GenerateResumePdf,
+  GenerationContextBuilder,
   GetApplication,
   GetCachedResumePdf,
   GetCompany,
@@ -32,6 +33,9 @@ import {
   ListExperiences,
   ListJobDescriptions,
   ParseJobDescription,
+  PromptRegistry,
+  RemoveExperienceGenerationOverride,
+  SetExperienceGenerationOverride,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -45,14 +49,27 @@ import {
   UpdateResumeDisplaySettings
 } from '@tailoredin/application';
 import { env, envInt, envOptional } from '@tailoredin/core';
+import { ModelTier } from '@tailoredin/domain';
 import {
+  BulletParamsSection,
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
   ClaudeApiJobDescriptionParser,
   ClaudeApiProvider,
   ClaudeApiResumeContentGenerator,
+  ClaudeApiResumeElementGenerator,
+  CompanyContextSection,
+  createExperienceBulletsRecipe,
+  createExperienceSummaryRecipe,
+  createBulletRecipe,
+  createHeadlineRecipe,
   createOrmConfig,
   DI,
+  EducationSection,
+  ExperienceDetailSection,
+  JobDescriptionSection,
+  OtherExperiencesSection,
+  OutputConstraintsSection,
   PostgresApplicationRepository,
   PostgresCompanyRepository,
   PostgresEducationRepository,
@@ -61,7 +78,12 @@ import {
   PostgresJobDescriptionRepository,
   PostgresProfileRepository,
   PostgresResumeContentRepository,
-  TypstResumeRendererFactory
+  ProfileSection,
+  RulesSection,
+  SettingsSection,
+  ToneSection,
+  TypstResumeRendererFactory,
+  UserInstructionsSection
 } from '@tailoredin/infrastructure';
 
 const orm = await MikroORM.init(
@@ -269,19 +291,56 @@ container.bind({
   useFactory: () => new UpdateGenerationSettings(container.get(DI.GenerationSettings.Repository))
 });
 
-// Resume
+// Resume — prompt pipeline
+const sections = {
+  rules: new RulesSection(),
+  outputConstraints: new OutputConstraintsSection(),
+  profile: new ProfileSection(),
+  tone: new ToneSection(),
+  companyContext: new CompanyContextSection(),
+  education: new EducationSection(),
+  settings: new SettingsSection(),
+  jobDescription: new JobDescriptionSection(),
+  experienceDetail: new ExperienceDetailSection(),
+  otherExperiences: new OtherExperiencesSection(),
+  userInstructions: new UserInstructionsSection(),
+  bulletParams: new BulletParamsSection()
+};
+
+const defaultModel = 'claude-sonnet-4-6';
+const promptRegistry = new PromptRegistry([
+  createHeadlineRecipe(sections, defaultModel),
+  createExperienceBulletsRecipe(sections, defaultModel),
+  createExperienceSummaryRecipe(sections, defaultModel),
+  createBulletRecipe(sections, defaultModel)
+]);
+
+container.bind({ provide: DI.Resume.PromptRegistry, useValue: promptRegistry });
+container.bind({ provide: DI.Resume.ElementGenerator, useClass: ClaudeApiResumeElementGenerator });
+container.bind({
+  provide: DI.Resume.ContextBuilder,
+  useFactory: () =>
+    new GenerationContextBuilder(
+      container.get(DI.Profile.Repository),
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.Education.Repository),
+      container.get(DI.Company.Repository),
+      container.get(DI.GenerationSettings.Repository),
+      container.get(DI.ExperienceGenerationOverride.Repository)
+    )
+});
+// Legacy generator — kept for now, will be removed in cleanup phase
 container.bind({ provide: DI.Resume.Generator, useClass: ClaudeApiResumeContentGenerator });
 container.bind({
   provide: DI.Resume.Generate,
   useFactory: () =>
     new GenerateResumeContent(
-      container.get(DI.Profile.Repository),
-      container.get(DI.Experience.Repository),
-      container.get(DI.JobDescription.Repository),
+      container.get(DI.Resume.ContextBuilder),
+      container.get(DI.Resume.PromptRegistry),
+      container.get(DI.Resume.ElementGenerator),
       container.get(DI.ResumeContent.Repository),
-      container.get(DI.Resume.Generator),
-      container.get(DI.Education.Repository),
-      container.get(DI.GenerationSettings.Repository)
+      container.get(DI.Education.Repository)
     )
 });
 container.bind({ provide: DI.Resume.RendererFactory, useClass: TypstResumeRendererFactory });
