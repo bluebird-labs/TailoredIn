@@ -27,6 +27,16 @@ function formatCurrentContent(summary: string | undefined, bullets: string[]): s
   return parts.join('\n');
 }
 
+function formatFullOutput(output: { headline?: string; experiences: readonly ResumeOutputExperience[] }): string {
+  const parts: string[] = [];
+  if (output.headline) parts.push(`Headline: ${output.headline}`);
+  for (const exp of output.experiences) {
+    parts.push(`\n${exp.experienceTitle} — ${exp.companyName}`);
+    parts.push(formatCurrentContent(exp.summary, exp.bullets));
+  }
+  return parts.join('\n');
+}
+
 function RegeneratePopover({
   isRegenerating,
   onRegenerate,
@@ -37,7 +47,7 @@ function RegeneratePopover({
   isRegenerating: boolean;
   onRegenerate: (prompt: string) => void;
   triggerTitle: string;
-  currentContent?: { summary?: string; bullets: string[] };
+  currentContent?: string;
   initialPrompt?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -47,8 +57,7 @@ function RegeneratePopover({
   function handleSubmit() {
     let finalPrompt = prompt.trim();
     if (includeCurrentVersion && currentContent) {
-      const content = formatCurrentContent(currentContent.summary, currentContent.bullets);
-      finalPrompt = `Current version:\n${content}${finalPrompt ? `\n\nInstructions: ${finalPrompt}` : ''}`;
+      finalPrompt = `Current version:\n${currentContent}${finalPrompt ? `\n\nInstructions: ${finalPrompt}` : ''}`;
     }
     onRegenerate(finalPrompt);
     setOpen(false);
@@ -160,7 +169,7 @@ function ExperienceCard({
           isRegenerating={isRegenerating}
           onRegenerate={onRegenerate}
           triggerTitle="Regenerate this experience"
-          currentContent={{ summary: exp.summary, bullets: exp.bullets }}
+          currentContent={formatCurrentContent(exp.summary, exp.bullets)}
           initialPrompt={initialPrompt}
         />
       </div>
@@ -201,6 +210,7 @@ export function GenerationWorkspace({
   onSelectJob: (id: string | null) => void;
 }) {
   const [additionalPrompt, setAdditionalPrompt] = useState('');
+  const [includeCurrentVersion, setIncludeCurrentVersion] = useState(false);
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
   const [sessionOverrides, setSessionOverrides] = useState<Map<string, { min: number; max: number }>>(new Map());
 
@@ -239,11 +249,17 @@ export function GenerationWorkspace({
   }
 
   function handleGenerate() {
+    let prompt = additionalPrompt.trim();
+    if (includeCurrentVersion && resumeOutput) {
+      const content = formatFullOutput(resumeOutput);
+      prompt = `Current version:\n${content}${prompt ? `\n\nInstructions: ${prompt}` : ''}`;
+    }
     generate.mutate(
-      { additionalPrompt: additionalPrompt.trim() || undefined, bulletOverrides: buildBulletOverrides() },
+      { additionalPrompt: prompt || undefined, bulletOverrides: buildBulletOverrides() },
       {
         onSuccess: () => {
           setAdditionalPrompt('');
+          setIncludeCurrentVersion(false);
           toast.success('Resume content generated');
         },
         onError: err => toast.error(err instanceof Error ? err.message : 'Generation failed')
@@ -357,6 +373,17 @@ export function GenerationWorkspace({
             onChange={e => setAdditionalPrompt(e.target.value)}
             className="min-h-[72px] resize-none text-[13px]"
           />
+          {resumeOutput && (
+            <label className="flex cursor-pointer items-center gap-2 py-1 text-[12px] text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={includeCurrentVersion}
+                onChange={e => setIncludeCurrentVersion(e.target.checked)}
+                className="rounded"
+              />
+              Include current version as reference
+            </label>
+          )}
           <div className="flex justify-end">
             <Button size="sm" onClick={handleGenerate} disabled={!selectedJobId || generate.isPending}>
               {generate.isPending ? (
@@ -385,6 +412,7 @@ export function GenerationWorkspace({
                   isRegenerating={regeneratingId === 'headline'}
                   onRegenerate={handleRegenerateHeadline}
                   triggerTitle="Regenerate headline"
+                  currentContent={resumeOutput.headline}
                   initialPrompt={scopedInstructions.headline}
                 />
               </div>
