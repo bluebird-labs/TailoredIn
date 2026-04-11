@@ -30,6 +30,11 @@ export const queryKeys = {
   resume: {
     cachedPdf: (jobDescriptionId: string) => ['resume', 'cachedPdf', jobDescriptionId] as const
   },
+  applications: {
+    all: ['applications'] as const,
+    list: () => [...queryKeys.applications.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.applications.all, 'detail', id] as const
+  },
   generationSettings: {
     all: ['generationSettings'] as const,
     detail: () => ['generationSettings', 'detail'] as const
