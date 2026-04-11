@@ -11,6 +11,8 @@ export type Application = {
   status: string;
   jobDescriptionId: string | null;
   notes: string | null;
+  archiveReason: string | null;
+  withdrawReason: string | null;
   appliedAt: string;
   updatedAt: string;
 };
@@ -52,9 +54,13 @@ export function useUpdateApplicationStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: { id: string; status: string }) => {
+    mutationFn: async (input: { id: string; status: string; archiveReason?: string; withdrawReason?: string }) => {
       const segment = api.applications as EdenRouteSegment;
-      const { data, error } = await segment({ id: input.id }).status.patch({ status: input.status });
+      const { data, error } = await segment({ id: input.id }).status.patch({
+        status: input.status,
+        archive_reason: input.archiveReason,
+        withdraw_reason: input.withdrawReason
+      });
       if (error) throw new Error(extractApiError(error, 'Could not update application status'));
       return data?.data;
     },
@@ -64,7 +70,16 @@ export function useUpdateApplicationStatus() {
       const previous = queryClient.getQueryData<Application[]>(queryKeys.applications.list());
 
       queryClient.setQueryData<Application[]>(queryKeys.applications.list(), old =>
-        old?.map(app => (app.id === input.id ? { ...app, status: input.status } : app))
+        old?.map(app =>
+          app.id === input.id
+            ? {
+                ...app,
+                status: input.status,
+                archiveReason: input.archiveReason ?? null,
+                withdrawReason: input.withdrawReason ?? null
+              }
+            : app
+        )
       );
 
       return { previous };

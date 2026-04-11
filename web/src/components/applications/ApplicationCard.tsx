@@ -40,6 +40,11 @@ export function ApplicationCard({ application, company, jobDescription, isDragOv
         <span className="truncate text-xs text-muted-foreground">{companyName}</span>
       </div>
       <p className="mt-1.5 text-xs text-muted-foreground">{formatDate(application.appliedAt)}</p>
+      {(application.archiveReason || application.withdrawReason) && (
+        <p className="mt-1 truncate text-xs italic text-muted-foreground/70">
+          {application.archiveReason ?? application.withdrawReason}
+        </p>
+      )}
     </div>
   );
 }

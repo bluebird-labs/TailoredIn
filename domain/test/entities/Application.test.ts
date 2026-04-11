@@ -15,6 +15,8 @@ describe('Application', () => {
     expect(app.status).toBe(ApplicationStatus.DRAFT);
     expect(app.jobDescriptionId).toBeNull();
     expect(app.notes).toBeNull();
+    expect(app.archiveReason).toBeNull();
+    expect(app.withdrawReason).toBeNull();
     expect(app.appliedAt).toBeInstanceOf(Date);
     expect(app.updatedAt).toBeInstanceOf(Date);
   });
@@ -41,10 +43,77 @@ describe('Application', () => {
 
     const originalUpdatedAt = app.updatedAt;
 
-    // Small delay to ensure timestamp differs
     app.setStatus(ApplicationStatus.INTERVIEWING);
 
     expect(app.status).toBe(ApplicationStatus.INTERVIEWING);
     expect(app.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
+  });
+
+  test('setStatus clears archive and withdraw reasons', () => {
+    const app = Application.create({
+      profileId: 'profile-1',
+      companyId: 'company-1'
+    });
+
+    app.archive('Role closed');
+    expect(app.archiveReason).toBe('Role closed');
+
+    app.setStatus(ApplicationStatus.DRAFT);
+    expect(app.archiveReason).toBeNull();
+    expect(app.withdrawReason).toBeNull();
+  });
+
+  test('setStatus throws when called with ARCHIVED', () => {
+    const app = Application.create({
+      profileId: 'profile-1',
+      companyId: 'company-1'
+    });
+
+    expect(() => app.setStatus(ApplicationStatus.ARCHIVED)).toThrow('Use archive() to set ARCHIVED status');
+  });
+
+  test('setStatus throws when called with WITHDRAWN', () => {
+    const app = Application.create({
+      profileId: 'profile-1',
+      companyId: 'company-1'
+    });
+
+    expect(() => app.setStatus(ApplicationStatus.WITHDRAWN)).toThrow('Use withdraw() to set WITHDRAWN status');
+  });
+
+  test('archive sets status, archiveReason, and clears withdrawReason', () => {
+    const app = Application.create({
+      profileId: 'profile-1',
+      companyId: 'company-1'
+    });
+
+    app.withdraw('Compensation mismatch');
+    expect(app.withdrawReason).toBe('Compensation mismatch');
+
+    const beforeArchive = app.updatedAt;
+    app.archive('Position filled');
+
+    expect(app.status).toBe(ApplicationStatus.ARCHIVED);
+    expect(app.archiveReason).toBe('Position filled');
+    expect(app.withdrawReason).toBeNull();
+    expect(app.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeArchive.getTime());
+  });
+
+  test('withdraw sets status, withdrawReason, and clears archiveReason', () => {
+    const app = Application.create({
+      profileId: 'profile-1',
+      companyId: 'company-1'
+    });
+
+    app.archive('Role closed');
+    expect(app.archiveReason).toBe('Role closed');
+
+    const beforeWithdraw = app.updatedAt;
+    app.withdraw('Accepted another offer');
+
+    expect(app.status).toBe(ApplicationStatus.WITHDRAWN);
+    expect(app.withdrawReason).toBe('Accepted another offer');
+    expect(app.archiveReason).toBeNull();
+    expect(app.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeWithdraw.getTime());
   });
 });

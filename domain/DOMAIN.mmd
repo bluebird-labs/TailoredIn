@@ -30,8 +30,12 @@ classDiagram
         +ApplicationStatus status
         +string? jobDescriptionId
         +string? notes
+        +string? archiveReason
+        +string? withdrawReason
         +Date appliedAt
         +setStatus()
+        +archive()
+        +withdraw()
     }
 
     class Education {

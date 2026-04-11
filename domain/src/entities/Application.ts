@@ -8,6 +8,8 @@ export type ApplicationCreateProps = {
   status?: ApplicationStatus;
   jobDescriptionId?: string | null;
   notes?: string | null;
+  archiveReason?: string | null;
+  withdrawReason?: string | null;
 };
 
 @Entity({ tableName: 'applications' })
@@ -30,6 +32,12 @@ export class Application extends AggregateRoot {
   @Property({ fieldName: 'notes', type: 'text', nullable: true })
   public notes: string | null;
 
+  @Property({ fieldName: 'archive_reason', type: 'text', nullable: true })
+  public archiveReason: string | null;
+
+  @Property({ fieldName: 'withdraw_reason', type: 'text', nullable: true })
+  public withdrawReason: string | null;
+
   @Property({ fieldName: 'applied_at', type: 'timestamp(3)' })
   public readonly appliedAt: Date;
 
@@ -46,6 +54,8 @@ export class Application extends AggregateRoot {
     status: ApplicationStatus;
     jobDescriptionId: string | null;
     notes: string | null;
+    archiveReason: string | null;
+    withdrawReason: string | null;
     appliedAt: Date;
     createdAt: Date;
     updatedAt: Date;
@@ -57,13 +67,37 @@ export class Application extends AggregateRoot {
     this.status = props.status;
     this.jobDescriptionId = props.jobDescriptionId;
     this.notes = props.notes;
+    this.archiveReason = props.archiveReason;
+    this.withdrawReason = props.withdrawReason;
     this.appliedAt = props.appliedAt;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
 
   public setStatus(status: ApplicationStatus): void {
+    if (status === ApplicationStatus.ARCHIVED) {
+      throw new Error('Use archive() to set ARCHIVED status');
+    }
+    if (status === ApplicationStatus.WITHDRAWN) {
+      throw new Error('Use withdraw() to set WITHDRAWN status');
+    }
     this.status = status;
+    this.archiveReason = null;
+    this.withdrawReason = null;
+    this.updatedAt = new Date();
+  }
+
+  public archive(reason: string): void {
+    this.status = ApplicationStatus.ARCHIVED;
+    this.archiveReason = reason;
+    this.withdrawReason = null;
+    this.updatedAt = new Date();
+  }
+
+  public withdraw(reason: string): void {
+    this.status = ApplicationStatus.WITHDRAWN;
+    this.withdrawReason = reason;
+    this.archiveReason = null;
     this.updatedAt = new Date();
   }
 
@@ -76,6 +110,8 @@ export class Application extends AggregateRoot {
       status: props.status ?? ApplicationStatus.DRAFT,
       jobDescriptionId: props.jobDescriptionId ?? null,
       notes: props.notes ?? null,
+      archiveReason: props.archiveReason ?? null,
+      withdrawReason: props.withdrawReason ?? null,
       appliedAt: now,
       createdAt: now,
       updatedAt: now

@@ -16,6 +16,7 @@ import type { Company } from '@/hooks/use-companies';
 import type { JobDescription } from '@/hooks/use-job-descriptions';
 import { ApplicationCard } from './ApplicationCard';
 import { BoardColumn } from './BoardColumn';
+import { StatusReasonDialog } from './StatusReasonDialog';
 
 const ACTIVE_STATUSES = [
   { status: 'draft', label: 'Draft' },
@@ -40,6 +41,10 @@ interface ApplicationBoardProps {
 
 export function ApplicationBoard({ applications, companies, jobDescriptions }: ApplicationBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [pendingReasonAction, setPendingReasonAction] = useState<{
+    applicationId: string;
+    status: 'archived' | 'withdrawn';
+  } | null>(null);
   const updateStatus = useUpdateApplicationStatus();
 
   const sensors = useSensors(
@@ -76,6 +81,11 @@ export function ApplicationBoard({ applications, companies, jobDescriptions }: A
     const currentStatus = (active.data.current as { status: string } | undefined)?.status;
 
     if (targetStatus === currentStatus) return;
+
+    if (targetStatus === 'archived' || targetStatus === 'withdrawn') {
+      setPendingReasonAction({ applicationId, status: targetStatus });
+      return;
+    }
 
     updateStatus.mutate({ id: applicationId, status: targetStatus });
   }
@@ -132,6 +142,27 @@ export function ApplicationBoard({ applications, companies, jobDescriptions }: A
           />
         ) : null}
       </DragOverlay>
+
+      <StatusReasonDialog
+        open={pendingReasonAction !== null}
+        onOpenChange={open => {
+          if (!open) setPendingReasonAction(null);
+        }}
+        status={pendingReasonAction?.status ?? 'archived'}
+        isPending={updateStatus.isPending}
+        onConfirm={reason => {
+          if (!pendingReasonAction) return;
+          const { applicationId, status } = pendingReasonAction;
+          updateStatus.mutate(
+            {
+              id: applicationId,
+              status,
+              ...(status === 'archived' ? { archiveReason: reason } : { withdrawReason: reason })
+            },
+            { onSettled: () => setPendingReasonAction(null) }
+          );
+        }}
+      />
     </DndContext>
   );
 }

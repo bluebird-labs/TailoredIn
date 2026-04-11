@@ -41,4 +41,58 @@ describe('UpdateApplicationStatus', () => {
       })
     ).rejects.toThrow('Application not found');
   });
+
+  test('archives with reason and returns updated DTO', async () => {
+    const app = makeApplication();
+    const useCase = new UpdateApplicationStatus(mockApplicationRepo(app));
+
+    const dto = await useCase.execute({
+      applicationId: app.id,
+      status: ApplicationStatus.ARCHIVED,
+      archiveReason: 'Role closed'
+    });
+
+    expect(dto.status).toBe('archived');
+    expect(dto.archiveReason).toBe('Role closed');
+    expect(dto.withdrawReason).toBeNull();
+  });
+
+  test('throws when archiving without reason', async () => {
+    const app = makeApplication();
+    const useCase = new UpdateApplicationStatus(mockApplicationRepo(app));
+
+    await expect(
+      useCase.execute({
+        applicationId: app.id,
+        status: ApplicationStatus.ARCHIVED
+      })
+    ).rejects.toThrow('Archive reason is required');
+  });
+
+  test('withdraws with reason and returns updated DTO', async () => {
+    const app = makeApplication();
+    const useCase = new UpdateApplicationStatus(mockApplicationRepo(app));
+
+    const dto = await useCase.execute({
+      applicationId: app.id,
+      status: ApplicationStatus.WITHDRAWN,
+      withdrawReason: 'Accepted another offer'
+    });
+
+    expect(dto.status).toBe('withdrawn');
+    expect(dto.withdrawReason).toBe('Accepted another offer');
+    expect(dto.archiveReason).toBeNull();
+  });
+
+  test('throws when withdrawing without reason', async () => {
+    const app = makeApplication();
+    const useCase = new UpdateApplicationStatus(mockApplicationRepo(app));
+
+    await expect(
+      useCase.execute({
+        applicationId: app.id,
+        status: ApplicationStatus.WITHDRAWN
+      })
+    ).rejects.toThrow('Withdraw reason is required');
+  });
 });
