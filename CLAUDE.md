@@ -100,8 +100,9 @@ bun test <path/to/test.ts>   # run a single test file
 ```bash
 bun run domain:diagram       # regenerate domain/DOMAIN.mmd
 bun run app:diagram          # regenerate application/APPLICATION.mmd
-bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running, main only)
+bun run db:diagram           # regenerate infrastructure/DATABASE.mmd (needs DB running)
 bun run diags                # regenerate all three diagrams in parallel
+bun dev:diagram              # same as db:diagram but guarded to main branch only
 ```
 
 ### Storybook
@@ -145,7 +146,7 @@ Before ending a session, run `git status`. If there are unstaged or untracked fi
 **Never run `db:migration:up` without asking first.** When asking, read the migration file and explicitly state whether it includes data deletion (DROP TABLE, DROP COLUMN, DELETE, TRUNCATE). Show the destructive SQL if present.
 
 ### Session-end checklist
-1. `bun run domain:diagram && bun run app:diagram && bun run db:diagram` — regenerate diagrams
+1. `bun run diags` — regenerate all diagrams
 2. Commit any diagram changes
 3. `git status` — resolve any remaining unstaged/untracked files with the user
 
