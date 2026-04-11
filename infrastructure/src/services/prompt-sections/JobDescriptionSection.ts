@@ -8,7 +8,7 @@ export class JobDescriptionSection extends PromptSection {
 
   public render(context: GenerationContext): PromptBlock {
     const { jobDescription: jd } = context;
-    const lines = ['## Target Job Description', '', `Title: ${jd.title}`, '', `Description:`, jd.description];
+    const lines = ['## Target Job Description', '', `Title: ${jd.title}`, '', `Job Analysis:`, jd.description];
 
     if (jd.level) {
       lines.push('', `Level: ${jd.level}`);

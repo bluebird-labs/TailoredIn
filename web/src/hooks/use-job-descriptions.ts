@@ -164,6 +164,8 @@ export function useUpdateJobDescription(companyId: string) {
       source: string;
       posted_at?: string | null;
       raw_text?: string | null;
+      sought_hard_skills?: string[] | null;
+      sought_soft_skills?: string[] | null;
     }) => {
       const { id, ...body } = input;
       const segment = api['job-descriptions'] as EdenRouteSegment;

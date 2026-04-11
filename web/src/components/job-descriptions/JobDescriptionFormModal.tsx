@@ -514,7 +514,7 @@ function FormStep({
         error={errors.description}
         disabled={disabled}
         placeholder="Role responsibilities and requirements..."
-        rows={4}
+        rows={8}
       />
 
       <div className="grid grid-cols-2 gap-3">

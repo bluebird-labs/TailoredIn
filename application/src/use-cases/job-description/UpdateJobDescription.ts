@@ -22,6 +22,8 @@ export type UpdateJobDescriptionInput = {
   source: JobSource;
   postedAt?: Date | null;
   rawText?: string | null;
+  soughtHardSkills?: string[] | null;
+  soughtSoftSkills?: string[] | null;
 };
 
 export class UpdateJobDescription {
@@ -42,6 +44,8 @@ export class UpdateJobDescription {
     jd.source = input.source;
     jd.postedAt = input.postedAt ?? null;
     if (input.rawText !== undefined) jd.rawText = input.rawText;
+    if (input.soughtHardSkills !== undefined) jd.soughtHardSkills = input.soughtHardSkills;
+    if (input.soughtSoftSkills !== undefined) jd.soughtSoftSkills = input.soughtSoftSkills;
     jd.salaryRange =
       input.salaryCurrency != null
         ? new SalaryRange({

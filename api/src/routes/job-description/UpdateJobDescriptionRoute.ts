@@ -26,7 +26,9 @@ export class UpdateJobDescriptionRoute {
             locationType: body.location_type ? (body.location_type as LocationType) : undefined,
             source: body.source as JobSource,
             postedAt: body.posted_at ? new Date(body.posted_at) : null,
-            rawText: body.raw_text
+            rawText: body.raw_text,
+            soughtHardSkills: body.sought_hard_skills,
+            soughtSoftSkills: body.sought_soft_skills
           });
           return { data };
         } catch (e) {
@@ -51,7 +53,9 @@ export class UpdateJobDescriptionRoute {
           location_type: t.Optional(t.Nullable(t.String())),
           source: t.String({ minLength: 1 }),
           posted_at: t.Optional(t.Nullable(t.String())),
-          raw_text: t.Optional(t.Nullable(t.String()))
+          raw_text: t.Optional(t.Nullable(t.String())),
+          sought_hard_skills: t.Optional(t.Nullable(t.Array(t.String()))),
+          sought_soft_skills: t.Optional(t.Nullable(t.Array(t.String())))
         })
       }
     );

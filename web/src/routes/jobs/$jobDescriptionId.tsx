@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Download, Pencil, Sparkles } from 'lucide-react';
+import { Download, Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import Markdown from 'react-markdown';
+import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { formatEnumLabel } from '@/components/job-descriptions/job-description-options.js';
@@ -13,7 +15,12 @@ import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useCompany } from '@/hooks/use-companies';
-import { type JobDescription, useJobDescription } from '@/hooks/use-job-descriptions';
+import {
+  type JobDescription,
+  useJobDescription,
+  useParseJobDescription,
+  useUpdateJobDescription
+} from '@/hooks/use-job-descriptions';
 
 export const Route = createFileRoute('/jobs/$jobDescriptionId')({
   component: JobDetailPage
@@ -62,6 +69,45 @@ function JobDetailPage() {
   const { data: jd, isLoading } = useJobDescription(jobDescriptionId);
   const { data: company } = useCompany(jd?.companyId ?? '');
   const [editOpen, setEditOpen] = useState(false);
+  const parseJd = useParseJobDescription();
+  const updateJd = useUpdateJobDescription(jd?.companyId ?? '');
+  const isReparsing = parseJd.isPending || updateJd.isPending;
+
+  function handleReparse() {
+    if (!jd?.rawText) return;
+    parseJd.mutate(
+      { text: jd.rawText },
+      {
+        onSuccess: result => {
+          updateJd.mutate(
+            {
+              id: jd.id,
+              company_id: jd.companyId,
+              title: result.title ?? jd.title,
+              description: result.description ?? jd.description,
+              url: result.url ?? jd.url,
+              location: result.location ?? jd.location,
+              salary_min: result.salaryMin ?? jd.salaryRange?.min,
+              salary_max: result.salaryMax ?? jd.salaryRange?.max,
+              salary_currency: result.salaryCurrency ?? jd.salaryRange?.currency,
+              level: result.level ?? jd.level,
+              location_type: result.locationType ?? jd.locationType,
+              source: jd.source,
+              posted_at: result.postedAt ?? jd.postedAt,
+              raw_text: jd.rawText,
+              sought_hard_skills: result.soughtHardSkills,
+              sought_soft_skills: result.soughtSoftSkills
+            },
+            {
+              onSuccess: () => toast.success('Job analysis regenerated'),
+              onError: () => toast.error('Failed to save reparsed job description')
+            }
+          );
+        },
+        onError: () => toast.error('Failed to reparse job description')
+      }
+    );
+  }
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
   if (!jd) return <EmptyState message="Job description not found." />;
@@ -125,6 +171,16 @@ function JobDetailPage() {
         }
         actions={
           <div className="flex items-center gap-2">
+            {jd.rawText && (
+              <Button size="sm" variant="outline" onClick={handleReparse} disabled={isReparsing}>
+                {isReparsing ? (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                )}
+                {isReparsing ? 'Reparsing...' : 'Reparse'}
+              </Button>
+            )}
             <Link to="/atelier" search={{ job: jobDescriptionId }}>
               <Button size="sm" variant="outline">
                 <Sparkles className="mr-1.5 h-3.5 w-3.5" />
@@ -141,9 +197,18 @@ function JobDetailPage() {
 
       <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
         <div className="space-y-5">
-          <InfoCard label="Description">
+          <InfoCard label="Job Analysis">
             {jd.description ? (
-              <p className="text-[14px] leading-relaxed tracking-[0.01em]">{jd.description}</p>
+              <div
+                className="prose prose-sm max-w-none text-[14px] leading-relaxed tracking-[0.01em] text-foreground
+                  [&_h3]:text-[14px] [&_h3]:font-medium [&_h3]:mt-4 [&_h3]:mb-1.5
+                  [&_h3:first-child]:mt-0
+                  [&_p]:my-1.5
+                  [&_ul]:my-1.5 [&_ul]:pl-5 [&_ul]:list-disc
+                  [&_li]:my-0.5 [&_li]:text-[14px]"
+              >
+                <Markdown>{jd.description}</Markdown>
+              </div>
             ) : (
               <p className="text-[14px] italic text-muted-foreground">No description</p>
             )}
