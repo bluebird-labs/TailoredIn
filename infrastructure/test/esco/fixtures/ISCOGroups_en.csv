@@ -1,0 +1,221 @@
+conceptType,conceptUri,code,preferredLabel,status,altLabels,inScheme,description
+ISCOGroup,http://data.europa.eu/esco/isco/C0,0,Armed forces occupations,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Armed forces occupations include all jobs held by members of the armed forces. Members of the armed forces are those personnel who are currently serving in the armed forces, including auxiliary services, whether on a voluntary or compulsory basis, and who are not free to accept civilian employment and are subject to military discipline. Included are regular members of the army, navy, air force and other military services, as well as conscripts enrolled for military training or other service for a specified period.
+Occupations in this major group are classified into the following sub-major groups:
+01 Commissioned Armed Forces Officers
+02 Non-commissioned Armed Forces Officers
+03 Armed Forces Occupations, Other Ranks
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services.
+Notes
+Many jobs performed by members of the armed forces are similar, in terms of the nature of the work performed, to civilian occupations such as medical doctors, radio operators, cooks, secretaries and heavy truck drivers. Conceptually, it may be appropriate, therefore, to classify such jobs in the armed forces with similar civilian jobs. This approach is adopted in several national occupation classifications. Typically such classifications also identify a number of military-specific occupational groups. In many countries, however, it is not possible to produce information about the nature of the work performed by members of the armed forces. In adapting ISCO-08 for national purposes countries may wish, therefore, to consider what approach best suits their circumstances and user needs. For purposes of international comparability, however, where data pertaining to members of the armed forces are reported and classified by occupation, they should be included, where possible, in ISCO-08 Major Group 0: Armed Forces Occupations."
+ISCOGroup,http://data.europa.eu/esco/isco/C01,01,Commissioned armed forces officers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Commissioned armed forces officers provide leadership and management to organizational units in the armed forces and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. This group includes all members of the armed forces holding the rank of second lieutenant (or equivalent) or higher. Competent performance in most occupations in this sub-major group requires skills at the fourth ISCO skill level.
+Occupations in this sub-major group are classified into the following minor group:
+011 Commissioned Armed Forces Officers
+Excluded from this group are:
+- jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police);
+- customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C011,011,Commissioned armed forces officers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Commissioned armed forces officers provide leadership and management to organizational units in the armed forces and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. This group includes all members of the armed forces holding the rank of second lieutenant (or equivalent) or higher.
+Occupations in this minor group are classified into the following unit group:
+0110 Commissioned Armed Forces Officers
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C0110,0110,Commissioned armed forces officers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Commissioned armed forces officers provide leadership and management to organizational units in the armed forces and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. This group includes all members of the armed forces holding the rank of second lieutenant (or equivalent) or higher.
+Examples of the occupations classified here: - Admiral
+- Air commodore
+- Air marshal
+- Brigadier (army)
+- Captain (air force)
+- Captain (army)
+- Captain (navy)
+- Colonel (army)
+- Field marshal
+- Flight lieutenant (air force)
+- Flying officer (military)
+- General (army)
+- Group captain, (air force)
+- Lieutenant (army)
+- Major (army)
+- Midshipman
+- Naval officer (military) - Navy commander - Officer cadet (armed forces)
+- Second lieutenant (army)
+- Squadron leader
+- Sublieutenant (navy)
+- Wing commander
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C02,02,Non-commissioned armed forces officers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Non-commissioned armed forces officers enforce military discipline and supervise the activities of those employed in Sub-major Group 03: Armed Forces Occupations, Other Ranks, and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. This group includes members of the armed forces holding ranks such as sergeant, warrant officer and sergeant major. Competent performance in most occupations in this sub-major group requires skills at the second ISCO skill level.
+Occupations in this sub-major group are classified into the following minor group:
+021 Non-commissioned Armed Forces Officers
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C021,021,Non-commissioned armed forces officers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Non-commissioned armed forces officers enforce military discipline and supervise the activities of those employed in Sub-major 031: Armed Forces Occupations, Other Ranks, and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. This group includes members of the armed forces holding ranks such as sergeant, warrant officer and sergeant major.
+Occupations in this minor group are classified into the following unit group:
+0210 Non-commissioned Armed Forces Officers
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C0210,0210,Non-commissioned armed forces officers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Non-commissioned armed forces officers enforce military discipline and supervise the activities of those employed in Sub-major Group 0310: Armed Forces Occupations, Other Ranks, and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. This group includes members of the armed forces holding ranks such as sergeant, warrant officer and sergeant major.
+Examples of the occupations classified here:
+- Boatswain (navy)
+- Flight sergeant
+- Sergeant (army)
+- Sergeant major
+- Warrant officer
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C03,03,"Armed forces occupations, other ranks",released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Armed forces occupations, other ranks include all conscripted and non-conscripted members of the armed forces except commissioned and non-commissioned officers. They perform specific military tasks and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces. Most occupations in this sub-major group require skills at the first ISCO skill level.
+Occupations in this sub-major group are classified into the following minor group:
+031 Armed Forces Occupations, Other Ranks
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C031,031,"Armed forces occupations, other ranks",released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Armed forces occupations, other ranks include all conscripted and non-conscripted members of the armed forces except commissioned and non-commissioned officers. They perform specific military tasks and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces.
+Occupations in this minor group are classified into the following unit group:
+0310 Armed Forces Occupations, Other Ranks
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C0310,0310,"Armed forces occupations, other ranks",released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Armed forces occupations, other ranks include all conscripted and non-conscripted members of the armed forces except commissioned and non-commissioned officers. They perform specific military tasks and/or perform similar tasks to those performed in a variety of civilian occupations outside the armed forces.
+Examples of the occupations classified here:
+- Airman
+- Bombardier
+- Corporal (air force)
+- Corporal (army)
+- Coxswain (navy)
+- Gunner
+- Infantryman/woman
+- Paratrooper
+- Rifleman/woman
+- Seaman/woman (navy)
+Excluded from this group are: - jobs held by persons in civilian employment of government establishments concerned with defence issues; - police (other than military police); - customs inspectors and members of border or other armed civilian services."
+ISCOGroup,http://data.europa.eu/esco/isco/C1,1,Managers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Managers plan, direct, coordinate and evaluate the overall activities of enterprises, governments and other organizations, or of organizational units within them, and formulate and review their policies, laws, rules and regulations. Competent performance in most occupations in this major group requires skills at the fourth ISCO skill level, except for Sub-major Group 14: Hospitality, Retail and Other Services Managers, for which skills at the third ISCO skill level are generally required. Tasks performed by managers usually include: formulating and advising on the policy, budgets, laws and regulations of enterprises, governments and other organizational units; establishing objectives and standards and formulating and evaluating programmes and policies and procedures for their implementation; ensuring appropriate systems and procedures are developed and implemented to provide budgetary control; authorizing material, human and financial resources to implement policies and programmes; monitoring and evaluating performance of the organization or enterprise and of its staff; selecting or approving the selection of staff; ensuring compliance with health and safety requirements; planning and directing daily operations; representing and negotiating on behalf of the government, enterprise or organizational unit managed in meetings and other forums.
+Occupations in this major group are classified into the following sub-major groups:
+11 Chief Executives, Senior Officials and Legislators
+12 Administrative and Commercial Managers
+13 Production and Specialized Services Managers
+14 Hospitality, Retail and Other Services Managers
+Notes
+In distinguishing between managers classified in Major Group 1: Managers, and supervisors, classified in other major groups, it should be noted that both managers and supervisors may plan, organize, coordinate, control and direct the work done by others. In addition, managers usually have responsibility for and make decisions about: the overall strategic and operational direction of a business or organizational unit (for example about the kinds, quantity and quality of goods to be produced); budgets (how much money is to be spent and for what purposes); and the selection, appointment and dismissal of staff. Supervisors may provide advice and assistance to managers on these matters, especially in relation to staff selection and dismissal, but do not have authority to make decisions.
+It should be noted that it is not a necessary condition that managers have responsibility for all three of strategic and operational direction, budgets and staff selection and dismissal. The degree of autonomy they exercise may also vary. The critical difference is that supervisors are responsible only for the supervision of the activities of other workers, whereas managers have overall responsibility for the operations of an organizational unit."
+ISCOGroup,http://data.europa.eu/esco/isco/C11,11,"Chief executives, senior officials and legislators",released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Chief executives, senior officials and legislators formulate and review the policies, and plan, direct, coordinate and evaluate the overall activities of enterprises, governments and other organizations with the support of other managers. Competent performance in most occupations in this sub-major group requires skills at the fourth ISCO skill level .
+Tasks performed by workers in this sub-major group usually include: presiding over or participating in the proceedings of legislative bodies, boards of directors and committees; formulating and advising on the policy budgets, laws and regulations of enterprises, governments and other organizations; establishing objectives for enterprises, government departments or agencies and other organizations; formulating or approving and evaluating programmes and policies and procedures for their implementation; ensuring appropriate systems and procedures are developed and implemented to provide budgetary control; authorizing material, human and financial resources to implement policies and programmes; monitoring and evaluating performance of the organization or enterprise; selecting or approving the selection of senior staff; performing ceremonial duties and representing the enterprise, government, organization or community at official occasions and in meetings, negotiations, conventions and public hearings.
+Occupations in this sub-major group are classified into the following minor groups:
+111 Legislators and Senior Officials
+112 Managing Directors and Chief Executives."
+ISCOGroup,http://data.europa.eu/esco/isco/C111,111,Legislators and senior officials,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Legislators and senior officials determine, formulate, advise on and direct the implementation of policies of national, state, regional or local governments or communities, and of special-interest organizations. They make, ratify, amend or repeal laws, public rules and regulations, and plan, organize, direct, control and evaluate the overall activities of government departments and agencies, traditional communities and special-interest organizations.
+Tasks performed usually include: presiding over or participating in the proceedings of legislative bodies and administrative councils of governments, legislative assemblies, local communities and special-interest organizations; serving on government administrative boards or official committees; investigating matters of concern to the public and promoting the interests of constituents; formulating and advising on government policy, budgets, laws and regulations; establishing objectives for organizations and formulating or approving and evaluating programmes and policies and procedures for their implementation; recommending, reviewing, evaluating and approving documents, briefs and reports submitted; ensuring appropriate systems and procedures are developed and implemented to provide budgetary control; allocating the use of communal land and other resources; performing ceremonial duties and representing the government, organization or community at official occasions and in meetings, negotiations, conventions and public hearings.
+Occupations in this minor group are classified into the following unit groups:
+1111 Legislators
+1112 Senior Government Officials
+1113 Traditional Chiefs and Heads of Villages
+1114 Senior Officials of Special-interest Organizations."
+ISCOGroup,http://data.europa.eu/esco/isco/C1111,1111,Legislators,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Legislators determine, formulate and direct policies of national, state, regional or local governments and international governmental agencies, and make, ratify, amend or repeal laws, public rules and regulations. They include elected and non-elected members of parliaments, councils and governments.
+Tasks include -
+(a) presiding over or participating in the proceedings of legislative bodies and administrative councils of national, state, regional or local governments or legislative assemblies;
+(b) determining, formulating and directing policies of national, state, regional or local governments;
+(c) making, ratifying, amending or repealing laws, public rules and regulations within a statutory or constitutional framework;
+(d) serving on government administrative boards or official committees;
+(e) investigating matters of concern to the public and promoting the interests of the constituencies which they represent;
+(f) attending community functions and meetings to provide service to the community, understand public opinion and provide information on government plans;
+(g) negotiating with other legislators and representatives of interest groups in order to reconcile differing interests, and to create policies and agreements;
+(h) as members of the government, directing senior administrators and officials of government departments and agencies in the interpretation and implementation of government policies.
+Examples of the occupations classified here:
+- City councillor
+- Government minister
+- Mayor
+- Member of parliament
+- President (government)
+- Secretary of state
+- Senator
+- State governor."
+ISCOGroup,http://data.europa.eu/esco/isco/C1112,1112,Senior government officials,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Senior government officials advise governments on policy matters, oversee the interpretation and implementation of government policies and legislation by government departments and agencies, represent their country abroad and act on its behalf, or carry out similar tasks in intergovernmental organizations. They plan, organize, direct, control and evaluate the overall activities of municipal or local, regional and national government departments, boards, agencies or commissions in accordance with legislation and policies established by government and legislative bodies.
+Tasks include -
+(a) advising national, state, regional or local governments and legislators on policy matters;
+(b) advising on the preparation of government budgets, laws and regulations, including amendments;
+(c) establishing objectives for government departments or agencies in accordance with government legislation and policy;
+(d) formulating or approving and evaluating programmes and procedures for the implementation of government policies in conjunction or consultation with government,
+(e) recommending, reviewing, evaluating and approving documents, briefs and reports submitted by middle managers and senior staff members;
+(f) ensuring appropriate systems and procedures are developed and implemented to provide budgetary control;
+(g) coordinating activities with other senior government managers and officials;
+(h) making presentations to legislative and other government committees regarding policies, programmes or budgets;
+(i) overseeing the interpretation and implementation of government policies and legislation by government departments and agencies.
+Examples of the occupations classified here:
+- Ambassador
+- City administrator
+- Civil service commissioner
+- Consul-general
+- Director-general (government department)
+- Director-general (intergovernmental organization)
+- Fire commissioner
+- Inspector-general (police)
+- Permanent head (government department)
+- Police chief constable
+- Police commissioner
+- Secretary-general (government administration)
+- Under-secretary (government) Note
+Chief executives of government-owned enterprises are included in Unit Group 1120: Managing Directors and Chief Executives."
+ISCOGroup,http://data.europa.eu/esco/isco/C1113,1113,Traditional chiefs and heads of village,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Traditional chiefs and heads of villages perform a variety of legislative, administrative and ceremonial tasks and duties, determined by ancient traditions as well as by the division of rights and responsibilities between village chiefs and the local, regional and national authorities.
+Tasks include -
+(a) allocating the use of communal land and other resources among households in the community or village;
+(b) collecting and distributing surplus production of the community or village;
+(c) settling disputes between members of the community or village;
+(d) disciplining members of the community or village for violation of rules and customs;
+(e) performing ceremonial duties in connection with births, marriages, deaths, harvests and other important occasions;
+(f) representing the community or village on local or regional councils;
+(g) informing the community or village about government rules and regulations.
+Examples of the occupations classified here:
+- Village chief
+- Village head."
+ISCOGroup,http://data.europa.eu/esco/isco/C1114,1114,Senior officials of special-interest organisations,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Senior officials of special-interest organizations determine, formulate and direct the implementation of policies of special-interest organizations, such as political-party organizations, trade unions, employers’ organizations, trade and industry associations, humanitarian or charity organizations, or sports associations, and represent their organizations and act on their behalf.
+Tasks include -
+(a) determining and formulating the policies, rules and regulations of the organization;
+(b) planning, directing and coordinating the general functioning of the organization;
+(c) reviewing the operations and results of the organization and reporting to boards of directors and governing bodies, the organization’s membership and funding agencies;
+(d) negotiating on behalf of the organization, its members and relevant special-interest groups; (e) promoting the interests of the organization, its members and relevant special-interest groups before the legislature, government or general public; (f) planning, organizing and directing sections charged with implementing the organization's policies, programmes, rules and regulations;
+(g) ensuring appropriate systems and procedures are developed and implemented to provide budgetary control;
+(h) monitoring and evaluating performance of the organization or enterprise against established objectives and policies;
+(i) representing the organization at official occasions and board meetings, in negotiations and at conventions, public hearings and forums.
+Examples of the occupations classified here:
+- Chairperson, trade union
+- Director-general, employers’ organization
+- Leader, political party
+- President, political party
+- Secretary-general, environment protection organization
+- Secretary-general, human rights organization."
+ISCOGroup,http://data.europa.eu/esco/isco/C112,112,Managing directors and chief executives,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Managing directors and chief executives formulate and review the policies, and plan, direct, coordinate and evaluate the overall activities, of enterprises or organizations (except special-interest organizations and government departments) with the support of other managers, usually within guidelines established by a board of directors or a governing body to whom they are answerable for the operations undertaken and results.
+Tasks performed usually include: planning, directing and coordinating the general functioning of an enterprise or organization; reviewing the operations and results of the enterprise or organization, and reporting to boards of directors and governing bodies; determining objectives, strategies, policies and programmes for the enterprise or organization; providing overall direction and management to organizations; establishing and managing budgets, controlling expenditure and ensuring the efficient use of resources; authorizing material, human and financial resources to implement organizational policies and programmes; monitoring and evaluating performance of the organization or enterprise against established objectives and policies; consulting with senior subordinate staff and reviewing recommendations and reports; representing the organization at official occasions, in negotiations and at conventions, seminars, public hearings and forums; selecting or approving the selection of senior staff; ensuring the organization complies with relevant legislation and regulations.
+Occupations in this minor group are classified into the following unit group:
+1120 Managing Directors and Chief Executives."
+ISCOGroup,http://data.europa.eu/esco/isco/C1120,1120,Managing directors and chief executives,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Managing directors and chief executives formulate and review the policies, and plan, direct, coordinate and evaluate the overall activities, of enterprises or organizations (except special-interest organizations and government departments) with the support of other managers, usually within guidelines established by a board of directors or a governing body to whom they are answerable for the operations undertaken and results.
+Tasks include -
+(a) planning, directing and coordinating the general functioning of an enterprise or organization;
+(b) reviewing the operations and results of the enterprise or organization and reporting to boards of directors and governing bodies;
+(c) determining objectives, strategies, policies and programmes for the enterprise or organization;
+(d) providing overall leadership and management to the enterprise or organization;
+(e) establishing and managing budgets, controlling expenditure and ensuring the efficient use of resources;
+(f) authorizing material, human and financial resources to implement organizational policies and programmes;
+(g) monitoring and evaluating performance of the organization or enterprise against established objectives and policies;
+(h) consulting with senior subordinate staff and reviewing recommendations and reports;
+(i) representing the organization at official occasions and board meetings, in negotiations and at conventions, seminars, public hearings and forums; (j) selecting or approving the selection of senior staff;
+(k) ensuring the organization complies with relevant legislation and regulations.
+Examples of the occupations classified here:
+- Chief executive
+- Managing director
+- Regional manager Note
+Regional managers and other senior managers who coordinate and supervise the activities of subordinate managers who have a diverse range of functional responsibilities are included in Unit Group 1120: Managing Directors and Chief Executives. Managers responsible for specialized functions within a specific geographic area are excluded from this unit group. For example, regional sales managers are classified in Unit Group 1221: Sales and Marketing Managers. Jobs whose principal responsibility is to participate as a member of the board of directors of one or more enterprises or organizations are included in Unit Group 1120: Managing Directors and Chief Executives. Chief executives of government-owned enterprises are included in Unit Group 1120: Managing Directors and Chief Executives."
+ISCOGroup,http://data.europa.eu/esco/isco/C12,12,Administrative and commercial managers,released,,"http://data.europa.eu/esco/concept-scheme/occupations,
+http://data.europa.eu/esco/concept-scheme/isco","Administrative and commercial managers plan, organize, direct, control and coordinate the financial, administrative, human resource, policy, planning, research and development, advertising, public relations, and sales and marketing activities of enterprises and organizations, or of enterprises that provide such services to other enterprises and organizations. Competent performance in most occupations in this sub-major group requires skills at the fourth ISCO skill level
+Tasks performed by workers in this sub-major group usually include: formulating and administering policy advice and strategic and financial planning; establishing and directing operational and administrative procedures; implementing, monitoring and evaluating strategies and policies; providing advice to senior managers; directing the development of initiatives for new products, marketing, public relations and advertising campaigns; determining and directing sales activities, product mix and customer service standards; setting prices and credit arrangements; ensuring compliance with relevant legislation, regulations and standards; controlling selection, training and performance of staff; preparing budgets and overseeing financial operations; consulting with the chief executive and with managers of other departments or sections; controlling expenditure and ensuring the efficient use of resources; representing the enterprise or organization in negotiations, and at conventions, seminars, public hearings and forums.
+Occupations in this sub-major group are classified into the following minor groups:
+121 Business Services and Administration Managers
+122 Sales, Marketing and Development Managers
+Notes
+Specialized qualifications and extensive experience relevant to one or more occupations classified in Major Group 2: Professionals, or Major Group 3: Technicians and Associate Professionals, are usually required. Regional managers and other senior managers who coordinate and supervise the activities of subordinate managers who have a diverse range of functional responsibilities are included in Unit Group 1120: Managing Directors and Chief Executives."

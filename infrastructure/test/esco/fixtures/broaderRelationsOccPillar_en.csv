@@ -1,0 +1,21 @@
+conceptType,conceptUri,conceptLabel,broaderType,broaderUri,broaderLabel
+ISCOGroup,http://data.europa.eu/esco/isco/C01,Commissioned armed forces officers,ISCOGroup,http://data.europa.eu/esco/isco/C0,Armed forces occupations
+ISCOGroup,http://data.europa.eu/esco/isco/C011,Commissioned armed forces officers,ISCOGroup,http://data.europa.eu/esco/isco/C01,Commissioned armed forces officers
+ISCOGroup,http://data.europa.eu/esco/isco/C0110,Commissioned armed forces officers,ISCOGroup,http://data.europa.eu/esco/isco/C011,Commissioned armed forces officers
+ISCOGroup,http://data.europa.eu/esco/isco/C02,Non-commissioned armed forces officers,ISCOGroup,http://data.europa.eu/esco/isco/C0,Armed forces occupations
+ISCOGroup,http://data.europa.eu/esco/isco/C021,Non-commissioned armed forces officers,ISCOGroup,http://data.europa.eu/esco/isco/C02,Non-commissioned armed forces officers
+ISCOGroup,http://data.europa.eu/esco/isco/C0210,Non-commissioned armed forces officers,ISCOGroup,http://data.europa.eu/esco/isco/C021,Non-commissioned armed forces officers
+ISCOGroup,http://data.europa.eu/esco/isco/C03,"Armed forces occupations, other ranks",ISCOGroup,http://data.europa.eu/esco/isco/C0,Armed forces occupations
+ISCOGroup,http://data.europa.eu/esco/isco/C031,"Armed forces occupations, other ranks",ISCOGroup,http://data.europa.eu/esco/isco/C03,"Armed forces occupations, other ranks"
+ISCOGroup,http://data.europa.eu/esco/isco/C0310,"Armed forces occupations, other ranks",ISCOGroup,http://data.europa.eu/esco/isco/C031,"Armed forces occupations, other ranks"
+ISCOGroup,http://data.europa.eu/esco/isco/C11,"Chief executives, senior officials and legislators",ISCOGroup,http://data.europa.eu/esco/isco/C1,Managers
+ISCOGroup,http://data.europa.eu/esco/isco/C111,Legislators and senior officials,ISCOGroup,http://data.europa.eu/esco/isco/C11,"Chief executives, senior officials and legislators"
+ISCOGroup,http://data.europa.eu/esco/isco/C1111,Legislators,ISCOGroup,http://data.europa.eu/esco/isco/C111,Legislators and senior officials
+ISCOGroup,http://data.europa.eu/esco/isco/C1112,Senior government officials,ISCOGroup,http://data.europa.eu/esco/isco/C111,Legislators and senior officials
+ISCOGroup,http://data.europa.eu/esco/isco/C1113,Traditional chiefs and heads of village,ISCOGroup,http://data.europa.eu/esco/isco/C111,Legislators and senior officials
+ISCOGroup,http://data.europa.eu/esco/isco/C1114,Senior officials of special-interest organisations,ISCOGroup,http://data.europa.eu/esco/isco/C111,Legislators and senior officials
+ISCOGroup,http://data.europa.eu/esco/isco/C112,Managing directors and chief executives,ISCOGroup,http://data.europa.eu/esco/isco/C11,"Chief executives, senior officials and legislators"
+ISCOGroup,http://data.europa.eu/esco/isco/C1120,Managing directors and chief executives,ISCOGroup,http://data.europa.eu/esco/isco/C112,Managing directors and chief executives
+ISCOGroup,http://data.europa.eu/esco/isco/C12,Administrative and commercial managers,ISCOGroup,http://data.europa.eu/esco/isco/C1,Managers
+ISCOGroup,http://data.europa.eu/esco/isco/C121,Business services and administration managers,ISCOGroup,http://data.europa.eu/esco/isco/C12,Administrative and commercial managers
+ISCOGroup,http://data.europa.eu/esco/isco/C1211,Finance managers,ISCOGroup,http://data.europa.eu/esco/isco/C121,Business services and administration managers

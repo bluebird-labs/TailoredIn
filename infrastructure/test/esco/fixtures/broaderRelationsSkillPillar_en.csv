@@ -1,0 +1,21 @@
+conceptType,conceptUri,conceptLabel,broaderType,broaderUri,broaderLabel
+SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications,SkillGroup,http://data.europa.eu/esco/skill/c46fcb45-5c14-4ffa-abed-5a43f104bb22,knowledge
+SkillGroup,http://data.europa.eu/esco/isced-f/000,generic programmes and qualifications not further defined,SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications
+SkillGroup,http://data.europa.eu/esco/isced-f/0000,generic programmes and qualifications not further defined,SkillGroup,http://data.europa.eu/esco/isced-f/000,generic programmes and qualifications not further defined
+SkillGroup,http://data.europa.eu/esco/isced-f/001,basic programmes and qualifications,SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications
+SkillGroup,http://data.europa.eu/esco/isced-f/0011,basic programmes and qualifications,SkillGroup,http://data.europa.eu/esco/isced-f/001,basic programmes and qualifications
+SkillGroup,http://data.europa.eu/esco/isced-f/002,literacy and numeracy,SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications
+SkillGroup,http://data.europa.eu/esco/isced-f/0021,literacy and numeracy,SkillGroup,http://data.europa.eu/esco/isced-f/002,literacy and numeracy
+SkillGroup,http://data.europa.eu/esco/isced-f/003,personal skills and development,SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications
+SkillGroup,http://data.europa.eu/esco/isced-f/0031,personal skills and development,SkillGroup,http://data.europa.eu/esco/isced-f/003,personal skills and development
+SkillGroup,http://data.europa.eu/esco/isced-f/009,generic programmes and qualifications not elsewhere classified,SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications
+SkillGroup,http://data.europa.eu/esco/isced-f/0099,generic programmes and qualifications not elsewhere classified,SkillGroup,http://data.europa.eu/esco/isced-f/009,generic programmes and qualifications not elsewhere classified
+SkillGroup,http://data.europa.eu/esco/isced-f/01,education,SkillGroup,http://data.europa.eu/esco/skill/c46fcb45-5c14-4ffa-abed-5a43f104bb22,knowledge
+SkillGroup,http://data.europa.eu/esco/isced-f/011,education,SkillGroup,http://data.europa.eu/esco/isced-f/01,education
+SkillGroup,http://data.europa.eu/esco/isced-f/0110,education not further defined,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
+SkillGroup,http://data.europa.eu/esco/isced-f/0111,education science,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
+SkillGroup,http://data.europa.eu/esco/isced-f/0112,training for pre-school teachers,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
+SkillGroup,http://data.europa.eu/esco/isced-f/0113,teacher training without subject specialisation,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
+SkillGroup,http://data.europa.eu/esco/isced-f/0114,teacher training with subject specialisation,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
+SkillGroup,http://data.europa.eu/esco/isced-f/0119,education not elsewhere classified,SkillGroup,http://data.europa.eu/esco/isced-f/011,education
+SkillGroup,http://data.europa.eu/esco/isced-f/018,inter-disciplinary programmes and qualifications involving education,SkillGroup,http://data.europa.eu/esco/isced-f/01,education

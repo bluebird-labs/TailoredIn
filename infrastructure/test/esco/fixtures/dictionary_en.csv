@@ -1,0 +1,23 @@
+filename,data header,property,description
+occupations,conceptType,,No direct related property exists
+occupations,conceptUri,,No direct related property exists
+occupations,iscoGroup,http://www.w3.org/2004/02/skos/core#notation,"A notation, also known as classification code, is a string of characters such as ""T58.5"" or ""303.4833"" used to uniquely identify a concept within the scope of a given concept scheme."
+occupations,preferredLabel,http://www.w3.org/2004/02/skos/core#prefLabel,"The preferred lexical label for a resource, in a given language."
+occupations,altLabels,http://www.w3.org/2004/02/skos/core#altLabel,An alternative lexical label for a resource.
+occupations,hiddenLabels,http://www.w3.org/2004/02/skos/core#hiddenLabel,"A lexical label for a resource that should be hidden when generating visual displays of the resource, but should still be accessible to free text search operations."
+occupations,status,http://purl.org/iso25964/skos-thes#status,"ISO status
+- on ThesaurusConcept
+- on ThesaurusTerm"
+occupations,modifiedDate,http://purl.org/dc/terms/modified,Date on which the resource was changed.
+occupations,regulatedProfessionNote,http://data.europa.eu/esco/model#regulatedProfessionNote,The subject occupation is regulated according the description in the note.  The note typically contains a hyperlink.
+occupations,scopeNote,http://www.w3.org/2004/02/skos/core#scopeNote,A note that helps to clarify the meaning and/or the use of a concept.
+occupations,definition,http://www.w3.org/2004/02/skos/core#definition,A statement or formal explanation of the meaning of a concept.
+occupations,inScheme,http://www.w3.org/2004/02/skos/core#inScheme,Relates a resource (for example a concept) to a concept scheme in which it is included.
+occupations,description,http://purl.org/dc/terms/description,An account of the resource.
+occupations,code,http://www.w3.org/2004/02/skos/core#notation,"A notation, also known as classification code, is a string of characters such as ""T58.5"" or ""303.4833"" used to uniquely identify a concept within the scope of a given concept scheme."
+occupations,naceCode,http://data.europa.eu/esco/model#hasNACECode,A tagging concept using the NACE codes to specify the industry sector of the tagged subject.
+skills,conceptType,,No direct related property exists
+skills,conceptUri,,No direct related property exists
+skills,skillType,http://data.europa.eu/esco/model#skillType,Type of competence (a tagging concept)
+skills,reuseLevel,http://data.europa.eu/esco/model#skillReuseLevel,Reuseability level of a skill
+skills,preferredLabel,http://www.w3.org/2004/02/skos/core#prefLabel,"The preferred lexical label for a resource, in a given language."

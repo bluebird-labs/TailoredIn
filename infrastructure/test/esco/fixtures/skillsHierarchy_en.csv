@@ -1,0 +1,55 @@
+Level 0 URI,Level 0 preferred term,Level 1 URI,Level 1 preferred term,Level 2 URI,Level 2 preferred term,Level 3 URI,Level 3 preferred term,Description,Scope note,Level 0 code
+http://data.europa.eu/esco/skill/e35a5936-091d-4e87-bafe-f264e55bd656,language skills and knowledge,,,,,,,,,L
+http://data.europa.eu/esco/skill/e35a5936-091d-4e87-bafe-f264e55bd656,language skills and knowledge,http://data.europa.eu/esco/skill/43f425aa-f45d-4bb4-a200-6f82fa211b66,languages,,,,,"Ability to communicate through reading, writing, speaking and listening in the mother tongue and/or in a foreign language.",,L
+http://data.europa.eu/esco/skill/e35a5936-091d-4e87-bafe-f264e55bd656,language skills and knowledge,http://data.europa.eu/esco/skill/e434e71a-f068-44ed-8059-d1af9eb592d7,classical languages,,,,,"All dead languages, no longer actively used, originating from various periods in history, such as Latin from Antiquity, Middle English from the Middle Ages, Classical Maya from the Pre-colonial Americas, and Renaissance Italian from the Early Modern Period.","Excludes:
+- all languages that are actively used as a mother tongue or lingua franca Latin, Sanskrit, Ancient Greek.",L
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,,,,,,,,,S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,,,,,"Sorting, arranging, moving, transforming, fabricating and cleaning goods and materials by hand or using handheld tools and equipment. Tending plants, crops and animals.","Excludes:
+- Specific skills involving interaction with people.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/15dfca7a-5dde-4199-bad3-c00600387258,handling and disposing of waste and hazardous materials,,,"Collecting, storing and disposing of unwanted materials or hazardous, according to established waste management procedures.",,S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/15dfca7a-5dde-4199-bad3-c00600387258,handling and disposing of waste and hazardous materials,http://data.europa.eu/esco/skill/61d1dab2-6007-4b7c-9380-cd88207fa30f,disposing of non-hazardous waste or debris,Collecting and disposing of unwanted non-hazardous materials according to established waste management procedures.,"Examples:
+- Handle fish harvesting waste - Collect domestic waste.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/15dfca7a-5dde-4199-bad3-c00600387258,handling and disposing of waste and hazardous materials,http://data.europa.eu/esco/skill/8bde58aa-9d5b-422b-801c-ff9186dd648e,handling and disposing of hazardous materials,"Handling, collecting, storing and disposing of materials that pose substantial threats to public or personal health or the environment.","Hazardous waste is defined in accordance with the latest EU guidance on the classification of waste: https://europa.eu/!kr89QF Examples:
+- Dispose of medical waste - Handle chemical cleaning agents.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/15dfca7a-5dde-4199-bad3-c00600387258,handling and disposing of waste and hazardous materials,http://data.europa.eu/esco/skill/f8c676de-c871-424f-9a65-77059d07910a,handling and disposing of waste and hazardous materials,"Collecting, storing and disposing of unwanted materials or hazardous, according to established waste management procedures.",,S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1cc5ff0b-afaa-4993-9de7-ab0d77b6cca2,moving and lifting,,,"Performing physical activities to move, load, unload or store objects, position workpieces or equipment for assembly, or to climb structures, by hand or with the aid of equipment.","Excludes:
+- Specific skills involving lifting and moving people and animals
+- Operation of machinery other than hand-held equipment.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1cc5ff0b-afaa-4993-9de7-ab0d77b6cca2,moving and lifting,http://data.europa.eu/esco/skill/30b280e7-2468-440b-a78f-f1e7f515d60a,"positioning materials, tools or equipment","Placing workpieces, materials, tools or equipment in the correct position for assembly or further work.",,S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1cc5ff0b-afaa-4993-9de7-ab0d77b6cca2,moving and lifting,http://data.europa.eu/esco/skill/577ce84f-0d21-4f25-8307-99c53f6f8437,moving and lifting,"Performing physical activities to move, load, unload or store objects or to climb structures, by hand or with the aid of equipment.","Excludes:
+- Specific skills involving lifting and moving people and animals
+- Operation of machinery other than hand-held equipment.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1cc5ff0b-afaa-4993-9de7-ab0d77b6cca2,moving and lifting,http://data.europa.eu/esco/skill/682bb7ca-dbe9-4c33-9c7a-1ae56e28516e,"loading and unloading goods and, materials","Loading, securing or unloading products, materials, or equipment for transportation, storage or further processing by hand or using hand-held or manually operated equipment.","Excludes:
+- Operation of machinery other than hand-held equipment Examples:
+- Stow cargo
+- Secure cargo on ships
+- Unload supplies.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1cc5ff0b-afaa-4993-9de7-ab0d77b6cca2,moving and lifting,http://data.europa.eu/esco/skill/e852a2ed-c32e-4a39-bc4c-65a78ffe6bf2,"moving or lifting materials, equipment, or supplies","Moving or lifting goods, materials supplies or resources, by hand or with the aid of equipment, using actions such as lifting, pushing, carrying or shovelling.","Excludes:
+- Operation of machinery other than hand-held equipment Examples:
+- Feed concrete mixer
+- Transfer luggage
+- Lift heavy weights.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1cc5ff0b-afaa-4993-9de7-ab0d77b6cca2,moving and lifting,http://data.europa.eu/esco/skill/e963cf1f-dc3c-48b2-a0fa-274f5e7f50f6,storing goods and materials,"Placing goods and materials in storage by hand, or with the aid of hand-held or manually operated equipment.","Excludes:
+- Operation of machinery other than hand-held equipment - Storing hazardous material Examples:
+- Stock shelves
+- Store film reels.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1d9e5893-d6b2-47b1-80ba-5f1cdcbf5e9a,"making moulds, casts, models and patterns",,,"Making moulds, casts and two-dimensional patterns or templates and making three-dimensional models of products.","Excludes:
+- Operation of automated assembly equipment or machines
+- Repair of building structures and mechanical, electrical, electronic products and components.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1d9e5893-d6b2-47b1-80ba-5f1cdcbf5e9a,"making moulds, casts, models and patterns",http://data.europa.eu/esco/skill/0f8f9438-8529-41b8-bb7a-4d91121e3192,making patterns and templates,"Creating two dimensional patterns or templates for purposes such as cutting and fabricating articles in different shapes and sizes, or placement of items.","Examples:
+- Create floor plan template
+- Create patterns for garments.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1d9e5893-d6b2-47b1-80ba-5f1cdcbf5e9a,"making moulds, casts, models and patterns",http://data.europa.eu/esco/skill/480a0b1b-aae9-4b39-9a4f-1c2b8ddcbc46,making production moulds and casts,"Constructing moulds for the manufacture of objects in various materials, and making casts by filling moulds with liquid materials for solidification.","Excludes:
+- Operation of automated assembly equipment or machines
+- Pouring of concrete for construction of buildings Examples:
+- Modify casts for prostheses
+- Mould chocolate
+- Cast jewellery metal - Prevent casting adhesion.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1d9e5893-d6b2-47b1-80ba-5f1cdcbf5e9a,"making moulds, casts, models and patterns",http://data.europa.eu/esco/skill/6d535249-ac7c-4e44-8ada-09305c3a3900,"making moulds, casts, models and patterns","Making moulds, casts and two-dimensional patterns or templates and making three-dimensional models of products.","Excludes:
+- Operation of automated assembly equipment or machines
+- Repair of building structures and mechanical, electrical, electronic products and components.",S
+http://data.europa.eu/esco/skill/335228d2-297d-4e0e-a6ee-bc6a8dc110d9,skills,http://data.europa.eu/esco/skill/03e0b95b-67d1-457a-b3f7-06c407cf6bec,handling and moving,http://data.europa.eu/esco/skill/1d9e5893-d6b2-47b1-80ba-5f1cdcbf5e9a,"making moulds, casts, models and patterns",http://data.europa.eu/esco/skill/74b7938e-f667-48ff-a26d-faed294ac6c9,making models,Constructing physical three-dimensional models of products.,"Excludes:
+- Creation of virtual or conceptual models Examples:
+- Create set models
+- Build jewellery models
+- Make architectural mock-ups.",S

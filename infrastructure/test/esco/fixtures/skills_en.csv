@@ -1,0 +1,147 @@
+conceptType,conceptUri,skillType,reuseLevel,preferredLabel,altLabels,hiddenLabels,status,modifiedDate,scopeNote,definition,inScheme,description
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0005c151-5b5a-4a66-8aac-60e734beb1ab,skill/competence,sector-specific,manage musical staff,"manage music staff
+coordinate duties of musical staff
+direct musical staff
+manage staff of music",,released,2023-11-30T15:53:37.136Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Assign and manage staff tasks in areas such as scoring, arranging, copying music and vocal coaching."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/00064735-8fad-454b-90c7-ed858cc993f2,skill/competence,occupation-specific,supervise correctional procedures,"manage prison procedures
+monitor correctional procedures
+oversee prison procedures
+oversee correctional procedures
+manage correctional procedures
+monitor prison procedures",,released,2023-11-30T15:04:00.689Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Supervise the operations of a correctional facility or other correctional procedures, ensuring that they are compliant with legal regulations, and ensure that the staff complies with regulations, and aim to improve the facility's efficiency and safety."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/000709ed-2be5-4193-b056-45a97698d828,skill/competence,sector-specific,apply anti-oppressive practices,"make use of anti-oppressive practices
+use anti-oppressive practices
+apply non-oppressive practices
+apply anti-oppresive practice
+identify oppression in societies and groups
+apply an anti-oppressive practice
+act in a non-oppressive way",,released,2023-11-28T10:45:53.54Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Identify oppression in societies, economies, cultures, and groups, acting as a professional in an non-oppressive way, enabling service users to take action to improve their lives and enabling citizens to change their environment in accordance with their own interests."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0007bdc2-dd15-4824-b7d6-416522c46f35,skill/competence,sector-specific,control compliance of railway vehicles regulations,"checking compliance with rolling stock regulations
+control compliance of regulations of rolling stock
+conduct controls of compliance of railway vehicles regulations
+compliance controls of railway vehicles regulations
+ensuring compliance with railway vehicles regulations
+inspection of compliance with rolling stock regulations
+monitoring of compliance with rolling stock regulations
+monitoring of compliance with railway vehicles regulations",,released,2023-11-30T16:29:18.273Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Inspect rolling stock, components and systems to ensure compliance with standards and specifications."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/00090cc1-1f27-439e-a4e0-19a87a501bfc,skill/competence,cross-sector,identify available services,"determine available services
+classify available services
+classify rehabilitation services
+analyse rehabilitation services
+establish rehabilitation services
+establish available services
+determine rehabilitation services
+analyse available services",,released,2023-11-28T10:38:49.206Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Identify the different services available for an offender during probation in order to help in the rehabilitation and re-integration process, as well as advising the offenders as to how they can identify services available to them."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/000bb1e4-89f0-4b86-be05-05ece3641724,skill/competence,cross-sector,perform toxicological studies,"carry out toxicological studies
+apply toxicological testing methods
+perform toxicological study
+perform toxicological tests",,released,2023-11-30T15:10:42.752Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Perform tests to detect poisons or drug misuse and help to monitor therapy by using chemical reagents, enzymes, radioisotopes and antibodies to detect abnormal chemical concentrations in the body."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/000c94d2-2a2e-4545-993c-6df8cb5b0316,skill/competence,occupation-specific,ensure coquille uniformity,"ensuring coquille is uniform
+make sure coquille is uniform
+check that coquille is uniform
+ensuring of coquille uniformity
+ensuring uniformity of coquille
+ensure uniformity of coquille
+ensure coquille is uniform
+checking that coquille is uniform",,released,2023-11-30T16:49:26.078Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills",Oversee uniformity of coquilles; use casting equipment and tools such as welding machines.
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/000f1d3d-220f-4789-9c0a-cc742521fb02,knowledge,sector-specific,Haskell,Haskell techniques,,released,2023-11-30T16:13:21.77Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills,
+http://data.europa.eu/esco/concept-scheme/6c930acd-c104-4ece-acf7-f44fd7333036","The techniques and principles of software development, such as analysis, algorithms, coding, testing and compiling of programming paradigms in Haskell."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/001115fb-569f-4ee6-8381-c6807ef2527f,skill/competence,transversal,show initiative,"initiate action
+be a driving force
+give impetus
+take the initiative
+show sense of initiative
+show active initiative
+demonstrate sense of initiative","active participation
+activity
+initiative
+great initiative
+self starter",released,2021-09-02T16:37:00.315Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills,
+http://data.europa.eu/esco/concept-scheme/skill-transversal-groups",Be proactive and take the first step in an action without waiting for what others say or do.
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/001d46db-035e-4b92-83a3-ed8771e0c123,skill/competence,sector-specific,train staff to reduce food waste,"teach students food waste reduction practices
+educate staff on food waste reduction
+educate workers on food recycling methods
+inform staff on food waste reduction practices",,released,2021-01-20T14:31:01.524Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/green,
+http://data.europa.eu/esco/concept-scheme/member-skills","Establish new trainings and staff development provisions to support staff knowledge in food waste prevention and food recycling practices. Ensure that staff understands methods of and tools for food recycling, e.g., separating waste."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0023e7a5-43da-4b68-bee3-726ef21f986d,skill/competence,cross-sector,apply diplomatic principles,"administer diplomatic principles
+implement diplomatic principles
+utilise diplomacy principles
+administer diplomacy principles
+use diplomatic principles
+use diplomacy principles
+utilise diplomatic principles
+implement diplomacy principles",,released,2023-11-28T10:36:15.443Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Apply the processes involved in the creation of international treaties by conducting negotiations between representatives of different countries, protecting the home government's interests, and facilitating compromise."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/00298d97-3dc3-4086-a902-bce0a2fba831,skill/competence,sector-specific,lead police investigations,"manage police investigations
+oversee police investigations
+supervise police enquiries
+oversee police enquiries
+supervise police investigations
+manage police enquiries",,released,2023-11-30T15:58:51.376Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Lead investigations in police cases, which involves establishing an investigation strategy, contacting experts, being able to use different methods and points of view, and leading investigative staff."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/002b2e58-35ab-460c-be97-ca2f585fd990,skill/competence,sector-specific,handle fish harvesting waste,"dispose of waste from fish harvesting
+fish harvesting waste handling
+dispose of fish harvesting waste
+fish harvesting waste disposing",,released,2023-11-30T16:14:30.732Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Dispose of waste, blood and inferior quality fish according to site waste management procedures."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0037c821-2898-4919-b96e-7ed1cd89554c,skill/competence,cross-sector,develop energy saving concepts,"develop concepts for energy saving
+create energy saving concepts
+energy saving concepts creating
+creating energy saving concepts
+creating concepts for energy saving
+energy saving concepts developing
+create concepts for energy saving",,released,2023-11-30T16:47:09.526Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/green,
+http://data.europa.eu/esco/concept-scheme/member-skills","Use current research results and collaborate with experts to optimise or develop concepts, equipment, and production processes which require a lesser amount of energy such as new insulation practices and materials."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/004017c9-0337-4f5a-8077-798de9ef12e3,skill/competence,sector-specific,perform street interventions in social work,"conduct outreach activites
+carry out street interventions in social work
+perform street-intervention in social-work
+perform street intervention in social-work
+perform street-intervention in social work
+do street interventions in social work",,released,2023-11-30T15:11:30.413Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Conduct outreach activities by providing direct information or counselling services to individuals in their neighbourhood or in the streets, usually targeted at youth or homeless people."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/004f1e68-9ca2-4f3f-92d9-e7d7ff6b9330,skill/competence,sector-specific,work with soloists,"collaborate with soloists
+communicate with solo artists
+work with a soloist",,released,2023-11-30T14:52:04.558Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills",Communicate with solo artists and concert masters to discuss and prepare for performances.
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/00506f28-e884-4496-800c-3477c67eb355,knowledge,cross-sector,sport and exercise medicine,"sports medicine
+sports injury medicine
+sports injury treatment
+exercise and sports medicine",,released,2023-11-28T10:35:15.768Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills",Prevention and treatement of injuries or conditions resulted from a physical activity or sport.
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0058526a-11e9-40a1-ab33-7c5ffdf5da05,skill/competence,sector-specific,conduct research on flora,"perform research on flora
+run research on flora
+flora research
+research on flora
+carry out research on flora",,released,2025-07-25T11:15:00.857Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/member-skills","Collect and analyse data about plants in order to discover their basic aspects such as origin, anatomy, and function."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/00735755-adc6-4ea0-b034-b8caff339c9f,skill/competence,cross-sector,install heat pump,"installation of heat pumps
+commissioning heat pumps
+heat pump installing
+heat pump commissioning
+installation of heat pump
+commissioning heat pump
+commissioning of heat pumps
+heat pump installation
+commissioning of heat pump
+commission heat pumps
+commission heat pump",,released,2023-11-30T16:02:47.092Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/green,
+http://data.europa.eu/esco/concept-scheme/member-skills","Install heat pumps, which use the physical properties of substances called refrigerants to extract heat from an environment and release it to a warmer environment, counter to spontaneous heat flow. Create the necessary openings and install the indoors and outdoors parts of the heat pump. Connect electricity and any ducts, and configure the heat pump."
+KnowledgeSkillCompetence,http://data.europa.eu/esco/skill/0082c13b-5866-4542-bc4f-722a4ae9530e,skill/competence,sector-specific,design biomass installations,"design biomass energy system
+design biomass installation
+determine construction boundaries for biomass energy systems
+design biomass system
+calculate capacity indicators for biomass installations",,released,2024-02-26T09:06:09.511Z,,,"http://data.europa.eu/esco/concept-scheme/skills,
+http://data.europa.eu/esco/concept-scheme/green,
+http://data.europa.eu/esco/concept-scheme/member-skills","Design the biomass energy system. Determine construction boundaries such as needed space and weight. Calculate indicators such as capacity, flow, and temperatures. Make detailed descriptions and drawings of the design."

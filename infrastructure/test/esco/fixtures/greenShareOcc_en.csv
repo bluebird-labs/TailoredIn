@@ -1,0 +1,21 @@
+conceptType,conceptUri,code,preferredLabel,greenShare
+ISCO level 3,http://data.europa.eu/esco/isco/C011,011,Commissioned armed forces officers,0.00575396825396825
+ISCO level 4,http://data.europa.eu/esco/isco/C0110,0110,Commissioned armed forces officers,0.00575396825396825
+Occupation,http://data.europa.eu/esco/occupation/f2cc5978-e45c-4f28-b859-7f89221b0505,0110.1,air force officer,0.0
+Occupation,http://data.europa.eu/esco/occupation/c6a26e11-bdf1-47a1-849d-fdcf819d458d,0110.2,armed forces officer,0.0
+Occupation,http://data.europa.eu/esco/occupation/9bf4c8ea-e814-4772-ae31-0f29672dc497,0110.3,army captain,0.0333333333333333
+Occupation,http://data.europa.eu/esco/occupation/c6e5e0e7-fa99-4f71-9fc1-9889d85282a5,0110.4,army general,0.0
+Occupation,http://data.europa.eu/esco/occupation/e4c915ff-6c9c-4fa9-a8fb-09d0c67e30d4,0110.5,army major,0.0
+Occupation,http://data.europa.eu/esco/occupation/7696b15a-c52e-4ac5-b38d-9eeb010c5fa3,0110.6,artillery officer,0.0
+Occupation,http://data.europa.eu/esco/occupation/bbd1fe06-1b55-4937-9317-fc162311ab38,0110.7,brigadier,0.0
+Occupation,http://data.europa.eu/esco/occupation/b864c9a3-ef6e-46a0-a40c-66188f74dfa7,0110.8,colonel,0.0
+Occupation,http://data.europa.eu/esco/occupation/0b1d8dcb-d941-4d79-99bf-fc10c1806c43,0110.9,fleet commander,0.0357142857142857
+Occupation,http://data.europa.eu/esco/occupation/b223f402-0318-4e27-8691-df6e7f7295d2,0110.10,lieutenant,0.0
+Occupation,http://data.europa.eu/esco/occupation/262f21a3-ae78-46f4-a5f9-5a1f502caa90,0110.11,navy officer,0.0
+Occupation,http://data.europa.eu/esco/occupation/e44b2459-af5e-492d-9c57-d9c2e62944e7,0110.12,squadron leader,0.0
+ISCO level 3,http://data.europa.eu/esco/isco/C021,021,Non-commissioned armed forces officers,0.0
+ISCO level 4,http://data.europa.eu/esco/isco/C0210,0210,Non-commissioned armed forces officers,0.0
+Occupation,http://data.europa.eu/esco/occupation/4a3f40a8-0587-494c-b8d3-7098b8c5992f,0210.1,army corporal,0.0
+Occupation,http://data.europa.eu/esco/occupation/cb3b2662-774a-4e6f-841e-f120244d7031,0210.2,sergeant,0.0
+Occupation,http://data.europa.eu/esco/occupation/1de91afd-9da2-47ab-a7e7-19bf931709a4,0210.3,special forces officer,0.0
+Occupation,http://data.europa.eu/esco/occupation/86c892cf-09a3-44c8-b9d1-814d93dbcbb4,0210.4,warfare specialist,0.0

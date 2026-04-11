@@ -1,0 +1,122 @@
+conceptType,conceptUri,preferredLabel,altLabels,hiddenLabels,status,modifiedDate,scopeNote,inScheme,description,code
+SkillGroup,http://data.europa.eu/esco/isced-f/00,generic programmes and qualifications,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Generic programmes and qualifications are those providing fundamental and personal skills education which cover a broad range of subjects and do not emphasise or specialise in a particular broad or narrow field.
+This broad field should not be used as a residual category. Programmes and qualifications with a specific subject emphasis should be classified in broad fields 01 to 10. In particular, education at the tertiary level should only by way of exception be classified here.",00
+SkillGroup,http://data.europa.eu/esco/isced-f/000,generic programmes and qualifications not further defined,,,released,2023-07-13T15:16:44.968Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,000
+SkillGroup,http://data.europa.eu/esco/isced-f/0000,generic programmes and qualifications not further defined,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,0000
+SkillGroup,http://data.europa.eu/esco/isced-f/001,basic programmes and qualifications,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,001
+SkillGroup,http://data.europa.eu/esco/isced-f/0011,basic programmes and qualifications,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Basic programmes and qualifications are designed to provide participants with fundamental skills in reading, writing and arithmetic along with an elementary understanding of other subjects such as history, geography, natural science, social science, art and music, and in some cases religious instruction. These programmes and qualifications are normally offered at primary and lower secondary levels. Broad, non-specialised programmes at upper secondary level are also classified here even if there is some concentration on, for example, humanities, social science, natural science etc. Vocational programmes and qualifications are included here only by way of exception.
+Programmes and qualifications with the following main subject content are classified here:
+Basic programmes and qualifications
+Broad, generic (non-specialised) programmes and qualifications
+General programmes and qualifications with no specific subject emphasis
+Programmes and qualifications at primary level === Inclusions
+Basic programmes and qualifications at upper secondary level (in some countries at lower secondary level) with some emphasis on e.g. humanities, social sciences or natural sciences but still covering other fields of knowledge are included in this detailed field. In some countries such programmes or qualifications are offered on a modular basis and should also be classified here. === Exclusions
+Programmes that are considered as general in the programme orientation sense (non-vocational) but have a clear emphasis on a detailed, narrow or broad field are excluded from this detailed field and included in one of the broad fields 01-10, depending on the subject covered.",0011
+SkillGroup,http://data.europa.eu/esco/isced-f/002,literacy and numeracy,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,002
+SkillGroup,http://data.europa.eu/esco/isced-f/0021,literacy and numeracy,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Literacy and numeracy are programmes or qualifications arranged mainly for adults, designed to teach fundamental skills in reading, writing and arithmetic. The typical age range of participants can be used to distinguish between detailed field 0011 'Basic programmes and qualifications' and this detailed field.
+Programmes and qualifications with the following main content are classified here:
+Basic remedial programmes for youth or adults
+Literacy
+Numeracy.",0021
+SkillGroup,http://data.europa.eu/esco/isced-f/003,personal skills and development,,,released,2023-07-04T13:43:35.384Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,003
+SkillGroup,http://data.europa.eu/esco/isced-f/0031,personal skills and development,,,released,2024-07-03T13:25:01.639Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Personal skills are defined by reference to the effects on the individual's capacity (mental, social etc.). This detailed field covers personal skills programmes not included in 0011 'Basic programmes and qualifications' or 0021 'Literacy and numeracy', giving key competencies and transferable skills.
+Programmes and qualifications with the following main content are classified here:
+Argumentation and presentation
+Assertiveness training
+Communication skills
+Co-operation
+Development of behavioural capacities
+Development of mental skills
+Job-seeking programmes
+Parenting courses
+Public speaking
+Self-esteem skills
+Social competence
+Time management === Inclusions
+Education and training in leadership in the context of personal development is included here.
+Education and training related to the work place or to work assignments is included in this detailed field if it has more to do with personal development than work development. Personal skills courses can be taught at the workplace, but still be classified here based on their content.
+Programmes for people with special needs on how to cope with their daily life are included here === Exclusions
+Study of leadership in the context of management is excluded from this group and included in detailed field 0413 'Management and administration'.",0031
+SkillGroup,http://data.europa.eu/esco/isced-f/009,generic programmes and qualifications not elsewhere classified,,,released,2023-10-30T10:21:59.843Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,009
+SkillGroup,http://data.europa.eu/esco/isced-f/0099,generic programmes and qualifications not elsewhere classified,,,released,2023-10-30T10:06:51.66Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,0099
+SkillGroup,http://data.europa.eu/esco/isced-f/01,education,,,released,2022-01-13T14:57:09.082Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,01
+SkillGroup,http://data.europa.eu/esco/isced-f/011,education,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,011
+SkillGroup,http://data.europa.eu/esco/isced-f/0110,education not further defined,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,0110
+SkillGroup,http://data.europa.eu/esco/isced-f/0111,education science,,,released,2023-07-04T13:29:46.06Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Education science is the study of the learning process and the theories, methods and techniques of imparting knowledge to others.
+Programmes and qualifications with the following main content are classified here:
+Curriculum studies
+Didactics
+Educational assessment, testing and measurement
+Educational evaluation and research
+Paedagogical sciences === Exclusions
+Teacher training programmes which combine education science with the practice of teaching are excluded from this detailed field and included in one of the detailed fields for teacher training (0112-0114).",0111
+SkillGroup,http://data.europa.eu/esco/isced-f/0112,training for pre-school teachers,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Training for pre-school teachers is the study of the theories, methods and practice of teaching very young children up to 7 years of age within formal school settings at pre-primary or early childhood educational development levels.
+Programmes and qualifications with the following main content are classified here:
+Early childhood teaching (within formal school settings)
+Pre-primary teacher training === Exclusions
+Training in caring for children outside formal school settings is excluded from this detailed field and included in detailed field 0922 'Child care and youth services'..",0112
+SkillGroup,http://data.europa.eu/esco/isced-f/0113,teacher training without subject specialisation,,,released,2023-07-04T10:20:46.297Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Training for teachers without subject specialisation is the study of the theories, methods and practice of providing children between approximately 5 and 15 years of age with the fundamental skills in reading, writing and mathematics along with an elementary understanding of other subjects such as history, geography, social science etc. and laying the foundation for lifelong learning. Subject specialisation is stressed less than in detailed field 0114 'Teacher training with subject specialisation'. The study of teaching children with special needs is included in this detailed field, likewise the study of teaching adults fundamental reading and writing skills and teaching immigrants these types of skills in their home or first language.
+Programmes and qualifications with the following main content are classified here:
+Class teacher training
+Indigenous teacher training
+Primary teaching
+Teacher training for children with special needs === Inclusions
+The study of teaching adults basic literacy and numeracy skills is included here. Teacher's aide (teaching assistant) is also included here. === Exclusions
+Teacher training with subject specialisation even if intended for the teaching of children in primary or lower secondary education is excluded from this detailed field and included in detailed field 0114 'Teacher training with subject specialisation'.",0113
+SkillGroup,http://data.europa.eu/esco/isced-f/0114,teacher training with subject specialisation,,,released,2023-10-30T10:21:08.01Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f","Teacher training with subject specialisation is the study of the theories, methods and practice of teaching a specific subject, mostly at secondary or higher levels of education. Programmes and qualifications included in this detailed field often comprise both studies as well as the subject/subjects that are going to be taught.
+Programmes and qualifications with the following main content are classified here:
+Teacher training - arts and crafts
+Teacher training - commercial subjects
+Teacher training - music
+Teacher training - nursing
+Teacher training - physical training
+Teacher training - second languages
+Teacher training - specific theoretical subjects, e.g. English, mathematics, history
+Teacher training - technical subjects
+Teacher training - vocational subjects
+Training of driving instructors
+Training of trainers === Inclusions
+Teacher training courses for university teachers, instructors of work place and working life skills and in practical and artistic subjects are included here. === Exclusions
+Training of sports trainers is excluded from this detailed field and included in detailed field 1014 'Sports'.",0114
+SkillGroup,http://data.europa.eu/esco/isced-f/0119,education not elsewhere classified,,,released,,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,0119
+SkillGroup,http://data.europa.eu/esco/isced-f/018,inter-disciplinary programmes and qualifications involving education,,,released,2022-01-13T14:49:36.928Z,,"http://data.europa.eu/esco/concept-scheme/skills
+http://data.europa.eu/esco/concept-scheme/skills-hierarchy
+http://data.europa.eu/esco/concept-scheme/isced-f",,018

@@ -1,0 +1,236 @@
+conceptType,conceptUri,iscoGroup,preferredLabel,altLabels,hiddenLabels,status,modifiedDate,regulatedProfessionNote,scopeNote,definition,inScheme,description,code,naceCode
+Occupation,http://data.europa.eu/esco/occupation/00030d09-2b3a-4efd-87cc-c4ea39d27c34,2654,technical director,"director of technical arts
+technical supervisor
+head of technical
+technical and operations director
+technical manager
+head of technical department",,released,2024-01-25T11:28:50.295Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Technical directors realise the artistic visions of the creators within technical constraints. They coordinate the operations of various production units, such as scene, wardrobe, sound and lighting, and make-up. They adapt the prototype and study the feasibility, implementation, operation and technical monitoring of the artistic project. They are also responsible for the stage equipment and technical equipment.",2654.1.7,http://data.europa.eu/ux2/nace2.1/9031
+Occupation,http://data.europa.eu/esco/occupation/000e93a3-d956-4e45-aacb-f12c83fedf84,8121,metal drawing machine operator,"wire drawer
+forming machine operative
+draw machine operator
+metal drawing machine technician
+draw machine operative
+metal drawing machine operative
+wiredrawing setter
+wiredrawing machine tender
+draw machine technician
+wirer drawer machine operator
+forming machine technician",,released,2024-01-23T10:09:32.099Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Metal drawing machine operators set up and operate drawing machines for ferrous and non-ferrous metal products, designed to provide wires, bars, pipes, hollow profiles and tubes with their specific form by reducing its cross-section and by pulling the working materials through a series of drawing dies.",8121.4,http://data.europa.eu/ux2/nace2.1/242
+Occupation,http://data.europa.eu/esco/occupation/0019b951-c699-4191-8208-9822882d150c,7543,precision device inspector,"precision device quality control supervisor
+precision device quality assurance supervisor
+precision instrument quality control inspector
+precision instrument inspector
+precision instrument supervisor
+precision device QC inspector
+inspector of precision devices
+inspector of precision instruments
+precision device quality control inspector
+precision instrument QC inspector",,released,2024-01-25T15:00:12.188Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Precision device inspectors make sure precision devices, such as micrometers and gauges, operate according to design specifications. They may adjust the precision devices and their components in case of any faults.",7543.10.3,http://data.europa.eu/ux2/nace2.1/2651
+Occupation,http://data.europa.eu/esco/occupation/0022f466-426c-41a4-ac96-a235c945cf97,3155,air traffic safety technician,"air traffic safety electronics hardware specialist
+air traffic safety electronics technician
+air traffic safety electronics engineer
+air traffic safety electronics software specialist
+air traffic safety hardware specialist
+air traffic safety software specialist
+air traffic safety engineer",,released,2024-01-29T16:01:13.998Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Air traffic safety technicians provide technical support regarding the safety of air traffic control and navigation systems. They design, maintain, install and operate these systems both in the airport and on board the aeroplane according to regulations.",3155.1,http://data.europa.eu/ux2/nace2.1/5223
+Occupation,http://data.europa.eu/esco/occupation/002da35b-7808-43f3-83bf-63596b8b351f,2431,hospitality revenue manager,"yield manager
+hospitality yields manager
+hospitality revenues manager
+revenue manager",,released,2024-01-11T10:28:45.871Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Hospitality revenue managers maximise revenue generated from facilities such as hotels, holiday resorts and camping grounds by analysing trends and competition. They assist establishment managers in strategic decisions. Hospitality revenue managers analyse and optimise the financial potential of facilities and manage the corresponding staff.",2431.9,"http://data.europa.eu/ux2/nace2.1/701,
+http://data.europa.eu/ux2/nace2.1/55"
+Occupation,http://data.europa.eu/esco/occupation/0044c991-c26f-4261-a213-4bd1c0564a4c,3212,medical laboratory assistant,"biomedical laboratory research assistant
+clinical research assistant
+assistant clinical researcher
+assistant in medical laboratory
+medical lab assistant
+medical laboratory research assistant
+biomedical laboratory assistant
+assistant in biomedical laboratory",,released,2024-01-24T15:38:45.842Z,http://data.europa.eu/esco/regulated-professions/unregulated,"Excludes people performing analysis of blood samples, cell cultures, or review blood samples. Excludes people performing assignment of blood groups, interpretation of tests or results, or contacting patients with these results.",,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Medical laboratory assistants work under supervision of the biomedical scientist and carry out basic laboratory procedures. They work in the pre-analytical handling of samples such as checking the details of specimens received for analysis, maintaining analysers, loading reagents, and packaging specimens. They also perform clerical tasks such as monitoring the stock levels of reagents used in analysis.",3212.2,http://data.europa.eu/ux2/nace2.1/861
+Occupation,http://data.europa.eu/esco/occupation/00634fc4-802a-461b-8af0-499273756f99,3116,asphalt laboratory technician,"bitumen technician
+asphalt production technical supervisor
+aggregates and bitumen laboratory technician
+technical supervisor, asphalt production
+road surface laboratory technician
+road surface technician
+aggregates and asphalt laboratory technician
+site technician, asphalt
+site technician
+bitumen production technician
+asphalt technician
+asphalt production technician
+materials technician",,released,2024-01-26T15:03:25.743Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Asphalt laboratory technicians perform asphalt and related raw materials inspections and laboratory testing, ensuring a high quality of the products. They also participate in coming up with resolutions to technical issues on construction sites.",3116.1.1,"http://data.europa.eu/ux2/nace2.1/712,
+http://data.europa.eu/ux2/nace2.1/2399"
+Occupation,http://data.europa.eu/esco/occupation/00674f21-2f8f-4a41-9896-133f7cbe2a6e,5312,primary school teaching assistant,"primary school TA
+primary school assistant
+primary school paraprofessional
+elementary school teaching assistant
+primary school teaching aide
+primary school instructional assistant
+primary education teaching assistant
+teaching assistant in primary schools",,released,2023-07-04T08:19:38.994Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Primary school teaching assistants provide instructional and practical support to primary school teachers. They reinforce instruction with students in need of extra attention and prepare the materials the teacher needs in class. They also perform clerical work, monitor the students' learning progress and behaviour and supervise the students with and without the head teacher present.",5312.2,http://data.europa.eu/ux2/nace2.1/852
+Occupation,http://data.europa.eu/esco/occupation/006cc1f9-2841-41c3-991a-dc3f2f3bd533,2264,physiotherapist,"respiratory therapist
+masseuse
+rehabilitation therapist
+occupational therapist
+osteopath
+physiotherapist manager
+neurological physiotherapist
+respiratory physiotherapist
+chiropractor
+physical therapist
+occupational physiotherapist
+eurythmy therapist
+neuromuscular physiotherapist
+health and well-being therapist
+chiropractic therapist
+cardiovascular physiotherapist
+neuromusculoskeletal physiotherapist
+remedial physiotherapist
+neurodevelopmental physiotherapist
+health promotion worker
+sports physiotherapist
+manipulative physiotherapist
+hydrotherapist
+bobath physiotherapist
+business physiotherapist",,released,2024-01-16T10:48:48.922Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Physiotherapists are autonomous health professionals who are responsible for developing, maintaining or restoring motor function and movement throughout the lifespan using evidence-based practice. They relieve pain and treat or prevent physical conditions associated with injury, disease or other impairments. Physiotherapists empower patients and their carers to manage the condition outside clinical settings. They work within their scope of practice and their professional Code of Conduct.",2264.2,http://data.europa.eu/ux2/nace2.1/8695
+Occupation,http://data.europa.eu/esco/occupation/00747307-6341-4266-a061-25416f7c6a96,2310,performing arts theatre instructor,"professor of theatre
+acting school teacher
+theatre instructor in performing arts school
+acting school instructor
+instructor in performing arts
+conservatory theatre instructor
+performing arts theater instructor
+theatre instructor
+conservatory theatre lecturer",,released,2024-01-16T13:49:12.7Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Performing arts theatre instructors educate students in specific theory and, primarily, practice-based theatre courses at a specialised theatre, or acting, school or conservatory at a higher education level. They provide theoretical instruction in service of the practical skills and techniques the students must subsequently master in theatre. Performing arts theatre instructors monitor the students' progress, assist individually when necessary, and evaluate their knowledge and performance of theatre practice through assignments, tests and examinations.",2310.1.30,"http://data.europa.eu/ux2/nace2.1/854,
+http://data.europa.eu/ux2/nace2.1/853"
+Occupation,http://data.europa.eu/esco/occupation/0085f271-5999-4d42-b879-75c3b4269883,8160,hydrogenation machine operator,"hydrogenation process operator
+hydrogenation machine operative
+hydrogenation operator
+hydrogenator",,released,2024-01-24T09:18:05.061Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations",Hydrogenation machine operators control equipment to process base oils for manufacture of margarine and shortening products.,8160.39,http://data.europa.eu/ux2/nace2.1/104
+Occupation,http://data.europa.eu/esco/occupation/0090dd54-057a-4f65-bbe8-f74c4999e8e8,8160,pasta operator,"pasta manufacturer
+dry pasta production operator
+pasta maker
+pasta production operator
+pasta products operator",,released,2024-02-22T16:06:16.592Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Pasta operators manufacture dry pasta products. They unload raw ingredients from storage silos and ingredient delivery systems. These operators mix, press, extrude as to reach desired drying levels of pasta.",8160.46,http://data.europa.eu/ux2/nace2.1/1073
+Occupation,http://data.europa.eu/esco/occupation/00913533-5237-4870-9003-d1cb806603c9,1420,tobacco shop manager,"tobacco store manager
+cigar store manager
+cigarette shop manager
+cigar shop manager
+tobacconists shop manager
+purveyor of tobacco and tobacco products
+tobacconist store manager
+cigar and cigarette shop manager
+cigarette store manager
+smokers products shop manager
+tobacconist shop manager
+pipe smokers shop manager
+tobacconists store manager
+cigar and cigarette store manager",,released,2024-01-26T16:51:59.766Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations",Tobacco shop managers assume responsibility for activities and staff in specialised shops.,1420.4.42,http://data.europa.eu/ux2/nace2.1/4726
+Occupation,http://data.europa.eu/esco/occupation/009d29de-5872-43be-8d9b-abd27f8c99f1,5249,"rental service representative in other machinery, equipment and tangible goods","rental sales desk supervisor in other machinery, equipment and tangible goods
+rental sales desk clerk in other machinery, equipment and tangible goods
+rental specialist in other machinery, equipment and tangible goods
+rental sales assistant in other machinery, equipment and tangible goods
+rental service worker in other machinery, equipment and tangible goods
+rental sales manager in other machinery, equipment and tangible goods
+rental service desk clerk in other machinery, equipment and tangible goods
+rental service assistant in other machinery, equipment and tangible goods
+rental sales desk agent in other machinery, equipment and tangible goods
+rental service desk supervisor in other machinery, equipment and tangible goods
+rental sales supervisor in other machinery, equipment and tangible goods
+rental sales worker in other machinery, equipment and tangible goods
+rental service team leader in other machinery, equipment and tangible goods
+rental service desk agent in other machinery, equipment and tangible goods
+rental service supervisor in other machinery, equipment and tangible goods
+rental service manager in other machinery, equipment and tangible goods
+rental sales team leader in other machinery, equipment and tangible goods
+rental advisor in other machinery, equipment and tangible goods",,released,2024-01-25T09:35:09.037Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Rental service representatives in other machinery, equipment and tangible goods are in charge of renting out equipment and determining specific periods of usage. They document transactions, insurances and payments.",5249.2.1,http://data.europa.eu/ux2/nace2.1/7739
+Occupation,http://data.europa.eu/esco/occupation/00ab29a3-6d4a-4df9-b46d-de31069e36e8,2165,mine surveyor,"mine planning surveyor
+mine plan maker
+planner of mining operations
+mining surveyor
+mine surveyors
+mine operations surveyor
+mine records keeper",,released,2024-01-25T15:10:08.054Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations",Mine surveyors prepare and maintain mining plans in line with statutory and management requirements. They keep records of the physical progress of mining operations and of ore or mineral production.,2165.4.2,"http://data.europa.eu/ux2/nace2.1/7112,
+http://data.europa.eu/ux2/nace2.1/0891,
+http://data.europa.eu/ux2/nace2.1/07,
+http://data.europa.eu/ux2/nace2.1/4312,
+http://data.europa.eu/ux2/nace2.1/0899"
+Occupation,http://data.europa.eu/esco/occupation/00ab5610-e715-428f-99f6-b1e5e469dbcd,2263,food safety specialist,"trainee food safety specialist
+food quality controller
+food production quality controller
+assistant food safety specialist
+food compliance manager (food safety)
+food safety advisor
+food scientist
+HACCP compliance manager
+technical manager for food safety
+food hygiene specialist
+food safety monitor
+senior food safety specialist
+food safety consultant
+food safety controller
+food safety technician",,released,2024-01-25T10:40:47.807Z,http://data.europa.eu/esco/regulated-professions/unregulated,Includes people performing activities at the point of sale.,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations",Food safety specialists organise processes and implement procedures to avoid problems with food safety. They comply with regulations.,2263.2,http://data.europa.eu/ux2/nace2.1/10
+Occupation,http://data.europa.eu/esco/occupation/00c8d1cf-24f2-47d1-9f10-765e1c102811,7233,land-based machinery technician,"land-based machinery technicians
+landbased machinery technician
+land-based machinery mechanic",,released,2024-01-25T10:01:35.496Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Land-based machinery technicians maintain, overhaul and repair agricultural equipment and machinery.",7233.8,http://data.europa.eu/ux2/nace2.1/3312
+Occupation,http://data.europa.eu/esco/occupation/00cee175-1376-43fb-9f02-ba3d7a910a58,8331,bus driver,"private coach driver
+bus operator
+public bus operator
+coach driver
+bus driving operator
+driver of bus
+passenger driver
+private bus operator
+public bus driver
+touristic bus driver
+transit bus driver
+schoolbus driver
+public service vehicle operator
+international bus driver
+intercity bus driver",,released,2024-01-16T13:08:38.228Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Bus drivers operate buses or coaches, take fares, and look after passengers.",8331.1,"http://data.europa.eu/ux2/nace2.1/4931,
+http://data.europa.eu/ux2/nace2.1/4932"
+Occupation,http://data.europa.eu/esco/occupation/00fdad73-4551-4e43-b256-1d4a3759db1e,1324,import export manager in meat and meat products,"customs compliance manager in meat and meat products
+assistant import export manager in meat and meat products
+international trade compliance manager in meat and meat products
+international trade manager in meat and meat products
+senior import manager in meat and meat products
+trainee import export manager in meat and meat products
+senior import export manager in meat and meat products
+graduate export manager in meat and meat products
+trainee import manager in meat and meat products
+graduate import manager in meat and meat products
+trainee export manager in meat and meat products
+senior export manager in meat and meat products
+graduate import export manager in meat and meat products
+assistant import manager in meat and meat products
+assistant export manager in meat and meat products",,released,2024-01-26T11:38:36.28Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Import export managers in meat and meat products install and maintain procedures for cross-border business, coordinating internal and external parties.",1324.3.2.22,"http://data.europa.eu/ux2/nace2.1/4617,
+http://data.europa.eu/ux2/nace2.1/4632"
+Occupation,http://data.europa.eu/esco/occupation/01205776-db8d-4588-a6a6-56d0b9c660a9,2422,housing policy officer,"policy officer
+housing policy analyst
+affordable housing policy officer
+housing policy development officer
+senior housing policy officer
+housing policy advisor
+planning and housing
+housing policy researcher
+housing policy and strategy officer",,released,2023-10-31T17:37:46.596Z,http://data.europa.eu/esco/regulated-professions/unregulated,,,"http://data.europa.eu/esco/concept-scheme/member-occupations,
+http://data.europa.eu/esco/concept-scheme/occupations","Housing policy officers research, analyse and develop housing policies which enable affordable and adequate housing for all. They implement these policies to improve the housing situation of the population by measures such as building affordable housing, supporting people to buy real estate and improving conditions in existing housing. Housing policy officers work closely with partners, external organisations or other stakeholders and provide them with regular updates.",2422.12.8,http://data.europa.eu/ux2/nace2.1/8412

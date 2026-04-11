@@ -4,6 +4,6 @@
     "rootDir": ".",
     "types": ["node", "bun-types"]
   },
-  "include": ["src/**/*", "dev/**/*"],
-  "exclude": ["dev/e2e-start-servers.ts"]
+  "include": ["src/**/*", "scripts/**/*", "esco/**/*"],
+  "exclude": ["scripts/e2e-start-servers.ts"]
 }
