@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TailoredIn — Markdown Form Controls</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: oklch(0.97 0.012 55);
+    --fg: oklch(0.16 0.03 50);
+    --card: oklch(0.995 0.008 55);
+    --primary: oklch(0.58 0.17 45);
+    --primary-fg: oklch(1 0 0);
+    --muted: oklch(0.92 0.02 55);
+    --muted-fg: oklch(0.45 0.05 50);
+    --border: oklch(0.85 0.035 50);
+    --accent: oklch(0.9 0.06 45);
+    --accent-fg: oklch(0.36 0.1 45);
+    --secondary: oklch(0.93 0.025 55);
+    --secondary-fg: oklch(0.3 0.04 50);
+    --ring: oklch(0.6 0.15 45);
+    --code-bg: oklch(0.94 0.015 50);
+    --marker: oklch(0.58 0.17 45);
+    --marker-muted: oklch(0.70 0.12 45);
+    --mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+    --edit-border: oklch(0.58 0.17 45 / 0.5);
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: oklch(0.12 0.01 50);
+    color: var(--fg);
+    padding: 32px;
+    line-height: 1.5;
+  }
+
+  h1 { color: white; font-size: 28px; font-weight: 500; text-align: center; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .page-subtitle { color: oklch(0.6 0.04 50); font-size: 15px; text-align: center; margin-bottom: 40px; }
+
+  /* Layout: controls catalog */
+  .catalog {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .control-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .control-card.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-header .name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .card-header .type {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--marker);
+    border: 1px solid var(--border);
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .states {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .state-col {
+    min-width: 0;
+  }
+
+  .state-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-fg);
+    margin-bottom: 12px;
+  }
+
+  /* === SHARED FRONTMATTER STYLES === */
+  .fm {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 2;
+  }
+
+  .fm.editing {
+    border-color: var(--edit-border);
+  }
+
+  .fm .fence { color: var(--marker); font-weight: 500; user-select: none; }
+  .fm .key { color: var(--marker-muted); }
+  .fm .val { color: var(--fg); }
+
+  .fm-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .fm-row.active {
+    background: oklch(0.58 0.17 45 / 0.06);
+    margin: 0 -8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Explanation block */
+  .explain {
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted-fg);
+    line-height: 1.7;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .explain code {
+    font-family: var(--mono);
+    background: var(--code-bg);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: var(--marker);
+  }
+
+  .explain strong { font-weight: 500; }
+
+  /* === SELECT / DROPDOWN === */
+  .md-select {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 0;
+    color: var(--fg);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .md-select .chevron {
+    font-size: 9px;
+    color: var(--marker);
+    margin-left: 2px;
+  }
+
+  .md-select-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    color: var(--fg);
+    background: oklch(0.58 0.17 45 / 0.08);
+    border-radius: 4px;
+    border-bottom: 2px solid var(--marker);
+  }
+
+  .md-select-open .chevron {
+    font-size: 9px;
+    color: var(--marker);
+    transform: rotate(180deg);
+  }
+
+  /* Dropdown menu */
+  .md-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: -8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    min-width: 180px;
+    box-shadow: 0 4px 16px oklch(0 0 0 / 0.08);
+    z-index: 10;
+  }
+
+  .md-dropdown-item {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .md-dropdown-item.selected {
+    background: oklch(0.58 0.17 45 / 0.08);
+    color: var(--marker);
+  }
+
+  .md-dropdown-item .check {
+    color: var(--marker);
+    font-size: 12px;
+    width: 14px;
+  }
+
+  .md-dropdown-search {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 10px;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    width: 100%;
+    outline: none;
+    color: var(--fg);
+    margin-bottom: 4px;
+  }
+
+  /* === CHECKBOX === */
+  .md-checkbox-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+  }
+
+  .md-checkbox-view .box {
+    color: var(--marker);
+    font-size: 14px;
+  }
+
+  .md-checkbox-view .text {
+    color: var(--fg);
+    font-size: 12.5px;
+  }
+
+  .md-checkbox-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .md-checkbox-edit:hover {
+    background: oklch(0.58 0.17 45 / 0.06);
+  }
+
+  .md-checkbox-edit .box {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--marker);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--primary-fg);
+    flex-shrink: 0;
+  }
+
+  .md-checkbox-edit .box.checked {
+    background: var(--marker);
+  }
+
+  .md-checkbox-edit .text {
+    color: var(--fg);
+    font-size: 12.5px;
+  }
+
+  /* === DATE PICKER === */
+  .md-date-view {
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+
+  .md-date-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    position: relative;
+  }
+
+  .md-date-part {
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .md-date-part:hover {
+    background: oklch(0.58 0.17 45 / 0.08);
+  }
+
+  .md-date-part.active {
+    background: oklch(0.58 0.17 45 / 0.10);
+    border-bottom: 2px solid var(--marker);
+  }
+
+  .md-date-sep {
+    color: var(--marker-muted);
+  }
+
+  /* Mini calendar popup */
+  .md-calendar {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 4px 16px oklch(0 0 0 / 0.08);
+    z-index: 10;
+    min-width: 200px;
+  }
+
+  .md-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .md-calendar-header .nav { color: var(--marker); cursor: pointer; font-size: 14px; }
+
+  .md-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+
+  .md-calendar-cell {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 4px;
+    text-align: center;
+    border-radius: 4px;
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .md-calendar-cell:hover { background: oklch(0.58 0.17 45 / 0.06); }
+  .md-calendar-cell.selected { background: var(--marker); color: var(--primary-fg); }
+  .md-calendar-cell.muted { color: var(--muted-fg); }
+
+  /* === RANGE +/- === */
+  .md-range-view {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--fg);
+  }
+
+  .md-range-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+
+  .md-range-btn {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: 4px;
+    color: var(--marker);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--mono);
+  }
+
+  .md-range-btn:hover {
+    background: oklch(0.58 0.17 45 / 0.08);
+    border-color: var(--marker-muted);
+  }
+
+  .md-range-val {
+    min-width: 24px;
+    text-align: center;
+    padding: 0 4px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  .md-range-label {
+    color: var(--muted-fg);
+    margin: 0 6px;
+    font-size: 11px;
+  }
+
+  /* === FULL EXAMPLE === */
+  .full-example {
+    background: var(--code-bg);
+    border: 1px solid var(--edit-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 2.2;
+  }
+
+  .full-example .fence { color: var(--marker); font-weight: 500; }
+  .full-example .key { color: var(--marker-muted); }
+  .full-example .plain-val { color: var(--fg); }
+
+  .full-example .row {
+    display: flex;
+    align-items: center;
+  }
+
+  .full-example .row.active {
+    background: oklch(0.58 0.17 45 / 0.06);
+    margin: 0 -10px;
+    padding: 0 10px;
+    border-radius: 4px;
+  }
+
+  @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+  .cursor { display:inline-block; width:2px; height:13px; background:var(--marker); animation:blink 1s infinite; vertical-align:text-bottom; margin-left:1px; }
+</style>
+</head>
+<body>
+  <h1>Markdown Form Controls</h1>
+  <p class="page-subtitle">Every non-text control rendered as if it belongs in a markdown document. View mode reads like YAML. Edit mode stays in the flow.</p>
+
+  <div class="catalog">
+
+    <!-- SELECT -->
+    <div class="control-card">
+      <div class="card-header">
+        <span class="name">Select / Dropdown</span>
+        <span class="type">e.g. company link, industry</span>
+      </div>
+      <div class="card-body">
+        <div class="states">
+          <div class="state-col">
+            <div class="state-label">View</div>
+            <div class="fm">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">company: </span><span class="val">Voi Technology</span></div>
+              <div class="fm-row"><span class="key">industry: </span><span class="val">Micromobility</span></div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+          <div class="state-col">
+            <div class="state-label">Edit</div>
+            <div class="fm editing">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">company: </span><span class="val">Voi Technology</span></div>
+              <div class="fm-row active" style="position: relative;">
+                <span class="key">industry: </span>
+                <span class="md-select-open">Micromobility <span class="chevron">▼</span></span>
+                <div class="md-dropdown">
+                  <input class="md-dropdown-search" placeholder="search..." value="micro">
+                  <div class="md-dropdown-item selected"><span class="check">✓</span> Micromobility</div>
+                  <div class="md-dropdown-item"><span class="check">&nbsp;</span> Microservices</div>
+                  <div class="md-dropdown-item"><span class="check">&nbsp;</span> Microelectronics</div>
+                </div>
+              </div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+        </div>
+        <div class="explain">
+          <strong>Pattern:</strong> In view mode, the value renders as plain text — indistinguishable from a string field. In edit mode, clicking the value reveals a <code>▼</code> chevron and opens a searchable dropdown. The dropdown uses the same <code>code-bg</code> styling. Values that come from a fixed set get a subtle chevron affordance on hover.
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKBOX -->
+    <div class="control-card">
+      <div class="card-header">
+        <span class="name">Checkbox / Toggle</span>
+        <span class="type">e.g. featured, remote, current role</span>
+      </div>
+      <div class="card-body">
+        <div class="states">
+          <div class="state-col">
+            <div class="state-label">View</div>
+            <div class="fm">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">remote: </span><span class="md-checkbox-view"><span class="box">[x]</span> <span class="text">true</span></span></div>
+              <div class="fm-row"><span class="key">featured: </span><span class="md-checkbox-view"><span class="box">[ ]</span> <span class="text">false</span></span></div>
+              <div class="fm-row"><span class="key">current: </span><span class="md-checkbox-view"><span class="box">[x]</span> <span class="text">true</span></span></div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+          <div class="state-col">
+            <div class="state-label">Edit</div>
+            <div class="fm editing">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">remote: </span><span class="md-checkbox-edit"><span class="box checked">✓</span> <span class="text">true</span></span></div>
+              <div class="fm-row"><span class="key">featured: </span><span class="md-checkbox-edit"><span class="box"></span> <span class="text">false</span></span></div>
+              <div class="fm-row active"><span class="key">current: </span><span class="md-checkbox-edit"><span class="box checked">✓</span> <span class="text">true</span></span></div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+        </div>
+        <div class="explain">
+          <strong>Pattern:</strong> Borrows GitHub-flavored markdown task syntax. View mode shows <code>[x]</code> and <code>[ ]</code> as monospace text with <code>true</code>/<code>false</code>. Edit mode swaps to a real checkbox with amber border/fill but keeps the <code>true</code>/<code>false</code> label inline. Single click toggles. The GFM checkbox is instantly recognizable to anyone who's used markdown.
+        </div>
+      </div>
+    </div>
+
+    <!-- DATE PICKER -->
+    <div class="control-card">
+      <div class="card-header">
+        <span class="name">Date Picker</span>
+        <span class="type">e.g. startDate, endDate (YYYY-MM)</span>
+      </div>
+      <div class="card-body">
+        <div class="states">
+          <div class="state-col">
+            <div class="state-label">View</div>
+            <div class="fm">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">start: </span><span class="md-date-view">2021-01</span></div>
+              <div class="fm-row"><span class="key">end: </span><span class="md-date-view">2023-12</span></div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+          <div class="state-col">
+            <div class="state-label">Edit</div>
+            <div class="fm editing">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">start: </span><span class="md-date-view">2021-01</span></div>
+              <div class="fm-row active" style="position: relative;">
+                <span class="key">end: </span>
+                <span class="md-date-edit">
+                  <span class="md-date-part">2023</span><span class="md-date-sep">-</span><span class="md-date-part active">12</span>
+                  <div class="md-calendar">
+                    <div class="md-calendar-header">
+                      <span class="nav">‹</span>
+                      <span>2023</span>
+                      <span class="nav">›</span>
+                    </div>
+                    <div class="md-calendar-grid">
+                      <div class="md-calendar-cell">Jan</div>
+                      <div class="md-calendar-cell">Feb</div>
+                      <div class="md-calendar-cell">Mar</div>
+                      <div class="md-calendar-cell">Apr</div>
+                      <div class="md-calendar-cell">May</div>
+                      <div class="md-calendar-cell">Jun</div>
+                      <div class="md-calendar-cell">Jul</div>
+                      <div class="md-calendar-cell">Aug</div>
+                      <div class="md-calendar-cell">Sep</div>
+                      <div class="md-calendar-cell">Oct</div>
+                      <div class="md-calendar-cell">Nov</div>
+                      <div class="md-calendar-cell selected">Dec</div>
+                    </div>
+                  </div>
+                </span>
+              </div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+        </div>
+        <div class="explain">
+          <strong>Pattern:</strong> Dates render as ISO-style <code>YYYY-MM</code> — the most "markdown/YAML-native" format. In edit mode, clicking the date splits it into year and month segments. Clicking a segment opens a compact month picker. The picker drops from the value position, not from a separate icon. The date string itself IS the trigger. Year navigation with <code>‹ ›</code> arrows.
+        </div>
+      </div>
+    </div>
+
+    <!-- RANGE +/- -->
+    <div class="control-card">
+      <div class="card-header">
+        <span class="name">Numeric Range (+/-)</span>
+        <span class="type">e.g. bulletMin, bulletMax</span>
+      </div>
+      <div class="card-body">
+        <div class="states">
+          <div class="state-col">
+            <div class="state-label">View</div>
+            <div class="fm">
+              <div class="fence">---</div>
+              <div class="fm-row"><span class="key">bullets: </span><span class="md-range-view">2–5</span></div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+          <div class="state-col">
+            <div class="state-label">Edit</div>
+            <div class="fm editing">
+              <div class="fence">---</div>
+              <div class="fm-row active">
+                <span class="key">bullets: </span>
+                <span class="md-range-edit">
+                  <span class="md-range-btn">−</span>
+                  <span class="md-range-val">2</span>
+                  <span class="md-range-btn">+</span>
+                  <span class="md-range-label">to</span>
+                  <span class="md-range-btn">−</span>
+                  <span class="md-range-val">5</span>
+                  <span class="md-range-btn">+</span>
+                </span>
+              </div>
+              <div class="fence">---</div>
+            </div>
+          </div>
+        </div>
+        <div class="explain">
+          <strong>Pattern:</strong> View mode shows the range as a compact <code>min–max</code> string. Edit mode reveals <code>−</code> / <code>+</code> stepper buttons flanking each number. The buttons use monospace font, amber color, and minimal styling (border, no fill). The <code>to</code> separator keeps the range relationship clear. Values can also be typed directly into the number.
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL ASSEMBLED EXAMPLE -->
+    <div class="control-card full-width">
+      <div class="card-header">
+        <span class="name">Complete Frontmatter — All Controls Together</span>
+        <span class="type">editing state</span>
+      </div>
+      <div class="card-body">
+        <div class="full-example">
+          <div class="fence">---</div>
+          <div class="row">
+            <span class="key">title: </span>
+            <span class="plain-val" style="border-bottom: 1px dashed var(--marker-muted); padding-bottom: 1px;">Senior Software Engineer</span>
+          </div>
+          <div class="row">
+            <span class="key">company: </span>
+            <span class="plain-val">Voi Technology </span>
+            <span style="color: var(--marker); font-size: 9px;">▼</span>
+          </div>
+          <div class="row">
+            <span class="key">website: </span>
+            <span class="plain-val" style="border-bottom: 1px dashed var(--marker-muted); padding-bottom: 1px; color: var(--primary);">voi.com</span>
+          </div>
+          <div class="row">
+            <span class="key">accent: </span>
+            <span class="plain-val" style="border-bottom: 1px dashed var(--marker-muted); padding-bottom: 1px; color: var(--muted-fg); font-style: italic;">acquired by Volvo Cars</span>
+          </div>
+          <div class="row">
+            <span class="key">location: </span>
+            <span class="plain-val" style="border-bottom: 1px dashed var(--marker-muted); padding-bottom: 1px;">Stockholm, Sweden</span>
+          </div>
+          <div class="row">
+            <span class="key">start: </span>
+            <span class="md-date-edit" style="font-size: 12.5px;">
+              <span class="md-date-part">2021</span><span class="md-date-sep">-</span><span class="md-date-part">01</span>
+            </span>
+            <span class="key" style="margin-left: 16px;">end: </span>
+            <span class="md-date-edit" style="font-size: 12.5px;">
+              <span class="md-date-part">2023</span><span class="md-date-sep">-</span><span class="md-date-part">12</span>
+            </span>
+          </div>
+          <div class="row">
+            <span class="key">current: </span>
+            <span class="md-checkbox-edit" style="font-size: 12.5px; padding: 0;">
+              <span class="box" style="width: 14px; height: 14px; border-width: 1.5px;"></span>
+              <span class="text" style="font-size: 12.5px;">false</span>
+            </span>
+          </div>
+          <div class="row active">
+            <span class="key">bullets: </span>
+            <span class="md-range-edit" style="font-size: 12.5px;">
+              <span class="md-range-btn" style="width: 20px; height: 20px; font-size: 13px;">−</span>
+              <span class="md-range-val">2</span>
+              <span class="md-range-btn" style="width: 20px; height: 20px; font-size: 13px;">+</span>
+              <span class="md-range-label">to</span>
+              <span class="md-range-btn" style="width: 20px; height: 20px; font-size: 13px;">−</span>
+              <span class="md-range-val">5</span>
+              <span class="md-range-btn" style="width: 20px; height: 20px; font-size: 13px;">+</span>
+            </span>
+            <span class="cursor"></span>
+          </div>
+          <div class="fence">---</div>
+        </div>
+        <div class="explain" style="margin-top: 16px;">
+          <strong>The principle:</strong> Every control lives inside the frontmatter block as a <code>key: value</code> pair. In view mode, all values render as plain monospace text — the entire block reads like YAML. In edit mode, each value type reveals its appropriate affordance (text input, dropdown, checkbox, stepper, date picker) while staying on the same line, in the same position, preserving the document flow. No field labels, no form layout — the YAML key IS the label. The frontmatter block IS the form.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
