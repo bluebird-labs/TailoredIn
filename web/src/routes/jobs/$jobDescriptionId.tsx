@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Download, Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronDown, Download, Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
+import { useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
@@ -197,22 +197,7 @@ function JobDetailPage() {
 
       <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
         <div className="space-y-5">
-          <InfoCard label="Job Analysis">
-            {jd.description ? (
-              <div
-                className="prose prose-sm max-w-none text-[14px] leading-relaxed tracking-[0.01em] text-foreground
-                  [&_h3]:text-[14px] [&_h3]:font-medium [&_h3]:mt-4 [&_h3]:mb-1.5
-                  [&_h3:first-child]:mt-0
-                  [&_p]:my-1.5
-                  [&_ul]:my-1.5 [&_ul]:pl-5 [&_ul]:list-disc
-                  [&_li]:my-0.5 [&_li]:text-[14px]"
-              >
-                <Markdown>{jd.description}</Markdown>
-              </div>
-            ) : (
-              <p className="text-[14px] italic text-muted-foreground">No description</p>
-            )}
-          </InfoCard>
+          <JobAnalysisCard description={jd.description} />
 
           <InfoCard label="Details">
             <InfoRow label="Level" value={levelLabel} />
@@ -279,5 +264,59 @@ function JobDetailPage() {
         />
       )}
     </div>
+  );
+}
+
+const COLLAPSED_HEIGHT = 300;
+
+function JobAnalysisCard({ description }: { description: string | null }) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [needsCollapse, setNeedsCollapse] = useState(false);
+
+  const measureRef = (node: HTMLDivElement | null) => {
+    contentRef.current = node;
+    if (node) {
+      setNeedsCollapse(node.scrollHeight > COLLAPSED_HEIGHT + 40);
+    }
+  };
+
+  return (
+    <InfoCard label="Job Analysis">
+      {description ? (
+        <div className="relative">
+          <div
+            ref={measureRef}
+            className="prose prose-sm max-w-none text-[14px] leading-relaxed tracking-[0.01em] text-foreground
+              [&_h3]:text-[14px] [&_h3]:font-medium [&_h3]:mt-4 [&_h3]:mb-1.5
+              [&_h3:first-child]:mt-0
+              [&_p]:my-1.5
+              [&_ul]:my-1.5 [&_ul]:pl-5 [&_ul]:list-disc
+              [&_li]:my-0.5 [&_li]:text-[14px]
+              overflow-hidden transition-[max-height] duration-300 ease-in-out"
+            style={{ maxHeight: !expanded && needsCollapse ? `${COLLAPSED_HEIGHT}px` : undefined }}
+          >
+            <Markdown>{description}</Markdown>
+          </div>
+          {needsCollapse && !expanded && (
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card to-transparent pointer-events-none" />
+          )}
+          {needsCollapse && (
+            <button
+              type="button"
+              className="mt-2 flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setExpanded(prev => !prev)}
+            >
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+              />
+              {expanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </div>
+      ) : (
+        <p className="text-[14px] italic text-muted-foreground">No description</p>
+      )}
+    </InfoCard>
   );
 }
