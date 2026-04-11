@@ -16,6 +16,9 @@ export { ClaudeApiCompanyDataProvider } from './services/ClaudeApiCompanyDataPro
 export { ClaudeApiCompanyDiscoveryProvider } from './services/ClaudeApiCompanyDiscoveryProvider.js';
 export { ClaudeApiJobDescriptionParser } from './services/ClaudeApiJobDescriptionParser.js';
 export { ClaudeApiResumeContentGenerator } from './services/ClaudeApiResumeContentGenerator.js';
+export { ClaudeApiResumeElementGenerator } from './services/ClaudeApiResumeElementGeneratorNew.js';
+// Prompt sections
+export * from './services/prompt-sections/index.js';
 // LLM
 export {
   BaseLlmApiProvider,
