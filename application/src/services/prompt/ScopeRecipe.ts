@@ -8,8 +8,8 @@ export class ScopeRecipe {
     public readonly scope: GenerationScope,
     public readonly sections: PromptSection[],
     public readonly model: string,
-    /** Opaque output schema — passed through to ComposedPrompt for infrastructure validation. */
-    public readonly outputSchema: unknown
+    /** Opaque output schema or factory — passed through to ComposedPrompt for infrastructure validation. */
+    private readonly outputSchemaOrFactory: unknown | ((context: GenerationContext) => unknown)
   ) {}
 
   public compose(context: GenerationContext): ComposedPrompt {
@@ -44,7 +44,10 @@ export class ScopeRecipe {
       sessionBlocks,
       requestBlocks,
       model: this.model,
-      outputSchema: this.outputSchema
+      outputSchema:
+        typeof this.outputSchemaOrFactory === 'function'
+          ? (this.outputSchemaOrFactory as (ctx: GenerationContext) => unknown)(context)
+          : this.outputSchemaOrFactory
     };
   }
 }

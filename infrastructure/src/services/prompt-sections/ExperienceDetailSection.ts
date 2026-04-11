@@ -33,7 +33,17 @@ export class ExperienceDetailSection extends PromptSection {
       }
     }
 
-    lines.push('', `Generate between ${target.bulletMin} and ${target.bulletMax} bullets for this experience.`);
+    if (target.bulletMin === target.bulletMax) {
+      lines.push(
+        '',
+        `IMPORTANT: Generate EXACTLY ${target.bulletMin} bullet(s) for this experience. No more, no fewer.`
+      );
+    } else {
+      lines.push(
+        '',
+        `IMPORTANT: Generate between ${target.bulletMin} and ${target.bulletMax} bullets for this experience. Aim for ${Math.round((target.bulletMin + target.bulletMax) / 2)}.`
+      );
+    }
 
     return { cacheTier: this.cacheTier, content: lines.join('\n') };
   }

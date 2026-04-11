@@ -15,6 +15,7 @@ export class RulesSection extends PromptSection {
 
 - **Strict derivation:** Content MUST be derived strictly from the experience it belongs to - do NOT borrow facts, metrics, skills, or achievements from other experiences.
 - **No invention:** Do NOT invent any competency, metric, or achievement not present in the source data. If an accomplishment lacks specific metrics, write a strong qualitative statement instead.
+- **Bullet count:** Generate EXACTLY the number of bullets specified per experience. Each experience specifies a min and max bullet count - you MUST generate at least min and at most max bullets. When min equals max, generate exactly that many bullets. Aim for the midpoint of the range. Only approach max when the experience has exceptionally rich accomplishment data with distinct, high-impact achievements. Prefer fewer, stronger bullets over more, weaker ones. This is a hard constraint - responses with the wrong number of bullets will be rejected.
 - **Metrics first:** When the accomplishment data contains specific numbers, percentages, dollar amounts, timelines, or scale figures, you MUST include them. Quantified impact is more compelling - never drop a metric that is present in the source.
 - **Tone:** Derive the candidate's voice, tone, and writing style from the About section provided. Mirror their personality and communication style in all generated content.
 - **Relevance:** Frame content to highlight relevance to the target job description. Lead with impact and action verbs.

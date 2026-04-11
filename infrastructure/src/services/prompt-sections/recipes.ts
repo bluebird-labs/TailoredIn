@@ -1,5 +1,5 @@
 import { ScopeRecipe } from '@tailoredin/application';
-import { GenerationScope, ResumeConstraints } from '@tailoredin/domain';
+import { type GenerationContext, GenerationScope, ResumeConstraints } from '@tailoredin/domain';
 import { z } from 'zod';
 import type { BulletParamsSection } from './BulletParamsSection.js';
 import type { CompanyContextSection } from './CompanyContextSection.js';
@@ -33,10 +33,22 @@ export const headlineOutputSchema = z.object({
   headline: z.string().min(ResumeConstraints.HEADLINE_MIN_LENGTH).max(ResumeConstraints.HEADLINE_MAX_LENGTH)
 });
 
-export const experienceBulletsOutputSchema = z.object({
-  summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH),
-  bullets: z.array(z.string().min(ResumeConstraints.BULLET_MIN_LENGTH).max(ResumeConstraints.BULLET_MAX_LENGTH))
-});
+export function createExperienceBulletsOutputSchema(bulletMin: number, bulletMax: number) {
+  return z.object({
+    summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH),
+    bullets: z
+      .array(z.string().min(ResumeConstraints.BULLET_MIN_LENGTH).max(ResumeConstraints.BULLET_MAX_LENGTH))
+      .min(bulletMin)
+      .max(bulletMax)
+  });
+}
+
+function experienceBulletsSchemaFactory(context: GenerationContext): unknown {
+  const target = context.experiences[0];
+  const bulletMin = target?.bulletMin ?? 1;
+  const bulletMax = target?.bulletMax ?? 5;
+  return createExperienceBulletsOutputSchema(bulletMin, bulletMax);
+}
 
 export const experienceSummaryOutputSchema = z.object({
   summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH)
@@ -81,7 +93,7 @@ export function createExperienceBulletsRecipe(s: AllSections, model: string): Sc
       s.userInstructions
     ],
     model,
-    experienceBulletsOutputSchema
+    experienceBulletsSchemaFactory
   );
 }
 
