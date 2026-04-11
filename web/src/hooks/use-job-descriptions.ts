@@ -25,6 +25,7 @@ export type ResumeOutput = {
   experiences: ResumeOutputExperience[];
   hiddenEducationIds: string[];
   generatedAt: string;
+  scopedInstructions: Record<string, string>;
 };
 
 export type JobDescription = {

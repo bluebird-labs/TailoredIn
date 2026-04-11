@@ -52,17 +52,17 @@ export function BulletRangePill({
           <Stepper
             label="Min"
             value={editMin}
-            onDecrement={() => setEditMin(v => Math.max(1, v - 1))}
+            onDecrement={() => setEditMin(v => Math.max(0, v - 1))}
             onIncrement={() => setEditMin(v => Math.min(editMax, v + 1))}
-            decrementDisabled={editMin <= 1}
+            decrementDisabled={editMin <= 0}
             incrementDisabled={editMin >= editMax}
           />
           <Stepper
             label="Max"
             value={editMax}
-            onDecrement={() => setEditMax(v => Math.max(editMin, v - 1))}
+            onDecrement={() => setEditMax(v => Math.max(0, Math.max(editMin, v - 1)))}
             onIncrement={() => setEditMax(v => Math.min(20, v + 1))}
-            decrementDisabled={editMax <= editMin}
+            decrementDisabled={editMax <= 0 || editMax <= editMin}
             incrementDisabled={editMax >= 20}
           />
         </div>
