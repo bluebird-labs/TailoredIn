@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { formatEnumLabel } from '@/components/job-descriptions/job-description-options.js';
+import { RawTextModal } from '@/components/job-descriptions/RawTextModal.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
@@ -70,14 +71,15 @@ function JobDetailPage() {
   const { data: jd, isLoading } = useJobDescription(jobDescriptionId);
   const { data: company } = useCompany(jd?.companyId ?? '');
   const [editOpen, setEditOpen] = useState(false);
+  const [rawTextModalOpen, setRawTextModalOpen] = useState(false);
   const parseJd = useParseJobDescription();
   const updateJd = useUpdateJobDescription(jd?.companyId ?? '');
   const isReparsing = parseJd.isPending || updateJd.isPending;
 
-  function handleReparse() {
-    if (!jd?.rawText) return;
+  function reparseWithText(text: string) {
+    if (!jd) return;
     parseJd.mutate(
-      { text: jd.rawText },
+      { text },
       {
         onSuccess: result => {
           updateJd.mutate(
@@ -95,12 +97,15 @@ function JobDetailPage() {
               location_type: result.locationType ?? jd.locationType,
               source: jd.source,
               posted_at: result.postedAt ?? jd.postedAt,
-              raw_text: jd.rawText,
+              raw_text: text,
               sought_hard_skills: result.soughtHardSkills,
               sought_soft_skills: result.soughtSoftSkills
             },
             {
-              onSuccess: () => toast.success('Job analysis regenerated'),
+              onSuccess: () => {
+                setRawTextModalOpen(false);
+                toast.success('Job analysis regenerated');
+              },
               onError: () => toast.error('Failed to save reparsed job description')
             }
           );
@@ -108,6 +113,15 @@ function JobDetailPage() {
         onError: () => toast.error('Failed to reparse job description')
       }
     );
+  }
+
+  function handleReparse() {
+    if (!jd) return;
+    if (jd.rawText) {
+      reparseWithText(jd.rawText);
+    } else {
+      setRawTextModalOpen(true);
+    }
   }
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
@@ -172,16 +186,14 @@ function JobDetailPage() {
         }
         actions={
           <div className="flex items-center gap-2">
-            {jd.rawText && (
-              <Button size="sm" variant="outline" onClick={handleReparse} disabled={isReparsing}>
-                {isReparsing ? (
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-                )}
-                {isReparsing ? 'Reparsing...' : 'Reparse'}
-              </Button>
-            )}
+            <Button size="sm" variant="outline" onClick={handleReparse} disabled={isReparsing}>
+              {isReparsing ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {isReparsing ? 'Reparsing...' : 'Reparse'}
+            </Button>
             <Link to="/atelier" search={{ job: jobDescriptionId }}>
               <Button size="sm" variant="outline">
                 <Sparkles className="mr-1.5 h-3.5 w-3.5" />
@@ -266,6 +278,13 @@ function JobDetailPage() {
           }}
         />
       )}
+
+      <RawTextModal
+        open={rawTextModalOpen}
+        onOpenChange={setRawTextModalOpen}
+        onSubmit={reparseWithText}
+        isProcessing={isReparsing}
+      />
     </div>
   );
 }
