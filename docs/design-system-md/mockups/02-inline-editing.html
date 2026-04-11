@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TailoredIn — Inline Editing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: oklch(0.97 0.012 55);
+    --fg: oklch(0.16 0.03 50);
+    --card: oklch(0.995 0.008 55);
+    --primary: oklch(0.58 0.17 45);
+    --primary-fg: oklch(1 0 0);
+    --muted: oklch(0.92 0.02 55);
+    --muted-fg: oklch(0.45 0.05 50);
+    --border: oklch(0.85 0.035 50);
+    --accent: oklch(0.9 0.06 45);
+    --accent-fg: oklch(0.36 0.1 45);
+    --sidebar-bg: oklch(0.2 0.035 50);
+    --sidebar-fg: oklch(0.6 0.04 50);
+    --sidebar-primary: oklch(0.82 0.12 45);
+    --sidebar-accent: oklch(0.3 0.06 45);
+    --sidebar-accent-fg: oklch(0.9 0.08 45);
+    --sidebar-border: oklch(0.3 0.04 50);
+    --secondary: oklch(0.93 0.025 55);
+    --secondary-fg: oklch(0.3 0.04 50);
+    --ring: oklch(0.6 0.15 45);
+    --code-bg: oklch(0.94 0.015 50);
+    --marker: oklch(0.58 0.17 45);
+    --marker-muted: oklch(0.70 0.12 45);
+    --mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+    /* Edit mode tokens */
+    --edit-border: oklch(0.58 0.17 45 / 0.5);
+    --edit-bg: oklch(0.58 0.17 45 / 0.03);
+    --cursor: oklch(0.58 0.17 45);
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: oklch(0.12 0.01 50);
+    color: var(--fg);
+    padding: 32px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    color: white;
+    font-size: 28px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .page-subtitle {
+    color: oklch(0.6 0.04 50);
+    font-size: 15px;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1500px;
+    margin: 0 auto 32px;
+  }
+
+  .panel {
+    background: var(--bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-header .label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-fg);
+  }
+
+  .badge-view { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--secondary); color: var(--secondary-fg); }
+  .badge-edit { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 999px; background: var(--primary); color: var(--primary-fg); }
+
+  /* Content panels (no sidebar — focus on the content area) */
+  .content-panel {
+    padding: 28px 32px;
+    min-height: 680px;
+    position: relative;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted-fg);
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  .breadcrumb a { color: var(--muted-fg); text-decoration: none; }
+  .breadcrumb .sep { color: var(--border); margin: 0 4px; }
+
+  /* === VIEW MODE === */
+
+  .md-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .md-heading .hash {
+    font-family: var(--mono);
+    color: var(--marker);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.35;
+    user-select: none;
+  }
+
+  .md-heading h2 {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .frontmatter {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 14px 0 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .frontmatter .fence { color: var(--marker); font-weight: 500; user-select: none; }
+  .frontmatter .key { color: var(--marker-muted); }
+  .frontmatter .value { color: var(--fg); }
+  .frontmatter .link { color: var(--primary); text-decoration: underline; text-decoration-color: oklch(0.58 0.17 45 / 0.3); }
+
+  .md-blockquote {
+    border-left: 3px solid var(--marker);
+    padding: 10px 14px;
+    margin: 0 0 6px;
+    background: oklch(0.58 0.17 45 / 0.04);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .md-blockquote .gt {
+    font-family: var(--mono);
+    color: var(--marker);
+    font-weight: 500;
+    margin-right: 6px;
+    font-size: 14px;
+    user-select: none;
+  }
+
+  .md-blockquote p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .md-hr {
+    font-family: var(--mono);
+    color: var(--marker-muted);
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    margin: 18px 0;
+    opacity: 0.6;
+    user-select: none;
+  }
+
+  .md-h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .md-h3 .hash { font-family: var(--mono); color: var(--marker); font-size: 14px; font-weight: 500; }
+  .md-h3 h3 { font-size: 14px; font-weight: 500; }
+
+  .md-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--accent-fg);
+    border: 1px solid var(--border);
+  }
+
+  .md-list { list-style: none; padding: 0; }
+
+  .md-list-item { padding: 8px 0; line-height: 1.75; }
+  .md-list-item + .md-list-item { border-top: 1px solid oklch(0.85 0.035 50 / 0.3); }
+  .md-list-item .bullet { font-family: var(--mono); color: var(--marker); font-size: 14px; font-weight: 500; margin-right: 8px; }
+  .md-list-item .title { font-size: 13px; font-weight: 500; }
+  .md-list-item .narrative { font-size: 12px; color: var(--muted-fg); margin-top: 2px; margin-left: 20px; line-height: 1.7; }
+
+  /* Click hint */
+  .click-hint {
+    position: absolute;
+    top: 28px;
+    right: 32px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted-fg);
+    background: var(--muted);
+    padding: 3px 10px;
+    border-radius: 4px;
+    opacity: 0.8;
+  }
+
+  /* === EDIT MODE === */
+
+  /* Editable section wrapper */
+  .editing-section {
+    border: 1px solid var(--edit-border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    background: var(--edit-bg);
+    margin: -8px -12px;
+    position: relative;
+  }
+
+  .editing-section::before {
+    content: 'EDITING';
+    position: absolute;
+    top: -9px;
+    left: 16px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    background: var(--bg);
+    padding: 0 6px;
+  }
+
+  /* Editable heading */
+  .edit-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .edit-heading .hash {
+    font-family: var(--mono);
+    color: var(--marker);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.35;
+    user-select: none;
+  }
+
+  .edit-heading .editable-text {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    border: none;
+    background: transparent;
+    outline: none;
+    border-bottom: 2px solid var(--marker);
+    padding-bottom: 2px;
+    width: 100%;
+    color: var(--fg);
+    font-family: inherit;
+  }
+
+  /* Editable frontmatter */
+  .edit-frontmatter {
+    background: var(--code-bg);
+    border: 1px solid var(--edit-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .edit-frontmatter .fence { color: var(--marker); font-weight: 500; }
+
+  .edit-frontmatter .field-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .edit-frontmatter .key {
+    color: var(--marker-muted);
+    flex-shrink: 0;
+  }
+
+  .edit-frontmatter .edit-value {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--marker-muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg);
+    padding: 0 2px 1px;
+    outline: none;
+    flex: 1;
+    margin-left: 2px;
+  }
+
+  .edit-frontmatter .edit-value:focus {
+    border-bottom-color: var(--marker);
+    border-bottom-style: solid;
+  }
+
+  /* Active field highlight */
+  .edit-frontmatter .field-row.active {
+    background: oklch(0.58 0.17 45 / 0.06);
+    margin: 0 -8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Editable blockquote */
+  .edit-blockquote {
+    border-left: 3px solid var(--marker);
+    padding: 10px 14px;
+    background: oklch(0.58 0.17 45 / 0.06);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 6px;
+  }
+
+  .edit-blockquote .gt {
+    font-family: var(--mono);
+    color: var(--marker);
+    font-weight: 500;
+    margin-right: 6px;
+    font-size: 14px;
+  }
+
+  .edit-blockquote textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--fg);
+    font-family: inherit;
+    resize: none;
+    min-height: 50px;
+  }
+
+  /* Editable accomplishment */
+  .edit-list-item {
+    padding: 10px 0;
+    line-height: 1.75;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .edit-list-item + .edit-list-item { border-top: 1px solid oklch(0.85 0.035 50 / 0.3); }
+
+  .edit-list-item .bullet {
+    font-family: var(--mono);
+    color: var(--marker);
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 8px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .edit-list-item .edit-content {
+    flex: 1;
+  }
+
+  .edit-list-item .edit-title {
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--marker-muted);
+    outline: none;
+    width: 100%;
+    color: var(--fg);
+    font-family: inherit;
+    padding-bottom: 1px;
+  }
+
+  .edit-list-item .edit-title:focus {
+    border-bottom-color: var(--marker);
+    border-bottom-style: solid;
+  }
+
+  .edit-list-item .edit-narrative {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted-fg);
+    font-family: inherit;
+    resize: none;
+    margin-top: 4px;
+    margin-left: 0;
+    min-height: 20px;
+  }
+
+  .edit-list-item .edit-narrative:focus {
+    color: var(--fg);
+  }
+
+  .edit-list-item.active-item {
+    background: oklch(0.58 0.17 45 / 0.04);
+    margin: 0 -12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+  }
+
+  /* Blinking cursor simulation */
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--cursor);
+    animation: blink 1s infinite;
+    vertical-align: text-bottom;
+    margin-left: 1px;
+  }
+
+  .cursor-sm {
+    height: 12px;
+  }
+
+  /* Save bar */
+  .save-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-discard {
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--muted-fg);
+    font-weight: 500;
+    cursor: default;
+  }
+
+  .btn-save {
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: var(--primary-fg);
+    font-weight: 500;
+    cursor: default;
+  }
+
+  .dirty-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: oklch(0.58 0.17 45 / 0.12);
+    color: var(--marker);
+    margin-right: auto;
+  }
+
+  /* Add item button */
+  .add-item {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--marker-muted);
+    padding: 8px 0;
+    margin-top: 4px;
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .add-item:hover { opacity: 1; }
+
+  /* Annotation strip */
+  .annotation-strip {
+    max-width: 1500px;
+    margin: 0 auto 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .annotation-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .annotation-card h4 {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--fg);
+  }
+
+  .annotation-card ul {
+    list-style: none;
+    padding: 0;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--fg);
+  }
+
+  .annotation-card code {
+    font-family: var(--mono);
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: var(--marker);
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+  <h1>Inline Editing — Modal-Free</h1>
+  <p class="page-subtitle">Click any section to edit it in place. Markdown structure stays visible during editing. No modal, no context switch.</p>
+
+  <div class="comparison">
+    <!-- VIEW MODE -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="label">View Mode</span>
+        <span class="badge-view">Reading</span>
+      </div>
+      <div class="content-panel">
+        <div class="click-hint">click any section to edit</div>
+
+        <div class="breadcrumb">
+          <a href="#">Profile</a><span class="sep">/</span><a href="#">Experiences</a><span class="sep">/</span>Senior Engineer
+        </div>
+
+        <!-- Heading -->
+        <div class="md-heading" style="cursor: pointer;" title="Click to edit title">
+          <span class="hash">#</span>
+          <h2>Senior Software Engineer</h2>
+        </div>
+
+        <!-- Frontmatter -->
+        <div class="frontmatter" style="cursor: pointer;" title="Click to edit metadata">
+          <div class="fence">---</div>
+          <div><span class="key">company:</span> <span class="value">Voi Technology</span></div>
+          <div><span class="key">website:</span> <span class="link">voi.com</span></div>
+          <div><span class="key">location:</span> <span class="value">Stockholm, Sweden</span></div>
+          <div><span class="key">period:</span> <span class="value">2021-01 — 2023-12</span></div>
+          <div><span class="key">bullets:</span> <span class="value">2–5</span></div>
+          <div class="fence">---</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="md-blockquote" style="cursor: pointer;" title="Click to edit summary">
+          <p><span class="gt">&gt;</span> Led backend platform team building real-time fleet management systems for electric scooter operations across 100+ cities. Focused on event-driven architecture, service decomposition, and developer experience.</p>
+        </div>
+
+        <div class="md-hr">———</div>
+
+        <!-- Accomplishments -->
+        <div class="md-h3">
+          <span class="hash">##</span>
+          <h3>Accomplishments</h3>
+          <span class="md-badge">4</span>
+        </div>
+
+        <ul class="md-list">
+          <li class="md-list-item" style="cursor: pointer;">
+            <span class="bullet">-</span>
+            <span class="title">Fleet Rebalancing Engine</span>
+            <div class="narrative">Designed and shipped an ML-powered rebalancing system that reduced scooter downtime by 34% across Nordic markets.</div>
+          </li>
+          <li class="md-list-item" style="cursor: pointer;">
+            <span class="bullet">-</span>
+            <span class="title">Event Sourcing Migration</span>
+            <div class="narrative">Led migration from REST-based sync to event-sourced architecture, cutting inter-service latency by 60%.</div>
+          </li>
+          <li class="md-list-item" style="cursor: pointer;">
+            <span class="bullet">-</span>
+            <span class="title">Developer Platform</span>
+            <div class="narrative">Built internal developer portal with service catalog, deployment pipelines, and observability dashboards.</div>
+          </li>
+          <li class="md-list-item" style="cursor: pointer;">
+            <span class="bullet">-</span>
+            <span class="title">Hiring & Mentorship</span>
+            <div class="narrative">Grew the platform team from 3 to 8 engineers. Established technical interview process and onboarding program.</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- EDIT MODE -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="label">Edit Mode — Inline</span>
+        <span class="badge-edit">Editing</span>
+      </div>
+      <div class="content-panel">
+
+        <div class="breadcrumb">
+          <a href="#">Profile</a><span class="sep">/</span><a href="#">Experiences</a><span class="sep">/</span>Senior Engineer
+        </div>
+
+        <!-- Entire document is in editing section -->
+        <div class="editing-section">
+
+          <!-- Editable heading -->
+          <div class="edit-heading">
+            <span class="hash">#</span>
+            <span class="editable-text">Senior Software Engineer</span>
+          </div>
+
+          <!-- Editable frontmatter -->
+          <div class="edit-frontmatter">
+            <div class="fence">---</div>
+            <div class="field-row">
+              <span class="key">company: </span>
+              <input class="edit-value" value="Voi Technology">
+            </div>
+            <div class="field-row">
+              <span class="key">website: </span>
+              <input class="edit-value" value="voi.com">
+            </div>
+            <div class="field-row active">
+              <span class="key">location: </span>
+              <input class="edit-value" value="Stockholm, Sweden" style="border-bottom-color: var(--marker); border-bottom-style: solid;">
+              <span class="cursor"></span>
+            </div>
+            <div class="field-row">
+              <span class="key">period: </span>
+              <input class="edit-value" value="2021-01 — 2023-12">
+            </div>
+            <div class="field-row">
+              <span class="key">bullets: </span>
+              <input class="edit-value" value="2–5" style="max-width: 40px;">
+            </div>
+            <div class="fence">---</div>
+          </div>
+
+          <!-- Editable summary -->
+          <div class="edit-blockquote">
+            <span class="gt">&gt;</span>
+            <textarea>Led backend platform team building real-time fleet management systems for electric scooter operations across 100+ cities. Focused on event-driven architecture, service decomposition, and developer experience.</textarea>
+          </div>
+
+          <div class="md-hr">———</div>
+
+          <!-- Editable accomplishments -->
+          <div class="md-h3">
+            <span class="hash">##</span>
+            <h3>Accomplishments</h3>
+            <span class="md-badge">4</span>
+          </div>
+
+          <div class="edit-list-item">
+            <span class="bullet">-</span>
+            <div class="edit-content">
+              <input class="edit-title" value="Fleet Rebalancing Engine">
+              <textarea class="edit-narrative">Designed and shipped an ML-powered rebalancing system that reduced scooter downtime by 34% across Nordic markets.</textarea>
+            </div>
+          </div>
+
+          <div class="edit-list-item active-item">
+            <span class="bullet">-</span>
+            <div class="edit-content">
+              <input class="edit-title" value="Event Sourcing Migration" style="border-bottom-color: var(--marker); border-bottom-style: solid;">
+              <textarea class="edit-narrative" style="color: var(--fg);">Led migration from REST-based sync to event-sourced architecture, cutting inter-service latency by 60%.<span class="cursor cursor-sm" style="display: inline-block; vertical-align: text-bottom;"></span></textarea>
+            </div>
+          </div>
+
+          <div class="edit-list-item">
+            <span class="bullet">-</span>
+            <div class="edit-content">
+              <input class="edit-title" value="Developer Platform">
+              <textarea class="edit-narrative">Built internal developer portal with service catalog, deployment pipelines, and observability dashboards.</textarea>
+            </div>
+          </div>
+
+          <div class="edit-list-item">
+            <span class="bullet">-</span>
+            <div class="edit-content">
+              <input class="edit-title" value="Hiring & Mentorship">
+              <textarea class="edit-narrative">Grew the platform team from 3 to 8 engineers. Established technical interview process and onboarding program.</textarea>
+            </div>
+          </div>
+
+          <div class="add-item">+ add accomplishment</div>
+
+          <!-- Save bar -->
+          <div class="save-bar">
+            <span class="dirty-badge">3 changed</span>
+            <span class="btn-discard">Discard</span>
+            <span class="btn-save">Save</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation-strip">
+    <div class="annotation-card">
+      <h4>How inline editing works</h4>
+      <ul>
+        <li>Click any section (title, metadata, summary, accomplishment) to enter edit mode</li>
+        <li>The markdown structure <strong style="font-weight:500">stays visible</strong> — <code>#</code>, <code>---</code>, <code>&gt;</code>, <code>-</code> markers remain during editing</li>
+        <li>Frontmatter becomes editable fields with <code>key: value</code> layout preserved</li>
+        <li>Active field gets a subtle amber highlight row</li>
+        <li>Dashed underlines on values indicate editability, solidify on focus</li>
+        <li>No modal, no context switch — you edit exactly where you read</li>
+        <li>Save bar appears at the bottom with dirty count + Save/Discard</li>
+      </ul>
+    </div>
+    <div class="annotation-card">
+      <h4>Key design decisions</h4>
+      <ul>
+        <li><strong style="font-weight:500">Section-level editing</strong> — click a section to edit just that part (preserves mutual exclusion from current UX)</li>
+        <li><strong style="font-weight:500">Or full-document editing</strong> — shown here, the entire experience becomes editable at once (more Obsidian-like)</li>
+        <li><strong style="font-weight:500">Markdown is the frame</strong> — the structure markers are not just decorative, they define the edit affordances</li>
+        <li><strong style="font-weight:500">No form fields</strong> — inputs are minimal, unstyled, flowing within the markdown layout</li>
+        <li>The <code>+ add accomplishment</code> prompt follows markdown list convention</li>
+        <li>Milkdown editor would handle the summary/narrative fields for rich markdown editing</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
