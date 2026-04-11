@@ -19,6 +19,7 @@ export type GenerateResumeContentScope =
 export type GenerateResumeContentInput = {
   jobDescriptionId: string;
   additionalPrompt?: string;
+  customInstructions?: string;
   scope?: GenerateResumeContentScope;
 };
 
@@ -68,8 +69,9 @@ export class GenerateResumeContent {
     const previousInstructions = parseScopedInstructions(existing?.prompt ?? '');
     const scopeKey = buildScopeKey(input.scope);
     const scopedInstructions = { ...previousInstructions };
-    if (input.additionalPrompt) {
-      scopedInstructions[scopeKey] = input.additionalPrompt;
+    const instructionsToStore = input.customInstructions ?? input.additionalPrompt;
+    if (instructionsToStore) {
+      scopedInstructions[scopeKey] = instructionsToStore;
     } else {
       delete scopedInstructions[scopeKey];
     }

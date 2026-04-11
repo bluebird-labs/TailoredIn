@@ -27,6 +27,7 @@ export class GenerateResumeContentRoute {
           const data = await this.generateResumeContent.execute({
             jobDescriptionId: body.jobDescriptionId,
             additionalPrompt: body.additionalPrompt,
+            customInstructions: body.customInstructions,
             scope: body.scope
           });
           return { data };
@@ -42,6 +43,7 @@ export class GenerateResumeContentRoute {
         body: t.Object({
           jobDescriptionId: t.String(),
           additionalPrompt: t.Optional(t.String()),
+          customInstructions: t.Optional(t.String()),
           scope: t.Optional(
             t.Union([
               t.Object({ type: t.Literal('headline') }),

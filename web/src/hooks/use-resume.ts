@@ -79,6 +79,7 @@ export function useGenerateResumeContent(jobDescriptionId: string) {
     mutationFn: async (
       input: {
         additionalPrompt?: string;
+        customInstructions?: string;
         scope?: ResumeGenerationScope;
         bulletOverrides?: Array<{ experienceId: string; min: number; max: number }>;
       } = {}

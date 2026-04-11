@@ -249,13 +249,18 @@ export function GenerationWorkspace({
   }
 
   function handleGenerate() {
-    let prompt = additionalPrompt.trim();
+    const rawInstructions = additionalPrompt.trim();
+    let prompt = rawInstructions;
     if (includeCurrentVersion && resumeOutput) {
       const content = formatFullOutput(resumeOutput);
       prompt = `Current version:\n${content}${prompt ? `\n\nInstructions: ${prompt}` : ''}`;
     }
     generate.mutate(
-      { additionalPrompt: prompt || undefined, bulletOverrides: buildBulletOverrides() },
+      {
+        additionalPrompt: prompt || undefined,
+        customInstructions: rawInstructions || undefined,
+        bulletOverrides: buildBulletOverrides()
+      },
       {
         onSuccess: () => {
           setAdditionalPrompt('');
