@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Download } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -21,8 +21,19 @@ import { useNavGuard } from '@/hooks/use-nav-guard.js';
 import { useProfile, useUpdateProfile } from '@/hooks/use-profile';
 import { hasErrors, type ProfileFormState, type ValidationErrors, validateProfile } from '@/lib/validation.js';
 
+const PROFILE_TABS = ['profile', 'experiences', 'education'] as const;
+type ProfileTab = (typeof PROFILE_TABS)[number];
+type ProfileSearch = { tab?: ProfileTab };
+
 export const Route = createFileRoute('/profile/')({
-  component: ProfilePage
+  component: ProfilePage,
+  validateSearch: (search: Record<string, unknown>): ProfileSearch => {
+    const tab = search.tab;
+    if (PROFILE_TABS.includes(tab as ProfileTab)) {
+      return { tab: tab as ProfileTab };
+    }
+    return {};
+  }
 });
 
 function formatMonthYear(value: string): string {
@@ -123,6 +134,19 @@ function generateProfileMarkdown(profile: ProfileData, experiences: Experience[]
 }
 
 function ProfilePage() {
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate();
+  const activeTab = tab ?? 'profile';
+
+  const setActiveTab = useCallback(
+    (value: string | null) => {
+      if (value) {
+        navigate({ to: '/profile', search: { tab: value as ProfileTab }, replace: true });
+      }
+    },
+    [navigate]
+  );
+
   const { data: profile, isLoading } = useProfile();
   const { data: experiences = [] } = useExperiences();
   const { data: educations = [] } = useEducations();
@@ -153,7 +177,7 @@ function ProfilePage() {
       <div className="space-y-6">
         <PageHeader profile={profile} experiences={experiences} educations={educations} />
 
-        <Tabs defaultValue="profile">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="experiences">
