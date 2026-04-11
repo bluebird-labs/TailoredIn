@@ -78,6 +78,9 @@ function JobDetailPage() {
 
   function reparseWithText(text: string) {
     if (!jd) return;
+    const isStringMeaningful = (v: string | null): v is string => v !== null && v !== '';
+    const isEnumMeaningful = (v: string | null): v is string => v !== null && v !== 'unknown';
+
     parseJd.mutate(
       { text },
       {
@@ -86,15 +89,17 @@ function JobDetailPage() {
             {
               id: jd.id,
               company_id: jd.companyId,
-              title: result.title ?? jd.title,
+              title: isStringMeaningful(result.title) ? result.title : jd.title,
               description: result.description ?? jd.description,
-              url: result.url ?? jd.url,
-              location: result.location ?? jd.location,
+              url: isStringMeaningful(result.url) ? result.url : jd.url,
+              location: isStringMeaningful(result.location) ? result.location : jd.location,
               salary_min: result.salaryMin ?? jd.salaryRange?.min,
               salary_max: result.salaryMax ?? jd.salaryRange?.max,
-              salary_currency: result.salaryCurrency ?? jd.salaryRange?.currency,
-              level: result.level ?? jd.level,
-              location_type: result.locationType ?? jd.locationType,
+              salary_currency: isStringMeaningful(result.salaryCurrency)
+                ? result.salaryCurrency
+                : jd.salaryRange?.currency,
+              level: isEnumMeaningful(result.level) ? result.level : jd.level,
+              location_type: isEnumMeaningful(result.locationType) ? result.locationType : jd.locationType,
               source: jd.source,
               posted_at: result.postedAt ?? jd.postedAt,
               raw_text: text,

@@ -79,6 +79,27 @@ function enrichmentToFormState(result: CompanyEnrichmentResult): CompanyFormStat
   };
 }
 
+function mergeEnrichment(existing: CompanyFormState, result: CompanyEnrichmentResult): CompanyFormState {
+  const enriched = enrichmentToFormState(result);
+  const isEnumMeaningful = (v: string) => v !== '' && v !== 'unknown';
+  const isStringMeaningful = (v: string) => v !== '';
+  const pick = (key: keyof CompanyFormState, isMeaningful: (v: string) => boolean): string =>
+    isMeaningful(enriched[key]) ? enriched[key] : existing[key];
+
+  return {
+    name: pick('name', isStringMeaningful),
+    domainName: pick('domainName', isStringMeaningful),
+    description: enriched.description,
+    website: pick('website', isStringMeaningful),
+    logoUrl: pick('logoUrl', isStringMeaningful),
+    linkedinLink: pick('linkedinLink', isStringMeaningful),
+    businessType: pick('businessType', isEnumMeaningful),
+    industry: pick('industry', isEnumMeaningful),
+    stage: pick('stage', isEnumMeaningful),
+    status: pick('status', isEnumMeaningful)
+  };
+}
+
 export function CompanyFormModal({ open, onOpenChange, company, onCreated, overlayClassName }: Props) {
   const isEdit = !!company;
   const createCompany = useCreateCompany();
@@ -159,7 +180,7 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
       { url, context: current.name || company?.name },
       {
         onSuccess: result => {
-          setFields(enrichmentToFormState(result));
+          setFields(mergeEnrichment(current, result));
           setStep('form');
         },
         onError: () => {
