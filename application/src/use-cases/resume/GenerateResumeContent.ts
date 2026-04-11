@@ -36,7 +36,7 @@ function parseScopedInstructions(prompt: string): ScopedInstructions {
     return typeof parsed === 'object' && parsed !== null ? parsed : {};
   } catch {
     // Legacy format — treat as resume-level instructions
-    return prompt ? { resume: prompt } : {};
+    return { resume: prompt };
   }
 }
 
