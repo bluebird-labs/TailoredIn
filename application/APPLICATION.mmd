@@ -274,23 +274,7 @@ classDiagram
     %%  Resume Use Cases
     %% ──────────────────────────────────────────────
 
-    class CachedResumePdfResult {
-        <<UseCase>>
-        +JobDescriptionRepository jobDescriptionRepository
-        +execute(GetCachedResumePdfInput) CachedResumePdfResult | null
-    }
-
     class GenerateResumeContent {
-        <<UseCase>>
-        +GenerationContextBuilder contextBuilder
-        +PromptRegistry registry
-        +ResumeElementGenerator elementGenerator
-        +ResumeContentRepository resumeContentRepository
-        +EducationRepository educationRepository
-        +execute(GenerateResumeContentInput) ResumeContentDto
-    }
-
-    class GenerateResumeContentScope {
         <<UseCase>>
         +GenerationContextBuilder contextBuilder
         +PromptRegistry registry
@@ -370,7 +354,6 @@ classDiagram
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
-    GenerateResumeContentScope ..> ResumeElementGenerator : depends
     GenerateResumeContent ..> ResumeElementGenerator : depends
     GenerateResumePdf ..> ResumeRendererFactory : depends
 
@@ -656,7 +639,6 @@ classDiagram
     ListJobDescriptions ..> JobDescriptionDto : returns
     ParseJobDescription ..> JobDescriptionParseResult : returns
     UpdateJobDescription ..> JobDescriptionDto : returns
-    GenerateResumeContentScope ..> ResumeContentDto : returns
     GenerateResumeContent ..> ResumeContentDto : returns
     GenerateResumeContentWithPdf ..> ResumeContentDto : returns
     UpdateProfile ..> ProfileDto : returns
@@ -758,10 +740,6 @@ classDiagram
     ListJobDescriptions ..> JobDescriptionRepository : depends
     ListJobDescriptions ..> CompanyRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
-    GenerateResumeContentScope ..> GenerationContextBuilder : depends
-    GenerateResumeContentScope ..> PromptRegistry : depends
-    GenerateResumeContentScope ..> ResumeContentRepository : depends
-    GenerateResumeContentScope ..> EducationRepository : depends
     GenerateResumeContent ..> GenerationContextBuilder : depends
     GenerateResumeContent ..> PromptRegistry : depends
     GenerateResumeContent ..> ResumeContentRepository : depends
@@ -771,7 +749,6 @@ classDiagram
     GenerateResumePdf ..> EducationRepository : depends
     GenerateResumePdf ..> JobDescriptionRepository : depends
     GenerateResumePdf ..> ResumeContentRepository : depends
-    CachedResumePdfResult ..> JobDescriptionRepository : depends
     GetCachedResumePdf ..> JobDescriptionRepository : depends
     UpdateResumeDisplaySettings ..> ResumeContentRepository : depends
     UpdateProfile ..> ProfileRepository : depends
@@ -817,9 +794,7 @@ classDiagram
     style UpdateJobDescription fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateProfile fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style CachedResumePdfResult fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumeContent fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
-    style GenerateResumeContentScope fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumeContentWithPdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetCachedResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px

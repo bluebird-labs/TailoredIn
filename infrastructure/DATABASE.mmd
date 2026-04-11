@@ -11,9 +11,9 @@ erDiagram
     accomplishments {
         uuid id PK
         uuid experience_id FK
-        text title "default: empty"
-        text narrative "default: empty"
-        integer ordinal "default: 0"
+        text title
+        text narrative
+        integer ordinal
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
@@ -22,98 +22,80 @@ erDiagram
         uuid id PK
         uuid profile_id FK
         uuid company_id FK
+        application_status status
         uuid job_description_id FK "nullable"
-        application_status status "default: draft"
         text notes "nullable"
-        timestamp applied_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
-    }
-
-    archetype_tag_weights {
-        uuid id PK
-        uuid archetype_id FK "unique"
-        uuid tag_id UK
-        numeric weight
-    }
-
-    archetypes {
-        uuid id PK
+        timestamp applied_at
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
-        uuid profile_id FK
-        text key
-        text label
-        uuid headline_id "nullable"
-        json content_selection "default: {}"
-        text headline_text "default: empty"
     }
 
     companies {
         uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
         text name
+        text domain_name UK
+        text description "nullable"
+        text website UK "nullable"
         text logo_url "nullable"
         text linkedin_link UK "nullable"
-        text website "nullable"
-        business_type business_type "default: unknown"
-        industry industry "default: unknown"
-        company_stage stage "default: unknown"
-        text description "nullable"
-        company_status status "default: unknown"
-        text domain_name
+        business_type business_type
+        industry industry
+        company_stage stage
+        company_status status
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     educations {
         uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid profile_id FK
         text degree_title
         text institution_name
         integer graduation_year
         text location "nullable"
         text honors "nullable"
-        integer ordinal "default: 0"
-        boolean hidden_by_default "default: false"
+        integer ordinal
+        boolean hidden_by_default
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     experiences {
         uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
         uuid profile_id FK
         text title
         text company_name
         text company_website "nullable"
-        text location "default: empty"
+        text company_accent "nullable"
+        uuid company_id FK "nullable"
+        text location
         text start_date
         text end_date
         text summary "nullable"
-        integer ordinal "default: 0"
-        uuid company_id FK "nullable"
-        text company_accent "nullable"
+        integer ordinal
         integer bullet_min
         integer bullet_max
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     generation_prompts {
         uuid id PK
-        uuid generation_settings_id FK "unique"
-        generation_scope scope UK
+        uuid generation_settings_id FK
+        generation_scope scope
         text content
-        timestamp created_at "default: now()"
-        timestamp updated_at "default: now()"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     generation_settings {
         uuid id PK
-        uuid profile_id FK "unique"
-        model_tier model_tier "default: balanced"
-        integer bullet_min "default: 2"
-        integer bullet_max "default: 5"
-        timestamp created_at "default: now()"
-        timestamp updated_at "default: now()"
+        uuid profile_id FK
+        model_tier model_tier
+        integer bullet_min
+        integer bullet_max
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     job_descriptions {
@@ -126,32 +108,32 @@ erDiagram
         integer salary_min "nullable"
         integer salary_max "nullable"
         text salary_currency "nullable"
-        job_level level "default: unknown"
-        location_type location_type "default: unknown"
+        job_level level
+        location_type location_type
         job_source source
         timestamp posted_at "nullable"
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
         text raw_text "nullable"
-        bytea resume_pdf "nullable"
-        text resume_pdf_theme "nullable"
         json sought_hard_skills "nullable"
         json sought_soft_skills "nullable"
+        bytea resume_pdf "nullable"
+        text resume_pdf_theme "nullable"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     profiles {
         uuid id PK
-        timestamp created_at "default: CURRENT_TIMESTAMP"
-        timestamp updated_at "default: CURRENT_TIMESTAMP"
         text email
         text first_name
         text last_name
-        text phone "nullable"
-        text location "nullable"
-        text linkedin_url "nullable"
-        text github_url "nullable"
-        text website_url "nullable"
         text about "nullable"
+        text phone "nullable"
+        text github_url "nullable"
+        text linkedin_url "nullable"
+        text website_url "nullable"
+        text location "nullable"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     resume_contents {
@@ -160,31 +142,29 @@ erDiagram
         uuid job_description_id FK
         text headline
         json experiences
+        json hidden_education_ids
         text prompt
         json schema "nullable"
-        timestamp created_at "default: now()"
-        timestamp updated_at "default: now()"
-        json hidden_education_ids "default: []"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
 
-    job_descriptions ||--o{ applications : "has"
-    companies ||--o{ experiences : "has"
-    job_descriptions ||--o{ resume_contents : "has"
-    profiles ||--o{ resume_contents : "has"
-    profiles ||--o{ applications : "has"
-    profiles ||--o| generation_settings : "has"
-    generation_settings ||--o| generation_prompts : "has"
-    profiles ||--o{ experiences : "has"
-    profiles ||--o{ educations : "has"
-    profiles ||--o{ archetypes : "has"
-    archetypes ||--o| archetype_tag_weights : "has"
     experiences ||--o{ accomplishments : "has"
-    companies ||--o{ job_descriptions : "has"
+    profiles ||--o{ applications : "has"
     companies ||--o{ applications : "has"
+    job_descriptions ||--o{ applications : "has"
+    profiles ||--o{ educations : "has"
+    profiles ||--o{ experiences : "has"
+    companies ||--o{ experiences : "has"
+    generation_settings ||--o{ generation_prompts : "has"
+    profiles ||--o{ generation_settings : "has"
+    companies ||--o{ job_descriptions : "has"
+    profiles ||--o{ resume_contents : "has"
+    job_descriptions ||--o{ resume_contents : "has"
 
     %% ──────────────────────────────────────────────
     %%  Styles
@@ -193,8 +173,6 @@ erDiagram
     classDef group0 fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px
     class accomplishments group0
     class applications group0
-    class archetype_tag_weights group0
-    class archetypes group0
     class companies group0
     class educations group0
     class experiences group0

@@ -23,6 +23,15 @@ classDiagram
         +fullName()
     }
 
+    class Accomplishment {
+        <<Entity>>
+        +string experienceId
+        +string title
+        +string narrative
+        +number ordinal
+        +update()
+    }
+
     class Application {
         <<AggregateRoot>>
         +string profileId
@@ -74,6 +83,14 @@ classDiagram
         +syncAccomplishments()
     }
 
+    class GenerationPrompt {
+        <<Entity>>
+        +string generationSettingsId
+        +GenerationScope scope
+        +string content
+        +updateContent()
+    }
+
     class GenerationSettings {
         <<AggregateRoot>>
         +string profileId
@@ -107,6 +124,12 @@ classDiagram
         WITHDRAWN · ACCEPTED · ARCHIVED
     }
 
+    class GenerationScope {
+        <<enumeration>>
+        RESUME · HEADLINE · EXPERIENCE
+        EXPERIENCE_SUMMARY · BULLET
+    }
+
     class ResumeExperience {
         <<ValueObject>>
         +string experienceId
@@ -115,13 +138,16 @@ classDiagram
         +number[] hiddenBulletIndices
     }
 
-    Profile "1" --> "*" GenerationSettings : has
-    Profile "1" --> "*" ResumeContent : has
-    ResumeContent "1" *-- "*" ResumeExperience : contains
+    Experience "1" --> "*" Accomplishment : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     Profile "1" --> "*" Education : has
     Profile "1" --> "*" Experience : has
+    GenerationSettings "1" --> "*" GenerationPrompt : has
+    GenerationPrompt --> GenerationScope
+    Profile "1" --> "*" GenerationSettings : has
+    Profile "1" --> "*" ResumeContent : has
+    ResumeContent "1" *-- "*" ResumeExperience : contains
 
     %% ──────────────────────────────────────────────
     %%  Company Subdomain
@@ -190,14 +216,14 @@ classDiagram
         FLEXIBLE · ONSITE · UNKNOWN
     }
 
-    JobDescription "1" --> "*" ResumeContent : has
+    Company "1" --> "*" Application : has
+    JobDescription "1" --> "*" Application : has
+    Company --> CompanyStatus
+    Company "1" --> "*" Experience : has
     Company "1" --> "*" JobDescription : has
     JobDescription --> LocationType
     JobDescription --> JobSource
-    Company "1" --> "*" Application : has
-    JobDescription "1" --> "*" Application : has
-    Company "1" --> "*" Experience : has
-    Company --> CompanyStatus
+    JobDescription "1" --> "*" ResumeContent : has
 
     %% ──────────────────────────────────────────────
     %%  Enums & Types
@@ -230,7 +256,6 @@ classDiagram
 
     class CompanySnapshot {
         <<ValueObject>>
-        +string id
         +string name
         +string? description
         +Industry industry
@@ -248,7 +273,6 @@ classDiagram
 
     class EducationSnapshot {
         <<ValueObject>>
-        +string id
         +string degreeTitle
         +string institutionName
         +number graduationYear
@@ -257,7 +281,6 @@ classDiagram
 
     class ExperienceSnapshot {
         <<ValueObject>>
-        +string id
         +string title
         +string companyName
         +string? summary
@@ -281,12 +304,6 @@ classDiagram
         +string? userInstructions
     }
 
-    class GenerationScope {
-        <<enumeration>>
-        RESUME · HEADLINE · EXPERIENCE
-        EXPERIENCE_SUMMARY · BULLET
-    }
-
     class Industry {
         <<enumeration>>
         AUTOMOBILE · CYBERSECURITY · FINANCE
@@ -306,7 +323,6 @@ classDiagram
 
     class JDSnapshot {
         <<ValueObject>>
-        +string id
         +string title
         +string description
         +string? rawText
@@ -339,7 +355,6 @@ classDiagram
 
     class ProfileSnapshot {
         <<ValueObject>>
-        +string id
         +string firstName
         +string lastName
         +string? about
@@ -348,7 +363,6 @@ classDiagram
 
     class ResumeTemplate {
         <<ValueObject>>
-        +string id
         +string pageSize
         +object margins
         +number bodyFontSizePt
@@ -374,12 +388,11 @@ classDiagram
         +ReadonlyMap<GenerationScope, string> adminPrompts
     }
 
-    GenerationSettings --> ModelTier
-    JobDescription --> JobLevel
     Company --> BusinessType
     Company --> Industry
     Company --> CompanyStage
-    LayoutAnalysis "1" *-- "*" BlockLayout : contains
+    GenerationSettings --> ModelTier
+    JobDescription --> JobLevel
     JDSnapshot --> JobLevel
     ExperienceSnapshot "1" *-- "*" AccomplishmentSnapshot : contains
     CompanySnapshot --> Industry
@@ -392,18 +405,22 @@ classDiagram
     GenerationContext "1" *-- "*" CompanySnapshot : contains
     GenerationContext "1" *-- "*" EducationSnapshot : contains
     GenerationContext *-- SettingsSnapshot
+    LayoutAnalysis "1" *-- "*" BlockLayout : contains
 
     %% ──────────────────────────────────────────────
     %%  Apply Styles
     %% ──────────────────────────────────────────────
 
     style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style GenerationPrompt fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style GenerationSettings fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperience fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
@@ -419,7 +436,6 @@ classDiagram
     style EducationSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ExperienceSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style GenerationContext fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
-    style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Industry fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JDSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style JobLevel fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px

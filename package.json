@@ -5,7 +5,8 @@
     "@biomejs/biome": "latest",
     "bun-types": "^1.3.11",
     "dependency-cruiser": "^17",
-    "knip": "^6.1.0"
+    "knip": "^6.1.0",
+    "ts-morph": "^27.0.2"
   },
   "private": true,
   "scripts": {
@@ -37,7 +38,7 @@
     "dev:migration:create": "bun run infrastructure/scripts/guard-main.ts && bun --env-file=.env run --cwd infrastructure migration:create",
     "dev:migration:up": "bun run infrastructure/scripts/guard-main.ts && bun --env-file=.env run --cwd infrastructure migration:up",
     "dev:seed": "bun run infrastructure/scripts/guard-main.ts && bun --env-file=.env run --cwd infrastructure seed:run",
-    "dev:diagram": "bun run infrastructure/scripts/guard-main.ts && bun --env-file=.env run infrastructure/scripts/generate-database-diagram.ts",
+    "dev:diagram": "bun run infrastructure/scripts/guard-main.ts && bun run scripts/diagrams/database/generate.ts",
     "wt:up": "bun run infrastructure/scripts/wt-up.ts",
     "wt:down": "bun run infrastructure/scripts/wt-down.ts",
     "wt:fresh": "bun wt:down && bun wt:up",
@@ -47,9 +48,9 @@
     "e2e:test:ui": "bun run --cwd e2e test:ui",
     "e2e:test:headed": "bun run --cwd e2e test:headed",
     "db:seed:generate-types": "bun --env-file=.env run infrastructure/src/db/generate-seed-types.ts",
-    "domain:diagram": "bun run domain/scripts/generate-diagram.ts",
-    "app:diagram": "bun run application/scripts/generate-diagram.ts",
-    "db:diagram": "bun --env-file=.env run infrastructure/scripts/generate-database-diagram.ts",
+    "domain:diagram": "bun run scripts/diagrams/domain/generate.ts",
+    "app:diagram": "bun run scripts/diagrams/application/generate.ts",
+    "db:diagram": "bun run scripts/diagrams/database/generate.ts",
     "diags": "bun run --parallel db:diagram app:diagram domain:diagram"
   },
   "workspaces": [
