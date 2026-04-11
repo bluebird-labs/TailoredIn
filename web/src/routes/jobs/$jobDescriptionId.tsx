@@ -210,10 +210,6 @@ function JobDetailPage() {
 
       <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
         <div className="space-y-5">
-          <JobAnalysisCard description={jd.description} />
-
-          <SkillsCard hardSkills={jd.soughtHardSkills} softSkills={jd.soughtSoftSkills} />
-
           <InfoCard label="Details">
             <InfoRow label="Level" value={levelLabel} />
             <InfoRow label="Location" value={jd.location} />
@@ -222,6 +218,8 @@ function JobDetailPage() {
             <InfoRow label="Posted" value={postedAt} />
             {jd.url && <InfoRow label="Job Posting" value="View posting" href={jd.url} />}
           </InfoCard>
+
+          <JobAnalysisCard description={jd.description} />
 
           {jd.rawText && (
             <Collapsible defaultOpen={false}>
@@ -265,6 +263,8 @@ function JobDetailPage() {
             <InfoRow label="Source" value={jd.source} />
             <InfoRow label="Added" value={createdAt} />
           </InfoCard>
+
+          <SkillsCard hardSkills={jd.soughtHardSkills} softSkills={jd.soughtSoftSkills} />
         </div>
       </div>
 
