@@ -22,14 +22,14 @@ interface NavItem {
   icon: LucideIcon;
 }
 
-const resumeNav: NavItem[] = [
-  { label: 'Atelier', to: '/atelier', icon: Palette },
+const workroomNav: NavItem[] = [
   { label: 'Profile', to: '/profile', icon: User },
+  { label: 'Atelier', to: '/atelier', icon: Palette },
   { label: 'Settings', to: '/settings', icon: Settings }
 ];
 
-const directoryNav: NavItem[] = [
-  { label: 'Applications', to: '/applications', icon: KanbanSquare },
+const pipelineNav: NavItem[] = [
+  { label: 'Rack', to: '/rack', icon: KanbanSquare },
   { label: 'Jobs', to: '/jobs', icon: FileText },
   { label: 'Companies', to: '/companies', icon: Building2 }
 ];
@@ -83,10 +83,10 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Resume</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Workroom</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {resumeNav.map(item => (
+              {workroomNav.map(item => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     render={<Link to={item.to} />}
@@ -101,10 +101,10 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Directory</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Pipeline</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {directoryNav.map(item => (
+              {pipelineNav.map(item => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     render={<Link to={item.to} />}

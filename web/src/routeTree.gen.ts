@@ -15,7 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as JobsIndexRouteImport } from './routes/jobs/index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies/index'
-import { Route as ApplicationsIndexRouteImport } from './routes/applications/index'
+import { Route as RackIndexRouteImport } from './routes/rack/index'
 import { Route as JobsJobDescriptionIdRouteImport } from './routes/jobs/$jobDescriptionId'
 import { Route as JobDescriptionsJobDescriptionIdRouteImport } from './routes/job-descriptions/$jobDescriptionId'
 import { Route as ExperiencesExperienceIdRouteImport } from './routes/experiences/$experienceId'
@@ -51,9 +51,9 @@ const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
   path: '/companies/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApplicationsIndexRoute = ApplicationsIndexRouteImport.update({
-  id: '/applications/',
-  path: '/applications/',
+const RackIndexRoute = RackIndexRouteImport.update({
+  id: '/rack/',
+  path: '/rack/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsJobDescriptionIdRoute = JobsJobDescriptionIdRouteImport.update({
@@ -86,7 +86,7 @@ export interface FileRoutesByFullPath {
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
   '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
-  '/applications/': typeof ApplicationsIndexRoute
+  '/rack/': typeof RackIndexRoute
   '/companies/': typeof CompaniesIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/profile/': typeof ProfileIndexRoute
@@ -99,7 +99,7 @@ export interface FileRoutesByTo {
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
   '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
-  '/applications': typeof ApplicationsIndexRoute
+  '/rack': typeof RackIndexRoute
   '/companies': typeof CompaniesIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/profile': typeof ProfileIndexRoute
@@ -113,7 +113,7 @@ export interface FileRoutesById {
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
   '/job-descriptions/$jobDescriptionId': typeof JobDescriptionsJobDescriptionIdRoute
   '/jobs/$jobDescriptionId': typeof JobsJobDescriptionIdRoute
-  '/applications/': typeof ApplicationsIndexRoute
+  '/rack/': typeof RackIndexRoute
   '/companies/': typeof CompaniesIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/profile/': typeof ProfileIndexRoute
@@ -128,7 +128,7 @@ export interface FileRouteTypes {
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
     | '/jobs/$jobDescriptionId'
-    | '/applications/'
+    | '/rack/'
     | '/companies/'
     | '/jobs/'
     | '/profile/'
@@ -141,7 +141,7 @@ export interface FileRouteTypes {
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
     | '/jobs/$jobDescriptionId'
-    | '/applications'
+    | '/rack'
     | '/companies'
     | '/jobs'
     | '/profile'
@@ -154,7 +154,7 @@ export interface FileRouteTypes {
     | '/experiences/$experienceId'
     | '/job-descriptions/$jobDescriptionId'
     | '/jobs/$jobDescriptionId'
-    | '/applications/'
+    | '/rack/'
     | '/companies/'
     | '/jobs/'
     | '/profile/'
@@ -168,7 +168,7 @@ export interface RootRouteChildren {
   ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
   JobDescriptionsJobDescriptionIdRoute: typeof JobDescriptionsJobDescriptionIdRoute
   JobsJobDescriptionIdRoute: typeof JobsJobDescriptionIdRoute
-  ApplicationsIndexRoute: typeof ApplicationsIndexRoute
+  RackIndexRoute: typeof RackIndexRoute
   CompaniesIndexRoute: typeof CompaniesIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
@@ -218,11 +218,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompaniesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/applications/': {
-      id: '/applications/'
-      path: '/applications'
-      fullPath: '/applications/'
-      preLoaderRoute: typeof ApplicationsIndexRouteImport
+    '/rack/': {
+      id: '/rack/'
+      path: '/rack'
+      fullPath: '/rack/'
+      preLoaderRoute: typeof RackIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs/$jobDescriptionId': {
@@ -264,7 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,
   JobDescriptionsJobDescriptionIdRoute: JobDescriptionsJobDescriptionIdRoute,
   JobsJobDescriptionIdRoute: JobsJobDescriptionIdRoute,
-  ApplicationsIndexRoute: ApplicationsIndexRoute,
+  RackIndexRoute: RackIndexRoute,
   CompaniesIndexRoute: CompaniesIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,

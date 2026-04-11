@@ -11,11 +11,11 @@ import { useCompanies } from '@/hooks/use-companies';
 import { useJobDescriptions } from '@/hooks/use-job-descriptions';
 import { useProfile } from '@/hooks/use-profile';
 
-export const Route = createFileRoute('/applications/')({
-  component: ApplicationsPage
+export const Route = createFileRoute('/rack/')({
+  component: RackPage
 });
 
-function ApplicationsPage() {
+function RackPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const { data: profile } = useProfile();
   const profileId = profile?.id ?? '';
@@ -32,8 +32,8 @@ function ApplicationsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="page-heading">Applications</h1>
-          <p className="text-sm text-muted-foreground">Track your job applications across every stage.</p>
+          <h1 className="page-heading">Rack</h1>
+          <p className="text-sm text-muted-foreground">Track your applications across every stage.</p>
         </div>
         <div className="flex items-center gap-2">
           {!isLoading && applications.length > 0 && <Badge variant="secondary">{applications.length}</Badge>}

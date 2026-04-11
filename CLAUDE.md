@@ -184,6 +184,7 @@ The web app uses file-based routing (TanStack Router). Key routes:
 - `/` → redirects to `/jobs`
 - `/profile` — Profile page with **tabbed layout**: Profile, Experiences, Education tabs
 - `/experiences/$experienceId` — Experience detail page (no index route — list is in Profile tab)
+- `/rack` — Application tracking board
 - `/jobs` — Job descriptions list
 - `/jobs/$jobDescriptionId` — Job detail
 - `/companies` — Companies list
@@ -191,7 +192,7 @@ The web app uses file-based routing (TanStack Router). Key routes:
 - `/atelier` — Resume generation workspace
 - `/settings` — Generation settings
 
-Sidebar groups: **Resume** (Atelier, Profile, Settings) and **Directory** (Jobs, Companies).
+Sidebar groups: **Workroom** (Profile, Atelier, Settings) and **Pipeline** (Rack, Jobs, Companies).
 
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):
