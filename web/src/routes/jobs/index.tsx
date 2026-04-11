@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { JobDescriptionList } from '@/components/job-descriptions/JobDescriptionList';
 import { Button } from '@/components/ui/button';
-import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
+import { clearStoredSearch, persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
 
 type JobsSearch = { search?: string; company?: string };
 
@@ -26,7 +26,8 @@ function JobsPage() {
 
   const setSearch = useCallback(
     (value: string) => {
-      navigate({ to: '/jobs', search: value ? { search: value } : {}, replace: true });
+      if (!value) clearStoredSearch('/jobs');
+      navigate({ to: '/jobs', search: { search: value || undefined }, replace: true });
     },
     [navigate]
   );

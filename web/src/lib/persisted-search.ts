@@ -11,6 +11,14 @@ function getStoredSearch<T>(routePath: string): Partial<T> | null {
   }
 }
 
+export function clearStoredSearch(routePath: string): void {
+  try {
+    localStorage.removeItem(`${STORAGE_KEY_PREFIX}${routePath}`);
+  } catch {
+    // Storage unavailable — silently ignore
+  }
+}
+
 function setStoredSearch(routePath: string, values: Record<string, unknown>): void {
   try {
     localStorage.setItem(`${STORAGE_KEY_PREFIX}${routePath}`, JSON.stringify(values));
@@ -63,6 +71,12 @@ export function useSearchPersistence<T extends Record<string, unknown>>(
     }
     if (hasValues) {
       setStoredSearch(routePath, toStore);
+    } else {
+      try {
+        localStorage.removeItem(`${STORAGE_KEY_PREFIX}${routePath}`);
+      } catch {
+        // Storage unavailable — silently ignore
+      }
     }
   }, [routePath, search, keys]);
 }

@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { CompanyList } from '@/components/companies/CompanyList';
 import { Button } from '@/components/ui/button';
-import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
+import { clearStoredSearch, persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
 
 type CompaniesSearch = { search?: string };
 
@@ -25,7 +25,8 @@ function CompaniesPage() {
 
   const setSearch = useCallback(
     (value: string) => {
-      navigate({ to: '/companies', search: value ? { search: value } : {}, replace: true });
+      if (!value) clearStoredSearch('/companies');
+      navigate({ to: '/companies', search: { search: value || undefined }, replace: true });
     },
     [navigate]
   );

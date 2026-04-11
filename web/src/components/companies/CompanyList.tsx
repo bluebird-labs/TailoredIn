@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
@@ -37,8 +37,17 @@ export function CompanyList({ search, onSearchChange, createOpen, onCreateOpenCh
               value={search}
               onChange={e => onSearchChange(e.target.value)}
               placeholder="Search companies..."
-              className="pl-9"
+              className={search ? 'pl-9 pr-8' : 'pl-9'}
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => onSearchChange('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           {filtered.length === 0 ? (
