@@ -11,7 +11,10 @@
         "test/**/*.test.ts",
         "test-integration/**/*.test.ts",
         "test-integration/support/**",
-        "dev/e2e-start-servers.ts"
+        "dev/e2e-start-servers.ts",
+        "src/db/migrations/*.ts",
+        "src/db/seeds/**/*.ts",
+        "src/db/orm-config.ts"
       ]
     },
     "api": {},
@@ -29,6 +32,6 @@
   },
   "ignore": ["e2e/**"],
   "ignoreBinaries": ["dot"],
-  "ignoreDependencies": ["cmdk"],
+  "ignoreDependencies": [],
   "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates", "enumMembers"]
 }

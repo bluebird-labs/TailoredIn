@@ -1,8 +1,6 @@
 import type { ResumeRenderEducation, ResumeRenderExperience } from '@tailoredin/application';
 import type { LayoutAnalysis, ResumeTemplate } from '@tailoredin/domain';
 
-export type { ResumeRenderEducation, ResumeRenderExperience } from '@tailoredin/application';
-
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export function formatDate(iso: string): string {
@@ -30,7 +28,7 @@ export function escapeTypst(text: string): string {
     .replaceAll('>', '\\>');
 }
 
-export function escapeTomValue(text: string): string {
+function escapeTomValue(text: string): string {
   return text.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
 }
 

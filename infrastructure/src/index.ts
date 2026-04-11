@@ -17,13 +17,7 @@ export { ClaudeApiCompanyDiscoveryProvider } from './services/ClaudeApiCompanyDi
 export { ClaudeApiJobDescriptionParser } from './services/ClaudeApiJobDescriptionParser.js';
 export { ClaudeApiResumeElementGenerator } from './services/ClaudeApiResumeElementGeneratorNew.js';
 // LLM
-export {
-  BaseLlmApiProvider,
-  ClaudeApiProvider,
-  LlmJsonRequest,
-  LlmRequestError,
-  type LlmRequestOptions
-} from './services/llm/index.js';
+export { ClaudeApiProvider } from './services/llm/index.js';
 // Prompt sections
 export * from './services/prompt-sections/index.js';
 export { TypstResumeRendererFactory } from './services/TypstResumeRendererFactory.js';

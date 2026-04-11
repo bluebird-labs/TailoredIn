@@ -2,7 +2,7 @@ import type { PromptBlock } from '@tailoredin/application';
 import { PromptSection } from '@tailoredin/application';
 import { CacheTier, type GenerationContext } from '@tailoredin/domain';
 
-export type BulletParams = {
+type BulletParams = {
   readonly existingBullets: string[];
   readonly bulletIndex: number;
   readonly instructions: string;

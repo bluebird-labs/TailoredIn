@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/shared/EmptyState.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
 import { LinkedEntityCard } from '@/components/shared/LinkedEntityCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useCompany } from '@/hooks/use-companies';
@@ -199,6 +200,8 @@ function JobDetailPage() {
         <div className="space-y-5">
           <JobAnalysisCard description={jd.description} />
 
+          <SkillsCard hardSkills={jd.soughtHardSkills} softSkills={jd.soughtSoftSkills} />
+
           <InfoCard label="Details">
             <InfoRow label="Level" value={levelLabel} />
             <InfoRow label="Location" value={jd.location} />
@@ -264,6 +267,43 @@ function JobDetailPage() {
         />
       )}
     </div>
+  );
+}
+
+function SkillsCard({ hardSkills, softSkills }: { hardSkills: string[] | null; softSkills: string[] | null }) {
+  const hasHard = hardSkills && hardSkills.length > 0;
+  const hasSoft = softSkills && softSkills.length > 0;
+  if (!hasHard && !hasSoft) return null;
+
+  return (
+    <InfoCard label="Skills">
+      <div className="space-y-4">
+        {hasHard && (
+          <div>
+            <div className="mb-2 text-[13px] text-muted-foreground">Hard Skills</div>
+            <div className="flex flex-wrap gap-1.5">
+              {hardSkills.map(skill => (
+                <Badge key={skill} variant="outline">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+        {hasSoft && (
+          <div>
+            <div className="mb-2 text-[13px] text-muted-foreground">Soft Skills</div>
+            <div className="flex flex-wrap gap-1.5">
+              {softSkills.map(skill => (
+                <Badge key={skill} variant="secondary">
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </InfoCard>
   );
 }
 

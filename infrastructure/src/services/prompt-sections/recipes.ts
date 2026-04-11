@@ -16,7 +16,7 @@ import type { SettingsSection } from './SettingsSection.js';
 import type { ToneSection } from './ToneSection.js';
 import type { UserInstructionsSection } from './UserInstructionsSection.js';
 
-export type AllSections = {
+type AllSections = {
   rules: RulesSection;
   outputConstraints: OutputConstraintsSection;
   profile: ProfileSection;
@@ -33,11 +33,11 @@ export type AllSections = {
   careerTimeline: CareerTimelineSection;
 };
 
-export const headlineOutputSchema = z.object({
+const headlineOutputSchema = z.object({
   headline: z.string().min(ResumeConstraints.HEADLINE_MIN_LENGTH).max(ResumeConstraints.HEADLINE_MAX_LENGTH)
 });
 
-export function createExperienceBulletsOutputSchema(bulletMin: number, bulletMax: number) {
+function createExperienceBulletsOutputSchema(bulletMin: number, bulletMax: number) {
   return z.object({
     summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH),
     bullets: z
@@ -54,11 +54,11 @@ function experienceBulletsSchemaFactory(context: GenerationContext): unknown {
   return createExperienceBulletsOutputSchema(bulletMin, bulletMax);
 }
 
-export const experienceSummaryOutputSchema = z.object({
+const experienceSummaryOutputSchema = z.object({
   summary: z.string().min(ResumeConstraints.SUMMARY_MIN_LENGTH).max(ResumeConstraints.SUMMARY_MAX_LENGTH)
 });
 
-export const bulletOutputSchema = z.object({
+const bulletOutputSchema = z.object({
   bullet: z.string().min(ResumeConstraints.BULLET_MIN_LENGTH).max(ResumeConstraints.BULLET_MAX_LENGTH)
 });
 

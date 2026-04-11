@@ -9,7 +9,7 @@ import {
 import type { ExperienceDto } from '../../dtos/ExperienceDto.js';
 import { toExperienceDto } from './ListExperiences.js';
 
-export type AccomplishmentInput = {
+type AccomplishmentInput = {
   id: string | null;
   title: string;
   narrative: string;
