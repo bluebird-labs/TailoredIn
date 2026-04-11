@@ -5,12 +5,16 @@ interface InfoCardProps {
   readonly label: string;
   readonly children: ReactNode;
   readonly className?: string;
+  readonly action?: ReactNode;
 }
 
-export function InfoCard({ label, children, className }: InfoCardProps) {
+export function InfoCard({ label, children, className, action }: InfoCardProps) {
   return (
     <div className={cn('rounded-[14px] border bg-card p-5', className)}>
-      <div className="mb-3 text-[11px] uppercase tracking-[0.06em] text-muted-foreground">{label}</div>
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-[11px] uppercase tracking-[0.06em] text-muted-foreground">{label}</div>
+        {action}
+      </div>
       {children}
     </div>
   );

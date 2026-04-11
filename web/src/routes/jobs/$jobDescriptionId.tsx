@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ChevronDown, Download, Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
+import { Check, ChevronDown, Copy, Download, Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { toast } from 'sonner';
@@ -313,6 +313,7 @@ function JobAnalysisCard({ description }: { description: string | null }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [needsCollapse, setNeedsCollapse] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const measureRef = (node: HTMLDivElement | null) => {
     contentRef.current = node;
@@ -321,8 +322,25 @@ function JobAnalysisCard({ description }: { description: string | null }) {
     }
   };
 
+  const handleCopy = async () => {
+    if (!description) return;
+    await navigator.clipboard.writeText(description);
+    setCopied(true);
+    toast.success('Copied to clipboard');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <InfoCard label="Job Analysis">
+    <InfoCard
+      label="Job Analysis"
+      action={
+        description ? (
+          <Button size="icon" variant="ghost" className="h-7 w-7" title="Copy to clipboard" onClick={handleCopy}>
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          </Button>
+        ) : undefined
+      }
+    >
       {description ? (
         <div className="relative">
           <div
