@@ -25,6 +25,9 @@ erDiagram
         application_status status
         uuid job_description_id FK "nullable"
         text notes "nullable"
+        uuid resume_content_id FK "nullable"
+        text archive_reason "nullable"
+        text withdraw_reason "nullable"
         timestamp applied_at
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
@@ -157,6 +160,7 @@ erDiagram
     profiles ||--o{ applications : "has"
     companies ||--o{ applications : "has"
     job_descriptions ||--o{ applications : "has"
+    resume_contents ||--o{ applications : "has"
     profiles ||--o{ educations : "has"
     profiles ||--o{ experiences : "has"
     companies ||--o{ experiences : "has"

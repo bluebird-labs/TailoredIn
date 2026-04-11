@@ -42,6 +42,7 @@ classDiagram
     class UpdateApplicationStatus {
         <<UseCase>>
         +ApplicationRepository applicationRepository
+        +ResumeContentRepository resumeContentRepository
         +execute(UpdateApplicationStatusInput) ApplicationDto
     }
 
@@ -382,6 +383,7 @@ classDiagram
         +ApplicationStatus status
         +string? jobDescriptionId
         +string? notes
+        +string? resumeContentId
         +string? archiveReason
         +string? withdrawReason
         +string appliedAt
@@ -557,19 +559,10 @@ classDiagram
     class ResumeOutputDto {
         <<DTO>>
         +string headline
-        +Readonly{
-    readonly experienceId: string;
-    readonly experienceTitle: string;
-    readonly companyName: string;
-    readonly startDate: string;
-    readonly endDate: string;
-    readonly summary: string;
-    readonly bullets: readonly string[];
-    readonly hiddenBulletIndices: readonly number[];
-  }[] experiences
-        +readonly string[] hiddenEducationIds
+        +object[] experiences
+        +string[] hiddenEducationIds
         +string generatedAt
-        +Record<string, string> scopedInstructions
+        +object scopedInstructions
     }
 
     class ResumeRenderEducation {
@@ -705,6 +698,7 @@ classDiagram
     ListApplications ..> ApplicationRepository : depends
     UpdateApplication ..> ApplicationRepository : depends
     UpdateApplicationStatus ..> ApplicationRepository : depends
+    UpdateApplicationStatus ..> ResumeContentRepository : depends
     CreateCompany ..> CompanyRepository : depends
     DeleteCompany ..> CompanyRepository : depends
     GetCompany ..> CompanyRepository : depends

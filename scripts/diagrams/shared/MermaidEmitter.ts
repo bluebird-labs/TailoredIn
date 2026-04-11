@@ -29,8 +29,16 @@ export namespace MermaidEmitter {
   /** Format a raw TypeScript type for diagram display. */
   export function formatType(rawType: string): string {
     let t = rawType.replace(/\s*\|\s*null/g, '').trim();
+    // Strip readonly modifier: readonly string[] → string[]
+    t = t.replace(/^readonly\s+/, '');
+    // ReadonlyArray<T> → T[], then Array<T> → T[]
+    t = t.replace(/ReadonlyArray<([^>]+)>/g, '$1[]');
     t = t.replace(/Array<([^>]+)>/g, '$1[]');
-    if (t.startsWith('{') || t.includes('{ ')) t = 'object';
+    // Record<K,V> → object
+    t = t.replace(/^Record<.+>$/, 'object');
+    // Object literals (inline or multiline) → object, preserving trailing []
+    const arraySuffix = t.endsWith('[]') ? '[]' : '';
+    if (t.startsWith('{') || t.includes('{ ') || t.includes('{\n')) t = `object${arraySuffix}`;
     // Union literal types like 'us-letter' | 'a4' → string
     if (/^'[^']+'\s*(\|\s*'[^']+')+$/.test(t)) t = 'string';
     return t;

@@ -39,10 +39,12 @@ classDiagram
         +ApplicationStatus status
         +string? jobDescriptionId
         +string? notes
+        +string? resumeContentId
         +string? archiveReason
         +string? withdrawReason
         +Date appliedAt
         +setStatus()
+        +apply()
         +archive()
         +withdraw()
     }
@@ -112,7 +114,7 @@ classDiagram
         +ResumeExperience[] experiences
         +string[] hiddenEducationIds
         +string prompt
-        +Record<string, unknown>? schema
+        +object? schema
         +withExperienceHiddenBullets()
         +withHiddenEducationIds()
     }
@@ -141,6 +143,7 @@ classDiagram
     Experience "1" --> "*" Accomplishment : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
+    ResumeContent "1" --> "*" Application : has
     Profile "1" --> "*" Education : has
     Profile "1" --> "*" Experience : has
     GenerationSettings "1" --> "*" GenerationPrompt : has
