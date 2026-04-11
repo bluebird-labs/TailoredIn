@@ -8,13 +8,6 @@ import { useJobDescription } from '@/hooks/use-job-descriptions';
 import { useProfile } from '@/hooks/use-profile';
 import { type ResumeTheme, useCachedResumePdf, useGenerateResumePdf } from '@/hooks/use-resume';
 
-function slugify(text: string | null | undefined): string {
-  return (text ?? '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
 const THEME_OPTIONS: { value: ResumeTheme; label: string }[] = [
   { value: 'brilliant-cv', label: 'Brilliant CV' },
   { value: 'imprecv', label: 'ImpresCV' },
@@ -85,12 +78,10 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
   const isLoading = generatePdf.isPending || cachedPdf.isLoading;
 
   const downloadFilename = useMemo(() => {
-    const namePart = slugify(`${profile?.firstName ?? ''} ${profile?.lastName ?? ''}`);
-    const companyPart = slugify(jd?.companyName);
-    const jobPart = slugify(jd?.title);
-    const datePart = new Date().toISOString().slice(0, 10);
-    return `${[namePart, companyPart, jobPart, datePart].filter(Boolean).join('-')}.pdf`;
-  }, [profile?.firstName, profile?.lastName, jd?.companyName, jd?.title]);
+    const namePart = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ');
+    const companyPart = jd?.companyName;
+    return `${[namePart, companyPart].filter(Boolean).join(' - ')}.pdf`;
+  }, [profile?.firstName, profile?.lastName, jd?.companyName]);
 
   const handleDownload = useCallback(async () => {
     if (!pdfBlobUrl) return;
