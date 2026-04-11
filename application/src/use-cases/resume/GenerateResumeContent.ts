@@ -27,6 +27,31 @@ type ExperienceBulletsResult = { summary: string; bullets: string[] };
 type SummaryResult = { summary: string };
 type BulletResult = { bullet: string };
 
+type ScopedInstructions = Record<string, string>;
+
+function parseScopedInstructions(prompt: string): ScopedInstructions {
+  if (!prompt) return {};
+  try {
+    const parsed = JSON.parse(prompt);
+    return typeof parsed === 'object' && parsed !== null ? parsed : {};
+  } catch {
+    // Legacy format — treat as resume-level instructions
+    return prompt ? { resume: prompt } : {};
+  }
+}
+
+function buildScopeKey(scope: GenerateResumeContentScope | undefined): string {
+  if (!scope) return 'resume';
+  switch (scope.type) {
+    case 'headline':
+      return 'headline';
+    case 'experience':
+    case 'summary':
+    case 'bullet':
+      return `experience:${scope.experienceId}`;
+  }
+}
+
 export class GenerateResumeContent {
   public constructor(
     private readonly contextBuilder: GenerationContextBuilder,
@@ -40,14 +65,24 @@ export class GenerateResumeContent {
     const context = await this.contextBuilder.build(input.jobDescriptionId, input.additionalPrompt);
     const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(input.jobDescriptionId);
 
+    const previousInstructions = parseScopedInstructions(existing?.prompt ?? '');
+    const scopeKey = buildScopeKey(input.scope);
+    const scopedInstructions = { ...previousInstructions };
+    if (input.additionalPrompt) {
+      scopedInstructions[scopeKey] = input.additionalPrompt;
+    } else {
+      delete scopedInstructions[scopeKey];
+    }
+    const promptJson = JSON.stringify(scopedInstructions);
+
     if (input.scope?.type === 'headline') {
-      return this.generateHeadline(context, existing);
+      return this.generateHeadline(context, existing, promptJson);
     }
     if (input.scope?.type === 'experience') {
-      return this.generateExperience(context, input.scope.experienceId, existing);
+      return this.generateExperience(context, input.scope.experienceId, existing, promptJson);
     }
     if (input.scope?.type === 'summary') {
-      return this.generateSummary(context, input.scope.experienceId, existing);
+      return this.generateSummary(context, input.scope.experienceId, existing, promptJson);
     }
     if (input.scope?.type === 'bullet') {
       return this.generateBullet(
@@ -55,25 +90,45 @@ export class GenerateResumeContent {
         input.scope.experienceId,
         input.scope.bulletIndex,
         input.scope.instructions,
-        existing
+        existing,
+        promptJson
       );
     }
 
-    return this.generateFull(context, existing);
+    return this.generateFull(context, existing, promptJson);
   }
 
-  private async generateFull(context: GenerationContext, existing: ResumeContent | null): Promise<ResumeContentDto> {
+  private async generateFull(
+    context: GenerationContext,
+    existing: ResumeContent | null,
+    promptJson: string
+  ): Promise<ResumeContentDto> {
     const headlineRecipe = this.registry.getRecipe(GenerationScope.HEADLINE);
     const experienceRecipe = this.registry.getRecipe(GenerationScope.EXPERIENCE);
+    const runId = new Date().toISOString().replace(/[:.]/g, '-');
 
     const headlinePromise = this.elementGenerator
-      .generate(headlineRecipe.compose(context))
+      .generate(headlineRecipe.compose(context, runId))
       .then(raw => raw as HeadlineResult);
+
+    const summaryRecipe = this.registry.getRecipe(GenerationScope.EXPERIENCE_SUMMARY);
 
     const experiencePromises = context.experiences.map(exp => {
       const expContext = this.withTargetExperience(context, exp.id);
+      if (exp.bulletMax === 0) {
+        return this.elementGenerator
+          .generate(summaryRecipe.compose(expContext, runId))
+          .then(raw => ({
+            experienceId: exp.id,
+            result: { ...(raw as SummaryResult), bullets: [] } as ExperienceBulletsResult
+          }))
+          .catch(error => ({
+            experienceId: exp.id,
+            error: error instanceof Error ? error.message : String(error)
+          }));
+      }
       return this.elementGenerator
-        .generate(experienceRecipe.compose(expContext))
+        .generate(experienceRecipe.compose(expContext, runId))
         .then(raw => ({ experienceId: exp.id, result: raw as ExperienceBulletsResult }))
         .catch(error => ({
           experienceId: exp.id,
@@ -120,7 +175,7 @@ export class GenerateResumeContent {
         hiddenBulletIndices: e.hiddenBulletIndices
       })),
       hiddenEducationIds,
-      prompt: '',
+      prompt: promptJson,
       schema: null
     });
     await this.resumeContentRepository.save(resumeContent);
@@ -138,7 +193,8 @@ export class GenerateResumeContent {
 
   private async generateHeadline(
     context: GenerationContext,
-    existing: ResumeContent | null
+    existing: ResumeContent | null,
+    promptJson: string
   ): Promise<ResumeContentDto> {
     const recipe = this.registry.getRecipe(GenerationScope.HEADLINE);
     const raw = await this.elementGenerator.generate(recipe.compose(context));
@@ -161,7 +217,7 @@ export class GenerateResumeContent {
       headline: result.headline,
       experiences,
       hiddenEducationIds,
-      prompt: '',
+      prompt: promptJson,
       schema: null
     });
     await this.resumeContentRepository.save(resumeContent);
@@ -183,20 +239,22 @@ export class GenerateResumeContent {
   private async generateExperience(
     context: GenerationContext,
     experienceId: string,
-    existing: ResumeContent | null
+    existing: ResumeContent | null,
+    promptJson: string
   ): Promise<ResumeContentDto> {
     const recipe = this.registry.getRecipe(GenerationScope.EXPERIENCE);
     const expContext = this.withTargetExperience(context, experienceId);
     const raw = await this.elementGenerator.generate(recipe.compose(expContext));
     const result = raw as ExperienceBulletsResult;
 
-    return this.mergeExperienceResult(context, existing, experienceId, result);
+    return this.mergeExperienceResult(context, existing, experienceId, result, promptJson);
   }
 
   private async generateSummary(
     context: GenerationContext,
     experienceId: string,
-    existing: ResumeContent | null
+    existing: ResumeContent | null,
+    promptJson: string
   ): Promise<ResumeContentDto> {
     const recipe = this.registry.getRecipe(GenerationScope.EXPERIENCE_SUMMARY);
     const expContext = this.withTargetExperience(context, experienceId);
@@ -204,10 +262,16 @@ export class GenerateResumeContent {
     const result = raw as SummaryResult;
 
     const existingExp = existing?.experiences.find(e => e.experienceId === experienceId);
-    return this.mergeExperienceResult(context, existing, experienceId, {
-      summary: result.summary,
-      bullets: existingExp?.bullets ?? []
-    });
+    return this.mergeExperienceResult(
+      context,
+      existing,
+      experienceId,
+      {
+        summary: result.summary,
+        bullets: existingExp?.bullets ?? []
+      },
+      promptJson
+    );
   }
 
   private async generateBullet(
@@ -215,7 +279,8 @@ export class GenerateResumeContent {
     experienceId: string,
     bulletIndex: number,
     instructions: string,
-    existing: ResumeContent | null
+    existing: ResumeContent | null,
+    promptJson: string
   ): Promise<ResumeContentDto> {
     const recipe = this.registry.getRecipe(GenerationScope.BULLET);
     const existingExp = existing?.experiences.find(e => e.experienceId === experienceId);
@@ -236,17 +301,24 @@ export class GenerateResumeContent {
       updatedBullets.push(result.bullet);
     }
 
-    return this.mergeExperienceResult(context, existing, experienceId, {
-      summary: existingExp?.summary ?? '',
-      bullets: updatedBullets
-    });
+    return this.mergeExperienceResult(
+      context,
+      existing,
+      experienceId,
+      {
+        summary: existingExp?.summary ?? '',
+        bullets: updatedBullets
+      },
+      promptJson
+    );
   }
 
   private async mergeExperienceResult(
     context: GenerationContext,
     existing: ResumeContent | null,
     experienceId: string,
-    result: { summary: string; bullets: string[] }
+    result: { summary: string; bullets: string[] },
+    promptJson: string
   ): Promise<ResumeContentDto> {
     const headline = existing?.headline ?? '';
 
@@ -275,7 +347,7 @@ export class GenerateResumeContent {
       headline,
       experiences,
       hiddenEducationIds,
-      prompt: '',
+      prompt: promptJson,
       schema: null
     });
     await this.resumeContentRepository.save(resumeContent);

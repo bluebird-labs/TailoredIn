@@ -10,10 +10,6 @@ export class JobDescriptionSection extends PromptSection {
     const { jobDescription: jd } = context;
     const lines = ['## Target Job Description', '', `Title: ${jd.title}`, '', `Description:`, jd.description];
 
-    if (jd.rawText) {
-      lines.push('', 'Raw Text:', jd.rawText);
-    }
-
     if (jd.level) {
       lines.push('', `Level: ${jd.level}`);
     }

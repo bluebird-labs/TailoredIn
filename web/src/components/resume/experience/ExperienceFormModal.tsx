@@ -391,7 +391,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
           type="number"
           label="Bullet Min"
           value={String(current.bulletMin)}
-          onChange={v => setField('bulletMin', Math.max(1, Number(v)))}
+          onChange={v => setField('bulletMin', Math.max(0, Number(v)))}
           isDirty={isDirtyField('bulletMin')}
           error={errors.bulletMin}
           disabled={isSaving}
@@ -400,7 +400,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
           type="number"
           label="Bullet Max"
           value={String(current.bulletMax)}
-          onChange={v => setField('bulletMax', Math.max(1, Number(v)))}
+          onChange={v => setField('bulletMax', Math.max(0, Number(v)))}
           isDirty={isDirtyField('bulletMax')}
           error={errors.bulletMax}
           disabled={isSaving}

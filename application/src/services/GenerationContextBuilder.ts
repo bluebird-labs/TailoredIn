@@ -77,8 +77,8 @@ export class GenerationContextBuilder {
         startDate: exp.startDate,
         endDate: exp.endDate,
         location: exp.location,
-        bulletMin: settings.bulletMin,
-        bulletMax: settings.bulletMax,
+        bulletMin: exp.bulletMin,
+        bulletMax: exp.bulletMax,
         companyId: exp.companyId
       })),
       companies: companies

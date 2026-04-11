@@ -11,7 +11,7 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 
-const LOG_DIR = resolve(import.meta.dir, '../../../logs/llm');
+const LOG_BASE_DIR = resolve(import.meta.dir, '../../../logs/llm');
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 @injectable()
@@ -25,8 +25,9 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
     const messages = this.buildMessages(composedPrompt);
     const model = composedPrompt.model as Anthropic.Messages.Model;
     const schema = composedPrompt.outputSchema as z.ZodObject<z.ZodRawShape>;
+    const { meta } = composedPrompt;
 
-    this.log.info(`Generating element | model=${model} messages=${messages.length}`);
+    this.log.info(`Generating element | scope=${meta.scope} model=${model} messages=${messages.length}`);
     const startTime = Date.now();
 
     try {
@@ -46,7 +47,7 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
       );
 
       const duration = Date.now() - startTime;
-      this.log.info(`Element generated | duration=${duration}ms`);
+      this.log.info(`Element generated | scope=${meta.scope} duration=${duration}ms`);
 
       const parsed = schema.safeParse(response.parsed_output);
       if (!parsed.success) {
@@ -63,13 +64,13 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
     } catch (e) {
       const duration = Date.now() - startTime;
       if (e instanceof Anthropic.APIConnectionTimeoutError) {
-        this.log.error(`Element generation timed out | duration=${duration}ms`);
+        this.log.error(`Element generation timed out | scope=${meta.scope} duration=${duration}ms`);
         this.logToFile(composedPrompt, model, duration, { error: `Timed out after ${duration}ms` });
         throw new ExternalServiceError('Claude API', `Timed out after ${duration}ms`);
       }
       if (e instanceof ExternalServiceError) throw e;
       const msg = e instanceof Error ? e.message : String(e);
-      this.log.error(`Element generation failed | duration=${duration}ms error="${msg}"`);
+      this.log.error(`Element generation failed | scope=${meta.scope} duration=${duration}ms error="${msg}"`);
       throw new ExternalServiceError('Claude API', msg);
     }
   }
@@ -117,13 +118,16 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
   ): void {
     if (IS_TEST) return;
     try {
-      if (!existsSync(LOG_DIR)) {
-        mkdirSync(LOG_DIR, { recursive: true });
+      const { meta } = prompt;
+      const now = new Date();
+
+      const folderName = `${meta.generationRunId}-${meta.profileId.slice(0, 8)}-${meta.jobDescriptionId.slice(0, 8)}`;
+      const folderPath = resolve(LOG_BASE_DIR, folderName);
+      if (!existsSync(folderPath)) {
+        mkdirSync(folderPath, { recursive: true });
       }
 
-      const now = new Date();
-      const timestamp = now.toISOString().replace(/[:.]/g, '-');
-      const filename = `${timestamp}_ResumeElement.md`;
+      const filename = meta.experienceId ? `${meta.scope}-${meta.experienceId}.md` : `${meta.scope}.md`;
 
       const systemText = prompt.systemBlocks.map(b => b.content).join('\n\n');
       const profileText = prompt.profileBlocks.map(b => b.content).join('\n\n');
@@ -133,12 +137,22 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
       const schema = prompt.outputSchema as z.ZodObject<z.ZodRawShape>;
       const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
 
+      const metaLines = [
+        `**Scope:** ${meta.scope}`,
+        `**Profile ID:** ${meta.profileId}`,
+        `**Job Description ID:** ${meta.jobDescriptionId}`
+      ];
+      if (meta.experienceId) {
+        metaLines.push(`**Experience ID:** ${meta.experienceId}`);
+      }
+
       const sections = [
-        '# ResumeElementGeneration',
+        `# ${meta.scope}${meta.experienceId ? ` — ${meta.experienceId}` : ''}`,
         `**Date:** ${now.toISOString()}`,
         `**Model:** ${model}`,
         `**Duration:** ${durationMs}ms`,
         `**Status:** ${'data' in result ? 'SUCCESS' : 'FAILURE'}`,
+        ...metaLines,
         '',
         '## System Prompt (SYSTEM_STABLE)',
         '',
@@ -167,8 +181,8 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
           : `**Error:** ${result.error}${result.raw ? `\n\n**Raw response:**\n\`\`\`json\n${JSON.stringify(result.raw, null, 2)}\n\`\`\`` : ''}`
       ];
 
-      writeFileSync(resolve(LOG_DIR, filename), sections.join('\n'), 'utf-8');
-      this.log.debug(`LLM log written: ${filename}`);
+      writeFileSync(resolve(folderPath, filename), sections.join('\n'), 'utf-8');
+      this.log.debug(`LLM log written: ${folderName}/${filename}`);
     } catch {
       this.log.warn('Failed to write LLM prompt log file');
     }

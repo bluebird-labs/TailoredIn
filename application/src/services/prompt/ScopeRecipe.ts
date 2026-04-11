@@ -12,7 +12,7 @@ export class ScopeRecipe {
     private readonly outputSchemaOrFactory: unknown | ((context: GenerationContext) => unknown)
   ) {}
 
-  public compose(context: GenerationContext): ComposedPrompt {
+  public compose(context: GenerationContext, generationRunId?: string): ComposedPrompt {
     const systemBlocks: PromptBlock[] = [];
     const profileBlocks: PromptBlock[] = [];
     const sessionBlocks: PromptBlock[] = [];
@@ -47,7 +47,14 @@ export class ScopeRecipe {
       outputSchema:
         typeof this.outputSchemaOrFactory === 'function'
           ? (this.outputSchemaOrFactory as (ctx: GenerationContext) => unknown)(context)
-          : this.outputSchemaOrFactory
+          : this.outputSchemaOrFactory,
+      meta: {
+        scope: this.scope,
+        profileId: context.profile.id,
+        jobDescriptionId: context.jobDescription.id,
+        experienceId: context.experiences[0]?.id,
+        generationRunId: generationRunId ?? new Date().toISOString().replace(/[:.]/g, '-')
+      }
     };
   }
 }

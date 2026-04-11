@@ -4,7 +4,7 @@ export * from './errors/index.js';
 export type * from './ports/index.js';
 // Prompt pipeline
 export { GenerationContextBuilder } from './services/GenerationContextBuilder.js';
-export type { ComposedPrompt } from './services/prompt/ComposedPrompt.js';
+export type { ComposedPrompt, ComposedPromptMeta } from './services/prompt/ComposedPrompt.js';
 export type { PromptBlock } from './services/prompt/PromptBlock.js';
 export { PromptRegistry } from './services/prompt/PromptRegistry.js';
 export { PromptSection } from './services/prompt/PromptSection.js';

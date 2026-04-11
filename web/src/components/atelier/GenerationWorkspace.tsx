@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Eye, EyeOff, Loader2, RotateCw, Settings, Sparkles } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -31,15 +31,17 @@ function RegeneratePopover({
   isRegenerating,
   onRegenerate,
   triggerTitle,
-  currentContent
+  currentContent,
+  initialPrompt
 }: {
   isRegenerating: boolean;
   onRegenerate: (prompt: string) => void;
   triggerTitle: string;
   currentContent?: { summary?: string; bullets: string[] };
+  initialPrompt?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(initialPrompt ?? '');
   const [includeCurrentVersion, setIncludeCurrentVersion] = useState(false);
 
   function handleSubmit() {
@@ -59,8 +61,10 @@ function RegeneratePopover({
       open={open}
       onOpenChange={nextOpen => {
         setOpen(nextOpen);
+        if (nextOpen) {
+          setPrompt(initialPrompt ?? '');
+        }
         if (!nextOpen) {
-          setPrompt('');
           setIncludeCurrentVersion(false);
         }
       }}
@@ -111,7 +115,8 @@ function ExperienceCard({
   onBulletRangeSave,
   onBulletRangeReset,
   onRegenerate,
-  isRegenerating
+  isRegenerating,
+  initialPrompt
 }: {
   exp: ResumeOutputExperience;
   defaultBulletMin: number;
@@ -122,6 +127,7 @@ function ExperienceCard({
   onBulletRangeReset: (experienceId: string) => void;
   onRegenerate: (prompt: string) => void;
   isRegenerating: boolean;
+  initialPrompt?: string;
 }) {
   const startFormatted = formatMonthYear(exp.startDate);
   const endFormatted = formatMonthYear(exp.endDate);
@@ -155,6 +161,7 @@ function ExperienceCard({
           onRegenerate={onRegenerate}
           triggerTitle="Regenerate this experience"
           currentContent={{ summary: exp.summary, bullets: exp.bullets }}
+          initialPrompt={initialPrompt}
         />
       </div>
       {exp.summary && <p className="text-[13px] italic text-muted-foreground">{exp.summary}</p>}
@@ -204,6 +211,19 @@ export function GenerationWorkspace({
   const updateDisplaySettings = useUpdateResumeDisplaySettings(selectedJobId ?? '');
 
   const resumeOutput = jd?.resumeOutput ?? null;
+
+  const scopedInstructions = resumeOutput?.scopedInstructions ?? {};
+
+  const prevJobIdRef = useRef(selectedJobId);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: additionalPrompt intentionally excluded — only sync on JD/job change
+  useEffect(() => {
+    const jobChanged = selectedJobId !== prevJobIdRef.current;
+    prevJobIdRef.current = selectedJobId;
+    const resumeInstructions = jd?.resumeOutput?.scopedInstructions?.resume;
+    if (resumeInstructions != null && (jobChanged || additionalPrompt === '')) {
+      setAdditionalPrompt(resumeInstructions);
+    }
+  }, [selectedJobId, jd?.resumeOutput?.scopedInstructions]);
 
   const experienceBulletMap = useMemo(() => {
     const map = new Map<string, { min: number; max: number }>();
@@ -365,6 +385,7 @@ export function GenerationWorkspace({
                   isRegenerating={regeneratingId === 'headline'}
                   onRegenerate={handleRegenerateHeadline}
                   triggerTitle="Regenerate headline"
+                  initialPrompt={scopedInstructions.headline}
                 />
               </div>
               <p className="text-[15px] text-foreground">{resumeOutput.headline}</p>
@@ -386,6 +407,7 @@ export function GenerationWorkspace({
                   onBulletRangeReset={handleBulletRangeReset}
                   onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
                   isRegenerating={regeneratingId === exp.experienceId}
+                  initialPrompt={scopedInstructions[`experience:${exp.experienceId}`]}
                 />
               );
             })}

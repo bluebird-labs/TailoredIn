@@ -57,8 +57,8 @@ export class UpdateExperienceRoute {
               ordinal: t.Integer({ minimum: 0 })
             })
           ),
-          bullet_min: t.Optional(t.Integer({ minimum: 1, maximum: 20 })),
-          bullet_max: t.Optional(t.Integer({ minimum: 1, maximum: 20 }))
+          bullet_min: t.Optional(t.Integer({ minimum: 0, maximum: 20 })),
+          bullet_max: t.Optional(t.Integer({ minimum: 0, maximum: 20 }))
         })
       }
     );
