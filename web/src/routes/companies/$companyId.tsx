@@ -1,8 +1,9 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { ArrowRight, ExternalLink, Pencil, Plus, Trash2 } from 'lucide-react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { ExternalLink, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal.js';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
+import { JobDescriptionCard } from '@/components/job-descriptions/JobDescriptionCard.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
@@ -10,8 +11,10 @@ import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/sha
 import { EmptyState } from '@/components/shared/EmptyState.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCompany, useDeleteCompany } from '@/hooks/use-companies';
+import { useJobDescriptions } from '@/hooks/use-job-descriptions';
 
 export const Route = createFileRoute('/companies/$companyId')({
   component: CompanyDetailPage
@@ -20,6 +23,7 @@ export const Route = createFileRoute('/companies/$companyId')({
 function CompanyDetailPage() {
   const { companyId } = Route.useParams();
   const { data: company, isLoading } = useCompany(companyId);
+  const { data: jobDescriptions = [], isLoading: isLoadingJobs } = useJobDescriptions(companyId);
   const deleteCompany = useDeleteCompany();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
@@ -76,10 +80,6 @@ function CompanyDetailPage() {
                 </Button>
               </a>
             )}
-            <Button variant="outline" size="sm" onClick={() => setAddJobOpen(true)}>
-              <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Add job
-            </Button>
             <Button size="sm" onClick={() => setEditOpen(true)}>
               <Pencil className="mr-1.5 h-3.5 w-3.5" />
               Edit
@@ -122,14 +122,30 @@ function CompanyDetailPage() {
         </InfoCard>
       </div>
 
-      <Link
-        to="/jobs"
-        search={{ company: companyId }}
-        className="flex items-center gap-2 text-[13px] text-primary hover:underline"
-      >
-        View jobs at this company
-        <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-[18px] font-medium">Jobs</h2>
+            {jobDescriptions.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {jobDescriptions.length}
+              </Badge>
+            )}
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setAddJobOpen(true)}>
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
+            Add job
+          </Button>
+        </div>
+
+        {isLoadingJobs ? (
+          <LoadingSkeleton variant="list" count={2} />
+        ) : jobDescriptions.length === 0 ? (
+          <EmptyState message="No jobs yet." actionLabel="Add job" onAction={() => setAddJobOpen(true)} />
+        ) : (
+          jobDescriptions.map(jd => <JobDescriptionCard key={jd.id} jobDescription={jd} />)
+        )}
+      </div>
 
       {editOpen && (
         <CompanyFormModal
