@@ -7,6 +7,7 @@ export type ApplicationDto = {
   readonly status: ApplicationStatus;
   readonly jobDescriptionId: string | null;
   readonly notes: string | null;
+  readonly resumeContentId: string | null;
   readonly archiveReason: string | null;
   readonly withdrawReason: string | null;
   readonly appliedAt: string;
@@ -21,6 +22,7 @@ export function toApplicationDto(application: Application): ApplicationDto {
     status: application.status,
     jobDescriptionId: application.jobDescriptionId,
     notes: application.notes,
+    resumeContentId: application.resumeContentId,
     archiveReason: application.archiveReason,
     withdrawReason: application.withdrawReason,
     appliedAt: application.appliedAt.toISOString(),

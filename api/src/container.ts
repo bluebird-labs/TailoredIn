@@ -233,7 +233,8 @@ container.bind({
 });
 container.bind({
   provide: DI.Application.UpdateStatus,
-  useFactory: () => new UpdateApplicationStatus(container.get(DI.Application.Repository))
+  useFactory: () =>
+    new UpdateApplicationStatus(container.get(DI.Application.Repository), container.get(DI.ResumeContent.Repository))
 });
 container.bind({
   provide: DI.Application.Delete,

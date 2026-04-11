@@ -18,6 +18,7 @@ export class UpdateApplicationStatusRoute {
           const data = await this.updateApplicationStatus.execute({
             applicationId: params.id,
             status: body.status as ApplicationStatus,
+            resumeContentId: body.resume_content_id,
             archiveReason: body.archive_reason,
             withdrawReason: body.withdraw_reason
           });
@@ -30,8 +31,12 @@ export class UpdateApplicationStatusRoute {
           if (
             e instanceof Error &&
             (e.message.includes('reason is required') ||
+              e.message.includes('is required when') ||
+              e.message.includes('not found:') ||
+              e.message.includes('Can only apply from') ||
               e.message.includes('Use archive()') ||
-              e.message.includes('Use withdraw()'))
+              e.message.includes('Use withdraw()') ||
+              e.message.includes('Use apply()'))
           ) {
             set.status = 422;
             return { error: { code: 'VALIDATION_ERROR', message: e.message } };
@@ -43,6 +48,7 @@ export class UpdateApplicationStatusRoute {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
         body: t.Object({
           status: t.String({ minLength: 1 }),
+          resume_content_id: t.Optional(t.String({ format: 'uuid' })),
           archive_reason: t.Optional(t.String({ minLength: 1 })),
           withdraw_reason: t.Optional(t.String({ minLength: 1 }))
         })

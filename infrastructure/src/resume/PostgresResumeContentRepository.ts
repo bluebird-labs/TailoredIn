@@ -6,6 +6,10 @@ import { ResumeContent, type ResumeContentRepository } from '@tailoredin/domain'
 export class PostgresResumeContentRepository implements ResumeContentRepository {
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
+  public async findById(id: string): Promise<ResumeContent | null> {
+    return this.orm.em.findOne(ResumeContent, { id });
+  }
+
   public async findLatestByJobDescriptionId(jobDescriptionId: string): Promise<ResumeContent | null> {
     return this.orm.em.findOne(ResumeContent, { jobDescriptionId }, { orderBy: { createdAt: 'DESC' } });
   }
