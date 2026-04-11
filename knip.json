@@ -13,9 +13,7 @@
         "test-integration/support/**",
         "scripts/e2e-start-servers.ts",
         "src/db/migrations/*.ts",
-        "src/db/seeds/**/*.ts",
-        "src/db/orm-config.ts",
-        "esco/schemas/index.ts"
+        "src/db/seeds/**/*.ts"
       ]
     },
     "api": {},

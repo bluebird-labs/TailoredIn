@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ReuseLevelEnum, SkillTypeEnum } from './skill.schema.js';
+import { ReuseLevelEnum, SkillTypeEnum } from './skill.js';
 
 /**
  * Shared schema for all skill collection files:

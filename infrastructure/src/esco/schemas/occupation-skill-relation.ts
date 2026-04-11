@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SkillTypeEnum } from './skill.schema.js';
+import { SkillTypeEnum } from './skill.js';
 
 export const RelationTypeEnum = z.enum(['essential', 'optional']);
 
