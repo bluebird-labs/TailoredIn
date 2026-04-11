@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { ArrowRight, ExternalLink, Pencil, Trash2 } from 'lucide-react';
+import { ArrowRight, ExternalLink, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { CompanyFormModal } from '@/components/companies/CompanyFormModal.js';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
+import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { DetailPageHeader, MetaBadge, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
@@ -22,6 +23,7 @@ function CompanyDetailPage() {
   const deleteCompany = useDeleteCompany();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
+  const [addJobOpen, setAddJobOpen] = useState(false);
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
   if (!company) return <EmptyState message="Company not found." />;
@@ -74,6 +76,10 @@ function CompanyDetailPage() {
                 </Button>
               </a>
             )}
+            <Button variant="outline" size="sm" onClick={() => setAddJobOpen(true)}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Add job
+            </Button>
             <Button size="sm" onClick={() => setEditOpen(true)}>
               <Pencil className="mr-1.5 h-3.5 w-3.5" />
               Edit
@@ -131,6 +137,16 @@ function CompanyDetailPage() {
           company={company}
           onOpenChange={next => {
             if (!next) setEditOpen(false);
+          }}
+        />
+      )}
+
+      {addJobOpen && (
+        <JobDescriptionFormModal
+          open
+          companyId={companyId}
+          onOpenChange={next => {
+            if (!next) setAddJobOpen(false);
           }}
         />
       )}
