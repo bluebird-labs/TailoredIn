@@ -5,12 +5,13 @@
     "allow": ["EnterPlanMode", "WebFetch"]
   },
   "hooks": {
-    "WorktreeCreate": [
+    "PostToolUse": [
       {
+        "matcher": "EnterWorktree",
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.worktree_path' | { read -r wt; main=$(git worktree list --porcelain | head -1 | sed 's/^worktree //'); [ -f \"$main/.env\" ] && cp \"$main/.env\" \"$wt/.env\" && echo '{\"systemMessage\": \"Copied .env to worktree\"}'; }",
+            "command": "/Users/sylvainestevez/Documents/Projects/TailoredIn/.claude/hooks/copy-env-to-worktree.sh",
             "statusMessage": "Copying .env to worktree..."
           }
         ]
