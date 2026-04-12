@@ -79,7 +79,15 @@ const SOURCE_TO_CATEGORY: Record<string, string> = {
   mobile_development: 'mobile',
   project_management: 'architecture-methodology',
   query_languages: 'databases',
-  leadership: 'leadership-communication'
+  leadership: 'leadership-communication',
+  management: 'leadership-communication',
+  software_architecture: 'architecture-methodology',
+  architecture: 'architecture-methodology',
+  ai_ml: 'ai-machine-learning',
+  product_management: 'leadership-communication',
+  frontend_development: 'frontend',
+  backend_development: 'backend',
+  data_infrastructure: 'cloud-infrastructure'
 };
 
 export class SkillSyncService {
