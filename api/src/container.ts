@@ -34,6 +34,7 @@ import {
   ListJobDescriptions,
   ParseJobDescription,
   PromptRegistry,
+  ScoreJobFit,
   ScoreResume,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -53,6 +54,7 @@ import {
   CareerTimelineSection,
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
+  ClaudeApiFitScorer,
   ClaudeApiJobDescriptionParser,
   ClaudeApiProvider,
   ClaudeApiResumeElementGenerator,
@@ -76,6 +78,7 @@ import {
   PostgresExperienceRepository,
   PostgresGenerationSettingsRepository,
   PostgresJobDescriptionRepository,
+  PostgresJobFitScoreRepository,
   PostgresProfileRepository,
   PostgresResumeContentRepository,
   ProfileSection,
@@ -261,7 +264,8 @@ container.bind({
       container.get(DI.JobDescription.Repository),
       container.get(DI.ResumeContent.Repository),
       container.get(DI.Experience.Repository),
-      container.get(DI.Company.Repository)
+      container.get(DI.Company.Repository),
+      container.get(DI.JobDescription.FitScoreRepository)
     )
 });
 container.bind({
@@ -276,6 +280,20 @@ container.bind({
 container.bind({
   provide: DI.JobDescription.Delete,
   useFactory: () => new DeleteJobDescription(container.get(DI.JobDescription.Repository))
+});
+container.bind({ provide: DI.JobDescription.FitScoreRepository, useClass: PostgresJobFitScoreRepository });
+container.bind({ provide: DI.JobDescription.FitScorer, useClass: ClaudeApiFitScorer });
+container.bind({
+  provide: DI.JobDescription.ScoreFit,
+  useFactory: () =>
+    new ScoreJobFit(
+      container.get(DI.Profile.Repository),
+      container.get(DI.Experience.Repository),
+      container.get(DI.Company.Repository),
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.JobDescription.FitScoreRepository),
+      container.get(DI.JobDescription.FitScorer)
+    )
 });
 
 // Resume Content

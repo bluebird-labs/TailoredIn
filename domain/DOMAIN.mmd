@@ -106,6 +106,23 @@ classDiagram
         +getPrompt()
     }
 
+    class JobFitRequirement {
+        <<Entity>>
+        +string jobFitScoreId
+        +string requirement
+        +RequirementCoverage coverage
+        +string reasoning
+        +number ordinal
+    }
+
+    class JobFitScore {
+        <<AggregateRoot>>
+        +string profileId
+        +string jobDescriptionId
+        +number overall
+        +string summary
+    }
+
     class ResumeContent {
         <<AggregateRoot>>
         +string profileId
@@ -158,6 +175,8 @@ classDiagram
     GenerationSettings "1" --> "*" GenerationPrompt : has
     GenerationPrompt --> GenerationScope
     Profile "1" --> "*" GenerationSettings : has
+    JobFitScore "1" --> "*" JobFitRequirement : has
+    Profile "1" --> "*" JobFitScore : has
     Profile "1" --> "*" ResumeContent : has
     ResumeContent "1" *-- "*" ResumeExperience : contains
     ResumeContent *-- ResumeScore
@@ -236,6 +255,7 @@ classDiagram
     Company "1" --> "*" JobDescription : has
     JobDescription --> LocationType
     JobDescription --> JobSource
+    JobDescription "1" --> "*" JobFitScore : has
     JobDescription "1" --> "*" ResumeContent : has
 
     %% ──────────────────────────────────────────────
@@ -419,6 +439,7 @@ classDiagram
     Company --> CompanyStage
     GenerationSettings --> ModelTier
     JobDescription --> JobLevel
+    JobFitRequirement --> RequirementCoverage
     JDSnapshot --> JobLevel
     ExperienceSnapshot "1" *-- "*" AccomplishmentSnapshot : contains
     CompanySnapshot --> Industry
@@ -446,6 +467,8 @@ classDiagram
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style GenerationPrompt fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style GenerationSettings fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style JobFitRequirement fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style JobFitScore fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px

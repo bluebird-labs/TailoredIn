@@ -20,6 +20,10 @@ export type { GenerationSettingsCreateProps } from './entities/GenerationSetting
 export { GenerationSettings } from './entities/GenerationSettings.js';
 export type { JobDescriptionCreateProps } from './entities/JobDescription.js';
 export { JobDescription } from './entities/JobDescription.js';
+export type { JobFitRequirementCreateProps } from './entities/JobFitRequirement.js';
+export { JobFitRequirement } from './entities/JobFitRequirement.js';
+export type { JobFitScoreCreateProps } from './entities/JobFitScore.js';
+export { JobFitScore } from './entities/JobFitScore.js';
 export type { ProfileCreateProps } from './entities/Profile.js';
 export { Profile } from './entities/Profile.js';
 export type { ResumeContentCreateProps } from './entities/ResumeContent.js';
@@ -31,6 +35,7 @@ export type { EducationRepository } from './ports/EducationRepository.js';
 export type { ExperienceRepository } from './ports/ExperienceRepository.js';
 export type { GenerationSettingsRepository } from './ports/GenerationSettingsRepository.js';
 export type { JobDescriptionRepository } from './ports/JobDescriptionRepository.js';
+export type { JobFitScoreRepository } from './ports/JobFitScoreRepository.js';
 export type { ProfileRepository } from './ports/ProfileRepository.js';
 export type { ResumeContentRepository } from './ports/ResumeContentRepository.js';
 export type { Result } from './Result.js';

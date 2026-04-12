@@ -41,6 +41,7 @@ import { DeleteJobDescriptionRoute } from './routes/job-description/DeleteJobDes
 import { GetJobDescriptionRoute } from './routes/job-description/GetJobDescriptionRoute.js';
 import { ListJobDescriptionsRoute } from './routes/job-description/ListJobDescriptionsRoute.js';
 import { ParseJobDescriptionRoute } from './routes/job-description/ParseJobDescriptionRoute.js';
+import { ScoreJobFitRoute } from './routes/job-description/ScoreJobFitRoute.js';
 import { UpdateJobDescriptionRoute } from './routes/job-description/UpdateJobDescriptionRoute.js';
 import { GenerateResumeContentRoute } from './routes/resume/GenerateResumeContentRoute.js';
 import { GenerateResumePdfRoute } from './routes/resume/GenerateResumePdfRoute.js';
@@ -158,6 +159,7 @@ const app = new Elysia()
   .use(container.get(ListJobDescriptionsRoute).plugin())
   .use(container.get(UpdateJobDescriptionRoute).plugin())
   .use(container.get(DeleteJobDescriptionRoute).plugin())
+  .use(container.get(ScoreJobFitRoute).plugin())
   // Resume
   .use(container.get(GenerateResumeContentRoute).plugin())
   .use(container.get(GenerateResumePdfRoute).plugin())

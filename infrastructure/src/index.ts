@@ -11,8 +11,10 @@ export { DI } from './DI.js';
 export { createOrmConfig } from './db/orm-config.js';
 export { PostgresEducationRepository } from './education/PostgresEducationRepository.js';
 export { PostgresExperienceRepository } from './experience/PostgresExperienceRepository.js';
+export { ClaudeApiFitScorer } from './job/ClaudeApiFitScorer.js';
 export { ClaudeApiJobDescriptionParser } from './job/ClaudeApiJobDescriptionParser.js';
 export { PostgresJobDescriptionRepository } from './job/PostgresJobDescriptionRepository.js';
+export { PostgresJobFitScoreRepository } from './job/PostgresJobFitScoreRepository.js';
 // LLM
 export { ClaudeApiProvider } from './llm/index.js';
 export { ClaudeApiResumeElementGenerator } from './resume/ClaudeApiResumeElementGeneratorNew.js';

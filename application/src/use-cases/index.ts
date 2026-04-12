@@ -64,6 +64,8 @@ export type { ListJobDescriptionsInput } from './job-description/ListJobDescript
 export { ListJobDescriptions } from './job-description/ListJobDescriptions.js';
 export type { ParseJobDescriptionInput } from './job-description/ParseJobDescription.js';
 export { ParseJobDescription } from './job-description/ParseJobDescription.js';
+export type { ScoreJobFitInput } from './job-description/ScoreJobFit.js';
+export { ScoreJobFit } from './job-description/ScoreJobFit.js';
 export type { UpdateJobDescriptionInput } from './job-description/UpdateJobDescription.js';
 export { UpdateJobDescription } from './job-description/UpdateJobDescription.js';
 export type {
