@@ -56,7 +56,8 @@
     "linguist:import": "bun --env-file=.env run infrastructure/scripts/linguist-import.ts",
     "mind:import": "bun --env-file=.env run infrastructure/scripts/mind-import.ts",
     "tanova:import": "bun --env-file=.env run infrastructure/scripts/tanova-import.ts",
-    "skills:sync": "bun --env-file=.env run infrastructure/scripts/skills-sync.ts"
+    "skills:sync": "bun --env-file=.env run infrastructure/scripts/skills-sync.ts",
+    "skills:reset": "bun --env-file=.env run infrastructure/scripts/skills-reset.ts"
   },
   "workspaces": [
     "domain",

@@ -106,6 +106,18 @@ export class SkillSyncService {
     this.log.info(`Done in ${elapsed}s`);
   }
 
+  /**
+   * Deletes all skills and skill categories. Clears experience_skills first
+   * because it has a non-cascading FK to skills.
+   */
+  public async reset(): Promise<void> {
+    this.log.info('Resetting skills data...');
+    await this.connection.execute('DELETE FROM "experience_skills"', [], 'run');
+    await this.connection.execute('DELETE FROM "skills"', [], 'run');
+    await this.connection.execute('DELETE FROM "skill_categories"', [], 'run');
+    this.log.info('Reset complete — experience_skills, skills, and skill_categories cleared');
+  }
+
   // ---------------------------------------------------------------------------
   // Phase 1: Category upsert
   // ---------------------------------------------------------------------------
