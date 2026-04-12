@@ -36,6 +36,7 @@ import {
   EscoSkillSkillRelationEntity,
   EscoSkillsHierarchyEntity
 } from '../esco/entities/index.js';
+import { LinguistLanguageEntity } from '../linguist/entities/index.js';
 import { MindConceptEntity, MindRelationEntity, MindSkillEntity } from '../mind/entities/index.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
@@ -84,6 +85,8 @@ export function createOrmConfig(db: OrmDbConfig) {
       EscoSkillCollectionEntity,
       EscoOccupationCollectionEntity,
       EscoGreenShareOccupationEntity,
+      // Linguist reference data
+      LinguistLanguageEntity,
       // MIND reference data
       MindSkillEntity,
       MindConceptEntity,
