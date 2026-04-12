@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { SkillTypeEnum } from './skill.js';
 
-export const RelationTypeEnum = z.enum(['essential', 'optional']);
+const RelationTypeEnum = z.enum(['essential', 'optional']);
 
 export const OccupationSkillRelationSchema = z.object({
   occupationUri: z.string().url(),

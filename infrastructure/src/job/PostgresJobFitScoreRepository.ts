@@ -18,7 +18,6 @@ export class PostgresJobFitScoreRepository implements JobFitScoreRepository {
     if (jobDescriptionIds.length === 0) return [];
     return this.orm.em.find(
       JobFitScore,
-      // biome-ignore lint/style/useNamingConvention: MikroORM query operator
       { jobDescriptionId: { $in: jobDescriptionIds } },
       { populate: ['requirements'], orderBy: { requirements: { ordinal: 'ASC' } } }
     );

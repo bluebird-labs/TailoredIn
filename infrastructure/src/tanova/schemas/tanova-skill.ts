@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const IndustryDemandEnum = z.enum(['very_high', 'high', 'medium', 'low']);
+const IndustryDemandEnum = z.enum(['very_high', 'high', 'medium', 'low']);
 
 const ProficiencyLevelSchema = z.object({
   markers: z.array(z.string()),
@@ -51,4 +51,4 @@ export const TanovaTaxonomySchema = z.object({
   categories: z.record(z.string(), CategorySchema)
 });
 
-export type TanovaTaxonomy = z.infer<typeof TanovaTaxonomySchema>;
+type TanovaTaxonomy = z.infer<typeof TanovaTaxonomySchema>;

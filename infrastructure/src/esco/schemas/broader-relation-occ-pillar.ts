@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const OccPillarConceptTypeEnum = z.enum(['ISCOGroup', 'Occupation']);
+const OccPillarConceptTypeEnum = z.enum(['ISCOGroup', 'Occupation']);
 
 export const BroaderRelationOccPillarSchema = z.object({
   conceptType: OccPillarConceptTypeEnum,

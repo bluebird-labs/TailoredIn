@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const LinguistTypeEnum = z.enum(['programming', 'data', 'markup', 'prose']);
+const LinguistTypeEnum = z.enum(['programming', 'data', 'markup', 'prose']);
 
 export const LinguistLanguageSchema = z.object({
   type: LinguistTypeEnum,
