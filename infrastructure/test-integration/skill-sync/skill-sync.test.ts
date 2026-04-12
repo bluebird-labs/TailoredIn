@@ -83,8 +83,9 @@ describe('SkillSyncService', () => {
        VALUES
          ('http://esco/skill/adapt', 'KnowledgeSkillCompetence', 'skill/competence', 'adapt to change', 'embrace change|flexibility', 'Ability to adapt to changing circumstances', 'released', '1.2.1', ?, ?),
          ('http://esco/skill/programming', 'KnowledgeSkillCompetence', 'knowledge', 'programming concepts', 'coding principles', 'Understanding of programming fundamentals', 'released', '1.2.1', ?, ?),
-         ('http://esco/skill/javascript', 'KnowledgeSkillCompetence', 'knowledge', 'JavaScript', 'JS|ECMAScript', 'JavaScript programming language', 'released', '1.2.1', ?, ?)`,
-      [now, now, now, now, now, now],
+         ('http://esco/skill/javascript', 'KnowledgeSkillCompetence', 'knowledge', 'JavaScript', 'JS|ECMAScript', 'JavaScript programming language', 'released', '1.2.1', ?, ?),
+         ('http://esco/skill/php', 'KnowledgeSkillCompetence', 'knowledge', 'PHP', E'Hypertext Preprocessor\\nPersonal Home Page|php5', 'PHP programming language', 'released', '1.2.1', ?, ?)`,
+      [now, now, now, now, now, now, now, now],
       'run'
     );
 
@@ -94,7 +95,8 @@ describe('SkillSyncService', () => {
        VALUES
          ('http://esco/skill/adapt', 'transversal', 'KnowledgeSkillCompetence', 'adapt to change', 'released'),
          ('http://esco/skill/programming', 'digital', 'KnowledgeSkillCompetence', 'programming concepts', 'released'),
-         ('http://esco/skill/javascript', 'digital', 'KnowledgeSkillCompetence', 'JavaScript', 'released')`,
+         ('http://esco/skill/javascript', 'digital', 'KnowledgeSkillCompetence', 'JavaScript', 'released'),
+         ('http://esco/skill/php', 'digital', 'KnowledgeSkillCompetence', 'PHP', 'released')`,
       [],
       'run'
     );
@@ -259,6 +261,26 @@ describe('SkillSyncService', () => {
     expect(progConcepts).toBeDefined();
     expect(progConcepts.type).toBe('technology');
     expect(progConcepts.category_id).toBeNull();
+  }, 60_000);
+
+  it('splits ESCO alt_labels containing newlines', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const php = skills.find(s => s.normalized_label === 'php')!;
+    expect(php).toBeDefined();
+
+    const aliases = typeof php.aliases === 'string' ? JSON.parse(php.aliases) : php.aliases;
+    const aliasLabels = aliases.map((a: { label: string }) => a.label);
+    // "Hypertext Preprocessor\nPersonal Home Page|php5" should produce 3 separate aliases
+    expect(aliasLabels).toContain('Hypertext Preprocessor');
+    expect(aliasLabels).toContain('Personal Home Page');
+    expect(aliasLabels).toContain('php5');
+    // No alias should contain a newline
+    for (const label of aliasLabels) {
+      expect(label).not.toContain('\n');
+    }
   }, 60_000);
 
   it('unknown MIND source file results in null category', async () => {

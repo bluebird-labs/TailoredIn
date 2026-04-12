@@ -279,6 +279,7 @@ export class SkillSyncService {
         const altLabels = row.alt_labels
           ? row.alt_labels
               .split('|')
+              .flatMap(s => s.split('\n'))
               .map(s => s.trim())
               .filter(s => s.length > 0)
           : [];
