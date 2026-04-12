@@ -99,12 +99,17 @@ test.describe('Experiences Page', () => {
     await page.getByRole('option', { name: '2020' }).click();
 
     await dialog.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('TempCorp')).toBeVisible();
+    await expect(page.getByText('TempCorp').first()).toBeVisible();
+
+    // Navigate back to experiences list — saving may redirect to detail page
+    await page.goto('/profile');
+    await page.getByRole('tab', { name: 'Experiences' }).click();
+    await expect(page.getByText('TempCorp').first()).toBeVisible();
 
     // Hover over the card to reveal delete button (opacity-0 → opacity-100 on group-hover)
-    await page.getByText('TempCorp').hover();
+    await page.getByText('TempCorp').first().hover();
     // Click delete button within the card
-    const card = page.locator('.group').filter({ hasText: 'TempCorp' });
+    const card = page.locator('.group').filter({ hasText: 'TempCorp' }).first();
     await card.locator('button.text-destructive').click();
 
     // Confirm in AlertDialog
@@ -112,7 +117,7 @@ test.describe('Experiences Page', () => {
     await expect(alertDialog.getByText('Delete experience?')).toBeVisible();
     await alertDialog.getByRole('button', { name: 'Delete' }).click();
 
-    await expect(page.getByText('TempCorp')).not.toBeVisible();
+    await expect(page.getByText('TempCorp')).toHaveCount(0);
   });
 
   test('cancel delete keeps experience', async ({ page }) => {
