@@ -9,14 +9,14 @@ This module loads the Tanova JSON dataset, validates it against Zod schemas, and
 ## CLI Usage
 
 ```bash
-bun tanova:import <path-to-taxonomy.json>
+bun tanova:import <path-to-taxonomy.json-or-directory>
 ```
 
-The file must be the `taxonomy.json` from the Tanova skills-taxonomy repository. To obtain it:
+Accepts either the `taxonomy.json` file directly or a directory containing it. To obtain the data:
 
 ```bash
-git clone https://github.com/tanova-ai/skills-taxonomy /tmp/tanova
-bun tanova:import /tmp/tanova/taxonomy.json
+git clone https://github.com/tanova-ai/skills-taxonomy .local/tanova-skills-taxonomy
+bun tanova:import .local/tanova-skills-taxonomy
 ```
 
 ## Source Data Structure

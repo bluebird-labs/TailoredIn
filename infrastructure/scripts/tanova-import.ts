@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
-import { resolve } from 'node:path';
+import { statSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Logger } from '@tailoredin/core';
 import { getOrmConfig } from '../src/db/orm-config.js';
@@ -9,13 +10,14 @@ import { TanovaImporter } from '../src/tanova/TanovaImporter.js';
 const log = Logger.create('tanova-import');
 
 async function main(): Promise<void> {
-  const fileArg = process.argv[2];
-  if (!fileArg) {
-    log.error('Usage: bun tanova:import <path-to-taxonomy.json>');
+  const arg = process.argv[2];
+  if (!arg) {
+    log.error('Usage: bun tanova:import <path-to-taxonomy.json-or-directory>');
     process.exit(1);
   }
 
-  const filePath = resolve(fileArg);
+  const resolved = resolve(arg);
+  const filePath = statSync(resolved).isDirectory() ? join(resolved, 'taxonomy.json') : resolved;
   log.info(`Loading Tanova taxonomy from ${filePath}`);
 
   const start = performance.now();

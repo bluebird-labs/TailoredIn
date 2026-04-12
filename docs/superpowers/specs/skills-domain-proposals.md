@@ -4,11 +4,11 @@
 
 | # | Block | Plan | Status | Session | Notes |
 |---|---|---|---|---|---|
-| 1 | Domain Model | [Block 1](../plans/2026-04-12-skills-block1-domain-model.md) | `TODO` | — | Foundation: entities, enum, ports, normalizeLabel |
+| 1 | Domain Model | [Block 1](../plans/2026-04-12-skills-block1-domain-model.md) | `DONE` | 36e5c0d | Foundation: entities, enum, ports, normalizeLabel |
 | 2 | Domain Tables + Repos | [Block 2](../plans/2026-04-12-skills-block2-tables-repositories.md) | `TODO` | — | pg_trgm, GIN index, integration tests |
-| 3a | MIND Source Import | [Block 3a](../plans/2026-04-12-skills-block3a-mind-import.md) | `TODO` | — | 3,333 skills + concepts + relations |
-| 3b | Linguist Source Import | [Block 3b](../plans/2026-04-12-skills-block3b-linguist-import.md) | `TODO` | — | 500+ programming languages |
-| 3c | Tanova Source Import | [Block 3c](../plans/2026-04-12-skills-block3c-tanova-import.md) | `TODO` | — | ~100 skills with relationships |
+| 3a | MIND Source Import | [Block 3a](../plans/2026-04-12-skills-block3a-mind-import.md) | `DONE` | 9b05ee8 | 3,333 skills + concepts + relations |
+| 3b | Linguist Source Import | [Block 3b](../plans/2026-04-12-skills-block3b-linguist-import.md) | `DONE` | be2638b | 500+ programming languages |
+| 3c | Tanova Source Import | [Block 3c](../plans/2026-04-12-skills-block3c-tanova-import.md) | `DONE` | cefc658 | ~100 skills with relationships |
 | 4 | Skills Sync Pipeline | [Block 4](../plans/2026-04-12-skills-block4-sync-pipeline.md) | `TODO` | — | Cross-source dedup + merge |
 | 5 | Application Layer | [Block 5](../plans/2026-04-12-skills-block5-application-layer.md) | `TODO` | — | Use cases + DTOs |
 | 6 | API Layer | [Block 6](../plans/2026-04-12-skills-block6-api-layer.md) | `TODO` | — | Routes + DI wiring |

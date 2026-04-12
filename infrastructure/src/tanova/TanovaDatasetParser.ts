@@ -9,7 +9,7 @@ export class TanovaDatasetParser {
     const taxonomy = TanovaTaxonomySchema.parse(raw);
 
     const skills: TanovaSkill[] = [];
-    for (const [_category, subcategories] of Object.entries(taxonomy.categories)) {
+    for (const [_category, { subcategories }] of Object.entries(taxonomy.categories)) {
       for (const [_subcategory, { skills: subcategorySkills }] of Object.entries(subcategories)) {
         skills.push(...subcategorySkills);
       }

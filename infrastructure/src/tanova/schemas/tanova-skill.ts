@@ -36,13 +36,19 @@ export const TanovaSkillSchema = z.object({
 export type TanovaSkill = z.infer<typeof TanovaSkillSchema>;
 
 const SubcategorySchema = z.object({
+  name: z.string(),
   skills: z.array(TanovaSkillSchema)
+});
+
+const CategorySchema = z.object({
+  name: z.string(),
+  subcategories: z.record(z.string(), SubcategorySchema)
 });
 
 export const TanovaTaxonomySchema = z.object({
   version: z.string(),
   last_updated: z.string(),
-  categories: z.record(z.string(), z.record(z.string(), SubcategorySchema))
+  categories: z.record(z.string(), CategorySchema)
 });
 
 export type TanovaTaxonomy = z.infer<typeof TanovaTaxonomySchema>;
