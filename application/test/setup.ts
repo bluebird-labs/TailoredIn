@@ -1,7 +1,6 @@
 import { defineConfig, MikroORM } from '@mikro-orm/sqlite';
 import {
   Accomplishment,
-  Application,
   Company,
   Education,
   Experience,

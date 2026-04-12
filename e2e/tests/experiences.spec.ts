@@ -117,6 +117,11 @@ test.describe('Experiences Page', () => {
     await expect(alertDialog.getByText('Delete experience?')).toBeVisible();
     await alertDialog.getByRole('button', { name: 'Delete' }).click();
 
+    // After AlertDialog closes, focus returns to trigger inside the Link card,
+    // which can cause navigation to the detail page. Navigate back to the list
+    // and verify the experience was deleted.
+    await page.goto('/profile');
+    await page.getByRole('tab', { name: 'Experiences' }).click();
     await expect(page.getByText('TempCorp')).toHaveCount(0);
   });
 
