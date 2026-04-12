@@ -1,0 +1,24 @@
+[
+  {
+    "name": "React",
+    "type": ["Framework"],
+    "synonyms": ["ReactJS", "React.js"],
+    "technicalDomains": ["frontend"],
+    "impliesKnowingSkills": ["JavaScript"],
+    "impliesKnowingConcepts": ["Component-based architecture"],
+    "conceptualAspects": ["virtual DOM", "JSX"],
+    "supportedProgrammingLanguages": ["JavaScript", "TypeScript"],
+    "architecturalPatterns": ["SPA"]
+  },
+  {
+    "name": "Vue",
+    "type": ["Framework"],
+    "synonyms": ["Vue.js", "VueJS"],
+    "technicalDomains": ["frontend"],
+    "impliesKnowingSkills": ["JavaScript"],
+    "impliesKnowingConcepts": ["Component-based architecture"],
+    "conceptualAspects": ["reactivity", "template syntax"],
+    "supportedProgrammingLanguages": ["JavaScript", "TypeScript"],
+    "architecturalPatterns": ["SPA"]
+  }
+]

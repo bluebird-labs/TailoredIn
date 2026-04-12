@@ -1,0 +1,35 @@
+[
+  {
+    "name": "JavaScript",
+    "type": ["ProgrammingLanguage"],
+    "synonyms": ["JS", "ECMAScript"],
+    "technicalDomains": ["frontend", "backend"],
+    "impliesKnowingSkills": [],
+    "impliesKnowingConcepts": ["Event-driven programming"],
+    "conceptualAspects": ["dynamic typing", "prototypal inheritance"],
+    "buildTools": ["npm", "webpack"],
+    "runtimeEnvironments": ["Node.js", "Deno", "Bun"]
+  },
+  {
+    "name": "Python",
+    "type": ["ProgrammingLanguage"],
+    "synonyms": ["py"],
+    "technicalDomains": ["backend", "data science", "AI/ML"],
+    "impliesKnowingSkills": [],
+    "impliesKnowingConcepts": [],
+    "conceptualAspects": ["dynamic typing", "duck typing"],
+    "buildTools": ["pip", "poetry"],
+    "runtimeEnvironments": ["CPython", "PyPy"]
+  },
+  {
+    "name": "Go",
+    "type": ["ProgrammingLanguage"],
+    "synonyms": ["Golang"],
+    "technicalDomains": ["backend", "DevOps"],
+    "impliesKnowingSkills": [],
+    "impliesKnowingConcepts": [],
+    "conceptualAspects": ["static typing", "goroutines"],
+    "buildTools": ["go build"],
+    "runtimeEnvironments": []
+  }
+]

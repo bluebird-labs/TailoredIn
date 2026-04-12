@@ -34,6 +34,7 @@ import {
   EscoSkillSkillRelationEntity,
   EscoSkillsHierarchyEntity
 } from '../esco/entities/index.js';
+import { MindConceptEntity, MindRelationEntity, MindSkillEntity } from '../mind/entities/index.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -78,7 +79,11 @@ export function createOrmConfig(db: OrmDbConfig) {
       EscoSkillsHierarchyEntity,
       EscoSkillCollectionEntity,
       EscoOccupationCollectionEntity,
-      EscoGreenShareOccupationEntity
+      EscoGreenShareOccupationEntity,
+      // MIND reference data
+      MindSkillEntity,
+      MindConceptEntity,
+      MindRelationEntity
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
