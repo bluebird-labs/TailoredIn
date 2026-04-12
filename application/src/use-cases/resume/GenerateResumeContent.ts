@@ -36,8 +36,7 @@ function parseScopedInstructions(prompt: string): ScopedInstructions {
     const parsed = JSON.parse(prompt);
     return typeof parsed === 'object' && parsed !== null ? parsed : {};
   } catch {
-    // Legacy format — treat as resume-level instructions
-    return { resume: prompt };
+    return {};
   }
 }
 
@@ -69,7 +68,7 @@ export class GenerateResumeContent {
     const previousInstructions = parseScopedInstructions(existing?.prompt ?? '');
     const scopeKey = buildScopeKey(input.scope);
     const scopedInstructions = { ...previousInstructions };
-    const instructionsToStore = input.customInstructions ?? input.additionalPrompt;
+    const instructionsToStore = input.customInstructions;
     if (instructionsToStore) {
       scopedInstructions[scopeKey] = instructionsToStore;
     } else {

@@ -14,7 +14,7 @@ function parseScopedInstructions(prompt: string): Record<string, string> {
     const parsed = JSON.parse(prompt);
     return typeof parsed === 'object' && parsed !== null ? parsed : {};
   } catch {
-    return { resume: prompt };
+    return {};
   }
 }
 

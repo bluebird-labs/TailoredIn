@@ -279,7 +279,12 @@ export function GenerationWorkspace({
   function handleRegenerateHeadline(prompt: string) {
     setRegeneratingId('headline');
     generate.mutate(
-      { additionalPrompt: prompt || undefined, scope: { type: 'headline' }, bulletOverrides: buildBulletOverrides() },
+      {
+        additionalPrompt: prompt || undefined,
+        customInstructions: prompt || undefined,
+        scope: { type: 'headline' },
+        bulletOverrides: buildBulletOverrides()
+      },
       {
         onSuccess: () => {
           setRegeneratingId(null);
@@ -298,6 +303,7 @@ export function GenerationWorkspace({
     generate.mutate(
       {
         additionalPrompt: prompt || undefined,
+        customInstructions: prompt || undefined,
         scope: { type: 'experience', experienceId },
         bulletOverrides: buildBulletOverrides()
       },
