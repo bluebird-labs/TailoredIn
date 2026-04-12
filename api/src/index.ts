@@ -28,6 +28,7 @@ import { DeleteExperienceRoute } from './routes/experience/DeleteExperienceRoute
 import { GetExperienceRoute } from './routes/experience/GetExperienceRoute.js';
 import { LinkCompanyRoute } from './routes/experience/LinkCompanyRoute.js';
 import { ListExperiencesRoute } from './routes/experience/ListExperiencesRoute.js';
+import { SyncExperienceSkillsRoute } from './routes/experience/SyncExperienceSkillsRoute.js';
 import { UnlinkCompanyRoute } from './routes/experience/UnlinkCompanyRoute.js';
 import { UpdateAccomplishmentRoute } from './routes/experience/UpdateAccomplishmentRoute.js';
 import { UpdateExperienceRoute } from './routes/experience/UpdateExperienceRoute.js';
@@ -48,6 +49,8 @@ import { GenerateResumePdfRoute } from './routes/resume/GenerateResumePdfRoute.j
 import { GetCachedResumePdfRoute } from './routes/resume/GetCachedResumePdfRoute.js';
 import { ScoreResumeRoute } from './routes/resume/ScoreResumeRoute.js';
 import { UpdateResumeDisplaySettingsRoute } from './routes/resume/UpdateResumeDisplaySettingsRoute.js';
+import { ListSkillCategoriesRoute } from './routes/skill/ListSkillCategoriesRoute.js';
+import { SearchSkillsRoute } from './routes/skill/SearchSkillsRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
 // --- App ---
@@ -132,6 +135,10 @@ const app = new Elysia()
   .use(container.get(DeleteAccomplishmentRoute).plugin())
   .use(container.get(LinkCompanyRoute).plugin())
   .use(container.get(UnlinkCompanyRoute).plugin())
+  .use(container.get(SyncExperienceSkillsRoute).plugin())
+  // Skills
+  .use(container.get(SearchSkillsRoute).plugin())
+  .use(container.get(ListSkillCategoriesRoute).plugin())
   // Generation Settings
   .use(container.get(GetGenerationSettingsRoute).plugin())
   .use(container.get(UpdateGenerationSettingsRoute).plugin())

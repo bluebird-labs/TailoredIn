@@ -32,10 +32,13 @@ import {
   ListEducation,
   ListExperiences,
   ListJobDescriptions,
+  ListSkillCategories,
   ParseJobDescription,
   PromptRegistry,
   ScoreJobFit,
   ScoreResume,
+  SearchSkills,
+  SyncExperienceSkills,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -81,6 +84,8 @@ import {
   PostgresJobFitScoreRepository,
   PostgresProfileRepository,
   PostgresResumeContentRepository,
+  PostgresSkillCategoryRepository,
+  PostgresSkillRepository,
   ProfileSection,
   RulesSection,
   SettingsSection,
@@ -179,6 +184,27 @@ container.bind({
 container.bind({
   provide: DI.Experience.UnlinkCompany,
   useFactory: () => new UnlinkCompanyFromExperience(container.get(DI.Experience.Repository))
+});
+
+// Skill
+container.bind({ provide: DI.Skill.Repository, useClass: PostgresSkillRepository });
+container.bind({ provide: DI.Skill.CategoryRepository, useClass: PostgresSkillCategoryRepository });
+container.bind({
+  provide: DI.Skill.Search,
+  useFactory: () => new SearchSkills(container.get(DI.Skill.Repository), container.get(DI.Skill.CategoryRepository))
+});
+container.bind({
+  provide: DI.Skill.ListCategories,
+  useFactory: () => new ListSkillCategories(container.get(DI.Skill.CategoryRepository))
+});
+container.bind({
+  provide: DI.Skill.SyncExperienceSkills,
+  useFactory: () =>
+    new SyncExperienceSkills(
+      container.get(DI.Experience.Repository),
+      container.get(DI.Skill.Repository),
+      container.get(DI.Company.Repository)
+    )
 });
 
 // LLM
