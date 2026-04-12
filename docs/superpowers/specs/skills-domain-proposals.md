@@ -331,7 +331,6 @@ erDiagram
         uuid id PK
         string label
         string normalizedLabel "unique, dedup key"
-        int ordinal
         timestamp createdAt
         timestamp updatedAt
     }
@@ -385,42 +384,59 @@ enum SkillType {
 
 ### Label Normalization
 
-**`normalizedLabel`** is the dedup key — a deterministic transformation of the display label. Applied to both Skill and SkillCategory.
+**`normalizedLabel`** is the dedup key — a URL-safe, hyphen-separated slug derived from the display label. Applied to both Skill and SkillCategory.
 
 **Rules (applied in order):**
 
 1. `trim()` — remove leading/trailing whitespace.
-2. `toLowerCase()` — case-insensitive matching.
-3. Remove whitespace: spaces, tabs → stripped. `"Node JS"` → `"nodejs"`.
-4. Remove hyphens/dashes: `-` → stripped. `"scikit-learn"` → `"scikitlearn"`.
-5. Remove underscores: `_` → stripped.
-6. **Preserve** all other characters: `+`, `#`, `.`, `/`, `@`, `&`, etc.
+2. **C-family pre-normalization** — exact (case-sensitive) match against a known map (see below). If matched, return the mapped value immediately.
+3. `toLowerCase()` — case-insensitive matching.
+4. Replace any run of non-alphanumeric characters with a single hyphen.
+5. Trim leading/trailing hyphens.
+
+**C-family pre-normalization map:**
+
+The naive rule would collapse C, C++, C#, and F# into ambiguous slugs (`c`, `c`, `c`, `f`). A pre-normalization map runs before the general rule on exact trimmed matches:
+
+| Input | Output | Reason |
+|---|---|---|
+| `C` | `c-lang` | Avoids collision with `c` prefix of C++ etc. |
+| `C++` | `cpp` | Community-standard abbreviation |
+| `C#` | `csharp` | Community-standard abbreviation |
+| `F#` | `fsharp` | Mirrors C# convention |
+| `Objective-C` | `objective-c` | Preserves the common name |
+| `Objective-C++` | `objective-cpp` | Mirrors C++ convention |
+
+The map is case-sensitive. `"c++"` (lowercase) would fall through to the general rule (producing `"c"`), but in practice labels always use the canonical casing from source data.
 
 **Examples:**
 
 | label (display) | normalizedLabel | rationale |
 |---|---|---|
+| TypeScript | `typescript` | case fold |
 | JavaScript | `javascript` | case fold |
-| Javascript | `javascript` | matches JavaScript → dedup |
-| Node.js | `node.js` | dot preserved |
-| Node JS | `nodejs` | space stripped |
-| scikit-learn | `scikitlearn` | dash stripped |
-| C++ | `c++` | plus preserved |
-| C# | `c#` | hash preserved |
-| ASP.NET | `asp.net` | dot preserved, case fold |
-| .NET | `.net` | leading dot preserved |
-| Vue.js | `vue.js` | dot preserved |
-| VueJS | `vuejs` | different from vue.js — linked via alias |
-| Ruby on Rails | `rubyonrails` | spaces stripped |
-| Machine Learning | `machinelearning` | spaces stripped |
-| CI/CD | `ci/cd` | slash preserved |
-| T-SQL | `tsql` | dash stripped |
+| Cloud & Infrastructure | `cloud-infrastructure` | `&` and spaces → single hyphen |
+| DevOps & CI/CD | `devops-ci-cd` | non-alphanum runs → hyphen |
+| AI & Machine Learning | `ai-machine-learning` | non-alphanum runs → hyphen |
+| Programming Languages | `programming-languages` | spaces → hyphen |
+| Node.js | `node-js` | dot → hyphen |
+| scikit-learn | `scikit-learn` | hyphen preserved between alphanum |
+| ASP.NET | `asp-net` | dot → hyphen |
+| .NET | `net` | leading hyphen trimmed |
+| Vue.js | `vue-js` | dot → hyphen |
+| VueJS | `vuejs` | no separator between alphanum |
+| Ruby on Rails | `ruby-on-rails` | spaces → hyphens |
+| Machine Learning | `machine-learning` | space → hyphen |
+| T-SQL | `t-sql` | hyphen preserved |
 | gRPC | `grpc` | case fold |
-| Team Building | `teambuilding` | spaces stripped |
+| Team Building | `team-building` | space → hyphen |
+| C++ | `cpp` | pre-normalization map |
+| C# | `csharp` | pre-normalization map |
+| C | `c-lang` | pre-normalization map |
 
 **Edge cases handled by aliases, not normalization:**
-- `"Vue.js"` (`vue.js`) vs `"VueJS"` (`vuejs`) — different normalized forms, linked as aliases of the same Skill.
-- `"Node.js"` (`node.js`) vs `"NodeJS"` (`nodejs`) — same approach, aliases.
+- `"Vue.js"` (`vue-js`) vs `"VueJS"` (`vuejs`) — different normalized forms, linked as aliases of the same Skill.
+- `"Node.js"` (`node-js`) vs `"NodeJS"` (`nodejs`) — same approach, aliases.
 - `"Go"` (`go`) vs `"Golang"` (`golang`) — different words entirely, aliases.
 
 ### Typeahead Search (Trigram GIN Index)
@@ -485,22 +501,26 @@ LIMIT 20;
 - **Skill and SkillCategory are reference data** — not user-created. Populated by infrastructure sync scripts.
 - **ExperienceSkill is a child of Experience** — managed via `addSkill()` / `removeSkill()` / `syncSkills()` on the Experience aggregate, exactly like Accomplishment.
 - **Cross-aggregate FK**: ExperienceSkill holds a plain `skillId: string` referencing the Skill catalog (same pattern as `Experience.companyId`).
-- **SkillCategory.ordinal** controls display ordering in grouped UIs.
+- **SkillCategory has no ordinal** — display order is handled by a hardcoded array in the frontend, not by the database.
 - **Skill.categoryId is nullable** — uncategorized skills are valid during initial sync.
 
-### Example categories (for engineering audience)
+### Categories (for engineering audience)
 
-| Category | ordinal | Example skills |
+Display order is handled by a hardcoded array in the frontend, not by the database. No `ordinal` column.
+
+| Category | normalizedLabel | Example skills |
 |---|---|---|
-| Programming Languages | 1 | TypeScript, Python, Go, Rust, Java, C++, SQL |
-| Frontend | 2 | React, Vue, Angular, Next.js, Tailwind CSS, HTML, CSS |
-| Backend | 3 | Node.js, Spring Boot, Django, FastAPI, Express, GraphQL |
-| Databases | 4 | PostgreSQL, MongoDB, Redis, Elasticsearch, DynamoDB |
-| Cloud & Infrastructure | 5 | AWS, GCP, Azure, Docker, Kubernetes, Terraform |
-| DevOps & CI/CD | 6 | GitHub Actions, Jenkins, ArgoCD, Datadog, Grafana |
-| AI & Machine Learning | 7 | PyTorch, TensorFlow, LangChain, scikit-learn, Hugging Face |
-| Architecture & Methodology | 8 | Microservices, Event-driven, DDD, Agile, TDD, CI/CD |
-| Leadership & Communication | 9 | Team building, Mentoring, Stakeholder management, Technical writing |
+| Programming Languages | `programming-languages` | TypeScript, Python, Go, Rust, Java, C++, SQL |
+| Frontend | `frontend` | React, Vue, Angular, Next.js, Tailwind CSS, HTML, CSS |
+| Backend | `backend` | Node.js, Spring Boot, Django, FastAPI, Express, GraphQL |
+| Mobile | `mobile` | React Native, Flutter, Swift, Kotlin, Expo |
+| Databases | `databases` | PostgreSQL, MongoDB, Redis, Elasticsearch, DynamoDB |
+| Cloud & Infrastructure | `cloud-infrastructure` | AWS, GCP, Azure, Docker, Kubernetes, Terraform |
+| DevOps & CI/CD | `devops-ci-cd` | GitHub Actions, Jenkins, ArgoCD, Datadog, Grafana |
+| Testing & Quality | `testing-quality` | Jest, Playwright, Cypress, SonarQube, k6 |
+| AI & Machine Learning | `ai-machine-learning` | PyTorch, TensorFlow, LangChain, scikit-learn, Hugging Face |
+| Architecture & Methodology | `architecture-methodology` | Microservices, Event-driven, DDD, Agile, TDD, CI/CD |
+| Leadership & Communication | `leadership-communication` | Team building, Mentoring, Stakeholder management, Technical writing |
 
 ### Future extensions (not in scope)
 
@@ -542,12 +562,12 @@ Block 2: Domain Tables Migration + Repositories
 - `domain/src/value-objects/SkillType.ts` — enum: `LANGUAGE`, `TECHNOLOGY`, `METHODOLOGY`, `INTERPERSONAL`
 - `domain/src/value-objects/SkillAlias.ts` — value object: `{ label: string; normalizedLabel: string }`
 - `domain/src/entities/Skill.ts` — AggregateRoot: `id`, `label`, `normalizedLabel`, `type`, `categoryId`, `description`, `aliases`, `createdAt`, `updatedAt`. Factory: `static create()`. Validation: label 1-500 chars, normalizedLabel derived. MikroORM decorators.
-- `domain/src/entities/SkillCategory.ts` — AggregateRoot: `id`, `label`, `normalizedLabel`, `ordinal`, `createdAt`, `updatedAt`. Factory: `static create()`.
+- `domain/src/entities/SkillCategory.ts` — AggregateRoot: `id`, `label`, `normalizedLabel`, `createdAt`, `updatedAt`. Factory: `static create()`. No ordinal — display order is frontend-controlled.
 - `domain/src/entities/ExperienceSkill.ts` — Entity (child of Experience): `id`, `experienceId`, `skillId`, `createdAt`. Factory: `static create()`.
 - `domain/src/ports/SkillRepository.ts` — interface: `findByIds(ids: string[])`, `search(query: string, limit: number)`, `findAll()`, `findByNormalizedLabel(normalizedLabel: string)`
 - `domain/src/ports/SkillCategoryRepository.ts` — interface: `findAll()`, `findByIdOrFail(id: string)`
 - Update `Experience` entity: add `@OneToMany` to ExperienceSkill collection + `addSkill()`, `removeSkill()`, `syncSkills()` methods.
-- `normalizeLabel()` utility in `core/` — shared normalization function (trim, lowercase, strip spaces/dashes/underscores, preserve `+#./@&`).
+- `normalizeLabel()` utility in `core/` — slug-style normalization (trim, C-family pre-normalization map, lowercase, replace non-alphanumeric runs with hyphen, trim hyphens).
 - Update `domain/DOMAIN.mmd` — add Skill, SkillCategory, ExperienceSkill, SkillAlias, SkillType.
 - Unit tests for Skill, SkillCategory, ExperienceSkill, normalizeLabel.
 
@@ -560,7 +580,7 @@ Block 2: Domain Tables Migration + Repositories
 **Goal:** Create database tables for the domain model and implement repositories.
 
 **Deliverables:**
-- Migration: `CREATE TABLE skill_categories` (id, label, normalized_label unique, ordinal, created_at, updated_at).
+- Migration: `CREATE TABLE skill_categories` (id, label, normalized_label unique, created_at, updated_at). No ordinal column.
 - Migration: `CREATE TABLE skills` (id, label, normalized_label unique, type, category_id FK nullable, description, aliases jsonb, search_text generated stored, created_at, updated_at). Enable `pg_trgm`, create GIN index on `search_text`.
 - Migration: `CREATE TABLE experience_skills` (id, experience_id FK, skill_id FK, created_at). Unique constraint on `(experience_id, skill_id)`.
 - `infrastructure/src/skill/PostgresSkillRepository.ts` — implements `SkillRepository`. `search()` uses trigram `%` operator + `ILIKE` prefix with `similarity()` ranking.
@@ -651,10 +671,10 @@ Block 2: Domain Tables Migration + Repositories
 
 **Deliverables:**
 - `application/src/dtos/SkillDto.ts` — `{ id, label, type, categoryId, category: SkillCategoryDto | null, description }`.
-- `application/src/dtos/SkillCategoryDto.ts` — `{ id, label, ordinal }`.
+- `application/src/dtos/SkillCategoryDto.ts` — `{ id, label }`.
 - `application/src/dtos/ExperienceSkillDto.ts` — `{ id, skillId, skill: SkillDto }`.
 - `application/src/use-cases/skill/SearchSkills.ts` — search the catalog (typeahead). Input: `{ query: string, limit?: number }`. Returns `SkillDto[]`.
-- `application/src/use-cases/skill/ListSkillCategories.ts` — list all categories ordered by ordinal.
+- `application/src/use-cases/skill/ListSkillCategories.ts` — list all categories ordered by label.
 - `application/src/use-cases/experience/SyncExperienceSkills.ts` — add/remove skills on an experience. Input: `{ experienceId: string, skillIds: string[] }`. Calls `experience.syncSkills()`.
 - Update `ExperienceDto` to include `skills: ExperienceSkillDto[]`.
 - Update `toExperienceDto()` mapper to include skills.

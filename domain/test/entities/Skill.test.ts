@@ -28,13 +28,13 @@ describe('Skill', () => {
       description: null,
       aliases: []
     });
-    expect(skill.normalizedLabel).toBe('node.js');
+    expect(skill.normalizedLabel).toBe('node-js');
   });
 
   test('creates with aliases', () => {
     const aliases = [
       { label: 'Golang', normalizedLabel: 'golang' },
-      { label: 'Go language', normalizedLabel: 'golanguage' }
+      { label: 'Go language', normalizedLabel: 'go-language' }
     ];
     const skill = Skill.create({
       label: 'Go',

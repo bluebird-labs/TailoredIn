@@ -7,6 +7,6 @@ export class ListSkillCategories {
 
   public async execute(): Promise<SkillCategoryDto[]> {
     const categories = await this.skillCategoryRepository.findAll();
-    return categories.sort((a, b) => a.ordinal - b.ordinal).map(toSkillCategoryDto);
+    return categories.map(toSkillCategoryDto);
   }
 }

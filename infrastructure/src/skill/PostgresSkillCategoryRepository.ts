@@ -7,7 +7,7 @@ export class PostgresSkillCategoryRepository implements SkillCategoryRepository 
   public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
 
   public async findAll(): Promise<SkillCategory[]> {
-    return this.orm.em.find(SkillCategory, {}, { orderBy: { ordinal: 'ASC' } });
+    return this.orm.em.find(SkillCategory, {}, { orderBy: { label: 'ASC' } });
   }
 
   public async findByIdOrFail(id: string): Promise<SkillCategory> {

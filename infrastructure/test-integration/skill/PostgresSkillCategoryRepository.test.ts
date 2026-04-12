@@ -23,10 +23,10 @@ describe('PostgresSkillCategoryRepository', () => {
   });
 
   describe('findAll', () => {
-    it('returns categories ordered by ordinal', async () => {
-      const cloud = SkillCategory.create({ label: 'Cloud Platforms', ordinal: 2 });
-      const languages = SkillCategory.create({ label: 'Programming Languages', ordinal: 0 });
-      const leadership = SkillCategory.create({ label: 'Leadership', ordinal: 1 });
+    it('returns categories ordered by label', async () => {
+      const cloud = SkillCategory.create({ label: 'Cloud Platforms' });
+      const languages = SkillCategory.create({ label: 'Programming Languages' });
+      const leadership = SkillCategory.create({ label: 'Leadership' });
 
       orm.em.persist(cloud);
       orm.em.persist(languages);
@@ -35,7 +35,7 @@ describe('PostgresSkillCategoryRepository', () => {
       orm.em.clear();
 
       const result = await repo.findAll();
-      expect(result.map(c => c.label)).toEqual(['Programming Languages', 'Leadership', 'Cloud Platforms']);
+      expect(result.map(c => c.label)).toEqual(['Cloud Platforms', 'Leadership', 'Programming Languages']);
     });
 
     it('returns empty array when no categories exist', async () => {
@@ -46,14 +46,13 @@ describe('PostgresSkillCategoryRepository', () => {
 
   describe('findByIdOrFail', () => {
     it('returns category by id', async () => {
-      const category = SkillCategory.create({ label: 'Frameworks', ordinal: 0 });
+      const category = SkillCategory.create({ label: 'Frameworks' });
       orm.em.persist(category);
       await orm.em.flush();
       orm.em.clear();
 
       const result = await repo.findByIdOrFail(category.id);
       expect(result.label).toBe('Frameworks');
-      expect(result.ordinal).toBe(0);
     });
 
     it('throws EntityNotFoundError for non-existent id', async () => {
