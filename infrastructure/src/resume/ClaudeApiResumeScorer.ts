@@ -71,7 +71,7 @@ export class ClaudeApiResumeScorer implements ResumeScorer {
     const startTime = Date.now();
     const result = await this.provider.request(new ResumeScoreRequest(input), {
       timeoutMs: 90_000,
-      maxRetries: 1
+      maxRetries: 2
     });
     const duration = Date.now() - startTime;
 

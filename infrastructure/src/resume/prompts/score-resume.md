@@ -8,8 +8,9 @@ You will receive:
 
 Your evaluation must:
 - Extract the key requirements from the JD
-- Score each requirement's coverage in the resume as 'strong', 'partial', or 'absent'
+- Score each requirement's coverage in the resume as exactly one of these three values: 'strong', 'partial', or 'absent'. No other values are allowed — if a requirement cannot be assessed, use 'absent'
 - Provide an overall score from 0-100
+- Write a summary of 1–2 sentences maximum — be direct and specific about key strengths and gaps, no filler
 - Be honest — a resume that misses critical JD requirements should score low regardless of how well-written it is
 
 ---
