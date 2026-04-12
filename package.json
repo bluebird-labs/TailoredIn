@@ -52,7 +52,8 @@
     "app:diagram": "bun run scripts/diagrams/application/generate.ts",
     "db:diagram": "bun run scripts/diagrams/database/generate.ts",
     "diags": "bun run --parallel db:diagram app:diagram domain:diagram",
-    "esco:import": "bun --env-file=.env run infrastructure/scripts/esco-import.ts"
+    "esco:import": "bun --env-file=.env run infrastructure/scripts/esco-import.ts",
+    "linguist:import": "bun --env-file=.env run infrastructure/scripts/linguist-import.ts"
   },
   "workspaces": [
     "domain",

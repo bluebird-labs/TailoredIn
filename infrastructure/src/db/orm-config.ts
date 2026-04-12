@@ -34,6 +34,7 @@ import {
   EscoSkillSkillRelationEntity,
   EscoSkillsHierarchyEntity
 } from '../esco/entities/index.js';
+import { LinguistLanguageEntity } from '../linguist/entities/index.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -78,7 +79,9 @@ export function createOrmConfig(db: OrmDbConfig) {
       EscoSkillsHierarchyEntity,
       EscoSkillCollectionEntity,
       EscoOccupationCollectionEntity,
-      EscoGreenShareOccupationEntity
+      EscoGreenShareOccupationEntity,
+      // Linguist reference data
+      LinguistLanguageEntity
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 
