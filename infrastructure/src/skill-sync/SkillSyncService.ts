@@ -58,6 +58,19 @@ const SOURCE_TO_CATEGORY: Record<string, string> = {
   machine_learning: 'ai-machine-learning',
   ai_tools: 'ai-machine-learning',
   data_science: 'ai-machine-learning',
+  libraries_csharp: 'backend',
+  libraries_java: 'backend',
+  // biome-ignore lint/style/useNamingConvention: exact MIND source_file keys
+  libraries_frontend_UI: 'frontend',
+  // biome-ignore lint/style/useNamingConvention: exact MIND source_file keys
+  libraries_mobile_UI: 'mobile',
+  webservers: 'backend',
+  libraries_javascript: 'frontend',
+  libraries_kotlin: 'mobile',
+  services: 'cloud-infrastructure',
+  libraries_python: 'backend',
+  tools: 'devops-ci-cd',
+  'libraries_-various': 'backend',
   architectural_patterns: 'architecture-methodology',
   design_patterns: 'architecture-methodology',
   // Tanova subcategories
