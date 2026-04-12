@@ -11,13 +11,16 @@ import {
   Company,
   Education,
   Experience,
+  ExperienceSkill,
   GenerationPrompt,
   GenerationSettings,
   JobDescription,
   JobFitRequirement,
   JobFitScore,
   Profile,
-  ResumeContent
+  ResumeContent,
+  Skill,
+  SkillCategory
 } from '@tailoredin/domain';
 import { StatusCode } from '@tselect/status-code';
 import {
@@ -71,6 +74,9 @@ export function createOrmConfig(db: OrmDbConfig) {
       ResumeContent,
       GenerationSettings,
       GenerationPrompt,
+      Skill,
+      SkillCategory,
+      ExperienceSkill,
       // ESCO reference data
       EscoSkillEntity,
       EscoOccupationEntity,

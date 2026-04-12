@@ -63,7 +63,9 @@ import type {
   JobDescriptionRepository,
   JobFitScoreRepository,
   ProfileRepository,
-  ResumeContentRepository
+  ResumeContentRepository,
+  SkillCategoryRepository,
+  SkillRepository
 } from '@tailoredin/domain';
 import type { ClaudeApiProvider } from './llm/ClaudeApiProvider.js';
 
@@ -147,6 +149,11 @@ export const DI = {
     UpdateDisplaySettings: new InjectionToken<UpdateResumeDisplaySettings>('DI.Resume.UpdateDisplaySettings'),
     Scorer: new InjectionToken<ResumeScorer>('DI.Resume.Scorer'),
     Score: new InjectionToken<ScoreResume>('DI.Resume.Score')
+  },
+
+  Skill: {
+    Repository: new InjectionToken<SkillRepository>('DI.Skill.Repository'),
+    CategoryRepository: new InjectionToken<SkillCategoryRepository>('DI.Skill.CategoryRepository')
   },
 
   Company: {
