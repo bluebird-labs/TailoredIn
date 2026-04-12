@@ -11,7 +11,7 @@
 | 3c | Tanova Source Import | [Block 3c](../plans/2026-04-12-skills-block3c-tanova-import.md) | `DONE` | cefc658 | ~100 skills with relationships |
 | 4 | Skills Sync Pipeline | [Block 4](../plans/2026-04-12-skills-block4-sync-pipeline.md) | `TODO` | — | Cross-source dedup + merge. Prereqs done (bd6b166): slug normalizeLabel, drop ordinal, 11 categories |
 | 5 | Application Layer | [Block 5](../plans/2026-04-12-skills-block5-application-layer.md) | `DONE` | 6588c39 | Use cases + DTOs |
-| 6 | API Layer | [Block 6](../plans/2026-04-12-skills-block6-api-layer.md) | `TODO` | — | Routes + DI wiring |
+| 6 | API Layer | [Block 6](../plans/2026-04-12-skills-block6-api-layer.md) | `DONE` | 42ef554 | 3 routes + DI wiring. Fixed missing repo barrel exports (89e6ce6) |
 | 7 | Web Layer | [Block 7](../plans/2026-04-12-skills-block7-web-layer.md) | `TODO` | — | Skill picker UI |
 
 ### Execution order
