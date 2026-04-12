@@ -4,6 +4,19 @@ import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { Company } from './use-companies';
 
+export type ExperienceSkill = {
+  id: string;
+  skillId: string;
+  skill: {
+    id: string;
+    label: string;
+    type: string;
+    categoryId: string | null;
+    category: { id: string; label: string } | null;
+    description: string | null;
+  };
+};
+
 export type Experience = {
   id: string;
   title: string;
@@ -20,6 +33,7 @@ export type Experience = {
   bulletMin: number;
   bulletMax: number;
   accomplishments: AccomplishmentDto[];
+  skills: ExperienceSkill[];
 };
 
 export type AccomplishmentDto = {
