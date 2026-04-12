@@ -20,6 +20,14 @@ function formatSalary(jd: JobDescription): string | null {
   return null;
 }
 
+function fitScoreBadgeClass(score: number): string {
+  if (score >= 70)
+    return 'border-emerald-300 bg-emerald-100 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400';
+  if (score >= 40)
+    return 'border-amber-300 bg-amber-100 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-400';
+  return 'border-red-300 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-400';
+}
+
 export function JobDescriptionCard({ jobDescription, showCompany }: JobDescriptionCardProps) {
   const levelLabel = formatEnumLabel('level', jobDescription.level);
   const locationTypeLabel = formatEnumLabel('locationType', jobDescription.locationType);
@@ -51,6 +59,11 @@ export function JobDescriptionCard({ jobDescription, showCompany }: JobDescripti
           </div>
         )}
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          {jobDescription.fitScore && (
+            <Badge variant="outline" className={fitScoreBadgeClass(jobDescription.fitScore.overall)}>
+              Fit: {jobDescription.fitScore.overall}
+            </Badge>
+          )}
           {locationTypeLabel && <Badge variant="secondary">{locationTypeLabel}</Badge>}
           {levelLabel && <Badge variant="secondary">{levelLabel}</Badge>}
           {salary && <Badge variant="outline">{salary}</Badge>}

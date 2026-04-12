@@ -1,4 +1,4 @@
-import type { CompanyRepository, JobDescriptionRepository } from '@tailoredin/domain';
+import type { CompanyRepository, JobDescriptionRepository, JobFitScoreRepository } from '@tailoredin/domain';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { JobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 import { toJobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
@@ -10,7 +10,8 @@ export type ListJobDescriptionsInput = {
 export class ListJobDescriptions {
   public constructor(
     private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly companyRepository: CompanyRepository
+    private readonly companyRepository: CompanyRepository,
+    private readonly jobFitScoreRepository: JobFitScoreRepository
   ) {}
 
   public async execute(input: ListJobDescriptionsInput): Promise<JobDescriptionDto[]> {
@@ -18,9 +19,16 @@ export class ListJobDescriptions {
       ? await this.jobDescriptionRepository.findByCompanyId(input.companyId)
       : await this.jobDescriptionRepository.findAll();
 
+    const jdIds = jobDescriptions.map(jd => jd.id);
     const companyIds = [...new Set(jobDescriptions.map(jd => jd.companyId))];
-    const companies = await Promise.all(companyIds.map(id => this.companyRepository.findById(id)));
+
+    const [companies, fitScores] = await Promise.all([
+      Promise.all(companyIds.map(id => this.companyRepository.findById(id))),
+      this.jobFitScoreRepository.findByJobDescriptionIds(jdIds)
+    ]);
+
     const companyMap = new Map(companies.filter(Boolean).map(c => [c!.id, toCompanyDto(c!)]));
+    const fitScoreMap = new Map(fitScores.map(s => [s.jobDescriptionId, s]));
 
     return jobDescriptions.map(jd => {
       const company = companyMap.get(jd.companyId);
@@ -28,7 +36,8 @@ export class ListJobDescriptions {
         jd,
         null,
         undefined,
-        company ? { name: company.name, logoUrl: company.logoUrl } : null
+        company ? { name: company.name, logoUrl: company.logoUrl } : null,
+        fitScoreMap.get(jd.id) ?? null
       );
     });
   }

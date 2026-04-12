@@ -271,7 +271,11 @@ container.bind({
 container.bind({
   provide: DI.JobDescription.List,
   useFactory: () =>
-    new ListJobDescriptions(container.get(DI.JobDescription.Repository), container.get(DI.Company.Repository))
+    new ListJobDescriptions(
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.Company.Repository),
+      container.get(DI.JobDescription.FitScoreRepository)
+    )
 });
 container.bind({
   provide: DI.JobDescription.Update,

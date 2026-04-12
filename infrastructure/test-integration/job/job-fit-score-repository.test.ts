@@ -110,6 +110,40 @@ describe('PostgresJobFitScoreRepository', () => {
     });
   });
 
+  describe('findByJobDescriptionIds', () => {
+    it('returns empty array for empty input', async () => {
+      const result = await repo.findByJobDescriptionIds([]);
+      expect(result).toEqual([]);
+    });
+
+    it('returns empty array when no scores exist', async () => {
+      const result = await repo.findByJobDescriptionIds([crypto.randomUUID()]);
+      expect(result).toEqual([]);
+    });
+
+    it('returns scores for matching job description IDs', async () => {
+      const score = createScore();
+      await repo.save(score);
+      orm.em.clear();
+
+      const result = await repo.findByJobDescriptionIds([jobDescriptionId]);
+      expect(result).toHaveLength(1);
+      expect(result[0].jobDescriptionId).toBe(jobDescriptionId);
+      expect(result[0].overall).toBe(85);
+      expect(result[0].requirements).toHaveLength(3);
+    });
+
+    it('returns only scores for requested IDs', async () => {
+      const score = createScore();
+      await repo.save(score);
+      orm.em.clear();
+
+      const result = await repo.findByJobDescriptionIds([jobDescriptionId, crypto.randomUUID()]);
+      expect(result).toHaveLength(1);
+      expect(result[0].jobDescriptionId).toBe(jobDescriptionId);
+    });
+  });
+
   describe('save', () => {
     it('persists a new score with requirements', async () => {
       const score = createScore();

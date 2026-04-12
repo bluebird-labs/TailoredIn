@@ -14,6 +14,16 @@ export class PostgresJobFitScoreRepository implements JobFitScoreRepository {
     );
   }
 
+  public async findByJobDescriptionIds(jobDescriptionIds: string[]): Promise<JobFitScore[]> {
+    if (jobDescriptionIds.length === 0) return [];
+    return this.orm.em.find(
+      JobFitScore,
+      // biome-ignore lint/style/useNamingConvention: MikroORM query operator
+      { jobDescriptionId: { $in: jobDescriptionIds } },
+      { populate: ['requirements'], orderBy: { requirements: { ordinal: 'ASC' } } }
+    );
+  }
+
   public async save(score: JobFitScore): Promise<void> {
     const existing = await this.orm.em.findOne(JobFitScore, {
       profileId: score.profileId,
