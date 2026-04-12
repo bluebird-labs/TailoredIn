@@ -36,6 +36,10 @@ export const queryKeys = {
     list: () => [...queryKeys.applications.all, 'list'] as const,
     detail: (id: string) => [...queryKeys.applications.all, 'detail', id] as const
   },
+  skills: {
+    all: ['skills'] as const,
+    search: (query: string) => ['skills', 'search', query] as const
+  },
   generationSettings: {
     all: ['generationSettings'] as const,
     detail: () => ['generationSettings', 'detail'] as const

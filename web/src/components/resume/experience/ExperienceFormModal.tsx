@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { EditableField } from '@/components/shared/EditableField.js';
 import { FieldError } from '@/components/shared/FieldError.js';
 import { FormModal } from '@/components/shared/FormModal.js';
+import { SkillPicker } from '@/components/skill-picker/SkillPicker.js';
 import { Label } from '@/components/ui/label';
 import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import type { Company } from '@/hooks/use-companies';
@@ -14,6 +15,8 @@ import {
   useUnlinkCompany,
   useUpdateExperience
 } from '@/hooks/use-experiences';
+import type { Skill } from '@/hooks/use-skills';
+import { useSyncExperienceSkills } from '@/hooks/use-skills';
 import { cn } from '@/lib/utils';
 import { type ExperienceFormState, hasErrors, type ValidationErrors, validateExperience } from '@/lib/validation.js';
 import type { AccomplishmentItem } from './AccomplishmentEditor.js';
@@ -76,8 +79,24 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
   const updateExperience = useUpdateExperience();
   const linkCompany = useLinkCompany();
   const unlinkCompany = useUnlinkCompany();
+  const syncSkills = useSyncExperienceSkills();
 
   const [nestedModalOpen, setNestedModalOpen] = useState(false);
+
+  // Local skills state — initialized from experience skills
+  const [localSkills, setLocalSkills] = useState<Skill[]>(() => (experience?.skills ?? []).map(es => es.skill));
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally snapshot once on mount
+  const initialSkillIds = useMemo(() => new Set((experience?.skills ?? []).map(es => es.skillId)), []);
+
+  const skillsDirty = useMemo(() => {
+    const currentIds = new Set(localSkills.map(s => s.id));
+    if (currentIds.size !== initialSkillIds.size) return true;
+    for (const id of currentIds) {
+      if (!initialSkillIds.has(id)) return true;
+    }
+    return false;
+  }, [localSkills, initialSkillIds]);
 
   const [linkedCompany, setLinkedCompany] = useState<Company | null>(
     modalMode.mode === 'edit' ? modalMode.experience.company : null
@@ -89,7 +108,11 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
   );
 
   const isSaving =
-    createExperience.isPending || updateExperience.isPending || linkCompany.isPending || unlinkCompany.isPending;
+    createExperience.isPending ||
+    updateExperience.isPending ||
+    linkCompany.isPending ||
+    unlinkCompany.isPending ||
+    syncSkills.isPending;
 
   const savedState = useMemo(() => (experience ? stateFromExperience(experience) : emptyState()), [experience]);
 
@@ -111,7 +134,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
     });
   }, [localAccomplishments, initialAccomplishments]);
 
-  const totalDirtyCount = dirtyCount + (accomplishmentsDirty ? 1 : 0);
+  const totalDirtyCount = dirtyCount + (accomplishmentsDirty ? 1 : 0) + (skillsDirty ? 1 : 0);
 
   function handleAccomplishmentAdd(title: string, narrative: string) {
     setLocalAccomplishments(prev => [
@@ -235,10 +258,25 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
         },
         {
           onSuccess: () => {
-            setErrors({});
-            reset();
-            onOpenChange(false);
-            toast.success('Changes saved');
+            if (skillsDirty) {
+              syncSkills.mutate(
+                { experienceId: experience.id, skillIds: localSkills.map(s => s.id) },
+                {
+                  onSuccess: () => {
+                    setErrors({});
+                    reset();
+                    onOpenChange(false);
+                    toast.success('Changes saved');
+                  },
+                  onError: () => toast.error('Failed to sync skills. Please try again.')
+                }
+              );
+            } else {
+              setErrors({});
+              reset();
+              onOpenChange(false);
+              toast.success('Changes saved');
+            }
           },
           onError: () => toast.error('Failed to save. Please try again.')
         }
@@ -250,6 +288,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
     reset();
     setErrors({});
     setLocalAccomplishments(toLocalAccomplishments(experience?.accomplishments ?? []));
+    setLocalSkills((experience?.skills ?? []).map(es => es.skill));
   }
 
   return (
@@ -408,7 +447,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
       </div>
 
       {experience && (
-        <div className="pt-2 border-t">
+        <div className="space-y-4 border-t pt-2">
           <AccomplishmentListEditor
             accomplishments={localAccomplishments}
             onAdd={handleAccomplishmentAdd}
@@ -418,6 +457,16 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
             onMoveDown={handleMoveDown}
             disabled={isSaving}
           />
+
+          <div className="space-y-1.5">
+            <Label>Skills</Label>
+            <SkillPicker
+              selectedSkills={localSkills}
+              onAdd={skill => setLocalSkills(prev => [...prev, skill])}
+              onRemove={skillId => setLocalSkills(prev => prev.filter(s => s.id !== skillId))}
+              disabled={isSaving}
+            />
+          </div>
         </div>
       )}
     </FormModal>

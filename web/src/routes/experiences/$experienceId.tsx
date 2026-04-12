@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/shared/EmptyState.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
 import { LinkedEntityCard } from '@/components/shared/LinkedEntityCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
+import { SkillChip } from '@/components/skill-picker/SkillChip.js';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useExperience } from '@/hooks/use-experiences';
@@ -116,6 +117,18 @@ function ExperienceDetailPage() {
                 <InfoRow label="Start Date" value={experience.startDate} />
                 <InfoRow label="End Date" value={experience.endDate} />
               </InfoCard>
+
+              <InfoCard label="Skills">
+                {experience.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {experience.skills.map(es => (
+                      <SkillChip key={es.id} label={es.skill.label} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[14px] italic text-muted-foreground">No skills tagged</p>
+                )}
+              </InfoCard>
             </div>
 
             <div className="space-y-5">
@@ -137,6 +150,7 @@ function ExperienceDetailPage() {
 
               <InfoCard label="Quick Stats">
                 <InfoRow label="Accomplishments" value={String(accomplishmentCount)} />
+                <InfoRow label="Skills" value={String(experience.skills.length)} />
                 <InfoRow label="Bullet Range" value={`${experience.bulletMin}–${experience.bulletMax}`} />
               </InfoCard>
             </div>
