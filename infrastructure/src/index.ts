@@ -25,7 +25,5 @@ export { PostgresResumeContentRepository } from './resume/PostgresResumeContentR
 export * from './resume/prompt-sections/index.js';
 export { TypstResumeRendererFactory } from './resume/TypstResumeRendererFactory.js';
 export { PostgresGenerationSettingsRepository } from './settings/PostgresGenerationSettingsRepository.js';
-// Skills
-export { PostgresSkillCategoryRepository, PostgresSkillRepository } from './skill/index.js';
 // Skill sync
 export { SkillSyncService } from './skill-sync/index.js';

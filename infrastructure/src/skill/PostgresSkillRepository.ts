@@ -8,7 +8,6 @@ export class PostgresSkillRepository implements SkillRepository {
 
   public async findByIds(ids: string[]): Promise<Skill[]> {
     if (ids.length === 0) return [];
-    // biome-ignore lint/style/useNamingConvention: MikroORM query operator
     return this.orm.em.find(Skill, { id: { $in: ids } });
   }
 
@@ -25,7 +24,6 @@ export class PostgresSkillRepository implements SkillRepository {
     if (rows.length === 0) return [];
 
     const ids = rows.map(r => r.id);
-    // biome-ignore lint/style/useNamingConvention: MikroORM query operator
     const skills = await this.orm.em.find(Skill, { id: { $in: ids } });
 
     // Preserve similarity ranking from the raw query

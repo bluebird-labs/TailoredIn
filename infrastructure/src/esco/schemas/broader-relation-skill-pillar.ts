@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const SkillPillarConceptTypeEnum = z.enum(['SkillGroup', 'KnowledgeSkillCompetence']);
+const SkillPillarConceptTypeEnum = z.enum(['SkillGroup', 'KnowledgeSkillCompetence']);
 
 export const BroaderRelationSkillPillarSchema = z.object({
   conceptType: SkillPillarConceptTypeEnum,

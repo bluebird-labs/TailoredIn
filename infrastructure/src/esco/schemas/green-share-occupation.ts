@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const GreenShareConceptTypeEnum = z.enum(['ISCO level 3', 'ISCO level 4', 'Occupation']);
+const GreenShareConceptTypeEnum = z.enum(['ISCO level 3', 'ISCO level 4', 'Occupation']);
 
 export const GreenShareOccupationSchema = z.object({
   conceptType: GreenShareConceptTypeEnum,

@@ -7,4 +7,4 @@ export const MindCategorizedConceptSchema = z
   .object({ category: z.string().min(1) })
   .catchall(z.array(z.string()).optional());
 
-export type MindCategorizedConcept = z.infer<typeof MindCategorizedConceptSchema>;
+type MindCategorizedConcept = z.infer<typeof MindCategorizedConceptSchema>;
