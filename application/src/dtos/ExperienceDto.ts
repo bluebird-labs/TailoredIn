@@ -1,5 +1,6 @@
 import type { AccomplishmentDto } from './AccomplishmentDto.js';
 import type { CompanyDto } from './CompanyDto.js';
+import type { ExperienceSkillDto } from './ExperienceSkillDto.js';
 
 export type { AccomplishmentDto };
 
@@ -19,4 +20,5 @@ export type ExperienceDto = {
   bulletMin: number;
   bulletMax: number;
   accomplishments: AccomplishmentDto[];
+  skills: ExperienceSkillDto[];
 };

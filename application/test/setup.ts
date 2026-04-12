@@ -5,11 +5,14 @@ import {
   Company,
   Education,
   Experience,
+  ExperienceSkill,
   GenerationPrompt,
   GenerationSettings,
   JobDescription,
   Profile,
-  ResumeContent
+  ResumeContent,
+  Skill,
+  SkillCategory
 } from '@tailoredin/domain';
 
 // Initialize MikroORM metadata so Collection API works in use case tests.
@@ -21,11 +24,13 @@ await MikroORM.init(
       Company,
       Experience,
       Accomplishment,
+      ExperienceSkill,
       GenerationPrompt,
       GenerationSettings,
-      Application,
       JobDescription,
-      ResumeContent
+      ResumeContent,
+      Skill,
+      SkillCategory
     ],
     connect: false,
     dbName: ':memory:'

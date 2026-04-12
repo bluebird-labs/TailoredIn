@@ -2,6 +2,7 @@ import type { Accomplishment, CompanyRepository, Experience, ExperienceRepositor
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { AccomplishmentDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
+import type { ExperienceSkillDto } from '../../dtos/ExperienceSkillDto.js';
 
 export class ListExperiences {
   public constructor(
@@ -21,7 +22,11 @@ export class ListExperiences {
   }
 }
 
-export function toExperienceDto(exp: Experience, company?: CompanyDto | null): ExperienceDto {
+export function toExperienceDto(
+  exp: Experience,
+  company?: CompanyDto | null,
+  skills: ExperienceSkillDto[] = []
+): ExperienceDto {
   return {
     id: exp.id,
     title: exp.title,
@@ -37,7 +42,8 @@ export function toExperienceDto(exp: Experience, company?: CompanyDto | null): E
     ordinal: exp.ordinal,
     bulletMin: exp.bulletMin,
     bulletMax: exp.bulletMax,
-    accomplishments: exp.accomplishments.map(toAccomplishmentDto)
+    accomplishments: exp.accomplishments.map(toAccomplishmentDto),
+    skills
   };
 }
 

@@ -173,6 +173,14 @@ classDiagram
         +execute() ExperienceDto[]
     }
 
+    class SyncExperienceSkills {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +SkillRepository skillRepository
+        +CompanyRepository companyRepository
+        +execute(SyncExperienceSkillsInput) ExperienceDto
+    }
+
     class UnlinkCompanyFromExperience {
         <<UseCase>>
         +ExperienceRepository experienceRepository
@@ -344,6 +352,24 @@ classDiagram
     GenerateResumeContentWithPdf ..> GenerateResumePdf : depends
 
     %% ──────────────────────────────────────────────
+    %%  Skill Use Cases
+    %% ──────────────────────────────────────────────
+
+    class ListSkillCategories {
+        <<UseCase>>
+        +SkillCategoryRepository skillCategoryRepository
+        +execute() SkillCategoryDto[]
+    }
+
+    class SearchSkills {
+        <<UseCase>>
+        +SkillRepository skillRepository
+        +SkillCategoryRepository skillCategoryRepository
+        +execute(SearchSkillsInput) SkillDto[]
+    }
+
+
+    %% ──────────────────────────────────────────────
     %%  Ports
     %% ──────────────────────────────────────────────
 
@@ -491,6 +517,14 @@ classDiagram
         +number bulletMin
         +number bulletMax
         +AccomplishmentDto[] accomplishments
+        +ExperienceSkillDto[] skills
+    }
+
+    class ExperienceSkillDto {
+        <<DTO>>
+        +string id
+        +string skillId
+        +SkillDto skill
     }
 
     class FitScoreResult {
@@ -671,8 +705,27 @@ classDiagram
         +string currency
     }
 
+    class SkillCategoryDto {
+        <<DTO>>
+        +string id
+        +string label
+        +number ordinal
+    }
+
+    class SkillDto {
+        <<DTO>>
+        +string id
+        +string label
+        +SkillType type
+        +string? categoryId
+        +SkillCategoryDto? category
+        +string? description
+    }
+
     ExperienceDto *-- CompanyDto
     ExperienceDto "1" *-- "*" AccomplishmentDto : contains
+    ExperienceDto "1" *-- "*" ExperienceSkillDto : contains
+    ExperienceSkillDto *-- SkillDto
     GenerationSettingsDto "1" *-- "*" GenerationPromptDto : contains
     JobDescriptionDto *-- SalaryRangeDto
     JobDescriptionDto *-- ResumeOutputDto
@@ -681,6 +734,7 @@ classDiagram
     PaginatedDto *-- PaginationMeta
     ResumeContentDto "1" *-- "*" ResumeExperienceBulletsDto : contains
     ResumeScoreDto "1" *-- "*" RequirementScoreDto : contains
+    SkillDto *-- SkillCategoryDto
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
     CompanyDiscoveryProvider ..> CompanyDiscoveryResult : produces
     FitScorer ..> FitScoreResult : produces
@@ -704,6 +758,7 @@ classDiagram
     GetExperience ..> ExperienceDto : returns
     LinkCompanyToExperience ..> ExperienceDto : returns
     ListExperiences ..> ExperienceDto : returns
+    SyncExperienceSkills ..> ExperienceDto : returns
     UnlinkCompanyFromExperience ..> ExperienceDto : returns
     UpdateExperience ..> ExperienceDto : returns
     GetProfile ..> ProfileDto : returns
@@ -718,6 +773,8 @@ classDiagram
     GenerateResumeContent ..> ResumeContentDto : returns
     GenerateResumeContentWithPdf ..> ResumeContentDto : returns
     ScoreResume ..> ResumeScoreDto : returns
+    ListSkillCategories ..> SkillCategoryDto : returns
+    SearchSkills ..> SkillDto : returns
     UpdateProfile ..> ProfileDto : returns
 
     %% ──────────────────────────────────────────────
@@ -780,6 +837,14 @@ classDiagram
         <<DomainPort>>
     }
 
+    class SkillCategoryRepository {
+        <<DomainPort>>
+    }
+
+    class SkillRepository {
+        <<DomainPort>>
+    }
+
     CreateApplication ..> ApplicationRepository : depends
     DeleteApplication ..> ApplicationRepository : depends
     GetApplication ..> ApplicationRepository : depends
@@ -807,6 +872,9 @@ classDiagram
     LinkCompanyToExperience ..> CompanyRepository : depends
     ListExperiences ..> ExperienceRepository : depends
     ListExperiences ..> CompanyRepository : depends
+    SyncExperienceSkills ..> ExperienceRepository : depends
+    SyncExperienceSkills ..> SkillRepository : depends
+    SyncExperienceSkills ..> CompanyRepository : depends
     UnlinkCompanyFromExperience ..> ExperienceRepository : depends
     UpdateAccomplishment ..> ExperienceRepository : depends
     UpdateExperience ..> ExperienceRepository : depends
@@ -841,6 +909,9 @@ classDiagram
     ScoreResume ..> ResumeContentRepository : depends
     ScoreResume ..> JobDescriptionRepository : depends
     UpdateResumeDisplaySettings ..> ResumeContentRepository : depends
+    ListSkillCategories ..> SkillCategoryRepository : depends
+    SearchSkills ..> SkillRepository : depends
+    SearchSkills ..> SkillCategoryRepository : depends
     UpdateProfile ..> ProfileRepository : depends
 
     %% ──────────────────────────────────────────────
@@ -871,6 +942,7 @@ classDiagram
     style GetExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style LinkCompanyToExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListExperiences fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style SyncExperienceSkills fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UnlinkCompanyFromExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -892,6 +964,8 @@ classDiagram
     style ResumeNotReadyError fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ScoreResume fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateResumeDisplaySettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListSkillCategories fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style SearchSkills fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style FitScorer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
@@ -908,6 +982,7 @@ classDiagram
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ExperienceSkillDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style FitScoreResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationPromptDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationSettingsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -926,6 +1001,8 @@ classDiagram
     style ResumeRenderExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeScoreDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SalaryRangeDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style SkillCategoryDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style SkillDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
@@ -938,3 +1015,5 @@ classDiagram
     style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style PromptRegistry fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ResumeContentRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style SkillCategoryRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style SkillRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
