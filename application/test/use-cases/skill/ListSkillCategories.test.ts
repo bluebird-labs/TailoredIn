@@ -6,33 +6,27 @@ const makeCategory = (overrides: Partial<ConstructorParameters<typeof SkillCateg
   new SkillCategory({
     id: 'cat-aaaa-1111-2222-3333-444444444444',
     label: 'Programming Languages',
-    normalizedLabel: 'programming languages',
-    ordinal: 0,
+    normalizedLabel: 'programming-languages',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides
   });
 
 describe('ListSkillCategories', () => {
-  test('returns categories sorted by ordinal', async () => {
-    const catB = makeCategory({ id: 'cat-b', label: 'Frameworks', normalizedLabel: 'frameworks', ordinal: 2 });
-    const catA = makeCategory({ id: 'cat-a', label: 'Languages', normalizedLabel: 'languages', ordinal: 0 });
-    const catC = makeCategory({ id: 'cat-c', label: 'Tools', normalizedLabel: 'tools', ordinal: 1 });
+  test('returns categories from repository', async () => {
+    const catA = makeCategory({ id: 'cat-a', label: 'Backend', normalizedLabel: 'backend' });
+    const catB = makeCategory({ id: 'cat-b', label: 'Frontend', normalizedLabel: 'frontend' });
 
     const categoryRepo: Partial<SkillCategoryRepository> = {
-      findAll: mock(() => Promise.resolve([catB, catA, catC]))
+      findAll: mock(() => Promise.resolve([catA, catB]))
     };
 
     const useCase = new ListSkillCategories(categoryRepo as SkillCategoryRepository);
     const result = await useCase.execute();
 
-    expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('Languages');
-    expect(result[0].ordinal).toBe(0);
-    expect(result[1].label).toBe('Tools');
-    expect(result[1].ordinal).toBe(1);
-    expect(result[2].label).toBe('Frameworks');
-    expect(result[2].ordinal).toBe(2);
+    expect(result).toHaveLength(2);
+    expect(result[0].label).toBe('Backend');
+    expect(result[1].label).toBe('Frontend');
   });
 
   test('returns empty array when no categories exist', async () => {

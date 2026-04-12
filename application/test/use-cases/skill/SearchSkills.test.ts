@@ -26,8 +26,7 @@ const makeCategory = (overrides: Partial<ConstructorParameters<typeof SkillCateg
   new SkillCategory({
     id: 'cat-aaaa-1111-2222-3333-444444444444',
     label: 'Programming Languages',
-    normalizedLabel: 'programming languages',
-    ordinal: 0,
+    normalizedLabel: 'programming-languages',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides

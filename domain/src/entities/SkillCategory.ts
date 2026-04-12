@@ -5,7 +5,6 @@ import { ValidationError } from '../ValidationError.js';
 
 export type SkillCategoryCreateProps = {
   label: string;
-  ordinal: number;
 };
 
 @Entity({ tableName: 'skill_categories' })
@@ -19,9 +18,6 @@ export class SkillCategory extends AggregateRoot {
   @Property({ fieldName: 'normalized_label', type: 'text', unique: true })
   public normalizedLabel: string;
 
-  @Property({ fieldName: 'ordinal', type: 'integer' })
-  public ordinal: number;
-
   @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
 
@@ -32,18 +28,15 @@ export class SkillCategory extends AggregateRoot {
     id: string;
     label: string;
     normalizedLabel: string;
-    ordinal: number;
     createdAt: Date;
     updatedAt: Date;
   }) {
     super();
     if (!props.label || props.label.length > 500)
       throw new ValidationError('label', 'must be between 1 and 500 characters');
-    if (props.ordinal < 0) throw new ValidationError('ordinal', 'must be >= 0');
     this.id = props.id;
     this.label = props.label;
     this.normalizedLabel = props.normalizedLabel;
-    this.ordinal = props.ordinal;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -54,7 +47,6 @@ export class SkillCategory extends AggregateRoot {
       id: crypto.randomUUID(),
       label: props.label,
       normalizedLabel: normalizeLabel(props.label),
-      ordinal: props.ordinal,
       createdAt: now,
       updatedAt: now
     });
