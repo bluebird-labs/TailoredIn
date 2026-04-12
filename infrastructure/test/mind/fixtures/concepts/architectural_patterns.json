@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Component-based architecture",
+    "synonyms": ["component architecture", "component-driven development"]
+  },
+  {
+    "name": "Event-driven programming",
+    "synonyms": ["event-driven architecture", "EDA"]
+  },
+  {
+    "name": "Microservices",
+    "synonyms": ["microservice architecture"]
+  }
+]
