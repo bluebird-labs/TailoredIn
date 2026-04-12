@@ -124,6 +124,24 @@ erDiagram
         timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
+    job_fit_requirements {
+        uuid id PK
+        uuid job_fit_score_id FK
+        text requirement
+        text coverage
+        text reasoning
+        integer ordinal
+    }
+
+    job_fit_scores {
+        uuid id PK
+        uuid profile_id FK
+        uuid job_description_id FK
+        integer overall
+        text summary
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+    }
+
     profiles {
         uuid id PK
         text email
@@ -168,6 +186,9 @@ erDiagram
     generation_settings ||--o{ generation_prompts : "has"
     profiles ||--o{ generation_settings : "has"
     companies ||--o{ job_descriptions : "has"
+    job_fit_scores ||--o{ job_fit_requirements : "has"
+    profiles ||--o{ job_fit_scores : "has"
+    job_descriptions ||--o{ job_fit_scores : "has"
     profiles ||--o{ resume_contents : "has"
     job_descriptions ||--o{ resume_contents : "has"
 
@@ -184,5 +205,7 @@ erDiagram
     class generation_prompts group0
     class generation_settings group0
     class job_descriptions group0
+    class job_fit_requirements group0
+    class job_fit_scores group0
     class profiles group0
     class resume_contents group0

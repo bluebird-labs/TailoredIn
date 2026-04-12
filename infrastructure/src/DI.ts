@@ -16,6 +16,7 @@ import type {
   DeleteJobDescription,
   DiscoverCompanies,
   EnrichCompanyData,
+  FitScorer,
   GenerateResumeContent,
   GenerateResumeContentWithPdf,
   GenerateResumePdf,
@@ -39,6 +40,7 @@ import type {
   ResumeElementGenerator,
   ResumeRendererFactory,
   ResumeScorer,
+  ScoreJobFit,
   ScoreResume,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -59,6 +61,7 @@ import type {
   ExperienceRepository,
   GenerationSettingsRepository,
   JobDescriptionRepository,
+  JobFitScoreRepository,
   ProfileRepository,
   ResumeContentRepository
 } from '@tailoredin/domain';
@@ -88,7 +91,10 @@ export const DI = {
     List: new InjectionToken<ListJobDescriptions>('DI.JobDescription.List'),
     Parse: new InjectionToken<ParseJobDescription>('DI.JobDescription.Parse'),
     Update: new InjectionToken<UpdateJobDescription>('DI.JobDescription.Update'),
-    Delete: new InjectionToken<DeleteJobDescription>('DI.JobDescription.Delete')
+    Delete: new InjectionToken<DeleteJobDescription>('DI.JobDescription.Delete'),
+    FitScoreRepository: new InjectionToken<JobFitScoreRepository>('DI.JobDescription.FitScoreRepository'),
+    FitScorer: new InjectionToken<FitScorer>('DI.JobDescription.FitScorer'),
+    ScoreFit: new InjectionToken<ScoreJobFit>('DI.JobDescription.ScoreFit')
   },
 
   Profile: {

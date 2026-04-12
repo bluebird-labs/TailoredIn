@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Check, ChevronDown, Copy, Download, Loader2, Pencil, RefreshCw, Sparkles } from 'lucide-react';
+import { Check, ChevronDown, Copy, Download, Loader2, Pencil, RefreshCw, Sparkles, Target } from 'lucide-react';
 import { useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { toast } from 'sonner';
 import { formatEnumLabel as formatCompanyEnumLabel } from '@/components/companies/company-options.js';
+import { FitScorePanel } from '@/components/job-descriptions/FitScorePanel.js';
 import { JobDescriptionFormModal } from '@/components/job-descriptions/JobDescriptionFormModal.js';
 import { formatEnumLabel } from '@/components/job-descriptions/job-description-options.js';
 import { RawTextModal } from '@/components/job-descriptions/RawTextModal.js';
@@ -23,6 +24,7 @@ import {
   useParseJobDescription,
   useUpdateJobDescription
 } from '@/hooks/use-job-descriptions';
+import { useScoreJobFit } from '@/hooks/use-job-fit-score';
 
 export const Route = createFileRoute('/jobs/$jobDescriptionId')({
   component: JobDetailPage
@@ -74,6 +76,7 @@ function JobDetailPage() {
   const [rawTextModalOpen, setRawTextModalOpen] = useState(false);
   const parseJd = useParseJobDescription();
   const updateJd = useUpdateJobDescription(jd?.companyId ?? '');
+  const scoreFit = useScoreJobFit(jobDescriptionId);
   const isReparsing = parseJd.isPending || updateJd.isPending;
 
   function reparseWithText(text: string) {
@@ -191,6 +194,14 @@ function JobDetailPage() {
         }
         actions={
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => scoreFit.mutate()} disabled={scoreFit.isPending}>
+              {scoreFit.isPending ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Target className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {scoreFit.isPending ? 'Scoring...' : jd.fitScore ? 'Re-score Fit' : 'Score Fit'}
+            </Button>
             <Button size="sm" variant="outline" onClick={handleReparse} disabled={isReparsing}>
               {isReparsing ? (
                 <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -213,7 +224,7 @@ function JobDetailPage() {
         }
       />
 
-      <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
+      <div className="mt-4 grid grid-cols-[1fr_380px] gap-5">
         <div className="space-y-5">
           <InfoCard label="Details">
             <InfoRow label="Level" value={levelLabel} />
@@ -223,6 +234,8 @@ function JobDetailPage() {
             <InfoRow label="Posted" value={postedAt} />
             {jd.url && <InfoRow label="Job Posting" value="View posting" href={jd.url} />}
           </InfoCard>
+
+          <SkillsCard hardSkills={jd.soughtHardSkills} softSkills={jd.soughtSoftSkills} />
 
           <JobAnalysisCard description={jd.description} />
 
@@ -269,7 +282,7 @@ function JobDetailPage() {
             <InfoRow label="Added" value={createdAt} />
           </InfoCard>
 
-          <SkillsCard hardSkills={jd.soughtHardSkills} softSkills={jd.soughtSoftSkills} />
+          {jd.fitScore && <FitScorePanel score={jd.fitScore} />}
         </div>
       </div>
 

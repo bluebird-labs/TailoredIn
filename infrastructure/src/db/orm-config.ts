@@ -14,6 +14,8 @@ import {
   GenerationPrompt,
   GenerationSettings,
   JobDescription,
+  JobFitRequirement,
+  JobFitScore,
   Profile,
   ResumeContent
 } from '@tailoredin/domain';
@@ -62,6 +64,8 @@ export function createOrmConfig(db: OrmDbConfig) {
       Accomplishment,
       Application,
       JobDescription,
+      JobFitScore,
+      JobFitRequirement,
       ResumeContent,
       GenerationSettings,
       GenerationPrompt,

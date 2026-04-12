@@ -1,5 +1,6 @@
 export type { CompanyDataProvider, CompanyEnrichmentResult } from './CompanyDataProvider.js';
 export type { CompanyDiscoveryProvider, CompanyDiscoveryResult } from './CompanyDiscoveryProvider.js';
+export type { FitScoreInput, FitScoreResult, FitScorer } from './FitScorer.js';
 export type { JobDescriptionParseResult, JobDescriptionParser } from './JobDescriptionParser.js';
 export type { ResumeElementGenerator } from './ResumeElementGenerator.js';
 export type {

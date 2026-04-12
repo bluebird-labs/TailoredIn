@@ -33,6 +33,20 @@ export type ResumeScore = {
   summary: string;
 };
 
+export type FitRequirementScore = {
+  requirement: string;
+  coverage: 'strong' | 'partial' | 'absent';
+  reasoning: string;
+};
+
+export type FitScore = {
+  id: string;
+  overall: number;
+  requirements: FitRequirementScore[];
+  summary: string;
+  createdAt: string;
+};
+
 export type ResumeOutput = {
   resumeContentId: string;
   headline?: string;
@@ -65,6 +79,7 @@ export type JobDescription = {
   resumeOutput: ResumeOutput | null;
   hasCachedPdf: boolean;
   resumePdfTheme: string | null;
+  fitScore: FitScore | null;
 };
 
 export type JobDescriptionParseResult = {

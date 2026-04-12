@@ -1,12 +1,14 @@
 import type {
   Experience,
   JobDescription,
+  JobFitScore,
   JobLevel,
   JobSource,
   LocationType,
   ResumeContent,
   ResumeScore
 } from '@tailoredin/domain';
+import type { JobFitScoreDto } from './JobFitScoreDto.js';
 
 function parseScopedInstructions(prompt: string): Record<string, string> {
   if (!prompt) return {};
@@ -65,13 +67,29 @@ export type JobDescriptionDto = {
   readonly resumeOutput: ResumeOutputDto | null;
   readonly hasCachedPdf: boolean;
   readonly resumePdfTheme: string | null;
+  readonly fitScore: JobFitScoreDto | null;
 };
+
+function toFitScoreDto(fitScore: JobFitScore): JobFitScoreDto {
+  return {
+    id: fitScore.id,
+    overall: fitScore.overall,
+    requirements: fitScore.requirements.map(r => ({
+      requirement: r.requirement,
+      coverage: r.coverage,
+      reasoning: r.reasoning
+    })),
+    summary: fitScore.summary,
+    createdAt: fitScore.createdAt.toISOString()
+  };
+}
 
 export function toJobDescriptionDto(
   jd: JobDescription,
   resumeContent?: ResumeContent | null,
   experiences?: Experience[],
-  company?: { name: string; logoUrl: string | null } | null
+  company?: { name: string; logoUrl: string | null } | null,
+  fitScore?: JobFitScore | null
 ): JobDescriptionDto {
   return {
     id: jd.id,
@@ -118,6 +136,7 @@ export function toJobDescriptionDto(
         }
       : null,
     hasCachedPdf: jd.resumePdf !== null,
-    resumePdfTheme: jd.resumePdfTheme
+    resumePdfTheme: jd.resumePdfTheme,
+    fitScore: fitScore ? toFitScoreDto(fitScore) : null
   };
 }
