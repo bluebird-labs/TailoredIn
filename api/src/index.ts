@@ -166,7 +166,7 @@ const app = new Elysia()
   .use(container.get(GetCachedResumePdfRoute).plugin())
   .use(container.get(UpdateResumeDisplaySettingsRoute).plugin())
   .use(container.get(ScoreResumeRoute).plugin())
-  .listen(port);
+  .listen({ port, idleTimeout: 120 });
 
 log.info(`Listening on port ${port}...`);
 

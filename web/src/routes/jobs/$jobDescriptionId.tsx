@@ -224,7 +224,7 @@ function JobDetailPage() {
         }
       />
 
-      <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
+      <div className="mt-4 grid grid-cols-[1fr_380px] gap-5">
         <div className="space-y-5">
           <InfoCard label="Details">
             <InfoRow label="Level" value={levelLabel} />
