@@ -20,7 +20,8 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: `http://localhost:${API_PORT}`,
-        rewrite: p => p.replace(/^\/api/, '')
+        rewrite: p => p.replace(/^\/api/, ''),
+        timeout: 120_000
       }
     }
   }

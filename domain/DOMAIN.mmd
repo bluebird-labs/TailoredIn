@@ -115,8 +115,10 @@ classDiagram
         +string[] hiddenEducationIds
         +string prompt
         +object? schema
+        +ResumeScore? score
         +withExperienceHiddenBullets()
         +withHiddenEducationIds()
+        +withScore()
     }
 
     class ApplicationStatus {
@@ -140,6 +142,13 @@ classDiagram
         +number[] hiddenBulletIndices
     }
 
+    class ResumeScore {
+        <<ValueObject>>
+        +number overall
+        +RequirementScore[] requirements
+        +string summary
+    }
+
     Experience "1" --> "*" Accomplishment : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
@@ -151,6 +160,7 @@ classDiagram
     Profile "1" --> "*" GenerationSettings : has
     Profile "1" --> "*" ResumeContent : has
     ResumeContent "1" *-- "*" ResumeExperience : contains
+    ResumeContent *-- ResumeScore
 
     %% ──────────────────────────────────────────────
     %%  Company Subdomain
@@ -364,6 +374,19 @@ classDiagram
         +string? location
     }
 
+    class RequirementCoverage {
+        <<type>>
+        strong · partial · absent
+    }
+
+    class RequirementScore {
+        <<ValueObject>>
+        +string requirement
+        +RequirementCoverage coverage
+        +number[] matchingBulletIndices
+        +string reasoning
+    }
+
     class ResumeTemplate {
         <<ValueObject>>
         +string pageSize
@@ -409,6 +432,8 @@ classDiagram
     GenerationContext "1" *-- "*" EducationSnapshot : contains
     GenerationContext *-- SettingsSnapshot
     LayoutAnalysis "1" *-- "*" BlockLayout : contains
+    RequirementScore --> RequirementCoverage
+    ResumeScore "1" *-- "*" RequirementScore : contains
 
     %% ──────────────────────────────────────────────
     %%  Apply Styles
@@ -425,6 +450,7 @@ classDiagram
     style ApplicationStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperience fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style ResumeScore fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style CompanyStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -445,6 +471,8 @@ classDiagram
     style LayoutAnalysis fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ModelTier fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ProfileSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style RequirementCoverage fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style RequirementScore fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ResumeTemplate fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style SalaryRange fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style SettingsSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px

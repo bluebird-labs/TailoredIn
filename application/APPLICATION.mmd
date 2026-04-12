@@ -309,6 +309,19 @@ classDiagram
         +execute(GetCachedResumePdfInput) CachedResumePdfResult | null
     }
 
+    class ResumeNotReadyError {
+        <<UseCase>>
+        +execute() void
+    }
+
+    class ScoreResume {
+        <<UseCase>>
+        +ResumeContentRepository resumeContentRepository
+        +JobDescriptionRepository jobDescriptionRepository
+        +ResumeScorer resumeScorer
+        +execute(ScoreResumeInput) ResumeScoreDto
+    }
+
     class UpdateResumeDisplaySettings {
         <<UseCase>>
         +ResumeContentRepository resumeContentRepository
@@ -352,11 +365,17 @@ classDiagram
         +get(theme) ResumeRenderer
     }
 
+    class ResumeScorer {
+        <<Port>>
+        +score(input) Promise<ResumeScore>
+    }
+
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
     GenerateResumeContent ..> ResumeElementGenerator : depends
     GenerateResumePdf ..> ResumeRendererFactory : depends
+    ScoreResume ..> ResumeScorer : depends
 
     %% ──────────────────────────────────────────────
     %%  DTOs
@@ -542,6 +561,14 @@ classDiagram
         +string? websiteUrl
     }
 
+    class RequirementScoreDto {
+        <<DTO>>
+        +string requirement
+        +RequirementCoverage coverage
+        +number[] matchingBulletIndices
+        +string reasoning
+    }
+
     class ResumeContentDto {
         <<DTO>>
         +string headline
@@ -558,11 +585,13 @@ classDiagram
 
     class ResumeOutputDto {
         <<DTO>>
+        +string resumeContentId
         +string headline
         +object[] experiences
         +string[] hiddenEducationIds
         +string generatedAt
         +object scopedInstructions
+        +ResumeScore? score
     }
 
     class ResumeRenderEducation {
@@ -586,6 +615,13 @@ classDiagram
         +string[] bullets
     }
 
+    class ResumeScoreDto {
+        <<DTO>>
+        +number overall
+        +RequirementScoreDto[] requirements
+        +string summary
+    }
+
     class SalaryRangeDto {
         <<DTO>>
         +number? min
@@ -600,6 +636,7 @@ classDiagram
     JobDescriptionDto *-- ResumeOutputDto
     PaginatedDto *-- PaginationMeta
     ResumeContentDto "1" *-- "*" ResumeExperienceBulletsDto : contains
+    ResumeScoreDto "1" *-- "*" RequirementScoreDto : contains
     CompanyDataProvider ..> CompanyEnrichmentResult : produces
     CompanyDiscoveryProvider ..> CompanyDiscoveryResult : produces
     JobDescriptionParser ..> JobDescriptionParseResult : produces
@@ -634,6 +671,7 @@ classDiagram
     UpdateJobDescription ..> JobDescriptionDto : returns
     GenerateResumeContent ..> ResumeContentDto : returns
     GenerateResumeContentWithPdf ..> ResumeContentDto : returns
+    ScoreResume ..> ResumeScoreDto : returns
     UpdateProfile ..> ProfileDto : returns
 
     %% ──────────────────────────────────────────────
@@ -744,6 +782,8 @@ classDiagram
     GenerateResumePdf ..> JobDescriptionRepository : depends
     GenerateResumePdf ..> ResumeContentRepository : depends
     GetCachedResumePdf ..> JobDescriptionRepository : depends
+    ScoreResume ..> ResumeContentRepository : depends
+    ScoreResume ..> JobDescriptionRepository : depends
     UpdateResumeDisplaySettings ..> ResumeContentRepository : depends
     UpdateProfile ..> ProfileRepository : depends
 
@@ -792,6 +832,8 @@ classDiagram
     style GenerateResumeContentWithPdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GenerateResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style GetCachedResumePdf fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ResumeNotReadyError fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ScoreResume fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateResumeDisplaySettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
@@ -799,6 +841,7 @@ classDiagram
     style ResumeElementGenerator fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeRenderer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeRendererFactory fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style ResumeScorer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApplicationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -814,11 +857,13 @@ classDiagram
     style PaginatedDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style PaginationMeta fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ProfileDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style RequirementScoreDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeContentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperienceBulletsDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeOutputDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeRenderEducation fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeRenderExperience fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ResumeScoreDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SalaryRangeDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

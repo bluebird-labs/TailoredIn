@@ -1,4 +1,12 @@
-import type { Experience, JobDescription, JobLevel, JobSource, LocationType, ResumeContent } from '@tailoredin/domain';
+import type {
+  Experience,
+  JobDescription,
+  JobLevel,
+  JobSource,
+  LocationType,
+  ResumeContent,
+  ResumeScore
+} from '@tailoredin/domain';
 
 function parseScopedInstructions(prompt: string): Record<string, string> {
   if (!prompt) return {};
@@ -17,6 +25,7 @@ export type SalaryRangeDto = {
 };
 
 export type ResumeOutputDto = {
+  readonly resumeContentId: string;
   readonly headline: string;
   readonly experiences: ReadonlyArray<{
     readonly experienceId: string;
@@ -31,6 +40,7 @@ export type ResumeOutputDto = {
   readonly hiddenEducationIds: readonly string[];
   readonly generatedAt: string;
   readonly scopedInstructions: Record<string, string>;
+  readonly score: ResumeScore | null;
 };
 
 export type JobDescriptionDto = {
@@ -86,6 +96,7 @@ export function toJobDescriptionDto(
     soughtSoftSkills: jd.soughtSoftSkills,
     resumeOutput: resumeContent
       ? {
+          resumeContentId: resumeContent.id,
           headline: resumeContent.headline,
           experiences: resumeContent.experiences.map(e => {
             const exp = experiences?.find(x => x.id === e.experienceId);
@@ -102,7 +113,8 @@ export function toJobDescriptionDto(
           }),
           hiddenEducationIds: resumeContent.hiddenEducationIds,
           generatedAt: resumeContent.createdAt.toISOString(),
-          scopedInstructions: parseScopedInstructions(resumeContent.prompt)
+          scopedInstructions: parseScopedInstructions(resumeContent.prompt),
+          score: resumeContent.score
         }
       : null,
     hasCachedPdf: jd.resumePdf !== null,

@@ -28,7 +28,8 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.jobDescriptions.all, 'detail', id] as const
   },
   resume: {
-    cachedPdf: (jobDescriptionId: string) => ['resume', 'cachedPdf', jobDescriptionId] as const
+    cachedPdf: (jobDescriptionId: string) => ['resume', 'cachedPdf', jobDescriptionId] as const,
+    score: (resumeContentId: string) => ['resume', 'score', resumeContentId] as const
   },
   applications: {
     all: ['applications'] as const,

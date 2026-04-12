@@ -76,6 +76,8 @@ export type { GenerateResumePdfInput } from './resume/GenerateResumePdf.js';
 export { GenerateResumePdf } from './resume/GenerateResumePdf.js';
 export type { CachedResumePdfResult, GetCachedResumePdfInput } from './resume/GetCachedResumePdf.js';
 export { GetCachedResumePdf } from './resume/GetCachedResumePdf.js';
+export type { ScoreResumeInput } from './resume/ScoreResume.js';
+export { ResumeNotReadyError, ScoreResume } from './resume/ScoreResume.js';
 export type { UpdateResumeDisplaySettingsInput } from './resume/UpdateResumeDisplaySettings.js';
 export { UpdateResumeDisplaySettings } from './resume/UpdateResumeDisplaySettings.js';
 export type { UpdateProfileInput } from './UpdateProfile.js';

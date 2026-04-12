@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Eye, EyeOff, Loader2, RotateCw, Settings, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2, RotateCw, Settings, Sparkles, Target } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { useEducations } from '@/hooks/use-educations';
 import { useExperiences } from '@/hooks/use-experiences';
 import { type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
 import { useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
+import { useScoreResume } from '@/hooks/use-resume-score';
 import { BulletRangePill } from './BulletRangePill.js';
 import { JobSelector } from './JobSelector.js';
 
@@ -204,10 +205,12 @@ function ExperienceCard({
 
 export function GenerationWorkspace({
   selectedJobId,
-  onSelectJob
+  onSelectJob,
+  onScoreComplete
 }: {
   selectedJobId: string | null;
   onSelectJob: (id: string | null) => void;
+  onScoreComplete: () => void;
 }) {
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [includeCurrentVersion, setIncludeCurrentVersion] = useState(false);
@@ -219,6 +222,7 @@ export function GenerationWorkspace({
   const { data: educations } = useEducations();
   const generate = useGenerateResumeContent(selectedJobId ?? '');
   const updateDisplaySettings = useUpdateResumeDisplaySettings(selectedJobId ?? '');
+  const scoreResume = useScoreResume(jd?.resumeOutput?.resumeContentId ?? '', selectedJobId ?? '');
 
   const resumeOutput = jd?.resumeOutput ?? null;
 
@@ -389,7 +393,35 @@ export function GenerationWorkspace({
               Include current version as reference
             </label>
           )}
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            {resumeOutput && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  scoreResume.mutate(undefined, {
+                    onSuccess: () => {
+                      toast.success('Resume scored');
+                      onScoreComplete();
+                    },
+                    onError: err => toast.error(err instanceof Error ? err.message : 'Scoring failed')
+                  })
+                }
+                disabled={scoreResume.isPending}
+              >
+                {scoreResume.isPending ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Scoring...
+                  </>
+                ) : (
+                  <>
+                    <Target className="mr-1.5 h-3.5 w-3.5" />
+                    {resumeOutput.score ? 'Re-score' : 'Score'}
+                  </>
+                )}
+              </Button>
+            )}
             <Button size="sm" onClick={handleGenerate} disabled={!selectedJobId || generate.isPending}>
               {generate.isPending ? (
                 <>

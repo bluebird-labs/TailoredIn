@@ -45,6 +45,7 @@ import { UpdateJobDescriptionRoute } from './routes/job-description/UpdateJobDes
 import { GenerateResumeContentRoute } from './routes/resume/GenerateResumeContentRoute.js';
 import { GenerateResumePdfRoute } from './routes/resume/GenerateResumePdfRoute.js';
 import { GetCachedResumePdfRoute } from './routes/resume/GetCachedResumePdfRoute.js';
+import { ScoreResumeRoute } from './routes/resume/ScoreResumeRoute.js';
 import { UpdateResumeDisplaySettingsRoute } from './routes/resume/UpdateResumeDisplaySettingsRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
@@ -162,6 +163,7 @@ const app = new Elysia()
   .use(container.get(GenerateResumePdfRoute).plugin())
   .use(container.get(GetCachedResumePdfRoute).plugin())
   .use(container.get(UpdateResumeDisplaySettingsRoute).plugin())
+  .use(container.get(ScoreResumeRoute).plugin())
   .listen(port);
 
 log.info(`Listening on port ${port}...`);

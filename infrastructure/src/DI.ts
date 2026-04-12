@@ -38,6 +38,8 @@ import type {
   PromptRegistry,
   ResumeElementGenerator,
   ResumeRendererFactory,
+  ResumeScorer,
+  ScoreResume,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -136,7 +138,9 @@ export const DI = {
     GeneratePdf: new InjectionToken<GenerateResumePdf>('DI.Resume.GeneratePdf'),
     GenerateContentWithPdf: new InjectionToken<GenerateResumeContentWithPdf>('DI.Resume.GenerateContentWithPdf'),
     GetCachedPdf: new InjectionToken<GetCachedResumePdf>('DI.Resume.GetCachedPdf'),
-    UpdateDisplaySettings: new InjectionToken<UpdateResumeDisplaySettings>('DI.Resume.UpdateDisplaySettings')
+    UpdateDisplaySettings: new InjectionToken<UpdateResumeDisplaySettings>('DI.Resume.UpdateDisplaySettings'),
+    Scorer: new InjectionToken<ResumeScorer>('DI.Resume.Scorer'),
+    Score: new InjectionToken<ScoreResume>('DI.Resume.Score')
   },
 
   Company: {

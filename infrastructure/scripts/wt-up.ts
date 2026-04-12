@@ -92,27 +92,26 @@ if (isContainerRunning(ctx.containerName)) {
 
 const ormConfig = toOrmConfig(session);
 
-let dbReady = false;
+let cloned = false;
 
 log.info('Attempting to clone dev database...');
 try {
-  dbReady = await cloneDevDatabase(ctx.containerName, session.dbName);
+  cloned = await cloneDevDatabase(ctx.containerName, session.dbName);
 } catch (e) {
   log.warn(`Clone failed: ${e instanceof Error ? e.message : e}`);
 }
 
-if (!dbReady) {
-  log.warn('Falling back to migrations + seeds.');
+// Always run migrations — the clone may be behind the worktree's migration set
+log.info('Running migrations...');
+try {
+  await runMigrations({ dbConfig: ormConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
+} catch (e) {
+  teardown();
+  throw e;
+}
 
-  log.info('Running migrations...');
-  try {
-    await runMigrations({ dbConfig: ormConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
-  } catch (e) {
-    teardown();
-    throw e;
-  }
-
-  log.info('Running seeds...');
+if (!cloned) {
+  log.info('No clone available — running seeds...');
   try {
     await runSeeds(ormConfig);
   } catch (e) {

@@ -145,10 +145,9 @@ export function AtelierPdfPreview({ selectedJobId }: { selectedJobId: string | n
 
   return (
     <>
-      <div className="flex h-full min-w-0 flex-1 flex-col border-l">
+      <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex flex-col gap-4 p-5" style={{ height: '100%' }}>
-          <div className="flex items-center justify-between">
-            <p className="text-[14px] font-medium text-foreground">PDF Preview</p>
+          <div className="flex items-center justify-end">
             <div className="flex gap-1">
               <Button
                 variant="ghost"

@@ -20,12 +20,27 @@ export type ResumeOutputExperience = {
   hiddenBulletIndices: number[];
 };
 
+export type RequirementScore = {
+  requirement: string;
+  coverage: 'strong' | 'partial' | 'absent';
+  matchingBulletIndices: number[];
+  reasoning: string;
+};
+
+export type ResumeScore = {
+  overall: number;
+  requirements: RequirementScore[];
+  summary: string;
+};
+
 export type ResumeOutput = {
+  resumeContentId: string;
   headline?: string;
   experiences: ResumeOutputExperience[];
   hiddenEducationIds: string[];
   generatedAt: string;
   scopedInstructions: Record<string, string>;
+  score: ResumeScore | null;
 };
 
 export type JobDescription = {

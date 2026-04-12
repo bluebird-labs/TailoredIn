@@ -9,3 +9,4 @@ export type {
   ResumeRenderInput
 } from './ResumeRenderer.js';
 export type { ResumeRendererFactory, ResumeTheme } from './ResumeRendererFactory.js';
+export type { ResumeScoreInput, ResumeScorer } from './ResumeScorer.js';

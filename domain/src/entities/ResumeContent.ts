@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { AggregateRoot } from '../AggregateRoot.js';
 import type { ResumeExperience } from '../value-objects/ResumeExperience.js';
+import type { ResumeScore } from '../value-objects/ResumeScore.js';
 
 export type ResumeContentCreateProps = {
   profileId: string;
@@ -38,6 +39,9 @@ export class ResumeContent extends AggregateRoot {
   @Property({ fieldName: 'schema', type: 'jsonb', nullable: true })
   public readonly schema: Record<string, unknown> | null;
 
+  @Property({ fieldName: 'score', type: 'jsonb', nullable: true })
+  public readonly score: ResumeScore | null;
+
   @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
 
@@ -53,6 +57,7 @@ export class ResumeContent extends AggregateRoot {
     hiddenEducationIds: string[];
     prompt: string;
     schema: Record<string, unknown> | null;
+    score: ResumeScore | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -65,6 +70,7 @@ export class ResumeContent extends AggregateRoot {
     this.hiddenEducationIds = props.hiddenEducationIds;
     this.prompt = props.prompt;
     this.schema = props.schema;
+    this.score = props.score;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -80,6 +86,7 @@ export class ResumeContent extends AggregateRoot {
       hiddenEducationIds: props.hiddenEducationIds ?? [],
       prompt: props.prompt,
       schema: props.schema,
+      score: null,
       createdAt: now,
       updatedAt: now
     });
@@ -98,6 +105,7 @@ export class ResumeContent extends AggregateRoot {
       hiddenEducationIds: this.hiddenEducationIds,
       prompt: this.prompt,
       schema: this.schema,
+      score: this.score,
       createdAt: this.createdAt,
       updatedAt: new Date()
     });
@@ -113,6 +121,23 @@ export class ResumeContent extends AggregateRoot {
       hiddenEducationIds: ids,
       prompt: this.prompt,
       schema: this.schema,
+      score: this.score,
+      createdAt: this.createdAt,
+      updatedAt: new Date()
+    });
+  }
+
+  public withScore(score: ResumeScore): ResumeContent {
+    return new ResumeContent({
+      id: this.id,
+      profileId: this.profileId,
+      jobDescriptionId: this.jobDescriptionId,
+      headline: this.headline,
+      experiences: this.experiences,
+      hiddenEducationIds: this.hiddenEducationIds,
+      prompt: this.prompt,
+      schema: this.schema,
+      score,
       createdAt: this.createdAt,
       updatedAt: new Date()
     });

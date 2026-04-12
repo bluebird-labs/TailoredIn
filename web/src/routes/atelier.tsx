@@ -1,6 +1,6 @@
 import { createFileRoute, retainSearchParams, useNavigate } from '@tanstack/react-router';
-import { useCallback } from 'react';
-import { AtelierPdfPreview } from '@/components/atelier/AtelierPdfPreview.js';
+import { useCallback, useState } from 'react';
+import { AtelierRightPanel, type AtelierTab } from '@/components/atelier/AtelierRightPanel.js';
 import { GenerationWorkspace } from '@/components/atelier/GenerationWorkspace.js';
 import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
 
@@ -21,6 +21,7 @@ function AtelierPage() {
   useSearchPersistence('/atelier', search, ['job']);
   const { job: selectedJobId } = search;
   const navigate = useNavigate();
+  const [rightTab, setRightTab] = useState<AtelierTab>('pdf');
 
   const setSelectedJobId = useCallback(
     (id: string | null) => {
@@ -31,8 +32,12 @@ function AtelierPage() {
 
   return (
     <div className="-mx-9 -my-8 flex" style={{ height: 'calc(100vh)' }}>
-      <GenerationWorkspace selectedJobId={selectedJobId ?? null} onSelectJob={setSelectedJobId} />
-      <AtelierPdfPreview selectedJobId={selectedJobId ?? null} />
+      <GenerationWorkspace
+        selectedJobId={selectedJobId ?? null}
+        onSelectJob={setSelectedJobId}
+        onScoreComplete={() => setRightTab('score')}
+      />
+      <AtelierRightPanel selectedJobId={selectedJobId ?? null} activeTab={rightTab} onTabChange={setRightTab} />
     </div>
   );
 }

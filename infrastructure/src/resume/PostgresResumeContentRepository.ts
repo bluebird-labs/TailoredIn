@@ -24,6 +24,7 @@ export class PostgresResumeContentRepository implements ResumeContentRepository 
     this.orm.em.assign(existing, {
       experiences: resumeContent.experiences,
       hiddenEducationIds: resumeContent.hiddenEducationIds,
+      score: resumeContent.score,
       updatedAt: resumeContent.updatedAt
     });
     await this.orm.em.flush();

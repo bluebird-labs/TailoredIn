@@ -62,6 +62,7 @@ export { LocationType } from './value-objects/LocationType.js';
 export { ModelTier } from './value-objects/ModelTier.js';
 export { ResumeConstraints } from './value-objects/ResumeConstraints.js';
 export type { ResumeExperience } from './value-objects/ResumeExperience.js';
+export type { RequirementCoverage, RequirementScore, ResumeScore } from './value-objects/ResumeScore.js';
 export type { ResumeTemplate } from './value-objects/ResumeTemplate.js';
 export { DEFAULT_RESUME_TEMPLATE } from './value-objects/ResumeTemplate.js';
 export { SalaryRange } from './value-objects/SalaryRange.js';

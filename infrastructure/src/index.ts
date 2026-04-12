@@ -16,6 +16,7 @@ export { PostgresJobDescriptionRepository } from './job/PostgresJobDescriptionRe
 // LLM
 export { ClaudeApiProvider } from './llm/index.js';
 export { ClaudeApiResumeElementGenerator } from './resume/ClaudeApiResumeElementGeneratorNew.js';
+export { ClaudeApiResumeScorer } from './resume/ClaudeApiResumeScorer.js';
 export { PostgresProfileRepository } from './resume/PostgresProfileRepository.js';
 export { PostgresResumeContentRepository } from './resume/PostgresResumeContentRepository.js';
 // Prompt sections

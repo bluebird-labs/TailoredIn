@@ -34,6 +34,7 @@ import {
   ListJobDescriptions,
   ParseJobDescription,
   PromptRegistry,
+  ScoreResume,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -55,6 +56,7 @@ import {
   ClaudeApiJobDescriptionParser,
   ClaudeApiProvider,
   ClaudeApiResumeElementGenerator,
+  ClaudeApiResumeScorer,
   CompanyContextSection,
   createBulletRecipe,
   createExperienceBulletsRecipe,
@@ -366,6 +368,16 @@ container.bind({
 container.bind({
   provide: DI.Resume.UpdateDisplaySettings,
   useFactory: () => new UpdateResumeDisplaySettings(container.get(DI.ResumeContent.Repository))
+});
+container.bind({ provide: DI.Resume.Scorer, useClass: ClaudeApiResumeScorer });
+container.bind({
+  provide: DI.Resume.Score,
+  useFactory: () =>
+    new ScoreResume(
+      container.get(DI.ResumeContent.Repository),
+      container.get(DI.JobDescription.Repository),
+      container.get(DI.Resume.Scorer)
+    )
 });
 
 export { container };
