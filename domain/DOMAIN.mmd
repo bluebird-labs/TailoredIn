@@ -83,6 +83,16 @@ classDiagram
         +unlinkCompany()
         +updateBulletRange()
         +syncAccomplishments()
+        +addSkill()
+        +removeSkill()
+        +findSkillOrFail()
+        +syncSkills()
+    }
+
+    class ExperienceSkill {
+        <<Entity>>
+        +string experienceId
+        +string skillId
     }
 
     class GenerationPrompt {
@@ -155,6 +165,7 @@ classDiagram
     ResumeContent "1" --> "*" Application : has
     Profile "1" --> "*" Education : has
     Profile "1" --> "*" Experience : has
+    Experience "1" --> "*" ExperienceSkill : has
     GenerationSettings "1" --> "*" GenerationPrompt : has
     GenerationPrompt --> GenerationScope
     Profile "1" --> "*" GenerationSettings : has
@@ -237,6 +248,41 @@ classDiagram
     JobDescription --> LocationType
     JobDescription --> JobSource
     JobDescription "1" --> "*" ResumeContent : has
+
+    %% ──────────────────────────────────────────────
+    %%  Skill Subdomain
+    %% ──────────────────────────────────────────────
+
+    class Skill {
+        <<AggregateRoot>>
+        +string label
+        +string normalizedLabel
+        +SkillType type
+        +string? categoryId
+        +string? description
+        +SkillAlias[] aliases
+    }
+
+    class SkillType {
+        <<enumeration>>
+        LANGUAGE · TECHNOLOGY · METHODOLOGY
+        INTERPERSONAL
+    }
+
+    Skill "1" --> "*" ExperienceSkill : has
+    Skill --> SkillType
+
+    %% ──────────────────────────────────────────────
+    %%  SkillCategory Subdomain
+    %% ──────────────────────────────────────────────
+
+    class SkillCategory {
+        <<AggregateRoot>>
+        +string label
+        +string normalizedLabel
+        +number ordinal
+    }
+
 
     %% ──────────────────────────────────────────────
     %%  Enums & Types
@@ -444,6 +490,7 @@ classDiagram
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ExperienceSkill fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style GenerationPrompt fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
     style GenerationSettings fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style ResumeContent fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
@@ -456,6 +503,9 @@ classDiagram
     style CompanyStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style Skill fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style SkillType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style SkillCategory fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style AccomplishmentSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BusinessType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px

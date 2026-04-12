@@ -14,6 +14,8 @@ export type { EducationCreateProps } from './entities/Education.js';
 export { Education } from './entities/Education.js';
 export type { ExperienceCreateProps } from './entities/Experience.js';
 export { Experience } from './entities/Experience.js';
+export type { ExperienceSkillCreateProps } from './entities/ExperienceSkill.js';
+export { ExperienceSkill } from './entities/ExperienceSkill.js';
 export type { GenerationPromptCreateProps } from './entities/GenerationPrompt.js';
 export { GenerationPrompt } from './entities/GenerationPrompt.js';
 export type { GenerationSettingsCreateProps } from './entities/GenerationSettings.js';
@@ -24,6 +26,10 @@ export type { ProfileCreateProps } from './entities/Profile.js';
 export { Profile } from './entities/Profile.js';
 export type { ResumeContentCreateProps } from './entities/ResumeContent.js';
 export { ResumeContent } from './entities/ResumeContent.js';
+export type { SkillCreateProps } from './entities/Skill.js';
+export { Skill } from './entities/Skill.js';
+export type { SkillCategoryCreateProps } from './entities/SkillCategory.js';
+export { SkillCategory } from './entities/SkillCategory.js';
 // Ports — repository interfaces
 export type { ApplicationRepository } from './ports/ApplicationRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
@@ -33,6 +39,8 @@ export type { GenerationSettingsRepository } from './ports/GenerationSettingsRep
 export type { JobDescriptionRepository } from './ports/JobDescriptionRepository.js';
 export type { ProfileRepository } from './ports/ProfileRepository.js';
 export type { ResumeContentRepository } from './ports/ResumeContentRepository.js';
+export type { SkillCategoryRepository } from './ports/SkillCategoryRepository.js';
+export type { SkillRepository } from './ports/SkillRepository.js';
 export type { Result } from './Result.js';
 export { err, ok } from './Result.js';
 export { ValidationError } from './ValidationError.js';
@@ -66,3 +74,5 @@ export type { RequirementCoverage, RequirementScore, ResumeScore } from './value
 export type { ResumeTemplate } from './value-objects/ResumeTemplate.js';
 export { DEFAULT_RESUME_TEMPLATE } from './value-objects/ResumeTemplate.js';
 export { SalaryRange } from './value-objects/SalaryRange.js';
+export type { SkillAlias } from './value-objects/SkillAlias.js';
+export { SkillType } from './value-objects/SkillType.js';

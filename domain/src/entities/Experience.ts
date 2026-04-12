@@ -4,6 +4,7 @@ import { AggregateRoot } from '../AggregateRoot.js';
 import { EntityNotFoundError } from '../EntityNotFoundError.js';
 import { ValidationError } from '../ValidationError.js';
 import { Accomplishment } from './Accomplishment.js';
+import { ExperienceSkill } from './ExperienceSkill.js';
 
 export type ExperienceCreateProps = {
   profileId: string;
@@ -71,6 +72,13 @@ export class Experience extends AggregateRoot {
     { orphanRemoval: true, orderBy: { ordinal: 'ASC' } }
   )
   public readonly accomplishments = new Collection<Accomplishment>(this);
+
+  @OneToMany(
+    () => ExperienceSkill,
+    es => es.experienceId,
+    { orphanRemoval: true }
+  )
+  public readonly skills = new Collection<ExperienceSkill>(this);
 
   @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
@@ -192,6 +200,46 @@ export class Experience extends AggregateRoot {
           narrative: item.narrative,
           ordinal: item.ordinal
         });
+      }
+    }
+
+    this.updatedAt = new Date();
+  }
+
+  public addSkill(skillId: string): ExperienceSkill {
+    const skill = ExperienceSkill.create({ experienceId: this.id, skillId });
+    this.skills.add(skill);
+    this.updatedAt = new Date();
+    return skill;
+  }
+
+  public removeSkill(skillId: string): void {
+    const item = this.skills.getItems().find(s => s.skillId === skillId);
+    if (!item) throw new EntityNotFoundError('ExperienceSkill', skillId);
+    this.skills.remove(item);
+    this.updatedAt = new Date();
+  }
+
+  public findSkillOrFail(skillId: string): ExperienceSkill {
+    const item = this.skills.getItems().find(s => s.skillId === skillId);
+    if (!item) throw new EntityNotFoundError('ExperienceSkill', skillId);
+    return item;
+  }
+
+  public syncSkills(skillIds: string[]): void {
+    const inputSet = new Set(skillIds);
+
+    // Remove skills absent from the input list
+    const toRemove = this.skills.getItems().filter(s => !inputSet.has(s.skillId));
+    for (const item of toRemove) {
+      this.skills.remove(item);
+    }
+
+    // Add new skills not already present
+    const existingSkillIds = new Set(this.skills.getItems().map(s => s.skillId));
+    for (const skillId of skillIds) {
+      if (!existingSkillIds.has(skillId)) {
+        this.skills.add(ExperienceSkill.create({ experienceId: this.id, skillId }));
       }
     }
 

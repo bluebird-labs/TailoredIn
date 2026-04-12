@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "dependencies": {
     "@mikro-orm/core": "^7.0.0",
-    "@mikro-orm/decorators": "^7.0.0"
+    "@mikro-orm/decorators": "^7.0.0",
+    "@tailoredin/core": "workspace:*"
   },
   "devDependencies": {
     "@mikro-orm/sqlite": "^7.0.0",

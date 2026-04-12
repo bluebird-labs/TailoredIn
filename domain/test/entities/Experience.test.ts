@@ -83,6 +83,78 @@ describe('Experience', () => {
     expect(exp.companyId).toBeNull();
   });
 
+  test('creates with empty skills', () => {
+    const exp = makeExperience();
+    expect(exp.skills).toHaveLength(0);
+  });
+
+  test('adds a skill', () => {
+    const exp = makeExperience();
+    const es = exp.addSkill('skill-1');
+    expect(exp.skills).toHaveLength(1);
+    expect(es.skillId).toBe('skill-1');
+    expect(es.experienceId).toBe(exp.id);
+  });
+
+  test('removes a skill', () => {
+    const exp = makeExperience();
+    exp.addSkill('skill-1');
+    exp.removeSkill('skill-1');
+    expect(exp.skills).toHaveLength(0);
+  });
+
+  test('throws when removing non-existent skill', () => {
+    const exp = makeExperience();
+    expect(() => exp.removeSkill('nonexistent')).toThrow('ExperienceSkill not found');
+  });
+
+  test('finds skill or fails', () => {
+    const exp = makeExperience();
+    exp.addSkill('skill-1');
+    const found = exp.findSkillOrFail('skill-1');
+    expect(found.skillId).toBe('skill-1');
+  });
+
+  describe('syncSkills', () => {
+    it('adds new skills', () => {
+      const exp = makeExperience();
+      exp.syncSkills(['skill-1', 'skill-2']);
+      expect(exp.skills).toHaveLength(2);
+    });
+
+    it('removes skills absent from input', () => {
+      const exp = makeExperience();
+      exp.addSkill('skill-1');
+      exp.addSkill('skill-2');
+      exp.syncSkills(['skill-1']);
+      expect(exp.skills).toHaveLength(1);
+      expect(exp.skills[0].skillId).toBe('skill-1');
+    });
+
+    it('keeps existing skills that are in the input', () => {
+      const exp = makeExperience();
+      const es = exp.addSkill('skill-1');
+      exp.syncSkills(['skill-1', 'skill-2']);
+      expect(exp.skills).toHaveLength(2);
+      expect(exp.skills.getItems().find(s => s.skillId === 'skill-1')!.id).toBe(es.id);
+    });
+
+    it('clears all skills when given empty list', () => {
+      const exp = makeExperience();
+      exp.addSkill('skill-1');
+      exp.addSkill('skill-2');
+      exp.syncSkills([]);
+      expect(exp.skills).toHaveLength(0);
+    });
+
+    it('updates experience updatedAt', () => {
+      const exp = makeExperience();
+      const before = exp.updatedAt;
+      exp.syncSkills(['skill-1']);
+      expect(exp.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
+    });
+  });
+
   describe('syncAccomplishments', () => {
     function makeExperienceWithAccomplishments() {
       const exp = Experience.create({
