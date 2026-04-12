@@ -14,11 +14,13 @@ describe('MindDatasetParser', () => {
     expect(dataset.skills).toHaveLength(5);
   });
 
-  test('parses all concepts from fixture files', async () => {
+  test('parses categorized concepts from fixture files', async () => {
     const dataset = await parser.parse(FIXTURES_DIR);
 
-    // 3 architectural pattern concepts
-    expect(dataset.concepts).toHaveLength(3);
+    // architectural_patterns: 2 categories x 3 items = 6
+    // technical_domains: 4 plain strings
+    // Total: 10
+    expect(dataset.concepts).toHaveLength(10);
   });
 
   test('attaches sourceFile to each skill', async () => {
@@ -31,11 +33,20 @@ describe('MindDatasetParser', () => {
     expect(reactSkill?.sourceFile).toBe('frameworks_frontend');
   });
 
-  test('attaches mindType to each concept', async () => {
+  test('attaches mindType to categorized concepts', async () => {
     const dataset = await parser.parse(FIXTURES_DIR);
 
     const concept = dataset.concepts.find(c => c.name === 'Microservices');
     expect(concept?.mindType).toBe('architectural_patterns');
+    expect(concept?.category).toBe('Application Architecture Patterns');
+  });
+
+  test('attaches mindType to plain string concepts with null category', async () => {
+    const dataset = await parser.parse(FIXTURES_DIR);
+
+    const concept = dataset.concepts.find(c => c.name === 'Backend');
+    expect(concept?.mindType).toBe('technical_domains');
+    expect(concept?.category).toBeNull();
   });
 
   test('maps skill fields correctly', async () => {
@@ -48,13 +59,6 @@ describe('MindDatasetParser', () => {
     expect(js.buildTools).toEqual(['npm', 'webpack']);
     expect(js.runtimeEnvironments).toEqual(['Node.js', 'Deno', 'Bun']);
     expect(js.impliesKnowingConcepts).toEqual(['Event-driven programming']);
-  });
-
-  test('maps concept fields correctly', async () => {
-    const dataset = await parser.parse(FIXTURES_DIR);
-
-    const eda = dataset.concepts.find(c => c.name === 'Event-driven programming')!;
-    expect(eda.synonyms).toEqual(['event-driven architecture', 'EDA']);
   });
 
   test('defaults optional arrays to empty', async () => {

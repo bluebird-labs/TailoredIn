@@ -41,11 +41,11 @@ describe('MindImporter', () => {
 
     // 3 programming languages + 2 frameworks = 5 skills
     expect(skills).toBe(5);
-    // 3 architectural pattern concepts
-    expect(concepts).toBe(3);
-    // React → JavaScript (impliesKnowingSkills) + React → Component-based architecture (impliesKnowingConcepts)
-    // Vue → JavaScript (impliesKnowingSkills) + Vue → Component-based architecture (impliesKnowingConcepts)
-    // JavaScript → Event-driven programming (impliesKnowingConcepts)
+    // architectural_patterns: 6 (2 categories x 3 items) + technical_domains: 4 = 10
+    expect(concepts).toBe(10);
+    // React → JavaScript, Vue → JavaScript (impliesKnowingSkills)
+    // JavaScript → Event-driven programming, React → Component-based architecture,
+    // Vue → Component-based architecture (impliesKnowingConcepts)
     expect(relations).toBe(5);
   }, 60_000);
 
@@ -69,7 +69,6 @@ describe('MindImporter', () => {
   test('relations are derived correctly from impliesKnowing arrays', async () => {
     const connection = orm.em.getConnection();
 
-    // Check impliesKnowingSkills relations
     const skillRelations = await connection.execute(
       `SELECT "mind_source_name", "mind_target_name" FROM "mind_relations" WHERE "relation_type" = 'impliesKnowingSkills' ORDER BY "mind_source_name"`
     );
@@ -81,7 +80,6 @@ describe('MindImporter', () => {
       ])
     );
 
-    // Check impliesKnowingConcepts relations
     const conceptRelations = await connection.execute(
       `SELECT "mind_source_name", "mind_target_name" FROM "mind_relations" WHERE "relation_type" = 'impliesKnowingConcepts' ORDER BY "mind_source_name"`
     );
@@ -93,6 +91,28 @@ describe('MindImporter', () => {
         expect.objectContaining({ mind_source_name: 'Vue', mind_target_name: 'Component-based architecture' })
       ])
     );
+  }, 60_000);
+
+  test('categorized concepts store category correctly', async () => {
+    const connection = orm.em.getConnection();
+    const result = await connection.execute(
+      `SELECT "mind_name", "mind_type", "category" FROM "mind_concepts" WHERE "mind_name" = 'Microservices'`
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0].mind_type).toBe('architectural_patterns');
+    expect(result[0].category).toBe('Application Architecture Patterns');
+  }, 60_000);
+
+  test('plain string concepts have null category', async () => {
+    const connection = orm.em.getConnection();
+    const result = await connection.execute(
+      `SELECT "mind_name", "mind_type", "category" FROM "mind_concepts" WHERE "mind_name" = 'Backend'`
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0].mind_type).toBe('technical_domains');
+    expect(result[0].category).toBeNull();
   }, 60_000);
 
   test('skill JSONB fields are stored correctly', async () => {

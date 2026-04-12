@@ -37,7 +37,7 @@ export class Migration_20260508000000_create_mind_tables extends Migration {
       CREATE TABLE "mind_concepts" (
         "mind_name"      text NOT NULL,
         "mind_type"      text NOT NULL,
-        "synonyms"       jsonb NOT NULL DEFAULT '[]',
+        "category"       text NULL,
         "mind_version"   text NOT NULL,
         "created_at"     timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updated_at"     timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,

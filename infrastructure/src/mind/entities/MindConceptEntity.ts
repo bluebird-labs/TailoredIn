@@ -3,7 +3,7 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 
 @Entity({ tableName: 'mind_concepts' })
 export class MindConceptEntity {
-  public [OptionalProps]?: 'synonyms' | 'createdAt' | 'updatedAt';
+  public [OptionalProps]?: 'category' | 'createdAt' | 'updatedAt';
 
   @PrimaryKey({ type: 'text' })
   public mindName!: string;
@@ -11,8 +11,8 @@ export class MindConceptEntity {
   @Property({ type: 'text' })
   public mindType!: string;
 
-  @Property({ type: 'jsonb' })
-  public synonyms: string[] = [];
+  @Property({ type: 'text', nullable: true })
+  public category: string | null = null;
 
   @Property({ type: 'text' })
   public mindVersion!: string;

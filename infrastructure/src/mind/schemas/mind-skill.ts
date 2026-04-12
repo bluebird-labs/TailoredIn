@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const MindSkillSchema = z.object({
   name: z.string().min(1),
-  type: z.array(z.string()).min(1),
+  type: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   synonyms: z.array(z.string()).default([]),
   technicalDomains: z.array(z.string()).default([]),
   impliesKnowingSkills: z.array(z.string()).default([]),

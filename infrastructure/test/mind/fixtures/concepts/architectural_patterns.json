@@ -1,14 +1,10 @@
 [
   {
-    "name": "Component-based architecture",
-    "synonyms": ["component architecture", "component-driven development"]
+    "category": "Service Architecture Patterns",
+    "patterns": ["REST", "GraphQL", "gRPC"]
   },
   {
-    "name": "Event-driven programming",
-    "synonyms": ["event-driven architecture", "EDA"]
-  },
-  {
-    "name": "Microservices",
-    "synonyms": ["microservice architecture"]
+    "category": "Application Architecture Patterns",
+    "patterns": ["MVC", "Microservices", "Event-Driven Architecture"]
   }
 ]

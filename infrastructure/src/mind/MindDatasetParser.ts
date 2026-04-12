@@ -3,7 +3,7 @@ import { basename, join } from 'node:path';
 import { Logger } from '@tailoredin/core';
 import type { ZodError } from 'zod';
 import type { MindDataset, MindParsedConcept, MindParsedSkill } from './MindDataset.js';
-import { MindConceptSchema } from './schemas/mind-concept.js';
+import { MindCategorizedConceptSchema } from './schemas/mind-concept.js';
 import { MindSkillSchema } from './schemas/mind-skill.js';
 
 export class MindDatasetParser {
@@ -26,7 +26,7 @@ export class MindDatasetParser {
 
     for (const file of files) {
       const sourceFile = basename(file, '.json');
-      if (sourceFile.startsWith('__')) continue;
+      if (sourceFile.startsWith('_')) continue;
 
       const raw = await this.readJsonArray(join(skillsDir, file));
       for (let i = 0; i < raw.length; i++) {
@@ -47,28 +47,49 @@ export class MindDatasetParser {
     return allSkills;
   }
 
+  /**
+   * Concept files come in two shapes:
+   * 1. Plain string arrays: ["Backend", "Frontend", ...]
+   * 2. Categorized objects: [{ category: "...", <items_key>: ["...", ...] }, ...]
+   *
+   * Both are flattened into MindParsedConcept rows. Categorized concepts get the
+   * category field populated; plain strings get category = null.
+   */
   private async parseConcepts(conceptsDir: string): Promise<MindParsedConcept[]> {
     const files = await this.listJsonFiles(conceptsDir);
     const allConcepts: MindParsedConcept[] = [];
-    const errors: { file: string; index: number; error: ZodError }[] = [];
 
     for (const file of files) {
       const mindType = basename(file, '.json');
-
       const raw = await this.readJsonArray(join(conceptsDir, file));
-      for (let i = 0; i < raw.length; i++) {
-        const result = MindConceptSchema.safeParse(raw[i]);
-        if (result.success) {
-          allConcepts.push({ ...result.data, mindType });
-        } else {
-          errors.push({ file, index: i, error: result.error });
+
+      if (raw.length === 0) continue;
+
+      if (typeof raw[0] === 'string') {
+        // Plain string array — each string is a concept name
+        for (const item of raw) {
+          if (typeof item === 'string' && item.length > 0) {
+            allConcepts.push({ name: item, category: null, mindType });
+          }
+        }
+      } else {
+        // Categorized objects — extract items from each category
+        for (const item of raw) {
+          const result = MindCategorizedConceptSchema.safeParse(item);
+          if (!result.success) continue;
+
+          const { category, ...rest } = result.data;
+          // The items key varies by file — find the first string array that isn't 'category'
+          for (const [key, values] of Object.entries(rest)) {
+            if (key === 'category' || !Array.isArray(values)) continue;
+            for (const name of values) {
+              if (typeof name === 'string' && name.length > 0) {
+                allConcepts.push({ name, category, mindType });
+              }
+            }
+          }
         }
       }
-    }
-
-    if (errors.length > 0) {
-      const messages = errors.map(e => `${e.file}[${e.index}]: ${e.error.message}`);
-      throw new Error(`MIND concept validation failed (${errors.length} errors):\n${messages.join('\n')}`);
     }
 
     return allConcepts;

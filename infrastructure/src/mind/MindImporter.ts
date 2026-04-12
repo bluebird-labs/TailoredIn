@@ -135,12 +135,12 @@ export class MindImporter {
   }
 
   private buildConcepts(dataset: MindDataset, version: string): TableImport {
-    const columns = ['mind_name', 'mind_type', 'synonyms', 'mind_version'];
+    const columns = ['mind_name', 'mind_type', 'category', 'mind_version'];
     return {
       table: 'mind_concepts',
       columns,
       conflictColumns: ['mind_name'],
-      rows: dataset.concepts.map(c => [c.name, c.mindType, JSON.stringify(c.synonyms), version])
+      rows: dataset.concepts.map(c => [c.name, c.mindType, c.category, version])
     };
   }
 
