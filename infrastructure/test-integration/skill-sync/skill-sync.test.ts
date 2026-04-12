@@ -38,8 +38,9 @@ describe('SkillSyncService', () => {
        VALUES
          ('JavaScript', 'programming', '#f1e05a', '["JS"]', '[]', '[]', 'v1', ?, ?),
          ('TypeScript', 'programming', '#3178c6', '["TS"]', '[]', '[]', 'v1', ?, ?),
-         ('HTML', 'markup', '#e34c26', '[]', '[]', '[]', 'v1', ?, ?)`,
-      [now, now, now, now, now, now],
+         ('HTML', 'markup', '#e34c26', '[]', '[]', '[]', 'v1', ?, ?),
+         ('JSON', 'data', '#292929', '[]', '[]', '[]', 'v1', ?, ?)`,
+      [now, now, now, now, now, now, now, now],
       'run'
     );
 
@@ -57,7 +58,8 @@ describe('SkillSyncService', () => {
          ('PostgreSQL', '["Database"]', '["Postgres"]', 'databases', 'v1', ${mindDefaults}),
          ('Docker', '["Tool"]', '[]', 'containerization', 'v1', ${mindDefaults}),
          ('TensorFlow', '["Library"]', '["TF"]', 'machine_learning', 'v1', ${mindDefaults}),
-         ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${mindDefaults})`,
+         ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${mindDefaults}),
+         ('GraphQL', '["QueryLanguage"]', '["GQL"]', 'query_languages', 'v1', ${mindDefaults})`,
       [],
       'run'
     );
@@ -216,6 +218,12 @@ describe('SkillSyncService', () => {
 
     const tf = skills.find(s => s.normalized_label === 'tensorflow')!;
     expect(getCategoryLabel(tf)).toBe('AI & Machine Learning');
+
+    const html = skills.find(s => s.normalized_label === 'html')!;
+    expect(getCategoryLabel(html)).toBe('Frontend');
+
+    const graphql = skills.find(s => s.normalized_label === 'graphql')!;
+    expect(getCategoryLabel(graphql)).toBe('Databases');
   }, 60_000);
 
   it('ESCO transversal skills get type INTERPERSONAL', async () => {
@@ -281,6 +289,15 @@ describe('SkillSyncService', () => {
     for (const label of aliasLabels) {
       expect(label).not.toContain('\n');
     }
+  }, 60_000);
+
+  it('excludes Linguist data-type entries from skills', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const json = skills.find(s => s.normalized_label === 'json');
+    expect(json).toBeUndefined();
   }, 60_000);
 
   it('unknown MIND source file results in null category', async () => {

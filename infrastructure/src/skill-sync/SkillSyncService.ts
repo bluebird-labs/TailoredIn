@@ -65,6 +65,7 @@ const SOURCE_TO_CATEGORY: Record<string, string> = {
   backend_frameworks: 'backend',
   mobile_development: 'mobile',
   project_management: 'architecture-methodology',
+  query_languages: 'databases',
   leadership: 'leadership-communication'
 };
 
@@ -149,7 +150,7 @@ export class SkillSyncService {
     const rows = await this.connection.execute(
       `SELECT "linguist_name", "linguist_type", "aliases"
        FROM "linguist_languages"
-       WHERE "linguist_type" IN ('programming', 'markup', 'data')`,
+       WHERE "linguist_type" IN ('programming', 'markup')`,
       [],
       'all'
     );
@@ -164,7 +165,7 @@ export class SkillSyncService {
         label: row.linguist_name,
         normalizedLabel: normalizeLabel(row.linguist_name),
         type: row.linguist_type === 'programming' ? SkillType.LANGUAGE : SkillType.TECHNOLOGY,
-        categoryNormalizedLabel: 'programming-languages',
+        categoryNormalizedLabel: row.linguist_type === 'programming' ? 'programming-languages' : 'frontend',
         description: null,
         aliases,
         sourcePriority: 1
