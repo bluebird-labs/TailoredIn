@@ -31,11 +31,11 @@ class FitScoreRequest extends LlmJsonRequest<typeof fitScoreSchema> {
   }
 
   public override get model(): string {
-    return 'claude-haiku-4-5-20251001';
+    return 'claude-opus-4-6';
   }
 
   public override get maxTokens(): number {
-    return 4096;
+    return 16384;
   }
 
   public getInput(): Record<string, unknown> {
