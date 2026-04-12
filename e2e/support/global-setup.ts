@@ -6,15 +6,15 @@ import { deleteServerState } from './server-state.js';
 let serverProcess: ChildProcess | null = null;
 
 /**
- * Playwright globalSetup — spawns `bun run infrastructure/dev/e2e-start-servers.ts`.
+ * Playwright globalSetup — spawns `bun run infrastructure/scripts/e2e-start-servers.ts`.
  *
- * The server script lives in infrastructure/dev/ (not e2e/) so that Bun resolves
+ * The server script lives in infrastructure/scripts/ (not e2e/) so that Bun resolves
  * @mikro-orm/*, @tailoredin/*, testcontainers, and vite from the workspace — not
  * from e2e/node_modules which only has @playwright/test.
  */
 export default async function globalSetup(_config: FullConfig): Promise<() => Promise<void>> {
   const repoRoot = resolve(import.meta.dirname, '../..');
-  const scriptPath = resolve(repoRoot, 'infrastructure/dev/e2e-start-servers.ts');
+  const scriptPath = resolve(repoRoot, 'infrastructure/scripts/e2e-start-servers.ts');
 
   const { webPort, process: proc } = await new Promise<{ webPort: number; process: ChildProcess }>(
     (resolvePromise, reject) => {

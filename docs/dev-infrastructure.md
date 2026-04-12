@@ -18,7 +18,7 @@ How the local development environment works for both main-branch and worktree co
 
 ## Key Files
 
-All located in `infrastructure/dev/`.
+All located in `infrastructure/scripts/`.
 
 | File | Role |
 |---|---|

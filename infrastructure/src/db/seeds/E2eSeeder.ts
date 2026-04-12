@@ -7,7 +7,7 @@ import { Seeder } from '@mikro-orm/seeder';
  * Truncates all tables and re-seeds with full fixture data.
  * Do NOT run against a production or development database.
  *
- * Used by: infrastructure/dev/e2e-start-servers.ts
+ * Used by: infrastructure/scripts/e2e-start-servers.ts
  */
 export class E2eSeeder extends Seeder {
   public async run(em: EntityManager): Promise<void> {
