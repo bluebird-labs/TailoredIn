@@ -38,6 +38,7 @@ import {
 } from '../esco/entities/index.js';
 import { LinguistLanguageEntity } from '../linguist/entities/index.js';
 import { MindConceptEntity, MindRelationEntity, MindSkillEntity } from '../mind/entities/index.js';
+import { TanovaSkillEntity } from '../tanova/entities/index.js';
 
 const PACKAGE_DIR = Path.resolve(import.meta.dirname);
 
@@ -90,7 +91,9 @@ export function createOrmConfig(db: OrmDbConfig) {
       // MIND reference data
       MindSkillEntity,
       MindConceptEntity,
-      MindRelationEntity
+      MindRelationEntity,
+      // Tanova reference data
+      TanovaSkillEntity
     ],
     extensions: [Migrator, SchemaGenerator, SeedManager],
 

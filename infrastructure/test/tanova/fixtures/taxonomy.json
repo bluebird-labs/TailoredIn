@@ -1,0 +1,127 @@
+{
+  "version": "1.0.0-test",
+  "last_updated": "2026-01-15",
+  "categories": {
+    "technology": {
+      "programming_languages": {
+        "skills": [
+          {
+            "id": "javascript",
+            "canonical_name": "JavaScript",
+            "aliases": ["JS", "ECMAScript"],
+            "category": "technology",
+            "subcategory": "programming_languages",
+            "tags": ["frontend", "backend", "web"],
+            "description": "A high-level, interpreted programming language.",
+            "parent_skills": [],
+            "child_skills": ["typescript"],
+            "related_skills": ["typescript", "nodejs"],
+            "transferability": {
+              "typescript": 0.95,
+              "python": 0.6
+            },
+            "proficiency_levels": {
+              "beginner": {
+                "markers": ["Can write basic scripts", "Understands variables and functions"],
+                "typical_experience": "0-6 months"
+              },
+              "intermediate": {
+                "markers": ["Comfortable with async/await", "Uses modern ES6+ features"],
+                "typical_experience": "6 months - 2 years"
+              },
+              "advanced": {
+                "markers": ["Deep understanding of event loop", "Can optimize performance"],
+                "typical_experience": "2-5 years"
+              },
+              "expert": {
+                "markers": ["Contributes to language spec", "Builds compilers/engines"],
+                "typical_experience": "5+ years"
+              }
+            },
+            "typical_roles": ["Frontend Developer", "Full Stack Developer"],
+            "industry_demand": "very_high",
+            "prerequisites": []
+          },
+          {
+            "id": "typescript",
+            "canonical_name": "TypeScript",
+            "aliases": ["TS"],
+            "category": "technology",
+            "subcategory": "programming_languages",
+            "tags": ["frontend", "backend", "typed"],
+            "description": "A typed superset of JavaScript that compiles to plain JavaScript.",
+            "parent_skills": ["javascript"],
+            "child_skills": [],
+            "related_skills": ["javascript", "nodejs"],
+            "transferability": {
+              "javascript": 0.98,
+              "java": 0.4
+            },
+            "proficiency_levels": {
+              "beginner": {
+                "markers": ["Can add basic type annotations"],
+                "typical_experience": "0-3 months"
+              },
+              "intermediate": {
+                "markers": ["Uses generics and utility types"],
+                "typical_experience": "3 months - 1 year"
+              }
+            },
+            "typical_roles": ["Frontend Developer", "Full Stack Developer"],
+            "industry_demand": "very_high",
+            "prerequisites": ["javascript"]
+          }
+        ]
+      },
+      "databases": {
+        "skills": [
+          {
+            "id": "postgresql",
+            "canonical_name": "PostgreSQL",
+            "aliases": ["Postgres", "PG"],
+            "category": "technology",
+            "subcategory": "databases",
+            "tags": ["database", "sql", "relational"],
+            "description": "An advanced open-source relational database.",
+            "parent_skills": [],
+            "child_skills": [],
+            "related_skills": ["mysql"],
+            "transferability": {
+              "mysql": 0.85
+            },
+            "proficiency_levels": {
+              "beginner": {
+                "markers": ["Can write basic SELECT queries"],
+                "typical_experience": "0-3 months"
+              }
+            },
+            "typical_roles": ["Backend Developer", "Database Administrator"],
+            "industry_demand": "high",
+            "prerequisites": []
+          }
+        ]
+      }
+    },
+    "business": {
+      "project_management": {
+        "skills": [
+          {
+            "id": "agile",
+            "canonical_name": "Agile Methodology",
+            "aliases": ["Agile", "Scrum"],
+            "category": "business",
+            "subcategory": "project_management",
+            "tags": ["methodology", "management"],
+            "description": "An iterative approach to project management and software development.",
+            "parent_skills": [],
+            "child_skills": [],
+            "related_skills": [],
+            "typical_roles": ["Project Manager", "Scrum Master"],
+            "industry_demand": "high",
+            "prerequisites": []
+          }
+        ]
+      }
+    }
+  }
+}
