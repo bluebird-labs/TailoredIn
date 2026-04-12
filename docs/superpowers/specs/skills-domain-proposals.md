@@ -12,7 +12,7 @@
 | 4 | Skills Sync Pipeline | [Block 4](../plans/2026-04-12-skills-block4-sync-pipeline.md) | `DONE` | dc35871 | Cross-source dedup + merge. 11 categories, slug normalizeLabel, missing source mappings fixed (7f0e98c, 8a48522) |
 | 5 | Application Layer | [Block 5](../plans/2026-04-12-skills-block5-application-layer.md) | `DONE` | 6588c39 | Use cases + DTOs |
 | 6 | API Layer | [Block 6](../plans/2026-04-12-skills-block6-api-layer.md) | `DONE` | 42ef554 | 3 routes + DI wiring. Fixed missing repo barrel exports (89e6ce6) |
-| 7 | Web Layer | [Block 7](../plans/2026-04-12-skills-block7-web-layer.md) | `TODO` | — | Skill picker UI |
+| 7 | Web Layer | [Block 7](../plans/2026-04-12-skills-block7-web-layer.md) | `DONE` | 3a97623 | Skill picker UI with typeahead search, category grouping, chips |
 
 ### Execution order
 
