@@ -194,14 +194,30 @@ The web app uses file-based routing (TanStack Router). Key routes:
 
 Sidebar groups: **Workroom** (Profile, Atelier, Settings) and **Pipeline** (Rack, Jobs, Companies).
 
+### Data import & skills commands
+
+```bash
+bun skills:sync              # sync skills from all imported sources
+bun skills:reset             # reset skills data and re-import
+bun esco:import              # import ESCO skills taxonomy
+bun linguist:import          # import GitHub Linguist language data
+bun mind:import              # import MIND dataset
+bun tanova:import            # import Tanova dataset
+```
+
+All import commands require `--env-file=.env` (set automatically in the scripts) and read source data from `.local/`.
+
 ## Environment Variables
 Single `.env` at the repo root (gitignored; see `.env.example`):
 ```
 POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SCHEMA
+TZ, API_PORT, NODE_ENV, CLAUDE_API_KEY
 ```
 Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config`.
 
 `NODE_ENV=development` is set in `.env` (loaded automatically by Bun). `NODE_ENV=test` is set in `.env.test` (loaded automatically by `bun test`, overriding `.env`). Production deployments override at the platform level.
+
+**Worktrees** use `.env.wt` (copied into each worktree by `wt:up`). The main `.env` is never used in worktrees.
 
 ## Tooling Notes
 
@@ -211,6 +227,23 @@ Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config
 - **mise** manages Bun version (pinned in `.mise.toml`). Run `mise install` after cloning.
 - Bun runs TypeScript natively — no build step required.
 - See **`CONVENTIONS.md`** for file naming and import conventions (`.js` extensions, barrel imports, `import type`).
+
+## CI Pipeline
+
+GitHub Actions (`.github/workflows/ci.yaml`) runs on push to `main` and PRs. Path-filtered jobs:
+
+| Job | Command | Notes |
+|---|---|---|
+| Lint & Format | `bun run check` | |
+| Typecheck | `bun run typecheck` | |
+| Test & Coverage | `bun run test:coverage` | |
+| Integration Tests | `bun run --cwd infrastructure test:integration` | Installs Typst |
+| Dead Code | `bun run knip` | |
+| Dependency Boundaries | `bun run dep:check` | |
+| E2E Tests | `bun e2e:test` | Installs Typst + Playwright Chromium |
+| Secret Scanning | gitleaks | Always runs |
+
+**Typst** is required for integration and E2E tests (resume PDF generation). CI installs it via `typst-community/setup-typst@v4`. Locally, install via `mise` or your OS package manager.
 
 ## Design System
 
