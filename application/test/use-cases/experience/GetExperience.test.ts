@@ -4,7 +4,8 @@ import {
   type CompanyRepository,
   EntityNotFoundError,
   Experience,
-  type ExperienceRepository
+  type ExperienceRepository,
+  type SkillRepository
 } from '@tailoredin/domain';
 import { GetExperience } from '../../../src/use-cases/experience/GetExperience.js';
 
@@ -45,6 +46,10 @@ const makeCompany = () =>
     updatedAt: new Date('2024-01-01')
   });
 
+const mockSkillRepo: Partial<SkillRepository> = {
+  findByIds: mock(() => Promise.resolve([]))
+};
+
 describe('GetExperience', () => {
   test('returns an experience DTO with linked company when companyId is set', async () => {
     const company = makeCompany();
@@ -60,7 +65,11 @@ describe('GetExperience', () => {
       findById: mock(() => Promise.resolve(company))
     };
 
-    const useCase = new GetExperience(experienceRepo, companyRepo as CompanyRepository);
+    const useCase = new GetExperience(
+      experienceRepo,
+      companyRepo as CompanyRepository,
+      mockSkillRepo as SkillRepository
+    );
     const result = await useCase.execute({ experienceId: 'exp-aaaa-1111-2222-3333-444444444444' });
 
     expect(result.id).toBe('exp-aaaa-1111-2222-3333-444444444444');
@@ -84,7 +93,11 @@ describe('GetExperience', () => {
       findById: mock(() => Promise.resolve(null))
     };
 
-    const useCase = new GetExperience(experienceRepo, companyRepo as CompanyRepository);
+    const useCase = new GetExperience(
+      experienceRepo,
+      companyRepo as CompanyRepository,
+      mockSkillRepo as SkillRepository
+    );
     const result = await useCase.execute({ experienceId: 'exp-aaaa-1111-2222-3333-444444444444' });
 
     expect(result.id).toBe('exp-aaaa-1111-2222-3333-444444444444');
@@ -106,7 +119,11 @@ describe('GetExperience', () => {
       findById: mock(() => Promise.resolve(null))
     };
 
-    const useCase = new GetExperience(experienceRepo, companyRepo as CompanyRepository);
+    const useCase = new GetExperience(
+      experienceRepo,
+      companyRepo as CompanyRepository,
+      mockSkillRepo as SkillRepository
+    );
 
     await expect(useCase.execute({ experienceId: 'exp-aaaa-1111-2222-3333-444444444444' })).rejects.toThrow(
       EntityNotFoundError

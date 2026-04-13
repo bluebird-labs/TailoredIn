@@ -134,6 +134,59 @@ export function useDeleteExperience() {
   });
 }
 
+export function useAddAccomplishment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { experienceId: string; title: string; narrative: string; ordinal: number }) => {
+      const { experienceId, ...body } = input;
+      const segment = api.experiences as EdenRouteSegment;
+      const { data, error } = await segment({ id: experienceId }).accomplishments.post(body);
+      if (error) throw new Error(extractApiError(error, 'Could not add accomplishment'));
+      return data?.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
+    }
+  });
+}
+
+export function useUpdateAccomplishment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      experienceId: string;
+      accomplishmentId: string;
+      title?: string;
+      narrative?: string;
+      ordinal?: number;
+    }) => {
+      const { experienceId, accomplishmentId, ...body } = input;
+      const segment = api.experiences as EdenRouteSegment;
+      const { error } = await segment({ id: experienceId }).accomplishments({ accomplishmentId }).put(body);
+      if (error) throw new Error(extractApiError(error, 'Could not update accomplishment'));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
+    }
+  });
+}
+
+export function useDeleteAccomplishment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { experienceId: string; accomplishmentId: string }) => {
+      const segment = api.experiences as EdenRouteSegment;
+      const { error } = await segment({ id: input.experienceId })
+        .accomplishments({ accomplishmentId: input.accomplishmentId })
+        .delete();
+      if (error) throw new Error(extractApiError(error, 'Could not delete accomplishment'));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
+    }
+  });
+}
+
 export function useLinkCompany() {
   const queryClient = useQueryClient();
   return useMutation({

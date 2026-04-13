@@ -23,7 +23,7 @@ All data fields render as plain text by default. The user clicks a section to en
 Edit sections are scoped to the domain aggregate boundary:
 - **Profile page:** One section for the entire Profile aggregate
 - **List pages:** Each list item (education, company) is its own editable section
-- **Complex entities (Experiences):** Click opens a modal instead of inline expand
+- **Detail pages:** Each section (e.g., experience Details, Summary, Skills, individual Accomplishments) is its own editable inline section
 
 ### Inline Expand for Lists
 
@@ -32,13 +32,18 @@ Simple-entity list items (Education, Companies) expand in-place when clicked:
 - Click expands card to reveal form fields with Save/Discard
 - Only one card can be expanded at a time within a list
 
-### Modal Forms (Complex Entities)
+### Detail Page Inline Editing
 
-Experiences (with nested Accomplishments) use modal forms. The card is content-first with the same hover treatment, but click opens `ExperienceFormModal` instead of inline expand.
+Complex entities like Experiences (with nested Accomplishments) use inline editing on a detail page. The detail page has editable sections for:
+- Details section
+- Summary section
+- Skills section
+- Individual Accomplishments (each is its own editable section)
 
-The `FormModal` shared component continues to handle:
+Editing respects the same mutual exclusion rules: only one section can be in edit mode at a time via `EditableSectionProvider`.
+
+The `FormModal` shared component is used for:
 - Create flows for any entity type
-- Edit flows for complex entities (Experiences)
 
 ### Dirty Tracking
 

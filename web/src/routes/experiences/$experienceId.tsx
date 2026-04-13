@@ -1,18 +1,25 @@
+import { closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Pencil } from 'lucide-react';
-import { useState } from 'react';
+import { Plus } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 import { formatEnumLabel } from '@/components/companies/company-options.js';
-import { ExperienceFormModal } from '@/components/resume/experience/ExperienceFormModal.js';
+import { SortableAccomplishmentCard } from '@/components/resume/experience/AccomplishmentCard.js';
+import { CreateAccomplishmentModal } from '@/components/resume/experience/CreateAccomplishmentModal.js';
+import { ExperienceDetailsEditor } from '@/components/resume/experience/ExperienceDetailsEditor.js';
+import { ExperienceSkillsEditor } from '@/components/resume/experience/ExperienceSkillsEditor.js';
+import { ExperienceSummaryEditor } from '@/components/resume/experience/ExperienceSummaryEditor.js';
 import { Breadcrumb } from '@/components/shared/Breadcrumb.js';
 import { DetailPageHeader, MetaDot, MetaText } from '@/components/shared/DetailPageHeader.js';
+import { EditableSectionProvider } from '@/components/shared/EditableSectionContext.js';
 import { EmptyState } from '@/components/shared/EmptyState.js';
-import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
+import { InfoCard } from '@/components/shared/InfoCard.js';
 import { LinkedEntityCard } from '@/components/shared/LinkedEntityCard.js';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton.js';
-import { SkillChip } from '@/components/skill-picker/SkillChip.js';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useExperience } from '@/hooks/use-experiences';
+import { useExperience, useUpdateExperience } from '@/hooks/use-experiences';
 
 export const Route = createFileRoute('/experiences/$experienceId')({
   component: ExperienceDetailPage
@@ -21,7 +28,52 @@ export const Route = createFileRoute('/experiences/$experienceId')({
 function ExperienceDetailPage() {
   const { experienceId } = Route.useParams();
   const { data: experience, isLoading } = useExperience(experienceId);
-  const [editOpen, setEditOpen] = useState(false);
+  const updateExperience = useUpdateExperience();
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      if (!experience) return;
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const items = [...experience.accomplishments];
+      const oldIndex = items.findIndex(a => a.id === active.id);
+      const newIndex = items.findIndex(a => a.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return;
+
+      const [moved] = items.splice(oldIndex, 1);
+      items.splice(newIndex, 0, moved);
+
+      updateExperience.mutate(
+        {
+          id: experience.id,
+          title: experience.title,
+          company_name: experience.companyName,
+          company_website: experience.companyWebsite ?? undefined,
+          company_accent: experience.companyAccent ?? undefined,
+          location: experience.location,
+          start_date: experience.startDate,
+          end_date: experience.endDate,
+          summary: experience.summary ?? undefined,
+          ordinal: experience.ordinal,
+          accomplishments: items.map((a, i) => ({
+            id: a.id,
+            title: a.title,
+            narrative: a.narrative,
+            ordinal: i
+          })),
+          bullet_min: experience.bulletMin,
+          bullet_max: experience.bulletMax
+        },
+        {
+          onError: () => toast.error('Failed to reorder. Please try again.')
+        }
+      );
+    },
+    [experience, updateExperience]
+  );
 
   if (isLoading) return <LoadingSkeleton variant="detail" />;
   if (!experience) return <EmptyState message="Experience not found." />;
@@ -29,170 +81,139 @@ function ExperienceDetailPage() {
   const initial = experience.companyName.charAt(0).toUpperCase();
   const industryLabel = experience.company ? formatEnumLabel('industry', experience.company.industry) : null;
   const stageLabel = experience.company ? formatEnumLabel('stage', experience.company.stage) : null;
-
   const accomplishmentCount = experience.accomplishments.length;
 
   return (
-    <div className="space-y-5">
-      <Breadcrumb parentLabel="Profile" parentTo="/profile" current={experience.title} />
+    <EditableSectionProvider>
+      <div className="space-y-5">
+        <Breadcrumb parentLabel="Profile" parentTo="/profile" current={experience.title} />
 
-      <DetailPageHeader
-        logo={
-          <div className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-accent text-[22px] font-medium text-accent-foreground">
-            {experience.company?.logoUrl ? (
-              <img
-                src={experience.company.logoUrl}
-                alt={experience.companyName}
-                className="h-full w-full rounded-xl object-cover"
-              />
-            ) : (
-              initial
-            )}
-          </div>
-        }
-        title={experience.title}
-        meta={
-          <>
-            {experience.company ? (
-              <Link
-                to="/companies/$companyId"
-                params={{ companyId: experience.company.id }}
-                className="text-[13px] text-primary hover:underline"
-              >
-                {experience.companyName}
-              </Link>
-            ) : (
-              <MetaText>{experience.companyName}</MetaText>
-            )}
-            {experience.location && (
-              <>
-                <MetaDot />
-                <MetaText>{experience.location}</MetaText>
-              </>
-            )}
-            <MetaDot />
-            <MetaText>
-              {experience.startDate} – {experience.endDate}
-            </MetaText>
-          </>
-        }
-        actions={
-          <Button size="sm" onClick={() => setEditOpen(true)}>
-            <Pencil className="mr-1.5 h-3.5 w-3.5" />
-            Edit
-          </Button>
-        }
-      />
-
-      <Tabs defaultValue="overview">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="accomplishments">
-            Accomplishments
-            {accomplishmentCount > 0 && (
-              <span className="ml-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[10px] text-accent-foreground">
-                {accomplishmentCount}
-              </span>
-            )}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview">
-          <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
-            <div className="space-y-5">
-              <InfoCard label="Summary">
-                {experience.summary ? (
-                  <p className="text-[14px] leading-relaxed tracking-[0.01em]">{experience.summary}</p>
-                ) : (
-                  <p className="text-[14px] italic text-muted-foreground">No summary</p>
-                )}
-              </InfoCard>
-
-              <InfoCard label="Details">
-                <InfoRow label="Company" value={experience.companyName} />
-                {experience.companyWebsite && (
-                  <InfoRow label="Website" value={experience.companyWebsite} href={experience.companyWebsite} />
-                )}
-                <InfoRow label="Location" value={experience.location} />
-                <InfoRow label="Start Date" value={experience.startDate} />
-                <InfoRow label="End Date" value={experience.endDate} />
-              </InfoCard>
-
-              <InfoCard label="Skills">
-                {experience.skills.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {experience.skills.map(es => (
-                      <SkillChip key={es.id} label={es.skill.label} />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-[14px] italic text-muted-foreground">No skills tagged</p>
-                )}
-              </InfoCard>
-            </div>
-
-            <div className="space-y-5">
-              {experience.company && (
-                <InfoCard label="Company">
-                  <LinkedEntityCard
-                    to={`/companies/${experience.company.id}`}
-                    logoUrl={experience.company.logoUrl}
-                    logoInitial={experience.company.name.charAt(0).toUpperCase()}
-                    name={experience.company.name}
-                    meta={
-                      [industryLabel, stageLabel].filter(Boolean).join(' · ') ||
-                      experience.company.website ||
-                      'No details'
-                    }
-                  />
-                </InfoCard>
+        <DetailPageHeader
+          logo={
+            <div className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-accent text-[22px] font-medium text-accent-foreground">
+              {experience.company?.logoUrl ? (
+                <img
+                  src={experience.company.logoUrl}
+                  alt={experience.companyName}
+                  className="h-full w-full rounded-xl object-cover"
+                />
+              ) : (
+                initial
               )}
-
-              <InfoCard label="Quick Stats">
-                <InfoRow label="Accomplishments" value={String(accomplishmentCount)} />
-                <InfoRow label="Skills" value={String(experience.skills.length)} />
-                <InfoRow label="Bullet Range" value={`${experience.bulletMin}–${experience.bulletMax}`} />
-              </InfoCard>
             </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="accomplishments">
-          <div className="mt-4">
-            {accomplishmentCount === 0 ? (
-              <EmptyState message="No accomplishments yet." />
-            ) : (
-              <div className="space-y-3">
-                {experience.accomplishments.map((accomplishment, index) => (
-                  <div key={accomplishment.id} className="rounded-[14px] border bg-card p-5">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 text-[12px] text-muted-foreground">#{index + 1}</span>
-                      <div className="flex-1">
-                        <h3 className="text-[15px] font-medium">{accomplishment.title}</h3>
-                        {accomplishment.narrative && (
-                          <p className="mt-1.5 text-[14px] leading-relaxed text-muted-foreground">
-                            {accomplishment.narrative}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {editOpen && (
-        <ExperienceFormModal
-          open
-          modalMode={{ mode: 'edit', experience }}
-          onOpenChange={next => {
-            if (!next) setEditOpen(false);
-          }}
+          }
+          title={experience.title}
+          meta={
+            <>
+              {experience.company ? (
+                <Link
+                  to="/companies/$companyId"
+                  params={{ companyId: experience.company.id }}
+                  className="text-[13px] text-primary hover:underline"
+                >
+                  {experience.companyName}
+                </Link>
+              ) : (
+                <MetaText>{experience.companyName}</MetaText>
+              )}
+              {experience.location && (
+                <>
+                  <MetaDot />
+                  <MetaText>{experience.location}</MetaText>
+                </>
+              )}
+              <MetaDot />
+              <MetaText>
+                {experience.startDate} – {experience.endDate}
+              </MetaText>
+            </>
+          }
+          actions={null}
         />
-      )}
-    </div>
+
+        <Tabs defaultValue="overview">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="accomplishments">
+              Accomplishments
+              {accomplishmentCount > 0 && (
+                <span className="ml-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[10px] text-accent-foreground">
+                  {accomplishmentCount}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <div className="mt-4 grid grid-cols-[1fr_280px] gap-5">
+              <div className="space-y-5">
+                <ExperienceDetailsEditor experience={experience} />
+                <ExperienceSummaryEditor experience={experience} />
+              </div>
+
+              <div className="space-y-5">
+                {experience.company && (
+                  <InfoCard label="Company">
+                    <LinkedEntityCard
+                      to={`/companies/${experience.company.id}`}
+                      logoUrl={experience.company.logoUrl}
+                      logoInitial={experience.company.name.charAt(0).toUpperCase()}
+                      name={experience.company.name}
+                      meta={
+                        [industryLabel, stageLabel].filter(Boolean).join(' · ') ||
+                        experience.company.website ||
+                        'No details'
+                      }
+                    />
+                  </InfoCard>
+                )}
+                <ExperienceSkillsEditor experience={experience} />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="accomplishments">
+            <div className="mt-4 space-y-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-dashed"
+                onClick={() => setAddModalOpen(true)}
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Add accomplishment
+              </Button>
+
+              {accomplishmentCount === 0 ? (
+                <EmptyState message="No accomplishments yet." />
+              ) : (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext
+                    items={experience.accomplishments.map(a => a.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {experience.accomplishments.map((accomplishment, index) => (
+                      <SortableAccomplishmentCard
+                        key={accomplishment.id}
+                        experienceId={experience.id}
+                        accomplishment={accomplishment}
+                        index={index}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              )}
+            </div>
+
+            <CreateAccomplishmentModal
+              open={addModalOpen}
+              onOpenChange={setAddModalOpen}
+              experienceId={experience.id}
+              accomplishmentCount={accomplishmentCount}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </EditableSectionProvider>
   );
 }

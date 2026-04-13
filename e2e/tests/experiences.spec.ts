@@ -55,28 +55,23 @@ test.describe('Experiences Page', () => {
     await expect(page.getByText('Principal Engineer').first()).toBeVisible();
   });
 
-  test('edit experience via modal', async ({ page }) => {
+  test('edit experience details inline', async ({ page }) => {
     // Click ScratchCorp card → navigates to detail page
     await page.getByText('ScratchCorp').click();
     await page.waitForURL(/\/experiences\/.+/);
 
-    // Open the edit modal from the detail page
-    await page.getByRole('button', { name: 'Edit' }).click();
-
-    const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('Edit Experience')).toBeVisible();
-    // Do not assert specific initial value — may differ on retry due to shared DB state
+    // Click the Details section to enter edit mode
+    const section = page.getByTestId('editable-section-experience-details');
+    await section.click();
 
     // Modify the title
-    await dialog.getByLabel('Role / Title').clear();
-    await dialog.getByLabel('Role / Title').fill('Senior QA Analyst');
-    await expect(dialog.getByLabel('Role / Title')).toHaveValue('Senior QA Analyst');
+    const titleInput = section.getByLabel('Title');
+    await titleInput.clear();
+    await titleInput.fill('Senior QA Analyst');
+    await expect(titleInput).toHaveValue('Senior QA Analyst');
 
-    // Verify Save button is enabled (dirty tracking works)
-    await expect(dialog.getByRole('button', { name: 'Save' })).toBeEnabled();
-
-    // Save and verify — use page-level click to avoid dialog portal issues
-    await page.locator('[data-slot="button"]:has-text("Save")').last().click();
+    // Save within the section
+    await section.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Changes saved').or(page.getByText('Failed to save'))).toBeVisible({ timeout: 15000 });
   });
 
@@ -152,37 +147,26 @@ test.describe('Experiences Page', () => {
     await expect(dialog.getByText('End date is required')).toBeVisible();
   });
 
-  test('discard unsaved modal changes', async ({ page }) => {
+  test('discard unsaved inline changes', async ({ page }) => {
     // Click ScratchCorp card → navigates to detail page (use first() against retry-induced duplicates)
     await page.getByText('ScratchCorp').first().click();
     await page.waitForURL(/\/experiences\/.+/);
 
-    // Open the edit modal from the detail page
-    await page.getByRole('button', { name: 'Edit' }).click();
+    // Click the Details section to enter edit mode
+    const section = page.getByTestId('editable-section-experience-details');
+    await section.click();
 
-    const dialog = page.getByRole('dialog');
     // Capture current title before editing (may differ from seed value on retry)
-    const originalTitle = await dialog.getByLabel('Role / Title').inputValue();
-    await dialog.getByLabel('Role / Title').clear();
-    await dialog.getByLabel('Role / Title').fill('Changed Title');
+    const titleInput = section.getByLabel('Title');
+    const originalTitle = await titleInput.inputValue();
+    await titleInput.clear();
+    await titleInput.fill('Changed Title');
 
-    // Click Cancel in the modal footer
-    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    // Click Discard within the section
+    await section.getByRole('button', { name: 'Discard' }).click();
 
-    // Discard confirmation should appear
-    const alertDialog = page.getByRole('alertdialog');
-    await expect(alertDialog.getByText('Discard unsaved changes?')).toBeVisible();
-
-    // Click Keep editing first
-    await alertDialog.getByRole('button', { name: 'Keep editing' }).click();
-    await expect(dialog).toBeVisible();
-
-    // Now actually discard
-    await dialog.getByRole('button', { name: 'Cancel' }).click();
-    await page.getByRole('alertdialog').getByRole('button', { name: 'Discard' }).click();
-
-    // Modal should be closed, original data intact — heading shows original title (not 'Changed Title')
-    await expect(dialog).not.toBeVisible();
-    await expect(page.getByRole('heading', { level: 1, name: originalTitle })).toBeVisible();
+    // Section should revert to display mode — click again to verify the original value is intact
+    await section.click();
+    await expect(section.getByLabel('Title')).toHaveValue(originalTitle);
   });
 });

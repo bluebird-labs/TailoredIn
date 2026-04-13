@@ -9,7 +9,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
 
   public async findByIdOrFail(id: string): Promise<Experience> {
     try {
-      return await this.orm.em.findOneOrFail(Experience, { id }, { populate: ['accomplishments'] });
+      return await this.orm.em.findOneOrFail(Experience, { id }, { populate: ['accomplishments', 'skills'] });
     } catch (e) {
       if (e instanceof NotFoundError) throw new EntityNotFoundError('Experience', id);
       throw e;
@@ -17,7 +17,7 @@ export class PostgresExperienceRepository implements ExperienceRepository {
   }
 
   public async findAll(): Promise<Experience[]> {
-    return this.orm.em.find(Experience, {}, { orderBy: { ordinal: 'ASC' }, populate: ['accomplishments'] });
+    return this.orm.em.find(Experience, {}, { orderBy: { ordinal: 'ASC' }, populate: ['accomplishments', 'skills'] });
   }
 
   public async save(experience: Experience): Promise<void> {

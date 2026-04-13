@@ -145,7 +145,12 @@ container.bind({
 container.bind({ provide: DI.Experience.Repository, useClass: PostgresExperienceRepository });
 container.bind({
   provide: DI.Experience.List,
-  useFactory: () => new ListExperiences(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
+  useFactory: () =>
+    new ListExperiences(
+      container.get(DI.Experience.Repository),
+      container.get(DI.Company.Repository),
+      container.get(DI.Skill.Repository)
+    )
 });
 container.bind({
   provide: DI.Experience.Create,
@@ -174,7 +179,12 @@ container.bind({
 });
 container.bind({
   provide: DI.Experience.Get,
-  useFactory: () => new GetExperience(container.get(DI.Experience.Repository), container.get(DI.Company.Repository))
+  useFactory: () =>
+    new GetExperience(
+      container.get(DI.Experience.Repository),
+      container.get(DI.Company.Repository),
+      container.get(DI.Skill.Repository)
+    )
 });
 container.bind({
   provide: DI.Experience.LinkCompany,
