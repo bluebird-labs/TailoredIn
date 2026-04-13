@@ -142,6 +142,17 @@ describe('PostgresSkillRepository', () => {
       expect(result).toHaveLength(2);
     });
 
+    it('ranks exact label match above prefix matches', async () => {
+      const kotlin = createSkill({ label: 'Kotlin', type: SkillType.LANGUAGE });
+      const kotlinCoroutines = createSkill({ label: 'Kotlin Coroutines', type: SkillType.TECHNOLOGY });
+      const kotlinMultiplatform = createSkill({ label: 'Kotlin Multiplatform Mobile', type: SkillType.TECHNOLOGY });
+      await seedSkills(kotlin, kotlinCoroutines, kotlinMultiplatform);
+
+      const result = await repo.search('kotlin', 10);
+      expect(result).toHaveLength(3);
+      expect(result[0].label).toBe('Kotlin');
+    });
+
     it('returns empty array for no matches', async () => {
       const react = createSkill({ label: 'React' });
       await seedSkills(react);

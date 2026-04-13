@@ -15,8 +15,8 @@ export class PostgresSkillRepository implements SkillRepository {
     const conn = this.orm.em.getConnection();
     const rows = await conn.execute<{ id: string }[]>(
       `SELECT id FROM skills
-       WHERE search_text % ? OR search_text ILIKE ?
-       ORDER BY similarity(search_text, ?) DESC
+       WHERE ? %> search_text OR search_text ILIKE ?
+       ORDER BY similarity(label, ?) DESC
        LIMIT ?`,
       [query, `${query}%`, query, limit]
     );
