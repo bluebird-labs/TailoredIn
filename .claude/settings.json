@@ -12,7 +12,7 @@
           {
             "type": "command",
             "command": "/Users/sylvainestevez/Documents/Projects/TailoredIn/.claude/hooks/copy-env-to-worktree.sh",
-            "statusMessage": "Copying .env.wt to worktree..."
+            "statusMessage": "Setting up worktree (.env.wt, mise trust, bun install)..."
           }
         ]
       }
