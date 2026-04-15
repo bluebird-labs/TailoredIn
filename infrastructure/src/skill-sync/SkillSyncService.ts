@@ -98,10 +98,10 @@ export class SkillSyncService {
     const mind = await this.readMindSkills();
     this.log.info(`MIND: ${mind.length} candidates`);
 
-    const runtimes = await this.readMindRuntimes();
+    const { candidates: runtimes, languageRuntimes } = await this.readMindRuntimes();
     this.log.info(`MIND runtimes: ${runtimes.length} candidates`);
 
-    await this.crossReferenceInterpreters(runtimes);
+    await this.crossReferenceInterpreters(runtimes, languageRuntimes);
     this.log.info('Interpreter cross-reference complete');
 
     // Phase 3: Deduplicate
@@ -218,7 +218,14 @@ export class SkillSyncService {
     );
   }
 
-  private async readMindRuntimes(): Promise<CandidateSkill[]> {
+  /**
+   * Reads MIND language → runtime mappings and returns both the parsed rows
+   * (for cross-referencing) and the deduplicated CandidateSkill entries.
+   */
+  private async readMindRuntimes(): Promise<{
+    candidates: CandidateSkill[];
+    languageRuntimes: { mindName: string; runtimeNames: string[] }[];
+  }> {
     const rows = await this.connection.execute(
       `SELECT "mind_name", "runtime_environments" FROM "mind_skills" WHERE "runtime_environments" != '[]'`,
       [],
@@ -226,14 +233,15 @@ export class SkillSyncService {
     );
 
     const byNormalizedLabel = new Map<string, CandidateSkill>();
+    const languageRuntimes: { mindName: string; runtimeNames: string[] }[] = [];
 
     for (const row of rows as { mind_name: string; runtime_environments: string[] | string }[]) {
-      const runtimes: string[] =
-        typeof row.runtime_environments === 'string'
-          ? JSON.parse(row.runtime_environments)
-          : row.runtime_environments;
+      const runtimeNames: string[] =
+        typeof row.runtime_environments === 'string' ? JSON.parse(row.runtime_environments) : row.runtime_environments;
 
-      for (const runtime of runtimes) {
+      languageRuntimes.push({ mindName: row.mind_name, runtimeNames });
+
+      for (const runtime of runtimeNames) {
         const normalizedLabel = normalizeLabel(runtime);
         if (!byNormalizedLabel.has(normalizedLabel)) {
           byNormalizedLabel.set(normalizedLabel, {
@@ -249,7 +257,7 @@ export class SkillSyncService {
       }
     }
 
-    return [...byNormalizedLabel.values()];
+    return { candidates: [...byNormalizedLabel.values()], languageRuntimes };
   }
 
   /**
@@ -260,18 +268,14 @@ export class SkillSyncService {
    * the runtime name (by stripping non-alphanumeric chars and checking prefix containment).
    * Matched interpreters are added as aliases on the runtime CandidateSkill.
    */
-  private async crossReferenceInterpreters(runtimes: CandidateSkill[]): Promise<void> {
+  private async crossReferenceInterpreters(
+    runtimes: CandidateSkill[],
+    languageRuntimes: { mindName: string; runtimeNames: string[] }[]
+  ): Promise<void> {
     // 1. Build runtime lookup: normalizedLabel → CandidateSkill
     const runtimeByNormalized = new Map(runtimes.map(r => [r.normalizedLabel, r]));
 
-    // 2. Read MIND language → runtimes mapping
-    const mindRows = await this.connection.execute(
-      `SELECT "mind_name", "runtime_environments" FROM "mind_skills" WHERE "runtime_environments" != '[]'`,
-      [],
-      'all'
-    );
-
-    // 3. Read Linguist language → interpreters mapping
+    // 2. Read Linguist language → interpreters mapping
     const linguistRows = await this.connection.execute(
       `SELECT "linguist_name", "interpreters" FROM "linguist_languages" WHERE "interpreters" != '[]'`,
       [],
@@ -283,14 +287,9 @@ export class SkillSyncService {
       interpretersByLanguage.set(row.linguist_name, interpreters);
     }
 
-    // 4. Cross-reference through parent language name
-    for (const row of mindRows as { mind_name: string; runtime_environments: string[] | string }[]) {
-      const runtimeNames: string[] =
-        typeof row.runtime_environments === 'string'
-          ? JSON.parse(row.runtime_environments)
-          : row.runtime_environments;
-
-      const interpreters = interpretersByLanguage.get(row.mind_name);
+    // 3. Cross-reference through parent language name
+    for (const { mindName, runtimeNames } of languageRuntimes) {
+      const interpreters = interpretersByLanguage.get(mindName);
       if (!interpreters || interpreters.length === 0) continue;
 
       for (const runtimeName of runtimeNames) {
