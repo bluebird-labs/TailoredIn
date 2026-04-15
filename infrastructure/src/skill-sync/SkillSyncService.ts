@@ -94,8 +94,11 @@ export class SkillSyncService {
     const mind = await this.readMindSkills();
     this.log.info(`MIND: ${mind.length} candidates`);
 
+    const runtimes = await this.readMindRuntimes();
+    this.log.info(`MIND runtimes: ${runtimes.length} candidates`);
+
     // Phase 3: Deduplicate
-    const allCandidates = [...linguist, ...mind];
+    const allCandidates = [...linguist, ...mind, ...runtimes];
     const deduplicated = this.deduplicateSkills(allCandidates);
     this.log.info(`Deduplicated: ${allCandidates.length} candidates -> ${deduplicated.length} unique skills`);
 
@@ -206,6 +209,40 @@ export class SkillSyncService {
         };
       }
     );
+  }
+
+  private async readMindRuntimes(): Promise<CandidateSkill[]> {
+    const rows = await this.connection.execute(
+      `SELECT "mind_name", "runtime_environments" FROM "mind_skills" WHERE "runtime_environments" != '[]'`,
+      [],
+      'all'
+    );
+
+    const byNormalizedLabel = new Map<string, CandidateSkill>();
+
+    for (const row of rows as { mind_name: string; runtime_environments: string[] | string }[]) {
+      const runtimes: string[] =
+        typeof row.runtime_environments === 'string'
+          ? JSON.parse(row.runtime_environments)
+          : row.runtime_environments;
+
+      for (const runtime of runtimes) {
+        const normalizedLabel = normalizeLabel(runtime);
+        if (!byNormalizedLabel.has(normalizedLabel)) {
+          byNormalizedLabel.set(normalizedLabel, {
+            label: runtime,
+            normalizedLabel,
+            type: SkillType.TECHNOLOGY,
+            categoryNormalizedLabel: 'backend',
+            description: null,
+            aliases: [],
+            sourcePriority: 2
+          });
+        }
+      }
+    }
+
+    return [...byNormalizedLabel.values()];
   }
 
   // ---------------------------------------------------------------------------
