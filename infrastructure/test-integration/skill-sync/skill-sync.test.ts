@@ -132,12 +132,12 @@ describe('SkillSyncService', () => {
     return result[0].count;
   }
 
-  it('creates all 11 categories', async () => {
+  it('creates all 10 categories', async () => {
     await seedFixtures();
     await runSync();
 
     const categories = await queryCategories();
-    expect(categories.length).toBe(11);
+    expect(categories.length).toBe(10);
 
     const labels = categories.map(c => c.label);
     expect(labels).toContain('Programming Languages');
@@ -150,10 +150,9 @@ describe('SkillSyncService', () => {
     expect(labels).toContain('Testing & Quality');
     expect(labels).toContain('AI & Machine Learning');
     expect(labels).toContain('Architecture & Methodology');
-    expect(labels).toContain('Leadership & Communication');
   }, 60_000);
 
-  it('deduplicates JavaScript across Linguist + MIND + ESCO', async () => {
+  it('deduplicates JavaScript across Linguist + MIND', async () => {
     await seedFixtures();
     await runSync();
 
@@ -166,14 +165,13 @@ describe('SkillSyncService', () => {
     expect(js.label).toBe('JavaScript');
     expect(js.type).toBe('language');
 
-    // Aliases unioned: JS from Linguist+MIND (deduped), ECMAScript from ESCO
+    // Aliases unioned: JS from Linguist+MIND (deduped)
     const aliases = typeof js.aliases === 'string' ? JSON.parse(js.aliases) : js.aliases;
     const aliasLabels = aliases.map((a: { label: string }) => a.label);
     expect(aliasLabels).toContain('JS');
-    expect(aliasLabels).toContain('ECMAScript');
   }, 60_000);
 
-  it('deduplicates React across MIND + Tanova', async () => {
+  it('includes React from MIND with aliases', async () => {
     await seedFixtures();
     await runSync();
 
@@ -182,11 +180,9 @@ describe('SkillSyncService', () => {
     expect(reactSkills.length).toBe(1);
 
     const react = reactSkills[0];
-    // MIND label wins (processed before Tanova)
     expect(react.label).toBe('React');
     expect(react.type).toBe('technology');
 
-    // Aliases deduped: React.js from both sources, ReactJS from MIND only
     const aliases = typeof react.aliases === 'string' ? JSON.parse(react.aliases) : react.aliases;
     const aliasLabels = aliases.map((a: { label: string }) => a.label);
     expect(aliasLabels).toContain('React.js');
@@ -226,69 +222,31 @@ describe('SkillSyncService', () => {
     expect(getCategoryLabel(graphql)).toBe('Databases');
   }, 60_000);
 
-  it('ESCO transversal skills get type INTERPERSONAL', async () => {
+  it('only produces LANGUAGE and TECHNOLOGY types from Linguist + MIND', async () => {
     await seedFixtures();
     await runSync();
 
     const skills = await querySkills();
-    const adaptToChange = skills.find(s => s.normalized_label === 'adapt-to-change')!;
-    expect(adaptToChange).toBeDefined();
-    expect(adaptToChange.type).toBe('interpersonal');
+    const types = new Set(skills.map(s => s.type));
+    expect(types.has('language')).toBe(true);
+    expect(types.has('technology')).toBe(true);
+    expect(types.has('interpersonal')).toBe(false);
+    expect(types.has('methodology')).toBe(false);
   }, 60_000);
 
-  it('Tanova methodology skills get type METHODOLOGY', async () => {
+  it('ignores Tanova and ESCO data during sync', async () => {
     await seedFixtures();
     await runSync();
 
     const skills = await querySkills();
-    const agile = skills.find(s => s.normalized_label === 'agile')!;
-    expect(agile).toBeDefined();
-    expect(agile.type).toBe('methodology');
-
-    const scrum = skills.find(s => s.normalized_label === 'scrum')!;
-    expect(scrum).toBeDefined();
-    expect(scrum.type).toBe('methodology');
-  }, 60_000);
-
-  it('longest description wins during merge', async () => {
-    await seedFixtures();
-    await runSync();
-
-    const skills = await querySkills();
-    const agile = skills.find(s => s.normalized_label === 'agile')!;
-    // Tanova has the longest description for Agile
-    expect(agile.description).toContain('iterative approach');
-  }, 60_000);
-
-  it('ESCO-only digital skill with null category', async () => {
-    await seedFixtures();
-    await runSync();
-
-    const skills = await querySkills();
-    const progConcepts = skills.find(s => s.normalized_label === 'programming-concepts')!;
-    expect(progConcepts).toBeDefined();
-    expect(progConcepts.type).toBe('technology');
-    expect(progConcepts.category_id).toBeNull();
-  }, 60_000);
-
-  it('splits ESCO alt_labels containing newlines', async () => {
-    await seedFixtures();
-    await runSync();
-
-    const skills = await querySkills();
-    const php = skills.find(s => s.normalized_label === 'php')!;
-    expect(php).toBeDefined();
-
-    const aliases = typeof php.aliases === 'string' ? JSON.parse(php.aliases) : php.aliases;
-    const aliasLabels = aliases.map((a: { label: string }) => a.label);
-    // "Hypertext Preprocessor\nPersonal Home Page|php5" should produce 3 separate aliases
-    expect(aliasLabels).toContain('Hypertext Preprocessor');
-    expect(aliasLabels).toContain('Personal Home Page');
-    expect(aliasLabels).toContain('php5');
-    // No alias should contain a newline
-    for (const label of aliasLabels) {
-      expect(label).not.toContain('\n');
-    }
+    // Tanova-only skills (Agile, Team Leadership, Scrum) should not appear
+    expect(skills.find(s => s.normalized_label === 'agile')).toBeUndefined();
+    expect(skills.find(s => s.normalized_label === 'team-leadership')).toBeUndefined();
+    expect(skills.find(s => s.normalized_label === 'scrum')).toBeUndefined();
+    // ESCO-only skills should not appear
+    expect(skills.find(s => s.normalized_label === 'adapt-to-change')).toBeUndefined();
+    expect(skills.find(s => s.normalized_label === 'programming-concepts')).toBeUndefined();
+    expect(skills.find(s => s.normalized_label === 'php')).toBeUndefined();
   }, 60_000);
 
   it('excludes Linguist data-type entries from skills', async () => {

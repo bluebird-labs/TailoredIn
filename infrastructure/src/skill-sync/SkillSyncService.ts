@@ -25,8 +25,7 @@ const CATEGORIES: { label: string; normalizedLabel: string }[] = [
   { label: 'DevOps & CI/CD', normalizedLabel: 'devops-ci-cd' },
   { label: 'Testing & Quality', normalizedLabel: 'testing-quality' },
   { label: 'AI & Machine Learning', normalizedLabel: 'ai-machine-learning' },
-  { label: 'Architecture & Methodology', normalizedLabel: 'architecture-methodology' },
-  { label: 'Leadership & Communication', normalizedLabel: 'leadership-communication' }
+  { label: 'Architecture & Methodology', normalizedLabel: 'architecture-methodology' }
 ];
 
 const SOURCE_TO_CATEGORY: Record<string, string> = {
@@ -71,23 +70,9 @@ const SOURCE_TO_CATEGORY: Record<string, string> = {
   libraries_python: 'backend',
   tools: 'devops-ci-cd',
   'libraries_-various': 'backend',
-  architectural_patterns: 'architecture-methodology',
-  design_patterns: 'architecture-methodology',
-  // Tanova subcategories
-  frontend_frameworks: 'frontend',
-  backend_frameworks: 'backend',
-  mobile_development: 'mobile',
-  project_management: 'architecture-methodology',
   query_languages: 'databases',
-  leadership: 'leadership-communication',
-  management: 'leadership-communication',
-  software_architecture: 'architecture-methodology',
-  architecture: 'architecture-methodology',
-  ai_ml: 'ai-machine-learning',
-  product_management: 'leadership-communication',
-  frontend_development: 'frontend',
-  backend_development: 'backend',
-  data_infrastructure: 'cloud-infrastructure'
+  architectural_patterns: 'architecture-methodology',
+  design_patterns: 'architecture-methodology'
 };
 
 export class SkillSyncService {
@@ -109,14 +94,8 @@ export class SkillSyncService {
     const mind = await this.readMindSkills();
     this.log.info(`MIND: ${mind.length} candidates`);
 
-    const tanova = await this.readTanovaSkills();
-    this.log.info(`Tanova: ${tanova.length} candidates`);
-
-    const esco = await this.readEscoSkills();
-    this.log.info(`ESCO: ${esco.length} candidates`);
-
     // Phase 3: Deduplicate
-    const allCandidates = [...linguist, ...mind, ...tanova, ...esco];
+    const allCandidates = [...linguist, ...mind];
     const deduplicated = this.deduplicateSkills(allCandidates);
     this.log.info(`Deduplicated: ${allCandidates.length} candidates -> ${deduplicated.length} unique skills`);
 
@@ -224,96 +203,6 @@ export class SkillSyncService {
           description: null,
           aliases,
           sourcePriority: 2
-        };
-      }
-    );
-  }
-
-  private async readTanovaSkills(): Promise<CandidateSkill[]> {
-    const rows = await this.connection.execute(
-      `SELECT "canonical_name", "category", "subcategory", "aliases", "description" FROM "tanova_skills"`,
-      [],
-      'all'
-    );
-
-    return rows.map(
-      (row: {
-        canonical_name: string;
-        category: string;
-        subcategory: string;
-        aliases: string[] | string;
-        description: string | null;
-      }) => {
-        const aliases: string[] = typeof row.aliases === 'string' ? JSON.parse(row.aliases) : (row.aliases ?? []);
-
-        let type: SkillType;
-        if (row.category === 'technology' && row.subcategory === 'programming_languages') {
-          type = SkillType.LANGUAGE;
-        } else if (row.category === 'technology') {
-          type = SkillType.TECHNOLOGY;
-        } else if (row.category === 'methodology') {
-          type = SkillType.METHODOLOGY;
-        } else if (row.category === 'soft_skill') {
-          type = SkillType.INTERPERSONAL;
-        } else {
-          type = SkillType.TECHNOLOGY;
-        }
-
-        return {
-          label: row.canonical_name,
-          normalizedLabel: normalizeLabel(row.canonical_name),
-          type,
-          categoryNormalizedLabel: SOURCE_TO_CATEGORY[row.subcategory] ?? null,
-          description: row.description ?? null,
-          aliases: aliases.map((a: string) => ({ label: a, normalizedLabel: normalizeLabel(a) })),
-          sourcePriority: 3
-        };
-      }
-    );
-  }
-
-  private async readEscoSkills(): Promise<CandidateSkill[]> {
-    const rows = await this.connection.execute(
-      `SELECT es."preferred_label", es."skill_type", es."alt_labels", es."description",
-              array_agg(DISTINCT esc."collection_type") AS "collection_types"
-       FROM "esco_skills" es
-       INNER JOIN "esco_skill_collections" esc ON es."concept_uri" = esc."concept_uri"
-       WHERE esc."collection_type" IN ('digital', 'transversal')
-       GROUP BY es."concept_uri", es."preferred_label", es."skill_type", es."alt_labels", es."description"`,
-      [],
-      'all'
-    );
-
-    return rows.map(
-      (row: {
-        preferred_label: string;
-        skill_type: string;
-        alt_labels: string | null;
-        description: string | null;
-        collection_types: string | string[];
-      }) => {
-        const collectionTypes: string[] =
-          typeof row.collection_types === 'string'
-            ? row.collection_types.replace(/[{}]/g, '').split(',')
-            : row.collection_types;
-        const isTransversal = collectionTypes.includes('transversal');
-
-        const altLabels = row.alt_labels
-          ? row.alt_labels
-              .split('|')
-              .flatMap(s => s.split('\n'))
-              .map(s => s.trim())
-              .filter(s => s.length > 0)
-          : [];
-
-        return {
-          label: row.preferred_label,
-          normalizedLabel: normalizeLabel(row.preferred_label),
-          type: isTransversal ? SkillType.INTERPERSONAL : SkillType.TECHNOLOGY,
-          categoryNormalizedLabel: isTransversal ? 'leadership-communication' : null,
-          description: row.description ?? null,
-          aliases: altLabels.map((a: string) => ({ label: a, normalizedLabel: normalizeLabel(a) })),
-          sourcePriority: 4
         };
       }
     );
