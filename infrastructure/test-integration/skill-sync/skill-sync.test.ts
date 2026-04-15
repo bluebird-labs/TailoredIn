@@ -36,30 +36,32 @@ describe('SkillSyncService', () => {
     await conn.execute(
       `INSERT INTO "linguist_languages" ("linguist_name", "linguist_type", "color", "aliases", "extensions", "interpreters", "linguist_version", "created_at", "updated_at")
        VALUES
-         ('JavaScript', 'programming', '#f1e05a', '["JS"]', '[]', '[]', 'v1', ?, ?),
-         ('TypeScript', 'programming', '#3178c6', '["TS"]', '[]', '[]', 'v1', ?, ?),
+         ('JavaScript', 'programming', '#f1e05a', '["JS"]', '[]', '["node", "nodejs"]', 'v1', ?, ?),
+         ('TypeScript', 'programming', '#3178c6', '["TS"]', '[]', '["ts-node"]', 'v1', ?, ?),
          ('HTML', 'markup', '#e34c26', '[]', '[]', '[]', 'v1', ?, ?),
          ('JSON', 'data', '#292929', '[]', '[]', '[]', 'v1', ?, ?)`,
       [now, now, now, now, now, now, now, now],
       'run'
     );
 
-    // -- MIND skills (6 rows) --
-    const mindDefaults = `'[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]'`;
-    await conn.execute(
-      `INSERT INTO "mind_skills" ("mind_name", "mind_type", "synonyms", "mind_source_file", "mind_version",
+    // -- MIND skills (7 rows) --
+    // All JSONB array columns except runtime_environments
+    const mindCols = `"mind_name", "mind_type", "synonyms", "mind_source_file", "mind_version",
          "technical_domains", "implies_knowing_skills", "implies_knowing_concepts", "conceptual_aspects",
          "architectural_patterns", "supported_programming_languages", "specific_to_frameworks",
          "adapter_for_tool_or_service", "implements_patterns", "associated_to_application_domains",
-         "solves_application_tasks", "build_tools", "runtime_environments")
+         "solves_application_tasks", "build_tools", "runtime_environments"`;
+    const emptyArrays = `'[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]'`;
+    await conn.execute(
+      `INSERT INTO "mind_skills" (${mindCols})
        VALUES
-         ('JavaScript', '["ProgrammingLanguage"]', '["JS"]', 'programming_languages', 'v1', ${mindDefaults}),
-         ('React', '["Framework"]', '["React.js", "ReactJS"]', 'frameworks_frontend', 'v1', ${mindDefaults}),
-         ('PostgreSQL', '["Database"]', '["Postgres"]', 'databases', 'v1', ${mindDefaults}),
-         ('Docker', '["Tool"]', '[]', 'containerization', 'v1', ${mindDefaults}),
-         ('TensorFlow', '["Library"]', '["TF"]', 'machine_learning', 'v1', ${mindDefaults}),
-         ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${mindDefaults}),
-         ('GraphQL', '["QueryLanguage"]', '["GQL"]', 'query_languages', 'v1', ${mindDefaults})`,
+         ('JavaScript', '["ProgrammingLanguage"]', '["JS"]', 'programming_languages', 'v1', ${emptyArrays}, '["Node.js", "Deno", "Bun"]'),
+         ('React', '["Framework"]', '["React.js", "ReactJS"]', 'frameworks_frontend', 'v1', ${emptyArrays}, '[]'),
+         ('PostgreSQL', '["Database"]', '["Postgres"]', 'databases', 'v1', ${emptyArrays}, '[]'),
+         ('Docker', '["Tool"]', '[]', 'containerization', 'v1', ${emptyArrays}, '[]'),
+         ('TensorFlow', '["Library"]', '["TF"]', 'machine_learning', 'v1', ${emptyArrays}, '[]'),
+         ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${emptyArrays}, '[]'),
+         ('GraphQL', '["QueryLanguage"]', '["GQL"]', 'query_languages', 'v1', ${emptyArrays}, '[]')`,
       [],
       'run'
     );
