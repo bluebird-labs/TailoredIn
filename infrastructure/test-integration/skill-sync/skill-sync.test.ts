@@ -306,4 +306,78 @@ describe('SkillSyncService', () => {
     const count = await countTable('experience_skills');
     expect(count).toBe(0);
   }, 60_000);
+
+  it('extracts MIND runtimes as standalone skills', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+    expect(nodejs).toBeDefined();
+    expect(nodejs.label).toBe('Node.js');
+    expect(nodejs.type).toBe('technology');
+
+    const deno = skills.find(s => s.normalized_label === 'deno')!;
+    expect(deno).toBeDefined();
+    expect(deno.label).toBe('Deno');
+    expect(deno.type).toBe('technology');
+
+    const bun = skills.find(s => s.normalized_label === 'bun')!;
+    expect(bun).toBeDefined();
+    expect(bun.label).toBe('Bun');
+    expect(bun.type).toBe('technology');
+  }, 60_000);
+
+  it('assigns Backend category to extracted runtimes', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const categories = await queryCategories();
+    const categoryById = new Map(categories.map(c => [c.id, c.label]));
+
+    const getCategoryLabel = (skill: { category_id: string | null }) =>
+      skill.category_id ? categoryById.get(skill.category_id) : null;
+
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+    expect(getCategoryLabel(nodejs)).toBe('Backend');
+
+    const deno = skills.find(s => s.normalized_label === 'deno')!;
+    expect(getCategoryLabel(deno)).toBe('Backend');
+  }, 60_000);
+
+  it('cross-references Linguist interpreters as runtime aliases', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+
+    const aliases = typeof nodejs.aliases === 'string' ? JSON.parse(nodejs.aliases) : nodejs.aliases;
+    const aliasLabels: string[] = aliases.map((a: { label: string }) => a.label);
+
+    // "nodejs" and "node" from Linguist interpreters matched to Node.js
+    expect(aliasLabels).toContain('nodejs');
+    expect(aliasLabels).toContain('node');
+
+    // Deno should NOT get JavaScript's interpreters (no fuzzy match)
+    const deno = skills.find(s => s.normalized_label === 'deno')!;
+    const denoAliases = typeof deno.aliases === 'string' ? JSON.parse(deno.aliases) : deno.aliases;
+    expect(denoAliases.length).toBe(0);
+  }, 60_000);
+
+  it('does not match unrelated interpreters to runtimes', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+
+    const aliases = typeof nodejs.aliases === 'string' ? JSON.parse(nodejs.aliases) : nodejs.aliases;
+    const aliasLabels: string[] = aliases.map((a: { label: string }) => a.label);
+
+    // ts-node is a TypeScript interpreter, not a match for Node.js
+    expect(aliasLabels).not.toContain('ts-node');
+  }, 60_000);
 });
