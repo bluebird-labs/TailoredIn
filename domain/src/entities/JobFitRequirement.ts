@@ -46,8 +46,8 @@ export class JobFitRequirement extends DomainEntity {
       throw new ValidationError('requirement', 'must be between 1 and 5000 characters');
     if (!props.reasoning || props.reasoning.length > 10000)
       throw new ValidationError('reasoning', 'must be between 1 and 10000 characters');
-    if (!['strong', 'partial', 'absent'].includes(props.coverage))
-      throw new ValidationError('coverage', "must be 'strong', 'partial', or 'absent'");
+    if (!['strong', 'partial', 'not_evidenced', 'absent'].includes(props.coverage))
+      throw new ValidationError('coverage', "must be 'strong', 'partial', 'not_evidenced', or 'absent'");
     this.id = props.id;
     this.jobFitScoreId = props.jobFitScoreId;
     this.requirement = props.requirement;

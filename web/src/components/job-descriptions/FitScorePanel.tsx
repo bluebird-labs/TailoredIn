@@ -6,6 +6,7 @@ type FitRequirementScore = FitScore['requirements'][number];
 const coverageConfig = {
   strong: { label: 'Strong', variant: 'default' as const },
   partial: { label: 'Partial', variant: 'secondary' as const },
+  not_evidenced: { label: 'Not Evidenced', variant: 'outline' as const },
   absent: { label: 'Absent', variant: 'destructive' as const }
 };
 
@@ -23,6 +24,7 @@ function scoreBgColor(score: number): string {
 
 const groupBgColor = {
   absent: 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800',
+  not_evidenced: 'bg-slate-50 border-slate-200 dark:bg-slate-950/30 dark:border-slate-800',
   partial: 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800',
   strong: 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
 };
@@ -69,6 +71,7 @@ function CoverageGroup({
 export function FitScorePanel({ score }: { score: FitScore }) {
   const strong = score.requirements.filter(r => r.coverage === 'strong');
   const partial = score.requirements.filter(r => r.coverage === 'partial');
+  const notEvidenced = score.requirements.filter(r => r.coverage === 'not_evidenced');
   const absent = score.requirements.filter(r => r.coverage === 'absent');
 
   return (
@@ -83,6 +86,12 @@ export function FitScorePanel({ score }: { score: FitScore }) {
 
       <div className="space-y-3">
         <CoverageGroup label="Missing" count={absent.length} requirements={absent} bgClass={groupBgColor.absent} />
+        <CoverageGroup
+          label="Not Evidenced"
+          count={notEvidenced.length}
+          requirements={notEvidenced}
+          bgClass={groupBgColor.not_evidenced}
+        />
         <CoverageGroup label="Partial" count={partial.length} requirements={partial} bgClass={groupBgColor.partial} />
         <CoverageGroup label="Covered" count={strong.length} requirements={strong} bgClass={groupBgColor.strong} />
       </div>

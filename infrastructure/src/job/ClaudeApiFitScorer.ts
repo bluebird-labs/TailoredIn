@@ -16,7 +16,7 @@ const fitScoreSchema = z.object({
   requirements: z.array(
     z.object({
       requirement: z.string(),
-      coverage: z.enum(['strong', 'partial', 'absent']),
+      coverage: z.enum(['strong', 'partial', 'not_evidenced', 'absent']),
       reasoning: z.string()
     })
   ),

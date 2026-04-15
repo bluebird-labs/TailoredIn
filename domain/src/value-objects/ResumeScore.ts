@@ -1,4 +1,4 @@
-export type RequirementCoverage = 'strong' | 'partial' | 'absent';
+export type RequirementCoverage = 'strong' | 'partial' | 'not_evidenced' | 'absent';
 
 export type RequirementScore = {
   readonly requirement: string;

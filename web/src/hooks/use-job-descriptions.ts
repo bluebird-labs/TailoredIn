@@ -35,7 +35,7 @@ export type ResumeScore = {
 
 export type FitRequirementScore = {
   requirement: string;
-  coverage: 'strong' | 'partial' | 'absent';
+  coverage: 'strong' | 'partial' | 'not_evidenced' | 'absent';
   reasoning: string;
 };
 
