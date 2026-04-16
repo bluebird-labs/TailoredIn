@@ -492,19 +492,15 @@ export class SkillSyncService {
     );
 
     const now = new Date();
-    const conceptRows = rows.map((row: { mind_name: string; mind_type: string; category: string | null }) => {
+    const seen = new Set<string>();
+    const conceptRows: unknown[][] = [];
+    for (const row of rows as { mind_name: string; mind_type: string; category: string | null }[]) {
+      const nl = normalizeLabel(row.mind_name);
+      if (seen.has(nl)) continue;
+      seen.add(nl);
       const kind = CONCEPT_FILE_TO_KIND[row.mind_type] ?? 'conceptual_aspect';
-      return [
-        crypto.randomUUID(),
-        row.mind_name,
-        normalizeLabel(row.mind_name),
-        kind,
-        row.category,
-        row.mind_name,
-        now,
-        now
-      ];
-    });
+      conceptRows.push([crypto.randomUUID(), row.mind_name, nl, kind, row.category, row.mind_name, now, now]);
+    }
 
     if (conceptRows.length > 0) {
       await this.batchUpsert(
