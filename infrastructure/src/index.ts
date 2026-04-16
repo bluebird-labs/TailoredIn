@@ -33,5 +33,3 @@ export { PostgresGenerationSettingsRepository } from './settings/PostgresGenerat
 export { PostgresConceptRepository } from './skill/PostgresConceptRepository.js';
 export { PostgresSkillCategoryRepository } from './skill/PostgresSkillCategoryRepository.js';
 export { PostgresSkillRepository } from './skill/PostgresSkillRepository.js';
-// Skill sync
-export { SkillSyncService } from './skill-sync/index.js';

@@ -6,5 +6,3 @@ import { z } from 'zod';
 export const MindCategorizedConceptSchema = z
   .object({ category: z.string().min(1) })
   .catchall(z.array(z.string()).optional());
-
-type MindCategorizedConcept = z.infer<typeof MindCategorizedConceptSchema>;

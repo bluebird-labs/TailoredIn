@@ -50,5 +50,3 @@ export const TanovaTaxonomySchema = z.object({
   last_updated: z.string(),
   categories: z.record(z.string(), CategorySchema)
 });
-
-type TanovaTaxonomy = z.infer<typeof TanovaTaxonomySchema>;

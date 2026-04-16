@@ -24,7 +24,7 @@ describe('PostgresProfileRepository', () => {
 
   describe('findByIdOrFail', () => {
     it('throws EntityNotFoundError when profile does not exist', async () => {
-      await expect(repo.findByIdOrFail('nonexistent-id')).rejects.toThrow('Profile');
+      await expect(repo.findByIdOrFail(crypto.randomUUID())).rejects.toThrow('Profile');
     });
 
     it('returns profile when it exists', async () => {

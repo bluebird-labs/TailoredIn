@@ -12,13 +12,27 @@ export class PostgresSkillRepository implements SkillRepository {
   }
 
   public async search(query: string, limit: number): Promise<Skill[]> {
+    const q = query.trim().toLowerCase();
+    if (q.length === 0) return [];
+
     const conn = this.orm.em.getConnection();
     const rows = await conn.execute<{ id: string }[]>(
-      `SELECT id FROM skills
-       WHERE ? %> search_text OR search_text ILIKE ?
-       ORDER BY similarity(label, ?) DESC
+      `SELECT matched.skill_id AS id
+       FROM (
+         SELECT skill_id, SUM(word_similarity(?, word)) AS score, MIN(word) AS first_word
+         FROM skill_search_terms
+         WHERE ? <% word
+         GROUP BY skill_id
+       ) matched
+       JOIN (
+         SELECT skill_id, COUNT(*) AS label_word_count
+         FROM skill_search_terms
+         WHERE kind = 'label'
+         GROUP BY skill_id
+       ) totals ON totals.skill_id = matched.skill_id
+       ORDER BY matched.score DESC, totals.label_word_count ASC, matched.first_word ASC
        LIMIT ?`,
-      [query, `${query}%`, query, limit]
+      [q, q, limit]
     );
 
     if (rows.length === 0) return [];
@@ -26,7 +40,6 @@ export class PostgresSkillRepository implements SkillRepository {
     const ids = rows.map(r => r.id);
     const skills = await this.orm.em.find(Skill, { id: { $in: ids } });
 
-    // Preserve similarity ranking from the raw query
     const idOrder = new Map(ids.map((id, i) => [id, i]));
     return skills.sort((a, b) => (idOrder.get(a.id) ?? 0) - (idOrder.get(b.id) ?? 0));
   }

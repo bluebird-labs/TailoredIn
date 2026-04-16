@@ -123,7 +123,7 @@ describe('PostgresSkillRepository', () => {
       expect(result[0].label).toBe('Kubernetes');
     });
 
-    it('finds skills by alias in search_text', async () => {
+    it('finds skills by alias', async () => {
       const golang = createSkill({
         label: 'Go',
         kind: SkillKind.PROGRAMMING_LANGUAGE,
@@ -163,6 +163,82 @@ describe('PostgresSkillRepository', () => {
 
       const result = await repo.search('zzzznonexistent', 10);
       expect(result).toEqual([]);
+    });
+
+    it('finds a short token embedded in a multi-word label', async () => {
+      const awsS3 = createSkill({ label: 'AWS S3', kind: SkillKind.TOOL });
+      const react = createSkill({ label: 'React', kind: SkillKind.TOOL });
+      await seedSkills(awsS3, react);
+
+      const result = await repo.search('s3', 10);
+      expect(result.map(s => s.label)).toContain('AWS S3');
+      expect(result[0].label).toBe('AWS S3');
+    });
+
+    it('finds a two-char single-word skill', async () => {
+      const go = createSkill({
+        label: 'Go',
+        kind: SkillKind.PROGRAMMING_LANGUAGE,
+        aliases: [{ label: 'Golang', normalizedLabel: 'golang' }]
+      });
+      const python = createSkill({ label: 'Python', kind: SkillKind.PROGRAMMING_LANGUAGE });
+      await seedSkills(go, python);
+
+      const result = await repo.search('go', 10);
+      expect(result.map(s => s.label)).toContain('Go');
+      expect(result[0].label).toBe('Go');
+    });
+
+    it('is case-insensitive across query casings', async () => {
+      const awsS3 = createSkill({ label: 'AWS S3', kind: SkillKind.TOOL });
+      await seedSkills(awsS3);
+
+      for (const q of ['aws', 'AWS', 'Aws', 'aWs']) {
+        const result = await repo.search(q, 10);
+        expect(result.map(s => s.label)).toEqual(['AWS S3']);
+      }
+    });
+
+    it('finds a skill by a short alias word', async () => {
+      const javascript = createSkill({
+        label: 'JavaScript',
+        kind: SkillKind.PROGRAMMING_LANGUAGE,
+        aliases: [{ label: 'JS', normalizedLabel: 'js' }]
+      });
+      await seedSkills(javascript);
+
+      const result = await repo.search('js', 10);
+      expect(result).toHaveLength(1);
+      expect(result[0].label).toBe('JavaScript');
+    });
+
+    it('ranks multi-word match above single-word match', async () => {
+      const kotlin = createSkill({ label: 'Kotlin', kind: SkillKind.PROGRAMMING_LANGUAGE });
+      const kotlinCoroutines = createSkill({ label: 'Kotlin Coroutines', kind: SkillKind.TOOL });
+      await seedSkills(kotlin, kotlinCoroutines);
+
+      const result = await repo.search('kotlin coroutines', 10);
+      expect(result[0].label).toBe('Kotlin Coroutines');
+    });
+
+    it('returns one row per skill even when multiple words match', async () => {
+      const awsS3 = createSkill({
+        label: 'AWS S3',
+        kind: SkillKind.TOOL,
+        aliases: [{ label: 'Amazon S3', normalizedLabel: 'amazon-s3' }]
+      });
+      await seedSkills(awsS3);
+
+      const result = await repo.search('s3', 10);
+      expect(result).toHaveLength(1);
+    });
+
+    it('returns empty array for empty or whitespace-only query', async () => {
+      const react = createSkill({ label: 'React' });
+      await seedSkills(react);
+
+      expect(await repo.search('', 10)).toEqual([]);
+      expect(await repo.search('   ', 10)).toEqual([]);
     });
   });
 });

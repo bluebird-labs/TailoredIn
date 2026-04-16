@@ -174,4 +174,4 @@ function SortableAccomplishmentCard({ experienceId, accomplishment, index }: Sor
   );
 }
 
-export { AccomplishmentCard, SortableAccomplishmentCard };
+export { SortableAccomplishmentCard };
