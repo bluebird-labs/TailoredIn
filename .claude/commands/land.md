@@ -98,7 +98,7 @@ Then follow the matching flow.
    gh pr merge --squash --delete-branch
    ```
 
-6. **Cleanup** → go to Phase 6.
+6. **Report** → go to Phase 6.
 
 ---
 
@@ -150,31 +150,21 @@ Use `MAIN` as shorthand for the main repo path, `BRANCH` for the current branch 
    git -C MAIN push origin main
    ```
 
-7. **Cleanup** → go to Phase 6.
+7. **Report** → go to Phase 6.
 
 ---
 
-### Phase 6 — Cleanup
+### Phase 6 — Report
 
-1. **Stop worktree servers** (if worktree session is active):
-   ```
-   bun wt:down
-   ```
-   If this fails, proceed anyway — servers may already be stopped.
-
-2. **Remove the worktree** (from the main repo):
-   ```
-   git -C MAIN worktree remove WTPATH --force
-   ```
-   This also deletes the worktree branch.
-
-3. **Delete the remote branch** (if it was pushed):
+1. **Delete the remote branch** (local flow only, if the branch was previously pushed):
    ```
    git -C MAIN push origin --delete BRANCH
    ```
-   If the remote branch doesn't exist, skip this.
+   If the remote branch doesn't exist, skip this. (Remote flow's `gh pr merge --delete-branch` already handled it.)
 
-4. **Report completion** with the squash commit hash and a summary of landed changes.
+2. **Report completion** with the squash commit hash and a summary of landed changes.
+
+The worktree is left intact — do not run `bun wt:down` and do not run `git worktree remove`. The user decides when to tear down the worktree.
 
 ---
 
@@ -191,4 +181,4 @@ git push origin main
 git branch -D <branch>
 ```
 
-Skip Phase 6 (no worktree to clean up).
+Skip Phase 6 (no worktree, and branch cleanup is already handled above).
