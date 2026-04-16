@@ -13,6 +13,33 @@ export type Skill = {
   description: string | null;
 };
 
+export type SkillCategory = {
+  id: string;
+  label: string;
+};
+
+export function useAllSkills() {
+  return useQuery({
+    queryKey: queryKeys.skills.list(),
+    queryFn: async () => {
+      const { data } = await api.skills.all.get();
+      return (data?.data ?? []) as Skill[];
+    },
+    staleTime: 5 * 60 * 1000
+  });
+}
+
+export function useSkillCategories() {
+  return useQuery({
+    queryKey: queryKeys.skills.categories(),
+    queryFn: async () => {
+      const { data } = await api['skill-categories'].get();
+      return (data?.data ?? []) as SkillCategory[];
+    },
+    staleTime: 5 * 60 * 1000
+  });
+}
+
 export function useSearchSkills(query: string) {
   return useQuery({
     queryKey: queryKeys.skills.search(query),

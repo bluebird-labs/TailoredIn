@@ -33,6 +33,7 @@ import {
   ListExperiences,
   ListJobDescriptions,
   ListSkillCategories,
+  ListSkills,
   ParseJobDescription,
   PromptRegistry,
   ScoreJobFit,
@@ -199,6 +200,10 @@ container.bind({
 // Skill
 container.bind({ provide: DI.Skill.Repository, useClass: PostgresSkillRepository });
 container.bind({ provide: DI.Skill.CategoryRepository, useClass: PostgresSkillCategoryRepository });
+container.bind({
+  provide: DI.Skill.List,
+  useFactory: () => new ListSkills(container.get(DI.Skill.Repository), container.get(DI.Skill.CategoryRepository))
+});
 container.bind({
   provide: DI.Skill.Search,
   useFactory: () => new SearchSkills(container.get(DI.Skill.Repository), container.get(DI.Skill.CategoryRepository))
