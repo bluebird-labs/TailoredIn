@@ -7,6 +7,7 @@ import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { env, envInt } from '@tailoredin/core';
 import {
   Accomplishment,
+  Account,
   Application,
   Company,
   Concept,
@@ -74,6 +75,7 @@ export function createOrmConfig(db: OrmDbConfig) {
 
     entities: [
       // Domain entities
+      Account,
       Profile,
       Education,
       Company,

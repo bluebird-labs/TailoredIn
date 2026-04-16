@@ -1,4 +1,7 @@
+import { resolve } from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
+
+const authStatePath = resolve(import.meta.dirname, '.auth-state.json');
 
 export default defineConfig({
   testDir: './tests',
@@ -13,6 +16,7 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:5173',
+    storageState: authStatePath,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure'
   },

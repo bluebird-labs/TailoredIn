@@ -3,6 +3,7 @@ import type { ScoreJobFit } from '@tailoredin/application';
 import { EntityNotFoundError } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
+import type { AuthContext } from '../../middleware/auth.js';
 
 @injectable()
 export class ScoreJobFitRoute {
@@ -11,9 +12,11 @@ export class ScoreJobFitRoute {
   public plugin() {
     return new Elysia().post(
       '/job-descriptions/:id/score-fit',
-      async ({ params, set }) => {
+      async ctx => {
+        const { auth } = ctx as unknown as AuthContext;
+        const { params, set } = ctx;
         try {
-          const data = await this.scoreJobFit.execute({ jobDescriptionId: params.id });
+          const data = await this.scoreJobFit.execute({ profileId: auth.profileId, jobDescriptionId: params.id });
           return { data };
         } catch (e) {
           if (e instanceof EntityNotFoundError) {

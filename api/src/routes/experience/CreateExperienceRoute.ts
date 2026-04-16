@@ -1,24 +1,21 @@
-import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import type { CreateExperience } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
-import { getProfileId } from '../../helpers/profile-id.js';
+import type { AuthContext } from '../../middleware/auth.js';
 
 @injectable()
 export class CreateExperienceRoute {
-  public constructor(
-    private readonly createExperience: CreateExperience = inject(DI.Experience.Create),
-    private readonly orm: MikroORM = inject(MikroORM)
-  ) {}
+  public constructor(private readonly createExperience: CreateExperience = inject(DI.Experience.Create)) {}
 
   public plugin() {
     return new Elysia().post(
       '/experiences',
-      async ({ body, set }) => {
-        const profileId = await getProfileId(this.orm);
+      async ctx => {
+        const { auth } = ctx as unknown as AuthContext;
+        const { body, set } = ctx;
         const data = await this.createExperience.execute({
-          profileId,
+          profileId: auth.profileId,
           title: body.title,
           companyName: body.company_name,
           companyWebsite: body.company_website ?? null,

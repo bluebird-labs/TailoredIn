@@ -91,6 +91,8 @@ export function toProcessEnv(session: WorktreeSession): Record<string, string> {
     POSTGRES_PORT: String(session.dbPort),
     API_PORT: String(session.apiPort),
     VITE_PORT: String(session.webPort),
-    COMPOSE_PROJECT_NAME: session.projectName
+    COMPOSE_PROJECT_NAME: session.projectName,
+    JWT_SECRET: 'worktree-dev-secret',
+    JWT_EXPIRES_IN_SECONDS: '604800'
   };
 }

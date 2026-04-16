@@ -48,6 +48,19 @@ classDiagram
 
 
     %% ──────────────────────────────────────────────
+    %%  Auth Use Cases
+    %% ──────────────────────────────────────────────
+
+    class Login {
+        <<UseCase>>
+        +AccountRepository accountRepository
+        +PasswordHasher passwordHasher
+        +TokenIssuer tokenIssuer
+        +execute(LoginInput) LoginOutput
+    }
+
+
+    %% ──────────────────────────────────────────────
     %%  Company Use Cases
     %% ──────────────────────────────────────────────
 
@@ -284,7 +297,7 @@ classDiagram
     class GetProfile {
         <<UseCase>>
         +ProfileRepository profileRepository
-        +execute() ProfileDto
+        +execute(GetProfileInput) ProfileDto
     }
 
     class UpdateProfile {
@@ -429,6 +442,13 @@ classDiagram
         +score(input) Promise<ResumeScore>
     }
 
+    class TokenIssuer {
+        <<Port>>
+        +issue(payload) { token: string; expiresIn: number }
+        +verify(token) { accountId: string; profileId: string }
+    }
+
+    Login ..> TokenIssuer : depends
     DiscoverCompanies ..> CompanyDiscoveryProvider : depends
     EnrichCompanyData ..> CompanyDataProvider : depends
     ParseJobDescription ..> JobDescriptionParser : depends
@@ -807,6 +827,12 @@ classDiagram
     %%  Errors
     %% ──────────────────────────────────────────────
 
+    class AuthenticationError {
+        <<Error>>
+        +number statusCode
+        +string code
+    }
+
     class ExternalServiceError {
         <<Error>>
         +number statusCode
@@ -818,6 +844,10 @@ classDiagram
     %% ──────────────────────────────────────────────
     %%  Domain Ports (external)
     %% ──────────────────────────────────────────────
+
+    class AccountRepository {
+        <<DomainPort>>
+    }
 
     class ApplicationRepository {
         <<DomainPort>>
@@ -855,6 +885,10 @@ classDiagram
         <<DomainPort>>
     }
 
+    class PasswordHasher {
+        <<DomainPort>>
+    }
+
     class ProfileRepository {
         <<DomainPort>>
     }
@@ -882,6 +916,8 @@ classDiagram
     UpdateApplication ..> ApplicationRepository : depends
     UpdateApplicationStatus ..> ApplicationRepository : depends
     UpdateApplicationStatus ..> ResumeContentRepository : depends
+    Login ..> AccountRepository : depends
+    Login ..> PasswordHasher : depends
     CreateCompany ..> CompanyRepository : depends
     DeleteCompany ..> CompanyRepository : depends
     GetCompany ..> CompanyRepository : depends
@@ -960,6 +996,7 @@ classDiagram
     style ListApplications fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateApplication fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateApplicationStatus fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style Login fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CreateCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DeleteCompany fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style DiscoverCompanies fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
@@ -1012,6 +1049,7 @@ classDiagram
     style ResumeRenderer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeRendererFactory fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style ResumeScorer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
+    style TokenIssuer fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style AccomplishmentDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApiErrorDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ApplicationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -1042,7 +1080,9 @@ classDiagram
     style SalaryRangeDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SkillCategoryDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SkillDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style AuthenticationError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
     style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
+    style AccountRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ConceptRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
@@ -1052,6 +1092,7 @@ classDiagram
     style GenerationSettingsRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style JobDescriptionRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style JobFitScoreRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style PasswordHasher fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ProfileRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style PromptRegistry fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ResumeContentRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

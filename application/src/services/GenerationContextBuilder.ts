@@ -21,11 +21,15 @@ export class GenerationContextBuilder {
     private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
-  public async build(jobDescriptionId: string, userInstructions?: string): Promise<GenerationContext> {
+  public async build(
+    profileId: string,
+    jobDescriptionId: string,
+    userInstructions?: string
+  ): Promise<GenerationContext> {
     const jd = await this.jobDescriptionRepository.findById(jobDescriptionId);
     if (!jd) throw new EntityNotFoundError('JobDescription', jobDescriptionId);
 
-    const profile = await this.profileRepository.findSingle();
+    const profile = await this.profileRepository.findByIdOrFail(profileId);
 
     const settings =
       (await this.generationSettingsRepository.findByProfileId(profile.id)) ??

@@ -1,24 +1,21 @@
-import { MikroORM } from '@mikro-orm/postgresql';
 import { inject, injectable } from '@needle-di/core';
 import type { CreateEducation } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
-import { getProfileId } from '../../helpers/profile-id.js';
+import type { AuthContext } from '../../middleware/auth.js';
 
 @injectable()
 export class CreateEducationRoute {
-  public constructor(
-    private readonly createEducation: CreateEducation = inject(DI.Education.CreateEducation),
-    private readonly orm: MikroORM = inject(MikroORM)
-  ) {}
+  public constructor(private readonly createEducation: CreateEducation = inject(DI.Education.CreateEducation)) {}
 
   public plugin() {
     return new Elysia().post(
       '/educations',
-      async ({ body, set }) => {
-        const profileId = await getProfileId(this.orm);
+      async ctx => {
+        const { auth } = ctx as unknown as AuthContext;
+        const { body, set } = ctx;
         const entry = await this.createEducation.execute({
-          profileId,
+          profileId: auth.profileId,
           degreeTitle: body.degree_title,
           institutionName: body.institution_name,
           graduationYear: body.graduation_year,

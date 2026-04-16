@@ -2,6 +2,7 @@ import type { ProfileRepository } from '@tailoredin/domain';
 import type { ProfileDto } from '../dtos/ProfileDto.js';
 
 export type UpdateProfileInput = {
+  profileId: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -17,7 +18,7 @@ export class UpdateProfile {
   public constructor(private readonly profileRepository: ProfileRepository) {}
 
   public async execute(input: UpdateProfileInput): Promise<ProfileDto> {
-    const profile = await this.profileRepository.findSingle();
+    const profile = await this.profileRepository.findByIdOrFail(input.profileId);
 
     profile.email = input.email;
     profile.firstName = input.firstName;

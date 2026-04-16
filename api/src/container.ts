@@ -35,6 +35,7 @@ import {
   ListJobDescriptions,
   ListSkillCategories,
   ListSkills,
+  Login,
   ParseJobDescription,
   PromptRegistry,
   ScoreJobFit,
@@ -56,6 +57,7 @@ import {
 import { env, envInt, envOptional } from '@tailoredin/core';
 import {
   BulletParamsSection,
+  BunPasswordHasher,
   CareerTimelineSection,
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
@@ -75,8 +77,10 @@ import {
   ExperienceDetailSection,
   HeadlineInstructionsSection,
   JobDescriptionSection,
+  JwtTokenIssuer,
   OtherExperiencesSection,
   OutputConstraintsSection,
+  PostgresAccountRepository,
   PostgresApplicationRepository,
   PostgresCompanyRepository,
   PostgresConceptRepository,
@@ -113,6 +117,23 @@ const container = new Container();
 
 // Infrastructure: ORM
 container.bind({ provide: MikroORM, useValue: orm });
+
+// Auth
+container.bind({ provide: DI.Auth.Repository, useClass: PostgresAccountRepository });
+container.bind({ provide: DI.Auth.PasswordHasher, useClass: BunPasswordHasher });
+container.bind({
+  provide: DI.Auth.TokenIssuer,
+  useFactory: () => new JwtTokenIssuer(env('JWT_SECRET'), envInt('JWT_EXPIRES_IN_SECONDS'))
+});
+container.bind({
+  provide: DI.Auth.Login,
+  useFactory: () =>
+    new Login(
+      container.get(DI.Auth.Repository),
+      container.get(DI.Auth.PasswordHasher),
+      container.get(DI.Auth.TokenIssuer)
+    )
+});
 
 // Profile
 container.bind({ provide: DI.Profile.Repository, useClass: PostgresProfileRepository });

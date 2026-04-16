@@ -1,8 +1,9 @@
-import { Link, useMatchRoute } from '@tanstack/react-router';
+import { Link, useMatchRoute, useNavigate } from '@tanstack/react-router';
 import {
   Building2,
   FileText,
   KanbanSquare,
+  LogOut,
   type LucideIcon,
   Moon,
   Palette,
@@ -25,6 +26,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar';
+import { clearToken } from '@/lib/auth.js';
 import { applyTheme, getEffectiveTheme } from '@/lib/theme.js';
 
 interface NavItem {
@@ -49,12 +51,18 @@ const adminNav: NavItem[] = [{ label: 'Skills', to: '/skills', icon: Sparkles }]
 
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
+  const navigate = useNavigate();
   const [theme, setTheme] = useState(getEffectiveTheme);
 
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark';
     applyTheme(next);
     setTheme(next);
+  }
+
+  function handleLogout() {
+    clearToken();
+    navigate({ to: '/login' });
   }
 
   return (
@@ -154,6 +162,10 @@ export function AppSidebar() {
         <Button variant="ghost" size="sm" className="w-full justify-start gap-2" onClick={toggleTheme}>
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+        </Button>
+        <Button variant="ghost" size="sm" className="w-full justify-start gap-2" onClick={handleLogout}>
+          <LogOut className="h-4 w-4" />
+          <span>Sign out</span>
         </Button>
       </SidebarFooter>
     </Sidebar>

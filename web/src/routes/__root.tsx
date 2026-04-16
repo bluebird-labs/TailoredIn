@@ -1,9 +1,10 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { createRootRoute, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { Toaster } from 'sonner';
 import { AppSidebar } from '@/components/layout/sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { isAuthenticated } from '@/lib/auth.js';
 import { applyTheme, getEffectiveTheme } from '@/lib/theme.js';
 
 export const Route = createRootRoute({
@@ -11,9 +12,28 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isLoginPage = location.pathname === '/login';
+
   useEffect(() => {
     applyTheme(getEffectiveTheme());
   }, []);
+
+  useEffect(() => {
+    if (!isLoginPage && !isAuthenticated()) {
+      navigate({ to: '/login' });
+    }
+  }, [isLoginPage, navigate]);
+
+  if (isLoginPage) {
+    return (
+      <>
+        <Outlet />
+        <Toaster />
+      </>
+    );
+  }
 
   return (
     <TooltipProvider>

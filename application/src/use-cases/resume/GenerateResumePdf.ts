@@ -15,6 +15,7 @@ import {
 } from '../../ports/ResumeRendererFactory.js';
 
 export type GenerateResumePdfInput = {
+  profileId: string;
   jobDescriptionId: string;
   theme?: ResumeTheme;
 };
@@ -45,7 +46,7 @@ export class GenerateResumePdf {
       throw new EntityNotFoundError('JobDescription', input.jobDescriptionId);
     }
 
-    const profile = await this.profileRepository.findSingle();
+    const profile = await this.profileRepository.findByIdOrFail(input.profileId);
 
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences

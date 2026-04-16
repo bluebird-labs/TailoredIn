@@ -3,9 +3,11 @@ export { AggregateRoot } from './AggregateRoot.js';
 export type { DomainEvent } from './DomainEvent.js';
 export { Entity } from './Entity.js';
 export { EntityNotFoundError } from './EntityNotFoundError.js';
-// Entities
 export type { AccomplishmentCreateProps } from './entities/Accomplishment.js';
 export { Accomplishment } from './entities/Accomplishment.js';
+// Entities
+export type { AccountCreateProps } from './entities/Account.js';
+export { Account } from './entities/Account.js';
 export type { ApplicationCreateProps } from './entities/Application.js';
 export { Application } from './entities/Application.js';
 export type { CompanyCreateProps } from './entities/Company.js';
@@ -57,6 +59,7 @@ export { SkillDependency } from './entities/SkillDependency.js';
 export type { ToolCreateProps } from './entities/Tool.js';
 export { Tool } from './entities/Tool.js';
 // Ports — repository interfaces
+export type { AccountRepository } from './ports/AccountRepository.js';
 export type { ApplicationRepository } from './ports/ApplicationRepository.js';
 export type { CompanyRepository } from './ports/CompanyRepository.js';
 export type { ConceptRepository } from './ports/ConceptRepository.js';
@@ -65,6 +68,7 @@ export type { ExperienceRepository } from './ports/ExperienceRepository.js';
 export type { GenerationSettingsRepository } from './ports/GenerationSettingsRepository.js';
 export type { JobDescriptionRepository } from './ports/JobDescriptionRepository.js';
 export type { JobFitScoreRepository } from './ports/JobFitScoreRepository.js';
+export type { PasswordHasher } from './ports/PasswordHasher.js';
 export type { ProfileRepository } from './ports/ProfileRepository.js';
 export type { ResumeContentRepository } from './ports/ResumeContentRepository.js';
 export type { SkillCategoryRepository } from './ports/SkillCategoryRepository.js';

@@ -16,7 +16,7 @@ export class E2eSeeder extends Seeder {
     await conn.execute(`
       TRUNCATE
         accomplishments, experiences,
-        educations, profiles,
+        educations, profiles, accounts,
         job_descriptions, companies
       CASCADE
     `);
@@ -41,6 +41,13 @@ export class E2eSeeder extends Seeder {
         NOW(), NOW()
       )
     `);
+
+    // Account (password: "password123")
+    const passwordHash = await Bun.password.hash('password123');
+    await conn.execute(
+      `INSERT INTO accounts (id, email, password_hash, profile_id, created_at, updated_at)
+       VALUES ('dddddddd-0000-4000-8000-000000000001', 'jane@example.com', '${passwordHash}', 'aaaaaaaa-0000-4000-8000-000000000001', NOW(), NOW())`
+    );
 
     // Experiences
     await conn.execute(`

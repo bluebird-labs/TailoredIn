@@ -12,7 +12,7 @@ export class GenerateResumeContentWithPdf {
     const content = await this.generateContent.execute(input);
 
     try {
-      await this.generatePdf.execute({ jobDescriptionId: input.jobDescriptionId });
+      await this.generatePdf.execute({ profileId: input.profileId, jobDescriptionId: input.jobDescriptionId });
     } catch {
       // PDF generation is best-effort — content was already saved
     }

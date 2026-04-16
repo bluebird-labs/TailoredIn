@@ -13,6 +13,7 @@ import type { JobFitScoreDto } from '../../dtos/JobFitScoreDto.js';
 import type { FitScorer } from '../../ports/FitScorer.js';
 
 export type ScoreJobFitInput = {
+  profileId: string;
   jobDescriptionId: string;
 };
 
@@ -89,7 +90,7 @@ export class ScoreJobFit {
       throw new EntityNotFoundError('JobDescription', input.jobDescriptionId);
     }
 
-    const profile = await this.profileRepository.findSingle();
+    const profile = await this.profileRepository.findByIdOrFail(input.profileId);
     const experiences = await this.experienceRepository.findAll();
 
     const companyIds = [...new Set(experiences.map(e => e.companyId).filter(Boolean))] as string[];

@@ -17,6 +17,7 @@ export type GenerateResumeContentScope =
   | { type: 'bullet'; experienceId: string; bulletIndex: number; instructions: string };
 
 export type GenerateResumeContentInput = {
+  profileId: string;
   jobDescriptionId: string;
   additionalPrompt?: string;
   customInstructions?: string;
@@ -62,7 +63,7 @@ export class GenerateResumeContent {
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
-    const context = await this.contextBuilder.build(input.jobDescriptionId, input.additionalPrompt);
+    const context = await this.contextBuilder.build(input.profileId, input.jobDescriptionId, input.additionalPrompt);
     const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(input.jobDescriptionId);
 
     const previousInstructions = parseScopedInstructions(existing?.prompt ?? '');

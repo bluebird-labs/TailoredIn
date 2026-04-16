@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AtelierRouteImport } from './routes/atelier'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SkillsIndexRouteImport } from './routes/skills/index'
@@ -25,6 +26,11 @@ import { Route as CompaniesCompanyIdRouteImport } from './routes/companies/$comp
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtelierRoute = AtelierRouteImport.update({
@@ -87,6 +93,7 @@ const CompaniesCompanyIdRoute = CompaniesCompanyIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atelier': typeof AtelierRoute
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atelier': typeof AtelierRoute
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/atelier': typeof AtelierRoute
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/companies/$companyId': typeof CompaniesCompanyIdRoute
   '/experiences/$experienceId': typeof ExperiencesExperienceIdRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/atelier'
+    | '/login'
     | '/settings'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/atelier'
+    | '/login'
     | '/settings'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/atelier'
+    | '/login'
     | '/settings'
     | '/companies/$companyId'
     | '/experiences/$experienceId'
@@ -175,6 +187,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AtelierRoute: typeof AtelierRoute
+  LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRoute
   CompaniesCompanyIdRoute: typeof CompaniesCompanyIdRoute
   ExperiencesExperienceIdRoute: typeof ExperiencesExperienceIdRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/atelier': {
@@ -279,6 +299,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtelierRoute: AtelierRoute,
+  LoginRoute: LoginRoute,
   SettingsRoute: SettingsRoute,
   CompaniesCompanyIdRoute: CompaniesCompanyIdRoute,
   ExperiencesExperienceIdRoute: ExperiencesExperienceIdRoute,

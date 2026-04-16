@@ -3,6 +3,7 @@ import type { GenerateResumeContentWithPdf } from '@tailoredin/application';
 import { EntityNotFoundError } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
+import type { AuthContext } from '../../middleware/auth.js';
 
 /**
  * Generates tailored resume bullet points for each experience based on a job description,
@@ -22,9 +23,12 @@ export class GenerateResumeContentRoute {
   public plugin() {
     return new Elysia().post(
       '/resume/generate',
-      async ({ body, set }) => {
+      async ctx => {
+        const { auth } = ctx as unknown as AuthContext;
+        const { body, set } = ctx;
         try {
           const data = await this.generateResumeContent.execute({
+            profileId: auth.profileId,
             jobDescriptionId: body.jobDescriptionId,
             additionalPrompt: body.additionalPrompt,
             customInstructions: body.customInstructions,

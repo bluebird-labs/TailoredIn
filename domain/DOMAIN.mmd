@@ -32,6 +32,14 @@ classDiagram
         +update()
     }
 
+    class Account {
+        <<AggregateRoot>>
+        +string email
+        +string passwordHash
+        +string profileId
+        +verifyPassword()
+    }
+
     class Application {
         <<AggregateRoot>>
         +string profileId
@@ -177,6 +185,7 @@ classDiagram
     }
 
     Experience "1" --> "*" Accomplishment : has
+    Profile "1" --> "*" Account : has
     Profile "1" --> "*" Application : has
     Application --> ApplicationStatus
     ResumeContent "1" --> "*" Application : has
@@ -551,6 +560,7 @@ classDiagram
 
     style Profile fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Accomplishment fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style Account fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Application fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Education fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style Experience fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px

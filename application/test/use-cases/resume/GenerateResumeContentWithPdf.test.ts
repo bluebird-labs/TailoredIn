@@ -18,11 +18,11 @@ describe('GenerateResumeContentWithPdf', () => {
     const generatePdf = { execute: mock(async () => new Uint8Array([1, 2, 3])) } as unknown as GenerateResumePdf;
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
-    const result = await useCase.execute({ jobDescriptionId: 'jd-1' });
+    const result = await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-1' });
 
     expect(result).toEqual(contentResult);
-    expect(generateContent.execute).toHaveBeenCalledWith({ jobDescriptionId: 'jd-1' });
-    expect(generatePdf.execute).toHaveBeenCalledWith({ jobDescriptionId: 'jd-1' });
+    expect(generateContent.execute).toHaveBeenCalledWith({ profileId: 'profile-1', jobDescriptionId: 'jd-1' });
+    expect(generatePdf.execute).toHaveBeenCalledWith({ profileId: 'profile-1', jobDescriptionId: 'jd-1' });
   });
 
   test('returns content even if PDF generation fails', async () => {
@@ -35,7 +35,7 @@ describe('GenerateResumeContentWithPdf', () => {
     } as unknown as GenerateResumePdf;
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
-    const result = await useCase.execute({ jobDescriptionId: 'jd-1' });
+    const result = await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-1' });
 
     expect(result).toEqual(contentResult);
   });
@@ -49,7 +49,7 @@ describe('GenerateResumeContentWithPdf', () => {
     const generatePdf = { execute: mock(async () => new Uint8Array()) } as unknown as GenerateResumePdf;
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
-    await expect(useCase.execute({ jobDescriptionId: 'jd-1' })).rejects.toThrow('LLM timeout');
+    await expect(useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-1' })).rejects.toThrow('LLM timeout');
     expect(generatePdf.execute).not.toHaveBeenCalled();
   });
 
@@ -60,12 +60,14 @@ describe('GenerateResumeContentWithPdf', () => {
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
     await useCase.execute({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-1',
       additionalPrompt: 'Focus on leadership',
       scope: { type: 'headline' }
     });
 
     expect(generateContent.execute).toHaveBeenCalledWith({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-1',
       additionalPrompt: 'Focus on leadership',
       scope: { type: 'headline' }

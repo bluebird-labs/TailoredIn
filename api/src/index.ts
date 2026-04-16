@@ -1,14 +1,17 @@
 import { MikroORM, RequestContext } from '@mikro-orm/postgresql';
-import { ExternalServiceError } from '@tailoredin/application';
+import { AuthenticationError, ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
+import { DI } from '@tailoredin/infrastructure';
 import { Elysia } from 'elysia';
 import { container } from './container.js';
+import { authMiddleware } from './middleware/auth.js';
 import { CreateApplicationRoute } from './routes/application/CreateApplicationRoute.js';
 import { DeleteApplicationRoute } from './routes/application/DeleteApplicationRoute.js';
 import { GetApplicationRoute } from './routes/application/GetApplicationRoute.js';
 import { ListApplicationsRoute } from './routes/application/ListApplicationsRoute.js';
 import { UpdateApplicationRoute } from './routes/application/UpdateApplicationRoute.js';
 import { UpdateApplicationStatusRoute } from './routes/application/UpdateApplicationStatusRoute.js';
+import { LoginRoute } from './routes/auth/LoginRoute.js';
 import { configRoute } from './routes/ConfigRoute.js';
 import { CreateCompanyRoute } from './routes/company/CreateCompanyRoute.js';
 import { DeleteCompanyRoute } from './routes/company/DeleteCompanyRoute.js';
@@ -90,6 +93,24 @@ const app = new Elysia()
   .onError(({ request, error, set, code }) => {
     if (code === 'VALIDATION') return;
 
+    // Auth errors
+    const authSource =
+      error instanceof AuthenticationError
+        ? error
+        : error instanceof Error && error.cause instanceof AuthenticationError
+          ? error.cause
+          : null;
+    if (authSource) {
+      set.status = 401;
+      logRequest(request, 401, startTimes.get(request));
+      return { error: { code: authSource.code, message: authSource.message } };
+    }
+    if (error instanceof Error && error.message === 'UNAUTHORIZED') {
+      set.status = 401;
+      logRequest(request, 401, startTimes.get(request));
+      return { error: { code: 'UNAUTHORIZED', message: 'Authentication required' } };
+    }
+
     // Elysia may wrap thrown errors — check both the error and its cause
     const source =
       error instanceof ExternalServiceError
@@ -118,6 +139,9 @@ const app = new Elysia()
   })
   .use(healthRoutes)
   .use(configRoute())
+  .use(container.get(LoginRoute).plugin())
+  // Auth guard — all routes below require a valid JWT
+  .use(authMiddleware(container.get(DI.Auth.TokenIssuer)))
   // Profile
   .use(container.get(GetProfileRoute).plugin())
   .use(container.get(UpdateProfileRoute).plugin())

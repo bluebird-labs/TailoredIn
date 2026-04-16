@@ -2,6 +2,10 @@
 
 // Repositories
 export { PostgresApplicationRepository } from './application/PostgresApplicationRepository.js';
+// Auth
+export { BunPasswordHasher } from './auth/BunPasswordHasher.js';
+export { JwtTokenIssuer } from './auth/JwtTokenIssuer.js';
+export { PostgresAccountRepository } from './auth/PostgresAccountRepository.js';
 // Services
 export { ClaudeApiCompanyDataProvider } from './company/ClaudeApiCompanyDataProvider.js';
 export { ClaudeApiCompanyDiscoveryProvider } from './company/ClaudeApiCompanyDiscoveryProvider.js';

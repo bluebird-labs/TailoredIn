@@ -2,6 +2,7 @@ import { inject, injectable } from '@needle-di/core';
 import type { CreateApplication } from '@tailoredin/application';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
+import type { AuthContext } from '../../middleware/auth.js';
 
 @injectable()
 export class CreateApplicationRoute {
@@ -10,9 +11,11 @@ export class CreateApplicationRoute {
   public plugin() {
     return new Elysia().post(
       '/applications',
-      async ({ body, set }) => {
+      async ctx => {
+        const { auth } = ctx as unknown as AuthContext;
+        const { body, set } = ctx;
         const data = await this.createApplication.execute({
-          profileId: body.profile_id,
+          profileId: auth.profileId,
           companyId: body.company_id,
           jobDescriptionId: body.job_description_id,
           notes: body.notes
@@ -22,7 +25,6 @@ export class CreateApplicationRoute {
       },
       {
         body: t.Object({
-          profile_id: t.String({ format: 'uuid' }),
           company_id: t.String({ format: 'uuid' }),
           job_description_id: t.Optional(t.Nullable(t.String({ format: 'uuid' }))),
           notes: t.Optional(t.Nullable(t.String()))

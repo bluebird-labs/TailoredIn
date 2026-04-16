@@ -55,6 +55,7 @@ bun dev:fresh              # restart everything (down + up)
 bun dev:migration:create   # create a new migration
 bun dev:migration:up       # run pending migrations
 bun dev:seed               # seed the database
+bun dev:set-password       # set password for an account (creates if needed)
 bun dev:diagram            # regenerate infrastructure/DATABASE.mmd (needs DB running)
 ```
 
@@ -66,6 +67,7 @@ bun wt:down                # stop servers + Docker + remove volume + delete sess
 bun wt:fresh               # restart everything (down + up)
 bun wt:migration:up        # run pending migrations in worktree DB
 bun wt:seed                # seed the worktree database
+bun wt:set-password        # set password for an account (creates if needed)
 ```
 
 ### e2e: commands (anywhere)
@@ -211,7 +213,7 @@ All import commands require `--env-file=.env` (set automatically in the scripts)
 Single `.env` at the repo root (gitignored; see `.env.example`):
 ```
 POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SCHEMA
-TZ, API_PORT, NODE_ENV, CLAUDE_API_KEY
+TZ, API_PORT, NODE_ENV, CLAUDE_API_KEY, JWT_SECRET, JWT_EXPIRES_IN_SECONDS
 ```
 Bun natively loads `.env` files — do NOT use `dotenv` or import `dotenv/config`.
 

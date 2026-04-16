@@ -11,3 +11,4 @@ export type {
 } from './ResumeRenderer.js';
 export type { ResumeRendererFactory, ResumeTheme } from './ResumeRendererFactory.js';
 export type { ResumeScoreInput, ResumeScorer } from './ResumeScorer.js';
+export type { TokenIssuer } from './TokenIssuer.js';

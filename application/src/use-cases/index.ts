@@ -10,6 +10,8 @@ export type { UpdateApplicationInput } from './application/UpdateApplication.js'
 export { UpdateApplication } from './application/UpdateApplication.js';
 export type { UpdateApplicationStatusInput } from './application/UpdateApplicationStatus.js';
 export { UpdateApplicationStatus } from './application/UpdateApplicationStatus.js';
+export type { LoginInput, LoginOutput } from './auth/Login.js';
+export { Login } from './auth/Login.js';
 export type { CreateCompanyInput } from './company/CreateCompany.js';
 export { CreateCompany } from './company/CreateCompany.js';
 export type { DeleteCompanyInput } from './company/DeleteCompany.js';
@@ -51,6 +53,7 @@ export type { UpdateAccomplishmentInput } from './experience/UpdateAccomplishmen
 export { UpdateAccomplishment } from './experience/UpdateAccomplishment.js';
 export type { UpdateExperienceInput } from './experience/UpdateExperience.js';
 export { UpdateExperience } from './experience/UpdateExperience.js';
+export type { GetProfileInput } from './GetProfile.js';
 export { GetProfile } from './GetProfile.js';
 export type { GetGenerationSettingsInput } from './generation-settings/GetGenerationSettings.js';
 export { GetGenerationSettings } from './generation-settings/GetGenerationSettings.js';

@@ -22,12 +22,12 @@ describe('PostgresProfileRepository', () => {
     orm.em.clear();
   });
 
-  describe('findSingle', () => {
-    it('throws when no profile exists', async () => {
-      expect(repo.findSingle()).rejects.toThrow('No profile found');
+  describe('findByIdOrFail', () => {
+    it('throws EntityNotFoundError when profile does not exist', async () => {
+      await expect(repo.findByIdOrFail('nonexistent-id')).rejects.toThrow('Profile');
     });
 
-    it('returns profile when one exists', async () => {
+    it('returns profile when it exists', async () => {
       const profile = Profile.create({
         email: 'john@example.com',
         firstName: 'John',
@@ -43,7 +43,7 @@ describe('PostgresProfileRepository', () => {
       await orm.em.flush();
       orm.em.clear();
 
-      const loaded = await repo.findSingle();
+      const loaded = await repo.findByIdOrFail(profile.id);
       expect(loaded.id).toBe(profile.id);
       expect(loaded.email).toBe('john@example.com');
       expect(loaded.firstName).toBe('John');
@@ -69,7 +69,7 @@ describe('PostgresProfileRepository', () => {
       await repo.save(profile);
       orm.em.clear();
 
-      const loaded = await repo.findSingle();
+      const loaded = await repo.findByIdOrFail(profile.id);
       expect(loaded.email).toBe('jane@example.com');
       expect(loaded.firstName).toBe('Jane');
     });
@@ -89,14 +89,14 @@ describe('PostgresProfileRepository', () => {
       await repo.save(profile);
       orm.em.clear();
 
-      const loaded = await repo.findSingle();
+      const loaded = await repo.findByIdOrFail(profile.id);
       loaded.firstName = 'After';
       loaded.about = 'Updated about';
       loaded.location = 'San Francisco';
       await repo.save(loaded);
       orm.em.clear();
 
-      const reloaded = await repo.findSingle();
+      const reloaded = await repo.findByIdOrFail(profile.id);
       expect(reloaded.firstName).toBe('After');
       expect(reloaded.about).toBe('Updated about');
       expect(reloaded.location).toBe('San Francisco');

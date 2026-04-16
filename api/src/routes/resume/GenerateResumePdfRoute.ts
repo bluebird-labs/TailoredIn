@@ -3,6 +3,7 @@ import type { GenerateResumePdf } from '@tailoredin/application';
 import { EntityNotFoundError } from '@tailoredin/domain';
 import { DI } from '@tailoredin/infrastructure';
 import { Elysia, t } from 'elysia';
+import type { AuthContext } from '../../middleware/auth.js';
 
 /**
  * Generates a tailored resume PDF for a given job description.
@@ -20,9 +21,12 @@ export class GenerateResumePdfRoute {
   public plugin() {
     return new Elysia().post(
       '/resume/pdf',
-      async ({ body, set }) => {
+      async ctx => {
+        const { auth } = ctx as unknown as AuthContext;
+        const { body, set } = ctx;
         try {
           const pdf = await this.generateResumePdf.execute({
+            profileId: auth.profileId,
             jobDescriptionId: body.jobDescriptionId,
             theme: body.theme
           });

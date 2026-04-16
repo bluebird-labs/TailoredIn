@@ -137,7 +137,9 @@ describe('GenerateResumePdf', () => {
     const experience = makeExperience();
     const education = makeEducation();
 
-    const profileRepo: ProfileRepository = { findSingle: mock(async () => profile) } as unknown as ProfileRepository;
+    const profileRepo: ProfileRepository = {
+      findByIdOrFail: mock(async () => profile)
+    } as unknown as ProfileRepository;
     const experienceRepo: ExperienceRepository = {
       findAll: mock(async () => [experience])
     } as unknown as ExperienceRepository;
@@ -165,6 +167,7 @@ describe('GenerateResumePdf', () => {
   test('calls factory.get with the provided theme', async () => {
     const { useCase, fakeFactory } = makeUseCase();
     await useCase.execute({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
       theme: 'imprecv'
     });
@@ -174,6 +177,7 @@ describe('GenerateResumePdf', () => {
   test('uses brilliant-cv when theme is omitted', async () => {
     const { useCase, fakeFactory } = makeUseCase();
     await useCase.execute({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
     });
     expect(fakeFactory.get).toHaveBeenCalledWith('brilliant-cv');
@@ -182,6 +186,7 @@ describe('GenerateResumePdf', () => {
   test('passes stored headline as headlineSummary to renderer', async () => {
     const { useCase, fakeRenderer } = makeUseCase();
     await useCase.execute({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
     });
     const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
@@ -193,6 +198,7 @@ describe('GenerateResumePdf', () => {
   test('caches PDF bytes and theme on the job description', async () => {
     const { useCase, jd, jdRepo } = makeUseCase();
     await useCase.execute({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
     });
     expect(jd.resumePdf).toEqual(new Uint8Array([1, 2, 3]));
@@ -203,6 +209,7 @@ describe('GenerateResumePdf', () => {
   test('caches the requested theme', async () => {
     const { useCase, jd } = makeUseCase();
     await useCase.execute({
+      profileId: 'profile-1',
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001',
       theme: 'modern-cv'
     });
@@ -211,7 +218,9 @@ describe('GenerateResumePdf', () => {
 
   test('throws EntityNotFoundError when JD does not exist', async () => {
     const profile = makeProfile();
-    const profileRepo: ProfileRepository = { findSingle: mock(async () => profile) } as unknown as ProfileRepository;
+    const profileRepo: ProfileRepository = {
+      findByIdOrFail: mock(async () => profile)
+    } as unknown as ProfileRepository;
     const experienceRepo: ExperienceRepository = { findAll: mock(async () => []) } as unknown as ExperienceRepository;
     const educationRepo: EducationRepository = { findAll: mock(async () => []) } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = {
@@ -236,14 +245,16 @@ describe('GenerateResumePdf', () => {
       resumeContentRepo,
       fakeFactory
     );
-    await expect(useCase.execute({ jobDescriptionId: 'nonexistent' })).rejects.toThrow(EntityNotFoundError);
+    await expect(useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'nonexistent' })).rejects.toThrow(
+      EntityNotFoundError
+    );
   });
 
   test('throws when resume content has not been generated', async () => {
     const { useCase } = makeUseCase(null);
-    await expect(useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' })).rejects.toThrow(
-      'Resume content has not been generated yet'
-    );
+    await expect(
+      useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' })
+    ).rejects.toThrow('Resume content has not been generated yet');
   });
 
   test('filters out hidden bullets by index', async () => {
@@ -256,7 +267,7 @@ describe('GenerateResumePdf', () => {
       }
     ]);
     const { useCase, fakeRenderer } = makeUseCase(rc);
-    await useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
+    await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
 
     const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
       experiences: Array<{ bullets: string[] }>;
@@ -274,7 +285,7 @@ describe('GenerateResumePdf', () => {
       }
     ]);
     const { useCase, fakeRenderer } = makeUseCase(rc);
-    await useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
+    await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
 
     const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
       experiences: Array<{ bullets: string[] }>;
@@ -287,7 +298,7 @@ describe('GenerateResumePdf', () => {
       'edu-00000000-0000-0000-0000-000000000001'
     ]);
     const { useCase, fakeRenderer } = makeUseCase(rc);
-    await useCase.execute({ jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
+    await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
 
     const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
       educations: Array<{ degreeTitle: string }>;

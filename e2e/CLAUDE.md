@@ -17,7 +17,9 @@ All commands can be run from any branch — the environment is fully self-contai
 1. **Global setup** (`support/global-setup.ts`) spawns `infrastructure/scripts/e2e-start-servers.ts`
 2. The server script starts a Testcontainers PostgreSQL instance, runs migrations + seeds, and launches API + web servers on dynamic ports
 3. The server emits `E2E_READY <webPort> <apiPort> <dbPort>` on stdout — global setup captures this and sets `E2E_BASE_URL`
-4. **Global teardown** kills the server process and cleans up state
+4. Global setup authenticates by calling `POST /auth/login` on the API, then saves a Playwright `storageState` file (`.auth-state.json`) with the JWT in localStorage
+5. All tests automatically load this storage state, so they are pre-authenticated as `jane@example.com`
+6. **Global teardown** kills the server process and cleans up state files (`.server-state.json`, `.auth-state.json`)
 
 ## Test structure
 

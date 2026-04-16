@@ -38,6 +38,7 @@ import type {
   ListJobDescriptions,
   ListSkillCategories,
   ListSkills,
+  Login,
   ParseJobDescription,
   PromptRegistry,
   ResumeElementGenerator,
@@ -47,6 +48,7 @@ import type {
   ScoreResume,
   SearchSkills,
   SyncExperienceSkills,
+  TokenIssuer,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
   UpdateApplication,
@@ -60,6 +62,7 @@ import type {
   UpdateResumeDisplaySettings
 } from '@tailoredin/application';
 import type {
+  AccountRepository,
   ApplicationRepository,
   CompanyRepository,
   ConceptRepository,
@@ -68,6 +71,7 @@ import type {
   GenerationSettingsRepository,
   JobDescriptionRepository,
   JobFitScoreRepository,
+  PasswordHasher,
   ProfileRepository,
   ResumeContentRepository,
   SkillCategoryRepository,
@@ -79,6 +83,13 @@ export const DI = {
   Llm: {
     ClaudeApiKey: new InjectionToken<string>('DI.Llm.ClaudeApiKey'),
     ClaudeApiProvider: new InjectionToken<ClaudeApiProvider>('DI.Llm.ClaudeApiProvider')
+  },
+
+  Auth: {
+    Repository: new InjectionToken<AccountRepository>('DI.Auth.Repository'),
+    PasswordHasher: new InjectionToken<PasswordHasher>('DI.Auth.PasswordHasher'),
+    TokenIssuer: new InjectionToken<TokenIssuer>('DI.Auth.TokenIssuer'),
+    Login: new InjectionToken<Login>('DI.Auth.Login')
   },
 
   Application: {
