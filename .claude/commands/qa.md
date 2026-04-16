@@ -8,8 +8,6 @@ description: Run quality checks, open a dev terminal, and enter a test/feedback 
 - Current directory: !`pwd`
 - Git branch: !`git branch --show-current`
 - Pending changes: !`git status --short`
-- Dev terminal: !`wsh term $(pwd)`
-
 ## Your task
 
 Run quality checks and enter a manual test/feedback loop. A dev terminal has been opened in the worktree directory — the user can start `bun wt:up` there while checks run.
