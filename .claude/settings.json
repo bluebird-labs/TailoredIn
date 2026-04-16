@@ -1,9 +1,4 @@
 {
-  "permissions": {
-    "defaultMode": "plan",
-    "additionalDirectories": ["~/Documents"],
-    "allow": ["EnterPlanMode", "WebFetch"]
-  },
   "hooks": {
     "PostToolUse": [
       {
