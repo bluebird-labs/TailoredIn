@@ -7,6 +7,7 @@ const makeCategory = (overrides: Partial<ConstructorParameters<typeof SkillCateg
     id: 'cat-aaaa-1111-2222-3333-444444444444',
     label: 'Programming Languages',
     normalizedLabel: 'programming-languages',
+    parentId: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides

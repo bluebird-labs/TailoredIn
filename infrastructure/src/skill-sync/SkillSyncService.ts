@@ -1,83 +1,122 @@
 import type { Connection } from '@mikro-orm/postgresql';
 import { Logger, normalizeLabel } from '@tailoredin/core';
 import type { SkillAlias } from '@tailoredin/domain';
-import { SkillType } from '@tailoredin/domain';
-
-function alphanumericKey(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
 
 const BATCH_SIZE = 500;
+
+const MIND_TYPE_TO_KIND: Record<string, string> = {
+  ProgrammingLanguage: 'programming_language',
+  MarkupLanguage: 'markup_language',
+  Framework: 'framework',
+  Library: 'library',
+  Database: 'database',
+  Tool: 'tool',
+  Webserver: 'tool',
+  Service: 'service',
+  Protocol: 'protocol',
+  QueryLanguage: 'query_language'
+};
+
+const MULTI_TYPE_OVERRIDES: Record<string, string> = {
+  Docker: 'tool',
+  Realm: 'database',
+  'Flux CD': 'tool',
+  'Fabric8 Kubernetes Client': 'library'
+};
+
+const SOURCE_FILE_TO_CATEGORY: Record<string, string> = {
+  programming_languages: 'Programming Languages',
+  markup_languages: 'Markup Languages',
+  frameworks_frontend: 'Frontend Frameworks',
+  frameworks_backend: 'Backend Frameworks',
+  frameworks_mobile: 'Mobile Frameworks',
+  frameworks_fullstack: 'Fullstack Frameworks',
+  libraries_javascript: 'JavaScript Libraries',
+  libraries_python: 'Python Libraries',
+  libraries_java: 'Java Libraries',
+  libraries_csharp: 'C# Libraries',
+  libraries_kotlin: 'Kotlin Libraries',
+  // biome-ignore lint/style/useNamingConvention: exact MIND source_file key
+  libraries_frontend_UI: 'Frontend UI Libraries',
+  // biome-ignore lint/style/useNamingConvention: exact MIND source_file key
+  libraries_mobile_UI: 'Mobile UI Libraries',
+  'libraries_-various': 'General Libraries',
+  databases: 'Relational Databases',
+  databases_nosql: 'NoSQL Databases',
+  query_languages: 'Query Languages',
+  services: 'Services',
+  cloud_services: 'Cloud Services',
+  cloud_platforms: 'Cloud Platforms',
+  infrastructure: 'Infrastructure',
+  operating_systems: 'Operating Systems',
+  containerization: 'Containerization',
+  ci_cd: 'CI/CD',
+  devops: 'DevOps',
+  build_tools: 'Build Tools',
+  package_managers: 'Package Managers',
+  version_control: 'Version Control',
+  ides: 'IDEs',
+  tools: 'Developer Tools',
+  testing: 'Testing',
+  machine_learning: 'Machine Learning',
+  ai_tools: 'AI Tools',
+  data_science: 'Data Science',
+  protocols: 'Protocols',
+  webservers: 'Web Servers',
+  runtime_environments: 'Runtime Environments',
+  architectural_patterns: 'Architectural Patterns',
+  design_patterns: 'Design Patterns'
+};
+
+const CONCEPT_FILE_TO_KIND: Record<string, string> = {
+  architectural_patterns: 'architectural_pattern',
+  application_tasks: 'application_task',
+  application_domains: 'application_domain',
+  conceptual_aspects: 'conceptual_aspect',
+  technical_domains: 'technical_domain',
+  vertical_domains: 'vertical_domain',
+  skill_deployment_types: 'deployment_type'
+};
 
 type CandidateSkill = {
   label: string;
   normalizedLabel: string;
-  type: SkillType;
-  categoryNormalizedLabel: string | null;
+  kind: string;
+  categoryLabel: string | null;
   description: string | null;
   aliases: SkillAlias[];
+  mindName: string | null;
+  technicalDomains: string[];
+  conceptualAspects: string[];
+  architecturalPatterns: string[];
+  runtimeEnvironments: string[] | null;
+  buildTools: string[] | null;
+  paradigms: string[] | null;
+  supportedLanguages: string[] | null;
+  specificToFrameworks: string[] | null;
+  adapterForToolOrService: string[] | null;
+  implementsPatterns: string[] | null;
+  solvesApplicationTasks: string[] | null;
+  associatedApplicationDomains: string[] | null;
+  deploymentTypes: string[] | null;
+  groups: string[] | null;
   sourcePriority: number;
 };
 
-const CATEGORIES: { label: string; normalizedLabel: string }[] = [
-  { label: 'Programming Languages', normalizedLabel: 'programming-languages' },
-  { label: 'Frontend', normalizedLabel: 'frontend' },
-  { label: 'Backend', normalizedLabel: 'backend' },
-  { label: 'Mobile', normalizedLabel: 'mobile' },
-  { label: 'Databases', normalizedLabel: 'databases' },
-  { label: 'Cloud & Infrastructure', normalizedLabel: 'cloud-infrastructure' },
-  { label: 'DevOps & CI/CD', normalizedLabel: 'devops-ci-cd' },
-  { label: 'Testing & Quality', normalizedLabel: 'testing-quality' },
-  { label: 'AI & Machine Learning', normalizedLabel: 'ai-machine-learning' },
-  { label: 'Architecture & Methodology', normalizedLabel: 'architecture-methodology' }
-];
+function parseJsonb<T>(val: T[] | string | null | undefined): T[] {
+  if (val == null) return [];
+  if (typeof val === 'string') return JSON.parse(val);
+  return val;
+}
 
-const SOURCE_TO_CATEGORY: Record<string, string> = {
-  // MIND source files
-  programming_languages: 'programming-languages',
-  markup_languages: 'frontend',
-  frameworks_frontend: 'frontend',
-  frameworks_mobile: 'mobile',
-  frameworks_backend: 'backend',
-  frameworks_fullstack: 'backend',
-  libraries_ui: 'frontend',
-  libraries_data: 'ai-machine-learning',
-  protocols: 'backend',
-  runtime_environments: 'backend',
-  databases: 'databases',
-  databases_nosql: 'databases',
-  cloud_services: 'cloud-infrastructure',
-  cloud_platforms: 'cloud-infrastructure',
-  infrastructure: 'cloud-infrastructure',
-  operating_systems: 'cloud-infrastructure',
-  containerization: 'devops-ci-cd',
-  ci_cd: 'devops-ci-cd',
-  devops: 'devops-ci-cd',
-  build_tools: 'devops-ci-cd',
-  package_managers: 'devops-ci-cd',
-  version_control: 'devops-ci-cd',
-  ides: 'devops-ci-cd',
-  testing: 'testing-quality',
-  machine_learning: 'ai-machine-learning',
-  ai_tools: 'ai-machine-learning',
-  data_science: 'ai-machine-learning',
-  libraries_csharp: 'backend',
-  libraries_java: 'backend',
-  // biome-ignore lint/style/useNamingConvention: exact MIND source_file keys
-  libraries_frontend_UI: 'frontend',
-  // biome-ignore lint/style/useNamingConvention: exact MIND source_file keys
-  libraries_mobile_UI: 'mobile',
-  webservers: 'backend',
-  libraries_javascript: 'frontend',
-  libraries_kotlin: 'mobile',
-  services: 'cloud-infrastructure',
-  libraries_python: 'backend',
-  tools: 'devops-ci-cd',
-  'libraries_-various': 'backend',
-  query_languages: 'databases',
-  architectural_patterns: 'architecture-methodology',
-  design_patterns: 'architecture-methodology'
-};
+function resolveKind(mindName: string, mindTypes: string[]): string {
+  if (MULTI_TYPE_OVERRIDES[mindName]) return MULTI_TYPE_OVERRIDES[mindName];
+  for (const t of mindTypes) {
+    const kind = MIND_TYPE_TO_KIND[t];
+    if (kind) return kind;
+  }
+  return 'tool';
+}
 
 export class SkillSyncService {
   private readonly log = Logger.create('skill-sync');
@@ -87,74 +126,138 @@ export class SkillSyncService {
   public async sync(): Promise<void> {
     const totalStart = performance.now();
 
-    // Phase 1: Upsert categories
     const categoryMap = await this.upsertCategories();
     this.log.info(`Categories: ${categoryMap.size} upserted`);
 
-    // Phase 2: Read all sources
+    const skillMap = await this.upsertSkills(categoryMap);
+    this.log.info(`Skills: ${skillMap.size} upserted`);
+
+    const conceptMap = await this.upsertConcepts();
+    this.log.info(`Concepts: ${conceptMap.size} upserted`);
+
+    const skillDepCount = await this.resolveSkillDependencies(skillMap);
+    this.log.info(`Skill dependencies: ${skillDepCount} resolved`);
+
+    const conceptDepCount = await this.resolveConceptDependencies(skillMap, conceptMap);
+    this.log.info(`Concept dependencies: ${conceptDepCount} resolved`);
+
+    const elapsed = ((performance.now() - totalStart) / 1000).toFixed(2);
+    this.log.info(`Done in ${elapsed}s`);
+  }
+
+  public async reset(): Promise<void> {
+    this.log.info('Resetting skills data...');
+    await this.connection.execute('DELETE FROM "concept_dependencies"', [], 'run');
+    await this.connection.execute('DELETE FROM "skill_dependencies"', [], 'run');
+    await this.connection.execute('DELETE FROM "concepts"', [], 'run');
+    await this.connection.execute('DELETE FROM "experience_skills"', [], 'run');
+    await this.connection.execute('DELETE FROM "skills"', [], 'run');
+    await this.connection.execute('DELETE FROM "skill_categories"', [], 'run');
+    this.log.info('Reset complete');
+  }
+
+  // ---- Phase 1: Upsert categories ----
+
+  private async upsertCategories(): Promise<Map<string, string>> {
+    const categoryLabels = new Set(Object.values(SOURCE_FILE_TO_CATEGORY));
+    const now = new Date();
+    const rows = [...categoryLabels].map(label => [crypto.randomUUID(), label, normalizeLabel(label), null, now, now]);
+
+    await this.batchUpsert(
+      'skill_categories',
+      ['id', 'label', 'normalized_label', 'parent_id', 'created_at', 'updated_at'],
+      ['normalized_label'],
+      rows
+    );
+
+    const result = await this.connection.execute(`SELECT "id", "label" FROM "skill_categories"`, [], 'all');
+    return new Map(result.map((r: { id: string; label: string }) => [r.label, r.id]));
+  }
+
+  // ---- Phase 2: Upsert skills ----
+
+  private async upsertSkills(categoryMap: Map<string, string>): Promise<Map<string, string>> {
     const linguist = await this.readLinguistLanguages();
     this.log.info(`Linguist: ${linguist.length} candidates`);
 
     const mind = await this.readMindSkills();
     this.log.info(`MIND: ${mind.length} candidates`);
 
-    const { candidates: runtimes, languageRuntimes } = await this.readMindRuntimes();
-    this.log.info(`MIND runtimes: ${runtimes.length} candidates`);
-
-    await this.crossReferenceInterpreters(runtimes, languageRuntimes);
-    this.log.info('Interpreter cross-reference complete');
-
-    // Phase 3: Deduplicate
-    const allCandidates = [...linguist, ...mind, ...runtimes];
+    const allCandidates = [...linguist, ...mind];
     const deduplicated = this.deduplicateSkills(allCandidates);
-    this.log.info(`Deduplicated: ${allCandidates.length} candidates -> ${deduplicated.length} unique skills`);
+    this.log.info(`Deduplicated: ${allCandidates.length} -> ${deduplicated.length} unique skills`);
 
-    // Phase 4: Upsert skills
-    await this.upsertSkills(deduplicated, categoryMap);
-    this.log.info(`Skills: ${deduplicated.length} upserted`);
-
-    const elapsed = ((performance.now() - totalStart) / 1000).toFixed(2);
-    this.log.info(`Done in ${elapsed}s`);
-  }
-
-  /**
-   * Deletes all skills and skill categories. Clears experience_skills first
-   * because it has a non-cascading FK to skills.
-   */
-  public async reset(): Promise<void> {
-    this.log.info('Resetting skills data...');
-    await this.connection.execute('DELETE FROM "experience_skills"', [], 'run');
-    await this.connection.execute('DELETE FROM "skills"', [], 'run');
-    await this.connection.execute('DELETE FROM "skill_categories"', [], 'run');
-    this.log.info('Reset complete — experience_skills, skills, and skill_categories cleared');
-  }
-
-  // ---------------------------------------------------------------------------
-  // Phase 1: Category upsert
-  // ---------------------------------------------------------------------------
-
-  private async upsertCategories(): Promise<Map<string, string>> {
     const now = new Date();
-    const rows = CATEGORIES.map(c => [crypto.randomUUID(), c.label, c.normalizedLabel, now, now]);
+    const rows = deduplicated.map(s => [
+      crypto.randomUUID(),
+      s.label,
+      s.normalizedLabel,
+      s.kind,
+      s.categoryLabel ? (categoryMap.get(s.categoryLabel) ?? null) : null,
+      s.description,
+      JSON.stringify(s.aliases),
+      JSON.stringify(s.technicalDomains),
+      JSON.stringify(s.conceptualAspects),
+      JSON.stringify(s.architecturalPatterns),
+      s.mindName,
+      s.runtimeEnvironments ? JSON.stringify(s.runtimeEnvironments) : null,
+      s.buildTools ? JSON.stringify(s.buildTools) : null,
+      s.paradigms ? JSON.stringify(s.paradigms) : null,
+      s.supportedLanguages ? JSON.stringify(s.supportedLanguages) : null,
+      s.specificToFrameworks ? JSON.stringify(s.specificToFrameworks) : null,
+      s.adapterForToolOrService ? JSON.stringify(s.adapterForToolOrService) : null,
+      s.implementsPatterns ? JSON.stringify(s.implementsPatterns) : null,
+      s.solvesApplicationTasks ? JSON.stringify(s.solvesApplicationTasks) : null,
+      s.associatedApplicationDomains ? JSON.stringify(s.associatedApplicationDomains) : null,
+      s.deploymentTypes ? JSON.stringify(s.deploymentTypes) : null,
+      s.groups ? JSON.stringify(s.groups) : null,
+      now,
+      now
+    ]);
 
     await this.batchUpsert(
-      'skill_categories',
-      ['id', 'label', 'normalized_label', 'created_at', 'updated_at'],
+      'skills',
+      [
+        'id',
+        'label',
+        'normalized_label',
+        'kind',
+        'category_id',
+        'description',
+        'aliases',
+        'technical_domains',
+        'conceptual_aspects',
+        'architectural_patterns',
+        'mind_name',
+        'runtime_environments',
+        'build_tools',
+        'paradigms',
+        'supported_languages',
+        'specific_to_frameworks',
+        'adapter_for_tool_or_service',
+        'implements_patterns',
+        'solves_application_tasks',
+        'associated_application_domains',
+        'deployment_types',
+        'groups',
+        'created_at',
+        'updated_at'
+      ],
       ['normalized_label'],
       rows
     );
 
-    const result = await this.connection.execute(`SELECT "id", "normalized_label" FROM "skill_categories"`, [], 'all');
-    const map = new Map<string, string>();
-    for (const row of result) {
-      map.set(row.normalized_label, row.id);
+    const result = await this.connection.execute(
+      `SELECT "id", "mind_name" FROM "skills" WHERE "mind_name" IS NOT NULL`,
+      [],
+      'all'
+    );
+    const skillMap = new Map<string, string>();
+    for (const row of result as { id: string; mind_name: string }[]) {
+      skillMap.set(row.mind_name, row.id);
     }
-    return map;
+    return skillMap;
   }
-
-  // ---------------------------------------------------------------------------
-  // Phase 2: Source readers
-  // ---------------------------------------------------------------------------
 
   private async readLinguistLanguages(): Promise<CandidateSkill[]> {
     const rows = await this.connection.execute(
@@ -165,158 +268,113 @@ export class SkillSyncService {
       'all'
     );
 
-    return rows.map((row: { linguist_name: string; linguist_type: string; aliases: string[] }) => {
-      const aliases: SkillAlias[] = (row.aliases ?? []).map((a: string) => ({
+    return rows.map((row: { linguist_name: string; linguist_type: string; aliases: string[] | string }) => {
+      const rawAliases = parseJsonb(row.aliases as string[]);
+      const aliases: SkillAlias[] = rawAliases.map((a: string) => ({
         label: a,
         normalizedLabel: normalizeLabel(a)
       }));
+      const kind = row.linguist_type === 'programming' ? 'programming_language' : 'markup_language';
+      const categoryLabel = row.linguist_type === 'programming' ? 'Programming Languages' : 'Markup Languages';
 
       return {
         label: row.linguist_name,
         normalizedLabel: normalizeLabel(row.linguist_name),
-        type: row.linguist_type === 'programming' ? SkillType.LANGUAGE : SkillType.TECHNOLOGY,
-        categoryNormalizedLabel: row.linguist_type === 'programming' ? 'programming-languages' : 'frontend',
+        kind,
+        categoryLabel,
         description: null,
         aliases,
+        mindName: null,
+        technicalDomains: [],
+        conceptualAspects: [],
+        architecturalPatterns: [],
+        runtimeEnvironments: kind === 'programming_language' ? [] : null,
+        buildTools: kind === 'programming_language' ? [] : null,
+        paradigms: kind === 'programming_language' ? [] : null,
+        supportedLanguages: null,
+        specificToFrameworks: null,
+        adapterForToolOrService: null,
+        implementsPatterns: null,
+        solvesApplicationTasks: null,
+        associatedApplicationDomains: null,
+        deploymentTypes: null,
+        groups: null,
         sourcePriority: 1
       };
     });
   }
 
   private async readMindSkills(): Promise<CandidateSkill[]> {
-    const rows = await this.connection.execute(
-      `SELECT "mind_name", "mind_type", "synonyms", "mind_source_file" FROM "mind_skills"`,
-      [],
-      'all'
-    );
+    const rows = await this.connection.execute(`SELECT * FROM "mind_skills"`, [], 'all');
 
-    return rows.map(
-      (row: {
-        mind_name: string;
-        mind_type: string[] | string;
-        synonyms: string[] | string;
-        mind_source_file: string;
-      }) => {
-        const mindType: string[] = typeof row.mind_type === 'string' ? JSON.parse(row.mind_type) : row.mind_type;
-        const synonyms: string[] = typeof row.synonyms === 'string' ? JSON.parse(row.synonyms) : (row.synonyms ?? []);
+    return rows.map((row: Record<string, unknown>) => {
+      const mindName = row.mind_name as string;
+      const mindTypes = parseJsonb(row.mind_type as string[]);
+      const synonyms = parseJsonb(row.synonyms as string[]);
+      const sourceFile = row.mind_source_file as string;
+      const kind = resolveKind(mindName, mindTypes);
 
-        const aliases: SkillAlias[] = synonyms.map((s: string) => ({
-          label: s,
-          normalizedLabel: normalizeLabel(s)
-        }));
+      const aliases: SkillAlias[] = synonyms.map((s: string) => ({
+        label: s,
+        normalizedLabel: normalizeLabel(s)
+      }));
 
-        return {
-          label: row.mind_name,
-          normalizedLabel: normalizeLabel(row.mind_name),
-          type: mindType.includes('ProgrammingLanguage') ? SkillType.LANGUAGE : SkillType.TECHNOLOGY,
-          categoryNormalizedLabel: SOURCE_TO_CATEGORY[row.mind_source_file] ?? null,
-          description: null,
-          aliases,
-          sourcePriority: 2
-        };
-      }
-    );
+      const categoryLabel = SOURCE_FILE_TO_CATEGORY[sourceFile] ?? null;
+      const technicalDomains = parseJsonb(row.technical_domains as string[]);
+      const conceptualAspects = parseJsonb(row.conceptual_aspects as string[]);
+      const architecturalPatterns = parseJsonb(row.architectural_patterns as string[]);
+
+      const paradigmKeywords = [
+        'Object-Oriented',
+        'Functional',
+        'Imperative',
+        'Declarative',
+        'Procedural',
+        'Logic',
+        'Concurrent',
+        'Event-Driven',
+        'Reactive',
+        'Multi-Paradigm',
+        'Prototype-Based',
+        'Aspect-Oriented',
+        'Metaprogramming',
+        'Generic'
+      ];
+
+      return {
+        label: mindName,
+        normalizedLabel: normalizeLabel(mindName),
+        kind,
+        categoryLabel,
+        description: null,
+        aliases,
+        mindName,
+        technicalDomains,
+        conceptualAspects,
+        architecturalPatterns,
+        runtimeEnvironments: kind === 'programming_language' ? parseJsonb(row.runtime_environments as string[]) : null,
+        buildTools: kind === 'programming_language' ? parseJsonb(row.build_tools as string[]) : null,
+        paradigms: kind === 'programming_language' ? conceptualAspects.filter(a => paradigmKeywords.includes(a)) : null,
+        supportedLanguages: ['framework', 'library'].includes(kind)
+          ? parseJsonb(row.supported_programming_languages as string[])
+          : null,
+        specificToFrameworks: kind === 'library' ? parseJsonb(row.specific_to_frameworks as string[]) : null,
+        adapterForToolOrService: kind === 'library' ? parseJsonb(row.adapter_for_tool_or_service as string[]) : null,
+        implementsPatterns: kind === 'library' ? parseJsonb(row.implements_patterns as string[]) : null,
+        solvesApplicationTasks: ['framework', 'library', 'database', 'tool', 'service', 'protocol'].includes(kind)
+          ? parseJsonb(row.solves_application_tasks as string[])
+          : null,
+        associatedApplicationDomains: ['framework', 'library', 'database', 'tool', 'service', 'protocol'].includes(kind)
+          ? parseJsonb(row.associated_to_application_domains as string[])
+          : null,
+        deploymentTypes: ['tool', 'service'].includes(kind) ? [] : null,
+        groups: kind === 'service' ? [] : null,
+        sourcePriority: 2
+      };
+    });
   }
 
-  /**
-   * Reads MIND language → runtime mappings and returns both the parsed rows
-   * (for cross-referencing) and the deduplicated CandidateSkill entries.
-   */
-  private async readMindRuntimes(): Promise<{
-    candidates: CandidateSkill[];
-    languageRuntimes: { mindName: string; runtimeNames: string[] }[];
-  }> {
-    const rows = await this.connection.execute(
-      `SELECT "mind_name", "runtime_environments" FROM "mind_skills" WHERE "runtime_environments" != '[]'`,
-      [],
-      'all'
-    );
-
-    const byNormalizedLabel = new Map<string, CandidateSkill>();
-    const languageRuntimes: { mindName: string; runtimeNames: string[] }[] = [];
-
-    for (const row of rows as { mind_name: string; runtime_environments: string[] | string }[]) {
-      const runtimeNames: string[] =
-        typeof row.runtime_environments === 'string' ? JSON.parse(row.runtime_environments) : row.runtime_environments;
-
-      languageRuntimes.push({ mindName: row.mind_name, runtimeNames });
-
-      for (const runtime of runtimeNames) {
-        const normalizedLabel = normalizeLabel(runtime);
-        if (!byNormalizedLabel.has(normalizedLabel)) {
-          byNormalizedLabel.set(normalizedLabel, {
-            label: runtime,
-            normalizedLabel,
-            type: SkillType.TECHNOLOGY,
-            categoryNormalizedLabel: 'backend',
-            description: null,
-            aliases: [],
-            sourcePriority: 2
-          });
-        }
-      }
-    }
-
-    return { candidates: [...byNormalizedLabel.values()], languageRuntimes };
-  }
-
-  /**
-   * Joins Linguist interpreters to MIND runtimes through the parent language.
-   *
-   * For each MIND language that has runtimes, look up the same language in Linguist
-   * and get its interpreters. For each runtime, check if any interpreter fuzzy-matches
-   * the runtime name (by stripping non-alphanumeric chars and checking prefix containment).
-   * Matched interpreters are added as aliases on the runtime CandidateSkill.
-   */
-  private async crossReferenceInterpreters(
-    runtimes: CandidateSkill[],
-    languageRuntimes: { mindName: string; runtimeNames: string[] }[]
-  ): Promise<void> {
-    // 1. Build runtime lookup: normalizedLabel → CandidateSkill
-    const runtimeByNormalized = new Map(runtimes.map(r => [r.normalizedLabel, r]));
-
-    // 2. Read Linguist language → interpreters mapping
-    const linguistRows = await this.connection.execute(
-      `SELECT "linguist_name", "interpreters" FROM "linguist_languages" WHERE "interpreters" != '[]'`,
-      [],
-      'all'
-    );
-    const interpretersByLanguage = new Map<string, string[]>();
-    for (const row of linguistRows as { linguist_name: string; interpreters: string[] | string }[]) {
-      const interpreters = typeof row.interpreters === 'string' ? JSON.parse(row.interpreters) : row.interpreters;
-      interpretersByLanguage.set(row.linguist_name, interpreters);
-    }
-
-    // 3. Cross-reference through parent language name
-    for (const { mindName, runtimeNames } of languageRuntimes) {
-      const interpreters = interpretersByLanguage.get(mindName);
-      if (!interpreters || interpreters.length === 0) continue;
-
-      for (const runtimeName of runtimeNames) {
-        const runtime = runtimeByNormalized.get(normalizeLabel(runtimeName));
-        if (!runtime) continue;
-
-        const runtimeKey = alphanumericKey(runtimeName);
-
-        for (const interpreter of interpreters) {
-          const interpKey = alphanumericKey(interpreter);
-          if (runtimeKey.startsWith(interpKey) || interpKey.startsWith(runtimeKey)) {
-            const normalizedInterp = normalizeLabel(interpreter);
-            if (
-              normalizedInterp !== runtime.normalizedLabel &&
-              !runtime.aliases.some(a => a.normalizedLabel === normalizedInterp)
-            ) {
-              runtime.aliases.push({ label: interpreter, normalizedLabel: normalizedInterp });
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Phase 3: Deduplication
-  // ---------------------------------------------------------------------------
+  // ---- Deduplication ----
 
   private deduplicateSkills(candidates: CandidateSkill[]): CandidateSkill[] {
     const byNormalizedLabel = new Map<string, CandidateSkill>();
@@ -348,24 +406,20 @@ export class SkillSyncService {
     byNormalizedLabel: Map<string, CandidateSkill>,
     aliasIndex: Map<string, string>
   ): CandidateSkill | null {
-    // 1. Direct match by normalizedLabel
     const direct = byNormalizedLabel.get(candidate.normalizedLabel);
     if (direct) return direct;
 
-    // 2. Candidate's normalizedLabel is an alias of an existing skill
     const ownerKey = aliasIndex.get(candidate.normalizedLabel);
     if (ownerKey) {
       const owner = byNormalizedLabel.get(ownerKey);
       if (owner) return owner;
     }
 
-    // 3. Candidate's aliases match an existing skill's normalizedLabel
     for (const alias of candidate.aliases) {
       const aliasMatch = byNormalizedLabel.get(alias.normalizedLabel);
       if (aliasMatch) return aliasMatch;
     }
 
-    // 4. Candidate's aliases match an existing alias
     for (const alias of candidate.aliases) {
       const aliasOwnerKey = aliasIndex.get(alias.normalizedLabel);
       if (aliasOwnerKey) {
@@ -377,12 +431,7 @@ export class SkillSyncService {
     return null;
   }
 
-  /**
-   * Merge candidate into existing skill. Returns newly-added alias normalizedLabels
-   * so the caller can register them in the aliasIndex.
-   */
   private mergeInto(existing: CandidateSkill, candidate: CandidateSkill): string[] {
-    // Description: longest non-null wins
     if (
       candidate.description &&
       (!existing.description || candidate.description.length > existing.description.length)
@@ -390,23 +439,38 @@ export class SkillSyncService {
       existing.description = candidate.description;
     }
 
-    // Category: keep first non-null
-    if (!existing.categoryNormalizedLabel && candidate.categoryNormalizedLabel) {
-      existing.categoryNormalizedLabel = candidate.categoryNormalizedLabel;
+    if (!existing.categoryLabel && candidate.categoryLabel) {
+      existing.categoryLabel = candidate.categoryLabel;
     }
 
-    // Aliases: union by normalizedLabel
+    if (candidate.mindName && !existing.mindName) {
+      existing.mindName = candidate.mindName;
+      existing.technicalDomains = candidate.technicalDomains;
+      existing.conceptualAspects = candidate.conceptualAspects;
+      existing.architecturalPatterns = candidate.architecturalPatterns;
+      if (candidate.runtimeEnvironments) existing.runtimeEnvironments = candidate.runtimeEnvironments;
+      if (candidate.buildTools) existing.buildTools = candidate.buildTools;
+      if (candidate.paradigms) existing.paradigms = candidate.paradigms;
+      if (candidate.supportedLanguages) existing.supportedLanguages = candidate.supportedLanguages;
+      if (candidate.specificToFrameworks) existing.specificToFrameworks = candidate.specificToFrameworks;
+      if (candidate.adapterForToolOrService) existing.adapterForToolOrService = candidate.adapterForToolOrService;
+      if (candidate.implementsPatterns) existing.implementsPatterns = candidate.implementsPatterns;
+      if (candidate.solvesApplicationTasks) existing.solvesApplicationTasks = candidate.solvesApplicationTasks;
+      if (candidate.associatedApplicationDomains)
+        existing.associatedApplicationDomains = candidate.associatedApplicationDomains;
+      if (candidate.deploymentTypes) existing.deploymentTypes = candidate.deploymentTypes;
+      if (candidate.groups) existing.groups = candidate.groups;
+    }
+
     const existingAliasSet = new Set(existing.aliases.map(a => a.normalizedLabel));
     const newAliases: string[] = [];
 
-    // Add candidate's primary label as alias if different from existing's primary
     if (candidate.normalizedLabel !== existing.normalizedLabel && !existingAliasSet.has(candidate.normalizedLabel)) {
       existing.aliases.push({ label: candidate.label, normalizedLabel: candidate.normalizedLabel });
       existingAliasSet.add(candidate.normalizedLabel);
       newAliases.push(candidate.normalizedLabel);
     }
 
-    // Union in candidate's aliases
     for (const alias of candidate.aliases) {
       if (alias.normalizedLabel !== existing.normalizedLabel && !existingAliasSet.has(alias.normalizedLabel)) {
         existing.aliases.push(alias);
@@ -418,44 +482,121 @@ export class SkillSyncService {
     return newAliases;
   }
 
-  // ---------------------------------------------------------------------------
-  // Phase 4: Skill upsert
-  // ---------------------------------------------------------------------------
+  // ---- Phase 3: Upsert concepts ----
 
-  /**
-   * Upserts deduplicated skills into the `skills` table.
-   *
-   * Idempotency note: re-running sync fully overwrites label, type, category_id,
-   * description, and aliases for every matched skill. This is intentional — the sync
-   * is a bootstrap tool, not an ongoing sync. No user-edited skills exist yet. If
-   * user-editable skills are added later, an `is_user_modified` flag should gate
-   * the upsert.
-   */
-  private async upsertSkills(skills: CandidateSkill[], categoryMap: Map<string, string>): Promise<void> {
-    const now = new Date();
-    const rows = skills.map(s => [
-      crypto.randomUUID(),
-      s.label,
-      s.normalizedLabel,
-      s.type,
-      s.categoryNormalizedLabel ? (categoryMap.get(s.categoryNormalizedLabel) ?? null) : null,
-      s.description,
-      JSON.stringify(s.aliases),
-      now,
-      now
-    ]);
-
-    await this.batchUpsert(
-      'skills',
-      ['id', 'label', 'normalized_label', 'type', 'category_id', 'description', 'aliases', 'created_at', 'updated_at'],
-      ['normalized_label'],
-      rows
+  private async upsertConcepts(): Promise<Map<string, string>> {
+    const rows = await this.connection.execute(
+      `SELECT "mind_name", "mind_type", "category" FROM "mind_concepts"`,
+      [],
+      'all'
     );
+
+    const now = new Date();
+    const conceptRows = rows.map((row: { mind_name: string; mind_type: string; category: string | null }) => {
+      const kind = CONCEPT_FILE_TO_KIND[row.mind_type] ?? 'conceptual_aspect';
+      return [
+        crypto.randomUUID(),
+        row.mind_name,
+        normalizeLabel(row.mind_name),
+        kind,
+        row.category,
+        row.mind_name,
+        now,
+        now
+      ];
+    });
+
+    if (conceptRows.length > 0) {
+      await this.batchUpsert(
+        'concepts',
+        ['id', 'label', 'normalized_label', 'kind', 'category', 'mind_name', 'created_at', 'updated_at'],
+        ['normalized_label'],
+        conceptRows
+      );
+    }
+
+    const result = await this.connection.execute(
+      `SELECT "id", "mind_name" FROM "concepts" WHERE "mind_name" IS NOT NULL`,
+      [],
+      'all'
+    );
+    return new Map(result.map((r: { id: string; mind_name: string }) => [r.mind_name, r.id]));
   }
 
-  // ---------------------------------------------------------------------------
-  // Batch upsert helper
-  // ---------------------------------------------------------------------------
+  // ---- Phase 4: Resolve skill dependencies ----
+
+  private async resolveSkillDependencies(skillMap: Map<string, string>): Promise<number> {
+    const rows = await this.connection.execute(
+      `SELECT "mind_source_name", "mind_target_name"
+       FROM "mind_relations"
+       WHERE "relation_type" = 'impliesKnowingSkills'`,
+      [],
+      'all'
+    );
+
+    await this.connection.execute('DELETE FROM "skill_dependencies"', [], 'run');
+
+    const now = new Date();
+    const depRows: unknown[][] = [];
+    for (const row of rows as { mind_source_name: string; mind_target_name: string }[]) {
+      const sourceId = skillMap.get(row.mind_source_name);
+      const targetId = skillMap.get(row.mind_target_name);
+      if (sourceId && targetId && sourceId !== targetId) {
+        depRows.push([crypto.randomUUID(), sourceId, targetId, now]);
+      }
+    }
+
+    if (depRows.length > 0) {
+      await this.batchUpsert(
+        'skill_dependencies',
+        ['id', 'skill_id', 'implied_skill_id', 'created_at'],
+        ['skill_id', 'implied_skill_id'],
+        depRows
+      );
+    }
+
+    return depRows.length;
+  }
+
+  // ---- Phase 5: Resolve concept dependencies ----
+
+  private async resolveConceptDependencies(
+    skillMap: Map<string, string>,
+    conceptMap: Map<string, string>
+  ): Promise<number> {
+    const rows = await this.connection.execute(
+      `SELECT "mind_source_name", "mind_target_name"
+       FROM "mind_relations"
+       WHERE "relation_type" = 'impliesKnowingConcepts'`,
+      [],
+      'all'
+    );
+
+    await this.connection.execute('DELETE FROM "concept_dependencies"', [], 'run');
+
+    const now = new Date();
+    const depRows: unknown[][] = [];
+    for (const row of rows as { mind_source_name: string; mind_target_name: string }[]) {
+      const skillId = skillMap.get(row.mind_source_name);
+      const conceptId = conceptMap.get(row.mind_target_name);
+      if (skillId && conceptId) {
+        depRows.push([crypto.randomUUID(), skillId, conceptId, now]);
+      }
+    }
+
+    if (depRows.length > 0) {
+      await this.batchUpsert(
+        'concept_dependencies',
+        ['id', 'skill_id', 'concept_id', 'created_at'],
+        ['skill_id', 'concept_id'],
+        depRows
+      );
+    }
+
+    return depRows.length;
+  }
+
+  // ---- Batch upsert helper ----
 
   private async batchUpsert(
     table: string,

@@ -49,6 +49,7 @@ import { GenerateResumePdfRoute } from './routes/resume/GenerateResumePdfRoute.j
 import { GetCachedResumePdfRoute } from './routes/resume/GetCachedResumePdfRoute.js';
 import { ScoreResumeRoute } from './routes/resume/ScoreResumeRoute.js';
 import { UpdateResumeDisplaySettingsRoute } from './routes/resume/UpdateResumeDisplaySettingsRoute.js';
+import { ListConceptsRoute } from './routes/skill/ListConceptsRoute.js';
 import { ListSkillCategoriesRoute } from './routes/skill/ListSkillCategoriesRoute.js';
 import { ListSkillsRoute } from './routes/skill/ListSkillsRoute.js';
 import { SearchSkillsRoute } from './routes/skill/SearchSkillsRoute.js';
@@ -141,6 +142,7 @@ const app = new Elysia()
   .use(container.get(SearchSkillsRoute).plugin())
   .use(container.get(ListSkillsRoute).plugin())
   .use(container.get(ListSkillCategoriesRoute).plugin())
+  .use(container.get(ListConceptsRoute).plugin())
   // Generation Settings
   .use(container.get(GetGenerationSettingsRoute).plugin())
   .use(container.get(UpdateGenerationSettingsRoute).plugin())

@@ -10,9 +10,9 @@ export type ExperienceSkill = {
   skill: {
     id: string;
     label: string;
-    type: string;
+    kind: string;
     categoryId: string | null;
-    category: { id: string; label: string } | null;
+    category: { id: string; label: string; parentId: string | null } | null;
     description: string | null;
   };
 };

@@ -84,6 +84,7 @@ export type { ScoreResumeInput } from './resume/ScoreResume.js';
 export { ResumeNotReadyError, ScoreResume } from './resume/ScoreResume.js';
 export type { UpdateResumeDisplaySettingsInput } from './resume/UpdateResumeDisplaySettings.js';
 export { UpdateResumeDisplaySettings } from './resume/UpdateResumeDisplaySettings.js';
+export { ListConcepts } from './skill/ListConcepts.js';
 export { ListSkillCategories } from './skill/ListSkillCategories.js';
 export { ListSkills } from './skill/ListSkills.js';
 export type { SearchSkillsInput } from './skill/SearchSkills.js';

@@ -26,6 +26,7 @@ export * from './resume/prompt-sections/index.js';
 export { TypstResumeRendererFactory } from './resume/TypstResumeRendererFactory.js';
 export { PostgresGenerationSettingsRepository } from './settings/PostgresGenerationSettingsRepository.js';
 // Skill
+export { PostgresConceptRepository } from './skill/PostgresConceptRepository.js';
 export { PostgresSkillCategoryRepository } from './skill/PostgresSkillCategoryRepository.js';
 export { PostgresSkillRepository } from './skill/PostgresSkillRepository.js';
 // Skill sync

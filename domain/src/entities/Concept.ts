@@ -2,14 +2,17 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
 import { normalizeLabel } from '@tailoredin/core';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ValidationError } from '../ValidationError.js';
+import type { ConceptKind } from '../value-objects/ConceptKind.js';
 
-export type SkillCategoryCreateProps = {
+export type ConceptCreateProps = {
   label: string;
-  parentId?: string | null;
+  kind: ConceptKind;
+  category: string | null;
+  mindName: string | null;
 };
 
-@Entity({ tableName: 'skill_categories' })
-export class SkillCategory extends AggregateRoot {
+@Entity({ tableName: 'concepts' })
+export class Concept extends AggregateRoot {
   @PrimaryKey({ type: 'uuid', fieldName: 'id' })
   public readonly id!: string;
 
@@ -19,8 +22,14 @@ export class SkillCategory extends AggregateRoot {
   @Property({ fieldName: 'normalized_label', type: 'text', unique: true })
   public normalizedLabel: string;
 
-  @Property({ fieldName: 'parent_id', type: 'uuid', nullable: true })
-  public parentId: string | null;
+  @Property({ fieldName: 'kind', type: 'text' })
+  public kind: ConceptKind;
+
+  @Property({ fieldName: 'category', type: 'text', nullable: true })
+  public category: string | null;
+
+  @Property({ fieldName: 'mind_name', type: 'text', nullable: true })
+  public mindName: string | null;
 
   @Property({ fieldName: 'created_at', type: 'timestamp(3)', defaultRaw: 'CURRENT_TIMESTAMP' })
   public readonly createdAt: Date;
@@ -32,7 +41,9 @@ export class SkillCategory extends AggregateRoot {
     id: string;
     label: string;
     normalizedLabel: string;
-    parentId: string | null;
+    kind: ConceptKind;
+    category: string | null;
+    mindName: string | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -42,18 +53,22 @@ export class SkillCategory extends AggregateRoot {
     this.id = props.id;
     this.label = props.label;
     this.normalizedLabel = props.normalizedLabel;
-    this.parentId = props.parentId;
+    this.kind = props.kind;
+    this.category = props.category;
+    this.mindName = props.mindName;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
 
-  public static create(props: SkillCategoryCreateProps): SkillCategory {
+  public static create(props: ConceptCreateProps): Concept {
     const now = new Date();
-    return new SkillCategory({
+    return new Concept({
       id: crypto.randomUUID(),
       label: props.label,
       normalizedLabel: normalizeLabel(props.label),
-      parentId: props.parentId ?? null,
+      kind: props.kind,
+      category: props.category,
+      mindName: props.mindName,
       createdAt: now,
       updatedAt: now
     });

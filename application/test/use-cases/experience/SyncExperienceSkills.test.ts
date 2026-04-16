@@ -4,8 +4,8 @@ import {
   Experience,
   type ExperienceRepository,
   Skill,
-  type SkillRepository,
-  SkillType
+  SkillKind,
+  type SkillRepository
 } from '@tailoredin/domain';
 import { SyncExperienceSkills } from '../../../src/use-cases/experience/SyncExperienceSkills.js';
 
@@ -35,10 +35,14 @@ const makeSkill = (overrides: Partial<ConstructorParameters<typeof Skill>[0]> = 
     id: 'skill-aaaa-1111-2222-3333-444444444444',
     label: 'TypeScript',
     normalizedLabel: 'typescript',
-    type: SkillType.LANGUAGE,
+    kind: SkillKind.PROGRAMMING_LANGUAGE,
     categoryId: null,
     description: null,
     aliases: [],
+    technicalDomains: [],
+    conceptualAspects: [],
+    architecturalPatterns: [],
+    mindName: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides
@@ -48,7 +52,7 @@ describe('SyncExperienceSkills', () => {
   test('syncs skills on an experience and returns updated DTO', async () => {
     const experience = makeExperience();
     const skillA = makeSkill({ id: 'skill-a', label: 'TypeScript' });
-    const skillB = makeSkill({ id: 'skill-b', label: 'React', type: SkillType.TECHNOLOGY });
+    const skillB = makeSkill({ id: 'skill-b', label: 'React', kind: SkillKind.TOOL });
 
     const experienceRepo: ExperienceRepository = {
       findByIdOrFail: mock(() => Promise.resolve(experience)),

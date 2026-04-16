@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
-import { Skill, SkillType } from '@tailoredin/domain';
+import { Skill, SkillKind } from '@tailoredin/domain';
 import { PostgresSkillRepository } from '../../src/skill/PostgresSkillRepository.js';
 import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase.js';
 
@@ -24,10 +24,14 @@ describe('PostgresSkillRepository', () => {
 
   function createSkill(overrides: Partial<Parameters<typeof Skill.create>[0]> & { label: string }) {
     return Skill.create({
-      type: SkillType.TECHNOLOGY,
+      kind: SkillKind.TOOL,
       categoryId: null,
       description: null,
       aliases: [],
+      technicalDomains: [],
+      conceptualAspects: [],
+      architecturalPatterns: [],
+      mindName: null,
       ...overrides
     });
   }
@@ -40,9 +44,9 @@ describe('PostgresSkillRepository', () => {
 
   describe('findAll', () => {
     it('returns skills ordered by label', async () => {
-      const react = createSkill({ label: 'React', type: SkillType.TECHNOLOGY });
-      const go = createSkill({ label: 'Go', type: SkillType.LANGUAGE });
-      const typescript = createSkill({ label: 'TypeScript', type: SkillType.LANGUAGE });
+      const react = createSkill({ label: 'React', kind: SkillKind.TOOL });
+      const go = createSkill({ label: 'Go', kind: SkillKind.PROGRAMMING_LANGUAGE });
+      const typescript = createSkill({ label: 'TypeScript', kind: SkillKind.PROGRAMMING_LANGUAGE });
       await seedSkills(react, go, typescript);
 
       const result = await repo.findAll();
@@ -100,8 +104,8 @@ describe('PostgresSkillRepository', () => {
 
   describe('search', () => {
     it('finds skills by prefix match', async () => {
-      const typescript = createSkill({ label: 'TypeScript', type: SkillType.LANGUAGE });
-      const python = createSkill({ label: 'Python', type: SkillType.LANGUAGE });
+      const typescript = createSkill({ label: 'TypeScript', kind: SkillKind.PROGRAMMING_LANGUAGE });
+      const python = createSkill({ label: 'Python', kind: SkillKind.PROGRAMMING_LANGUAGE });
       await seedSkills(typescript, python);
 
       const result = await repo.search('Type', 10);
@@ -110,8 +114,8 @@ describe('PostgresSkillRepository', () => {
     });
 
     it('finds skills by fuzzy trigram match', async () => {
-      const kubernetes = createSkill({ label: 'Kubernetes', type: SkillType.TECHNOLOGY });
-      const react = createSkill({ label: 'React', type: SkillType.TECHNOLOGY });
+      const kubernetes = createSkill({ label: 'Kubernetes', kind: SkillKind.TOOL });
+      const react = createSkill({ label: 'React', kind: SkillKind.TOOL });
       await seedSkills(kubernetes, react);
 
       const result = await repo.search('Kubernets', 10);
@@ -122,7 +126,7 @@ describe('PostgresSkillRepository', () => {
     it('finds skills by alias in search_text', async () => {
       const golang = createSkill({
         label: 'Go',
-        type: SkillType.LANGUAGE,
+        kind: SkillKind.PROGRAMMING_LANGUAGE,
         aliases: [{ label: 'Golang', normalizedLabel: 'golang' }]
       });
       await seedSkills(golang);
@@ -134,7 +138,7 @@ describe('PostgresSkillRepository', () => {
 
     it('respects limit', async () => {
       const skills = Array.from({ length: 5 }, (_, i) =>
-        createSkill({ label: `JavaScript${i}`, type: SkillType.LANGUAGE })
+        createSkill({ label: `JavaScript${i}`, kind: SkillKind.PROGRAMMING_LANGUAGE })
       );
       await seedSkills(...skills);
 
@@ -143,9 +147,9 @@ describe('PostgresSkillRepository', () => {
     });
 
     it('ranks exact label match above prefix matches', async () => {
-      const kotlin = createSkill({ label: 'Kotlin', type: SkillType.LANGUAGE });
-      const kotlinCoroutines = createSkill({ label: 'Kotlin Coroutines', type: SkillType.TECHNOLOGY });
-      const kotlinMultiplatform = createSkill({ label: 'Kotlin Multiplatform Mobile', type: SkillType.TECHNOLOGY });
+      const kotlin = createSkill({ label: 'Kotlin', kind: SkillKind.PROGRAMMING_LANGUAGE });
+      const kotlinCoroutines = createSkill({ label: 'Kotlin Coroutines', kind: SkillKind.TOOL });
+      const kotlinMultiplatform = createSkill({ label: 'Kotlin Multiplatform Mobile', kind: SkillKind.TOOL });
       await seedSkills(kotlin, kotlinCoroutines, kotlinMultiplatform);
 
       const result = await repo.search('kotlin', 10);

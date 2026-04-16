@@ -16,11 +16,16 @@ describe('SkillSyncService', () => {
 
   beforeEach(async () => {
     const conn = orm.em.getConnection();
-    // Clean domain tables
+    // Clean domain tables (new tables first due to FK constraints)
+    await conn.execute(`DELETE FROM "concept_dependencies"`, [], 'run');
+    await conn.execute(`DELETE FROM "skill_dependencies"`, [], 'run');
+    await conn.execute(`DELETE FROM "concepts"`, [], 'run');
     await conn.execute(`DELETE FROM "experience_skills"`, [], 'run');
     await conn.execute(`DELETE FROM "skills"`, [], 'run');
     await conn.execute(`DELETE FROM "skill_categories"`, [], 'run');
     // Clean source tables
+    await conn.execute(`DELETE FROM "mind_relations"`, [], 'run');
+    await conn.execute(`DELETE FROM "mind_concepts"`, [], 'run');
     await conn.execute(`DELETE FROM "esco_skill_collections"`, [], 'run');
     await conn.execute(`DELETE FROM "esco_skills"`, [], 'run');
     await conn.execute(`DELETE FROM "mind_skills"`, [], 'run');
@@ -32,7 +37,7 @@ describe('SkillSyncService', () => {
     const conn = orm.em.getConnection();
     const now = new Date();
 
-    // -- Linguist languages (3 rows) --
+    // -- Linguist languages (4 rows) --
     await conn.execute(
       `INSERT INTO "linguist_languages" ("linguist_name", "linguist_type", "color", "aliases", "extensions", "interpreters", "linguist_version", "created_at", "updated_at")
        VALUES
@@ -45,7 +50,6 @@ describe('SkillSyncService', () => {
     );
 
     // -- MIND skills (7 rows) --
-    // All JSONB array columns except runtime_environments
     const mindCols = `"mind_name", "mind_type", "synonyms", "mind_source_file", "mind_version",
          "technical_domains", "implies_knowing_skills", "implies_knowing_concepts", "conceptual_aspects",
          "architectural_patterns", "supported_programming_languages", "specific_to_frameworks",
@@ -63,6 +67,28 @@ describe('SkillSyncService', () => {
          ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${emptyArrays}, '[]'),
          ('GraphQL', '["QueryLanguage"]', '["GQL"]', 'query_languages', 'v1', ${emptyArrays}, '[]')`,
       [],
+      'run'
+    );
+
+    // -- MIND concepts (3 rows) --
+    await conn.execute(
+      `INSERT INTO "mind_concepts" ("mind_name", "mind_type", "category", "mind_version", "created_at", "updated_at")
+       VALUES
+         ('REST (Representational State Transfer)', 'architectural_patterns', 'Service Architecture Patterns', 'v1', ?, ?),
+         ('Object-Oriented', 'conceptual_aspects', NULL, 'v1', ?, ?),
+         ('Backend', 'technical_domains', NULL, 'v1', ?, ?)`,
+      [now, now, now, now, now, now],
+      'run'
+    );
+
+    // -- MIND relations (3 rows) --
+    await conn.execute(
+      `INSERT INTO "mind_relations" ("mind_source_name", "mind_target_name", "relation_type", "mind_version", "created_at")
+       VALUES
+         ('React', 'JavaScript', 'impliesKnowingSkills', 'v1', ?),
+         ('React', 'Object-Oriented', 'impliesKnowingConcepts', 'v1', ?),
+         ('PostgreSQL', 'Backend', 'impliesKnowingConcepts', 'v1', ?)`,
+      [now, now, now],
       'run'
     );
 
@@ -114,9 +140,10 @@ describe('SkillSyncService', () => {
 
   async function querySkills(): Promise<
     {
+      id: string;
       label: string;
       normalized_label: string;
-      type: string;
+      kind: string;
       category_id: string | null;
       description: string | null;
       aliases: string;
@@ -134,24 +161,21 @@ describe('SkillSyncService', () => {
     return result[0].count;
   }
 
-  it('creates all 10 categories', async () => {
+  it('creates categories from MIND source file basenames', async () => {
     await seedFixtures();
     await runSync();
 
     const categories = await queryCategories();
-    expect(categories.length).toBe(10);
+    // 39 unique categories derived from SOURCE_FILE_TO_CATEGORY
+    expect(categories.length).toBe(39);
 
     const labels = categories.map(c => c.label);
     expect(labels).toContain('Programming Languages');
-    expect(labels).toContain('Frontend');
-    expect(labels).toContain('Backend');
-    expect(labels).toContain('Mobile');
-    expect(labels).toContain('Databases');
-    expect(labels).toContain('Cloud & Infrastructure');
-    expect(labels).toContain('DevOps & CI/CD');
-    expect(labels).toContain('Testing & Quality');
-    expect(labels).toContain('AI & Machine Learning');
-    expect(labels).toContain('Architecture & Methodology');
+    expect(labels).toContain('Frontend Frameworks');
+    expect(labels).toContain('Backend Frameworks');
+    expect(labels).toContain('Relational Databases');
+    expect(labels).toContain('Developer Tools');
+    expect(labels).toContain('Cloud Services');
   }, 60_000);
 
   it('deduplicates JavaScript across Linguist + MIND', async () => {
@@ -165,7 +189,7 @@ describe('SkillSyncService', () => {
     const js = jsSkills[0];
     // Linguist label wins (processed first)
     expect(js.label).toBe('JavaScript');
-    expect(js.type).toBe('language');
+    expect(js.kind).toBe('programming_language');
 
     // Aliases unioned: JS from Linguist+MIND (deduped)
     const aliases = typeof js.aliases === 'string' ? JSON.parse(js.aliases) : js.aliases;
@@ -183,7 +207,7 @@ describe('SkillSyncService', () => {
 
     const react = reactSkills[0];
     expect(react.label).toBe('React');
-    expect(react.type).toBe('technology');
+    expect(react.kind).toBe('framework');
 
     const aliases = typeof react.aliases === 'string' ? JSON.parse(react.aliases) : react.aliases;
     const aliasLabels = aliases.map((a: { label: string }) => a.label);
@@ -192,6 +216,31 @@ describe('SkillSyncService', () => {
     // Should not have duplicates
     const normalizedAliases = aliases.map((a: { normalizedLabel: string }) => a.normalizedLabel);
     expect(new Set(normalizedAliases).size).toBe(normalizedAliases.length);
+  }, 60_000);
+
+  it('assigns correct SkillKind values from MIND type tags', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+
+    const js = skills.find(s => s.normalized_label === 'javascript')!;
+    expect(js.kind).toBe('programming_language');
+
+    const react = skills.find(s => s.normalized_label === 'react')!;
+    expect(react.kind).toBe('framework');
+
+    const pg = skills.find(s => s.normalized_label === 'postgresql')!;
+    expect(pg.kind).toBe('database');
+
+    const docker = skills.find(s => s.normalized_label === 'docker')!;
+    expect(docker.kind).toBe('tool');
+
+    const tf = skills.find(s => s.normalized_label === 'tensorflow')!;
+    expect(tf.kind).toBe('library');
+
+    const graphql = skills.find(s => s.normalized_label === 'graphql')!;
+    expect(graphql.kind).toBe('query_language');
   }, 60_000);
 
   it('assigns correct categories', async () => {
@@ -209,31 +258,22 @@ describe('SkillSyncService', () => {
     expect(getCategoryLabel(js)).toBe('Programming Languages');
 
     const react = skills.find(s => s.normalized_label === 'react')!;
-    expect(getCategoryLabel(react)).toBe('Frontend');
+    expect(getCategoryLabel(react)).toBe('Frontend Frameworks');
 
     const docker = skills.find(s => s.normalized_label === 'docker')!;
-    expect(getCategoryLabel(docker)).toBe('DevOps & CI/CD');
+    expect(getCategoryLabel(docker)).toBe('Containerization');
 
     const tf = skills.find(s => s.normalized_label === 'tensorflow')!;
-    expect(getCategoryLabel(tf)).toBe('AI & Machine Learning');
+    expect(getCategoryLabel(tf)).toBe('Machine Learning');
 
     const html = skills.find(s => s.normalized_label === 'html')!;
-    expect(getCategoryLabel(html)).toBe('Frontend');
+    expect(getCategoryLabel(html)).toBe('Markup Languages');
 
     const graphql = skills.find(s => s.normalized_label === 'graphql')!;
-    expect(getCategoryLabel(graphql)).toBe('Databases');
-  }, 60_000);
+    expect(getCategoryLabel(graphql)).toBe('Query Languages');
 
-  it('only produces LANGUAGE and TECHNOLOGY types from Linguist + MIND', async () => {
-    await seedFixtures();
-    await runSync();
-
-    const skills = await querySkills();
-    const types = new Set(skills.map(s => s.type));
-    expect(types.has('language')).toBe(true);
-    expect(types.has('technology')).toBe(true);
-    expect(types.has('interpersonal')).toBe(false);
-    expect(types.has('methodology')).toBe(false);
+    const pg = skills.find(s => s.normalized_label === 'postgresql')!;
+    expect(getCategoryLabel(pg)).toBe('Relational Databases');
   }, 60_000);
 
   it('ignores Tanova and ESCO data during sync', async () => {
@@ -307,77 +347,53 @@ describe('SkillSyncService', () => {
     expect(count).toBe(0);
   }, 60_000);
 
-  it('extracts MIND runtimes as standalone skills', async () => {
+  it('upserts concepts from mind_concepts', async () => {
     await seedFixtures();
     await runSync();
 
-    const skills = await querySkills();
+    const conn = orm.em.getConnection();
+    const result = await conn.execute(`SELECT * FROM "concepts" ORDER BY "label"`, [], 'all');
+    expect(result.length).toBe(3);
 
-    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
-    expect(nodejs).toBeDefined();
-    expect(nodejs.label).toBe('Node.js');
-    expect(nodejs.type).toBe('technology');
+    const rest = result.find(
+      (c: { normalized_label: string }) => c.normalized_label === 'rest-representational-state-transfer'
+    ) as { kind: string; category: string | null } | undefined;
+    expect(rest).toBeDefined();
+    expect(rest!.kind).toBe('architectural_pattern');
+    expect(rest!.category).toBe('Service Architecture Patterns');
 
-    const deno = skills.find(s => s.normalized_label === 'deno')!;
-    expect(deno).toBeDefined();
-    expect(deno.label).toBe('Deno');
-    expect(deno.type).toBe('technology');
-
-    const bun = skills.find(s => s.normalized_label === 'bun')!;
-    expect(bun).toBeDefined();
-    expect(bun.label).toBe('Bun');
-    expect(bun.type).toBe('technology');
+    const oo = result.find((c: { normalized_label: string }) => c.normalized_label === 'object-oriented') as
+      | { kind: string; category: string | null }
+      | undefined;
+    expect(oo).toBeDefined();
+    expect(oo!.kind).toBe('conceptual_aspect');
+    expect(oo!.category).toBeNull();
   }, 60_000);
 
-  it('assigns Backend category to extracted runtimes', async () => {
+  it('resolves skill dependencies from mind_relations', async () => {
     await seedFixtures();
     await runSync();
 
+    const conn = orm.em.getConnection();
+    const deps = await conn.execute(`SELECT * FROM "skill_dependencies"`, [], 'all');
+    // React implies JavaScript
+    expect(deps.length).toBe(1);
+
     const skills = await querySkills();
-    const categories = await queryCategories();
-    const categoryById = new Map(categories.map(c => [c.id, c.label]));
+    const react = skills.find(s => s.normalized_label === 'react')!;
+    const js = skills.find(s => s.normalized_label === 'javascript')!;
 
-    const getCategoryLabel = (skill: { category_id: string | null }) =>
-      skill.category_id ? categoryById.get(skill.category_id) : null;
-
-    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
-    expect(getCategoryLabel(nodejs)).toBe('Backend');
-
-    const deno = skills.find(s => s.normalized_label === 'deno')!;
-    expect(getCategoryLabel(deno)).toBe('Backend');
+    expect(deps[0].skill_id).toBe(react.id);
+    expect(deps[0].implied_skill_id).toBe(js.id);
   }, 60_000);
 
-  it('cross-references Linguist interpreters as runtime aliases', async () => {
+  it('resolves concept dependencies from mind_relations', async () => {
     await seedFixtures();
     await runSync();
 
-    const skills = await querySkills();
-    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
-
-    const aliases = typeof nodejs.aliases === 'string' ? JSON.parse(nodejs.aliases) : nodejs.aliases;
-    const aliasLabels: string[] = aliases.map((a: { label: string }) => a.label);
-
-    // "nodejs" and "node" from Linguist interpreters matched to Node.js
-    expect(aliasLabels).toContain('nodejs');
-    expect(aliasLabels).toContain('node');
-
-    // Deno should NOT get JavaScript's interpreters (no fuzzy match)
-    const deno = skills.find(s => s.normalized_label === 'deno')!;
-    const denoAliases = typeof deno.aliases === 'string' ? JSON.parse(deno.aliases) : deno.aliases;
-    expect(denoAliases.length).toBe(0);
-  }, 60_000);
-
-  it('does not match unrelated interpreters to runtimes', async () => {
-    await seedFixtures();
-    await runSync();
-
-    const skills = await querySkills();
-    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
-
-    const aliases = typeof nodejs.aliases === 'string' ? JSON.parse(nodejs.aliases) : nodejs.aliases;
-    const aliasLabels: string[] = aliases.map((a: { label: string }) => a.label);
-
-    // ts-node is a TypeScript interpreter, not a match for Node.js
-    expect(aliasLabels).not.toContain('ts-node');
+    const conn = orm.em.getConnection();
+    const deps = await conn.execute(`SELECT * FROM "concept_dependencies"`, [], 'all');
+    // React implies Object-Oriented, PostgreSQL implies Backend
+    expect(deps.length).toBe(2);
   }, 60_000);
 });

@@ -32,6 +32,7 @@ import type {
   LinkCompanyToExperience,
   ListApplications,
   ListCompanies,
+  ListConcepts,
   ListEducation,
   ListExperiences,
   ListJobDescriptions,
@@ -61,6 +62,7 @@ import type {
 import type {
   ApplicationRepository,
   CompanyRepository,
+  ConceptRepository,
   EducationRepository,
   ExperienceRepository,
   GenerationSettingsRepository,
@@ -158,9 +160,11 @@ export const DI = {
   Skill: {
     Repository: new InjectionToken<SkillRepository>('DI.Skill.Repository'),
     CategoryRepository: new InjectionToken<SkillCategoryRepository>('DI.Skill.CategoryRepository'),
+    ConceptRepository: new InjectionToken<ConceptRepository>('DI.Skill.ConceptRepository'),
     List: new InjectionToken<ListSkills>('DI.Skill.List'),
     Search: new InjectionToken<SearchSkills>('DI.Skill.Search'),
     ListCategories: new InjectionToken<ListSkillCategories>('DI.Skill.ListCategories'),
+    ListConcepts: new InjectionToken<ListConcepts>('DI.Skill.ListConcepts'),
     SyncExperienceSkills: new InjectionToken<SyncExperienceSkills>('DI.Skill.SyncExperienceSkills')
   },
 

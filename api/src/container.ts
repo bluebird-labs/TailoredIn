@@ -29,6 +29,7 @@ import {
   LinkCompanyToExperience,
   ListApplications,
   ListCompanies,
+  ListConcepts,
   ListEducation,
   ListExperiences,
   ListJobDescriptions,
@@ -78,6 +79,7 @@ import {
   OutputConstraintsSection,
   PostgresApplicationRepository,
   PostgresCompanyRepository,
+  PostgresConceptRepository,
   PostgresEducationRepository,
   PostgresExperienceRepository,
   PostgresGenerationSettingsRepository,
@@ -220,6 +222,11 @@ container.bind({
       container.get(DI.Skill.Repository),
       container.get(DI.Company.Repository)
     )
+});
+container.bind({ provide: DI.Skill.ConceptRepository, useClass: PostgresConceptRepository });
+container.bind({
+  provide: DI.Skill.ListConcepts,
+  useFactory: () => new ListConcepts(container.get(DI.Skill.ConceptRepository))
 });
 
 // LLM

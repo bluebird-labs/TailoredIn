@@ -7,15 +7,16 @@ import type { Experience } from './use-experiences';
 export type Skill = {
   id: string;
   label: string;
-  type: string;
+  kind: string;
   categoryId: string | null;
-  category: { id: string; label: string } | null;
+  category: { id: string; label: string; parentId: string | null } | null;
   description: string | null;
 };
 
 export type SkillCategory = {
   id: string;
   label: string;
+  parentId: string | null;
 };
 
 export function useAllSkills() {

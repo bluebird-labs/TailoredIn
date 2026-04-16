@@ -1,32 +1,44 @@
 import { describe, expect, test } from 'bun:test';
 import { Skill } from '../../src/entities/Skill.js';
-import { SkillType } from '../../src/value-objects/SkillType.js';
+import { SkillKind } from '../../src/value-objects/SkillKind.js';
 
 describe('Skill', () => {
-  test('creates with required fields', () => {
+  test('creates with required fields and new kind-based metadata', () => {
     const skill = Skill.create({
       label: 'TypeScript',
-      type: SkillType.LANGUAGE,
+      kind: SkillKind.PROGRAMMING_LANGUAGE,
       categoryId: null,
       description: null,
-      aliases: []
+      aliases: [],
+      technicalDomains: ['backend', 'frontend'],
+      conceptualAspects: ['Object-Oriented'],
+      architecturalPatterns: [],
+      mindName: 'TypeScript'
     });
     expect(skill.id).toBeString();
     expect(skill.label).toBe('TypeScript');
     expect(skill.normalizedLabel).toBe('typescript');
-    expect(skill.type).toBe(SkillType.LANGUAGE);
+    expect(skill.kind).toBe(SkillKind.PROGRAMMING_LANGUAGE);
     expect(skill.categoryId).toBeNull();
     expect(skill.description).toBeNull();
     expect(skill.aliases).toEqual([]);
+    expect(skill.technicalDomains).toEqual(['backend', 'frontend']);
+    expect(skill.conceptualAspects).toEqual(['Object-Oriented']);
+    expect(skill.architecturalPatterns).toEqual([]);
+    expect(skill.mindName).toBe('TypeScript');
   });
 
   test('derives normalizedLabel from label', () => {
     const skill = Skill.create({
       label: 'Node.js',
-      type: SkillType.TECHNOLOGY,
+      kind: SkillKind.TOOL,
       categoryId: null,
       description: null,
-      aliases: []
+      aliases: [],
+      technicalDomains: [],
+      conceptualAspects: [],
+      architecturalPatterns: [],
+      mindName: null
     });
     expect(skill.normalizedLabel).toBe('node-js');
   });
@@ -38,10 +50,14 @@ describe('Skill', () => {
     ];
     const skill = Skill.create({
       label: 'Go',
-      type: SkillType.LANGUAGE,
+      kind: SkillKind.PROGRAMMING_LANGUAGE,
       categoryId: 'cat-1',
       description: 'A programming language by Google',
-      aliases
+      aliases,
+      technicalDomains: [],
+      conceptualAspects: [],
+      architecturalPatterns: [],
+      mindName: 'Go'
     });
     expect(skill.aliases).toEqual(aliases);
     expect(skill.categoryId).toBe('cat-1');
@@ -50,7 +66,17 @@ describe('Skill', () => {
 
   test('throws when label is empty', () => {
     expect(() =>
-      Skill.create({ label: '', type: SkillType.LANGUAGE, categoryId: null, description: null, aliases: [] })
+      Skill.create({
+        label: '',
+        kind: SkillKind.PROGRAMMING_LANGUAGE,
+        categoryId: null,
+        description: null,
+        aliases: [],
+        technicalDomains: [],
+        conceptualAspects: [],
+        architecturalPatterns: [],
+        mindName: null
+      })
     ).toThrow('label');
   });
 
@@ -58,10 +84,14 @@ describe('Skill', () => {
     expect(() =>
       Skill.create({
         label: 'a'.repeat(501),
-        type: SkillType.LANGUAGE,
+        kind: SkillKind.PROGRAMMING_LANGUAGE,
         categoryId: null,
         description: null,
-        aliases: []
+        aliases: [],
+        technicalDomains: [],
+        conceptualAspects: [],
+        architecturalPatterns: [],
+        mindName: null
       })
     ).toThrow('label');
   });

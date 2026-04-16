@@ -4,6 +4,8 @@ export type { ApplicationDto } from './ApplicationDto.js';
 export { toApplicationDto } from './ApplicationDto.js';
 export type { CompanyDto } from './CompanyDto.js';
 export { toCompanyDto } from './CompanyDto.js';
+export type { ConceptDto } from './ConceptDto.js';
+export { toConceptDto } from './ConceptDto.js';
 export type { EducationDto } from './EducationDto.js';
 export type { ExperienceDto } from './ExperienceDto.js';
 export type { ExperienceSkillDto } from './ExperienceSkillDto.js';

@@ -156,6 +156,7 @@ classDiagram
         <<UseCase>>
         +ExperienceRepository experienceRepository
         +CompanyRepository companyRepository
+        +SkillRepository skillRepository
         +execute(GetExperienceInput) ExperienceDto
     }
 
@@ -170,6 +171,7 @@ classDiagram
         <<UseCase>>
         +ExperienceRepository experienceRepository
         +CompanyRepository companyRepository
+        +SkillRepository skillRepository
         +execute() ExperienceDto[]
     }
 
@@ -247,6 +249,7 @@ classDiagram
         <<UseCase>>
         +JobDescriptionRepository jobDescriptionRepository
         +CompanyRepository companyRepository
+        +JobFitScoreRepository jobFitScoreRepository
         +execute(ListJobDescriptionsInput) JobDescriptionDto[]
     }
 
@@ -355,10 +358,23 @@ classDiagram
     %%  Skill Use Cases
     %% ──────────────────────────────────────────────
 
+    class ListConcepts {
+        <<UseCase>>
+        +ConceptRepository conceptRepository
+        +execute() ConceptDto[]
+    }
+
     class ListSkillCategories {
         <<UseCase>>
         +SkillCategoryRepository skillCategoryRepository
         +execute() SkillCategoryDto[]
+    }
+
+    class ListSkills {
+        <<UseCase>>
+        +SkillRepository skillRepository
+        +SkillCategoryRepository skillCategoryRepository
+        +execute() SkillDto[]
     }
 
     class SearchSkills {
@@ -486,6 +502,14 @@ classDiagram
         +Industry? industry
         +CompanyStage? stage
         +CompanyStatus? status
+    }
+
+    class ConceptDto {
+        <<DTO>>
+        +string id
+        +string label
+        +ConceptKind kind
+        +string? category
     }
 
     class EducationDto {
@@ -709,14 +733,14 @@ classDiagram
         <<DTO>>
         +string id
         +string label
-        +number ordinal
+        +string? parentId
     }
 
     class SkillDto {
         <<DTO>>
         +string id
         +string label
-        +SkillType type
+        +SkillKind kind
         +string? categoryId
         +SkillCategoryDto? category
         +string? description
@@ -773,7 +797,9 @@ classDiagram
     GenerateResumeContent ..> ResumeContentDto : returns
     GenerateResumeContentWithPdf ..> ResumeContentDto : returns
     ScoreResume ..> ResumeScoreDto : returns
+    ListConcepts ..> ConceptDto : returns
     ListSkillCategories ..> SkillCategoryDto : returns
+    ListSkills ..> SkillDto : returns
     SearchSkills ..> SkillDto : returns
     UpdateProfile ..> ProfileDto : returns
 
@@ -798,6 +824,10 @@ classDiagram
     }
 
     class CompanyRepository {
+        <<DomainPort>>
+    }
+
+    class ConceptRepository {
         <<DomainPort>>
     }
 
@@ -868,10 +898,12 @@ classDiagram
     DeleteExperience ..> ExperienceRepository : depends
     GetExperience ..> ExperienceRepository : depends
     GetExperience ..> CompanyRepository : depends
+    GetExperience ..> SkillRepository : depends
     LinkCompanyToExperience ..> ExperienceRepository : depends
     LinkCompanyToExperience ..> CompanyRepository : depends
     ListExperiences ..> ExperienceRepository : depends
     ListExperiences ..> CompanyRepository : depends
+    ListExperiences ..> SkillRepository : depends
     SyncExperienceSkills ..> ExperienceRepository : depends
     SyncExperienceSkills ..> SkillRepository : depends
     SyncExperienceSkills ..> CompanyRepository : depends
@@ -890,6 +922,7 @@ classDiagram
     GetJobDescription ..> JobFitScoreRepository : depends
     ListJobDescriptions ..> JobDescriptionRepository : depends
     ListJobDescriptions ..> CompanyRepository : depends
+    ListJobDescriptions ..> JobFitScoreRepository : depends
     ScoreJobFit ..> ProfileRepository : depends
     ScoreJobFit ..> ExperienceRepository : depends
     ScoreJobFit ..> CompanyRepository : depends
@@ -909,7 +942,10 @@ classDiagram
     ScoreResume ..> ResumeContentRepository : depends
     ScoreResume ..> JobDescriptionRepository : depends
     UpdateResumeDisplaySettings ..> ResumeContentRepository : depends
+    ListConcepts ..> ConceptRepository : depends
     ListSkillCategories ..> SkillCategoryRepository : depends
+    ListSkills ..> SkillRepository : depends
+    ListSkills ..> SkillCategoryRepository : depends
     SearchSkills ..> SkillRepository : depends
     SearchSkills ..> SkillCategoryRepository : depends
     UpdateProfile ..> ProfileRepository : depends
@@ -964,7 +1000,9 @@ classDiagram
     style ResumeNotReadyError fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ScoreResume fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateResumeDisplaySettings fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListConcepts fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListSkillCategories fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style ListSkills fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style SearchSkills fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style CompanyDataProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
     style CompanyDiscoveryProvider fill:#7c3aed,stroke:#4c1d95,color:#ede9fe,stroke-width:2px
@@ -980,6 +1018,7 @@ classDiagram
     style CompanyDiscoveryResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style CompanyEnrichmentResult fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style ConceptDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style EducationDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ExperienceSkillDto fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
@@ -1006,6 +1045,7 @@ classDiagram
     style ExternalServiceError fill:#be185d,stroke:#831843,color:#fce7f3,stroke-width:1px
     style ApplicationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style CompanyRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
+    style ConceptRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style EducationRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style ExperienceRepository fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px
     style GenerationContextBuilder fill:#475569,stroke:#1e293b,color:#e2e8f0,stroke-width:1px

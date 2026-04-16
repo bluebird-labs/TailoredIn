@@ -3,8 +3,8 @@ import {
   Skill,
   SkillCategory,
   type SkillCategoryRepository,
-  type SkillRepository,
-  SkillType
+  SkillKind,
+  type SkillRepository
 } from '@tailoredin/domain';
 import { SearchSkills } from '../../../src/use-cases/skill/SearchSkills.js';
 
@@ -13,10 +13,14 @@ const makeSkill = (overrides: Partial<ConstructorParameters<typeof Skill>[0]> = 
     id: 'skill-aaaa-1111-2222-3333-444444444444',
     label: 'TypeScript',
     normalizedLabel: 'typescript',
-    type: SkillType.LANGUAGE,
+    kind: SkillKind.PROGRAMMING_LANGUAGE,
     categoryId: null,
     description: 'A typed superset of JavaScript',
     aliases: [],
+    technicalDomains: [],
+    conceptualAspects: [],
+    architecturalPatterns: [],
+    mindName: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides
@@ -27,6 +31,7 @@ const makeCategory = (overrides: Partial<ConstructorParameters<typeof SkillCateg
     id: 'cat-aaaa-1111-2222-3333-444444444444',
     label: 'Programming Languages',
     normalizedLabel: 'programming-languages',
+    parentId: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides
@@ -50,7 +55,7 @@ describe('SearchSkills', () => {
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe(skill.id);
     expect(result[0].label).toBe('TypeScript');
-    expect(result[0].type).toBe(SkillType.LANGUAGE);
+    expect(result[0].kind).toBe(SkillKind.PROGRAMMING_LANGUAGE);
     expect(result[0].category).not.toBeNull();
     expect(result[0].category!.label).toBe('Programming Languages');
     expect(skillRepo.search).toHaveBeenCalledWith('type', 20);

@@ -193,6 +193,48 @@ classDiagram
     ResumeContent *-- ResumeScore
 
     %% ──────────────────────────────────────────────
+    %%  Skill Subdomain
+    %% ──────────────────────────────────────────────
+
+    class Skill {
+        <<AggregateRoot>>
+        +string label
+        +string normalizedLabel
+        +SkillKind kind
+        +string? categoryId
+        +string? description
+        +SkillAlias[] aliases
+        +string[] technicalDomains
+        +string[] conceptualAspects
+        +string[] architecturalPatterns
+        +string? mindName
+    }
+
+    class ConceptDependency {
+        <<Entity>>
+        +string skillId
+        +string conceptId
+    }
+
+    class SkillDependency {
+        <<Entity>>
+        +string skillId
+        +string impliedSkillId
+    }
+
+    class SkillKind {
+        <<enumeration>>
+        PROGRAMMING_LANGUAGE · MARKUP_LANGUAGE · FRAMEWORK
+        LIBRARY · DATABASE · TOOL
+        SERVICE · PROTOCOL · QUERY_LANGUAGE
+    }
+
+    Skill "1" --> "*" ConceptDependency : has
+    Skill "1" --> "*" ExperienceSkill : has
+    Skill --> SkillKind
+    Skill "1" --> "*" SkillDependency : has
+
+    %% ──────────────────────────────────────────────
     %%  Company Subdomain
     %% ──────────────────────────────────────────────
 
@@ -270,27 +312,27 @@ classDiagram
     JobDescription "1" --> "*" ResumeContent : has
 
     %% ──────────────────────────────────────────────
-    %%  Skill Subdomain
+    %%  Concept Subdomain
     %% ──────────────────────────────────────────────
 
-    class Skill {
+    class Concept {
         <<AggregateRoot>>
         +string label
         +string normalizedLabel
-        +SkillType type
-        +string? categoryId
-        +string? description
-        +SkillAlias[] aliases
+        +ConceptKind kind
+        +string? category
+        +string? mindName
     }
 
-    class SkillType {
+    class ConceptKind {
         <<enumeration>>
-        LANGUAGE · TECHNOLOGY · METHODOLOGY
-        INTERPERSONAL
+        ARCHITECTURAL_PATTERN · APPLICATION_TASK · APPLICATION_DOMAIN
+        CONCEPTUAL_ASPECT · TECHNICAL_DOMAIN · VERTICAL_DOMAIN
+        DEPLOYMENT_TYPE
     }
 
-    Skill "1" --> "*" ExperienceSkill : has
-    Skill --> SkillType
+    Concept --> ConceptKind
+    Concept "1" --> "*" ConceptDependency : has
 
     %% ──────────────────────────────────────────────
     %%  SkillCategory Subdomain
@@ -300,7 +342,7 @@ classDiagram
         <<AggregateRoot>>
         +string label
         +string normalizedLabel
-        +number ordinal
+        +string? parentId
     }
 
 
@@ -442,7 +484,8 @@ classDiagram
 
     class RequirementCoverage {
         <<type>>
-        strong · partial · absent
+        strong · partial · not_evidenced
+        absent
     }
 
     class RequirementScore {
@@ -521,13 +564,17 @@ classDiagram
     style GenerationScope fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style ResumeExperience fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style ResumeScore fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
+    style Skill fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ConceptDependency fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style SkillDependency fill:#0369a1,stroke:#0c4a6e,color:#e0f2fe,stroke-width:2px
+    style SkillKind fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style Company fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style JobDescription fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style CompanyStatus fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style JobSource fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style LocationType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
-    style Skill fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
-    style SkillType fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
+    style Concept fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
+    style ConceptKind fill:#a16207,stroke:#713f12,color:#fef3c7,stroke-width:1px
     style SkillCategory fill:#4338ca,stroke:#312e81,color:#e0e7ff,stroke-width:2px
     style AccomplishmentSnapshot fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
     style BlockLayout fill:#047857,stroke:#064e3b,color:#d1fae5,stroke-width:1px
