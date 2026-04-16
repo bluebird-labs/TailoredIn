@@ -1,29 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ResumeScore } from '@/hooks/use-job-descriptions';
+import { api } from '@/lib/api';
+import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
-
-async function tryParseErrorBody(response: Response): Promise<string | null> {
-  try {
-    const json = (await response.json()) as { error?: { message?: string } };
-    return json?.error?.message ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export function useScoreResume(resumeContentId: string, jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/resume/${resumeContentId}/score`, {
-        method: 'POST'
-      });
-      if (!response.ok) {
-        const message = await tryParseErrorBody(response);
-        throw new Error(message ?? 'Failed to score resume');
-      }
-      const json = (await response.json()) as { data: ResumeScore };
-      return json.data;
+      const segment = api.resume({ id: resumeContentId }).score as EdenRouteSegment;
+      const { data, error } = await segment.post();
+      if (error) throw new Error(extractApiError(error, 'Failed to score resume'));
+      return (data as { data: ResumeScore }).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
