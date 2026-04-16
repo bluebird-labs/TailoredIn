@@ -36,6 +36,7 @@ import type {
   ListExperiences,
   ListJobDescriptions,
   ListSkillCategories,
+  ListSkills,
   ParseJobDescription,
   PromptRegistry,
   ResumeElementGenerator,
@@ -157,6 +158,7 @@ export const DI = {
   Skill: {
     Repository: new InjectionToken<SkillRepository>('DI.Skill.Repository'),
     CategoryRepository: new InjectionToken<SkillCategoryRepository>('DI.Skill.CategoryRepository'),
+    List: new InjectionToken<ListSkills>('DI.Skill.List'),
     Search: new InjectionToken<SearchSkills>('DI.Skill.Search'),
     ListCategories: new InjectionToken<ListSkillCategories>('DI.Skill.ListCategories'),
     SyncExperienceSkills: new InjectionToken<SyncExperienceSkills>('DI.Skill.SyncExperienceSkills')

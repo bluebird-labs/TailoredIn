@@ -1,5 +1,16 @@
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Building2, FileText, KanbanSquare, type LucideIcon, Moon, Palette, Settings, Sun, User } from 'lucide-react';
+import {
+  Building2,
+  FileText,
+  KanbanSquare,
+  type LucideIcon,
+  Moon,
+  Palette,
+  Settings,
+  Sparkles,
+  Sun,
+  User
+} from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +44,8 @@ const pipelineNav: NavItem[] = [
   { label: 'Jobs', to: '/jobs', icon: FileText },
   { label: 'Companies', to: '/companies', icon: Building2 }
 ];
+
+const adminNav: NavItem[] = [{ label: 'Skills', to: '/skills', icon: Sparkles }];
 
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
@@ -105,6 +118,24 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {pipelineNav.map(item => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton
+                    render={<Link to={item.to} />}
+                    isActive={!!matchRoute({ to: item.to, fuzzy: true })}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Admin</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {adminNav.map(item => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     render={<Link to={item.to} />}

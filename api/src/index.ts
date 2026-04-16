@@ -50,6 +50,7 @@ import { GetCachedResumePdfRoute } from './routes/resume/GetCachedResumePdfRoute
 import { ScoreResumeRoute } from './routes/resume/ScoreResumeRoute.js';
 import { UpdateResumeDisplaySettingsRoute } from './routes/resume/UpdateResumeDisplaySettingsRoute.js';
 import { ListSkillCategoriesRoute } from './routes/skill/ListSkillCategoriesRoute.js';
+import { ListSkillsRoute } from './routes/skill/ListSkillsRoute.js';
 import { SearchSkillsRoute } from './routes/skill/SearchSkillsRoute.js';
 import { UpdateProfileRoute } from './routes/UpdateProfileRoute.js';
 
@@ -138,6 +139,7 @@ const app = new Elysia()
   .use(container.get(SyncExperienceSkillsRoute).plugin())
   // Skills
   .use(container.get(SearchSkillsRoute).plugin())
+  .use(container.get(ListSkillsRoute).plugin())
   .use(container.get(ListSkillCategoriesRoute).plugin())
   // Generation Settings
   .use(container.get(GetGenerationSettingsRoute).plugin())

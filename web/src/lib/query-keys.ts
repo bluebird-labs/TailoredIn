@@ -38,7 +38,9 @@ export const queryKeys = {
   },
   skills: {
     all: ['skills'] as const,
-    search: (query: string) => ['skills', 'search', query] as const
+    list: () => ['skills', 'list'] as const,
+    search: (query: string) => ['skills', 'search', query] as const,
+    categories: () => ['skills', 'categories'] as const
   },
   generationSettings: {
     all: ['generationSettings'] as const,
