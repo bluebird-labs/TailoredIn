@@ -365,7 +365,8 @@ container.bind({
       container.get(DI.Company.Repository),
       container.get(DI.JobDescription.Repository),
       container.get(DI.JobDescription.FitScoreRepository),
-      container.get(DI.JobDescription.FitScorer)
+      container.get(DI.JobDescription.FitScorer),
+      container.get(DI.Skill.Repository)
     )
 });
 

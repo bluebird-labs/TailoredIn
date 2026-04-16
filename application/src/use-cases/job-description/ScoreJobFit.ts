@@ -7,7 +7,10 @@ import {
   type JobDescriptionRepository,
   JobFitScore,
   type JobFitScoreRepository,
-  type ProfileRepository
+  type ProfileRepository,
+  type Skill,
+  SkillKind,
+  type SkillRepository
 } from '@tailoredin/domain';
 import type { JobFitScoreDto } from '../../dtos/JobFitScoreDto.js';
 import type { FitScorer } from '../../ports/FitScorer.js';
@@ -17,10 +20,44 @@ export type ScoreJobFitInput = {
   jobDescriptionId: string;
 };
 
+const SKILL_KIND_HEADINGS: { kind: SkillKind; heading: string }[] = [
+  { kind: SkillKind.PROGRAMMING_LANGUAGE, heading: 'Programming Languages' },
+  { kind: SkillKind.MARKUP_LANGUAGE, heading: 'Markup Languages' },
+  { kind: SkillKind.QUERY_LANGUAGE, heading: 'Query Languages' },
+  { kind: SkillKind.FRAMEWORK, heading: 'Frameworks' },
+  { kind: SkillKind.LIBRARY, heading: 'Libraries' },
+  { kind: SkillKind.DATABASE, heading: 'Databases' },
+  { kind: SkillKind.TOOL, heading: 'Tools' },
+  { kind: SkillKind.SERVICE, heading: 'Services' },
+  { kind: SkillKind.PROTOCOL, heading: 'Protocols' }
+];
+
+function formatSkillsAsMarkdown(skills: Skill[]): string | null {
+  if (skills.length === 0) return null;
+
+  const byKind = new Map<SkillKind, string[]>();
+  for (const skill of skills) {
+    const list = byKind.get(skill.kind) ?? [];
+    list.push(skill.label);
+    byKind.set(skill.kind, list);
+  }
+
+  const blocks: string[] = ['\n## Skills'];
+  for (const { kind, heading } of SKILL_KIND_HEADINGS) {
+    const labels = byKind.get(kind);
+    if (!labels || labels.length === 0) continue;
+    labels.sort((a, b) => a.localeCompare(b));
+    blocks.push(`\n### ${heading}\n${labels.join(', ')}`);
+  }
+
+  return blocks.join('\n');
+}
+
 function formatProfileAsMarkdown(
   profile: { about: string | null; fullName: string },
   experiences: Experience[],
-  companyMap: Map<string, Company>
+  companyMap: Map<string, Company>,
+  skills: Skill[]
 ): string {
   const parts: string[] = [];
 
@@ -28,6 +65,11 @@ function formatProfileAsMarkdown(
 
   if (profile.about) {
     parts.push(`\n## About\n\n${profile.about}`);
+  }
+
+  const skillsBlock = formatSkillsAsMarkdown(skills);
+  if (skillsBlock) {
+    parts.push(skillsBlock);
   }
 
   for (const exp of experiences) {
@@ -81,7 +123,8 @@ export class ScoreJobFit {
     private readonly companyRepository: CompanyRepository,
     private readonly jobDescriptionRepository: JobDescriptionRepository,
     private readonly jobFitScoreRepository: JobFitScoreRepository,
-    private readonly fitScorer: FitScorer
+    private readonly fitScorer: FitScorer,
+    private readonly skillRepository: SkillRepository
   ) {}
 
   public async execute(input: ScoreJobFitInput): Promise<JobFitScoreDto> {
@@ -100,7 +143,10 @@ export class ScoreJobFit {
       if (company) companyMap.set(company.id, company);
     }
 
-    const profileMarkdown = formatProfileAsMarkdown(profile, experiences, companyMap);
+    const skillIds = [...new Set(experiences.flatMap(e => e.skills.getItems().map(es => es.skillId)))];
+    const skills = skillIds.length > 0 ? await this.skillRepository.findByIds(skillIds) : [];
+
+    const profileMarkdown = formatProfileAsMarkdown(profile, experiences, companyMap, skills);
 
     const result = await this.fitScorer.score({
       jobDescriptionText: jd.description,
