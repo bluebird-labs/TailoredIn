@@ -406,25 +406,28 @@ export class SkillSyncService {
     byNormalizedLabel: Map<string, CandidateSkill>,
     aliasIndex: Map<string, string>
   ): CandidateSkill | null {
+    // Direct label match always merges (same canonical name = same skill)
     const direct = byNormalizedLabel.get(candidate.normalizedLabel);
     if (direct) return direct;
 
+    // Alias-based matches only merge within the same kind — prevents
+    // e.g. Node.js (tool) from being swallowed by JavaScript (programming_language)
     const ownerKey = aliasIndex.get(candidate.normalizedLabel);
     if (ownerKey) {
       const owner = byNormalizedLabel.get(ownerKey);
-      if (owner) return owner;
+      if (owner && owner.kind === candidate.kind) return owner;
     }
 
     for (const alias of candidate.aliases) {
       const aliasMatch = byNormalizedLabel.get(alias.normalizedLabel);
-      if (aliasMatch) return aliasMatch;
+      if (aliasMatch && aliasMatch.kind === candidate.kind) return aliasMatch;
     }
 
     for (const alias of candidate.aliases) {
       const aliasOwnerKey = aliasIndex.get(alias.normalizedLabel);
       if (aliasOwnerKey) {
         const aliasOwner = byNormalizedLabel.get(aliasOwnerKey);
-        if (aliasOwner) return aliasOwner;
+        if (aliasOwner && aliasOwner.kind === candidate.kind) return aliasOwner;
       }
     }
 
