@@ -32,6 +32,7 @@ interface Props {
   readonly onOpenChange: (open: boolean) => void;
   readonly companyId?: string;
   readonly jobDescription?: JobDescription;
+  readonly onCreated?: (jobDescription: JobDescription) => void;
 }
 
 type Step = 'company' | 'source' | 'parsing' | 'form';
@@ -103,7 +104,13 @@ function parseResultToFormState(result: JobDescriptionParseResult): JobDescripti
   };
 }
 
-export function JobDescriptionFormModal({ open, onOpenChange, companyId: companyIdProp, jobDescription }: Props) {
+export function JobDescriptionFormModal({
+  open,
+  onOpenChange,
+  companyId: companyIdProp,
+  jobDescription,
+  onCreated
+}: Props) {
   const isEdit = !!jobDescription;
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(companyIdProp ?? null);
   const effectiveCompanyId = companyIdProp ?? selectedCompanyId ?? '';
@@ -226,19 +233,30 @@ export function JobDescriptionFormModal({ open, onOpenChange, companyId: company
       sought_soft_skills: parsedSkills.soughtSoftSkills
     };
 
-    const options = {
-      onSuccess: () => {
-        resetAll();
-        onOpenChange(false);
-        toast.success(isEdit ? 'Job description updated' : 'Job description created');
-      },
-      onError: () => toast.error(isEdit ? 'Failed to update job description' : 'Failed to create job description')
-    };
-
     if (isEdit) {
-      updateJd.mutate({ id: jobDescription.id, ...payload }, options);
+      updateJd.mutate(
+        { id: jobDescription.id, ...payload },
+        {
+          onSuccess: () => {
+            resetAll();
+            onOpenChange(false);
+            toast.success('Job description updated');
+          },
+          onError: () => toast.error('Failed to update job description')
+        }
+      );
     } else {
-      createJd.mutate(payload, options);
+      createJd.mutate(payload, {
+        onSuccess: result => {
+          resetAll();
+          onOpenChange(false);
+          toast.success('Job description created');
+          if (onCreated && result) {
+            onCreated(result as JobDescription);
+          }
+        },
+        onError: () => toast.error('Failed to create job description')
+      });
     }
   }
 

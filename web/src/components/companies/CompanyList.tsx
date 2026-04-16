@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
@@ -15,6 +16,7 @@ interface CompanyListProps {
 }
 
 export function CompanyList({ search, onSearchChange, createOpen, onCreateOpenChange }: CompanyListProps) {
+  const navigate = useNavigate();
   const { data: companies = [], isLoading } = useCompanies();
 
   const filtered = useMemo(() => {
@@ -64,6 +66,7 @@ export function CompanyList({ search, onSearchChange, createOpen, onCreateOpenCh
           onOpenChange={next => {
             if (!next) onCreateOpenChange(false);
           }}
+          onCreated={company => navigate({ to: '/companies/$companyId', params: { companyId: company.id } })}
         />
       )}
     </>

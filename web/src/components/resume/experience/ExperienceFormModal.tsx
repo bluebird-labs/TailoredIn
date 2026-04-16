@@ -29,6 +29,7 @@ interface Props {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
   readonly modalMode: ModalMode;
+  readonly onCreated?: (experience: Experience) => void;
 }
 
 function emptyState(): ExperienceFormState {
@@ -71,7 +72,7 @@ function toLocalAccomplishments(accomplishments: Experience['accomplishments']):
   }));
 }
 
-export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
+export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }: Props) {
   const isCreate = modalMode.mode === 'create';
   const experience = modalMode.mode === 'edit' ? modalMode.experience : null;
 
@@ -225,11 +226,14 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode }: Props) {
           ordinal: modalMode.mode === 'create' ? modalMode.experienceCount : 0
         },
         {
-          onSuccess: () => {
+          onSuccess: result => {
             setErrors({});
             reset();
             onOpenChange(false);
             toast.success('Experience created');
+            if (onCreated && result) {
+              onCreated(result as Experience);
+            }
           },
           onError: () => toast.error('Failed to create experience')
         }

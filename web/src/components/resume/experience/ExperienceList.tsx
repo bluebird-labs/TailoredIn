@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
@@ -10,6 +11,7 @@ import { ExperienceFormModal } from './ExperienceFormModal.js';
 type ModalState = { mode: 'closed' } | { mode: 'create' };
 
 export function ExperienceList() {
+  const navigate = useNavigate();
   const { data: experiences = [], isLoading } = useExperiences();
   const [modalState, setModalState] = useState<ModalState>({ mode: 'closed' });
 
@@ -50,6 +52,7 @@ export function ExperienceList() {
             if (!next) setModalState({ mode: 'closed' });
           }}
           modalMode={{ mode: 'create', experienceCount: experiences.length }}
+          onCreated={exp => navigate({ to: '/experiences/$experienceId', params: { experienceId: exp.id } })}
         />
       )}
     </>

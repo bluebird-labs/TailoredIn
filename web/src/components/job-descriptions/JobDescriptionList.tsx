@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { EmptyState } from '@/components/shared/EmptyState.js';
@@ -22,6 +23,7 @@ export function JobDescriptionList({
   createOpen,
   onCreateOpenChange
 }: JobDescriptionListProps) {
+  const navigate = useNavigate();
   const { data: jobDescriptions = [], isLoading } = useJobDescriptions(companyId);
 
   const filtered = useMemo(() => {
@@ -78,6 +80,7 @@ export function JobDescriptionList({
           onOpenChange={next => {
             if (!next) onCreateOpenChange(false);
           }}
+          onCreated={jd => navigate({ to: '/jobs/$jobDescriptionId', params: { jobDescriptionId: jd.id } })}
         />
       )}
     </>

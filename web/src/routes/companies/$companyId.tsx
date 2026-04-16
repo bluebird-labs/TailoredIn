@@ -164,6 +164,7 @@ function CompanyDetailPage() {
           onOpenChange={next => {
             if (!next) setAddJobOpen(false);
           }}
+          onCreated={jd => navigate({ to: '/jobs/$jobDescriptionId', params: { jobDescriptionId: jd.id } })}
         />
       )}
     </div>
