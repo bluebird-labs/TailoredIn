@@ -36,30 +36,32 @@ describe('SkillSyncService', () => {
     await conn.execute(
       `INSERT INTO "linguist_languages" ("linguist_name", "linguist_type", "color", "aliases", "extensions", "interpreters", "linguist_version", "created_at", "updated_at")
        VALUES
-         ('JavaScript', 'programming', '#f1e05a', '["JS"]', '[]', '[]', 'v1', ?, ?),
-         ('TypeScript', 'programming', '#3178c6', '["TS"]', '[]', '[]', 'v1', ?, ?),
+         ('JavaScript', 'programming', '#f1e05a', '["JS"]', '[]', '["node", "nodejs"]', 'v1', ?, ?),
+         ('TypeScript', 'programming', '#3178c6', '["TS"]', '[]', '["ts-node"]', 'v1', ?, ?),
          ('HTML', 'markup', '#e34c26', '[]', '[]', '[]', 'v1', ?, ?),
          ('JSON', 'data', '#292929', '[]', '[]', '[]', 'v1', ?, ?)`,
       [now, now, now, now, now, now, now, now],
       'run'
     );
 
-    // -- MIND skills (6 rows) --
-    const mindDefaults = `'[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]'`;
-    await conn.execute(
-      `INSERT INTO "mind_skills" ("mind_name", "mind_type", "synonyms", "mind_source_file", "mind_version",
+    // -- MIND skills (7 rows) --
+    // All JSONB array columns except runtime_environments
+    const mindCols = `"mind_name", "mind_type", "synonyms", "mind_source_file", "mind_version",
          "technical_domains", "implies_knowing_skills", "implies_knowing_concepts", "conceptual_aspects",
          "architectural_patterns", "supported_programming_languages", "specific_to_frameworks",
          "adapter_for_tool_or_service", "implements_patterns", "associated_to_application_domains",
-         "solves_application_tasks", "build_tools", "runtime_environments")
+         "solves_application_tasks", "build_tools", "runtime_environments"`;
+    const emptyArrays = `'[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]', '[]'`;
+    await conn.execute(
+      `INSERT INTO "mind_skills" (${mindCols})
        VALUES
-         ('JavaScript', '["ProgrammingLanguage"]', '["JS"]', 'programming_languages', 'v1', ${mindDefaults}),
-         ('React', '["Framework"]', '["React.js", "ReactJS"]', 'frameworks_frontend', 'v1', ${mindDefaults}),
-         ('PostgreSQL', '["Database"]', '["Postgres"]', 'databases', 'v1', ${mindDefaults}),
-         ('Docker', '["Tool"]', '[]', 'containerization', 'v1', ${mindDefaults}),
-         ('TensorFlow', '["Library"]', '["TF"]', 'machine_learning', 'v1', ${mindDefaults}),
-         ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${mindDefaults}),
-         ('GraphQL', '["QueryLanguage"]', '["GQL"]', 'query_languages', 'v1', ${mindDefaults})`,
+         ('JavaScript', '["ProgrammingLanguage"]', '["JS"]', 'programming_languages', 'v1', ${emptyArrays}, '["Node.js", "Deno", "Bun"]'),
+         ('React', '["Framework"]', '["React.js", "ReactJS"]', 'frameworks_frontend', 'v1', ${emptyArrays}, '[]'),
+         ('PostgreSQL', '["Database"]', '["Postgres"]', 'databases', 'v1', ${emptyArrays}, '[]'),
+         ('Docker', '["Tool"]', '[]', 'containerization', 'v1', ${emptyArrays}, '[]'),
+         ('TensorFlow', '["Library"]', '["TF"]', 'machine_learning', 'v1', ${emptyArrays}, '[]'),
+         ('ExoticThing', '["Tool"]', '[]', 'exotic_things', 'v1', ${emptyArrays}, '[]'),
+         ('GraphQL', '["QueryLanguage"]', '["GQL"]', 'query_languages', 'v1', ${emptyArrays}, '[]')`,
       [],
       'run'
     );
@@ -303,5 +305,79 @@ describe('SkillSyncService', () => {
 
     const count = await countTable('experience_skills');
     expect(count).toBe(0);
+  }, 60_000);
+
+  it('extracts MIND runtimes as standalone skills', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+    expect(nodejs).toBeDefined();
+    expect(nodejs.label).toBe('Node.js');
+    expect(nodejs.type).toBe('technology');
+
+    const deno = skills.find(s => s.normalized_label === 'deno')!;
+    expect(deno).toBeDefined();
+    expect(deno.label).toBe('Deno');
+    expect(deno.type).toBe('technology');
+
+    const bun = skills.find(s => s.normalized_label === 'bun')!;
+    expect(bun).toBeDefined();
+    expect(bun.label).toBe('Bun');
+    expect(bun.type).toBe('technology');
+  }, 60_000);
+
+  it('assigns Backend category to extracted runtimes', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const categories = await queryCategories();
+    const categoryById = new Map(categories.map(c => [c.id, c.label]));
+
+    const getCategoryLabel = (skill: { category_id: string | null }) =>
+      skill.category_id ? categoryById.get(skill.category_id) : null;
+
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+    expect(getCategoryLabel(nodejs)).toBe('Backend');
+
+    const deno = skills.find(s => s.normalized_label === 'deno')!;
+    expect(getCategoryLabel(deno)).toBe('Backend');
+  }, 60_000);
+
+  it('cross-references Linguist interpreters as runtime aliases', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+
+    const aliases = typeof nodejs.aliases === 'string' ? JSON.parse(nodejs.aliases) : nodejs.aliases;
+    const aliasLabels: string[] = aliases.map((a: { label: string }) => a.label);
+
+    // "nodejs" and "node" from Linguist interpreters matched to Node.js
+    expect(aliasLabels).toContain('nodejs');
+    expect(aliasLabels).toContain('node');
+
+    // Deno should NOT get JavaScript's interpreters (no fuzzy match)
+    const deno = skills.find(s => s.normalized_label === 'deno')!;
+    const denoAliases = typeof deno.aliases === 'string' ? JSON.parse(deno.aliases) : deno.aliases;
+    expect(denoAliases.length).toBe(0);
+  }, 60_000);
+
+  it('does not match unrelated interpreters to runtimes', async () => {
+    await seedFixtures();
+    await runSync();
+
+    const skills = await querySkills();
+    const nodejs = skills.find(s => s.normalized_label === 'node-js')!;
+
+    const aliases = typeof nodejs.aliases === 'string' ? JSON.parse(nodejs.aliases) : nodejs.aliases;
+    const aliasLabels: string[] = aliases.map((a: { label: string }) => a.label);
+
+    // ts-node is a TypeScript interpreter, not a match for Node.js
+    expect(aliasLabels).not.toContain('ts-node');
   }, 60_000);
 });

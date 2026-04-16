@@ -3,6 +3,10 @@ import { Logger, normalizeLabel } from '@tailoredin/core';
 import type { SkillAlias } from '@tailoredin/domain';
 import { SkillType } from '@tailoredin/domain';
 
+function alphanumericKey(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 const BATCH_SIZE = 500;
 
 type CandidateSkill = {
@@ -94,8 +98,14 @@ export class SkillSyncService {
     const mind = await this.readMindSkills();
     this.log.info(`MIND: ${mind.length} candidates`);
 
+    const { candidates: runtimes, languageRuntimes } = await this.readMindRuntimes();
+    this.log.info(`MIND runtimes: ${runtimes.length} candidates`);
+
+    await this.crossReferenceInterpreters(runtimes, languageRuntimes);
+    this.log.info('Interpreter cross-reference complete');
+
     // Phase 3: Deduplicate
-    const allCandidates = [...linguist, ...mind];
+    const allCandidates = [...linguist, ...mind, ...runtimes];
     const deduplicated = this.deduplicateSkills(allCandidates);
     this.log.info(`Deduplicated: ${allCandidates.length} candidates -> ${deduplicated.length} unique skills`);
 
@@ -206,6 +216,102 @@ export class SkillSyncService {
         };
       }
     );
+  }
+
+  /**
+   * Reads MIND language → runtime mappings and returns both the parsed rows
+   * (for cross-referencing) and the deduplicated CandidateSkill entries.
+   */
+  private async readMindRuntimes(): Promise<{
+    candidates: CandidateSkill[];
+    languageRuntimes: { mindName: string; runtimeNames: string[] }[];
+  }> {
+    const rows = await this.connection.execute(
+      `SELECT "mind_name", "runtime_environments" FROM "mind_skills" WHERE "runtime_environments" != '[]'`,
+      [],
+      'all'
+    );
+
+    const byNormalizedLabel = new Map<string, CandidateSkill>();
+    const languageRuntimes: { mindName: string; runtimeNames: string[] }[] = [];
+
+    for (const row of rows as { mind_name: string; runtime_environments: string[] | string }[]) {
+      const runtimeNames: string[] =
+        typeof row.runtime_environments === 'string' ? JSON.parse(row.runtime_environments) : row.runtime_environments;
+
+      languageRuntimes.push({ mindName: row.mind_name, runtimeNames });
+
+      for (const runtime of runtimeNames) {
+        const normalizedLabel = normalizeLabel(runtime);
+        if (!byNormalizedLabel.has(normalizedLabel)) {
+          byNormalizedLabel.set(normalizedLabel, {
+            label: runtime,
+            normalizedLabel,
+            type: SkillType.TECHNOLOGY,
+            categoryNormalizedLabel: 'backend',
+            description: null,
+            aliases: [],
+            sourcePriority: 2
+          });
+        }
+      }
+    }
+
+    return { candidates: [...byNormalizedLabel.values()], languageRuntimes };
+  }
+
+  /**
+   * Joins Linguist interpreters to MIND runtimes through the parent language.
+   *
+   * For each MIND language that has runtimes, look up the same language in Linguist
+   * and get its interpreters. For each runtime, check if any interpreter fuzzy-matches
+   * the runtime name (by stripping non-alphanumeric chars and checking prefix containment).
+   * Matched interpreters are added as aliases on the runtime CandidateSkill.
+   */
+  private async crossReferenceInterpreters(
+    runtimes: CandidateSkill[],
+    languageRuntimes: { mindName: string; runtimeNames: string[] }[]
+  ): Promise<void> {
+    // 1. Build runtime lookup: normalizedLabel → CandidateSkill
+    const runtimeByNormalized = new Map(runtimes.map(r => [r.normalizedLabel, r]));
+
+    // 2. Read Linguist language → interpreters mapping
+    const linguistRows = await this.connection.execute(
+      `SELECT "linguist_name", "interpreters" FROM "linguist_languages" WHERE "interpreters" != '[]'`,
+      [],
+      'all'
+    );
+    const interpretersByLanguage = new Map<string, string[]>();
+    for (const row of linguistRows as { linguist_name: string; interpreters: string[] | string }[]) {
+      const interpreters = typeof row.interpreters === 'string' ? JSON.parse(row.interpreters) : row.interpreters;
+      interpretersByLanguage.set(row.linguist_name, interpreters);
+    }
+
+    // 3. Cross-reference through parent language name
+    for (const { mindName, runtimeNames } of languageRuntimes) {
+      const interpreters = interpretersByLanguage.get(mindName);
+      if (!interpreters || interpreters.length === 0) continue;
+
+      for (const runtimeName of runtimeNames) {
+        const runtime = runtimeByNormalized.get(normalizeLabel(runtimeName));
+        if (!runtime) continue;
+
+        const runtimeKey = alphanumericKey(runtimeName);
+
+        for (const interpreter of interpreters) {
+          const interpKey = alphanumericKey(interpreter);
+          if (runtimeKey.startsWith(interpKey) || interpKey.startsWith(runtimeKey)) {
+            const normalizedInterp = normalizeLabel(interpreter);
+            if (
+              normalizedInterp !== runtime.normalizedLabel &&
+              !runtime.aliases.some(a => a.normalizedLabel === normalizedInterp)
+            ) {
+              runtime.aliases.push({ label: interpreter, normalizedLabel: normalizedInterp });
+            }
+          }
+        }
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------
