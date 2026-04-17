@@ -1,5 +1,5 @@
 /**
- * Typed access to process.env. Bun loads .env natively — no dotenv needed.
+ * Typed access to process.env.
  * Throws at call time (not import time) if a requested key is missing.
  */
 export function env(key: string): string {

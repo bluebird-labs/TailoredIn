@@ -6,7 +6,7 @@ Concrete implementations of all application ports: database repositories. Also o
 
 ## Keeping the diagram in sync
 
-**`infrastructure/DATABASE.mmd` is the source of truth for the database schema.** After adding migrations or modifying entities, regenerate with `bun run db:diagram` (requires DB running). The diagram must always reflect the schema.
+**`infrastructure/DATABASE.mmd` is the source of truth for the database schema.** After adding migrations or modifying entities, regenerate with `pnpm run db:diagram` (requires DB running). The diagram must always reflect the schema.
 
 ## Directory structure
 
@@ -16,9 +16,9 @@ infrastructure/src/
 │   ├── migrations/      ← Timestamped MikroORM migrations
 │   ├── seeds/           ← DatabaseSeeder + E2eSeeder
 │   └── orm-config.ts    ← MikroORM config (imports entities from @tailoredin/domain)
-├── repositories/        ← Postgres<Entity>Repository implementations
+���── repositories/        ← Postgres<Entity>Repository implementations
 ├── services/            ← External service adapters (LLM, etc.)
-├── DI.ts                ← All DI tokens
+├���─ DI.ts                ← All DI tokens
 └── index.ts
 ```
 
@@ -31,17 +31,17 @@ Domain entities in `domain/src/entities/` carry MikroORM decorators directly —
 `Postgres<Entity>Repository` — thin wrappers around `EntityManager`. One file per aggregate root:
 
 ```typescript
-@injectable()
+@Injectable()
 export class PostgresExperienceRepository implements ExperienceRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(DI.Orm.EntityManager) private readonly em: EntityManager) {}
 
   public async findByIdOrFail(id: string): Promise<Experience> {
-    return this.orm.em.findOneOrFail(Experience, { id }, { populate: ['accomplishments'] });
+    return this.em.findOneOrFail(Experience, { id }, { populate: ['accomplishments'] });
   }
 
   public async save(experience: Experience): Promise<void> {
-    this.orm.em.persist(experience);
-    await this.orm.em.flush();
+    this.em.persist(experience);
+    await this.em.flush();
   }
 }
 ```
@@ -68,11 +68,11 @@ export const DI = {
 
 1. Add a port interface to `application/src/ports/<ServiceName>.ts`
 2. Add it to `application/src/ports/index.ts`
-3. Create the implementation in `infrastructure/src/services/<ServiceName>.ts` with `@injectable()`
+3. Create the implementation in `infrastructure/src/services/<ServiceName>.ts` with `@Injectable()`
 4. Add a DI token to `infrastructure/src/DI.ts`
-5. Bind in `api/src/container.ts`:
+5. Add provider in the appropriate NestJS module:
    ```typescript
-   container.bind({ provide: DI.MyDomain.MyService, useClass: MyServiceImpl });
+   { provide: DI.MyDomain.MyService, useClass: MyServiceImpl }
    ```
 
 ## Migrations
@@ -88,15 +88,15 @@ export async function down(db: Kysely<unknown>): Promise<void> {
 }
 ```
 
-Run: `bun dev:migration:up` (main branch) or `bun wt:migration:up` (worktree)
+Run: `pnpm dev:migration:up`
 
 ## Seeders
 
 `DatabaseSeeder` orchestrates per-domain seeders:
-- `ResumeDataSeeder` — profile, experience, accomplishments, education, companies
+- `ResumeDataSeeder` �� profile, experience, accomplishments, education, companies
 - `E2eSeeder` — minimal data for E2E tests
 
-Run: `bun run db:seed`
+Run: `pnpm dev:seed`
 
 ## LLM prompt logging
 
@@ -109,7 +109,7 @@ When adding a new `LlmJsonRequest` subclass, override `getInput()` to expose the
 Run against a real PostgreSQL instance via Testcontainers:
 
 ```bash
-bun run --cwd infrastructure test:integration
+pnpm --filter @tailoredin/infrastructure run test:integration
 ```
 
 Tests live in `infrastructure/test-integration/`. 60 s timeout per test.

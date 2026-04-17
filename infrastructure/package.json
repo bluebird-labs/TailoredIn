@@ -11,11 +11,11 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.integration.config.ts",
-    "typecheck": "bunx tsc --noEmit",
-    "migration:create": "bunx mikro-orm migration:create",
-    "migration:up": "bunx mikro-orm migration:up",
-    "seed:run": "bunx mikro-orm seeder:run",
-    "seed:run:e2e": "bunx mikro-orm seeder:run --class=E2eSeeder"
+    "typecheck": "pnpm exec tsc --noEmit",
+    "migration:create": "pnpm exec mikro-orm migration:create",
+    "migration:up": "pnpm exec mikro-orm migration:up",
+    "seed:run": "pnpm exec mikro-orm seeder:run",
+    "seed:run:e2e": "pnpm exec mikro-orm seeder:run --class=E2eSeeder"
   },
   "mikro-orm": {
     "configPaths": [

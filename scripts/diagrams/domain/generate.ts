@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
  * Generates domain/DOMAIN.mmd — a Mermaid class diagram of the domain model.
  *

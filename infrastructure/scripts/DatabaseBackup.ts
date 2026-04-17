@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Logger } from '@tailoredin/core';
@@ -5,10 +6,6 @@ import type { OrmDbConfig } from '../src/db/orm-config.js';
 
 const log = Logger.create('database-backup');
 
-/**
- * Create a pg_dump backup of the database via `docker exec`.
- * Returns the absolute path of the generated `.sql` file.
- */
 export function backupDatabase(dbConfig: OrmDbConfig, containerName: string, repoRoot: string): string {
   const backupDir = resolve(repoRoot, 'backups');
   mkdirSync(backupDir, { recursive: true });
@@ -19,24 +16,15 @@ export function backupDatabase(dbConfig: OrmDbConfig, containerName: string, rep
 
   log.info(`Backing up ${dbConfig.dbName} → ${fileName}`);
 
-  const result = Bun.spawnSync(
-    [
-      'docker',
-      'exec',
-      '-e',
-      `PGPASSWORD=${dbConfig.password}`,
-      containerName,
-      'pg_dump',
-      '-U',
-      dbConfig.user,
-      dbConfig.dbName
-    ],
-    { stdout: 'pipe', stderr: 'pipe' }
+  const result = spawnSync(
+    'docker',
+    ['exec', '-e', `PGPASSWORD=${dbConfig.password}`, containerName, 'pg_dump', '-U', dbConfig.user, dbConfig.dbName],
+    { stdio: ['ignore', 'pipe', 'pipe'] }
   );
 
-  if (result.exitCode !== 0) {
+  if (result.status !== 0) {
     const stderr = result.stderr.toString().trim();
-    throw new Error(`pg_dump failed (exit ${result.exitCode}): ${stderr}`);
+    throw new Error(`pg_dump failed (exit ${result.status}): ${stderr}`);
   }
 
   writeFileSync(filePath, result.stdout);

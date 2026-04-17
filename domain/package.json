@@ -17,7 +17,7 @@
   },
   "private": true,
   "scripts": {
-    "typecheck": "bunx tsc --noEmit",
+    "typecheck": "pnpm exec tsc --noEmit",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage"
   },

@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 import { MikroORM } from '@mikro-orm/postgresql';
 import { Logger } from '@tailoredin/core';
 import { getOrmConfig } from '../src/db/orm-config.js';

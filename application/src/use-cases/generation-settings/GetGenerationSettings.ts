@@ -11,7 +11,8 @@ export type GetGenerationSettingsInput = {
 @Injectable()
 export class GetGenerationSettings {
   public constructor(
-    @Inject(DI.GenerationSettings.Repository) private readonly generationSettingsRepository: GenerationSettingsRepository
+    @Inject(DI.GenerationSettings.Repository)
+    private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
   public async execute(input: GetGenerationSettingsInput): Promise<GenerationSettingsDto> {

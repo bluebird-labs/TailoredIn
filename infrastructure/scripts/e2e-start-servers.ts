@@ -1,7 +1,7 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
  * Boots Testcontainers Postgres + API + Vite for e2e tests.
- * Lives in infrastructure/scripts/ so Bun resolves @mikro-orm/* from
+ * Lives in infrastructure/scripts/ so tsx resolves @mikro-orm/* from
  * infrastructure/node_modules (correct versions).
  *
  * Writes server state to e2e/.server-state.json, then keeps running until killed.

@@ -220,7 +220,9 @@ describe('GenerateResumePdf', () => {
     const profileRepo: ProfileRepository = {
       findByIdOrFail: jest.fn(async () => profile)
     } as unknown as ProfileRepository;
-    const experienceRepo: ExperienceRepository = { findAll: jest.fn(async () => []) } as unknown as ExperienceRepository;
+    const experienceRepo: ExperienceRepository = {
+      findAll: jest.fn(async () => [])
+    } as unknown as ExperienceRepository;
     const educationRepo: EducationRepository = { findAll: jest.fn(async () => []) } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = {
       findById: jest.fn(async () => null),

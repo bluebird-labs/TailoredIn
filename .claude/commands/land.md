@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(bun run check:fix), Bash(bun run typecheck), Bash(bun run test), Bash(bun run dep:check), Bash(bun wt:down), Bash(git rebase:*), Bash(git push:*), Bash(git status:*), Bash(git log:*), Bash(git branch:*), Bash(git diff:*), Bash(git merge:*), Bash(git commit:*), Bash(git add:*), Bash(git fetch:*), Bash(git rev-parse:*), Bash(git worktree:*), Bash(git -C:*), Bash(gh pr create:*), Bash(gh pr merge:*), Bash(gh pr checks:*), Bash(gh pr view:*)
+allowed-tools: Bash(pnpm run check:fix), Bash(pnpm run typecheck), Bash(pnpm run test), Bash(pnpm run dep:check), Bash(pnpm dev:down), Bash(git rebase:*), Bash(git push:*), Bash(git status:*), Bash(git log:*), Bash(git branch:*), Bash(git diff:*), Bash(git merge:*), Bash(git commit:*), Bash(git add:*), Bash(git fetch:*), Bash(git rev-parse:*), Bash(git worktree:*), Bash(git -C:*), Bash(gh pr create:*), Bash(gh pr merge:*), Bash(gh pr checks:*), Bash(gh pr view:*)
 description: Run quality checks, commit changes, and land the current branch into main
 ---
 
@@ -33,10 +33,10 @@ If there are no commits ahead of main, report "Nothing to land" and stop.
 
 Run these checks in order. Fix any issues before proceeding — even if unrelated to your changes. If auto-fix resolves everything, continue. If issues remain that require judgment, STOP and ask.
 
-1. `bun run check:fix` — auto-fix lint/format
-2. `bun run typecheck` — fix any type errors
-3. `bun run test` — fix any failing tests
-4. `bun run dep:check` — fix any architecture violations
+1. `pnpm run check:fix` — auto-fix lint/format
+2. `pnpm run typecheck` — fix any type errors
+3. `pnpm run test` — fix any failing tests
+4. `pnpm run dep:check` — fix any architecture violations
 
 ---
 
@@ -164,7 +164,7 @@ Use `MAIN` as shorthand for the main repo path, `BRANCH` for the current branch 
 
 2. **Report completion** with the squash commit hash and a summary of landed changes.
 
-The worktree is left intact — do not run `bun wt:down` and do not run `git worktree remove`. The user decides when to tear down the worktree.
+The worktree is left intact — do not run `git worktree remove`. The user decides when to tear down the worktree.
 
 ---
 

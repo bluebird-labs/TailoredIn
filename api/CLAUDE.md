@@ -2,71 +2,62 @@
 
 Package: `@tailoredin/api`
 
-Elysia HTTP server, DI composition root, and Eden Treaty client export. This is the outermost layer — it wires everything together and exposes the API.
+NestJS HTTP server and module composition root. This is the outermost layer — it wires everything together and exposes the API.
 
 ## Key files
 
 | File | Purpose |
 |---|---|
-| `src/index.ts` | Elysia app bootstrap, port 8000, request logging middleware |
-| `src/container.ts` | DI container setup — binds all services and use cases |
-| `src/client.ts` | Eden Treaty type-safe client export for the web frontend |
-| `src/helpers/profile-id.ts` | Shared helper to extract profile ID from requests |
+| `src/main.ts` | NestJS bootstrap, starts Express server |
+| `src/app.module.ts` | Root NestJS module — imports all feature modules |
+| `src/config/env.schema.ts` | Zod schema for environment validation |
 
-## Route class anatomy
+## Controller anatomy
 
-One file per endpoint (`<VerbNoun>Route.ts`), organized in domain subdirectories (e.g., `routes/experience/CreateExperienceRoute.ts`). Each is an `@injectable()` class with a `plugin()` method:
+Controllers organized by domain (e.g., `controllers/experience/ExperienceController.ts`). Zod DTOs for request validation:
 
 ```typescript
-@injectable()
-export class GetExperienceRoute {
+@Controller('experiences')
+export class ExperienceController {
   public constructor(
-    @inject(DI.Experience.GetExperience) private readonly getExperience: GetExperience,
+    @Inject(DI.Experience.GetExperience) private readonly getExperience: GetExperience,
   ) {}
 
-  public plugin(): Elysia {
-    return new Elysia().get('/experiences/:id', async ({ params }) => {
-      const result = await this.getExperience.execute({ experienceId: params.id });
-      return { data: result };
-    });
+  @Get(':id')
+  public async get(@Param('id') id: string) {
+    const result = await this.getExperience.execute({ experienceId: id });
+    return { data: result };
   }
 }
 ```
+
+## Auth
+
+- Global `JwtAuthGuard` (applied via `APP_GUARD`)
+- `@Public()` decorator exempts routes (login, health)
+- `@CurrentUser()` param decorator extracts `{ accountId, profileId }` from request
+
+## Validation
+
+- `createZodDto()` from `nestjs-zod` creates DTOs from Zod schemas
+- Global `ZodValidationPipe` returns 422 on validation failures
+- Zod schemas live alongside controllers
 
 ## Response envelope
 
 See `CONVENTIONS.md` for the full response envelope spec (success/error shapes, HTTP status codes, pagination).
 
-## Error mapping
-
-Map `Result` errors to HTTP status codes:
+## Wiring providers in modules
 
 ```typescript
-const result = await this.updateExperience.execute(input);
-if (!result.ok) {
-  if (result.error === 'NOT_FOUND') throw new NotFoundError();
+{
+  provide: DI.Experience.Repository,
+  useClass: PostgresExperienceRepository,
 }
-return { data: result.value };
 ```
 
-## Wiring a new service in container.ts
+See [infrastructure/CLAUDE.md](../infrastructure/CLAUDE.md) for the full "Adding a new service" workflow (port → implementation → token → module provider).
 
-See [infrastructure/CLAUDE.md](../infrastructure/CLAUDE.md) for the full "Adding a new service" workflow (port → implementation → token → binding).
+## OpenAPI
 
-## Eden Treaty client
-
-`src/client.ts` exports the Elysia app type so the web layer gets full type safety:
-
-```typescript
-export type App = typeof app; // re-exported from index.ts
-```
-
-The web layer consumes this via `edenTreaty<App>(baseUrl)`. Adding new routes automatically updates the client's types — no manual sync needed.
-
-## Mounting routes
-
-In `src/index.ts`, resolve routes from the container:
-
-```typescript
-app.use(container.get(ExperienceRoutes).plugin());
-```
+`@nestjs/swagger` + `nestjs-zod` generates OpenAPI spec automatically from controllers and Zod DTOs.

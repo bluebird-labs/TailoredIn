@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(bun run check:fix), Bash(bun run typecheck), Bash(bun run test), Bash(bun run dep:check), Bash(bun run knip), Bash(bun run --cwd infrastructure test:integration), Bash(bun e2e:test), Bash(git status:*), Bash(git diff:*)
+allowed-tools: Bash(pnpm run check:fix), Bash(pnpm run typecheck), Bash(pnpm run test), Bash(pnpm run dep:check), Bash(pnpm run knip), Bash(pnpm run --cwd infrastructure test:integration), Bash(pnpm e2e:test), Bash(git status:*), Bash(git diff:*)
 description: Make every code check green — lint, types, tests, architecture, dead code, integration, e2e
 ---
 
@@ -18,7 +18,7 @@ Make **every** code check green. Fix all issues — even if they come from a pre
 ### Step 1 — Lint & format
 
 ```
-bun run check:fix
+pnpm run check:fix
 ```
 
 Auto-fixes most issues. If any remain, fix them manually before continuing.
@@ -28,7 +28,7 @@ Auto-fixes most issues. If any remain, fix them manually before continuing.
 ### Step 2 — Type checking
 
 ```
-bun run typecheck
+pnpm run typecheck
 ```
 
 Fix all type errors before continuing.
@@ -38,7 +38,7 @@ Fix all type errors before continuing.
 ### Step 3 — Unit tests
 
 ```
-bun run test
+pnpm run test
 ```
 
 Fix all failing tests before continuing.
@@ -48,7 +48,7 @@ Fix all failing tests before continuing.
 ### Step 4 — Architecture boundaries
 
 ```
-bun run dep:check
+pnpm run dep:check
 ```
 
 Fix any dependency violations before continuing.
@@ -58,7 +58,7 @@ Fix any dependency violations before continuing.
 ### Step 5 — Dead code & unused exports
 
 ```
-bun run knip
+pnpm run knip
 ```
 
 Remove unused exports, unused dependencies, and dead code before continuing.
@@ -68,7 +68,7 @@ Remove unused exports, unused dependencies, and dead code before continuing.
 ### Step 6 — Integration tests
 
 ```
-bun run --cwd infrastructure test:integration
+pnpm run --cwd infrastructure test:integration
 ```
 
 Fix all failing integration tests before continuing. These use Testcontainers (real Postgres) — allow up to 120s for the run.
@@ -78,7 +78,7 @@ Fix all failing integration tests before continuing. These use Testcontainers (r
 ### Step 7 — End-to-end tests
 
 ```
-bun e2e:test
+pnpm e2e:test
 ```
 
 Fix all failing e2e tests before continuing. These use Playwright — allow up to 5 minutes for the run.

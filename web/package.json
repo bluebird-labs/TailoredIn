@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
-    "typecheck": "bunx tsc --noEmit",
+    "typecheck": "pnpm exec tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },

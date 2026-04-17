@@ -10,7 +10,7 @@
   "scripts": {
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
-    "typecheck": "bunx tsc --noEmit"
+    "typecheck": "pnpm exec tsc --noEmit"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",

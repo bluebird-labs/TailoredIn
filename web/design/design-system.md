@@ -262,7 +262,7 @@ This makes `--radius-lg` = 0.75rem (12px), which with the card override of 14px 
 
 ## Verification
 
-1. Start the dev server (`bun run --cwd web dev`) and visually confirm light mode matches the mockup
+1. Start the dev server (`pnpm run --cwd web dev`) and visually confirm light mode matches the mockup
 2. Toggle dark mode and confirm the dark variant
 3. Verify all shadcn/ui components (button, card, input, dialog, table) inherit the new tokens correctly
 4. Check sidebar active/inactive states
