@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   type EducationRepository,
   type GenerationContext,
@@ -5,6 +6,7 @@ import {
   ResumeContent,
   type ResumeContentRepository
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { ResumeContentDto } from '../../dtos/ResumeContentDto.js';
 import type { ResumeElementGenerator } from '../../ports/ResumeElementGenerator.js';
 import type { GenerationContextBuilder } from '../../services/GenerationContextBuilder.js';
@@ -53,13 +55,14 @@ function buildScopeKey(scope: GenerateResumeContentScope | undefined): string {
   }
 }
 
+@Injectable()
 export class GenerateResumeContent {
   public constructor(
-    private readonly contextBuilder: GenerationContextBuilder,
-    private readonly registry: PromptRegistry,
-    private readonly elementGenerator: ResumeElementGenerator,
-    private readonly resumeContentRepository: ResumeContentRepository,
-    private readonly educationRepository: EducationRepository
+    @Inject(DI.Resume.ContextBuilder) private readonly contextBuilder: GenerationContextBuilder,
+    @Inject(DI.Resume.PromptRegistry) private readonly registry: PromptRegistry,
+    @Inject(DI.Resume.ElementGenerator) private readonly elementGenerator: ResumeElementGenerator,
+    @Inject(DI.ResumeContent.Repository) private readonly resumeContentRepository: ResumeContentRepository,
+    @Inject(DI.Education.Repository) private readonly educationRepository: EducationRepository
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {

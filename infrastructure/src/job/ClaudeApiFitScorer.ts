@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import type { FitScoreInput, FitScoreResult, FitScorer } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
@@ -55,11 +55,11 @@ class FitScoreRequest extends LlmJsonRequest<typeof fitScoreSchema> {
   }
 }
 
-@injectable()
+@Injectable()
 export class ClaudeApiFitScorer implements FitScorer {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
+  public constructor(@Inject(DI.Llm.ClaudeApiProvider) private readonly provider: ClaudeApiProvider) {}
 
   public async score(input: FitScoreInput): Promise<FitScoreResult> {
     this.log.info(

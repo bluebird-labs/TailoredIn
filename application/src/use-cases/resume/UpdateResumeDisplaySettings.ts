@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, type ResumeContentRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 
 export type UpdateResumeDisplaySettingsInput = {
   jobDescriptionId: string;
@@ -6,8 +8,11 @@ export type UpdateResumeDisplaySettingsInput = {
   hiddenEducationIds?: string[];
 };
 
+@Injectable()
 export class UpdateResumeDisplaySettings {
-  public constructor(private readonly resumeContentRepository: ResumeContentRepository) {}
+  public constructor(
+    @Inject(DI.ResumeContent.Repository) private readonly resumeContentRepository: ResumeContentRepository
+  ) {}
 
   public async execute(input: UpdateResumeDisplaySettingsInput): Promise<void> {
     let resumeContent = await this.resumeContentRepository.findLatestByJobDescriptionId(input.jobDescriptionId);

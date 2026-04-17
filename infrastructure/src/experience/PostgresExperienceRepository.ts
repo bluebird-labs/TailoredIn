@@ -1,11 +1,11 @@
 import { NotFoundError } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, Experience, type ExperienceRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresExperienceRepository implements ExperienceRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findByIdOrFail(id: string): Promise<Experience> {
     try {

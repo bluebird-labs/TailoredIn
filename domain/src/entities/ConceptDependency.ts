@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { Entity as DomainEntity } from '../Entity.js';
 
 export type ConceptDependencyCreateProps = {

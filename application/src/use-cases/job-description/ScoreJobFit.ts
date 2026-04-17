@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   type Company,
   type CompanyRepository,
@@ -12,6 +13,7 @@ import {
   SkillKind,
   type SkillRepository
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { JobFitScoreDto } from '../../dtos/JobFitScoreDto.js';
 import type { FitScorer } from '../../ports/FitScorer.js';
 
@@ -116,15 +118,16 @@ function toJobFitScoreDto(score: JobFitScore): JobFitScoreDto {
   };
 }
 
+@Injectable()
 export class ScoreJobFit {
   public constructor(
-    private readonly profileRepository: ProfileRepository,
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly companyRepository: CompanyRepository,
-    private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly jobFitScoreRepository: JobFitScoreRepository,
-    private readonly fitScorer: FitScorer,
-    private readonly skillRepository: SkillRepository
+    @Inject(DI.Profile.Repository) private readonly profileRepository: ProfileRepository,
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository,
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository,
+    @Inject(DI.JobDescription.FitScoreRepository) private readonly jobFitScoreRepository: JobFitScoreRepository,
+    @Inject(DI.JobDescription.FitScorer) private readonly fitScorer: FitScorer,
+    @Inject(DI.Skill.Repository) private readonly skillRepository: SkillRepository
   ) {}
 
   public async execute(input: ScoreJobFitInput): Promise<JobFitScoreDto> {

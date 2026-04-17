@@ -13,6 +13,7 @@
     "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
+    "@nestjs/common": "^11.1.19",
     "@tailoredin/domain": "workspace:*"
   },
   "devDependencies": {

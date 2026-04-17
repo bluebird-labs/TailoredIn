@@ -1,7 +1,7 @@
-import { injectable } from '@needle-di/core';
+import { Injectable } from '@nestjs/common';
 import type { PasswordHasher } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class BunPasswordHasher implements PasswordHasher {
   public async hash(password: string): Promise<string> {
     return Bun.password.hash(password);

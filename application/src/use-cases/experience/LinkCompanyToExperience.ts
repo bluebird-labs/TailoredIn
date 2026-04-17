@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   type CompanyRepository,
   EntityNotFoundError,
@@ -7,6 +8,7 @@ import {
   ok,
   type Result
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { ExperienceDto } from '../../dtos/ExperienceDto.js';
 import { toExperienceDto } from './ListExperiences.js';
@@ -16,10 +18,11 @@ export type LinkCompanyToExperienceInput = {
   companyId: string;
 };
 
+@Injectable()
 export class LinkCompanyToExperience {
   public constructor(
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly companyRepository: CompanyRepository
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository
   ) {}
 
   public async execute(input: LinkCompanyToExperienceInput): Promise<Result<ExperienceDto, Error>> {

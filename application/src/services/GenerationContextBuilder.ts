@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   type CompanyRepository,
   type EducationRepository,
@@ -10,15 +11,17 @@ import {
   type JobDescriptionRepository,
   type ProfileRepository
 } from '@tailoredin/domain';
+import { DI } from '../DI.js';
 
+@Injectable()
 export class GenerationContextBuilder {
   public constructor(
-    private readonly profileRepository: ProfileRepository,
-    private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly educationRepository: EducationRepository,
-    private readonly companyRepository: CompanyRepository,
-    private readonly generationSettingsRepository: GenerationSettingsRepository
+    @Inject(DI.Profile.Repository) private readonly profileRepository: ProfileRepository,
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository,
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Education.Repository) private readonly educationRepository: EducationRepository,
+    @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository,
+    @Inject(DI.GenerationSettings.Repository) private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
   public async build(

@@ -1,4 +1,4 @@
-import { Entity, Property } from '@mikro-orm/decorators/es';
+import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import { normalizeLabel } from '@tailoredin/core';
 import type { SkillAlias } from '../value-objects/SkillAlias.js';
 import { SkillKind } from '../value-objects/SkillKind.js';

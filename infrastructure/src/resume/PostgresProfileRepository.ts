@@ -1,10 +1,10 @@
 import { MikroORM, NotFoundError } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, Profile, type ProfileRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresProfileRepository implements ProfileRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findByIdOrFail(id: string): Promise<Profile> {
     try {

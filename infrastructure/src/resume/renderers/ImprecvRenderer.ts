@@ -1,9 +1,9 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { injectable } from '@needle-di/core';
+import { Injectable } from '@nestjs/common';
 import type { ResumeRenderer, ResumeRenderInput } from '@tailoredin/application';
 import { generateImprecvTemplateTyp, generateImprecvYaml } from './imprecv-generators.js';
 
-@injectable()
+@Injectable()
 export class ImprecvRenderer implements ResumeRenderer {
   public async render(input: ResumeRenderInput): Promise<Uint8Array> {
     const tmpDir = await mkdtemp('/tmp/tailoredin-resume-');

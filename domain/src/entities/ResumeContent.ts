@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { AggregateRoot } from '../AggregateRoot.js';
 import type { ResumeExperience } from '../value-objects/ResumeExperience.js';
 import type { ResumeScore } from '../value-objects/ResumeScore.js';

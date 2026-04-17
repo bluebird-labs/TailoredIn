@@ -1,10 +1,10 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { Skill, type SkillRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresSkillRepository implements SkillRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findByIds(ids: string[]): Promise<Skill[]> {
     if (ids.length === 0) return [];

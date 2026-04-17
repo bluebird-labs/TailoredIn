@@ -6,6 +6,8 @@
     "jsx": "react-jsx",
     "lib": ["es2022", "DOM", "DOM.Iterable"],
     "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noEmit": true,
     "skipLibCheck": true,
     "isolatedModules": true,

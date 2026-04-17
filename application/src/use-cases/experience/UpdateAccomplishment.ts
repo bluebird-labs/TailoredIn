@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   EntityNotFoundError,
   type Experience,
@@ -6,6 +7,7 @@ import {
   ok,
   type Result
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 
 export type UpdateAccomplishmentInput = {
   experienceId: string;
@@ -15,8 +17,9 @@ export type UpdateAccomplishmentInput = {
   ordinal?: number;
 };
 
+@Injectable()
 export class UpdateAccomplishment {
-  public constructor(private readonly experienceRepository: ExperienceRepository) {}
+  public constructor(@Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository) {}
 
   public async execute(input: UpdateAccomplishmentInput): Promise<Result<void, Error>> {
     let experience: Experience;

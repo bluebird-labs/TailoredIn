@@ -1,4 +1,4 @@
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import type { CompanyDiscoveryProvider, CompanyDiscoveryResult } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
@@ -42,11 +42,11 @@ class CompanyDiscoveryRequest extends LlmJsonRequest<typeof companyDiscoverySche
   }
 }
 
-@injectable()
+@Injectable()
 export class ClaudeApiCompanyDiscoveryProvider implements CompanyDiscoveryProvider {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
+  public constructor(@Inject(DI.Llm.ClaudeApiProvider) private readonly provider: ClaudeApiProvider) {}
 
   public async discover(query: string): Promise<CompanyDiscoveryResult[]> {
     this.log.info(`Discovering companies for query: "${query}"`);

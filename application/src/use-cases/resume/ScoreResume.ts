@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   EntityNotFoundError,
   type JobDescriptionRepository,
@@ -5,6 +6,7 @@ import {
   type ResumeContentRepository,
   type ResumeScore
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { ResumeScoreDto } from '../../dtos/ResumeScoreDto.js';
 import type { ResumeScorer } from '../../ports/ResumeScorer.js';
 
@@ -48,11 +50,12 @@ function toResumeScoreDto(score: ResumeScore): ResumeScoreDto {
   };
 }
 
+@Injectable()
 export class ScoreResume {
   public constructor(
-    private readonly resumeContentRepository: ResumeContentRepository,
-    private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly resumeScorer: ResumeScorer
+    @Inject(DI.ResumeContent.Repository) private readonly resumeContentRepository: ResumeContentRepository,
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository,
+    @Inject(DI.Resume.Scorer) private readonly resumeScorer: ResumeScorer
   ) {}
 
   public async execute(input: ScoreResumeInput): Promise<ResumeScoreDto> {

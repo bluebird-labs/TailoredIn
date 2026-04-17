@@ -1,4 +1,4 @@
-import { inject, injectable } from '@needle-di/core';
+import { Injectable } from '@nestjs/common';
 import { EscoCsvParser } from './EscoCsvParser.js';
 import type { EscoDataset } from './EscoDataset.js';
 import type { EscoDirectory } from './EscoDirectoryLoader.js';
@@ -17,9 +17,9 @@ import { SkillGroupSchema } from './schemas/skill-group.js';
 import { SkillSkillRelationSchema } from './schemas/skill-skill-relation.js';
 import { SkillsHierarchySchema } from './schemas/skills-hierarchy.js';
 
-@injectable()
+@Injectable()
 export class EscoDatasetParser {
-  public constructor(private readonly csvParser: EscoCsvParser = inject(EscoCsvParser)) {}
+  public constructor(private readonly csvParser: EscoCsvParser) {}
 
   public async parse(directory: EscoDirectory): Promise<EscoDataset> {
     const [

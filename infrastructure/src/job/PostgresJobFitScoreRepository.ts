@@ -1,10 +1,10 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { JobFitRequirement, JobFitScore, type JobFitScoreRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresJobFitScoreRepository implements JobFitScoreRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findByJobDescriptionId(jobDescriptionId: string): Promise<JobFitScore | null> {
     return this.orm.em.findOne(

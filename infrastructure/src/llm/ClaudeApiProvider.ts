@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { Logger } from '@tailoredin/core';
 import type { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
@@ -11,7 +11,7 @@ type JsonSchemaOutputInput = Parameters<typeof jsonSchemaOutputFormat>[0];
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
 
-@injectable()
+@Injectable()
 export class ClaudeApiProvider extends BaseLlmApiProvider {
   protected readonly log: LoggerInstance = Logger.create(this);
   protected readonly defaultModel = 'claude-sonnet-4-6';
@@ -19,7 +19,7 @@ export class ClaudeApiProvider extends BaseLlmApiProvider {
 
   private _client: Anthropic | undefined;
 
-  public constructor(private readonly apiKey: string = inject(DI.Llm.ClaudeApiKey)) {
+  public constructor(@Inject(DI.Llm.ClaudeApiKey) private readonly apiKey: string) {
     super();
   }
 

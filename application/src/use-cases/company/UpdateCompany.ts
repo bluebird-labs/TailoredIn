@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type { BusinessType, CompanyRepository, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 
@@ -16,8 +18,9 @@ export type UpdateCompanyInput = {
   status: CompanyStatus;
 };
 
+@Injectable()
 export class UpdateCompany {
-  public constructor(private readonly companyRepository: CompanyRepository) {}
+  public constructor(@Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository) {}
 
   public async execute(input: UpdateCompanyInput): Promise<CompanyDto> {
     const company = await this.companyRepository.findById(input.companyId);

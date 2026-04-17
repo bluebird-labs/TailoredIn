@@ -1,9 +1,9 @@
-import { injectable } from '@needle-di/core';
+import { Injectable } from '@nestjs/common';
 import { type ZodError, type ZodObject, type ZodRawShape, type ZodTypeAny, z } from 'zod';
 import { parseCSVContent } from 'zod-csv';
 import { EscoCsvParseError } from './EscoCsvParseError.js';
 
-@injectable()
+@Injectable()
 export class EscoCsvParser {
   /**
    * Parses a CSV file and validates every row against the given Zod schema.

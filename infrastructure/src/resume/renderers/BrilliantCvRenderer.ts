@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { injectable } from '@needle-di/core';
+import { Injectable } from '@nestjs/common';
 import type { ResumeRenderer, ResumeRenderInput } from '@tailoredin/application';
 import {
   generateConfigTyp,
@@ -12,7 +12,7 @@ import {
 const TYPST_DIR = join(import.meta.dir, '../../../typst/brilliant-cv');
 const FONTS_DIR = join(import.meta.dir, '../../../typst/fonts');
 
-@injectable()
+@Injectable()
 export class BrilliantCvRenderer implements ResumeRenderer {
   public async render(input: ResumeRenderInput): Promise<Uint8Array> {
     const tmpDir = await mkdtemp('/tmp/tailoredin-resume-');

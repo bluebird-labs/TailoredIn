@@ -1,10 +1,10 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresSkillCategoryRepository implements SkillCategoryRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findAll(): Promise<SkillCategory[]> {
     return this.orm.em.find(SkillCategory, {}, { orderBy: { label: 'ASC' } });

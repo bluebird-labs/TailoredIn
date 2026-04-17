@@ -1,10 +1,10 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { Application, type ApplicationRepository, EntityNotFoundError } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresApplicationRepository implements ApplicationRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findById(id: string): Promise<Application | null> {
     return this.orm.em.findOne(Application, { id });

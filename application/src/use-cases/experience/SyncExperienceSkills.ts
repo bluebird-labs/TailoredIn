@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type { CompanyRepository, ExperienceRepository, SkillRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { ExperienceDto } from '../../dtos/ExperienceDto.js';
@@ -11,11 +13,12 @@ export type SyncExperienceSkillsInput = {
   skillIds: string[];
 };
 
+@Injectable()
 export class SyncExperienceSkills {
   public constructor(
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly skillRepository: SkillRepository,
-    private readonly companyRepository: CompanyRepository
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Skill.Repository) private readonly skillRepository: SkillRepository,
+    @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository
   ) {}
 
   public async execute(input: SyncExperienceSkillsInput): Promise<ExperienceDto> {

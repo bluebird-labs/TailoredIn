@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import Anthropic from '@anthropic-ai/sdk';
 import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import type { ComposedPrompt, ResumeElementGenerator } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
@@ -14,11 +14,11 @@ import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 const LOG_BASE_DIR = resolve(import.meta.dir, '../../../logs/llm');
 const IS_TEST = process.env.NODE_ENV === 'test';
 
-@injectable()
+@Injectable()
 export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
+  public constructor(@Inject(DI.Llm.ClaudeApiProvider) private readonly provider: ClaudeApiProvider) {}
 
   public async generate(composedPrompt: ComposedPrompt): Promise<unknown> {
     const systemContent = this.buildSystemContent(composedPrompt);

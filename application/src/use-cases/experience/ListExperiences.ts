@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type {
   Accomplishment,
   CompanyRepository,
@@ -5,17 +6,19 @@ import type {
   ExperienceRepository,
   SkillRepository
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { CompanyDto } from '../../dtos/CompanyDto.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { AccomplishmentDto, ExperienceDto } from '../../dtos/ExperienceDto.js';
 import type { ExperienceSkillDto } from '../../dtos/ExperienceSkillDto.js';
 import { toSkillDto } from '../../dtos/SkillDto.js';
 
+@Injectable()
 export class ListExperiences {
   public constructor(
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly companyRepository: CompanyRepository,
-    private readonly skillRepository: SkillRepository
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository,
+    @Inject(DI.Skill.Repository) private readonly skillRepository: SkillRepository
   ) {}
 
   public async execute(): Promise<ExperienceDto[]> {

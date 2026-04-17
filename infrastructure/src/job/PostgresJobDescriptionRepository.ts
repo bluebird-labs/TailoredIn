@@ -1,10 +1,10 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, JobDescription, type JobDescriptionRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresJobDescriptionRepository implements JobDescriptionRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findAll(): Promise<JobDescription[]> {
     return this.orm.em.find(JobDescription, {}, { orderBy: { createdAt: 'DESC' } });

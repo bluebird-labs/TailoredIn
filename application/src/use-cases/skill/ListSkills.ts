@@ -1,11 +1,14 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type { SkillCategoryRepository, SkillRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { SkillDto } from '../../dtos/SkillDto.js';
 import { toSkillDto } from '../../dtos/SkillDto.js';
 
+@Injectable()
 export class ListSkills {
   public constructor(
-    private readonly skillRepository: SkillRepository,
-    private readonly skillCategoryRepository: SkillCategoryRepository
+    @Inject(DI.Skill.Repository) private readonly skillRepository: SkillRepository,
+    @Inject(DI.Skill.CategoryRepository) private readonly skillCategoryRepository: SkillCategoryRepository
   ) {}
 
   public async execute(): Promise<SkillDto[]> {

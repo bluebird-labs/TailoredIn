@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   DEFAULT_RESUME_TEMPLATE,
   type EducationRepository,
@@ -7,6 +8,7 @@ import {
   type ProfileRepository,
   type ResumeContentRepository
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { ResumeRenderInput } from '../../ports/ResumeRenderer.js';
 import {
   DEFAULT_RESUME_THEME,
@@ -30,14 +32,15 @@ function extractGithubUsername(url: string | null): string | null {
   return url.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/$/, '');
 }
 
+@Injectable()
 export class GenerateResumePdf {
   public constructor(
-    private readonly profileRepository: ProfileRepository,
-    private readonly experienceRepository: ExperienceRepository,
-    private readonly educationRepository: EducationRepository,
-    private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly resumeContentRepository: ResumeContentRepository,
-    private readonly rendererFactory: ResumeRendererFactory
+    @Inject(DI.Profile.Repository) private readonly profileRepository: ProfileRepository,
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Education.Repository) private readonly educationRepository: EducationRepository,
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository,
+    @Inject(DI.ResumeContent.Repository) private readonly resumeContentRepository: ResumeContentRepository,
+    @Inject(DI.Resume.RendererFactory) private readonly rendererFactory: ResumeRendererFactory
   ) {}
 
   public async execute(input: GenerateResumePdfInput): Promise<Uint8Array> {

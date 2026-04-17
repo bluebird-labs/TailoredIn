@@ -1,11 +1,16 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, err, type JobDescriptionRepository, ok, type Result } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 
 export type DeleteJobDescriptionInput = {
   jobDescriptionId: string;
 };
 
+@Injectable()
 export class DeleteJobDescription {
-  public constructor(private readonly jobDescriptionRepository: JobDescriptionRepository) {}
+  public constructor(
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository
+  ) {}
 
   public async execute(input: DeleteJobDescriptionInput): Promise<Result<void, Error>> {
     try {
