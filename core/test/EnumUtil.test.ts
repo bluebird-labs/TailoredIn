@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { EnumUtil } from '../src/EnumUtil.js';
 
 enum Color {

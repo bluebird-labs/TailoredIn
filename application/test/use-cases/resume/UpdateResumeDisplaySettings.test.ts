@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { EntityNotFoundError, ResumeContent, type ResumeContentRepository } from '@tailoredin/domain';
 import { UpdateResumeDisplaySettings } from '../../../src/use-cases/resume/UpdateResumeDisplaySettings.js';
 
@@ -22,9 +21,9 @@ function makeResumeContent() {
 
 function mockRepo(resumeContent: ResumeContent | null): ResumeContentRepository {
   return {
-    findLatestByJobDescriptionId: mock(async () => resumeContent),
-    save: mock(async () => {}),
-    update: mock(async () => {})
+    findLatestByJobDescriptionId: jest.fn(async () => resumeContent),
+    save: jest.fn(async () => {}),
+    update: jest.fn(async () => {})
   };
 }
 
@@ -39,7 +38,7 @@ describe('UpdateResumeDisplaySettings', () => {
     });
 
     expect(repo.update).toHaveBeenCalledTimes(1);
-    const saved = (repo.update as ReturnType<typeof mock>).mock.calls[0][0] as ResumeContent;
+    const saved = (repo.update as jest.Mock).mock.calls[0][0] as ResumeContent;
     expect(saved.experiences[0].hiddenBulletIndices).toEqual([1, 2]);
     expect(saved.experiences[1].hiddenBulletIndices).toEqual([]);
   });
@@ -54,7 +53,7 @@ describe('UpdateResumeDisplaySettings', () => {
     });
 
     expect(repo.update).toHaveBeenCalledTimes(1);
-    const saved = (repo.update as ReturnType<typeof mock>).mock.calls[0][0] as ResumeContent;
+    const saved = (repo.update as jest.Mock).mock.calls[0][0] as ResumeContent;
     expect(saved.hiddenEducationIds).toEqual(['edu-1', 'edu-2']);
   });
 
@@ -68,7 +67,7 @@ describe('UpdateResumeDisplaySettings', () => {
       hiddenEducationIds: ['edu-1']
     });
 
-    const saved = (repo.update as ReturnType<typeof mock>).mock.calls[0][0] as ResumeContent;
+    const saved = (repo.update as jest.Mock).mock.calls[0][0] as ResumeContent;
     expect(saved.experiences[1].hiddenBulletIndices).toEqual([0]);
     expect(saved.hiddenEducationIds).toEqual(['edu-1']);
   });

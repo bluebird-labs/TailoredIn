@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { Education, type EducationRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { EducationDto } from '../../dtos/EducationDto.js';
 
 export type CreateEducationInput = {
@@ -12,8 +14,9 @@ export type CreateEducationInput = {
   hiddenByDefault?: boolean;
 };
 
+@Injectable()
 export class CreateEducation {
-  public constructor(private readonly educationRepository: EducationRepository) {}
+  public constructor(@Inject(DI.Education.Repository) private readonly educationRepository: EducationRepository) {}
 
   public async execute(input: CreateEducationInput): Promise<EducationDto> {
     const education = Education.create({

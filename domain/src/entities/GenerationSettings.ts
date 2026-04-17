@@ -1,5 +1,5 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ValidationError } from '../ValidationError.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';

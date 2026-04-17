@@ -1,4 +1,3 @@
-import { describe, expect, it, vi } from 'bun:test';
 import { Company, type CompanyRepository } from '@tailoredin/domain';
 import { GetCompany } from '../../../src/use-cases/company/GetCompany.js';
 
@@ -24,10 +23,10 @@ describe('GetCompany', () => {
   it('returns a company DTO when found', async () => {
     const company = makeCompany();
     const repo: CompanyRepository = {
-      findAll: vi.fn(),
-      findById: vi.fn().mockResolvedValue(company),
-      upsertByLinkedinLink: vi.fn(),
-      save: vi.fn()
+      findAll: jest.fn(),
+      findById: jest.fn().mockResolvedValue(company),
+      upsertByLinkedinLink: jest.fn(),
+      save: jest.fn()
     };
 
     const useCase = new GetCompany(repo);
@@ -40,10 +39,10 @@ describe('GetCompany', () => {
 
   it('throws when company not found', async () => {
     const repo: CompanyRepository = {
-      findAll: vi.fn(),
-      findById: vi.fn().mockResolvedValue(null),
-      upsertByLinkedinLink: vi.fn(),
-      save: vi.fn()
+      findAll: jest.fn(),
+      findById: jest.fn().mockResolvedValue(null),
+      upsertByLinkedinLink: jest.fn(),
+      save: jest.fn()
     };
 
     const useCase = new GetCompany(repo);

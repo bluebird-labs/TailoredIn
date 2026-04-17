@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { SalaryRange } from '../src/value-objects/SalaryRange.js';
 
 describe('ValueObject', () => {

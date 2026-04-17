@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   type JobDescriptionRepository,
   type JobLevel,
@@ -5,6 +6,7 @@ import {
   type LocationType,
   SalaryRange
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { JobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 import { toJobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 
@@ -26,8 +28,11 @@ export type UpdateJobDescriptionInput = {
   soughtSoftSkills?: string[] | null;
 };
 
+@Injectable()
 export class UpdateJobDescription {
-  public constructor(private readonly jobDescriptionRepository: JobDescriptionRepository) {}
+  public constructor(
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository
+  ) {}
 
   public async execute(input: UpdateJobDescriptionInput): Promise<JobDescriptionDto> {
     const jd = await this.jobDescriptionRepository.findById(input.jobDescriptionId);

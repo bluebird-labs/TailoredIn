@@ -1,10 +1,19 @@
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { Logger } from '@tailoredin/core';
-import type { DevContext } from './DevContext.js';
+import { projectName } from './ports.js';
 
 const log = Logger.create('docker-compose');
 
-function composeArgs(ctx: DevContext): string[] {
-  const args = [
+interface ComposeContext {
+  composeFile: string;
+  projectName: string;
+  composeProjectDir: string;
+  containerName: string;
+}
+
+function composeArgs(ctx: ComposeContext): string[] {
+  return [
     'docker',
     'compose',
     '-f',
@@ -14,76 +23,63 @@ function composeArgs(ctx: DevContext): string[] {
     '--project-directory',
     ctx.composeProjectDir
   ];
-
-  // In worktree mode, prevent docker compose from reading the repo root's .env
-  // (which contains main-branch ports). Worktree env vars are set via process.env.
-  if (ctx.mode === 'worktree') {
-    args.push('--env-file', '/dev/null');
-  }
-
-  return args;
 }
 
-/** Throws if Docker daemon is not reachable. */
 export function assertDockerRunning(): void {
-  const result = Bun.spawnSync(['docker', 'info'], { stdout: 'ignore', stderr: 'ignore' });
-  if (result.exitCode !== 0) {
+  const result = spawnSync('docker', ['info'], { stdio: 'ignore' });
+  if (result.status !== 0) {
     throw new Error('Docker is not running. Start Docker Desktop and try again.');
   }
 }
 
-/** Start services via docker compose. */
-export function composeUp(ctx: DevContext): void {
+export function composeUp(ctx: ComposeContext): void {
   const args = [...composeArgs(ctx), 'up', '-d'];
   log.info(`Starting: ${args.join(' ')}`);
-  const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit', env: process.env });
-  if (result.exitCode !== 0) {
-    throw new Error(`docker compose up failed (exit ${result.exitCode}).`);
+  const result = spawnSync(args[0], args.slice(1), { stdio: 'inherit', env: process.env });
+  if (result.status !== 0) {
+    throw new Error(`docker compose up failed (exit ${result.status}).`);
   }
 }
 
-/**
- * Stop services. Pass `removeVolumes: true` to also remove Docker volumes (worktree teardown).
- */
-export function composeDown(ctx: DevContext, removeVolumes: boolean): void {
+export function composeDown(ctx: ComposeContext, removeVolumes: boolean): void {
   const args = [...composeArgs(ctx), 'down'];
   if (removeVolumes) args.push('-v');
 
   log.info(`Stopping: ${args.join(' ')}`);
-  const result = Bun.spawnSync(args, { stdout: 'inherit', stderr: 'inherit', env: process.env });
-  if (result.exitCode !== 0) {
-    log.warn(`docker compose down exited with code ${result.exitCode}`);
+  const result = spawnSync(args[0], args.slice(1), { stdio: 'inherit', env: process.env });
+  if (result.status !== 0) {
+    log.warn(`docker compose down exited with code ${result.status}`);
   }
 }
 
-/** Check if the postgres container is currently running. */
 export function isContainerRunning(containerName: string): boolean {
-  const result = Bun.spawnSync(['docker', 'inspect', '--format', '{{.State.Running}}', containerName], {
-    stdout: 'pipe',
-    stderr: 'ignore'
+  const result = spawnSync('docker', ['inspect', '--format', '{{.State.Running}}', containerName], {
+    stdio: ['ignore', 'pipe', 'ignore']
   });
-  return result.exitCode === 0 && result.stdout.toString().trim() === 'true';
+  return result.status === 0 && result.stdout.toString().trim() === 'true';
 }
 
-/**
- * Wait for PostgreSQL to accept connections. Polls `pg_isready` inside the container.
- * On timeout, prints the last 20 lines of container logs for diagnostics.
- */
 export async function waitForPostgres(containerName: string, timeoutSeconds = 30): Promise<void> {
   for (let i = 1; i <= timeoutSeconds; i++) {
-    const result = Bun.spawnSync(['docker', 'exec', containerName, 'pg_isready', '-U', 'postgres'], {
-      stdout: 'ignore',
-      stderr: 'ignore'
+    const result = spawnSync('docker', ['exec', containerName, 'pg_isready', '-U', 'postgres'], {
+      stdio: 'ignore'
     });
-    if (result.exitCode === 0) return;
-    await Bun.sleep(1000);
+    if (result.status === 0) return;
+    await new Promise(r => setTimeout(r, 1000));
   }
 
   log.error(`PostgreSQL did not become ready within ${timeoutSeconds}s. Container logs:`);
-  Bun.spawnSync(['docker', 'logs', '--tail', '20', containerName], {
-    stdout: 'inherit',
-    stderr: 'inherit'
-  });
+  spawnSync('docker', ['logs', '--tail', '20', containerName], { stdio: 'inherit' });
 
   throw new Error(`PostgreSQL not ready after ${timeoutSeconds}s.`);
+}
+
+export function resolveComposeContext(branch: string, repoRoot: string): ComposeContext {
+  const name = projectName(branch);
+  return {
+    composeFile: resolve(repoRoot, 'compose.yaml'),
+    projectName: name,
+    composeProjectDir: repoRoot,
+    containerName: `${name}-postgres-1`
+  };
 }

@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { Skill } from '../../src/entities/Skill.js';
 import { SkillKind } from '../../src/value-objects/SkillKind.js';
 
@@ -15,7 +14,7 @@ describe('Skill', () => {
       architecturalPatterns: [],
       mindName: 'TypeScript'
     });
-    expect(skill.id).toBeString();
+    expect(typeof skill.id).toBe('string');
     expect(skill.label).toBe('TypeScript');
     expect(skill.normalizedLabel).toBe('typescript');
     expect(skill.kind).toBe(SkillKind.PROGRAMMING_LANGUAGE);

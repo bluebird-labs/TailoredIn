@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import {
   type JobDescription,
   type JobDescriptionRepository,
@@ -36,7 +35,7 @@ describe('CreateJobDescription', () => {
       source: JobSource.LINKEDIN
     });
 
-    expect(dto.id).toBeString();
+    expect(typeof dto.id).toBe('string');
     expect(dto.id).toMatch(/^[0-9a-f-]{36}$/);
     expect(dto.companyId).toBe('company-1');
     expect(dto.title).toBe('Senior Engineer');
@@ -45,7 +44,7 @@ describe('CreateJobDescription', () => {
     expect(dto.salaryRange).toBeNull();
     expect(dto.level).toBe(JobLevel.UNKNOWN);
     expect(dto.locationType).toBe(LocationType.UNKNOWN);
-    expect(dto.createdAt).toBeString();
+    expect(typeof dto.createdAt).toBe('string');
     expect(saved).toBeDefined();
   });
 

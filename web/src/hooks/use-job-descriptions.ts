@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 
 export type SalaryRangeDto = {
@@ -100,46 +99,31 @@ export type JobDescriptionParseResult = {
 export function useJobDescriptions(companyId?: string) {
   return useQuery({
     queryKey: companyId ? queryKeys.jobDescriptions.list(companyId) : queryKeys.jobDescriptions.listAll(),
-    queryFn: async () => {
-      const segment = api['job-descriptions'] as EdenRouteSegment;
-      const query = companyId ? { company_id: companyId } : {};
-      const { data } = await segment.get({ query });
-      return (data?.data ?? []) as JobDescription[];
-    }
+    queryFn: () => api.get<JobDescription[]>('/job-descriptions', companyId ? { company_id: companyId } : undefined)
   });
 }
 
 export function useJobDescription(id: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.jobDescriptions.detail(id),
-    queryFn: async () => {
-      const segment = api['job-descriptions'] as EdenRouteSegment;
-      const { data, error } = await segment({ id }).get();
-      if (error) throw new Error(extractApiError(error, `Could not load job description ${id}`));
-      return data?.data as JobDescription;
-    },
+    queryFn: () => api.get<JobDescription>(`/job-descriptions/${id}`),
     enabled: options?.enabled
   });
 }
 
 export function useParseJobDescription() {
   return useMutation({
-    mutationFn: async (input: { text: string }) => {
-      const segment = api['job-descriptions'] as EdenRouteSegment;
-      const { data, error } = await segment.parse.post(input);
-      if (error) throw new Error(extractApiError(error, 'Could not parse job description text'));
-      return data?.data as JobDescriptionParseResult;
-    }
+    mutationFn: (input: { text: string }) => api.post<JobDescriptionParseResult>('/job-descriptions/parse', input)
   });
 }
 
 export function useExtractText() {
   return useMutation({
     mutationFn: async (file: File) => {
-      const segment = api.factory as EdenRouteSegment;
-      const { data, error } = await segment['extract-text'].post({ file });
-      if (error) throw new Error(extractApiError(error, `Could not extract text from "${file.name}"`));
-      return (data?.data as { text: string }).text;
+      const formData = new FormData();
+      formData.append('file', file);
+      const result = await api.postFormData<{ text: string }>('/factory/extract-text', formData);
+      return result.text;
     }
   });
 }
@@ -147,7 +131,7 @@ export function useExtractText() {
 export function useCreateJobDescription() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       company_id: string;
       title: string;
       description: string;
@@ -163,12 +147,7 @@ export function useCreateJobDescription() {
       raw_text?: string | null;
       sought_hard_skills?: string[] | null;
       sought_soft_skills?: string[] | null;
-    }) => {
-      const segment = api['job-descriptions'] as EdenRouteSegment;
-      const { data, error } = await segment.post(input);
-      if (error) throw new Error(extractApiError(error, `Could not create job description "${input.title}"`));
-      return data?.data;
-    },
+    }) => api.post<JobDescription>('/job-descriptions', input),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(variables.company_id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.listAll() });
@@ -179,7 +158,7 @@ export function useCreateJobDescription() {
 export function useUpdateJobDescription(companyId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       id: string;
       company_id: string;
       title: string;
@@ -198,10 +177,7 @@ export function useUpdateJobDescription(companyId: string) {
       sought_soft_skills?: string[] | null;
     }) => {
       const { id, ...body } = input;
-      const segment = api['job-descriptions'] as EdenRouteSegment;
-      const { data, error } = await segment({ id }).put(body);
-      if (error) throw new Error(extractApiError(error, `Could not update job description "${input.title}"`));
-      return data?.data;
+      return api.put<JobDescription>(`/job-descriptions/${id}`, body);
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(companyId) });
@@ -214,11 +190,7 @@ export function useUpdateJobDescription(companyId: string) {
 export function useDeleteJobDescription(companyId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const segment = api['job-descriptions'] as EdenRouteSegment;
-      const { error } = await segment({ id }).delete();
-      if (error) throw new Error(extractApiError(error, `Could not delete job description ${id}`));
-    },
+    mutationFn: (id: string) => api.delete(`/job-descriptions/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.list(companyId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.listAll() });

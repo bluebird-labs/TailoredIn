@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { ExternalServiceError } from '../../src/errors/ExternalServiceError.js';
 
 describe('ExternalServiceError', () => {

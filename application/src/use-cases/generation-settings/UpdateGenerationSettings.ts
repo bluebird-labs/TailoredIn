@@ -1,9 +1,11 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   type GenerationScope,
   GenerationSettings,
   type GenerationSettingsRepository,
   type ModelTier
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { GenerationSettingsDto } from '../../dtos/GenerationSettingsDto.js';
 import { toGenerationSettingsDto } from '../../dtos/GenerationSettingsDto.js';
 
@@ -15,8 +17,12 @@ export type UpdateGenerationSettingsInput = {
   prompts?: Array<{ scope: GenerationScope; content: string | null }>;
 };
 
+@Injectable()
 export class UpdateGenerationSettings {
-  public constructor(private readonly generationSettingsRepository: GenerationSettingsRepository) {}
+  public constructor(
+    @Inject(DI.GenerationSettings.Repository)
+    private readonly generationSettingsRepository: GenerationSettingsRepository
+  ) {}
 
   public async execute(input: UpdateGenerationSettingsInput): Promise<GenerationSettingsDto> {
     let settings = await this.generationSettingsRepository.findByProfileId(input.profileId);

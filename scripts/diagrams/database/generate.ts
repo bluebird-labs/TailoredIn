@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
  * Generates infrastructure/DATABASE.mmd — a Mermaid ERD from MikroORM entity decorators.
  *

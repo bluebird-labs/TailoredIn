@@ -7,11 +7,13 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "noEmit": true,
     "declaration": true,
     "inlineSourceMap": true,
     "outDir": "./dist",
-    "types": ["node", "bun-types"]
+    "types": ["node"]
   }
 }

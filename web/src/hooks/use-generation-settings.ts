@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 
 export type GenerationPromptDto = {
@@ -41,29 +40,19 @@ export function recordToPrompts(record: Record<PromptScope, string>): Array<{ sc
 export function useGenerationSettings() {
   return useQuery({
     queryKey: queryKeys.generationSettings.detail(),
-    queryFn: async () => {
-      const segment = api['generation-settings'] as EdenRouteSegment;
-      const { data, error } = await segment.get();
-      if (error) throw new Error(extractApiError(error, 'Could not load generation settings'));
-      return data?.data as GenerationSettings;
-    }
+    queryFn: () => api.get<GenerationSettings>('/generation-settings')
   });
 }
 
 export function useUpdateGenerationSettings() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       model_tier?: 'fast' | 'balanced' | 'best';
       bullet_min?: number;
       bullet_max?: number;
       prompts?: Array<{ scope: string; content: string | null }>;
-    }) => {
-      const segment = api['generation-settings'] as EdenRouteSegment;
-      const { data, error } = await segment.put(input);
-      if (error) throw new Error(extractApiError(error, 'Could not update generation settings'));
-      return data?.data as GenerationSettings;
-    },
+    }) => api.put<GenerationSettings>('/generation-settings', input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.generationSettings.all });
     }

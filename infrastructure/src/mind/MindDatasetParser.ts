@@ -1,4 +1,4 @@
-import { readdir } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { Logger } from '@tailoredin/core';
 import type { ZodError } from 'zod';
@@ -101,7 +101,7 @@ export class MindDatasetParser {
   }
 
   private async readJsonArray(filePath: string): Promise<unknown[]> {
-    const text = await Bun.file(filePath).text();
+    const text = await readFile(filePath, 'utf-8');
     const parsed: unknown = JSON.parse(text);
     if (!Array.isArray(parsed)) {
       throw new Error(`Expected JSON array in ${filePath}, got ${typeof parsed}`);

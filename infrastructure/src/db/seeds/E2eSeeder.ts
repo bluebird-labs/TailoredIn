@@ -1,5 +1,6 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
+import argon2 from 'argon2';
 
 /**
  * Destructive seeder for E2E tests.
@@ -43,7 +44,7 @@ export class E2eSeeder extends Seeder {
     `);
 
     // Account (password: "password123")
-    const passwordHash = await Bun.password.hash('password123');
+    const passwordHash = await argon2.hash('password123');
     await conn.execute(
       `INSERT INTO accounts (id, email, password_hash, profile_id, created_at, updated_at)
        VALUES ('dddddddd-0000-4000-8000-000000000001', 'jane@example.com', '${passwordHash}', 'aaaaaaaa-0000-4000-8000-000000000001', NOW(), NOW())`

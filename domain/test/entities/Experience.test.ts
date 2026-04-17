@@ -1,4 +1,3 @@
-import { describe, expect, it, test } from 'bun:test';
 import { Experience } from '../../src/entities/Experience.js';
 
 describe('Experience', () => {

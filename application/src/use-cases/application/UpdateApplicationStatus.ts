@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type ApplicationRepository, ApplicationStatus, type ResumeContentRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { ApplicationDto } from '../../dtos/ApplicationDto.js';
 import { toApplicationDto } from '../../dtos/ApplicationDto.js';
 
@@ -10,10 +12,11 @@ export type UpdateApplicationStatusInput = {
   withdrawReason?: string;
 };
 
+@Injectable()
 export class UpdateApplicationStatus {
   public constructor(
-    private readonly applicationRepository: ApplicationRepository,
-    private readonly resumeContentRepository: ResumeContentRepository
+    @Inject(DI.Application.Repository) private readonly applicationRepository: ApplicationRepository,
+    @Inject(DI.ResumeContent.Repository) private readonly resumeContentRepository: ResumeContentRepository
   ) {}
 
   public async execute(input: UpdateApplicationStatusInput): Promise<ApplicationDto> {

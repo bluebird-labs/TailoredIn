@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { GenerationScope, GenerationSettings, type GenerationSettingsRepository, ModelTier } from '@tailoredin/domain';
 import { UpdateGenerationSettings } from '../../../src/use-cases/generation-settings/UpdateGenerationSettings.js';
 
@@ -8,8 +7,8 @@ function makeSettings(profileId = 'profile-1'): GenerationSettings {
 
 function mockRepo(settings: GenerationSettings | null): GenerationSettingsRepository {
   return {
-    findByProfileId: mock(() => Promise.resolve(settings)),
-    save: mock(() => Promise.resolve())
+    findByProfileId: jest.fn(() => Promise.resolve(settings)),
+    save: jest.fn(() => Promise.resolve())
   };
 }
 

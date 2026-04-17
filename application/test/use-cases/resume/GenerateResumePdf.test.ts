@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import {
   type EducationRepository,
   EntityNotFoundError,
@@ -110,9 +109,9 @@ function makeEducation() {
 
 function mockResumeContentRepo(resumeContent: ResumeContent | null): ResumeContentRepository {
   return {
-    findLatestByJobDescriptionId: mock(async () => resumeContent),
-    save: mock(async () => {}),
-    update: mock(async () => {})
+    findLatestByJobDescriptionId: jest.fn(async () => resumeContent),
+    save: jest.fn(async () => {}),
+    update: jest.fn(async () => {})
   };
 }
 
@@ -125,11 +124,11 @@ describe('GenerateResumePdf', () => {
     const fakePdf = new Uint8Array([1, 2, 3]);
 
     const fakeRenderer: ResumeRenderer = {
-      render: mock(async () => fakePdf)
+      render: jest.fn(async () => fakePdf)
     };
 
     const fakeFactory: ResumeRendererFactory = {
-      get: mock(() => fakeRenderer)
+      get: jest.fn(() => fakeRenderer)
     };
 
     const jd = makeJd();
@@ -138,17 +137,17 @@ describe('GenerateResumePdf', () => {
     const education = makeEducation();
 
     const profileRepo: ProfileRepository = {
-      findByIdOrFail: mock(async () => profile)
+      findByIdOrFail: jest.fn(async () => profile)
     } as unknown as ProfileRepository;
     const experienceRepo: ExperienceRepository = {
-      findAll: mock(async () => [experience])
+      findAll: jest.fn(async () => [experience])
     } as unknown as ExperienceRepository;
     const educationRepo: EducationRepository = {
-      findAll: mock(async () => [education])
+      findAll: jest.fn(async () => [education])
     } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = {
-      findById: mock(async () => jd),
-      save: mock(async () => {})
+      findById: jest.fn(async () => jd),
+      save: jest.fn(async () => {})
     } as unknown as JobDescriptionRepository;
     const resumeContentRepo = mockResumeContentRepo(resumeContent);
 
@@ -189,7 +188,7 @@ describe('GenerateResumePdf', () => {
       profileId: 'profile-1',
       jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001'
     });
-    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+    const renderInput = (fakeRenderer.render as jest.Mock).mock.calls[0][0] as {
       headlineSummary: string;
     };
     expect(renderInput.headlineSummary).toBe('Staff Engineer | 5+ Years of Experience');
@@ -203,7 +202,7 @@ describe('GenerateResumePdf', () => {
     });
     expect(jd.resumePdf).toEqual(new Uint8Array([1, 2, 3]));
     expect(jd.resumePdfTheme).toBe('brilliant-cv');
-    expect((jdRepo.save as ReturnType<typeof mock>).mock.calls).toHaveLength(1);
+    expect((jdRepo.save as jest.Mock).mock.calls).toHaveLength(1);
   });
 
   test('caches the requested theme', async () => {
@@ -219,22 +218,24 @@ describe('GenerateResumePdf', () => {
   test('throws EntityNotFoundError when JD does not exist', async () => {
     const profile = makeProfile();
     const profileRepo: ProfileRepository = {
-      findByIdOrFail: mock(async () => profile)
+      findByIdOrFail: jest.fn(async () => profile)
     } as unknown as ProfileRepository;
-    const experienceRepo: ExperienceRepository = { findAll: mock(async () => []) } as unknown as ExperienceRepository;
-    const educationRepo: EducationRepository = { findAll: mock(async () => []) } as unknown as EducationRepository;
+    const experienceRepo: ExperienceRepository = {
+      findAll: jest.fn(async () => [])
+    } as unknown as ExperienceRepository;
+    const educationRepo: EducationRepository = { findAll: jest.fn(async () => []) } as unknown as EducationRepository;
     const jdRepo: JobDescriptionRepository = {
-      findById: mock(async () => null),
-      save: mock(async () => {})
+      findById: jest.fn(async () => null),
+      save: jest.fn(async () => {})
     } as unknown as JobDescriptionRepository;
     const resumeContentRepo = mockResumeContentRepo(null);
 
     const fakeRenderer: ResumeRenderer = {
-      render: mock(async () => new Uint8Array([1, 2, 3]))
+      render: jest.fn(async () => new Uint8Array([1, 2, 3]))
     };
 
     const fakeFactory: ResumeRendererFactory = {
-      get: mock(() => fakeRenderer)
+      get: jest.fn(() => fakeRenderer)
     };
 
     const useCase = new GenerateResumePdf(
@@ -269,7 +270,7 @@ describe('GenerateResumePdf', () => {
     const { useCase, fakeRenderer } = makeUseCase(rc);
     await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
 
-    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+    const renderInput = (fakeRenderer.render as jest.Mock).mock.calls[0][0] as {
       experiences: Array<{ bullets: string[] }>;
     };
     expect(renderInput.experiences[0].bullets).toEqual(['Bullet 1', 'Bullet 3']);
@@ -287,7 +288,7 @@ describe('GenerateResumePdf', () => {
     const { useCase, fakeRenderer } = makeUseCase(rc);
     await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
 
-    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+    const renderInput = (fakeRenderer.render as jest.Mock).mock.calls[0][0] as {
       experiences: Array<{ bullets: string[] }>;
     };
     expect(renderInput.experiences[0].bullets).toEqual(['Bullet 1', 'Bullet 2', 'Bullet 3']);
@@ -300,7 +301,7 @@ describe('GenerateResumePdf', () => {
     const { useCase, fakeRenderer } = makeUseCase(rc);
     await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-00000000-0000-0000-0000-000000000001' });
 
-    const renderInput = (fakeRenderer.render as ReturnType<typeof mock>).mock.calls[0][0] as {
+    const renderInput = (fakeRenderer.render as jest.Mock).mock.calls[0][0] as {
       educations: Array<{ degreeTitle: string }>;
     };
     expect(renderInput.educations).toEqual([]);

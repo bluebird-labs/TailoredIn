@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { Company, EntityNotFoundError } from '@tailoredin/domain';
 import { PostgresCompanyRepository } from '../../src/company/PostgresCompanyRepository.js';
@@ -89,7 +88,7 @@ describe('PostgresCompanyRepository', () => {
       expect(company.name).toBe('Acme Inc');
       expect(company.linkedinLink).toBe('https://linkedin.com/company/acme');
       expect(company.website).toBe('https://acme.com');
-      expect(company.id).toBeString();
+      expect(typeof company.id).toBe('string');
     });
 
     it('updates on conflict', async () => {

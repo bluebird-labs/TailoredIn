@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { act, fireEvent, render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { EditableSection } from '../EditableSection.js';
@@ -15,7 +14,7 @@ function renderInProvider(ui: ReactNode) {
 describe('EditableSection', () => {
   test('renders display slot by default, not editor', () => {
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={mock()} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={jest.fn()} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -31,7 +30,7 @@ describe('EditableSection', () => {
 
   test('switches to editor on click', async () => {
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={mock()} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={jest.fn()} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -52,7 +51,7 @@ describe('EditableSection', () => {
 
   test('shows Save and Discard buttons in edit mode', async () => {
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={mock()} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={jest.fn()} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -73,10 +72,10 @@ describe('EditableSection', () => {
   });
 
   test('calls onSave when Save is clicked', async () => {
-    const onSave = mock(() => Promise.resolve());
+    const onSave = jest.fn(() => Promise.resolve());
 
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={onSave} onDiscard={mock()} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={onSave} onDiscard={jest.fn()} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -102,10 +101,10 @@ describe('EditableSection', () => {
   });
 
   test('calls onDiscard and returns to display when Discard is clicked (clean state)', async () => {
-    const onDiscard = mock();
+    const onDiscard = jest.fn();
 
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={onDiscard} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={onDiscard} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -134,7 +133,7 @@ describe('EditableSection', () => {
 
   test('applies hover class on display wrapper', () => {
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={mock()} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={jest.fn()} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -149,10 +148,10 @@ describe('EditableSection', () => {
   });
 
   test('Escape key triggers discard when clean', async () => {
-    const onDiscard = mock();
+    const onDiscard = jest.fn();
 
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={onDiscard} isDirty={false} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={onDiscard} isDirty={false} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>
@@ -179,10 +178,10 @@ describe('EditableSection', () => {
   });
 
   test('Escape key does nothing when dirty', async () => {
-    const onDiscard = mock();
+    const onDiscard = jest.fn();
 
     const { container } = renderInProvider(
-      <EditableSection sectionId="s1" onSave={mock()} onDiscard={onDiscard} isDirty={true} isSaving={false}>
+      <EditableSection sectionId="s1" onSave={jest.fn()} onDiscard={onDiscard} isDirty={true} isSaving={false}>
         <EditableSection.Display>
           <span data-slot="display">Display content</span>
         </EditableSection.Display>

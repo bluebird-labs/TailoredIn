@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import type { JobDescriptionParseResult, JobDescriptionParser } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
@@ -10,7 +10,7 @@ import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from '../llm/LlmJsonRequest.js';
 
-const PROMPT_PATH = resolve(import.meta.dir, 'prompts/parse-job-description.md');
+const PROMPT_PATH = resolve(import.meta.dirname, 'prompts/parse-job-description.md');
 
 const jobDescriptionParseSchema = z.object({
   title: z.string().nullable(),
@@ -44,11 +44,11 @@ class JobDescriptionParseRequest extends LlmJsonRequest<typeof jobDescriptionPar
   }
 }
 
-@injectable()
+@Injectable()
 export class ClaudeApiJobDescriptionParser implements JobDescriptionParser {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
+  public constructor(@Inject(DI.Llm.ClaudeApiProvider) private readonly provider: ClaudeApiProvider) {}
 
   public async parseFromText(text: string): Promise<JobDescriptionParseResult> {
     this.log.info(`Parsing job description (${text.length} chars)`);

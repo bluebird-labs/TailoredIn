@@ -3,7 +3,7 @@
 // Repositories
 export { PostgresApplicationRepository } from './application/PostgresApplicationRepository.js';
 // Auth
-export { BunPasswordHasher } from './auth/BunPasswordHasher.js';
+export { Argon2PasswordHasher } from './auth/Argon2PasswordHasher.js';
 export { JwtTokenIssuer } from './auth/JwtTokenIssuer.js';
 export { PostgresAccountRepository } from './auth/PostgresAccountRepository.js';
 // Services

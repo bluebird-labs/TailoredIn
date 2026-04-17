@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import {
   type JobDescriptionRepository,
   ResumeContent,
@@ -43,22 +42,22 @@ const fakeScore: ResumeScore = {
 describe('ScoreResume', () => {
   function setup(resumeContent: ResumeContent | null = makeResumeContent()) {
     const resumeContentRepo: ResumeContentRepository = {
-      findById: mock(async () => resumeContent),
-      findLatestByJobDescriptionId: mock(async () => null),
-      save: mock(async () => {}),
-      update: mock(async () => {})
+      findById: jest.fn(async () => resumeContent),
+      findLatestByJobDescriptionId: jest.fn(async () => null),
+      save: jest.fn(async () => {}),
+      update: jest.fn(async () => {})
     };
 
     const jdRepo: JobDescriptionRepository = {
-      findById: mock(async () => ({ id: 'jd-1', description: 'We need a TypeScript engineer' }) as never),
-      findAll: mock(async () => []),
-      findByCompanyId: mock(async () => []),
-      save: mock(async () => {}),
-      delete: mock(async () => {})
+      findById: jest.fn(async () => ({ id: 'jd-1', description: 'We need a TypeScript engineer' }) as never),
+      findAll: jest.fn(async () => []),
+      findByCompanyId: jest.fn(async () => []),
+      save: jest.fn(async () => {}),
+      delete: jest.fn(async () => {})
     };
 
     const scorer: ResumeScorer = {
-      score: mock(async () => fakeScore)
+      score: jest.fn(async () => fakeScore)
     };
 
     const useCase = new ScoreResume(resumeContentRepo, jdRepo, scorer);
@@ -76,7 +75,7 @@ describe('ScoreResume', () => {
     expect(scorer.score).toHaveBeenCalledTimes(1);
     expect(resumeContentRepo.update).toHaveBeenCalledTimes(1);
 
-    const updated = (resumeContentRepo.update as ReturnType<typeof mock>).mock.calls[0][0] as ResumeContent;
+    const updated = (resumeContentRepo.update as jest.Mock).mock.calls[0][0] as ResumeContent;
     expect(updated.score).toEqual(fakeScore);
   });
 
@@ -85,7 +84,7 @@ describe('ScoreResume', () => {
 
     await useCase.execute({ resumeContentId: 'rc-1' });
 
-    const call = (scorer.score as ReturnType<typeof mock>).mock.calls[0][0] as {
+    const call = (scorer.score as jest.Mock).mock.calls[0][0] as {
       resumeMarkdown: string;
     };
     // exp-2 has bullet at index 0 hidden, so "Bullet C" should not appear

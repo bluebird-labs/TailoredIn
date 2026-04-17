@@ -18,7 +18,7 @@ import { useEducations } from '@/hooks/use-educations.js';
 import type { Experience } from '@/hooks/use-experiences.js';
 import { useExperiences } from '@/hooks/use-experiences.js';
 import { useNavGuard } from '@/hooks/use-nav-guard.js';
-import { useProfile, useUpdateProfile } from '@/hooks/use-profile';
+import { type Profile, useProfile, useUpdateProfile } from '@/hooks/use-profile';
 import { persistSearchParams, useSearchPersistence } from '@/lib/persisted-search.js';
 import { hasErrors, type ProfileFormState, type ValidationErrors, validateProfile } from '@/lib/validation.js';
 
@@ -48,7 +48,7 @@ function formatMonthYear(value: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-function generateProfileMarkdown(profile: ProfileData, experiences: Experience[], educations: Education[]): string {
+function generateProfileMarkdown(profile: Profile, experiences: Experience[], educations: Education[]): string {
   const lines: string[] = [];
 
   lines.push(`# ${profile.firstName} ${profile.lastName}`);
@@ -229,7 +229,7 @@ function PageHeader({
   experiences,
   educations
 }: {
-  readonly profile: ProfileData | null;
+  readonly profile: Profile | null;
   readonly experiences: Experience[];
   readonly educations: Education[];
 }) {
@@ -279,19 +279,7 @@ function PageHeader({
   );
 }
 
-type ProfileData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  about: string | null;
-  phone: string | null;
-  location: string | null;
-  linkedinUrl: string | null;
-  githubUrl: string | null;
-  websiteUrl: string | null;
-};
-
-function ProfileSection({ profile }: { readonly profile: ProfileData }) {
+function ProfileSection({ profile }: { readonly profile: Profile }) {
   const updateProfile = useUpdateProfile();
   const [errors, setErrors] = useState<ValidationErrors<ProfileFormState>>({});
 

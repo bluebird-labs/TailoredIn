@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 
 export type Application = {
@@ -20,11 +19,7 @@ export type Application = {
 export function useApplications(profileId: string) {
   return useQuery({
     queryKey: queryKeys.applications.list(),
-    queryFn: async () => {
-      const segment = api.applications as EdenRouteSegment;
-      const { data } = await segment.get({ query: { profile_id: profileId } });
-      return (data?.data ?? []) as Application[];
-    },
+    queryFn: () => api.get<Application[]>('/applications', { profile_id: profileId }),
     enabled: !!profileId
   });
 }
@@ -33,17 +28,12 @@ export function useCreateApplication() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       profile_id: string;
       company_id: string;
       job_description_id?: string | null;
       notes?: string | null;
-    }) => {
-      const segment = api.applications as EdenRouteSegment;
-      const { data, error } = await segment.post(input);
-      if (error) throw new Error(extractApiError(error, 'Could not create application'));
-      return data?.data;
-    },
+    }) => api.post<Application>('/applications', input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.applications.all });
     }
@@ -54,16 +44,12 @@ export function useUpdateApplicationStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: { id: string; status: string; archiveReason?: string; withdrawReason?: string }) => {
-      const segment = api.applications as EdenRouteSegment;
-      const { data, error } = await segment({ id: input.id }).status.patch({
+    mutationFn: (input: { id: string; status: string; archiveReason?: string; withdrawReason?: string }) =>
+      api.patch<Application>(`/applications/${input.id}/status`, {
         status: input.status,
         archive_reason: input.archiveReason,
         withdraw_reason: input.withdrawReason
-      });
-      if (error) throw new Error(extractApiError(error, 'Could not update application status'));
-      return data?.data;
-    },
+      }),
     onMutate: async input => {
       await queryClient.cancelQueries({ queryKey: queryKeys.applications.list() });
 

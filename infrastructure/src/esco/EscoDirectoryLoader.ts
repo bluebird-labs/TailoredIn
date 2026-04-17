@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { injectable } from '@needle-di/core';
+import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 
 const file = z.string().endsWith('.csv');
@@ -51,7 +51,7 @@ const FILENAME_TO_KEY: Record<string, keyof EscoDirectory> = {
   'transversalSkillsCollection_en.csv': 'transversalSkillsCollection'
 };
 
-@injectable()
+@Injectable()
 export class EscoDirectoryLoader {
   public async load(directory: string): Promise<EscoDirectory> {
     const entries = await readdir(directory, { withFileTypes: true });

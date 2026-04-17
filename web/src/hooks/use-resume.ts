@@ -1,29 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
-import { getToken } from '@/lib/auth';
+import { ApiError, api } from '@/lib/api';
 import { queryKeys } from '@/lib/query-keys';
 
 export type ResumeTheme = 'brilliant-cv' | 'imprecv' | 'modern-cv' | 'linked-cv';
-
-function authHeaders(): Record<string, string> {
-  const token = getToken();
-  return token ? { authorization: `Bearer ${token}` } : {};
-}
 
 export function useGenerateResumePdf() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: { jobDescriptionId: string; theme?: ResumeTheme }) => {
-      // Binary response — Treaty can't parse PDF, so use authenticated fetch
-      const response = await fetch('/api/resume/pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-        body: JSON.stringify(input)
-      });
+      const response = await api.postRaw('/resume/pdf', input);
       if (!response.ok) {
         const message = await tryParseErrorBody(response);
-        throw new Error(message ?? 'Failed to generate PDF');
+        throw new ApiError(response.status, 'PDF_GENERATION_FAILED', message ?? 'Failed to generate PDF');
       }
       return response.arrayBuffer();
     },
@@ -37,22 +25,14 @@ export function useGenerateResumePdf() {
 export function useUpdateResumeDisplaySettings(jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       experienceHiddenBullets?: Array<{ experienceId: string; hiddenBulletIndices: number[] }>;
       hiddenEducationIds?: string[];
-    }) => {
-      const segment = api.resume['display-settings'] as EdenRouteSegment;
-      const { error } = await segment.patch({ jobDescriptionId, ...input });
-      if (error) throw new Error(extractApiError(error, 'Failed to update display settings'));
-    },
+    }) => api.patch('/resume/display-settings', { jobDescriptionId, ...input }),
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
       try {
-        await fetch('/api/resume/pdf', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...authHeaders() },
-          body: JSON.stringify({ jobDescriptionId })
-        });
+        await api.postRaw('/resume/pdf', { jobDescriptionId });
       } catch {
         // PDF regeneration is best-effort
       }
@@ -70,19 +50,14 @@ type ResumeGenerationScope =
 export function useGenerateResumeContent(jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (
+    mutationFn: (
       input: {
         additionalPrompt?: string;
         customInstructions?: string;
         scope?: ResumeGenerationScope;
         bulletOverrides?: Array<{ experienceId: string; min: number; max: number }>;
       } = {}
-    ) => {
-      const segment = api.resume.generate as EdenRouteSegment;
-      const { data, error } = await segment.post({ jobDescriptionId, ...input });
-      if (error) throw new Error(extractApiError(error, 'Failed to generate resume content'));
-      return data as { data: unknown };
-    },
+    ) => api.post('/resume/generate', { jobDescriptionId, ...input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.resume.cachedPdf(jobDescriptionId) });
@@ -94,10 +69,9 @@ export function useCachedResumePdf(jobDescriptionId: string, enabled: boolean) {
   return useQuery({
     queryKey: queryKeys.resume.cachedPdf(jobDescriptionId),
     queryFn: async () => {
-      // Binary response — Treaty can't parse PDF, so use authenticated fetch
-      const response = await fetch(`/api/resume/pdf/${jobDescriptionId}`, { headers: authHeaders() });
+      const response = await api.getRaw(`/resume/pdf/${jobDescriptionId}`);
       if (response.status === 404) return null;
-      if (!response.ok) throw new Error('Failed to fetch cached PDF');
+      if (!response.ok) throw new ApiError(response.status, 'FETCH_FAILED', 'Failed to fetch cached PDF');
       return response.arrayBuffer();
     },
     enabled

@@ -1,5 +1,5 @@
 import { OptionalProps } from '@mikro-orm/core';
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 
 @Entity({ tableName: 'esco_skills_hierarchy' })
 export class EscoSkillsHierarchyEntity {

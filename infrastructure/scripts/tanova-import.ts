@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 import { statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { MikroORM } from '@mikro-orm/postgresql';

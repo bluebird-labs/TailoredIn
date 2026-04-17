@@ -6,7 +6,7 @@ The pure domain layer — aggregates, entities, value objects, domain services, 
 
 **Hard rules:**
 - MikroORM decorators (`@Entity`, `@Property`, `@ManyToOne`, `@OneToMany`, `@PrimaryKey`) are allowed — they are inert metadata with no I/O
-- No other framework dependencies (`@injectable`, `inject`, Elysia, etc.)
+- No other framework dependencies (no NestJS decorators, no HTTP framework, etc.)
 - No I/O (no database, HTTP, file system)
 - No imports from `@tailoredin/application` or `@tailoredin/infrastructure`
 - Only `@tailoredin/core` utilities and `@mikro-orm/core` / `@mikro-orm/decorators` are allowed as external deps

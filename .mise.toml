@@ -1,3 +1,4 @@
 [tools]
-bun = "latest"
-typst = "latest"
+node = "24.15.0"
+pnpm = "10.33.0"
+typst = "0.14.2"

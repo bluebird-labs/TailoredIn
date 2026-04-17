@@ -1,10 +1,10 @@
-import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { Company, type CompanyCreateProps, type CompanyRepository, EntityNotFoundError } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresCompanyRepository implements CompanyRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findAll(): Promise<Company[]> {
     return this.orm.em.find(Company, {}, { orderBy: { name: 'ASC' } });

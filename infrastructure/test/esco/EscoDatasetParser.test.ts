@@ -1,11 +1,10 @@
-import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
 import { EscoCsvParser } from '../../src/esco/EscoCsvParser.js';
 import type { EscoDataset } from '../../src/esco/EscoDataset.js';
 import { EscoDatasetParser } from '../../src/esco/EscoDatasetParser.js';
 import { EscoDirectoryLoader } from '../../src/esco/EscoDirectoryLoader.js';
 
-const FIXTURES_DIR = join(import.meta.dir, 'fixtures', 'esco-dataset-v1.2.1-classification-en-csv');
+const FIXTURES_DIR = join(import.meta.dirname, 'fixtures', 'esco-dataset-v1.2.1-classification-en-csv');
 
 describe('EscoDatasetParser', () => {
   const loader = new EscoDirectoryLoader();

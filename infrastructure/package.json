@@ -8,14 +8,14 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "test": "bun test test/",
-    "test:coverage": "bun test test/ --coverage",
-    "test:integration": "bun test test-integration/ --timeout 60000",
-    "typecheck": "bunx tsc --noEmit",
-    "migration:create": "bunx mikro-orm migration:create",
-    "migration:up": "bunx mikro-orm migration:up",
-    "seed:run": "bunx mikro-orm seeder:run",
-    "seed:run:e2e": "bunx mikro-orm seeder:run --class=E2eSeeder"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.integration.config.ts",
+    "typecheck": "pnpm exec tsc --noEmit",
+    "migration:create": "pnpm exec mikro-orm migration:create",
+    "migration:up": "pnpm exec mikro-orm migration:up",
+    "seed:run": "pnpm exec mikro-orm seeder:run",
+    "seed:run:e2e": "pnpm exec mikro-orm seeder:run --class=E2eSeeder"
   },
   "mikro-orm": {
     "configPaths": [
@@ -32,11 +32,13 @@
     "@mikro-orm/reflection": "^7.0.0",
     "@mikro-orm/seeder": "^7.0.0",
     "@mikro-orm/sql-highlighter": "^1.0.1",
-    "@needle-di/core": "^0.12.0",
+    "@nestjs/common": "^11.1.19",
     "@tailoredin/application": "workspace:*",
     "@tailoredin/core": "workspace:*",
     "@tailoredin/domain": "workspace:*",
     "@tselect/status-code": "^1.0.2",
+    "argon2": "^0.44.0",
+    "glob": "^13.0.6",
     "yaml": "^2.8.3",
     "zod": "^3.24.1",
     "zod-csv": "^0.2.1",
@@ -44,7 +46,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "bun-types": "^1.3.11",
     "testcontainers": "^11.13.0",
     "typescript": "^5.7.3",
     "vite": "^8.0.3"

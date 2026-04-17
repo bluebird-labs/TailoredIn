@@ -1,10 +1,13 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type { ProfileRepository } from '@tailoredin/domain';
+import { DI } from '../DI.js';
 import type { ProfileDto } from '../dtos/ProfileDto.js';
 
 export type GetProfileInput = { profileId: string };
 
+@Injectable()
 export class GetProfile {
-  public constructor(private readonly profileRepository: ProfileRepository) {}
+  public constructor(@Inject(DI.Profile.Repository) private readonly profileRepository: ProfileRepository) {}
 
   public async execute(input: GetProfileInput): Promise<ProfileDto> {
     const profile = await this.profileRepository.findByIdOrFail(input.profileId);

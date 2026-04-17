@@ -1,11 +1,14 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { DI } from '../../DI.js';
 import type { ResumeContentDto } from '../../dtos/ResumeContentDto.js';
 import type { GenerateResumeContent, GenerateResumeContentInput } from './GenerateResumeContent.js';
 import type { GenerateResumePdf } from './GenerateResumePdf.js';
 
+@Injectable()
 export class GenerateResumeContentWithPdf {
   public constructor(
-    private readonly generateContent: GenerateResumeContent,
-    private readonly generatePdf: GenerateResumePdf
+    @Inject(DI.Resume.Generate) private readonly generateContent: GenerateResumeContent,
+    @Inject(DI.Resume.GeneratePdf) private readonly generatePdf: GenerateResumePdf
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {

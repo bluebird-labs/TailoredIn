@@ -1,4 +1,3 @@
-import { describe, expect, it, mock } from 'bun:test';
 import { Experience, type ExperienceRepository } from '@tailoredin/domain';
 import { AddAccomplishment } from '../../../src/use-cases/experience/AddAccomplishment.js';
 
@@ -16,10 +15,10 @@ const fakeExperience = Experience.create({
 });
 
 const mockRepo = {
-  findByIdOrFail: mock(async () => fakeExperience),
-  findAll: mock(async () => []),
-  save: mock(async () => {}),
-  delete: mock(async () => {})
+  findByIdOrFail: jest.fn(async () => fakeExperience),
+  findAll: jest.fn(async () => []),
+  save: jest.fn(async () => {}),
+  delete: jest.fn(async () => {})
 };
 
 describe('AddAccomplishment', () => {

@@ -1,5 +1,5 @@
 import { OptionalProps } from '@mikro-orm/core';
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ValidationError } from '../ValidationError.js';
 import { BusinessType } from '../value-objects/BusinessType.js';

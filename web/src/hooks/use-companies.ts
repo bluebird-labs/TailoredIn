@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 
 export type Company = {
@@ -38,51 +37,34 @@ export type CompanyEnrichmentResult = {
 export function useCompanies() {
   return useQuery({
     queryKey: queryKeys.companies.list(),
-    queryFn: async () => {
-      const { data } = await api.companies.get();
-      return (data?.data ?? []) as Company[];
-    }
+    queryFn: () => api.get<Company[]>('/companies')
   });
 }
 
 export function useCompany(id: string) {
   return useQuery({
     queryKey: queryKeys.companies.detail(id),
-    queryFn: async () => {
-      const segment = api.companies as EdenRouteSegment;
-      const { data, error } = await segment({ id }).get();
-      if (error) throw new Error(extractApiError(error, `Could not load company ${id}`));
-      return data?.data as Company;
-    }
+    queryFn: () => api.get<Company>(`/companies/${id}`)
   });
 }
 
 export function useDiscoverCompanies() {
   return useMutation({
-    mutationFn: async (input: { query: string }) => {
-      const segment = api.companies as EdenRouteSegment;
-      const { data, error } = await segment.discover.post(input);
-      if (error) throw new Error(extractApiError(error, `Could not discover companies for "${input.query}"`));
-      return (data?.data ?? []) as CompanyDiscoveryResult[];
-    }
+    mutationFn: (input: { query: string }) => api.post<CompanyDiscoveryResult[]>('/companies/discover', input)
   });
 }
 
 export function useEnrichCompany() {
   return useMutation({
-    mutationFn: async (input: { url: string; context?: string }) => {
-      const segment = api.companies as EdenRouteSegment;
-      const { data, error } = await segment.enrich.post(input);
-      if (error) throw new Error(extractApiError(error, `Could not enrich company data from ${input.url}`));
-      return data?.data as CompanyEnrichmentResult;
-    }
+    mutationFn: (input: { url: string; context?: string }) =>
+      api.post<CompanyEnrichmentResult>('/companies/enrich', input)
   });
 }
 
 export function useUpdateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       id: string;
       name: string;
       domain_name: string;
@@ -96,10 +78,7 @@ export function useUpdateCompany() {
       status?: string;
     }) => {
       const { id, ...body } = input;
-      const segment = api.companies as EdenRouteSegment;
-      const { data, error } = await segment({ id }).put(body);
-      if (error) throw new Error(extractApiError(error, `Could not update company "${input.name}"`));
-      return data?.data;
+      return api.put<Company>(`/companies/${id}`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
@@ -110,11 +89,7 @@ export function useUpdateCompany() {
 export function useDeleteCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const segment = api.companies as EdenRouteSegment;
-      const { error } = await segment({ id }).delete();
-      if (error) throw new Error(extractApiError(error, `Could not delete company ${id}`));
-    },
+    mutationFn: (id: string) => api.delete(`/companies/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.all });
@@ -125,7 +100,7 @@ export function useDeleteCompany() {
 export function useCreateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       name: string;
       domain_name: string;
       description?: string | null;
@@ -136,12 +111,7 @@ export function useCreateCompany() {
       industry?: string;
       stage?: string;
       status?: string;
-    }) => {
-      const segment = api.companies as EdenRouteSegment;
-      const { data, error } = await segment.post(input);
-      if (error) throw new Error(extractApiError(error, `Could not create company "${input.name}"`));
-      return data?.data;
-    },
+    }) => api.post<Company>('/companies', input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     }

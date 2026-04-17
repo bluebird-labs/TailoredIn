@@ -9,9 +9,9 @@ let serverProcess: ChildProcess | null = null;
 const AUTH_STATE_PATH = resolve(import.meta.dirname, '..', '.auth-state.json');
 
 /**
- * Playwright globalSetup — spawns `bun run infrastructure/scripts/e2e-start-servers.ts`.
+ * Playwright globalSetup — spawns the E2E server script via tsx.
  *
- * The server script lives in infrastructure/scripts/ (not e2e/) so that Bun resolves
+ * The server script lives in infrastructure/scripts/ (not e2e/) so that Node resolves
  * @mikro-orm/*, @tailoredin/*, testcontainers, and vite from the workspace — not
  * from e2e/node_modules which only has @playwright/test.
  */
@@ -24,10 +24,10 @@ export default async function globalSetup(_config: FullConfig): Promise<() => Pr
     apiPort: number;
     process: ChildProcess;
   }>((resolvePromise, reject) => {
-    const child = spawn('bun', ['run', scriptPath], {
+    const child = spawn('npx', ['tsx', scriptPath], {
       stdio: ['ignore', 'pipe', 'inherit'],
       cwd: repoRoot,
-      env: { ...process.env, NODE_ENV: 'test', BUN_CONFIG_NO_DOT_ENV: '1' }
+      env: { ...process.env, NODE_ENV: 'test' }
     });
 
     let stdout = '';

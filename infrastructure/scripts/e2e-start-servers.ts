@@ -1,7 +1,7 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
  * Boots Testcontainers Postgres + API + Vite for e2e tests.
- * Lives in infrastructure/scripts/ so Bun resolves @mikro-orm/* from
+ * Lives in infrastructure/scripts/ so tsx resolves @mikro-orm/* from
  * infrastructure/node_modules (correct versions).
  *
  * Writes server state to e2e/.server-state.json, then keeps running until killed.
@@ -75,7 +75,8 @@ process.env.LINKEDIN_PASSWORD = 'test';
 process.env.HEADLESS = 'true';
 process.env.SLOW_MO = '0';
 
-await import('../../api/src/index.js');
+const { bootstrap } = await import('../../api/src/main.js');
+await bootstrap();
 await waitForHealth(`http://localhost:${apiPort}/health`);
 log.info('API ready');
 

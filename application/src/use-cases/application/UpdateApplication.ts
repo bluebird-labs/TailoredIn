@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type { ApplicationRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { ApplicationDto } from '../../dtos/ApplicationDto.js';
 import { toApplicationDto } from '../../dtos/ApplicationDto.js';
 
@@ -8,8 +10,11 @@ export type UpdateApplicationInput = {
   notes?: string | null;
 };
 
+@Injectable()
 export class UpdateApplication {
-  public constructor(private readonly applicationRepository: ApplicationRepository) {}
+  public constructor(
+    @Inject(DI.Application.Repository) private readonly applicationRepository: ApplicationRepository
+  ) {}
 
   public async execute(input: UpdateApplicationInput): Promise<ApplicationDto> {
     const application = await this.applicationRepository.findById(input.applicationId);

@@ -1,11 +1,10 @@
-import { NotFoundError } from '@mikro-orm/core';
-import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { MikroORM, NotFoundError } from '@mikro-orm/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { Education, type EducationRepository, EntityNotFoundError } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresEducationRepository implements EducationRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findAll(): Promise<Education[]> {
     return this.orm.em.findAll(Education, { orderBy: { ordinal: 'ASC' } });

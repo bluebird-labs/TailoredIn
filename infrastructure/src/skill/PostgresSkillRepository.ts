@@ -1,10 +1,10 @@
-import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { Skill, type SkillRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresSkillRepository implements SkillRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findByIds(ids: string[]): Promise<Skill[]> {
     if (ids.length === 0) return [];
@@ -16,7 +16,7 @@ export class PostgresSkillRepository implements SkillRepository {
     if (q.length === 0) return [];
 
     const conn = this.orm.em.getConnection();
-    const rows = await conn.execute<{ id: string }[]>(
+    const rows: { id: string }[] = await conn.execute(
       `SELECT matched.skill_id AS id
        FROM (
          SELECT skill_id, SUM(word_similarity(?, word)) AS score, MIN(word) AS first_word

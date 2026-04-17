@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { Account, type AccountRepository, type PasswordHasher } from '@tailoredin/domain';
 import { AuthenticationError } from '../../../src/errors/AuthenticationError.js';
 import type { TokenIssuer } from '../../../src/ports/TokenIssuer.js';
@@ -22,19 +21,19 @@ function makeMocks(
   overrides: { findByEmail?: AccountRepository['findByEmail']; verify?: PasswordHasher['verify'] } = {}
 ) {
   const accountRepository: AccountRepository = {
-    findByEmail: overrides.findByEmail ?? mock(async () => makeAccount()),
-    findByIdOrFail: mock(async () => makeAccount()),
-    save: mock(async () => {})
+    findByEmail: overrides.findByEmail ?? jest.fn(async () => makeAccount()),
+    findByIdOrFail: jest.fn(async () => makeAccount()),
+    save: jest.fn(async () => {})
   };
 
   const passwordHasher: PasswordHasher = {
-    hash: mock(async () => 'hashed'),
-    verify: overrides.verify ?? mock(async () => true)
+    hash: jest.fn(async () => 'hashed'),
+    verify: overrides.verify ?? jest.fn(async () => true)
   };
 
   const tokenIssuer: TokenIssuer = {
-    issue: mock(() => ({ token: 'jwt-token', expiresIn: 3600 })),
-    verify: mock(() => ({ accountId: ACCOUNT_ID, profileId: PROFILE_ID }))
+    issue: jest.fn(() => ({ token: 'jwt-token', expiresIn: 3600 })),
+    verify: jest.fn(() => ({ accountId: ACCOUNT_ID, profileId: PROFILE_ID }))
   };
 
   return { accountRepository, passwordHasher, tokenIssuer };
@@ -54,7 +53,7 @@ describe('Login', () => {
 
   test('throws AuthenticationError on unknown email', async () => {
     const { accountRepository, passwordHasher, tokenIssuer } = makeMocks({
-      findByEmail: mock(async () => null)
+      findByEmail: jest.fn(async () => null)
     });
     const useCase = new Login(accountRepository, passwordHasher, tokenIssuer);
 
@@ -65,7 +64,7 @@ describe('Login', () => {
 
   test('throws AuthenticationError on wrong password', async () => {
     const { accountRepository, passwordHasher, tokenIssuer } = makeMocks({
-      verify: mock(async () => false)
+      verify: jest.fn(async () => false)
     });
     const useCase = new Login(accountRepository, passwordHasher, tokenIssuer);
 

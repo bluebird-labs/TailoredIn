@@ -1,10 +1,9 @@
-import { describe, expect, test } from 'bun:test';
 import { SkillCategory } from '../../src/entities/SkillCategory.js';
 
 describe('SkillCategory', () => {
   test('creates with required fields', () => {
     const cat = SkillCategory.create({ label: 'Programming Languages' });
-    expect(cat.id).toBeString();
+    expect(typeof cat.id).toBe('string');
     expect(cat.label).toBe('Programming Languages');
     expect(cat.normalizedLabel).toBe('programming-languages');
     expect(cat.createdAt).toBeInstanceOf(Date);

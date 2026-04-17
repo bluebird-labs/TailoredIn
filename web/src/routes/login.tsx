@@ -22,12 +22,8 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error: apiError } = await api.auth.login.post({ email, password });
-      if (apiError) {
-        setError('Invalid email or password');
-        return;
-      }
-      setToken(data.data.token);
+      const data = await api.post<{ token: string }>('/auth/login', { email, password });
+      setToken(data.token);
       navigate({ to: '/jobs' });
     } catch {
       setError('Invalid email or password');

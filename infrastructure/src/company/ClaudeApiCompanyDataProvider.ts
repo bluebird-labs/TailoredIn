@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { inject, injectable } from '@needle-di/core';
+import { Inject, Injectable } from '@nestjs/common';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
 import { Logger } from '@tailoredin/core';
@@ -10,7 +10,7 @@ import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from '../llm/LlmJsonRequest.js';
 
-const PROMPT_PATH = resolve(import.meta.dir, 'prompts/enrich-company.md');
+const PROMPT_PATH = resolve(import.meta.dirname, 'prompts/enrich-company.md');
 
 const companyEnrichmentSchema = z.object({
   name: z.string().nullable(),
@@ -58,11 +58,11 @@ class CompanyEnrichmentRequest extends LlmJsonRequest<typeof companyEnrichmentSc
   }
 }
 
-@injectable()
+@Injectable()
 export class ClaudeApiCompanyDataProvider implements CompanyDataProvider {
   private readonly log = Logger.create(this);
 
-  public constructor(private readonly provider: ClaudeApiProvider = inject(DI.Llm.ClaudeApiProvider)) {}
+  public constructor(@Inject(DI.Llm.ClaudeApiProvider) private readonly provider: ClaudeApiProvider) {}
 
   public async enrichFromUrl(url: string, context?: string): Promise<CompanyEnrichmentResult> {
     this.log.info(`Enriching company data for URL: "${url}"`);

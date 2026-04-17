@@ -2,8 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
-    "types": ["node", "bun-types"]
+    "types": ["node"]
   },
-  "include": ["src/**/*", "scripts/**/*"],
-  "exclude": ["scripts/e2e-start-servers.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["scripts/**/*"]
 }

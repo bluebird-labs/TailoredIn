@@ -7,7 +7,7 @@ import type { LlmJsonRequest } from './LlmJsonRequest.js';
 import { LlmRequestError } from './LlmRequestError.js';
 import type { LlmRequestOptions } from './LlmRequestOptions.js';
 
-const LOG_DIR = resolve(import.meta.dir, '../../../logs/llm');
+const LOG_DIR = resolve(import.meta.dirname, '../../../logs/llm');
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;

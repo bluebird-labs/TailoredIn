@@ -1,4 +1,6 @@
+import { Inject, Injectable } from '@nestjs/common';
 import type { CompanyRepository, JobDescriptionRepository, JobFitScoreRepository } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import { toCompanyDto } from '../../dtos/CompanyDto.js';
 import type { JobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
 import { toJobDescriptionDto } from '../../dtos/JobDescriptionDto.js';
@@ -7,11 +9,12 @@ export type ListJobDescriptionsInput = {
   companyId?: string;
 };
 
+@Injectable()
 export class ListJobDescriptions {
   public constructor(
-    private readonly jobDescriptionRepository: JobDescriptionRepository,
-    private readonly companyRepository: CompanyRepository,
-    private readonly jobFitScoreRepository: JobFitScoreRepository
+    @Inject(DI.JobDescription.Repository) private readonly jobDescriptionRepository: JobDescriptionRepository,
+    @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository,
+    @Inject(DI.JobDescription.FitScoreRepository) private readonly jobFitScoreRepository: JobFitScoreRepository
   ) {}
 
   public async execute(input: ListJobDescriptionsInput): Promise<JobDescriptionDto[]> {

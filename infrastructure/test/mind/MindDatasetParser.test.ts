@@ -1,8 +1,7 @@
-import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
 import { MindDatasetParser } from '../../src/mind/MindDatasetParser.js';
 
-const FIXTURES_DIR = join(import.meta.dir, 'fixtures');
+const FIXTURES_DIR = join(import.meta.dirname, 'fixtures');
 
 describe('MindDatasetParser', () => {
   const parser = new MindDatasetParser();

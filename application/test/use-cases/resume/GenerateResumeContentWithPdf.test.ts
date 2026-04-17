@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import type { ResumeContentDto } from '../../../src/dtos/ResumeContentDto.js';
 import type { GenerateResumeContent } from '../../../src/use-cases/resume/GenerateResumeContent.js';
 import { GenerateResumeContentWithPdf } from '../../../src/use-cases/resume/GenerateResumeContentWithPdf.js';
@@ -14,8 +13,8 @@ function makeContentResult(): ResumeContentDto {
 describe('GenerateResumeContentWithPdf', () => {
   test('calls generateContent then generatePdf and returns content', async () => {
     const contentResult = makeContentResult();
-    const generateContent = { execute: mock(async () => contentResult) } as unknown as GenerateResumeContent;
-    const generatePdf = { execute: mock(async () => new Uint8Array([1, 2, 3])) } as unknown as GenerateResumePdf;
+    const generateContent = { execute: jest.fn(async () => contentResult) } as unknown as GenerateResumeContent;
+    const generatePdf = { execute: jest.fn(async () => new Uint8Array([1, 2, 3])) } as unknown as GenerateResumePdf;
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
     const result = await useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-1' });
@@ -27,9 +26,9 @@ describe('GenerateResumeContentWithPdf', () => {
 
   test('returns content even if PDF generation fails', async () => {
     const contentResult = makeContentResult();
-    const generateContent = { execute: mock(async () => contentResult) } as unknown as GenerateResumeContent;
+    const generateContent = { execute: jest.fn(async () => contentResult) } as unknown as GenerateResumeContent;
     const generatePdf = {
-      execute: mock(async () => {
+      execute: jest.fn(async () => {
         throw new Error('Typst crashed');
       })
     } as unknown as GenerateResumePdf;
@@ -42,11 +41,11 @@ describe('GenerateResumeContentWithPdf', () => {
 
   test('propagates content generation errors', async () => {
     const generateContent = {
-      execute: mock(async () => {
+      execute: jest.fn(async () => {
         throw new Error('LLM timeout');
       })
     } as unknown as GenerateResumeContent;
-    const generatePdf = { execute: mock(async () => new Uint8Array()) } as unknown as GenerateResumePdf;
+    const generatePdf = { execute: jest.fn(async () => new Uint8Array()) } as unknown as GenerateResumePdf;
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
     await expect(useCase.execute({ profileId: 'profile-1', jobDescriptionId: 'jd-1' })).rejects.toThrow('LLM timeout');
@@ -55,8 +54,8 @@ describe('GenerateResumeContentWithPdf', () => {
 
   test('passes input through to content generation', async () => {
     const contentResult = makeContentResult();
-    const generateContent = { execute: mock(async () => contentResult) } as unknown as GenerateResumeContent;
-    const generatePdf = { execute: mock(async () => new Uint8Array()) } as unknown as GenerateResumePdf;
+    const generateContent = { execute: jest.fn(async () => contentResult) } as unknown as GenerateResumeContent;
+    const generatePdf = { execute: jest.fn(async () => new Uint8Array()) } as unknown as GenerateResumePdf;
 
     const useCase = new GenerateResumeContentWithPdf(generateContent, generatePdf);
     await useCase.execute({

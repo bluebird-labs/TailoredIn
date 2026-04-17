@@ -1,9 +1,8 @@
-import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
 import { ZodError } from 'zod';
 import { EscoDirectoryLoader } from '../../src/esco/EscoDirectoryLoader.js';
 
-const FIXTURES_DIR = join(import.meta.dir, 'fixtures', 'esco-dataset-v1.2.1-classification-en-csv');
+const FIXTURES_DIR = join(import.meta.dirname, 'fixtures', 'esco-dataset-v1.2.1-classification-en-csv');
 
 describe('EscoDirectoryLoader', () => {
   const loader = new EscoDirectoryLoader();
@@ -24,7 +23,7 @@ describe('EscoDirectoryLoader', () => {
   });
 
   test('throws ZodError when a required file is missing', async () => {
-    const incomplete = join(import.meta.dir, 'fixtures');
+    const incomplete = join(import.meta.dirname, 'fixtures');
 
     await expect(loader.load(incomplete)).rejects.toBeInstanceOf(ZodError);
   });

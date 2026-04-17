@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import {
   Company,
   type CompanyRepository,
@@ -47,7 +46,7 @@ const makeCompany = () =>
   });
 
 const mockSkillRepo: Partial<SkillRepository> = {
-  findByIds: mock(() => Promise.resolve([]))
+  findByIds: jest.fn(() => Promise.resolve([]))
 };
 
 describe('GetExperience', () => {
@@ -56,13 +55,13 @@ describe('GetExperience', () => {
     const experience = makeExperience({ companyId: company.id });
 
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => Promise.resolve(experience)),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findByIdOrFail: jest.fn(() => Promise.resolve(experience)),
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
     const companyRepo: Partial<CompanyRepository> = {
-      findById: mock(() => Promise.resolve(company))
+      findById: jest.fn(() => Promise.resolve(company))
     };
 
     const useCase = new GetExperience(
@@ -84,13 +83,13 @@ describe('GetExperience', () => {
     const experience = makeExperience({ companyId: null });
 
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => Promise.resolve(experience)),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findByIdOrFail: jest.fn(() => Promise.resolve(experience)),
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
     const companyRepo: Partial<CompanyRepository> = {
-      findById: mock(() => Promise.resolve(null))
+      findById: jest.fn(() => Promise.resolve(null))
     };
 
     const useCase = new GetExperience(
@@ -108,15 +107,15 @@ describe('GetExperience', () => {
 
   test('throws EntityNotFoundError when experience does not exist', async () => {
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => {
+      findByIdOrFail: jest.fn(() => {
         throw new EntityNotFoundError('Experience', 'exp-aaaa-1111-2222-3333-444444444444');
       }),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
     const companyRepo: Partial<CompanyRepository> = {
-      findById: mock(() => Promise.resolve(null))
+      findById: jest.fn(() => Promise.resolve(null))
     };
 
     const useCase = new GetExperience(

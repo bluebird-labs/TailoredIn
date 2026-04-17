@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { Entity as DomainEntity } from '../Entity.js';
 import { ValidationError } from '../ValidationError.js';
 import type { GenerationScope } from '../value-objects/GenerationScope.js';
@@ -15,7 +15,6 @@ export class GenerationPrompt extends DomainEntity {
   @PrimaryKey({ type: 'uuid', fieldName: 'id' })
   public readonly id!: string;
 
-  // @ts-expect-error — MikroORM decorator types don't support mapToPk with string PKs; required for @OneToMany on GenerationSettings
   @ManyToOne(() => GenerationSettings, { fieldName: 'generation_settings_id', mapToPk: true })
   public readonly generationSettingsId: string;
 

@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { Entity as DomainEntity } from '../Entity.js';
 import { Experience } from './Experience.js';
 
@@ -12,7 +12,6 @@ export class ExperienceSkill extends DomainEntity {
   @PrimaryKey({ type: 'uuid', fieldName: 'id' })
   public readonly id!: string;
 
-  // @ts-expect-error — MikroORM decorator types don't support mapToPk with string PKs; required for @OneToMany on Experience
   @ManyToOne(() => Experience, { fieldName: 'experience_id', mapToPk: true })
   public readonly experienceId: string;
 

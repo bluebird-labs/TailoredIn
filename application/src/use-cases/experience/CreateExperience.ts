@@ -1,9 +1,11 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   Experience,
   type ExperienceRepository,
   GenerationSettings,
   type GenerationSettingsRepository
 } from '@tailoredin/domain';
+import { DI } from '../../DI.js';
 import type { ExperienceDto } from '../../dtos/ExperienceDto.js';
 import { toExperienceDto } from './ListExperiences.js';
 
@@ -20,9 +22,11 @@ export type CreateExperienceInput = {
   ordinal: number;
 };
 
+@Injectable()
 export class CreateExperience {
   public constructor(
-    private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
+    @Inject(DI.GenerationSettings.Repository)
     private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 

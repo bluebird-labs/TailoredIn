@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { Profile } from '../../src/entities/Profile.js';
 
 describe('Profile', () => {

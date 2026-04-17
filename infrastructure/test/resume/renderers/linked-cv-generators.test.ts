@@ -1,5 +1,4 @@
 // infrastructure/test/services/renderers/linked-cv-generators.test.ts
-import { describe, expect, test } from 'bun:test';
 import type { ResumeRenderExperience, ResumeRenderInput } from '@tailoredin/application';
 import { DEFAULT_RESUME_TEMPLATE } from '@tailoredin/domain';
 import {

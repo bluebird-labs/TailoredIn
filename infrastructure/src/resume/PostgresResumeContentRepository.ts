@@ -1,10 +1,10 @@
-import { MikroORM } from '@mikro-orm/postgresql';
-import { inject, injectable } from '@needle-di/core';
+import { MikroORM } from '@mikro-orm/core';
+import { Inject, Injectable } from '@nestjs/common';
 import { ResumeContent, type ResumeContentRepository } from '@tailoredin/domain';
 
-@injectable()
+@Injectable()
 export class PostgresResumeContentRepository implements ResumeContentRepository {
-  public constructor(private readonly orm: MikroORM = inject(MikroORM)) {}
+  public constructor(@Inject(MikroORM) private readonly orm: MikroORM) {}
 
   public async findById(id: string): Promise<ResumeContent | null> {
     return this.orm.em.findOne(ResumeContent, { id });

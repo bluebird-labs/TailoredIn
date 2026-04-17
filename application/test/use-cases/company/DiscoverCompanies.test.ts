@@ -1,10 +1,9 @@
-import { describe, expect, mock, test } from 'bun:test';
 import type { CompanyDiscoveryProvider, CompanyDiscoveryResult } from '../../../src/ports/CompanyDiscoveryProvider.js';
 import { DiscoverCompanies } from '../../../src/use-cases/company/DiscoverCompanies.js';
 
 function mockProvider(results: CompanyDiscoveryResult[]): CompanyDiscoveryProvider {
   return {
-    discover: mock(async () => results)
+    discover: jest.fn(async () => results)
   };
 }
 

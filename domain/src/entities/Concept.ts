@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/es';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { normalizeLabel } from '@tailoredin/core';
 import { AggregateRoot } from '../AggregateRoot.js';
 import { ValidationError } from '../ValidationError.js';

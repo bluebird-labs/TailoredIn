@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
  * Generates application/APPLICATION.mmd — a Mermaid class diagram of the application layer.
  *

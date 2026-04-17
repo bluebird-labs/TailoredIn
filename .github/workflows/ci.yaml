@@ -36,7 +36,7 @@ jobs:
               - 'application/**/*.ts'
               - 'core/**/*.ts'
             deps:
-              - 'bun.lock'
+              - 'pnpm-lock.yaml'
               - 'package.json'
               - '**/package.json'
             lint-config:
@@ -51,8 +51,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
-      - run: bun run check
+      - uses: ./.github/actions/setup-node
+      - run: pnpm run check
 
   typecheck:
     name: Typecheck
@@ -61,8 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
-      - run: bun run typecheck
+      - uses: ./.github/actions/setup-node
+      - run: pnpm run typecheck
 
   test:
     name: Test & Coverage
@@ -71,8 +71,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
-      - run: bun run --filter '@tailoredin/*' test:coverage
+      - uses: ./.github/actions/setup-node
+      - run: pnpm run test:coverage
 
   test-integration:
     name: Integration Tests
@@ -81,10 +81,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
+      - uses: ./.github/actions/setup-node
       - name: Install Typst
         uses: typst-community/setup-typst@v4
-      - run: bun run --cwd infrastructure test:integration
+      - run: pnpm --filter @tailoredin/infrastructure run test:integration
 
   knip:
     name: Dead Code
@@ -93,8 +93,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
-      - run: bun run knip
+      - uses: ./.github/actions/setup-node
+      - run: pnpm run knip
 
   dep-check:
     name: Dependency Boundaries
@@ -103,8 +103,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
-      - run: bun run dep:check
+      - uses: ./.github/actions/setup-node
+      - run: pnpm run dep:check
 
   test-e2e:
     name: E2E Tests
@@ -113,15 +113,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-bun
+      - uses: ./.github/actions/setup-node
       - name: Install Typst
         uses: typst-community/setup-typst@v4
-      - name: Install e2e dependencies
-        run: cd e2e && bun install
       - name: Install Playwright browsers
-        run: cd e2e && bunx playwright install chromium --with-deps
+        run: pnpm exec playwright install chromium --with-deps
+        working-directory: e2e
       - name: Run e2e tests
-        run: bun e2e:test
+        run: pnpm run e2e:test
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
