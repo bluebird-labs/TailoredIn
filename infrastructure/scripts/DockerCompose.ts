@@ -5,7 +5,7 @@ import { projectName } from './ports.js';
 
 const log = Logger.create('docker-compose');
 
-export interface ComposeContext {
+interface ComposeContext {
   composeFile: string;
   projectName: string;
   composeProjectDir: string;

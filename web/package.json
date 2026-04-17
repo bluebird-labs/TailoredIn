@@ -19,7 +19,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/geist": "^5.2.8",
-
     "@tanstack/react-query": "^5.0",
     "@tanstack/react-router": "^1.0",
     "class-variance-authority": "^0.7.1",
@@ -45,7 +44,6 @@
     "@types/react-dom": "^19.0",
     "@vitejs/plugin-react": "^4.0",
     "happy-dom": "^20.8.9",
-    "jest-environment-jsdom": "^30.3.0",
     "storybook": "^10.3.4",
     "tailwindcss": "^4.0",
     "typescript": "^5.7",

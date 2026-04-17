@@ -13,11 +13,12 @@
         "test-integration/support/**",
         "scripts/e2e-start-servers.ts",
         "src/db/migrations/*.ts",
-        "src/db/seeds/**/*.ts",
-        "src/db/orm-config.ts"
+        "src/db/seeds/**/*.ts"
       ]
     },
-    "api": {},
+    "api": {
+      "ignoreDependencies": ["@mikro-orm/postgresql", "multer", "@nestjs/testing"]
+    },
     "web": {
       "entry": [
         "test/**/*.ts",
@@ -30,7 +31,7 @@
       "ignore": ["src/components/ui/**"]
     }
   },
-  "ignore": ["e2e/**"],
+  "ignore": ["e2e/**", "jest.config.ts"],
   "ignoreBinaries": ["dot"],
   "ignoreDependencies": [],
   "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates", "enumMembers"]

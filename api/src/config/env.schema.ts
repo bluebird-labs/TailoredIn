@@ -16,4 +16,4 @@ export const EnvSchema = z.object({
   TZ: z.string().default('UTC')
 });
 
-export type Env = z.infer<typeof EnvSchema>;
+type _Env = z.infer<typeof EnvSchema>;
