@@ -14,7 +14,7 @@ const config: Config = {
       {
         jsc: {
           parser: { syntax: 'typescript', decorators: true },
-          transform: { decoratorVersion: '2022-03' },
+          transform: { legacyDecorator: true, decoratorMetadata: true },
           target: 'es2022'
         },
         module: { type: 'es6' }

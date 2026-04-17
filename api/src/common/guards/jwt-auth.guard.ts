@@ -7,7 +7,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator.js';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   public constructor(
-    private readonly reflector: Reflector,
+    @Inject(Reflector) private readonly reflector: Reflector,
     @Inject(DI.Auth.TokenIssuer) private readonly tokenIssuer: TokenIssuer
   ) {}
 

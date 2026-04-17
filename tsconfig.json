@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "references": [
+    { "path": "./core" },
+    { "path": "./domain" },
+    { "path": "./application" },
+    { "path": "./infrastructure" },
+    { "path": "./api" },
+    { "path": "./web" }
+  ]
+}
