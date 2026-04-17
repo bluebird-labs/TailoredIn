@@ -4,7 +4,7 @@
  * Reads POSTGRES_PORT, GIT_BRANCH from environment (set by dev:env, passed through by turbo).
  */
 import { execSync } from 'node:child_process';
-import { envInt, Logger } from '@tailoredin/core';
+import { Logger } from '@tailoredin/core';
 import {
   assertDockerRunning,
   composeUp,
@@ -16,7 +16,6 @@ import {
 const log = Logger.create('dev:docker');
 const repoRoot = new URL('../..', import.meta.url).pathname.replace(/\/$/, '');
 const branch = process.env.GIT_BRANCH ?? (execSync('git branch --show-current').toString().trim() || 'detached');
-const dbPort = envInt('POSTGRES_PORT');
 
 assertDockerRunning();
 
@@ -30,5 +29,5 @@ if (isContainerRunning(ctx.containerName)) {
 }
 
 log.info('Waiting for PostgreSQL...');
-await waitForPostgres(ctx.containerName, dbPort);
+await waitForPostgres(ctx.containerName);
 log.info('PostgreSQL ready.');

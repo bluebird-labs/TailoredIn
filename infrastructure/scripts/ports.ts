@@ -15,6 +15,7 @@ export function portsForBranch(branchName: string) {
 }
 
 export function projectName(branchName: string): string {
+  if (branchName === 'main' || branchName === 'master') return 'tailored-in';
   const slug = branchName.replace(/[^a-z0-9-]/gi, '-').toLowerCase();
   return `tailoredin-${slug}`;
 }
