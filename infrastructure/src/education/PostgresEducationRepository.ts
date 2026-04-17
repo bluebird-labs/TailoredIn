@@ -1,5 +1,4 @@
-import { NotFoundError } from '@mikro-orm/core';
-import { MikroORM } from '@mikro-orm/postgresql';
+import { MikroORM, NotFoundError } from '@mikro-orm/core';
 import { Inject, Injectable } from '@nestjs/common';
 import { Education, type EducationRepository, EntityNotFoundError } from '@tailoredin/domain';
 

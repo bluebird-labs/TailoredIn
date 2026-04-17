@@ -1,4 +1,4 @@
-import { MikroORM } from '@mikro-orm/postgresql';
+import { MikroORM } from '@mikro-orm/core';
 import { Inject, Injectable } from '@nestjs/common';
 import { JobFitRequirement, JobFitScore, type JobFitScoreRepository } from '@tailoredin/domain';
 

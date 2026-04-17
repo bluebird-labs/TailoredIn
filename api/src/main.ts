@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { MikroORM, RequestContext } from '@mikro-orm/postgresql';
+import { MikroORM, RequestContext } from '@mikro-orm/core';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@tailoredin/core';

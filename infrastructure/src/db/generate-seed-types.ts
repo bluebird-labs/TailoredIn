@@ -7,8 +7,7 @@
  */
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { ReferenceKind } from '@mikro-orm/core';
-import { MikroORM } from '@mikro-orm/postgresql';
+import { MikroORM, ReferenceKind } from '@mikro-orm/core';
 import { Logger } from '@tailoredin/core';
 import { getOrmConfig } from './orm-config.js';
 
