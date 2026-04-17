@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { SkillCategory, type SkillCategoryRepository } from '@tailoredin/domain';
 import { ListSkillCategories } from '../../../src/use-cases/skill/ListSkillCategories.js';
 
@@ -19,7 +18,7 @@ describe('ListSkillCategories', () => {
     const catB = makeCategory({ id: 'cat-b', label: 'Frontend', normalizedLabel: 'frontend' });
 
     const categoryRepo: Partial<SkillCategoryRepository> = {
-      findAll: mock(() => Promise.resolve([catA, catB]))
+      findAll: jest.fn(() => Promise.resolve([catA, catB]))
     };
 
     const useCase = new ListSkillCategories(categoryRepo as SkillCategoryRepository);
@@ -32,7 +31,7 @@ describe('ListSkillCategories', () => {
 
   test('returns empty array when no categories exist', async () => {
     const categoryRepo: Partial<SkillCategoryRepository> = {
-      findAll: mock(() => Promise.resolve([]))
+      findAll: jest.fn(() => Promise.resolve([]))
     };
 
     const useCase = new ListSkillCategories(categoryRepo as SkillCategoryRepository);

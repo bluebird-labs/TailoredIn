@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { BusinessType, Company, type CompanyRepository, CompanyStage, Industry } from '@tailoredin/domain';
 import { ListCompanies } from '../../../src/use-cases/company/ListCompanies.js';
 

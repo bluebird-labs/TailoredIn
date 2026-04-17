@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'bun:test';
 import { Accomplishment } from '../../src/entities/Accomplishment.js';
 
 describe('Accomplishment', () => {
@@ -9,7 +8,7 @@ describe('Accomplishment', () => {
       narrative: 'Led the migration of billing engine to hash-based sharding.',
       ordinal: 0
     });
-    expect(a.id).toBeString();
+    expect(typeof a.id).toBe('string');
     expect(a.title).toBe('Billing sharding');
     expect(a.narrative).toBe('Led the migration of billing engine to hash-based sharding.');
   });

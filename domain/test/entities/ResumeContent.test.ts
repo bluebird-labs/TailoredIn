@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { ResumeContent } from '../../src/entities/ResumeContent.js';
 
 function makeResumeContent() {

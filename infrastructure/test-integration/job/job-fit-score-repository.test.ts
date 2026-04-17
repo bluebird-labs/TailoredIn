@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { Company, JobDescription, JobFitRequirement, JobFitScore, JobSource, Profile } from '@tailoredin/domain';
 import { PostgresJobFitScoreRepository } from '../../src/job/PostgresJobFitScoreRepository.js';

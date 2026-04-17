@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { BusinessType, type Company, type CompanyRepository, CompanyStage, Industry } from '@tailoredin/domain';
 import { CreateCompany } from '../../../src/use-cases/company/CreateCompany.js';
 
@@ -35,7 +34,7 @@ describe('CreateCompany', () => {
       stage: CompanyStage.LATE_STAGE
     });
 
-    expect(dto.id).toBeString();
+    expect(typeof dto.id).toBe('string');
     expect(dto.id).toMatch(/^[0-9a-f-]{36}$/);
     expect(dto.name).toBe('GitHub');
     expect(dto.domainName).toBe('github.com');

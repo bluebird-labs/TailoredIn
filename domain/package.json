@@ -18,8 +18,8 @@
   "private": true,
   "scripts": {
     "typecheck": "bunx tsc --noEmit",
-    "test": "bun test",
-    "test:coverage": "bun test --coverage"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage"
   },
   "type": "module"
 }

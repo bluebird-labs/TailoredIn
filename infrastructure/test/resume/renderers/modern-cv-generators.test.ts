@@ -1,5 +1,4 @@
 // infrastructure/test/services/renderers/modern-cv-generators.test.ts
-import { describe, expect, test } from 'bun:test';
 import type { ResumeRenderInput } from '@tailoredin/application';
 import { DEFAULT_RESUME_TEMPLATE } from '@tailoredin/domain';
 import { generateModernCvTyp } from '../../../src/resume/renderers/modern-cv-generators.js';

@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import type { ResumeRenderInput } from '@tailoredin/application';
 import { DEFAULT_RESUME_TEMPLATE } from '@tailoredin/domain';
 import {

@@ -1,12 +1,11 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { renderHook } from '@testing-library/react';
-import { useNavGuard } from '../use-nav-guard.js';
 
-// Mock TanStack Router's useBlocker
-const mockUseBlocker = mock(() => {});
-mock.module('@tanstack/react-router', () => ({
+const mockUseBlocker = jest.fn(() => {});
+jest.unstable_mockModule('@tanstack/react-router', () => ({
   useBlocker: mockUseBlocker
 }));
+
+const { useNavGuard } = await import('../use-nav-guard.js');
 
 describe('useNavGuard', () => {
   test('calls useBlocker with shouldBlockFn that returns isDirty value', () => {

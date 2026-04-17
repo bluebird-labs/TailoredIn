@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { Concept } from '../../src/entities/Concept.js';
 import { ConceptKind } from '../../src/value-objects/ConceptKind.js';
 
@@ -10,7 +9,7 @@ describe('Concept', () => {
       category: 'Service Architecture Patterns',
       mindName: 'REST (Representational State Transfer)'
     });
-    expect(concept.id).toBeString();
+    expect(typeof concept.id).toBe('string');
     expect(concept.label).toBe('REST (Representational State Transfer)');
     expect(concept.normalizedLabel).toBe('rest-representational-state-transfer');
     expect(concept.kind).toBe(ConceptKind.ARCHITECTURAL_PATTERN);

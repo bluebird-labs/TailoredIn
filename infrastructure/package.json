@@ -8,9 +8,9 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "test": "bun test test/",
-    "test:coverage": "bun test test/ --coverage",
-    "test:integration": "bun test test-integration/ --timeout 60000",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.integration.config.ts",
     "typecheck": "bunx tsc --noEmit",
     "migration:create": "bunx mikro-orm migration:create",
     "migration:up": "bunx mikro-orm migration:up",

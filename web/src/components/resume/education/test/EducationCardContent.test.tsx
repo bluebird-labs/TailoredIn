@@ -1,4 +1,3 @@
-import { afterEach, describe, expect, test } from 'bun:test';
 import { cleanup, render, screen } from '@testing-library/react';
 import type { Education } from '@/hooks/use-educations';
 import { EducationCardContent } from '../EducationCardContent.js';

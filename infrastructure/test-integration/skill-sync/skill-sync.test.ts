@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { SkillSyncService } from '../../src/skill-sync/SkillSyncService.js';
 import { setupTestDatabase, teardownTestDatabase } from '../support/TestDatabase.js';

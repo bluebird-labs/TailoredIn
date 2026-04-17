@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import {
   Skill,
   SkillCategory,
@@ -43,10 +42,10 @@ describe('SearchSkills', () => {
     const skill = makeSkill({ categoryId: category.id });
 
     const skillRepo: Partial<SkillRepository> = {
-      search: mock(() => Promise.resolve([skill]))
+      search: jest.fn(() => Promise.resolve([skill]))
     };
     const categoryRepo: Partial<SkillCategoryRepository> = {
-      findByIdOrFail: mock(() => Promise.resolve(category))
+      findByIdOrFail: jest.fn(() => Promise.resolve(category))
     };
 
     const useCase = new SearchSkills(skillRepo as SkillRepository, categoryRepo as SkillCategoryRepository);
@@ -63,7 +62,7 @@ describe('SearchSkills', () => {
 
   test('uses default limit of 20 when not specified', async () => {
     const skillRepo: Partial<SkillRepository> = {
-      search: mock(() => Promise.resolve([]))
+      search: jest.fn(() => Promise.resolve([]))
     };
     const categoryRepo: Partial<SkillCategoryRepository> = {};
 
@@ -75,7 +74,7 @@ describe('SearchSkills', () => {
 
   test('respects custom limit', async () => {
     const skillRepo: Partial<SkillRepository> = {
-      search: mock(() => Promise.resolve([]))
+      search: jest.fn(() => Promise.resolve([]))
     };
     const categoryRepo: Partial<SkillCategoryRepository> = {};
 
@@ -89,10 +88,10 @@ describe('SearchSkills', () => {
     const skill = makeSkill({ categoryId: null });
 
     const skillRepo: Partial<SkillRepository> = {
-      search: mock(() => Promise.resolve([skill]))
+      search: jest.fn(() => Promise.resolve([skill]))
     };
     const categoryRepo: Partial<SkillCategoryRepository> = {
-      findByIdOrFail: mock(() => Promise.reject(new Error('should not be called')))
+      findByIdOrFail: jest.fn(() => Promise.reject(new Error('should not be called')))
     };
 
     const useCase = new SearchSkills(skillRepo as SkillRepository, categoryRepo as SkillCategoryRepository);

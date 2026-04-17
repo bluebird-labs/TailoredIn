@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { EntityNotFoundError, SkillCategory } from '@tailoredin/domain';
 import { PostgresSkillCategoryRepository } from '../../src/skill/PostgresSkillCategoryRepository.js';

@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import {
   type CompanyRepository,
   Experience,
@@ -55,16 +54,16 @@ describe('SyncExperienceSkills', () => {
     const skillB = makeSkill({ id: 'skill-b', label: 'React', kind: SkillKind.TOOL });
 
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => Promise.resolve(experience)),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findByIdOrFail: jest.fn(() => Promise.resolve(experience)),
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
     const skillRepo: Partial<SkillRepository> = {
-      findByIds: mock(() => Promise.resolve([skillA, skillB]))
+      findByIds: jest.fn(() => Promise.resolve([skillA, skillB]))
     };
     const companyRepo: Partial<CompanyRepository> = {
-      findById: mock(() => Promise.resolve(null))
+      findById: jest.fn(() => Promise.resolve(null))
     };
 
     const useCase = new SyncExperienceSkills(
@@ -87,13 +86,13 @@ describe('SyncExperienceSkills', () => {
     const experience = makeExperience();
 
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => Promise.resolve(experience)),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findByIdOrFail: jest.fn(() => Promise.resolve(experience)),
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
     const skillRepo: Partial<SkillRepository> = {
-      findByIds: mock(() => Promise.resolve([]))
+      findByIds: jest.fn(() => Promise.resolve([]))
     };
     const companyRepo: Partial<CompanyRepository> = {};
 
@@ -113,16 +112,16 @@ describe('SyncExperienceSkills', () => {
     experience.addSkill('skill-a');
 
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => Promise.resolve(experience)),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findByIdOrFail: jest.fn(() => Promise.resolve(experience)),
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
     const skillRepo: Partial<SkillRepository> = {
-      findByIds: mock(() => Promise.resolve([]))
+      findByIds: jest.fn(() => Promise.resolve([]))
     };
     const companyRepo: Partial<CompanyRepository> = {
-      findById: mock(() => Promise.resolve(null))
+      findById: jest.fn(() => Promise.resolve(null))
     };
 
     const useCase = new SyncExperienceSkills(

@@ -8,7 +8,7 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
-    "test": "bun test --pass-with-no-tests",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --passWithNoTests",
     "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {

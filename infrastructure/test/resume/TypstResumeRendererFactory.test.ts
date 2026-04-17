@@ -1,5 +1,4 @@
 // infrastructure/test/services/TypstResumeRendererFactory.test.ts
-import { describe, expect, test } from 'bun:test';
 import { BrilliantCvRenderer } from '../../src/resume/renderers/BrilliantCvRenderer.js';
 import { ImprecvRenderer } from '../../src/resume/renderers/ImprecvRenderer.js';
 import { LinkedCvRenderer } from '../../src/resume/renderers/LinkedCvRenderer.js';

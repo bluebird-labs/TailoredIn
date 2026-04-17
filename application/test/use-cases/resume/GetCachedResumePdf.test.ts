@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { JobDescription, type JobDescriptionRepository, JobSource } from '@tailoredin/domain';
 import { GetCachedResumePdf } from '../../../src/use-cases/resume/GetCachedResumePdf.js';
 
@@ -29,7 +28,7 @@ describe('GetCachedResumePdf', () => {
     const pdfBytes = new Uint8Array([1, 2, 3, 4]);
     const jd = makeJd(pdfBytes, 'modern-cv');
     const repo: JobDescriptionRepository = {
-      findById: mock(async () => jd)
+      findById: jest.fn(async () => jd)
     } as unknown as JobDescriptionRepository;
 
     const useCase = new GetCachedResumePdf(repo);
@@ -43,7 +42,7 @@ describe('GetCachedResumePdf', () => {
   test('returns null when no cached PDF exists', async () => {
     const jd = makeJd(null, null);
     const repo: JobDescriptionRepository = {
-      findById: mock(async () => jd)
+      findById: jest.fn(async () => jd)
     } as unknown as JobDescriptionRepository;
 
     const useCase = new GetCachedResumePdf(repo);
@@ -54,7 +53,7 @@ describe('GetCachedResumePdf', () => {
 
   test('returns null when JD does not exist', async () => {
     const repo: JobDescriptionRepository = {
-      findById: mock(async () => null)
+      findById: jest.fn(async () => null)
     } as unknown as JobDescriptionRepository;
 
     const useCase = new GetCachedResumePdf(repo);
@@ -67,7 +66,7 @@ describe('GetCachedResumePdf', () => {
     const pdfBytes = new Uint8Array([5, 6, 7]);
     const jd = makeJd(pdfBytes, null);
     const repo: JobDescriptionRepository = {
-      findById: mock(async () => jd)
+      findById: jest.fn(async () => jd)
     } as unknown as JobDescriptionRepository;
 
     const useCase = new GetCachedResumePdf(repo);

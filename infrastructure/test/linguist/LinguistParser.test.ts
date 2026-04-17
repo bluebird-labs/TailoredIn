@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { writeFileSync } from 'node:fs';
 import Path from 'node:path';
 import { LinguistParser } from '../../src/linguist/LinguistParser.js';
 
@@ -75,7 +75,7 @@ describe('LinguistParser', () => {
 
   test('rejects YAML with invalid type', async () => {
     const tmpFile = Path.resolve(import.meta.dirname, 'fixtures/invalid-type.yml');
-    await Bun.write(tmpFile, 'InvalidLang:\n  type: invalid_type\n  language_id: 1\n');
+    writeFileSync(tmpFile, 'InvalidLang:\n  type: invalid_type\n  language_id: 1\n');
 
     try {
       await expect(parser.parse(tmpFile)).rejects.toThrow('validation failed');
@@ -87,7 +87,7 @@ describe('LinguistParser', () => {
 
   test('rejects YAML with missing type field', async () => {
     const tmpFile = Path.resolve(import.meta.dirname, 'fixtures/missing-type.yml');
-    await Bun.write(tmpFile, 'NoType:\n  color: "#ffffff"\n  language_id: 1\n');
+    writeFileSync(tmpFile, 'NoType:\n  color: "#ffffff"\n  language_id: 1\n');
 
     try {
       await expect(parser.parse(tmpFile)).rejects.toThrow('validation failed');

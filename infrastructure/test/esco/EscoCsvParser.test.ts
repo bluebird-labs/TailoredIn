@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { existsSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { EscoCsvParseError } from '../../src/esco/EscoCsvParseError.js';
 import { EscoCsvParser } from '../../src/esco/EscoCsvParser.js';
@@ -17,7 +17,7 @@ import { SkillGroupSchema } from '../../src/esco/schemas/skill-group.js';
 import { SkillSkillRelationSchema } from '../../src/esco/schemas/skill-skill-relation.js';
 import { SkillsHierarchySchema } from '../../src/esco/schemas/skills-hierarchy.js';
 
-const FIXTURES_DIR = join(import.meta.dir, 'fixtures', 'esco-dataset-v1.2.1-classification-en-csv');
+const FIXTURES_DIR = join(import.meta.dirname, 'fixtures', 'esco-dataset-v1.2.1-classification-en-csv');
 const csv = (filename: string) => join(FIXTURES_DIR, filename);
 
 describe('EscoCsvParser', () => {
@@ -266,30 +266,26 @@ describe('EscoCsvParser', () => {
 
   describe('error handling', () => {
     test('throws EscoCsvParseError with row details on invalid data', async () => {
-      const tmpPath = join(import.meta.dir, 'fixtures', 'invalid_test.csv');
-      await Bun.write(
+      const tmpPath = join(import.meta.dirname, 'fixtures', 'invalid_test.csv');
+      writeFileSync(
         tmpPath,
         'conceptType,conceptUri,code,preferredLabel,greenShare\nBadType,not-a-url,001,Test,abc\n'
       );
 
       try {
         await parser.parse(tmpPath, GreenShareOccupationSchema);
-        expect.unreachable('should have thrown');
+        throw new Error('should have thrown');
       } catch (error) {
+        if (error instanceof Error && error.message === 'should have thrown') throw error;
         expect(error).toBeInstanceOf(EscoCsvParseError);
         const csvError = error as EscoCsvParseError;
         expect(csvError.filePath).toBe(tmpPath);
         expect(csvError.rowErrors.size).toBe(1);
         expect(csvError.rowErrors.has(0)).toBe(true);
       } finally {
-        await Bun.file(tmpPath)
-          .exists()
-          .then(exists => {
-            if (exists) {
-              const { unlinkSync } = require('node:fs');
-              unlinkSync(tmpPath);
-            }
-          });
+        if (existsSync(tmpPath)) {
+          unlinkSync(tmpPath);
+        }
       }
     });
 

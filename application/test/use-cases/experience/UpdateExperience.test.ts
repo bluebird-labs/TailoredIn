@@ -1,4 +1,3 @@
-import { describe, expect, it, mock } from 'bun:test';
 import { Experience, type ExperienceRepository } from '@tailoredin/domain';
 import { UpdateExperience } from '../../../src/use-cases/experience/UpdateExperience.js';
 
@@ -22,10 +21,10 @@ function makeExperience() {
 
 function mockRepo(exp: Experience) {
   return {
-    findByIdOrFail: mock(async () => exp),
-    findAll: mock(async () => []),
-    save: mock(async () => {}),
-    delete: mock(async () => {})
+    findByIdOrFail: jest.fn(async () => exp),
+    findAll: jest.fn(async () => []),
+    save: jest.fn(async () => {}),
+    delete: jest.fn(async () => {})
   } as unknown as ExperienceRepository;
 }
 
@@ -94,18 +93,18 @@ describe('UpdateExperience', () => {
     const repo = mockRepo(exp);
     const uc = new UpdateExperience(repo);
     await uc.execute({ ...baseInput, accomplishments: [] });
-    expect((repo.save as ReturnType<typeof mock>).mock.calls).toHaveLength(1);
+    expect((repo.save as jest.Mock).mock.calls).toHaveLength(1);
   });
 
   it('returns NOT_FOUND error when experience does not exist', async () => {
     const { EntityNotFoundError } = await import('@tailoredin/domain');
     const repo = {
-      findByIdOrFail: mock(async () => {
+      findByIdOrFail: jest.fn(async () => {
         throw new EntityNotFoundError('Experience', 'x');
       }),
-      findAll: mock(async () => []),
-      save: mock(async () => {}),
-      delete: mock(async () => {})
+      findAll: jest.fn(async () => []),
+      save: jest.fn(async () => {}),
+      delete: jest.fn(async () => {})
     } as unknown as ExperienceRepository;
     const uc = new UpdateExperience(repo);
     const result = await uc.execute({ ...baseInput, accomplishments: [] });

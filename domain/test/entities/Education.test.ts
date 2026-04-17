@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { Education } from '../../src/entities/Education.js';
 
 describe('Education', () => {

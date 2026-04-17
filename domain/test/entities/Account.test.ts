@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { Account } from '../../src/entities/Account.js';
 import type { PasswordHasher } from '../../src/ports/PasswordHasher.js';
 
@@ -32,8 +31,8 @@ describe('Account', () => {
   test('verifyPassword delegates to PasswordHasher', async () => {
     const account = makeAccount({ passwordHash: '$argon2id$hashed' });
     const hasher: PasswordHasher = {
-      hash: mock(() => Promise.resolve('')),
-      verify: mock((password: string, hash: string) =>
+      hash: jest.fn(() => Promise.resolve('')),
+      verify: jest.fn((password: string, hash: string) =>
         Promise.resolve(password === 'correct' && hash === '$argon2id$hashed')
       )
     };

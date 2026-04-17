@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import type { MikroORM } from '@mikro-orm/postgresql';
 import { Profile } from '@tailoredin/domain';
 import { PostgresProfileRepository } from '../../src/resume/PostgresProfileRepository.js';

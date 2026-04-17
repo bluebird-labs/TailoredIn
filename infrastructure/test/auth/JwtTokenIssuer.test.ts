@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { JwtTokenIssuer } from '../../src/auth/JwtTokenIssuer.js';
 
 describe('JwtTokenIssuer', () => {
@@ -8,7 +7,7 @@ describe('JwtTokenIssuer', () => {
   test('issue returns a token and expiresIn', () => {
     const payload = { accountId: 'acc-123', profileId: 'prof-456' };
     const result = issuer.issue(payload);
-    expect(result.token).toBeString();
+    expect(typeof result.token).toBe('string');
     expect(result.token.split('.')).toHaveLength(3);
     expect(result.expiresIn).toBe(3600);
   });

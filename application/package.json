@@ -8,8 +8,8 @@
     "./src/*": "./src/*"
   },
   "scripts": {
-    "test": "bun test",
-    "test:coverage": "bun test --coverage",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {

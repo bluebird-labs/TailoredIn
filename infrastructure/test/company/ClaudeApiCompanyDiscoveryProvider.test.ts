@@ -1,11 +1,10 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { err, ok } from '@tailoredin/domain';
 import { ClaudeApiCompanyDiscoveryProvider } from '../../src/company/ClaudeApiCompanyDiscoveryProvider.js';
 import type { ClaudeApiProvider } from '../../src/llm/ClaudeApiProvider.js';
 import { LlmRequestError } from '../../src/llm/LlmRequestError.js';
 
 function createMockProvider(result: ReturnType<typeof ok> | ReturnType<typeof err>) {
-  return { request: mock(() => Promise.resolve(result)) } as unknown as ClaudeApiProvider;
+  return { request: jest.fn(() => Promise.resolve(result)) } as unknown as ClaudeApiProvider;
 }
 
 describe('ClaudeApiCompanyDiscoveryProvider', () => {

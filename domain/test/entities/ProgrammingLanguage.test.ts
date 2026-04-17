@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { ProgrammingLanguage } from '../../src/entities/ProgrammingLanguage.js';
 import { SkillKind } from '../../src/value-objects/SkillKind.js';
 

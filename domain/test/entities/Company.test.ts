@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import { Company } from '../../src/entities/Company.js';
 import { BusinessType } from '../../src/value-objects/BusinessType.js';
 import { CompanyStage } from '../../src/value-objects/CompanyStage.js';

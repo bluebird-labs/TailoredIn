@@ -1,4 +1,3 @@
-import { describe, expect, mock, test } from 'bun:test';
 import { EntityNotFoundError, Experience, type ExperienceRepository } from '@tailoredin/domain';
 import { UnlinkCompanyFromExperience } from '../../../src/use-cases/experience/UnlinkCompanyFromExperience.js';
 
@@ -27,10 +26,10 @@ describe('UnlinkCompanyFromExperience', () => {
   test('unlinks a company from an experience', async () => {
     const experience = makeLinkedExperience();
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => Promise.resolve(experience)),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findByIdOrFail: jest.fn(() => Promise.resolve(experience)),
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
 
     const useCase = new UnlinkCompanyFromExperience(experienceRepo);
@@ -46,12 +45,12 @@ describe('UnlinkCompanyFromExperience', () => {
 
   test('returns error when experience not found', async () => {
     const experienceRepo: ExperienceRepository = {
-      findByIdOrFail: mock(() => {
+      findByIdOrFail: jest.fn(() => {
         throw new EntityNotFoundError('Experience', 'exp-1');
       }),
-      findAll: mock(() => Promise.resolve([])),
-      save: mock(() => Promise.resolve()),
-      delete: mock(() => Promise.resolve())
+      findAll: jest.fn(() => Promise.resolve([])),
+      save: jest.fn(() => Promise.resolve()),
+      delete: jest.fn(() => Promise.resolve())
     };
 
     const useCase = new UnlinkCompanyFromExperience(experienceRepo);

@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "typecheck": "bunx tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
@@ -44,6 +46,7 @@
     "@types/react-dom": "^19.0",
     "@vitejs/plugin-react": "^4.0",
     "happy-dom": "^20.8.9",
+    "jest-environment-jsdom": "^30.3.0",
     "storybook": "^10.3.4",
     "tailwindcss": "^4.0",
     "typescript": "^5.7",

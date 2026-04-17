@@ -1,4 +1,3 @@
-import { describe, expect, test } from 'bun:test';
 import type { Application, ApplicationRepository } from '@tailoredin/domain';
 import { CreateApplication } from '../../../src/use-cases/application/CreateApplication.js';
 
@@ -28,15 +27,15 @@ describe('CreateApplication', () => {
       companyId: 'company-1'
     });
 
-    expect(dto.id).toBeString();
+    expect(typeof dto.id).toBe('string');
     expect(dto.id).toMatch(/^[0-9a-f-]{36}$/);
     expect(dto.profileId).toBe('profile-1');
     expect(dto.companyId).toBe('company-1');
     expect(dto.status).toBe('draft');
     expect(dto.jobDescriptionId).toBeNull();
     expect(dto.notes).toBeNull();
-    expect(dto.appliedAt).toBeString();
-    expect(dto.updatedAt).toBeString();
+    expect(typeof dto.appliedAt).toBe('string');
+    expect(typeof dto.updatedAt).toBe('string');
     expect(saved).toBeDefined();
   });
 

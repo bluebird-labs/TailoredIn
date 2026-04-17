@@ -1,10 +1,9 @@
-import { describe, expect, mock, test } from 'bun:test';
 import type { CompanyDataProvider, CompanyEnrichmentResult } from '../../../src/ports/CompanyDataProvider.js';
 import { EnrichCompanyData } from '../../../src/use-cases/company/EnrichCompanyData.js';
 
 function mockProvider(result: CompanyEnrichmentResult): CompanyDataProvider {
   return {
-    enrichFromUrl: mock(async () => result)
+    enrichFromUrl: jest.fn(async () => result)
   };
 }
 
