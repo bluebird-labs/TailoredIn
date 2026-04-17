@@ -100,7 +100,7 @@ Run: `pnpm dev:seed`
 
 ## LLM prompt logging
 
-Every LLM call made through `BaseLlmApiProvider` is logged to `logs/llm/` (gitignored). Each log is a Markdown file named `{timestamp}_{RequestClassName}.md` containing four sections: **Input** (structured input data as JSON), **Output Schema** (the Zod schema as JSON Schema), **Prompt** (full rendered prompt text), and **Response** (parsed JSON on success, or error + raw response on failure).
+Every LLM call made through `BaseLlmApiProvider` is logged to `<os.tmpdir()>/tailoredin/logs/llm/` (via `getLogDirectory()` from `@tailoredin/core`). Each log is a Markdown file named `{timestamp}_{RequestClassName}.md` containing four sections: **Input** (structured input data as JSON), **Output Schema** (the Zod schema as JSON Schema), **Prompt** (full rendered prompt text), and **Response** (parsed JSON on success, or error + raw response on failure).
 
 When adding a new `LlmJsonRequest` subclass, override `getInput()` to expose the structured input data for logging. The default returns `undefined` (shown as "No structured input available").
 

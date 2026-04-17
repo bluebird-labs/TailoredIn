@@ -1,17 +1,16 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import Anthropic from '@anthropic-ai/sdk';
 import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema';
 import { Inject, Injectable } from '@nestjs/common';
 import type { ComposedPrompt, ResumeElementGenerator } from '@tailoredin/application';
 import { ExternalServiceError } from '@tailoredin/application';
-import { Logger } from '@tailoredin/core';
+import { getLogDirectory, Logger } from '@tailoredin/core';
 import type { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 
-const LOG_BASE_DIR = resolve(import.meta.dirname, '../../../logs/llm');
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 @Injectable()
@@ -122,10 +121,7 @@ export class ClaudeApiResumeElementGenerator implements ResumeElementGenerator {
       const now = new Date();
 
       const folderName = `${meta.generationRunId}-${meta.profileId.slice(0, 8)}-${meta.jobDescriptionId.slice(0, 8)}`;
-      const folderPath = resolve(LOG_BASE_DIR, folderName);
-      if (!existsSync(folderPath)) {
-        mkdirSync(folderPath, { recursive: true });
-      }
+      const folderPath = getLogDirectory('llm', folderName);
 
       const filename = meta.experienceId ? `${meta.scope}-${meta.experienceId}.md` : `${meta.scope}.md`;
 

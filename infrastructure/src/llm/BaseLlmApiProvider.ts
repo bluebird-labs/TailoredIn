@@ -1,13 +1,12 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { Logger } from '@tailoredin/core';
+import { getLogDirectory, type Logger } from '@tailoredin/core';
 import { err, ok, type Result } from '@tailoredin/domain';
 import type { z } from 'zod';
 import type { LlmJsonRequest } from './LlmJsonRequest.js';
 import { LlmRequestError } from './LlmRequestError.js';
 import type { LlmRequestOptions } from './LlmRequestOptions.js';
 
-const LOG_DIR = resolve(import.meta.dirname, '../../../logs/llm');
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 type LoggerInstance = ReturnType<typeof Logger.create>;
@@ -138,9 +137,7 @@ export abstract class BaseLlmApiProvider {
   ): void {
     if (IS_TEST) return;
     try {
-      if (!existsSync(LOG_DIR)) {
-        mkdirSync(LOG_DIR, { recursive: true });
-      }
+      const logDir = getLogDirectory('llm');
 
       const now = new Date();
       const timestamp = now.toISOString().replace(/[:.]/g, '-');
@@ -174,7 +171,7 @@ export abstract class BaseLlmApiProvider {
         'data' in result ? `\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`` : `**Error:** ${result.error}`
       ];
 
-      const filePath = resolve(LOG_DIR, filename);
+      const filePath = resolve(logDir, filename);
       writeFileSync(filePath, sections.join('\n'), 'utf-8');
       this.log.debug(`LLM log written: ${filePath}`);
     } catch (error) {
