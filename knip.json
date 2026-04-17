@@ -17,7 +17,7 @@
       ]
     },
     "api": {
-      "ignoreDependencies": ["@mikro-orm/postgresql", "multer", "@nestjs/testing"]
+      "ignoreDependencies": ["multer", "@nestjs/testing"]
     },
     "web": {
       "entry": [
