@@ -354,16 +354,16 @@ describe('SkillSyncService', () => {
     const result = await conn.execute(`SELECT * FROM "concepts" ORDER BY "label"`, [], 'all');
     expect(result.length).toBe(3);
 
-    const rest = result.find(
-      (c: { normalized_label: string }) => c.normalized_label === 'rest-representational-state-transfer'
-    ) as { kind: string; category: string | null } | undefined;
+    const rest = (result as { normalized_label: string; kind: string; category: string | null }[]).find(
+      c => c.normalized_label === 'rest-representational-state-transfer'
+    );
     expect(rest).toBeDefined();
     expect(rest!.kind).toBe('architectural_pattern');
     expect(rest!.category).toBe('Service Architecture Patterns');
 
-    const oo = result.find((c: { normalized_label: string }) => c.normalized_label === 'object-oriented') as
-      | { kind: string; category: string | null }
-      | undefined;
+    const oo = (result as { normalized_label: string; kind: string; category: string | null }[]).find(
+      c => c.normalized_label === 'object-oriented'
+    );
     expect(oo).toBeDefined();
     expect(oo!.kind).toBe('conceptual_aspect');
     expect(oo!.category).toBeNull();

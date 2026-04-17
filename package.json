@@ -55,6 +55,19 @@
     "skills:sync": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/skills-sync.ts",
     "skills:reset": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/skills-reset.ts"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "argon2",
+      "better-sqlite3",
+      "cpu-features",
+      "esbuild",
+      "msw",
+      "protobufjs",
+      "ssh2",
+      "unrs-resolver"
+    ]
+  },
   "workspaces": [
     "domain",
     "application",

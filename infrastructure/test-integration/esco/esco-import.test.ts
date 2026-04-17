@@ -120,7 +120,7 @@ describe('EscoImporter', () => {
     const result = await orm.em
       .getConnection()
       .execute(`SELECT DISTINCT "collection_type" FROM "esco_skill_collections" ORDER BY "collection_type"`);
-    const types = result.map((r: { collection_type: string }) => r.collection_type);
+    const types = (result as { collection_type: string }[]).map(r => r.collection_type);
 
     expect(types).toContain('green');
     expect(types).toContain('digital');
@@ -139,7 +139,7 @@ describe('EscoImporter', () => {
       ORDER BY tc.table_name, tc.constraint_name
     `;
     const fks = await orm.em.getConnection().execute(fkQuery);
-    const fkNames = fks.map((r: { constraint_name: string }) => r.constraint_name);
+    const fkNames = (fks as { constraint_name: string }[]).map(r => r.constraint_name);
 
     expect(fkNames).toContain('esco_osr_occupation_fk');
     expect(fkNames).toContain('esco_osr_skill_fk');

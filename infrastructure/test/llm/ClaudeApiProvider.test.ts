@@ -46,7 +46,7 @@ class TestableClaudeApiProvider extends ClaudeApiProvider {
     super(apiKey);
   }
 
-  protected override getClient(): Anthropic {
+  public override getClient(): Anthropic {
     return { messages: { parse: this.mockMessagesParse } } as unknown as Anthropic;
   }
 }
@@ -127,7 +127,9 @@ describe('ClaudeApiProvider', () => {
     const result = await provider.request(new JobRequest(), { maxRetries: 1 });
 
     expect(result.isErr).toBe(true);
-    expect(result.error!.message).toContain('Schema validation failed');
+    if (result.isErr) {
+      expect(result.error.message).toContain('Schema validation failed');
+    }
   });
 
   test('returns err when API throws', async () => {

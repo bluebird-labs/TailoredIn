@@ -45,6 +45,7 @@ describe('PostgresExperienceRepository', () => {
       companyName: 'ACME',
       companyWebsite: null,
       companyAccent: null,
+      companyId: null,
       location: 'Remote',
       startDate: '2020-01',
       endDate: '2023-01',
@@ -84,9 +85,7 @@ describe('PostgresExperienceRepository', () => {
       exp.addAccomplishment({
         title: 'Led migration',
         narrative: 'Migrated to microservices',
-        ordinal: 0,
-        bulletMin: 2,
-        bulletMax: 5
+        ordinal: 0
       });
       orm.em.persist(exp);
       await orm.em.flush();
@@ -105,9 +104,7 @@ describe('PostgresExperienceRepository', () => {
       exp.addAccomplishment({
         title: 'Billing sharding',
         narrative: 'Led hash-based sharding migration.',
-        ordinal: 0,
-        bulletMin: 2,
-        bulletMax: 5
+        ordinal: 0
       });
       orm.em.persist(exp);
       await orm.em.flush();

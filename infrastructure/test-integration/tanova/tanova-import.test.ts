@@ -72,7 +72,7 @@ describe('TanovaImporter', () => {
     const rows = await orm.em
       .getConnection()
       .execute(`SELECT DISTINCT "category" FROM "tanova_skills" ORDER BY "category"`);
-    const categories = rows.map((r: { category: string }) => r.category);
+    const categories = (rows as { category: string }[]).map(r => r.category);
     expect(categories).toEqual(['business', 'technology']);
   }, 60_000);
 });

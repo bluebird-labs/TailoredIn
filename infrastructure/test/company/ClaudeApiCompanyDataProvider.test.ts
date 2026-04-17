@@ -16,7 +16,7 @@ function fullLlmResponse(overrides: Record<string, unknown> = {}) {
     logoUrl: null as string | null,
     businessType: BusinessType.PLATFORM,
     industry: Industry.SOFTWARE,
-    stage: CompanyStage.ACQUIRED,
+    stage: CompanyStage.PUBLIC,
     ...overrides
   };
 }
