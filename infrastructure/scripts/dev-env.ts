@@ -10,7 +10,7 @@
  * lives in turbo.json's dependsOn chain.
  */
 import { execSync, spawnSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Logger } from '@tailoredin/core';
 import { checkPnpmInstall } from './PnpmInstall.js';
@@ -18,6 +18,21 @@ import { portsForBranch, projectName } from './ports.js';
 
 const log = Logger.create('dev:env');
 const repoRoot = resolve(import.meta.dirname, '../..');
+
+// Load .env if it exists (user overrides like CLAUDE_API_KEY)
+const dotEnvPath = resolve(repoRoot, '.env');
+if (existsSync(dotEnvPath)) {
+  for (const line of readFileSync(dotEnvPath, 'utf-8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx);
+    const value = trimmed.slice(eqIdx + 1);
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
+
 const branch = execSync('git branch --show-current').toString().trim() || 'detached';
 const ports = portsForBranch(branch);
 
