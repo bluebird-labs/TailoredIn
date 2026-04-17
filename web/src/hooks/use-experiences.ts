@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { Company } from './use-companies';
 
@@ -46,29 +45,21 @@ export type AccomplishmentDto = {
 export function useExperiences() {
   return useQuery({
     queryKey: queryKeys.experiences.list(),
-    queryFn: async () => {
-      const { data } = await api.experiences.get();
-      return (data?.data ?? []) as Experience[];
-    }
+    queryFn: () => api.get<Experience[]>('/experiences')
   });
 }
 
 export function useExperience(id: string) {
   return useQuery({
     queryKey: queryKeys.experiences.detail(id),
-    queryFn: async () => {
-      const segment = api.experiences as EdenRouteSegment;
-      const { data, error } = await segment({ id }).get();
-      if (error) throw new Error(extractApiError(error, `Could not load experience ${id}`));
-      return data?.data as Experience;
-    }
+    queryFn: () => api.get<Experience>(`/experiences/${id}`)
   });
 }
 
 export function useCreateExperience() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       title: string;
       company_name: string;
       company_website?: string;
@@ -78,12 +69,7 @@ export function useCreateExperience() {
       end_date: string;
       summary?: string;
       ordinal: number;
-    }) => {
-      const segment = api.experiences as EdenRouteSegment;
-      const { data, error } = await segment.post(input);
-      if (error) throw new Error(extractApiError(error, `Could not create experience "${input.title}"`));
-      return data?.data;
-    },
+    }) => api.post<Experience>('/experiences', input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
@@ -93,7 +79,7 @@ export function useCreateExperience() {
 export function useUpdateExperience() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       id: string;
       title: string;
       company_name: string;
@@ -109,10 +95,7 @@ export function useUpdateExperience() {
       bullet_max?: number;
     }) => {
       const { id, ...body } = input;
-      const { data, error } = await api.experiences({ id }).put(body);
-      if (error)
-        throw new Error(extractApiError(error as EdenRouteSegment, `Could not update experience "${input.title}"`));
-      return (data as EdenRouteSegment)?.data as Experience;
+      return api.put<Experience>(`/experiences/${id}`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
@@ -123,11 +106,7 @@ export function useUpdateExperience() {
 export function useDeleteExperience() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const segment = api.experiences as EdenRouteSegment;
-      const { error } = await segment({ id }).delete();
-      if (error) throw new Error(extractApiError(error, `Could not delete experience ${id}`));
-    },
+    mutationFn: (id: string) => api.delete(`/experiences/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
@@ -137,12 +116,9 @@ export function useDeleteExperience() {
 export function useAddAccomplishment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { experienceId: string; title: string; narrative: string; ordinal: number }) => {
+    mutationFn: (input: { experienceId: string; title: string; narrative: string; ordinal: number }) => {
       const { experienceId, ...body } = input;
-      const segment = api.experiences as EdenRouteSegment;
-      const { data, error } = await segment({ id: experienceId }).accomplishments.post(body);
-      if (error) throw new Error(extractApiError(error, 'Could not add accomplishment'));
-      return data?.data;
+      return api.post(`/experiences/${experienceId}/accomplishments`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
@@ -153,7 +129,7 @@ export function useAddAccomplishment() {
 export function useUpdateAccomplishment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       experienceId: string;
       accomplishmentId: string;
       title?: string;
@@ -161,9 +137,7 @@ export function useUpdateAccomplishment() {
       ordinal?: number;
     }) => {
       const { experienceId, accomplishmentId, ...body } = input;
-      const segment = api.experiences as EdenRouteSegment;
-      const { error } = await segment({ id: experienceId }).accomplishments({ accomplishmentId }).put(body);
-      if (error) throw new Error(extractApiError(error, 'Could not update accomplishment'));
+      return api.put(`/experiences/${experienceId}/accomplishments/${accomplishmentId}`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
@@ -174,13 +148,8 @@ export function useUpdateAccomplishment() {
 export function useDeleteAccomplishment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { experienceId: string; accomplishmentId: string }) => {
-      const segment = api.experiences as EdenRouteSegment;
-      const { error } = await segment({ id: input.experienceId })
-        .accomplishments({ accomplishmentId: input.accomplishmentId })
-        .delete();
-      if (error) throw new Error(extractApiError(error, 'Could not delete accomplishment'));
-    },
+    mutationFn: (input: { experienceId: string; accomplishmentId: string }) =>
+      api.delete(`/experiences/${input.experienceId}/accomplishments/${input.accomplishmentId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
@@ -190,16 +159,8 @@ export function useDeleteAccomplishment() {
 export function useLinkCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { experienceId: string; companyId: string }) => {
-      const { data, error } = await api.experiences({ id: input.experienceId }).company.put({
-        company_id: input.companyId
-      });
-      if (error)
-        throw new Error(
-          extractApiError(error as EdenRouteSegment, `Could not link company to experience ${input.experienceId}`)
-        );
-      return (data as EdenRouteSegment)?.data;
-    },
+    mutationFn: (input: { experienceId: string; companyId: string }) =>
+      api.put(`/experiences/${input.experienceId}/company`, { company_id: input.companyId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
@@ -209,14 +170,7 @@ export function useLinkCompany() {
 export function useUnlinkCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (experienceId: string) => {
-      const { data, error } = await api.experiences({ id: experienceId }).company.delete();
-      if (error)
-        throw new Error(
-          extractApiError(error as EdenRouteSegment, `Could not unlink company from experience ${experienceId}`)
-        );
-      return (data as EdenRouteSegment)?.data;
-    },
+    mutationFn: (experienceId: string) => api.delete(`/experiences/${experienceId}/company`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 
 export type Education = {
@@ -17,17 +16,14 @@ export type Education = {
 export function useEducations() {
   return useQuery({
     queryKey: queryKeys.educations.list(),
-    queryFn: async () => {
-      const { data } = await api.educations.get();
-      return (data?.data ?? []) as Education[];
-    }
+    queryFn: () => api.get<Education[]>('/educations')
   });
 }
 
 export function useCreateEducation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       degree_title: string;
       institution_name: string;
       graduation_year: number;
@@ -35,15 +31,7 @@ export function useCreateEducation() {
       honors: string | null;
       ordinal: number;
       hidden_by_default?: boolean;
-    }) => {
-      const segment = api.educations as EdenRouteSegment;
-      const { data, error } = await segment.post(input);
-      if (error)
-        throw new Error(
-          extractApiError(error, `Could not create education "${input.degree_title}" at ${input.institution_name}`)
-        );
-      return data?.data;
-    },
+    }) => api.post<Education>('/educations', input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.educations.list() });
     }
@@ -53,7 +41,7 @@ export function useCreateEducation() {
 export function useUpdateEducation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
+    mutationFn: (input: {
       id: string;
       degree_title: string;
       institution_name: string;
@@ -63,20 +51,8 @@ export function useUpdateEducation() {
       ordinal: number;
       hidden_by_default: boolean;
     }) => {
-      const segment = api.educations as EdenRouteSegment;
-      const { error } = await segment({ id: input.id }).put({
-        degree_title: input.degree_title,
-        institution_name: input.institution_name,
-        graduation_year: input.graduation_year,
-        location: input.location,
-        honors: input.honors,
-        ordinal: input.ordinal,
-        hidden_by_default: input.hidden_by_default
-      });
-      if (error)
-        throw new Error(
-          extractApiError(error, `Could not update education "${input.degree_title}" at ${input.institution_name}`)
-        );
+      const { id, ...body } = input;
+      return api.put(`/educations/${id}`, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.educations.list() });
@@ -87,11 +63,7 @@ export function useUpdateEducation() {
 export function useDeleteEducation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const segment = api.educations as EdenRouteSegment;
-      const { error } = await segment({ id }).delete();
-      if (error) throw new Error(extractApiError(error, `Could not delete education ${id}`));
-    },
+    mutationFn: (id: string) => api.delete(`/educations/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.educations.list() });
     }

@@ -4,7 +4,7 @@ Package: `@tailoredin/web`
 
 React 19 SPA with file-based routing, TanStack Query for server state, and shadcn/ui components.
 
-**Only imports from `@tailoredin/api/client`** — never import domain or application packages directly.
+**Does not depend on `@tailoredin/api`** — the web layer uses a standalone fetch-based API client.
 
 ## Key files
 
@@ -12,7 +12,7 @@ React 19 SPA with file-based routing, TanStack Query for server state, and shadc
 |---|---|
 | `src/main.tsx` | App entry point |
 | `src/routeTree.gen.ts` | **Auto-generated** — never edit manually |
-| `src/lib/api.ts` | Eden Treaty client setup |
+| `src/lib/api.ts` | Typed fetch API client with auth header injection and `ApiError` class |
 | `src/lib/query-keys.ts` | Centralized TanStack Query keys |
 
 ## File-based routing
@@ -30,26 +30,34 @@ All server state goes through TanStack Query. Encapsulate calls in custom hooks:
 
 ```typescript
 // src/hooks/use-experiences.ts
-export function useExperiences(profileId: string) {
+export function useExperiences() {
   return useQuery({
-    queryKey: queryKeys.experiences.list(profileId),
-    queryFn: () => api.experiences.get({ query: { profileId } }).then(unwrap),
+    queryKey: queryKeys.experiences.list(),
+    queryFn: () => api.get<Experience[]>('/experiences'),
   });
 }
 ```
 
 - All query keys live in `src/lib/query-keys.ts` — add new keys there when adding new endpoints
-- Import the API client from `src/lib/api.ts`, not directly from `@tailoredin/api`
+- Import the API client from `src/lib/api.ts`
 
 ## API client
 
 ```typescript
-// src/lib/api.ts
-import { edenTreaty } from '@elysiajs/eden';
-import type { App } from '@tailoredin/api/client';
-
-export const api = edenTreaty<App>('/api');
+// src/lib/api.ts — typed fetch wrapper
+export const api = {
+  get: <T>(path: string, query?) => request<T>('GET', path, { query }),
+  post: <T>(path: string, body?) => request<T>('POST', path, { body }),
+  put: <T>(path: string, body?) => request<T>('PUT', path, { body }),
+  patch: <T>(path: string, body?) => request<T>('PATCH', path, { body }),
+  delete: <T = void>(path: string) => request<T>('DELETE', path),
+  postRaw: (path, body?) => requestRaw('POST', path, { body }),
+  getRaw: (path) => requestRaw('GET', path),
+  postFormData: <T>(path, formData) => requestFormData<T>('POST', path, formData),
+};
 ```
+
+The client automatically injects the JWT `Authorization` header and unwraps the `{ data }` response envelope. For binary responses (PDF), use `postRaw`/`getRaw` which return the raw `Response`.
 
 The `/api` prefix is proxied to the API server (port 8000) by Vite in dev, and should be proxied by a reverse proxy in production. Configure port via `API_PORT` env var.
 

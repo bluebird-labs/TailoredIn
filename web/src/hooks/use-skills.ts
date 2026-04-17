@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { type EdenRouteSegment, extractApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { Experience } from './use-experiences';
 
@@ -22,10 +21,7 @@ export type SkillCategory = {
 export function useAllSkills() {
   return useQuery({
     queryKey: queryKeys.skills.list(),
-    queryFn: async () => {
-      const { data } = await api.skills.all.get();
-      return (data?.data ?? []) as Skill[];
-    },
+    queryFn: () => api.get<Skill[]>('/skills/all'),
     staleTime: 5 * 60 * 1000
   });
 }
@@ -33,10 +29,7 @@ export function useAllSkills() {
 export function useSkillCategories() {
   return useQuery({
     queryKey: queryKeys.skills.categories(),
-    queryFn: async () => {
-      const { data } = await api['skill-categories'].get();
-      return (data?.data ?? []) as SkillCategory[];
-    },
+    queryFn: () => api.get<SkillCategory[]>('/skill-categories'),
     staleTime: 5 * 60 * 1000
   });
 }
@@ -44,11 +37,7 @@ export function useSkillCategories() {
 export function useSearchSkills(query: string) {
   return useQuery({
     queryKey: queryKeys.skills.search(query),
-    queryFn: async () => {
-      const { data, error } = await api.skills.get({ query: { q: query, limit: 20 } });
-      if (error) throw new Error(extractApiError(error as EdenRouteSegment, 'Could not search skills'));
-      return (data?.data ?? []) as Skill[];
-    },
+    queryFn: () => api.get<Skill[]>('/skills', { q: query, limit: 20 }),
     enabled: query.trim().length > 0
   });
 }
@@ -56,14 +45,8 @@ export function useSearchSkills(query: string) {
 export function useSyncExperienceSkills() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { experienceId: string; skillIds: string[] }) => {
-      const segment = api.experiences as EdenRouteSegment;
-      const { data, error } = await segment({ id: input.experienceId }).skills.put({
-        skill_ids: input.skillIds
-      });
-      if (error) throw new Error(extractApiError(error, 'Could not sync experience skills'));
-      return data?.data as Experience;
-    },
+    mutationFn: (input: { experienceId: string; skillIds: string[] }) =>
+      api.put<Experience>(`/experiences/${input.experienceId}/skills`, { skill_ids: input.skillIds }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
     }
