@@ -1,0 +1,8 @@
+packages:
+  - domain
+  - application
+  - infrastructure
+  - core
+  - api
+  - web
+  - e2e
