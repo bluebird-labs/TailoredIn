@@ -1,6 +1,7 @@
 export * from './ColorUtil.js';
 export * from './EnumUtil.js';
 export { env, envInt, envOptional } from './Environment.js';
+export { getLogDirectory } from './LogDirectory.js';
 export { Logger } from './Logger.js';
 export { normalizeLabel } from './normalizeLabel.js';
 export * from './ObjectUtil.js';
