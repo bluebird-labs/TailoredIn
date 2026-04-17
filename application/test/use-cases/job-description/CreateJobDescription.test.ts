@@ -9,6 +9,7 @@ import { CreateJobDescription } from '../../../src/use-cases/job-description/Cre
 
 function mockJobDescriptionRepo(onSave?: (jd: JobDescription) => void): JobDescriptionRepository {
   return {
+    findAll: async () => [],
     findById: async () => null,
     findByCompanyId: async () => [],
     save: async (jd: JobDescription) => {

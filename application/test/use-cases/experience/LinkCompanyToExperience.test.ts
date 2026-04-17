@@ -1,9 +1,13 @@
 import {
+  BusinessType,
   Company,
   type CompanyRepository,
+  CompanyStage,
+  CompanyStatus,
   EntityNotFoundError,
   Experience,
-  type ExperienceRepository
+  type ExperienceRepository,
+  Industry
 } from '@tailoredin/domain';
 import { LinkCompanyToExperience } from '../../../src/use-cases/experience/LinkCompanyToExperience.js';
 
@@ -23,7 +27,6 @@ const makeExperience = () =>
     ordinal: 0,
     bulletMin: 2,
     bulletMax: 5,
-    accomplishments: [],
     createdAt: new Date(),
     updatedAt: new Date()
   });
@@ -32,13 +35,15 @@ const makeCompany = () =>
   new Company({
     id: 'company-1',
     name: 'Acme Corp',
+    domainName: 'acme.com',
     description: null,
     website: 'https://acme.com',
     logoUrl: null,
     linkedinLink: null,
-    businessType: null,
-    industry: null,
-    stage: null,
+    businessType: BusinessType.UNKNOWN,
+    industry: Industry.UNKNOWN,
+    stage: CompanyStage.UNKNOWN,
+    status: CompanyStatus.RUNNING,
     createdAt: new Date(),
     updatedAt: new Date()
   });

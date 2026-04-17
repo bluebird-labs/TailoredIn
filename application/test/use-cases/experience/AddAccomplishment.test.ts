@@ -7,11 +7,14 @@ const fakeExperience = Experience.create({
   companyName: 'ACME',
   companyWebsite: null,
   companyAccent: null,
+  companyId: null,
   location: 'Remote',
   startDate: '2020',
   endDate: '2023',
   summary: null,
-  ordinal: 0
+  ordinal: 0,
+  bulletMin: 2,
+  bulletMax: 5
 });
 
 const mockRepo = {

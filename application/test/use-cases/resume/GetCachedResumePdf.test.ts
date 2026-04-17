@@ -1,4 +1,4 @@
-import { JobDescription, type JobDescriptionRepository, JobSource } from '@tailoredin/domain';
+import { JobDescription, type JobDescriptionRepository, JobLevel, JobSource, LocationType } from '@tailoredin/domain';
 import { GetCachedResumePdf } from '../../../src/use-cases/resume/GetCachedResumePdf.js';
 
 function makeJd(pdf: Uint8Array | null, theme: string | null) {
@@ -11,11 +11,12 @@ function makeJd(pdf: Uint8Array | null, theme: string | null) {
     url: null,
     location: null,
     salaryRange: null,
-    level: null,
-    locationType: null,
+    level: JobLevel.UNKNOWN,
+    locationType: LocationType.UNKNOWN,
     source: JobSource.UPLOAD,
     postedAt: null,
-    resumeOutput: null,
+    soughtHardSkills: null,
+    soughtSoftSkills: null,
     resumePdf: pdf,
     resumePdfTheme: theme,
     createdAt: new Date('2024-01-01'),

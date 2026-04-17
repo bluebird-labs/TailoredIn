@@ -11,12 +11,14 @@ describe('EnrichCompanyData', () => {
   test('delegates to CompanyDataProvider and returns result', async () => {
     const enrichmentResult: CompanyEnrichmentResult = {
       name: 'GitHub',
+      description: null,
       website: 'https://github.com',
       logoUrl: 'https://logo.com/gh.png',
       linkedinLink: 'https://linkedin.com/company/github',
       businessType: null,
       industry: null,
-      stage: null
+      stage: null,
+      status: null
     };
 
     const useCase = new EnrichCompanyData(mockProvider(enrichmentResult));
@@ -28,12 +30,14 @@ describe('EnrichCompanyData', () => {
   test('returns nulls when provider cannot determine fields', async () => {
     const emptyResult: CompanyEnrichmentResult = {
       name: null,
+      description: null,
       website: null,
       logoUrl: null,
       linkedinLink: null,
       businessType: null,
       industry: null,
-      stage: null
+      stage: null,
+      status: null
     };
 
     const useCase = new EnrichCompanyData(mockProvider(emptyResult));
@@ -46,12 +50,14 @@ describe('EnrichCompanyData', () => {
   test('passes context to provider when provided', async () => {
     const enrichmentResult: CompanyEnrichmentResult = {
       name: 'Stripe',
+      description: null,
       website: 'https://stripe.com',
       logoUrl: null,
       linkedinLink: null,
       businessType: null,
       industry: null,
-      stage: null
+      stage: null,
+      status: null
     };
 
     const provider = mockProvider(enrichmentResult);
@@ -64,12 +70,14 @@ describe('EnrichCompanyData', () => {
   test('calls provider without context when not provided', async () => {
     const enrichmentResult: CompanyEnrichmentResult = {
       name: 'GitHub',
+      description: null,
       website: 'https://github.com',
       logoUrl: null,
       linkedinLink: null,
       businessType: null,
       industry: null,
-      stage: null
+      stage: null,
+      status: null
     };
 
     const provider = mockProvider(enrichmentResult);

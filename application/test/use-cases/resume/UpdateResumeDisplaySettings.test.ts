@@ -14,6 +14,7 @@ function makeResumeContent() {
     hiddenEducationIds: [],
     prompt: 'test',
     schema: null,
+    score: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   });
@@ -21,6 +22,7 @@ function makeResumeContent() {
 
 function mockRepo(resumeContent: ResumeContent | null): ResumeContentRepository {
   return {
+    findById: jest.fn(async () => resumeContent),
     findLatestByJobDescriptionId: jest.fn(async () => resumeContent),
     save: jest.fn(async () => {}),
     update: jest.fn(async () => {})

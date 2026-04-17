@@ -17,7 +17,6 @@ const makeLinkedExperience = () =>
     ordinal: 0,
     bulletMin: 2,
     bulletMax: 5,
-    accomplishments: [],
     createdAt: new Date(),
     updatedAt: new Date()
   });

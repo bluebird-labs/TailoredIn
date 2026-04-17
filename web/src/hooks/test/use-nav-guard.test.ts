@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 
 const mockUseBlocker = jest.fn(() => {});
+// @ts-expect-error jest.unstable_mockModule exists in Jest 30 but @types/jest lacks it
 jest.unstable_mockModule('@tanstack/react-router', () => ({
   useBlocker: mockUseBlocker
 }));

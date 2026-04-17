@@ -31,7 +31,7 @@ await MikroORM.init(
       Skill,
       SkillCategory
     ],
-    connect: false,
-    dbName: ':memory:'
+    dbName: ':memory:',
+    discovery: { warnWhenNoEntities: false }
   })
 );

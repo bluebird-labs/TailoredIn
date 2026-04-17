@@ -7,6 +7,7 @@ describe('Company', () => {
   const makeCompany = (overrides?: Partial<Parameters<typeof Company.create>[0]>) =>
     Company.create({
       name: 'Acme Corp',
+      domainName: 'acme.com',
       description: 'A test company',
       website: 'https://acme.com',
       logoUrl: null,

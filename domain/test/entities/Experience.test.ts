@@ -167,7 +167,9 @@ describe('Experience', () => {
         startDate: '2020-01',
         endDate: '2023-01',
         summary: null,
-        ordinal: 0
+        ordinal: 0,
+        bulletMin: 2,
+        bulletMax: 5
       });
       exp.addAccomplishment({ title: 'First', narrative: 'Narrative 1', ordinal: 0 });
       exp.addAccomplishment({ title: 'Second', narrative: 'Narrative 2', ordinal: 1 });

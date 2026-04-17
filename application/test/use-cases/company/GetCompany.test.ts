@@ -1,4 +1,11 @@
-import { Company, type CompanyRepository } from '@tailoredin/domain';
+import {
+  BusinessType,
+  Company,
+  type CompanyRepository,
+  CompanyStage,
+  CompanyStatus,
+  Industry
+} from '@tailoredin/domain';
 import { GetCompany } from '../../../src/use-cases/company/GetCompany.js';
 
 function makeCompany(overrides: Partial<ConstructorParameters<typeof Company>[0]> = {}): Company {
@@ -10,9 +17,10 @@ function makeCompany(overrides: Partial<ConstructorParameters<typeof Company>[0]
     website: 'https://acme.com',
     logoUrl: null,
     linkedinLink: 'https://linkedin.com/company/acme',
-    businessType: 'b2b',
-    industry: 'software',
-    stage: 'series_b',
+    businessType: BusinessType.B2B,
+    industry: Industry.SOFTWARE,
+    stage: CompanyStage.SERIES_B,
+    status: CompanyStatus.RUNNING,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides
@@ -26,7 +34,8 @@ describe('GetCompany', () => {
       findAll: jest.fn(),
       findById: jest.fn().mockResolvedValue(company),
       upsertByLinkedinLink: jest.fn(),
-      save: jest.fn()
+      save: jest.fn(),
+      delete: jest.fn()
     };
 
     const useCase = new GetCompany(repo);
@@ -42,7 +51,8 @@ describe('GetCompany', () => {
       findAll: jest.fn(),
       findById: jest.fn().mockResolvedValue(null),
       upsertByLinkedinLink: jest.fn(),
-      save: jest.fn()
+      save: jest.fn(),
+      delete: jest.fn()
     };
 
     const useCase = new GetCompany(repo);

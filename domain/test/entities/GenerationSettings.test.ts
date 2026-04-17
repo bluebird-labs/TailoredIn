@@ -136,6 +136,7 @@ describe('GenerationSettings', () => {
 describe('GenerationPrompt', () => {
   test('create sets fields and timestamps', () => {
     const prompt = GenerationPrompt.create({
+      generationSettingsId: crypto.randomUUID(),
       scope: GenerationScope.RESUME,
       content: 'Use active voice'
     });
@@ -149,6 +150,7 @@ describe('GenerationPrompt', () => {
   test('updateContent changes content and updatedAt', () => {
     const prompt = new GenerationPrompt({
       id: crypto.randomUUID(),
+      generationSettingsId: crypto.randomUUID(),
       scope: GenerationScope.HEADLINE,
       content: 'Original',
       createdAt: new Date('2024-01-01'),

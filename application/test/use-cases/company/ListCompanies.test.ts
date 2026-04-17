@@ -8,7 +8,8 @@ function mockCompanyRepo(companies: Company[]): CompanyRepository {
     upsertByLinkedinLink: async () => {
       throw new Error('Not implemented');
     },
-    save: async () => {}
+    save: async () => {},
+    delete: async () => {}
   };
 }
 
@@ -24,16 +25,17 @@ describe('ListCompanies', () => {
       Company.create({
         name: 'GitHub',
         domainName: 'github.com',
+        description: null,
         website: 'https://github.com',
         logoUrl: null,
         linkedinLink: null,
         businessType: BusinessType.PLATFORM,
-        industry: Industry.SOFTWARE,
-        stage: null
+        industry: Industry.SOFTWARE
       }),
       Company.create({
         name: 'Stripe',
         domainName: 'stripe.com',
+        description: null,
         website: 'https://stripe.com',
         logoUrl: null,
         linkedinLink: 'https://linkedin.com/company/stripe',

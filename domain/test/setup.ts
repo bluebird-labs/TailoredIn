@@ -11,8 +11,8 @@ import { Profile } from '../src/entities/Profile.js';
 import { ResumeContent } from '../src/entities/ResumeContent.js';
 
 // Initialize MikroORM metadata so Collection API works in domain unit tests.
-// connect: false — no database connection, just metadata registration.
-await MikroORM.init(
+// Synchronous constructor — no database connection, just metadata registration.
+new MikroORM(
   defineConfig({
     entities: [
       Profile,
@@ -26,7 +26,6 @@ await MikroORM.init(
       JobDescription,
       ResumeContent
     ],
-    connect: false,
     dbName: ':memory:'
   })
 );

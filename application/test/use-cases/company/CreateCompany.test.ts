@@ -1,15 +1,24 @@
-import { BusinessType, type Company, type CompanyRepository, CompanyStage, Industry } from '@tailoredin/domain';
+import {
+  BusinessType,
+  type Company,
+  type CompanyRepository,
+  CompanyStage,
+  CompanyStatus,
+  Industry
+} from '@tailoredin/domain';
 import { CreateCompany } from '../../../src/use-cases/company/CreateCompany.js';
 
 function mockCompanyRepo(onSave?: (c: Company) => void): CompanyRepository {
   return {
+    findAll: async () => [],
     findById: async () => null,
     upsertByLinkedinLink: async () => {
       throw new Error('Not implemented');
     },
     save: async (c: Company) => {
       onSave?.(c);
-    }
+    },
+    delete: async () => {}
   };
 }
 
@@ -26,12 +35,14 @@ describe('CreateCompany', () => {
     const dto = await useCase.execute({
       name: 'GitHub',
       domainName: 'github.com',
+      description: null,
       website: 'https://github.com',
       logoUrl: 'https://logo.com/gh.png',
       linkedinLink: 'https://linkedin.com/company/github',
       businessType: BusinessType.PLATFORM,
       industry: Industry.SOFTWARE,
-      stage: CompanyStage.LATE_STAGE
+      stage: CompanyStage.LATE_STAGE,
+      status: CompanyStatus.RUNNING
     });
 
     expect(typeof dto.id).toBe('string');
@@ -53,12 +64,14 @@ describe('CreateCompany', () => {
     const dto = await useCase.execute({
       name: 'SomeCo',
       domainName: 'someco.com',
+      description: null,
       website: null,
       logoUrl: null,
       linkedinLink: null,
       businessType: BusinessType.UNKNOWN,
       industry: Industry.UNKNOWN,
-      stage: CompanyStage.UNKNOWN
+      stage: CompanyStage.UNKNOWN,
+      status: CompanyStatus.UNKNOWN
     });
 
     expect(dto.name).toBe('SomeCo');

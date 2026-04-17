@@ -13,7 +13,9 @@ function makeExperience() {
     startDate: '2020-01',
     endDate: '2023-01',
     summary: null,
-    ordinal: 0
+    ordinal: 0,
+    bulletMin: 2,
+    bulletMax: 5
   });
   exp.addAccomplishment({ title: 'Old one', narrative: 'Old narrative', ordinal: 0 });
   return exp;

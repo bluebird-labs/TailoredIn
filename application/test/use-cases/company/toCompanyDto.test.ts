@@ -1,4 +1,4 @@
-import { Company } from '@tailoredin/domain';
+import { BusinessType, Company, CompanyStage, CompanyStatus, Industry } from '@tailoredin/domain';
 import { toCompanyDto } from '../../../src/dtos/CompanyDto.js';
 
 describe('toCompanyDto', () => {
@@ -6,12 +6,15 @@ describe('toCompanyDto', () => {
     const company = new Company({
       id: 'abc-123',
       name: 'GitHub',
+      domainName: 'github.com',
+      description: null,
       website: 'https://github.com',
       logoUrl: 'https://logo.com/gh.png',
       linkedinLink: 'https://linkedin.com/company/github',
-      businessType: null,
-      industry: null,
-      stage: null,
+      businessType: BusinessType.UNKNOWN,
+      industry: Industry.UNKNOWN,
+      stage: CompanyStage.UNKNOWN,
+      status: CompanyStatus.RUNNING,
       createdAt: new Date('2026-01-01'),
       updatedAt: new Date('2026-01-01')
     });
@@ -21,12 +24,15 @@ describe('toCompanyDto', () => {
     expect(dto).toEqual({
       id: 'abc-123',
       name: 'GitHub',
+      domainName: 'github.com',
+      description: null,
       website: 'https://github.com',
       logoUrl: 'https://logo.com/gh.png',
       linkedinLink: 'https://linkedin.com/company/github',
-      businessType: null,
-      industry: null,
-      stage: null
+      businessType: BusinessType.UNKNOWN,
+      industry: Industry.UNKNOWN,
+      stage: CompanyStage.UNKNOWN,
+      status: CompanyStatus.RUNNING
     });
   });
 
@@ -34,12 +40,15 @@ describe('toCompanyDto', () => {
     const company = new Company({
       id: 'abc-456',
       name: 'SomeCo',
+      domainName: 'someco.com',
+      description: null,
       website: null,
       logoUrl: null,
       linkedinLink: null,
-      businessType: null,
-      industry: null,
-      stage: null,
+      businessType: BusinessType.UNKNOWN,
+      industry: Industry.UNKNOWN,
+      stage: CompanyStage.UNKNOWN,
+      status: CompanyStatus.UNKNOWN,
       createdAt: new Date('2026-01-01'),
       updatedAt: new Date('2026-01-01')
     });
