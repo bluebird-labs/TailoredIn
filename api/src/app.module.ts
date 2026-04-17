@@ -1,4 +1,5 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -123,6 +124,7 @@ import { SkillController } from './skill/skill.controller.js';
       validate: config => EnvSchema.parse(config)
     }),
     MikroOrmModule.forRootAsync({
+      driver: PostgreSqlDriver,
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
         createOrmConfig({

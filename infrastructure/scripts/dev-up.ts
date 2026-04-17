@@ -72,6 +72,7 @@ async function startLocal(): Promise<void> {
     .map(([k, v]) => `${k}=${v}`)
     .join('\n');
   writeFileSync(resolve(repoRoot, '.env.local'), `${envContent}\n`);
+  Object.assign(process.env, envVars);
 
   checkPnpmInstall();
   assertDockerRunning();
@@ -107,18 +108,17 @@ async function startLocal(): Promise<void> {
 
   // Start dev servers
   log.info('Starting dev servers...');
-  const childEnv = { ...process.env, ...envVars };
 
   const apiProc = spawn('npx', ['tsx', '--watch', 'api/src/main.ts'], {
     cwd: repoRoot,
     stdio: 'inherit',
-    env: childEnv
+    env: process.env
   });
 
   const webProc = spawn('pnpm', ['--filter', '@tailoredin/web', 'run', 'dev', '--port', String(ports.webPort)], {
     cwd: repoRoot,
     stdio: 'inherit',
-    env: childEnv
+    env: process.env
   });
 
   log.info('Dev environment ready!');
