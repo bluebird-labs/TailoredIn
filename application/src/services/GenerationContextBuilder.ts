@@ -21,7 +21,8 @@ export class GenerationContextBuilder {
     @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
     @Inject(DI.Education.Repository) private readonly educationRepository: EducationRepository,
     @Inject(DI.Company.Repository) private readonly companyRepository: CompanyRepository,
-    @Inject(DI.GenerationSettings.Repository) private readonly generationSettingsRepository: GenerationSettingsRepository
+    @Inject(DI.GenerationSettings.Repository)
+    private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
   public async build(

@@ -17,9 +17,7 @@ export type UnlinkCompanyFromExperienceInput = {
 
 @Injectable()
 export class UnlinkCompanyFromExperience {
-  public constructor(
-    @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository
-  ) {}
+  public constructor(@Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository) {}
 
   public async execute(input: UnlinkCompanyFromExperienceInput): Promise<Result<ExperienceDto, Error>> {
     let experience: Experience;

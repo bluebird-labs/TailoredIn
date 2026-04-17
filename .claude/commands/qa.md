@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(bun run typecheck), Bash(bun run check), Bash(bun run check:fix), Bash(bun run test), Bash(bun run dep:check), Bash(git status:*), Bash(git diff:*)
+allowed-tools: Bash(pnpm run typecheck), Bash(pnpm run check), Bash(pnpm run check:fix), Bash(pnpm run test), Bash(pnpm run dep:check), Bash(git status:*), Bash(git diff:*)
 description: Run quality checks, open a dev terminal, and enter a test/feedback loop
 ---
 
@@ -10,7 +10,7 @@ description: Run quality checks, open a dev terminal, and enter a test/feedback 
 - Pending changes: !`git status --short`
 ## Your task
 
-Run quality checks and enter a manual test/feedback loop. A dev terminal has been opened in the worktree directory — the user can start `bun wt:up` there while checks run.
+Run quality checks and enter a manual test/feedback loop. A dev terminal has been opened in the worktree directory — the user can start `pnpm dev:up` there while checks run.
 
 ---
 
@@ -18,10 +18,10 @@ Run quality checks and enter a manual test/feedback loop. A dev terminal has bee
 
 Run these checks in order. Fix any issues before proceeding. If auto-fix resolves everything, continue. If issues remain that require judgment, STOP and ask.
 
-1. `bun run check:fix` — auto-fix lint/format
-2. `bun run typecheck` — fix any type errors before continuing
-3. `bun run test` — fix any failing tests before continuing
-4. `bun run dep:check` — fix any architecture violations before continuing
+1. `pnpm run check:fix` — auto-fix lint/format
+2. `pnpm run typecheck` — fix any type errors before continuing
+3. `pnpm run test` — fix any failing tests before continuing
+4. `pnpm run dep:check` — fix any architecture violations before continuing
 
 After all checks pass, tell the user:
 > ✅ All automated quality checks pass. Let me know when the dev environment is up and you've started testing, or say **"ready"** to continue.
@@ -40,8 +40,8 @@ Enter a loop. On each iteration:
 
 4. **Run quick checks after each fix:**
    ```
-   bun run check:fix
-   bun run typecheck
+   pnpm run check:fix
+   pnpm run typecheck
    ```
    Fix any issues. Do NOT run the full test suite on every iteration — only typecheck and lint.
 
@@ -57,10 +57,10 @@ Enter a loop. On each iteration:
 Run the full quality suite:
 
 ```
-bun run check:fix
-bun run typecheck
-bun run test
-bun run dep:check
+pnpm run check:fix
+pnpm run typecheck
+pnpm run test
+pnpm run dep:check
 ```
 
 Report the results. If everything passes, ask:

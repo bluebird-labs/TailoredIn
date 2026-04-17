@@ -1,113 +1,259 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
- * `bun dev:up` — Start the full dev environment (main branch only).
+ * `pnpm dev:up` — Start the full dev environment.
  *
- * 1. Checks if `bun install` is needed
- * 2. Starts PostgreSQL via Docker Compose
- * 3. Runs all pending migrations
- * 4. Runs the DatabaseSeeder
- * 5. Spawns API + web dev servers
+ * Supports two profiles:
+ *   --profile local       (default) Docker Postgres, branch-based port allocation
+ *   --profile production   Read .env.production, no Docker
  *
- * Reads config from `.env` via Bun's `--env-file` loading.
  * Idempotent: safe to call multiple times. Ctrl+C stops everything.
  */
+import { execSync, spawn } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { env, envInt, Logger } from '@tailoredin/core';
-import { checkBunInstall } from './BunInstall.js';
-import { requireMain } from './ContextGuard.js';
-import { resolveDevContext } from './DevContext.js';
-import { assertDockerRunning, composeUp, isContainerRunning, waitForPostgres } from './DockerCompose.js';
+import { envInt, Logger } from '@tailoredin/core';
+import {
+  assertDockerRunning,
+  composeUp,
+  isContainerRunning,
+  resolveComposeContext,
+  waitForPostgres
+} from './DockerCompose.js';
 import { runMigrations } from './MigrationRunner.js';
+import { checkPnpmInstall } from './PnpmInstall.js';
+import { portsForBranch, projectName } from './ports.js';
 import { runSeeds } from './SeedRunner.js';
 
 const log = Logger.create('dev:up');
 
-// ── Preflight ────────────────────────────────────────────────────
+// ── Parse CLI args ──────────────────────────────────────────────────
 
-const ctx = resolveDevContext();
-requireMain(ctx);
+const profileArg = process.argv.find((_, i, a) => a[i - 1] === '--profile') ?? 'local';
+if (profileArg !== 'local' && profileArg !== 'production') {
+  log.error(`Unknown profile: ${profileArg}. Use --profile local|production`);
+  process.exit(1);
+}
 
-log.info('Dev environment (main)');
+const repoRoot = resolve(import.meta.dirname, '../..');
 
-checkBunInstall();
-assertDockerRunning();
-
-// ── Start or verify database ─────────────────────────────────────
-
-if (isContainerRunning(ctx.containerName)) {
-  log.info('Database already running.');
+if (profileArg === 'local') {
+  await startLocal();
 } else {
-  log.info('Starting PostgreSQL...');
-  composeUp(ctx);
-  log.info('Waiting for PostgreSQL...');
-  await waitForPostgres(ctx.containerName);
+  await startProduction();
 }
 
-// ── Migrations + seeds ───────────────────────────────────────────
+// ── Local profile ───────────────────────────────────────────────────
 
-const dbConfig = {
-  timezone: env('TZ'),
-  user: env('POSTGRES_USER'),
-  password: env('POSTGRES_PASSWORD'),
-  dbName: env('POSTGRES_DB'),
-  schema: env('POSTGRES_SCHEMA'),
-  host: env('POSTGRES_HOST'),
-  port: envInt('POSTGRES_PORT')
-};
+async function startLocal(): Promise<void> {
+  const branch = execSync('git branch --show-current').toString().trim() || 'detached';
+  const ports = portsForBranch(branch);
+  const project = projectName(branch);
 
-log.info('Running migrations...');
-await runMigrations({ dbConfig, containerName: ctx.containerName, repoRoot: ctx.repoRoot });
+  log.info(`Profile: local | Branch: ${branch} | Ports: DB=${ports.dbPort} API=${ports.apiPort} Web=${ports.webPort}`);
 
-log.info('Running seeds...');
-await runSeeds(dbConfig);
+  // Generate .env.local
+  const envVars: Record<string, string> = {
+    APP_PROFILE: 'local',
+    NODE_ENV: 'development',
+    POSTGRES_HOST: 'localhost',
+    POSTGRES_PORT: String(ports.dbPort),
+    POSTGRES_USER: 'postgres',
+    POSTGRES_PASSWORD: 'postgres',
+    POSTGRES_DB: 'tailored_in',
+    POSTGRES_SCHEMA: 'public',
+    TZ: 'UTC',
+    API_PORT: String(ports.apiPort),
+    JWT_SECRET: 'dev-secret-key-minimum-length-32-characters-ok',
+    JWT_EXPIRES_IN_SECONDS: '604800',
+    CLAUDE_API_KEY: process.env.CLAUDE_API_KEY ?? 'missing_api_key'
+  };
 
-// ── Start dev servers ────────────────────────────────────────────
+  const envContent = Object.entries(envVars)
+    .map(([k, v]) => `${k}=${v}`)
+    .join('\n');
+  writeFileSync(resolve(repoRoot, '.env.local'), `${envContent}\n`);
 
-log.info('Starting dev servers...');
+  checkPnpmInstall();
+  assertDockerRunning();
 
-const envFile = resolve(ctx.workingDir, '.env');
+  // Start or verify database
+  const ctx = resolveComposeContext(branch, repoRoot);
 
-const apiProc = Bun.spawn(['bun', `--env-file=${envFile}`, '--watch', 'api/src/index.ts'], {
-  cwd: ctx.workingDir,
-  stdout: 'inherit',
-  stderr: 'inherit'
-});
+  if (isContainerRunning(ctx.containerName)) {
+    log.info('Database already running.');
+  } else {
+    log.info('Starting PostgreSQL...');
+    composeUp(ctx);
+    log.info('Waiting for PostgreSQL...');
+    await waitForPostgres(ctx.containerName);
+  }
 
-const webProc = Bun.spawn(['bun', `--env-file=${envFile}`, 'run', '--cwd', 'web', 'dev'], {
-  cwd: ctx.workingDir,
-  stdout: 'inherit',
-  stderr: 'inherit'
-});
+  // Migrations + seeds
+  const dbConfig = {
+    timezone: envVars.TZ,
+    user: envVars.POSTGRES_USER,
+    password: envVars.POSTGRES_PASSWORD,
+    dbName: envVars.POSTGRES_DB,
+    schema: envVars.POSTGRES_SCHEMA,
+    host: envVars.POSTGRES_HOST,
+    port: ports.dbPort
+  };
 
-log.info('Dev environment ready!');
-log.info(`  DB: localhost:${env('POSTGRES_PORT')} (${env('POSTGRES_DB')})`);
+  log.info('Running migrations...');
+  await runMigrations({ dbConfig, containerName: ctx.containerName, repoRoot });
 
-// ── Signal handling ──────────────────────────────────────────────
+  log.info('Running seeds...');
+  await runSeeds(dbConfig);
 
-let shuttingDown = false;
+  // Start dev servers
+  log.info('Starting dev servers...');
+  const childEnv = { ...process.env, ...envVars };
 
-function shutdown() {
-  if (shuttingDown) return;
-  shuttingDown = true;
-  log.info('Shutting down servers...');
-  apiProc.kill();
-  webProc.kill();
-}
+  const apiProc = spawn('npx', ['tsx', '--watch', 'api/src/main.ts'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: childEnv
+  });
 
-process.on('SIGINT', () => {
+  const webProc = spawn('pnpm', ['--filter', '@tailoredin/web', 'run', 'dev', '--port', String(ports.webPort)], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: childEnv
+  });
+
+  log.info('Dev environment ready!');
+  log.info(`  DB: localhost:${ports.dbPort} (${envVars.POSTGRES_DB})`);
+  log.info(`  API: http://localhost:${ports.apiPort}`);
+  log.info(`  Web: http://localhost:${ports.webPort}`);
+
+  // Write state file
+  writeFileSync(
+    resolve(repoRoot, '.dev-state.json'),
+    JSON.stringify(
+      {
+        profile: 'local',
+        branch,
+        pids: { api: apiProc.pid, web: webProc.pid },
+        ports: { db: ports.dbPort, api: ports.apiPort, web: ports.webPort },
+        projectName: project
+      },
+      null,
+      2
+    )
+  );
+
+  // Signal handling
+  let shuttingDown = false;
+  function shutdown() {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    log.info('Shutting down servers...');
+    apiProc.kill();
+    webProc.kill();
+  }
+
+  process.on('SIGINT', () => {
+    shutdown();
+    process.exit(0);
+  });
+  process.on('SIGTERM', () => {
+    shutdown();
+    process.exit(0);
+  });
+
+  await Promise.race([
+    new Promise<void>(res =>
+      apiProc.on('exit', code => {
+        if (code !== 0) log.error(`API exited with code ${code}`);
+        res();
+      })
+    ),
+    new Promise<void>(res =>
+      webProc.on('exit', code => {
+        if (code !== 0) log.error(`Web exited with code ${code}`);
+        res();
+      })
+    )
+  ]);
   shutdown();
-  process.exit(0);
-});
-process.on('SIGTERM', () => {
-  shutdown();
-  process.exit(0);
-});
-
-const exitCode = await Promise.race([
-  apiProc.exited.then(code => ({ process: 'API', code })),
-  webProc.exited.then(code => ({ process: 'Web', code }))
-]);
-if (exitCode.code !== 0) {
-  log.error(`${exitCode.process} server exited with code ${exitCode.code}`);
 }
-shutdown();
+
+// ── Production profile ──────────────────────────────────────────────
+
+async function startProduction(): Promise<void> {
+  const envFile = resolve(repoRoot, '.env.production');
+  try {
+    readFileSync(envFile, 'utf-8');
+  } catch {
+    log.error('.env.production not found. Create it from .env.production.example');
+    process.exit(1);
+  }
+
+  log.info('Profile: production');
+
+  // Load .env.production into process.env
+  const lines = readFileSync(envFile, 'utf-8').split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx);
+    const value = trimmed.slice(eqIdx + 1);
+    process.env[key] = value;
+  }
+
+  const apiPort = envInt('API_PORT');
+  const childEnv = { ...process.env };
+
+  const apiProc = spawn('npx', ['tsx', 'api/src/main.ts'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: childEnv
+  });
+
+  const webProc = spawn('pnpm', ['--filter', '@tailoredin/web', 'run', 'dev'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: childEnv
+  });
+
+  writeFileSync(
+    resolve(repoRoot, '.dev-state.json'),
+    JSON.stringify(
+      {
+        profile: 'production',
+        pids: { api: apiProc.pid, web: webProc.pid },
+        ports: { api: apiPort }
+      },
+      null,
+      2
+    )
+  );
+
+  log.info(`API: http://localhost:${apiPort}`);
+
+  let shuttingDown = false;
+  function shutdown() {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    log.info('Shutting down servers...');
+    apiProc.kill();
+    webProc.kill();
+  }
+
+  process.on('SIGINT', () => {
+    shutdown();
+    process.exit(0);
+  });
+  process.on('SIGTERM', () => {
+    shutdown();
+    process.exit(0);
+  });
+
+  await Promise.race([
+    new Promise<void>(res => apiProc.on('exit', () => res())),
+    new Promise<void>(res => webProc.on('exit', () => res()))
+  ]);
+  shutdown();
+}

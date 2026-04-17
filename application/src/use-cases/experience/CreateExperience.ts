@@ -26,7 +26,8 @@ export type CreateExperienceInput = {
 export class CreateExperience {
   public constructor(
     @Inject(DI.Experience.Repository) private readonly experienceRepository: ExperienceRepository,
-    @Inject(DI.GenerationSettings.Repository) private readonly generationSettingsRepository: GenerationSettingsRepository
+    @Inject(DI.GenerationSettings.Repository)
+    private readonly generationSettingsRepository: GenerationSettingsRepository
   ) {}
 
   public async execute(input: CreateExperienceInput): Promise<ExperienceDto> {

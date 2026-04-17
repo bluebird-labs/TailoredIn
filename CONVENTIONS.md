@@ -17,16 +17,16 @@ Every external dependency (database, HTTP, file system, LLM, environment variabl
 | Layer | DI approach |
 |---|---|
 | `domain/` | No DI framework. No external dependencies. Pure domain logic |
-| `application/` | Plain classes with explicit constructor parameters. No `@injectable()`, no `inject()` |
-| `infrastructure/` | `@injectable()` + `inject()` from `@needle-di/core` |
-| `api/`, `cli/` | Composition roots. Wire everything. `@injectable()` allowed on route classes |
+| `application/` | `@Injectable()` + `@Inject(DI.X.Y)` from `@nestjs/common` |
+| `infrastructure/` | `@Injectable()` + `@Inject()` from `@nestjs/common` |
+| `api/` | NestJS modules + controllers. Composition root via module providers |
 
-Use cases are plain classes — bound in composition roots via `useFactory`:
+Use cases are `@Injectable()` classes wired in NestJS modules:
 ```typescript
-container.bind({
-  provide: DI.Job.GetTopJob,
-  useFactory: () => new GetTopJob(container.get(DI.Job.Repository))
-});
+@Injectable()
+export class GetTopJob {
+  public constructor(@Inject(DI.Job.Repository) private readonly repo: JobRepository) {}
+}
 ```
 
 ## No Side Effects
@@ -45,9 +45,9 @@ Strict inward dependency rule:
 api/cli → infrastructure → application → domain → core
 ```
 
-- Enforced by `dependency-cruiser` — run `bun run dep:check`
-- DI framework decorators (`@injectable()`, `inject()`) only in `infrastructure/` and composition roots (`api/`, `cli/`)
-- Domain and application layers must remain framework-agnostic
+- Enforced by `dependency-cruiser` — run `pnpm run dep:check`
+- NestJS DI decorators (`@Injectable()`, `@Inject()`) in `application/`, `infrastructure/`, and `api/`
+- Domain layer must remain framework-agnostic (only MikroORM metadata decorators allowed)
 
 ## Domain Layer
 
@@ -67,16 +67,18 @@ api/cli → infrastructure → application → domain → core
 
 ## Infrastructure Layer
 
-- **Services**: `@injectable()` classes implementing application ports
+- **Services**: `@Injectable()` classes implementing application ports
 - **Repository implementations**: `Postgres<Entity>Repository`, thin wrappers around `EntityManager` (no ORM ↔ domain mapping — domain entities carry MikroORM decorators directly)
 - **DI tokens**: namespaced in `infrastructure/src/DI.ts` as `DI.Job.*`, `DI.Resume.*`
 
 ## API Layer
 
-- Each route is its own `@injectable()` class — **one file per route, organized in domain subdirectories** (e.g., `routes/experience/CreateExperienceRoute.ts`)
-- File naming: `<VerbNounRoute>.ts` (e.g., `GetTopJobRoute.ts`, `ChangeJobStatusRoute.ts`)
-- Each class has a `plugin()` method returning an Elysia instance
-- Composition root resolves routes: `container.get(RouteClass).plugin()`
+- **NestJS controllers** organized by domain (e.g., `controllers/experience/ExperienceController.ts`)
+- Zod DTOs via `createZodDto()` from `nestjs-zod` for request validation
+- Global `ZodValidationPipe` for automatic validation (422 on failure)
+- Global `JwtAuthGuard` with `@Public()` decorator to exempt routes
+- `@CurrentUser()` param decorator extracts `{ accountId, profileId }` from request
+- NestJS modules wire providers: `{ provide: DI.X.Y, useClass: PostgresXRepository }`
 
 ## API Conventions
 
@@ -153,7 +155,7 @@ Each route defines its own set of allowed sort fields. Unknown fields are ignore
 
 - Query parameter names use **snake_case** matching the field name (e.g., `target_salary`, `business_type`)
 - Array values use repeated params: `?status=NEW&status=APPLIED`
-- Elysia's `t.Union([t.Array(...), t.Enum(...)])` pattern handles both single and array values
+- Zod schemas with `z.array(z.nativeEnum(...))` handle array values via `createZodDto()`
 - Enum-based filters use the domain enum values directly
 
 ### Query Parameter Casing

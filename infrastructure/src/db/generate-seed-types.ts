@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
  * Generates seed-types.generated.ts from ORM entity metadata.
  * Re-run after migrations to keep seed data types in sync with the schema.

@@ -267,10 +267,7 @@ describe('EscoCsvParser', () => {
   describe('error handling', () => {
     test('throws EscoCsvParseError with row details on invalid data', async () => {
       const tmpPath = join(import.meta.dirname, 'fixtures', 'invalid_test.csv');
-      writeFileSync(
-        tmpPath,
-        'conceptType,conceptUri,code,preferredLabel,greenShare\nBadType,not-a-url,001,Test,abc\n'
-      );
+      writeFileSync(tmpPath, 'conceptType,conceptUri,code,preferredLabel,greenShare\nBadType,not-a-url,001,Test,abc\n');
 
       try {
         await parser.parse(tmpPath, GreenShareOccupationSchema);

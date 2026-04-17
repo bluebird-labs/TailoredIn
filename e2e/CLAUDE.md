@@ -5,9 +5,9 @@ Playwright E2E tests that run against a fully ephemeral environment (Testcontain
 ## Running tests
 
 ```bash
-bun e2e:test            # headless, from repo root
-bun e2e:test:headed     # visible browser
-bun e2e:test:ui         # Playwright UI mode
+pnpm e2e:test           # headless, from repo root
+pnpm e2e:test:headed    # visible browser
+pnpm e2e:test:ui        # Playwright UI mode
 ```
 
 All commands can be run from any branch — the environment is fully self-contained.
@@ -47,7 +47,7 @@ Tests run against seeded data from `infrastructure/src/db/seeds/`. The E2E seede
 ## CI integration
 
 The GitHub Actions CI pipeline (`ci.yaml`) runs E2E tests as a separate job with:
-- Browser installation step (`npx playwright install --with-deps chromium`)
+- Browser installation step (`pnpm exec playwright install --with-deps chromium`)
 - Artifact upload for test results
 - Path filtering — only runs when relevant files change
 
@@ -62,4 +62,4 @@ The GitHub Actions CI pipeline (`ci.yaml`) runs E2E tests as a separate job with
 
 - The `e2e/` package only has `@playwright/test` as a dependency — all server infrastructure lives in `infrastructure/scripts/`
 - Do **not** import from `@tailoredin/*` packages in test files — interact only through the browser
-- Dynamic ports avoid conflicts when running alongside `dev:up` or `wt:up`
+- Dynamic ports avoid conflicts when running alongside `dev:up`

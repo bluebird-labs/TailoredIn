@@ -1,35 +1,47 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 /**
- * `bun dev:down` — Stop the dev environment (main branch only).
+ * `pnpm dev:down` — Stop the dev environment.
  *
- * 1. Kills any running API + web dev server processes
- * 2. Stops PostgreSQL via Docker Compose (preserves volume)
- *
- * Idempotent: safe to call multiple times.
+ * 1. Reads .dev-state.json for PIDs and profile
+ * 2. Kills API + web processes
+ * 3. If local profile: stops Docker (--clean removes volumes)
+ * 4. Deletes .dev-state.json
  */
+import { existsSync, readFileSync, unlinkSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { Logger } from '@tailoredin/core';
-import { requireMain } from './ContextGuard.js';
-import { resolveDevContext } from './DevContext.js';
-import { composeDown, isContainerRunning } from './DockerCompose.js';
+import { composeDown, resolveComposeContext } from './DockerCompose.js';
 
 const log = Logger.create('dev:down');
 
-const ctx = resolveDevContext();
-requireMain(ctx);
+const repoRoot = resolve(import.meta.dirname, '../..');
+const statePath = resolve(repoRoot, '.dev-state.json');
+const clean = process.argv.includes('--clean');
 
-log.info('Stopping dev environment (main)');
-
-// Kill any running dev server processes (best-effort)
-log.info('Stopping dev servers...');
-Bun.spawnSync(['pkill', '-f', 'bun.*api/src/index.ts'], { stdout: 'ignore', stderr: 'ignore' });
-Bun.spawnSync(['pkill', '-f', 'bun.*--cwd web dev'], { stdout: 'ignore', stderr: 'ignore' });
-
-if (!isContainerRunning(ctx.containerName)) {
-  log.info('Nothing to tear down.');
+if (!existsSync(statePath)) {
+  log.info('No .dev-state.json found — nothing to tear down.');
   process.exit(0);
 }
 
-log.info('Stopping PostgreSQL...');
-composeDown(ctx, false);
+const state = JSON.parse(readFileSync(statePath, 'utf-8'));
 
+// Kill processes by stored PIDs
+log.info('Stopping dev servers...');
+for (const [name, pid] of Object.entries(state.pids ?? {}) as [string, number][]) {
+  try {
+    process.kill(pid, 'SIGTERM');
+    log.info(`Killed ${name} (PID ${pid})`);
+  } catch {
+    log.info(`${name} (PID ${pid}) already stopped`);
+  }
+}
+
+// Stop Docker if local profile
+if (state.profile === 'local' && state.branch) {
+  const ctx = resolveComposeContext(state.branch, repoRoot);
+  log.info('Stopping PostgreSQL...');
+  composeDown(ctx, clean);
+}
+
+unlinkSync(statePath);
 log.info('Done.');

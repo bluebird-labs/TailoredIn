@@ -32,8 +32,12 @@ export class ModernCvRenderer implements ResumeRenderer {
         });
 
         let stderr = '';
-        proc.stderr.on('data', (chunk: Buffer) => { stderr += chunk.toString(); });
-        proc.on('close', (code) => code === 0 ? resolve() : reject(new Error(`Typst compilation failed (exit ${code}): ${stderr}`)));
+        proc.stderr.on('data', (chunk: Buffer) => {
+          stderr += chunk.toString();
+        });
+        proc.on('close', code =>
+          code === 0 ? resolve() : reject(new Error(`Typst compilation failed (exit ${code}): ${stderr}`))
+        );
         proc.on('error', reject);
       });
 

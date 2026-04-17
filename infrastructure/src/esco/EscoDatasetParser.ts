@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EscoCsvParser } from './EscoCsvParser.js';
+import type { EscoCsvParser } from './EscoCsvParser.js';
 import type { EscoDataset } from './EscoDataset.js';
 import type { EscoDirectory } from './EscoDirectoryLoader.js';
 import { BroaderRelationOccPillarSchema } from './schemas/broader-relation-occ-pillar.js';

@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env tsx
 import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { MikroORM } from '@mikro-orm/postgresql';

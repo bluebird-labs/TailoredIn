@@ -5,14 +5,14 @@ Package: `@tailoredin/application`
 The orchestration layer — use cases coordinate domain objects and external services via port interfaces.
 
 **Hard rules:**
-- No DI framework annotations (`@injectable`, `inject`) — plain classes only
+- `@Injectable()` and `@Inject(DI.X.Y)` from `@nestjs/common` for DI wiring
 - No ORM imports (MikroORM, Kysely, etc.)
 - No HTTP framework imports
-- Only imports from `@tailoredin/domain` and `@tailoredin/core`
+- Only imports from `@tailoredin/domain`, `@tailoredin/core`, and `@nestjs/common` (DI decorators only)
 
 ## Keeping the diagram in sync
 
-**`application/APPLICATION.mmd` is the source of truth for the application layer.** Whenever you add, remove, or rename a use case, port, or DTO — regenerate with `bun run app:diagram`. The diagram must always reflect the code.
+**`application/APPLICATION.mmd` is the source of truth for the application layer.** Whenever you add, remove, or rename a use case, port, or DTO — regenerate with `pnpm run app:diagram`. The diagram must always reflect the code.
 
 ## Directory structure
 
@@ -36,17 +36,19 @@ Single `async execute(input)` method. One file per use case:
 ```typescript
 export type GetExperienceInput = { experienceId: string };
 
+@Injectable()
 export class GetExperience {
-  public constructor(private readonly experiences: ExperienceRepository) {}
+  public constructor(@Inject(DI.Experience.Repository) private readonly experiences: ExperienceRepository) {}
 
   public async execute(input: GetExperienceInput): Promise<ExperienceDto> {
-    const experience = await this.experiences.findByIdOrFail(new ExperienceId(input.experienceId));
+    const experience = await this.experiences.findByIdOrFail(input.experienceId);
     return toExperienceDto(experience);
   }
 }
 ```
 
 - Input type named `<UseCase>Input`
+- `@Injectable()` + `@Inject(DI.X.Y)` for DI wiring via NestJS
 - Constructor params are port interfaces or domain services — never concrete implementations
 - No `new ConcreteRepository()` inside use cases
 
@@ -108,7 +110,7 @@ Mock ports in tests — never use real database or HTTP:
 
 ```typescript
 const mockExperiences: ExperienceRepository = {
-  findByIdOrFail: vi.fn().mockResolvedValue(fakeExperience),
+  findByIdOrFail: jest.fn().mockResolvedValue(fakeExperience),
   // ...
 };
 const useCase = new GetExperience(mockExperiences);

@@ -80,7 +80,7 @@ Feature-based, not type-based — keep components close to the feature they serv
 
 Components live in `src/components/ui/`. They are exempt from Biome's `useNamingConvention` rule (they use kebab-case filenames by convention).
 
-To add a new shadcn component: `bunx shadcn@latest add <component>` from the `web/` directory.
+To add a new shadcn component: `pnpm exec shadcn@latest add <component>` from the `web/` directory.
 
 ## Query key structure
 
