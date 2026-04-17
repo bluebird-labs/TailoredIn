@@ -1,18 +1,129 @@
 {
   "$schema": "https://turbo.build/schema.json",
+
+  "globalDependencies": [
+    "tsconfig.base.json",
+    ".env.test"
+  ],
+
+  "globalEnv": [
+    "NODE_ENV",
+    "TZ"
+  ],
+
+  "globalPassThroughEnv": [
+    "CI",
+    "GITHUB_ACTIONS"
+  ],
+
   "tasks": {
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "description": "Type-check with tsc --noEmit",
+      "dependsOn": ["^typecheck"],
+      "outputs": []
     },
-    "test": {},
-    "test:coverage": {},
+
+    "test": {
+      "description": "Run unit tests via Jest",
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+
+    "test:coverage": {
+      "description": "Run unit tests with coverage reporting",
+      "dependsOn": ["^typecheck"],
+      "outputs": ["coverage/**"]
+    },
+
     "test:integration": {
-      "cache": false
+      "description": "Run integration tests against real PostgreSQL via Testcontainers",
+      "cache": false,
+      "passThroughEnv": [
+        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
+        "POSTGRES_DB", "POSTGRES_SCHEMA",
+        "API_PORT", "JWT_SECRET", "JWT_EXPIRES_IN_SECONDS", "CLAUDE_API_KEY"
+      ]
     },
-    "check": {},
+
     "build": {
+      "description": "Compile production build",
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
+    },
+
+    "check": {
+      "description": "Lint and format check via Biome",
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/biome.json"],
+      "outputs": []
+    },
+
+    "//#dev:docker": {
+      "description": "Start PostgreSQL via Docker Compose and wait for readiness",
+      "cache": false,
+      "passThroughEnv": [
+        "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB",
+        "GIT_BRANCH"
+      ]
+    },
+
+    "dev:migrate": {
+      "description": "Run pending database migrations",
+      "cache": false,
+      "dependsOn": ["//#dev:docker"],
+      "passThroughEnv": [
+        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
+        "POSTGRES_DB", "POSTGRES_SCHEMA", "TZ", "GIT_BRANCH"
+      ]
+    },
+
+    "dev:seed": {
+      "description": "Seed reference data",
+      "cache": false,
+      "dependsOn": ["dev:migrate"],
+      "passThroughEnv": [
+        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
+        "POSTGRES_DB", "POSTGRES_SCHEMA", "TZ"
+      ]
+    },
+
+    "dev": {
+      "description": "Start development server",
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["@tailoredin/infrastructure#dev:seed"],
+      "passThroughEnv": [
+        "APP_PROFILE", "API_PORT", "VITE_PORT",
+        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
+        "POSTGRES_DB", "POSTGRES_SCHEMA",
+        "JWT_SECRET", "JWT_EXPIRES_IN_SECONDS", "CLAUDE_API_KEY"
+      ]
+    },
+
+    "storybook": {
+      "description": "Start Storybook dev server",
+      "cache": false,
+      "persistent": true
+    },
+
+    "storybook:build": {
+      "description": "Build static Storybook",
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
+
+    "domain:diagram": {
+      "description": "Generate domain layer Mermaid diagram",
+      "cache": false
+    },
+
+    "app:diagram": {
+      "description": "Generate application layer Mermaid diagram",
+      "cache": false
+    },
+
+    "db:diagram": {
+      "description": "Generate database ER diagram from live DB",
+      "cache": false
     }
   }
 }
