@@ -7,7 +7,7 @@
     ".": "./src/main.ts"
   },
   "scripts": {
-    "dev": "tsx --watch src/main.ts",
+    "dev": "node --import @swc-node/register/esm-register --watch src/main.ts",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },

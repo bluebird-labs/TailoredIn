@@ -4,6 +4,7 @@
   "devDependencies": {
     "@biomejs/biome": "latest",
     "@jest/globals": "^30.3.0",
+    "@swc-node/register": "^1.11.1",
     "@swc/core": "^1.15.26",
     "@swc/jest": "^0.2.39",
     "@types/jest": "^30.0.0",
@@ -25,7 +26,7 @@
     "dev:migrate": "turbo run dev:migrate --filter=@tailoredin/infrastructure",
     "dev:seed": "turbo run dev:seed --filter=@tailoredin/infrastructure",
     "dev:migration:create": "pnpm --filter @tailoredin/infrastructure run migration:create",
-    "dev:set-password": "tsx infrastructure/scripts/set-password.ts",
+    "dev:set-password": "node --import @swc-node/register/esm-register infrastructure/scripts/set-password.ts",
     "web:dev": "pnpm --filter @tailoredin/web run dev",
     "web:build": "pnpm --filter @tailoredin/web run build",
     "web:storybook": "pnpm --filter @tailoredin/web run storybook",
@@ -43,17 +44,17 @@
     "e2e:test": "pnpm --filter @tailoredin/e2e run test",
     "e2e:test:ui": "pnpm --filter @tailoredin/e2e run test:ui",
     "e2e:test:headed": "pnpm --filter @tailoredin/e2e run test:headed",
-    "db:seed:generate-types": "tsx infrastructure/src/db/generate-seed-types.ts",
+    "db:seed:generate-types": "node --import @swc-node/register/esm-register infrastructure/src/db/generate-seed-types.ts",
     "domain:diagram": "tsx scripts/diagrams/domain/generate.ts",
     "app:diagram": "tsx scripts/diagrams/application/generate.ts",
     "db:diagram": "tsx scripts/diagrams/database/generate.ts",
     "diags": "turbo run domain:diagram app:diagram db:diagram",
-    "esco:import": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/esco-import.ts",
-    "linguist:import": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/linguist-import.ts",
-    "mind:import": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/mind-import.ts",
-    "tanova:import": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/tanova-import.ts",
-    "skills:sync": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/skills-sync.ts",
-    "skills:reset": "node --env-file=.env.local --import tsx/esm infrastructure/scripts/skills-reset.ts"
+    "esco:import": "node --env-file=.env.local --import @swc-node/register/esm-register infrastructure/scripts/esco-import.ts",
+    "linguist:import": "node --env-file=.env.local --import @swc-node/register/esm-register infrastructure/scripts/linguist-import.ts",
+    "mind:import": "node --env-file=.env.local --import @swc-node/register/esm-register infrastructure/scripts/mind-import.ts",
+    "tanova:import": "node --env-file=.env.local --import @swc-node/register/esm-register infrastructure/scripts/tanova-import.ts",
+    "skills:sync": "node --env-file=.env.local --import @swc-node/register/esm-register infrastructure/scripts/skills-sync.ts",
+    "skills:reset": "node --env-file=.env.local --import @swc-node/register/esm-register infrastructure/scripts/skills-reset.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
