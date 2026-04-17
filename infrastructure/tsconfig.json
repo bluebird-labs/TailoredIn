@@ -4,6 +4,6 @@
     "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["scripts/**/*"]
+  "include": ["src/**/*", "scripts/**/*"],
+  "exclude": ["scripts/e2e-start-servers.ts"]
 }
