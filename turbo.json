@@ -13,7 +13,20 @@
 
   "globalPassThroughEnv": [
     "CI",
-    "GITHUB_ACTIONS"
+    "GITHUB_ACTIONS",
+    "APP_PROFILE",
+    "POSTGRES_HOST",
+    "POSTGRES_PORT",
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_DB",
+    "POSTGRES_SCHEMA",
+    "API_PORT",
+    "VITE_PORT",
+    "JWT_SECRET",
+    "JWT_EXPIRES_IN_SECONDS",
+    "CLAUDE_API_KEY",
+    "GIT_BRANCH"
   ],
 
   "tasks": {
@@ -37,12 +50,7 @@
 
     "test:integration": {
       "description": "Run integration tests against real PostgreSQL via Testcontainers",
-      "cache": false,
-      "passThroughEnv": [
-        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
-        "POSTGRES_DB", "POSTGRES_SCHEMA",
-        "API_PORT", "JWT_SECRET", "JWT_EXPIRES_IN_SECONDS", "CLAUDE_API_KEY"
-      ]
+      "cache": false
     },
 
     "build": {
@@ -59,44 +67,26 @@
 
     "//#dev:docker": {
       "description": "Start PostgreSQL via Docker Compose and wait for readiness",
-      "cache": false,
-      "passThroughEnv": [
-        "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB",
-        "GIT_BRANCH"
-      ]
+      "cache": false
     },
 
     "dev:migrate": {
       "description": "Run pending database migrations",
       "cache": false,
-      "dependsOn": ["//#dev:docker"],
-      "passThroughEnv": [
-        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
-        "POSTGRES_DB", "POSTGRES_SCHEMA", "TZ", "GIT_BRANCH"
-      ]
+      "dependsOn": ["//#dev:docker"]
     },
 
     "dev:seed": {
       "description": "Seed reference data",
       "cache": false,
-      "dependsOn": ["dev:migrate"],
-      "passThroughEnv": [
-        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
-        "POSTGRES_DB", "POSTGRES_SCHEMA", "TZ"
-      ]
+      "dependsOn": ["dev:migrate"]
     },
 
     "dev": {
       "description": "Start development server",
       "cache": false,
       "persistent": true,
-      "dependsOn": ["@tailoredin/infrastructure#dev:seed"],
-      "passThroughEnv": [
-        "APP_PROFILE", "API_PORT", "VITE_PORT",
-        "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_PASSWORD",
-        "POSTGRES_DB", "POSTGRES_SCHEMA",
-        "JWT_SECRET", "JWT_EXPIRES_IN_SECONDS", "CLAUDE_API_KEY"
-      ]
+      "dependsOn": ["@tailoredin/infrastructure#dev:seed"]
     },
 
     "storybook": {
