@@ -1,6 +1,6 @@
 # Node + NestJS Migration Plan
 
-**Goal:** Migrate TailoredIn from Bun/Elysia/Needle DI to Node 22 LTS / NestJS / Jest / pnpm + Turborepo.
+**Goal:** Migrate TailoredIn from Bun/Elysia/Needle DI to Node 24 / NestJS / Jest / pnpm + Turborepo.
 
 ---
 
@@ -83,7 +83,7 @@ S2 touches only test files (imports, mocks) + bunfig.toml + package.json test sc
 - Verify all `workspace:*` references resolve under pnpm
 - Add `turbo.json` with tasks: `typecheck`, `test`, `test:coverage`, `test:integration`, `check`, `dep:check`, `knip`
 - Update root `package.json` scripts to use `turbo run` where appropriate
-- Update `.mise.toml` to add Node 22 alongside Bun (both coexist temporarily)
+- Update `.mise.toml` to add Node 24 alongside Bun (both coexist temporarily)
 - Delete `bun.lock`
 
 ### Does NOT change
@@ -363,7 +363,7 @@ S2 touches only test files (imports, mocks) + bunfig.toml + package.json test sc
 
 #### CI pipeline
 - Replace `setup-bun` action with `setup-node` + `setup-pnpm`
-- Pin Node 22 LTS
+- Pin Node 24
 - `pnpm install --frozen-lockfile`
 - `turbo run` for parallel jobs
 - `pnpm exec playwright install`
