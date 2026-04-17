@@ -9,6 +9,7 @@
     "@swc/jest": "^0.2.39",
     "@types/jest": "^30.0.0",
     "dependency-cruiser": "^17",
+    "dotenv": "^17.4.2",
     "jest": "^30.3.0",
     "knip": "^6.1.0",
     "ts-morph": "^27.0.2",

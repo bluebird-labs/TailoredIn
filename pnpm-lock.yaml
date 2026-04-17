@@ -29,6 +29,9 @@ importers:
       dependency-cruiser:
         specifier: ^17
         version: 17.3.10
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       jest:
         specifier: ^30.3.0
         version: 30.3.0(@types/node@22.19.17)
