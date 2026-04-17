@@ -10,7 +10,7 @@ import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from '../llm/LlmJsonRequest.js';
 
-const PROMPT_PATH = resolve(import.meta.dir, 'prompts/enrich-company.md');
+const PROMPT_PATH = resolve(import.meta.dirname, 'prompts/enrich-company.md');
 
 const companyEnrichmentSchema = z.object({
   name: z.string().nullable(),

@@ -1,13 +1,12 @@
-import { BunPasswordHasher } from '../../src/auth/BunPasswordHasher.js';
+import { Argon2PasswordHasher } from '../../src/auth/Argon2PasswordHasher.js';
 
-// TODO: S4 replaces BunPasswordHasher with Argon2PasswordHasher
-describe.skip('BunPasswordHasher', () => {
-  const hasher = new BunPasswordHasher();
+describe('Argon2PasswordHasher', () => {
+  const hasher = new Argon2PasswordHasher();
 
   test('hash returns a non-empty string different from input', async () => {
     const password = 'my-secret-password';
     const hashed = await hasher.hash(password);
-    expect(hashed).toBeString();
+    expect(typeof hashed).toBe('string');
     expect(hashed.length).toBeGreaterThan(0);
     expect(hashed).not.toBe(password);
   });

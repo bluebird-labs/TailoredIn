@@ -57,7 +57,7 @@ import {
 import { env, envInt, envOptional } from '@tailoredin/core';
 import {
   BulletParamsSection,
-  BunPasswordHasher,
+  Argon2PasswordHasher,
   CareerTimelineSection,
   ClaudeApiCompanyDataProvider,
   ClaudeApiCompanyDiscoveryProvider,
@@ -120,7 +120,7 @@ container.bind({ provide: MikroORM, useValue: orm });
 
 // Auth
 container.bind({ provide: DI.Auth.Repository, useClass: PostgresAccountRepository });
-container.bind({ provide: DI.Auth.PasswordHasher, useClass: BunPasswordHasher });
+container.bind({ provide: DI.Auth.PasswordHasher, useClass: Argon2PasswordHasher });
 container.bind({
   provide: DI.Auth.TokenIssuer,
   useFactory: () => new JwtTokenIssuer(env('JWT_SECRET'), envInt('JWT_EXPIRES_IN_SECONDS'))

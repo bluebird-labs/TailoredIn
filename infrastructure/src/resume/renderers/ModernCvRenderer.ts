@@ -1,12 +1,14 @@
 // infrastructure/src/resume/renderers/ModernCvRenderer.ts
 
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Injectable } from '@nestjs/common';
 import type { ResumeRenderer, ResumeRenderInput } from '@tailoredin/application';
+import { glob } from 'glob';
 import { generateModernCvTyp } from './modern-cv-generators.js';
 
-const FONTS_DIR = join(import.meta.dir, '../../../typst/fonts');
+const FONTS_DIR = join(import.meta.dirname, '../../../typst/fonts');
 
 @Injectable()
 export class ModernCvRenderer implements ResumeRenderer {
@@ -15,28 +17,27 @@ export class ModernCvRenderer implements ResumeRenderer {
 
     try {
       await mkdir(join(tmpDir, 'fonts'));
-      const fontsGlob = new Bun.Glob('**/*.{otf,ttf,woff,woff2}');
-      for await (const fontFile of fontsGlob.scan(FONTS_DIR)) {
-        // Flatten all font files into fonts/ — basenames are assumed unique across subdirectories
+      const fontFiles = await glob('**/*.{otf,ttf,woff,woff2}', { cwd: FONTS_DIR });
+      for (const fontFile of fontFiles) {
         const dest = join(tmpDir, 'fonts', fontFile.split('/').pop()!);
-        await Bun.write(dest, Bun.file(join(FONTS_DIR, fontFile)));
+        await copyFile(join(FONTS_DIR, fontFile), dest);
       }
 
       await writeFile(join(tmpDir, 'resume.typ'), generateModernCvTyp(input));
 
-      const proc = Bun.spawn(['typst', 'compile', '--font-path', './fonts', 'resume.typ', 'output.pdf'], {
-        cwd: tmpDir,
-        stderr: 'pipe'
+      await new Promise<void>((resolve, reject) => {
+        const proc = spawn('typst', ['compile', '--font-path', './fonts', 'resume.typ', 'output.pdf'], {
+          cwd: tmpDir,
+          stdio: ['ignore', 'ignore', 'pipe']
+        });
+
+        let stderr = '';
+        proc.stderr.on('data', (chunk: Buffer) => { stderr += chunk.toString(); });
+        proc.on('close', (code) => code === 0 ? resolve() : reject(new Error(`Typst compilation failed (exit ${code}): ${stderr}`)));
+        proc.on('error', reject);
       });
 
-      const exitCode = await proc.exited;
-      if (exitCode !== 0) {
-        const stderr = await new Response(proc.stderr).text();
-        throw new Error(`Typst compilation failed (exit ${exitCode}): ${stderr}`);
-      }
-
-      const pdfBuffer = await Bun.file(join(tmpDir, 'output.pdf')).arrayBuffer();
-      return new Uint8Array(pdfBuffer);
+      return await readFile(join(tmpDir, 'output.pdf'));
     } finally {
       await rm(tmpDir, { recursive: true, force: true });
     }

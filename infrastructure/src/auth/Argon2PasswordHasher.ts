@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import type { PasswordHasher } from '@tailoredin/domain';
+import argon2 from 'argon2';
 
 @Injectable()
-export class BunPasswordHasher implements PasswordHasher {
+export class Argon2PasswordHasher implements PasswordHasher {
   public async hash(password: string): Promise<string> {
-    return Bun.password.hash(password);
+    return argon2.hash(password);
   }
 
   public async verify(password: string, hash: string): Promise<boolean> {
-    return Bun.password.verify(password, hash);
+    return argon2.verify(hash, password);
   }
 }

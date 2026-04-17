@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import type { TokenIssuer } from '@tailoredin/application';
 
 function base64url(data: string | Uint8Array): string {
@@ -47,8 +48,8 @@ export class JwtTokenIssuer implements TokenIssuer {
   }
 
   private sign(input: string): string {
-    const hasher = new Bun.CryptoHasher('sha256', this.keyData);
-    hasher.update(input);
-    return base64url(hasher.digest());
+    const hmac = createHmac('sha256', this.keyData);
+    hmac.update(input);
+    return hmac.digest('base64url');
   }
 }

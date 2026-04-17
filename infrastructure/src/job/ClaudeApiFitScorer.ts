@@ -9,7 +9,7 @@ import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from '../llm/LlmJsonRequest.js';
 
-const PROMPT_PATH = resolve(import.meta.dir, 'prompts/score-fit.md');
+const PROMPT_PATH = resolve(import.meta.dirname, 'prompts/score-fit.md');
 
 const fitScoreSchema = z.object({
   overall: z.number().min(0).max(100),

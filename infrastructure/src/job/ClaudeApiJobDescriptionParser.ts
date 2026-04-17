@@ -10,7 +10,7 @@ import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 import { LlmJsonRequest } from '../llm/LlmJsonRequest.js';
 
-const PROMPT_PATH = resolve(import.meta.dir, 'prompts/parse-job-description.md');
+const PROMPT_PATH = resolve(import.meta.dirname, 'prompts/parse-job-description.md');
 
 const jobDescriptionParseSchema = z.object({
   title: z.string().nullable(),

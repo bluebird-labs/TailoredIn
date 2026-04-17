@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { Logger } from '@tailoredin/core';
 import { type TanovaSkill, TanovaTaxonomySchema } from './schemas/tanova-skill.js';
 
@@ -5,7 +6,7 @@ export class TanovaDatasetParser {
   private readonly log = Logger.create(this);
 
   public async parse(filePath: string): Promise<{ skills: TanovaSkill[]; version: string }> {
-    const raw = await Bun.file(filePath).json();
+    const raw = JSON.parse(await readFile(filePath, 'utf-8'));
     const taxonomy = TanovaTaxonomySchema.parse(raw);
 
     const skills: TanovaSkill[] = [];

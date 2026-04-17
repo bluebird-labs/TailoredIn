@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { Injectable } from '@nestjs/common';
 import { type ZodError, type ZodObject, type ZodRawShape, type ZodTypeAny, z } from 'zod';
 import { parseCSVContent } from 'zod-csv';
@@ -14,7 +15,7 @@ export class EscoCsvParser {
    * @throws {EscoCsvParseError} when one or more rows fail validation
    */
   public async parse<T extends ZodObject<ZodRawShape>>(filePath: string, schema: T): Promise<z.infer<T>[]> {
-    const content = await Bun.file(filePath).text();
+    const content = await readFile(filePath, 'utf-8');
 
     const headers = this.extractHeaders(content);
     const extractionSchema = this.buildExtractionSchema(headers);

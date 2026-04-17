@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { Logger } from '@tailoredin/core';
 import YAML from 'yaml';
 import type { ZodError } from 'zod';
@@ -9,7 +10,7 @@ export class LinguistParser {
   private readonly log = Logger.create('linguist-parser');
 
   public async parse(filePath: string): Promise<ParsedLinguistLanguage[]> {
-    const content = await Bun.file(filePath).text();
+    const content = await readFile(filePath, 'utf-8');
     const raw = YAML.parse(content) as Record<string, unknown>;
 
     const validated: ParsedLinguistLanguage[] = [];

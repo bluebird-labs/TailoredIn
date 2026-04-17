@@ -14,6 +14,6 @@
     "declaration": true,
     "inlineSourceMap": true,
     "outDir": "./dist",
-    "types": ["node", "bun-types"]
+    "types": ["node"]
   }
 }

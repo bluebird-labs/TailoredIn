@@ -18,13 +18,6 @@ const config: Config = {
       module: { type: 'es6' },
     }],
   },
-  // TODO: S4 removes Bun APIs from production code, then un-skip these
-  testPathIgnorePatterns: [
-    'test-integration/esco/',
-    'test-integration/linguist/',
-    'test-integration/mind/',
-    'test-integration/tanova/',
-  ],
   setupFilesAfterEnv: ['../test/jest-globals.ts'],
 };
 

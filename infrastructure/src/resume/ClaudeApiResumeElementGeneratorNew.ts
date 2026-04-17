@@ -11,7 +11,7 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DI } from '../DI.js';
 import type { ClaudeApiProvider } from '../llm/ClaudeApiProvider.js';
 
-const LOG_BASE_DIR = resolve(import.meta.dir, '../../../logs/llm');
+const LOG_BASE_DIR = resolve(import.meta.dirname, '../../../logs/llm');
 const IS_TEST = process.env.NODE_ENV === 'test';
 
 @Injectable()
