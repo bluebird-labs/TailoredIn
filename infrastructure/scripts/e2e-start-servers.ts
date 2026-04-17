@@ -75,7 +75,8 @@ process.env.LINKEDIN_PASSWORD = 'test';
 process.env.HEADLESS = 'true';
 process.env.SLOW_MO = '0';
 
-await import('../../api/src/index.js');
+const { bootstrap } = await import('../../api/src/main.js');
+await bootstrap();
 await waitForHealth(`http://localhost:${apiPort}/health`);
 log.info('API ready');
 
