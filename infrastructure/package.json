@@ -15,7 +15,9 @@
     "migration:create": "pnpm exec mikro-orm migration:create",
     "migration:up": "pnpm exec mikro-orm migration:up",
     "seed:run": "pnpm exec mikro-orm seeder:run",
-    "seed:run:e2e": "pnpm exec mikro-orm seeder:run --class=E2eSeeder"
+    "seed:run:e2e": "pnpm exec mikro-orm seeder:run --class=E2eSeeder",
+    "dev:migrate": "tsx scripts/dev-migrate.ts",
+    "dev:seed": "tsx scripts/dev-seed.ts"
   },
   "mikro-orm": {
     "configPaths": [
