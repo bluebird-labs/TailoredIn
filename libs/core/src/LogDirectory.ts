@@ -1,19 +1,19 @@
 import { mkdirSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
-const BASE_DIR = join(tmpdir(), 'tailoredin');
+const REPO_ROOT = resolve(import.meta.dirname, '../../..');
+const BASE_DIR = join(REPO_ROOT, '.local');
 
-function getTmpSubdirectory(subdirectory: string, ...segments: string[]): string {
+function getSubdirectory(subdirectory: string, ...segments: string[]): string {
   const dir = join(BASE_DIR, subdirectory, ...segments);
   mkdirSync(dir, { recursive: true });
   return dir;
 }
 
 export function getLogDirectory(...segments: string[]): string {
-  return getTmpSubdirectory('logs', ...segments);
+  return getSubdirectory('logs', ...segments);
 }
 
 export function getBackupDirectory(...segments: string[]): string {
-  return getTmpSubdirectory('backups', ...segments);
+  return getSubdirectory('backups', ...segments);
 }
