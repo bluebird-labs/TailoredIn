@@ -16,8 +16,8 @@ const AUTH_STATE_PATH = resolve(import.meta.dirname, '..', '.auth-state.json');
  * from e2e/node_modules which only has @playwright/test.
  */
 export default async function globalSetup(_config: FullConfig): Promise<() => Promise<void>> {
-  const repoRoot = resolve(import.meta.dirname, '../..');
-  const scriptPath = resolve(repoRoot, 'infrastructure/scripts/e2e-start-servers.ts');
+  const repoRoot = resolve(import.meta.dirname, '../../..');
+  const scriptPath = resolve(repoRoot, 'libs/infrastructure/scripts/e2e-start-servers.ts');
 
   const { webPort, apiPort, process: proc } = await new Promise<{
     webPort: number;
