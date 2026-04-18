@@ -11,13 +11,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm + Turborepo monorepo — **TailoredIn** — structured as four Onion Architecture layers plus a cross-cutting `core/` package.
 
 ```
-core/            ← Cross-cutting pure utilities (no domain, no framework deps)
-domain/          ← Single package: aggregates, value objects, domain services
-application/     ← Single package: use cases + ports + DTOs (@Injectable, no framework beyond DI)
-infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
-api/             ← NestJS HTTP server + module composition root
-web/             ← React 19 SPA (consumes api/ via generated OpenAPI client)
-e2e/             ← Playwright end-to-end tests
+libs/
+  core/            ← Cross-cutting pure utilities (no domain, no framework deps)
+  domain/          ← Single package: aggregates, value objects, domain services
+  application/     ← Single package: use cases + ports + DTOs (@Injectable, no framework beyond DI)
+  infrastructure/  ← Single package: ORM entities, repository impls, external service adapters, DI tokens
+apps/
+  api/             ← NestJS HTTP server + module composition root
+  web/             ← React 19 SPA (consumes api/ via generated OpenAPI client)
+  e2e/             ← Playwright end-to-end tests
 ```
 
 **Dependency rule (inward only):**
@@ -29,13 +31,13 @@ web → api → infrastructure → application → domain → (core)
 
 | Layer | Package | Purpose | Details |
 |---|---|---|---|
-| `core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) | [core/CLAUDE.md](core/CLAUDE.md) |
-| `domain/` | `@tailoredin/domain` | Aggregates, value objects, domain services | [domain/CLAUDE.md](domain/CLAUDE.md) |
-| `application/` | `@tailoredin/application` | Use cases, ports, DTOs | [application/CLAUDE.md](application/CLAUDE.md) |
-| `infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, DI tokens | [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) |
-| `api/` | `@tailoredin/api` | NestJS HTTP controllers + module composition root | [api/CLAUDE.md](api/CLAUDE.md) |
-| `web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend | [web/CLAUDE.md](web/CLAUDE.md) |
-| `e2e/` | `@tailoredin/e2e` | Playwright end-to-end tests | [e2e/CLAUDE.md](e2e/CLAUDE.md) |
+| `libs/core/` | `@tailoredin/core` | Shared TypeScript utilities (EnumUtil, TimeUtil, ColorUtil, Environment, etc.) | [libs/core/CLAUDE.md](libs/core/CLAUDE.md) |
+| `libs/domain/` | `@tailoredin/domain` | Aggregates, value objects, domain services | [libs/domain/CLAUDE.md](libs/domain/CLAUDE.md) |
+| `libs/application/` | `@tailoredin/application` | Use cases, ports, DTOs | [libs/application/CLAUDE.md](libs/application/CLAUDE.md) |
+| `libs/infrastructure/` | `@tailoredin/infrastructure` | MikroORM entities + repositories, PostgreSQL migrations, DI tokens | [libs/infrastructure/CLAUDE.md](libs/infrastructure/CLAUDE.md) |
+| `apps/api/` | `@tailoredin/api` | NestJS HTTP controllers + module composition root | [apps/api/CLAUDE.md](apps/api/CLAUDE.md) |
+| `apps/web/` | `@tailoredin/web` | React 19 + Vite + TanStack Router/Query + shadcn/ui frontend | [apps/web/CLAUDE.md](apps/web/CLAUDE.md) |
+| `apps/e2e/` | `@tailoredin/e2e` | Playwright end-to-end tests | [apps/e2e/CLAUDE.md](apps/e2e/CLAUDE.md) |
 
 ## Commands
 
@@ -53,7 +55,7 @@ pnpm dev:migration:create    # create a new migration
 pnpm dev:migration:up        # run pending migrations
 pnpm dev:seed                # seed the database
 pnpm dev:set-password        # set password for an account (creates if needed)
-pnpm dev:diagram             # regenerate infrastructure/DATABASE.mmd (needs DB running)
+pnpm dev:diagram             # regenerate libs/infrastructure/DATABASE.mmd (needs DB running)
 ```
 
 `dev:up` auto-detects the current branch and allocates deterministic ports (DB, API, Web) via branch-name hashing. On `main`, ports are 5432/8000/5173. On feature branches, ports are offset to avoid collisions. State is stored in `.dev-state.json`.
@@ -87,9 +89,9 @@ pnpm --filter @tailoredin/infrastructure run test:integration  # integration tes
 ### Diagrams
 
 ```bash
-pnpm run domain:diagram      # regenerate domain/DOMAIN.mmd
-pnpm run app:diagram         # regenerate application/APPLICATION.mmd
-pnpm run db:diagram          # regenerate infrastructure/DATABASE.mmd (needs DB running)
+pnpm run domain:diagram      # regenerate libs/domain/DOMAIN.mmd
+pnpm run app:diagram         # regenerate libs/application/APPLICATION.mmd
+pnpm run db:diagram          # regenerate libs/infrastructure/DATABASE.mmd (needs DB running)
 pnpm run diags               # regenerate all three diagrams in parallel (via Turborepo)
 ```
 
@@ -110,17 +112,17 @@ pnpm run web:dev             # Vite dev server
 
 TypeScript is executed via `tsx` (TypeScript Execute). `typecheck` scripts exist only to surface type errors.
 
-**Test runner**: Jest (unit + integration). Integration tests in `infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `e2e/` use `@playwright/test`.
+**Test runner**: Jest (unit + integration). Integration tests in `libs/infrastructure/test-integration/` use Testcontainers (real Postgres, 60 s timeout). E2E tests in `apps/e2e/` use `@playwright/test`.
 
 ### Testing Strategy by Layer
 
 | Layer | Unit | Integration | E2E |
 |---|---|---|---|
-| `core/`, `domain/` | Yes | — | — |
-| `application/` | Yes (mock ports) | — | — |
-| `infrastructure/` | Yes | Yes (Testcontainers) | — |
-| `api/` | — | — | Yes |
-| `web/` | — | — | Yes |
+| `libs/core/`, `libs/domain/` | Yes | — | — |
+| `libs/application/` | Yes (mock ports) | — | — |
+| `libs/infrastructure/` | Yes | Yes (Testcontainers) | — |
+| `apps/api/` | — | — | Yes |
+| `apps/web/` | — | — | Yes |
 
 ## Session Hygiene
 
@@ -142,9 +144,9 @@ Before ending a session, run `git status`. If there are unstaged or untracked fi
 
 | Diagram | Covers | Regenerate |
 |---|---|---|
-| `domain/DOMAIN.mmd` | Aggregates, entities, value objects, enums, relationships | `pnpm run domain:diagram` |
-| `application/APPLICATION.mmd` | Use cases, ports, DTOs, orchestration flows | `pnpm run app:diagram` |
-| `infrastructure/DATABASE.mmd` | Database tables, columns, indexes, FK relationships | `pnpm run db:diagram` |
+| `libs/domain/DOMAIN.mmd` | Aggregates, entities, value objects, enums, relationships | `pnpm run domain:diagram` |
+| `libs/application/APPLICATION.mmd` | Use cases, ports, DTOs, orchestration flows | `pnpm run app:diagram` |
+| `libs/infrastructure/DATABASE.mmd` | Database tables, columns, indexes, FK relationships | `pnpm run db:diagram` |
 
 **Before modifying any layer, read its diagram to understand current state.** These are auto-generated from code — regenerate after changes and commit the result.
 
@@ -154,18 +156,18 @@ See **`CONVENTIONS.md`** for detailed coding standards: OOP-first design, DI pat
 
 ## Key Design Decisions
 
-- **NestJS DI throughout**: Use cases in `application/` have `@Injectable()` + `@Inject(DI.X.Y)`. Infrastructure services use `@Injectable()`. NestJS modules wire everything.
+- **NestJS DI throughout**: Use cases in `libs/application/` have `@Injectable()` + `@Inject(DI.X.Y)`. Infrastructure services use `@Injectable()`. NestJS modules wire everything.
 - **Zod validation**: Request DTOs use `createZodDto()` from `nestjs-zod`. Global `ZodValidationPipe` returns 422 on validation failures. No class-validator.
-- **Merged domain + ORM entities**: Domain entities in `domain/src/entities/` carry MikroORM decorators directly. There is no separate ORM entity layer. Repositories are thin wrappers around `EntityManager` (persist + flush).
+- **Merged domain + ORM entities**: Domain entities in `libs/domain/src/entities/` carry MikroORM decorators directly. There is no separate ORM entity layer. Repositories are thin wrappers around `EntityManager` (persist + flush).
 - **Plain string IDs**: All entity IDs are plain `string` UUIDs (`public readonly id!: string`). There are no `<Entity>Id` value objects — IDs were simplified to plain strings. Use `crypto.randomUUID()` in factories.
-- **DI tokens & wiring**: see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for the full workflow of adding new services.
+- **DI tokens & wiring**: see [libs/infrastructure/CLAUDE.md](libs/infrastructure/CLAUDE.md) for the full workflow of adding new services.
 - **Profile-based environment**: `dev:up` uses `--profile local|production`. Local profile auto-generates `.env.local` with branch-specific ports. Production reads `.env.production`.
 
 ## Entry Points
 
-- `api/src/main.ts` — NestJS bootstrap (starts Express server)
-- `web/src/main.tsx` — React SPA entry point
-- PostgreSQL via MikroORM — see [infrastructure/CLAUDE.md](infrastructure/CLAUDE.md) for database conventions
+- `apps/api/src/main.ts` — NestJS bootstrap (starts Express server)
+- `apps/web/src/main.tsx` — React SPA entry point
+- PostgreSQL via MikroORM — see [libs/infrastructure/CLAUDE.md](libs/infrastructure/CLAUDE.md) for database conventions
 
 ## Frontend Route Structure
 
@@ -245,5 +247,5 @@ GitHub Actions (`.github/workflows/ci.yaml`) runs on push to `main` and PRs. Pat
 
 Before writing or modifying frontend code, read these specs:
 
-- **[web/design/design-system.md](web/design/design-system.md)** — OKLch color tokens, typography scale, component styling rules (borders not shadows, no bold/semibold text)
-- **[web/design/ux-guidelines.md](web/design/ux-guidelines.md)** — click-to-edit interaction pattern, mutual exclusion of editable sections, validation timing, modal vs inline editing rules
+- **[apps/web/design/design-system.md](apps/web/design/design-system.md)** — OKLch color tokens, typography scale, component styling rules (borders not shadows, no bold/semibold text)
+- **[apps/web/design/ux-guidelines.md](apps/web/design/ux-guidelines.md)** — click-to-edit interaction pattern, mutual exclusion of editable sections, validation timing, modal vs inline editing rules

@@ -9,7 +9,7 @@ module.exports = {
       from: {},
       to: {
         circular: true,
-        pathNot: '^(infrastructure/src/db/entities/[^/]+/|domain/src/entities/)'
+        pathNot: '^(libs/infrastructure/src/db/entities/[^/]+/|libs/domain/src/entities/)'
       }
     },
 
@@ -19,8 +19,8 @@ module.exports = {
       severity: 'error',
       comment:
         'domain is the innermost ring: only shared utilities allowed, no application/infrastructure/api/web imports.',
-      from: { path: '^domain/' },
-      to: { path: '^(application|infrastructure|api|web)/' }
+      from: { path: '^libs/domain/' },
+      to: { path: '^(libs/application|libs/infrastructure|apps/api|apps/web)/' }
     },
 
     // ── application: only domain ──────────────────────────────────────
@@ -28,8 +28,8 @@ module.exports = {
       name: 'application-no-infra',
       severity: 'error',
       comment: 'application must not depend on infrastructure, api, or web.',
-      from: { path: '^application/' },
-      to: { path: '^(infrastructure|api|web)/' }
+      from: { path: '^libs/application/' },
+      to: { path: '^(libs/infrastructure|apps/api|apps/web)/' }
     },
 
     // ── infrastructure: no api/cli/web ───────────────────────────────
@@ -37,8 +37,8 @@ module.exports = {
       name: 'infrastructure-no-entrypoints',
       severity: 'error',
       comment: 'infrastructure must not depend on api or web.',
-      from: { path: '^infrastructure/', pathNot: '^infrastructure/scripts/e2e-' },
-      to: { path: '^(api|web)/' }
+      from: { path: '^libs/infrastructure/', pathNot: '^libs/infrastructure/scripts/e2e-' },
+      to: { path: '^(apps/api|apps/web)/' }
     },
 
     // ── web: only public subpath exports ─────────────────────────────
@@ -46,36 +46,36 @@ module.exports = {
       name: 'web-only-api-client',
       severity: 'error',
       comment: 'web may only import from @tailoredin/api/client, not the full api barrel.',
-      from: { path: '^web/' },
-      to: { path: '^api/src/', pathNot: '^api/src/client\\.ts$' }
+      from: { path: '^apps/web/' },
+      to: { path: '^apps/api/src/', pathNot: '^apps/api/src/client\\.ts$' }
     },
     {
       name: 'web-no-domain',
       severity: 'error',
       comment: 'web must not depend on domain directly. Use @tailoredin/api/client to re-export what web needs.',
-      from: { path: '^web/' },
-      to: { path: '^domain/' }
+      from: { path: '^apps/web/' },
+      to: { path: '^libs/domain/' }
     },
     {
       name: 'web-no-infrastructure',
       severity: 'error',
       comment: 'web must not depend on infrastructure.',
-      from: { path: '^web/' },
-      to: { path: '^infrastructure/' }
+      from: { path: '^apps/web/' },
+      to: { path: '^libs/infrastructure/' }
     },
     {
       name: 'web-no-application',
       severity: 'error',
       comment: 'web must not depend on application.',
-      from: { path: '^web/' },
-      to: { path: '^application/' }
+      from: { path: '^apps/web/' },
+      to: { path: '^libs/application/' }
     },
     {
       name: 'web-no-core',
       severity: 'error',
       comment: 'web must not depend on core.',
-      from: { path: '^web/' },
-      to: { path: '^core/' }
+      from: { path: '^apps/web/' },
+      to: { path: '^libs/core/' }
     }
   ],
 

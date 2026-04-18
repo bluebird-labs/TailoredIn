@@ -19,10 +19,10 @@ import { ApplicationDiagramAssembler } from './ApplicationDiagramAssembler.js';
 import { ApplicationExtractor } from './ApplicationExtractor.js';
 
 const ROOT = resolve(import.meta.dirname, '../../..');
-const BARREL_PATH = resolve(ROOT, 'application/src/index.ts');
-const OUTPUT_PATH = resolve(ROOT, 'application/APPLICATION.mmd');
+const BARREL_PATH = resolve(ROOT, 'libs/application/src/index.ts');
+const OUTPUT_PATH = resolve(ROOT, 'libs/application/APPLICATION.mmd');
 
-const project = TsMorphProjectFactory.create(resolve(ROOT, 'application/tsconfig.json'));
+const project = TsMorphProjectFactory.create(resolve(ROOT, 'libs/application/tsconfig.json'));
 
 const entries = BarrelResolver.resolveTwoLevelEntries(project, BARREL_PATH, ['use-cases', 'ports', 'dtos', 'errors']);
 

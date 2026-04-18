@@ -6,7 +6,7 @@ Coding conventions for the TailoredIn codebase. All contributors (human and AI) 
 
 All code is class-based. No `{}` object literals with class-like behavior.
 
-- Static-only utility classes use `namespace` (e.g., `EnumUtil`, `TimeUtil`, `StringUtil` in `core/src/`)
+- Static-only utility classes use `namespace` (e.g., `EnumUtil`, `TimeUtil`, `StringUtil` in `libs/core/src/`)
 - All class members must have **explicit visibility** (`public`, `private`, `protected`) — enforced by Biome's `useConsistentMemberAccessibility`
 - No `any` — enforced by Biome's `noExplicitAny`. Exceptions require a `biome-ignore` comment with a reason and must be approved
 
@@ -16,10 +16,10 @@ Every external dependency (database, HTTP, file system, LLM, environment variabl
 
 | Layer | DI approach |
 |---|---|
-| `domain/` | No DI framework. No external dependencies. Pure domain logic |
-| `application/` | `@Injectable()` + `@Inject(DI.X.Y)` from `@nestjs/common` |
-| `infrastructure/` | `@Injectable()` + `@Inject()` from `@nestjs/common` |
-| `api/` | NestJS modules + controllers. Composition root via module providers |
+| `libs/domain/` | No DI framework. No external dependencies. Pure domain logic |
+| `libs/application/` | `@Injectable()` + `@Inject(DI.X.Y)` from `@nestjs/common` |
+| `libs/infrastructure/` | `@Injectable()` + `@Inject()` from `@nestjs/common` |
+| `apps/api/` | NestJS modules + controllers. Composition root via module providers |
 
 Use cases are `@Injectable()` classes wired in NestJS modules:
 ```typescript
@@ -31,8 +31,8 @@ export class GetTopJob {
 
 ## No Side Effects
 
-- **No direct `process.env` access** outside composition roots and `core/src/Environment.ts`
-  - `core/src/Logger.ts` is the one allowed exception (bootstrap-time circular dependency with `Environment`)
+- **No direct `process.env` access** outside composition roots and `libs/core/src/Environment.ts`
+  - `libs/core/src/Logger.ts` is the one allowed exception (bootstrap-time circular dependency with `Environment`)
   - Config values (DB connection, API keys, feature flags) must be injected via DI tokens or factory function parameters
 - **No direct file system calls, API calls, or I/O** outside the infrastructure layer
 - All I/O goes through injected ports so it can be stubbed in tests
@@ -42,11 +42,11 @@ export class GetTopJob {
 Strict inward dependency rule:
 
 ```
-api/cli → infrastructure → application → domain → core
+apps/api → libs/infrastructure → libs/application → libs/domain → libs/core
 ```
 
 - Enforced by `dependency-cruiser` — run `pnpm run dep:check`
-- NestJS DI decorators (`@Injectable()`, `@Inject()`) in `application/`, `infrastructure/`, and `api/`
+- NestJS DI decorators (`@Injectable()`, `@Inject()`) in `libs/application/`, `libs/infrastructure/`, and `apps/api/`
 - Domain layer must remain framework-agnostic (only MikroORM metadata decorators allowed)
 
 ## Domain Layer
@@ -54,7 +54,7 @@ api/cli → infrastructure → application → domain → core
 - Entities extend `AggregateRoot` or `Entity`
 - IDs are plain `string` UUIDs (`public readonly id!: string`), generated via `crypto.randomUUID()` in `static create()` factories
 - Enums for domain concepts (`JobStatus`, `Archetype`, `SkillAffinity`)
-- Repository ports: **interfaces** in `domain/src/ports/`, with domain-focused methods (not generic CRUD)
+- Repository ports: **interfaces** in `libs/domain/src/ports/`, with domain-focused methods (not generic CRUD)
 - Domain events implement the `DomainEvent` interface
 
 ## Application Layer
@@ -62,14 +62,14 @@ api/cli → infrastructure → application → domain → core
 - **Use cases**: plain classes, single `async execute(input): Promise<T>` method
 - Input types named `<UseCase>Input` (e.g., `GetTopJobInput`)
 - Return `Result<T, Error>` for expected failures; throw for unexpected/critical errors
-- **Ports**: interfaces in `application/src/ports/` for external service adapters
+- **Ports**: interfaces in `libs/application/src/ports/` for external service adapters
 - **DTOs**: plain `type` aliases (not classes), named `<Concept>Dto`
 
 ## Infrastructure Layer
 
 - **Services**: `@Injectable()` classes implementing application ports
 - **Repository implementations**: `Postgres<Entity>Repository`, thin wrappers around `EntityManager` (no ORM ↔ domain mapping — domain entities carry MikroORM decorators directly)
-- **DI tokens**: namespaced in `infrastructure/src/DI.ts` as `DI.Job.*`, `DI.Resume.*`
+- **DI tokens**: namespaced in `libs/infrastructure/src/DI.ts` as `DI.Job.*`, `DI.Resume.*`
 
 ## API Layer
 

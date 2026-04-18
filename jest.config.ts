@@ -2,11 +2,11 @@ import type { Config } from 'jest';
 
 const config: Config = {
   projects: [
-    '<rootDir>/core',
-    '<rootDir>/domain',
-    '<rootDir>/application',
-    '<rootDir>/infrastructure',
-    '<rootDir>/web',
+    '<rootDir>/libs/core',
+    '<rootDir>/libs/domain',
+    '<rootDir>/libs/application',
+    '<rootDir>/libs/infrastructure',
+    '<rootDir>/apps/web',
   ],
 };
 

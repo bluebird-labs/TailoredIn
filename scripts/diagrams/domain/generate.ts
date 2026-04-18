@@ -17,11 +17,11 @@ import { DomainDiagramAssembler } from './DomainDiagramAssembler.js';
 import { DomainExtractor } from './DomainExtractor.js';
 
 const ROOT = resolve(import.meta.dirname, '../../..');
-const DOMAIN_SRC = resolve(ROOT, 'domain/src');
+const DOMAIN_SRC = resolve(ROOT, 'libs/domain/src');
 const BARREL_PATH = resolve(DOMAIN_SRC, 'index.ts');
-const OUTPUT_PATH = resolve(ROOT, 'domain/DOMAIN.mmd');
+const OUTPUT_PATH = resolve(ROOT, 'libs/domain/DOMAIN.mmd');
 
-const project = TsMorphProjectFactory.create(resolve(ROOT, 'domain/tsconfig.json'));
+const project = TsMorphProjectFactory.create(resolve(ROOT, 'libs/domain/tsconfig.json'));
 
 const barrelExports = BarrelResolver.resolveExportedNames(project, BARREL_PATH, {
   ignoreSuffixes: ['Id', 'Repository', 'CreateProps'],

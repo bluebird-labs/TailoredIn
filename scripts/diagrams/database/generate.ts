@@ -18,10 +18,10 @@ import { DatabaseExtractor } from './DatabaseExtractor.js';
 import { DatabaseRelationshipInferrer } from './DatabaseRelationshipInferrer.js';
 
 const ROOT = resolve(import.meta.dirname, '../../..');
-const ENTITIES_DIR = resolve(ROOT, 'domain/src/entities');
-const OUTPUT_PATH = resolve(ROOT, 'infrastructure/DATABASE.mmd');
+const ENTITIES_DIR = resolve(ROOT, 'libs/domain/src/entities');
+const OUTPUT_PATH = resolve(ROOT, 'libs/infrastructure/DATABASE.mmd');
 
-const project = TsMorphProjectFactory.create(resolve(ROOT, 'domain/tsconfig.json'));
+const project = TsMorphProjectFactory.create(resolve(ROOT, 'libs/domain/tsconfig.json'));
 const { tables, foreignKeys } = DatabaseExtractor.extract(project, ENTITIES_DIR);
 const analysis = DatabaseRelationshipInferrer.analyze(tables, foreignKeys);
 const diagramOutput = DatabaseDiagramAssembler.assemble(tables, foreignKeys, analysis);

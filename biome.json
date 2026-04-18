@@ -88,7 +88,7 @@
   },
   "overrides": [
     {
-      "includes": ["infrastructure/src/db/entities/**"],
+      "includes": ["libs/infrastructure/src/db/entities/**"],
       "linter": {
         "rules": {
           "style": {
@@ -98,7 +98,7 @@
       }
     },
     {
-      "includes": ["api/src/**"],
+      "includes": ["apps/api/src/**"],
       "linter": {
         "rules": {
           "style": {
@@ -108,7 +108,7 @@
       }
     },
     {
-      "includes": ["web/src/components/ui/**"],
+      "includes": ["apps/web/src/components/ui/**"],
       "linter": {
         "rules": {
           "correctness": {

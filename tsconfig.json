@@ -4,11 +4,11 @@
     "noEmit": true
   },
   "references": [
-    { "path": "./core" },
-    { "path": "./domain" },
-    { "path": "./application" },
-    { "path": "./infrastructure" },
-    { "path": "./api" },
-    { "path": "./web" }
+    { "path": "./libs/core" },
+    { "path": "./libs/domain" },
+    { "path": "./libs/application" },
+    { "path": "./libs/infrastructure" },
+    { "path": "./apps/api" },
+    { "path": "./apps/web" }
   ]
 }

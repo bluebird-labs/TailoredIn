@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(pnpm run check:fix), Bash(pnpm run typecheck), Bash(pnpm run test), Bash(pnpm run dep:check), Bash(pnpm run knip), Bash(pnpm run --cwd infrastructure test:integration), Bash(pnpm e2e:test), Bash(git status:*), Bash(git diff:*)
+allowed-tools: Bash(pnpm run check:fix), Bash(pnpm run typecheck), Bash(pnpm run test), Bash(pnpm run dep:check), Bash(pnpm run knip), Bash(pnpm run --cwd libs/infrastructure test:integration), Bash(pnpm e2e:test), Bash(git status:*), Bash(git diff:*)
 description: Make every code check green — lint, types, tests, architecture, dead code, integration, e2e
 ---
 
@@ -68,7 +68,7 @@ Remove unused exports, unused dependencies, and dead code before continuing.
 ### Step 6 — Integration tests
 
 ```
-pnpm run --cwd infrastructure test:integration
+pnpm run --cwd libs/infrastructure test:integration
 ```
 
 Fix all failing integration tests before continuing. These use Testcontainers (real Postgres) — allow up to 120s for the run.

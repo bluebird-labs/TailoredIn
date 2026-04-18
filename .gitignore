@@ -23,24 +23,24 @@ nimbalyst-local/
 
 # Generated resume PDFs
 cli/Resumes/
-infrastructure/resumes/
+libs/infrastructure/resumes/
 
 # LinkedIn Playwright session (sensitive auth cookies)
-infrastructure/src/linkedin/playwright/.auth/
+libs/infrastructure/src/linkedin/playwright/.auth/
 
 # dependency-cruiser generated graph
 dep-graph.svg
-infrastructure/temp/
+libs/infrastructure/temp/
 .mikroorm-cache/
 
 # Database backups
 backups/
 
 # E2E test artifacts
-e2e/.server-state.json
-e2e/.auth-state.json
-e2e/playwright-report/
-e2e/test-results/
+apps/e2e/.server-state.json
+apps/e2e/.auth-state.json
+apps/e2e/playwright-report/
+apps/e2e/test-results/
 
 # Storybook build output
 storybook-static

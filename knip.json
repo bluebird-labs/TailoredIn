@@ -1,12 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "workspaces": {
-    "core": {
+    "libs/core": {
       "entry": ["test/**/*.test.ts"]
     },
-    "domain": {},
-    "application": {},
-    "infrastructure": {
+    "libs/domain": {},
+    "libs/application": {},
+    "libs/infrastructure": {
       "entry": [
         "test/**/*.test.ts",
         "test-integration/**/*.test.ts",
@@ -16,10 +16,10 @@
         "src/db/seeds/**/*.ts"
       ]
     },
-    "api": {
+    "apps/api": {
       "ignoreDependencies": ["multer", "@nestjs/testing"]
     },
-    "web": {
+    "apps/web": {
       "entry": [
         "test/**/*.ts",
         "src/**/test/**/*.ts",
@@ -31,7 +31,7 @@
       "ignore": ["src/components/ui/**"]
     }
   },
-  "ignore": ["e2e/**", "jest.config.ts"],
+  "ignore": ["apps/e2e/**", "jest.config.ts"],
   "ignoreBinaries": ["dot"],
   "ignoreDependencies": [],
   "exclude": ["nsExports", "nsTypes", "namespaceMembers", "duplicates", "enumMembers"]
