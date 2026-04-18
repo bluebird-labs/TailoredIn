@@ -18,7 +18,6 @@ dist/
 build/
 .idea/
 .superpowers/
-.claire/
 docs/superpowers/
 .vscode/
 nimbalyst-local/
