@@ -33,9 +33,6 @@ dep-graph.svg
 libs/infrastructure/temp/
 .mikroorm-cache/
 
-# Database backups
-backups/
-
 # E2E test artifacts
 apps/e2e/.server-state.json
 apps/e2e/.auth-state.json

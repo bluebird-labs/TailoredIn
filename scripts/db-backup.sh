@@ -3,7 +3,7 @@
 # Backs up the TailoredIn PostgreSQL database to a timestamped .sql.gz file.
 #
 # Usage:
-#   ./scripts/db-backup.sh                  # backs up to ./backups/
+#   ./scripts/db-backup.sh                  # backs up to $TMPDIR/tailoredin/backups/
 #   ./scripts/db-backup.sh /path/to/dir     # backs up to custom directory
 #
 # Requires: docker CLI with access to the tailored-in-postgres-1 container.
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 CONTAINER="tailored-in-postgres-1"
-BACKUP_DIR="${1:-$(cd "$(dirname "$0")/.." && pwd)/backups}"
+BACKUP_DIR="${1:-${TMPDIR:-/tmp}/tailoredin/backups}"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 FILENAME="tailoredin-${TIMESTAMP}.sql.gz"
 

@@ -1,14 +1,13 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { Logger } from '@tailoredin/core';
+import { getBackupDirectory, Logger } from '@tailoredin/core';
 import type { OrmDbConfig } from '../src/db/orm-config.js';
 
 const log = Logger.create('database-backup');
 
-export function backupDatabase(dbConfig: OrmDbConfig, containerName: string, repoRoot: string): string {
-  const backupDir = resolve(repoRoot, 'backups');
-  mkdirSync(backupDir, { recursive: true });
+export function backupDatabase(dbConfig: OrmDbConfig, containerName: string, _repoRoot: string): string {
+  const backupDir = getBackupDirectory();
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const fileName = `${dbConfig.dbName}_${timestamp}.sql`;
