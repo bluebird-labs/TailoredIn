@@ -126,8 +126,8 @@ TypeScript is executed via `tsx` (TypeScript Execute). `typecheck` scripts exist
 
 ## Session Hygiene
 
-### Docs must be committed
-Any files created or modified under `docs/` (specs, design docs, plans) must be included in commits — never leave them as untracked. Specs and design documents live in `docs/superpowers/specs/` and `docs/superpowers/plans/`.
+### Plugin-generated docs
+Superpowers specs and plans are stored in `.claude/docs/` (gitignored), **not** in `docs/superpowers/`. When superpowers skills instruct you to save to `docs/superpowers/specs/` or `docs/superpowers/plans/`, save to `.claude/docs/specs/` and `.claude/docs/plans/` instead. These are ephemeral working documents and must not be committed.
 
 ### Unstaged files
 Before ending a session, run `git status`. If there are unstaged or untracked files, ask the user what to do with each (commit, stash, or discard). Never leave files dangling silently.
