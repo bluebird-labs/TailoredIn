@@ -20,7 +20,7 @@ const config: Config = {
       }
     ]
   },
-  setupFilesAfterEnv: ['../../test/jest-globals.ts']
+  setupFilesAfterEnv: ['../../libs/core/test/jest-globals.ts']
 };
 
 export default config;
