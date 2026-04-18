@@ -241,7 +241,7 @@ GitHub Actions (`.github/workflows/ci.yaml`) runs on push to `main` and PRs. Pat
 | E2E Tests | `pnpm run e2e:test` | Installs Typst + Playwright Chromium |
 | Secret Scanning | gitleaks | Always runs |
 
-**Typst** is required for integration and E2E tests (resume PDF generation). CI installs it via `typst-community/setup-typst@v4`. Locally, install via `mise` or your OS package manager.
+**Typst** is required for integration and E2E tests (resume PDF generation). Versions for Node, pnpm, and Typst are pinned in `.mise.toml` and installed uniformly in both CI (via `jdx/mise-action`) and local dev (via `mise install`).
 
 ## Design System
 

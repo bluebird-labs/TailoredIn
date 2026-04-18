@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-toolchain
       - run: pnpm run check
 
   typecheck:
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-toolchain
       - run: pnpm run typecheck
 
   test:
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-toolchain
       - run: pnpm run test:coverage
 
   test-integration:
@@ -81,9 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
-      - name: Install Typst
-        uses: typst-community/setup-typst@v4
+      - uses: ./.github/actions/setup-toolchain
       - run: pnpm --filter @tailoredin/infrastructure run test:integration
 
   knip:
@@ -93,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-toolchain
       - run: pnpm run knip
 
   dep-check:
@@ -103,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-toolchain
       - run: pnpm run dep:check
 
   test-e2e:
@@ -113,9 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-node
-      - name: Install Typst
-        uses: typst-community/setup-typst@v4
+      - uses: ./.github/actions/setup-toolchain
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium --with-deps
         working-directory: apps/e2e
