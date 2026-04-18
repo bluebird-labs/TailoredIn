@@ -197,7 +197,7 @@ pnpm mind:import             # import MIND dataset
 pnpm tanova:import           # import Tanova dataset
 ```
 
-All import commands load environment from `.env.local` and read source data from `.local/`.
+All import commands load environment from `.env.local` and read source data from `.attic/`.
 
 ## Environment Variables
 

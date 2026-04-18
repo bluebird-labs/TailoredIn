@@ -47,5 +47,5 @@ storybook-static
 # LLM prompt/response logs
 logs/
 
-.local/
+.attic/
 .turbo/

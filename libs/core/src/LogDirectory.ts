@@ -2,7 +2,7 @@ import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const REPO_ROOT = resolve(import.meta.dirname, '../../..');
-const BASE_DIR = join(REPO_ROOT, '.local');
+const BASE_DIR = join(REPO_ROOT, '.attic');
 
 function getSubdirectory(subdirectory: string, ...segments: string[]): string {
   const dir = join(BASE_DIR, subdirectory, ...segments);
