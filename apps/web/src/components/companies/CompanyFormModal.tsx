@@ -261,6 +261,7 @@ export function CompanyFormModal({ open, onOpenChange, company, onCreated, overl
           candidates={candidates}
           selectedIndex={selectedIndex}
           onSelect={setSelectedIndex}
+          onSkipToManual={() => setStep('form')}
         />
       )}
 
@@ -293,7 +294,8 @@ function DiscoveryStep({
   isDiscovering,
   candidates,
   selectedIndex,
-  onSelect
+  onSelect,
+  onSkipToManual
 }: {
   query: string;
   onQueryChange: (v: string) => void;
@@ -302,6 +304,7 @@ function DiscoveryStep({
   candidates: CompanyDiscoveryResult[];
   selectedIndex: number | null;
   onSelect: (i: number) => void;
+  onSkipToManual: () => void;
 }) {
   const hasResults = candidates.length > 0;
 
@@ -328,6 +331,17 @@ function DiscoveryStep({
         )}
         {isDiscovering ? 'Discovering...' : 'Discover'}
       </Button>
+
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={onSkipToManual}
+          disabled={isDiscovering}
+          className="text-xs text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          or fill in manually →
+        </button>
+      </div>
 
       {hasResults && (
         <div className="space-y-1.5">
