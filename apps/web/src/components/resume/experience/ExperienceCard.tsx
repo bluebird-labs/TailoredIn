@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router';
-import { Building2, Link2, MapPin, Trash2 } from 'lucide-react';
+import { Building2, EyeOff, Link2, MapPin, Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Experience } from '@/hooks/use-experiences';
 import { useDeleteExperience } from '@/hooks/use-experiences';
+import { cn } from '@/lib/utils';
 
 function formatMonthYear(value: string): string {
   if (!value) return '';
@@ -29,7 +30,10 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
     <Link
       to="/experiences/$experienceId"
       params={{ experienceId: experience.id }}
-      className="group block w-full text-left border rounded-[14px] p-4 transition-colors hover:bg-accent/40"
+      className={cn(
+        'group block w-full text-left border rounded-[14px] p-4 transition-colors hover:bg-accent/40',
+        experience.hiddenByDefault && 'opacity-50 bg-muted/30'
+      )}
     >
       <div className="flex items-start gap-3">
         {experience.company?.logoUrl ? (
@@ -67,6 +71,12 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {experience.hiddenByDefault && (
+            <Badge variant="outline" className="text-xs gap-1">
+              <EyeOff className="h-3 w-3" />
+              Hidden
+            </Badge>
+          )}
           {experience.accomplishments.length > 0 && (
             <Badge variant="secondary" className="text-xs">
               {experience.accomplishments.length} accomplishment{experience.accomplishments.length !== 1 ? 's' : ''}
