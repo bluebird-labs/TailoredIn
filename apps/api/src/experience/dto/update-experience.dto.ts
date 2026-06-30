@@ -20,7 +20,8 @@ const UpdateExperienceSchema = z.object({
     })
   ),
   bullet_min: z.number().int().min(0).max(20).optional(),
-  bullet_max: z.number().int().min(0).max(20).optional()
+  bullet_max: z.number().int().min(0).max(20).optional(),
+  hidden_by_default: z.boolean().optional()
 });
 
 export class UpdateExperienceDto extends createZodDto(UpdateExperienceSchema) {}

@@ -59,6 +59,7 @@ interface ExperienceFormState {
   summary: string;
   bulletMin: number;
   bulletMax: number;
+  hiddenByDefault: boolean;
 }
 
 function validateExperience(values: ExperienceFormState): ValidationErrors<ExperienceFormState> {

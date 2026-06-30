@@ -32,6 +32,7 @@ export type UpdateExperienceInput = {
   accomplishments: AccomplishmentInput[];
   bulletMin?: number;
   bulletMax?: number;
+  hiddenByDefault?: boolean;
 };
 
 @Injectable()
@@ -56,6 +57,9 @@ export class UpdateExperience {
     experience.endDate = input.endDate;
     experience.summary = input.summary;
     experience.ordinal = input.ordinal;
+    if (input.hiddenByDefault !== undefined) {
+      experience.hiddenByDefault = input.hiddenByDefault;
+    }
     experience.updatedAt = new Date();
     experience.syncAccomplishments(input.accomplishments);
 

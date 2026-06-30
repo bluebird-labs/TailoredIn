@@ -20,6 +20,7 @@ export type CreateExperienceInput = {
   endDate: string;
   summary: string | null;
   ordinal: number;
+  hiddenByDefault?: boolean;
 };
 
 @Injectable()

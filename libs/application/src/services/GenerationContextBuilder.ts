@@ -41,7 +41,7 @@ export class GenerationContextBuilder {
 
     const allExperiences = await this.experienceRepository.findAll();
     const experiences = allExperiences
-      .filter(e => e.profileId === profile.id)
+      .filter(e => e.profileId === profile.id && !e.hiddenByDefault)
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
     const companyIds = experiences.map(e => e.companyId).filter((id): id is string => id !== null);

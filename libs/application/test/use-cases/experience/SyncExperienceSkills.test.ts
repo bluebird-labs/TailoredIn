@@ -24,6 +24,7 @@ const makeExperience = (overrides: Partial<ConstructorParameters<typeof Experien
     ordinal: 0,
     bulletMin: 2,
     bulletMax: 5,
+    hiddenByDefault: false,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides

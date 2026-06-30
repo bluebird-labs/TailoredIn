@@ -31,6 +31,7 @@ export type Experience = {
   ordinal: number;
   bulletMin: number;
   bulletMax: number;
+  hiddenByDefault: boolean;
   accomplishments: AccomplishmentDto[];
   skills: ExperienceSkill[];
 };
@@ -69,6 +70,7 @@ export function useCreateExperience() {
       end_date: string;
       summary?: string;
       ordinal: number;
+      hidden_by_default?: boolean;
     }) => api.post<Experience>('/experiences', input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
@@ -93,6 +95,7 @@ export function useUpdateExperience() {
       accomplishments: { id: string | null; title: string; narrative: string; ordinal: number }[];
       bullet_min?: number;
       bullet_max?: number;
+      hidden_by_default?: boolean;
     }) => {
       const { id, ...body } = input;
       return api.put<Experience>(`/experiences/${id}`, body);

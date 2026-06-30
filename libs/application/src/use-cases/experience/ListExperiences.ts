@@ -66,6 +66,7 @@ export function toExperienceDto(
     ordinal: exp.ordinal,
     bulletMin: exp.bulletMin,
     bulletMax: exp.bulletMax,
+    hiddenByDefault: exp.hiddenByDefault,
     accomplishments: exp.accomplishments.map(toAccomplishmentDto),
     skills
   };

@@ -45,6 +45,7 @@ export const Full: Story = {
       ordinal: 0,
       bulletMin: 2,
       bulletMax: 5,
+      hiddenByDefault: false,
       accomplishments: [
         { id: 'a1', title: 'Reduced latency by 40%', narrative: '', ordinal: 0 },
         { id: 'a2', title: 'Mentored 3 junior engineers', narrative: '', ordinal: 1 }
@@ -71,6 +72,7 @@ export const Minimal: Story = {
       ordinal: 0,
       bulletMin: 2,
       bulletMax: 5,
+      hiddenByDefault: false,
       accomplishments: [],
       skills: []
     }

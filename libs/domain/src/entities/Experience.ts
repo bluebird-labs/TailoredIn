@@ -20,6 +20,7 @@ export type ExperienceCreateProps = {
   ordinal: number;
   bulletMin: number;
   bulletMax: number;
+  hiddenByDefault?: boolean;
 };
 
 @Entity({ tableName: 'experiences' })
@@ -66,6 +67,9 @@ export class Experience extends AggregateRoot {
   @Property({ fieldName: 'bullet_max', type: 'integer' })
   public bulletMax: number;
 
+  @Property({ fieldName: 'hidden_by_default', type: 'boolean' })
+  public hiddenByDefault: boolean;
+
   @OneToMany(
     () => Accomplishment,
     acc => acc.experienceId,
@@ -101,6 +105,7 @@ export class Experience extends AggregateRoot {
     ordinal: number;
     bulletMin: number;
     bulletMax: number;
+    hiddenByDefault: boolean;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -131,6 +136,7 @@ export class Experience extends AggregateRoot {
     this.ordinal = props.ordinal;
     this.bulletMin = props.bulletMin;
     this.bulletMax = props.bulletMax;
+    this.hiddenByDefault = props.hiddenByDefault;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
@@ -251,6 +257,7 @@ export class Experience extends AggregateRoot {
     return new Experience({
       id: crypto.randomUUID(),
       ...props,
+      hiddenByDefault: props.hiddenByDefault ?? false,
       createdAt: now,
       updatedAt: now
     });

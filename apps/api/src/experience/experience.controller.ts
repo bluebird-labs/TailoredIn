@@ -70,7 +70,8 @@ export class ExperienceController {
       startDate: body.start_date,
       endDate: body.end_date,
       summary: body.summary ?? null,
-      ordinal: body.ordinal
+      ordinal: body.ordinal,
+      hiddenByDefault: body.hidden_by_default
     });
     return { data };
   }
@@ -95,7 +96,8 @@ export class ExperienceController {
         ordinal: a.ordinal
       })),
       bulletMin: body.bullet_min,
-      bulletMax: body.bullet_max
+      bulletMax: body.bullet_max,
+      hiddenByDefault: body.hidden_by_default
     });
     if (!result.isOk) {
       throw new HttpException({ error: { code: 'NOT_FOUND', message: result.error.message } }, 404);

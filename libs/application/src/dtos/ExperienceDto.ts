@@ -19,6 +19,7 @@ export type ExperienceDto = {
   ordinal: number;
   bulletMin: number;
   bulletMax: number;
+  hiddenByDefault: boolean;
   accomplishments: AccomplishmentDto[];
   skills: ExperienceSkillDto[];
 };

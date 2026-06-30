@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { EditableField } from '@/components/shared/EditableField.js';
 import { FieldError } from '@/components/shared/FieldError.js';
 import { FormModal } from '@/components/shared/FormModal.js';
 import { SkillPicker } from '@/components/skill-picker/SkillPicker.js';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { MonthYearPicker } from '@/components/ui/month-year-picker';
 import type { Company } from '@/hooks/use-companies';
@@ -43,7 +44,8 @@ function emptyState(): ExperienceFormState {
     endDate: '',
     summary: '',
     bulletMin: 2,
-    bulletMax: 5
+    bulletMax: 5,
+    hiddenByDefault: false
   };
 }
 
@@ -58,8 +60,31 @@ function stateFromExperience(exp: Experience): ExperienceFormState {
     endDate: exp.endDate,
     summary: exp.summary ?? '',
     bulletMin: exp.bulletMin,
-    bulletMax: exp.bulletMax
+    bulletMax: exp.bulletMax,
+    hiddenByDefault: exp.hiddenByDefault
   };
+}
+
+function HiddenByDefaultCheckbox({
+  checked,
+  onChange,
+  isDirty,
+  disabled
+}: {
+  readonly checked: boolean;
+  readonly onChange: (checked: boolean) => void;
+  readonly isDirty?: boolean;
+  readonly disabled?: boolean;
+}) {
+  const fieldId = useId();
+  return (
+    <div className={cn('flex items-center gap-2 py-1', isDirty && 'border-l-2 border-primary/30 pl-3')}>
+      <Checkbox id={fieldId} checked={checked} onCheckedChange={onChange} disabled={disabled} />
+      <Label htmlFor={fieldId} className="text-sm leading-none">
+        Hidden by default on new resumes
+      </Label>
+    </div>
+  );
 }
 
 function toLocalAccomplishments(accomplishments: Experience['accomplishments']): AccomplishmentItem[] {
@@ -223,7 +248,8 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }
           start_date: current.startDate.trim(),
           end_date: current.endDate.trim(),
           summary: current.summary.trim() || undefined,
-          ordinal: modalMode.mode === 'create' ? modalMode.experienceCount : 0
+          ordinal: modalMode.mode === 'create' ? modalMode.experienceCount : 0,
+          hidden_by_default: current.hiddenByDefault
         },
         {
           onSuccess: result => {
@@ -258,7 +284,8 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }
             ordinal: index
           })),
           bullet_min: current.bulletMin,
-          bullet_max: current.bulletMax
+          bullet_max: current.bulletMax,
+          hidden_by_default: current.hiddenByDefault
         },
         {
           onSuccess: () => {
@@ -449,6 +476,13 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }
           disabled={isSaving}
         />
       </div>
+
+      <HiddenByDefaultCheckbox
+        checked={current.hiddenByDefault}
+        onChange={v => setField('hiddenByDefault', v)}
+        isDirty={isDirtyField('hiddenByDefault')}
+        disabled={isSaving}
+      />
 
       {experience && (
         <div className="space-y-4 border-t pt-2">

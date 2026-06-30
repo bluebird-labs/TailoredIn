@@ -10,7 +10,8 @@ const CreateExperienceSchema = z.object({
   start_date: z.string().min(1),
   end_date: z.string().min(1),
   summary: z.string().optional(),
-  ordinal: z.number().int().min(0)
+  ordinal: z.number().int().min(0),
+  hidden_by_default: z.boolean().default(false).optional()
 });
 
 export class CreateExperienceDto extends createZodDto(CreateExperienceSchema) {}

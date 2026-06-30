@@ -91,6 +91,7 @@ function makeExperience() {
     ordinal: 0,
     bulletMin: 2,
     bulletMax: 5,
+    hiddenByDefault: false,
     createdAt: new Date(),
     updatedAt: new Date()
   });

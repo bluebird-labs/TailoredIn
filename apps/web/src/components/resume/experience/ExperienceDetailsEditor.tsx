@@ -1,14 +1,39 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { EditableField } from '@/components/shared/EditableField.js';
 import { EditableSection } from '@/components/shared/EditableSection.js';
 import { InfoCard, InfoRow } from '@/components/shared/InfoCard.js';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useDirtyTracking } from '@/hooks/use-dirty-tracking.js';
 import { type Experience, useUpdateExperience } from '@/hooks/use-experiences';
+import { cn } from '@/lib/utils';
 import { type ExperienceFormState, hasErrors, type ValidationErrors, validateExperience } from '@/lib/validation.js';
 
 interface ExperienceDetailsEditorProps {
   readonly experience: Experience;
+}
+
+function HiddenByDefaultCheckbox({
+  checked,
+  onChange,
+  isDirty,
+  disabled
+}: {
+  readonly checked: boolean;
+  readonly onChange: (checked: boolean) => void;
+  readonly isDirty?: boolean;
+  readonly disabled?: boolean;
+}) {
+  const fieldId = useId();
+  return (
+    <div className={cn('flex items-center gap-2 py-1', isDirty && 'border-l-2 border-primary/30 pl-3')}>
+      <Checkbox id={fieldId} checked={checked} onCheckedChange={onChange} disabled={disabled} />
+      <Label htmlFor={fieldId} className="text-sm leading-none">
+        Hidden by default on new resumes
+      </Label>
+    </div>
+  );
 }
 
 function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
@@ -26,7 +51,8 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
       endDate: experience.endDate,
       summary: experience.summary ?? '',
       bulletMin: experience.bulletMin,
-      bulletMax: experience.bulletMax
+      bulletMax: experience.bulletMax,
+      hiddenByDefault: experience.hiddenByDefault
     }),
     [
       experience.title,
@@ -38,7 +64,8 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
       experience.endDate,
       experience.summary,
       experience.bulletMin,
-      experience.bulletMax
+      experience.bulletMax,
+      experience.hiddenByDefault
     ]
   );
 
@@ -68,7 +95,8 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
           ordinal: a.ordinal
         })),
         bullet_min: current.bulletMin,
-        bullet_max: current.bulletMax
+        bullet_max: current.bulletMax,
+        hidden_by_default: current.hiddenByDefault
       },
       {
         onSuccess: () => {
@@ -186,6 +214,12 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
               disabled={update.isPending}
             />
           </div>
+          <HiddenByDefaultCheckbox
+            checked={current.hiddenByDefault}
+            onChange={v => setField('hiddenByDefault', v)}
+            isDirty={isDirtyField('hiddenByDefault')}
+            disabled={update.isPending}
+          />
         </div>
       </EditableSection.Editor>
     </EditableSection>
