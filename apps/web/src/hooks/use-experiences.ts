@@ -106,6 +106,19 @@ export function useUpdateExperience() {
   });
 }
 
+export function useSetExperienceHiddenByDefault() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { id: string; hidden_by_default: boolean }) =>
+      api.put<Experience>(`/experiences/${input.id}/hidden-by-default`, {
+        hidden_by_default: input.hidden_by_default
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.experiences.all });
+    }
+  });
+}
+
 export function useDeleteExperience() {
   const queryClient = useQueryClient();
   return useMutation({

@@ -188,6 +188,12 @@ classDiagram
         +execute() ExperienceDto[]
     }
 
+    class SetExperienceHiddenByDefault {
+        <<UseCase>>
+        +ExperienceRepository experienceRepository
+        +execute(SetExperienceHiddenByDefaultInput) Result<ExperienceDto, Error>
+    }
+
     class SyncExperienceSkills {
         <<UseCase>>
         +ExperienceRepository experienceRepository
@@ -802,6 +808,7 @@ classDiagram
     GetExperience ..> ExperienceDto : returns
     LinkCompanyToExperience ..> ExperienceDto : returns
     ListExperiences ..> ExperienceDto : returns
+    SetExperienceHiddenByDefault ..> ExperienceDto : returns
     SyncExperienceSkills ..> ExperienceDto : returns
     UnlinkCompanyFromExperience ..> ExperienceDto : returns
     UpdateExperience ..> ExperienceDto : returns
@@ -940,6 +947,7 @@ classDiagram
     ListExperiences ..> ExperienceRepository : depends
     ListExperiences ..> CompanyRepository : depends
     ListExperiences ..> SkillRepository : depends
+    SetExperienceHiddenByDefault ..> ExperienceRepository : depends
     SyncExperienceSkills ..> ExperienceRepository : depends
     SyncExperienceSkills ..> SkillRepository : depends
     SyncExperienceSkills ..> CompanyRepository : depends
@@ -1015,6 +1023,7 @@ classDiagram
     style GetExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style LinkCompanyToExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style ListExperiences fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
+    style SetExperienceHiddenByDefault fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style SyncExperienceSkills fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UnlinkCompanyFromExperience fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px
     style UpdateAccomplishment fill:#0d9488,stroke:#134e4a,color:#ccfbf1,stroke-width:2px

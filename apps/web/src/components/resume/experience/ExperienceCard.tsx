@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { Building2, EyeOff, Link2, MapPin, Trash2 } from 'lucide-react';
+import { Building2, Eye, EyeOff, Link2, MapPin, Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Experience } from '@/hooks/use-experiences';
-import { useDeleteExperience } from '@/hooks/use-experiences';
+import { useDeleteExperience, useSetExperienceHiddenByDefault } from '@/hooks/use-experiences';
 import { cn } from '@/lib/utils';
 
 function formatMonthYear(value: string): string {
@@ -21,6 +21,7 @@ interface ExperienceCardProps {
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {
   const deleteExperience = useDeleteExperience();
+  const setHiddenByDefault = useSetExperienceHiddenByDefault();
 
   const startFormatted = formatMonthYear(experience.startDate);
   const endFormatted = formatMonthYear(experience.endDate);
@@ -82,6 +83,21 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
               {experience.accomplishments.length} accomplishment{experience.accomplishments.length !== 1 ? 's' : ''}
             </Badge>
           )}
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-label={experience.hiddenByDefault ? 'Show on new resumes' : 'Hide from new resumes'}
+            title={experience.hiddenByDefault ? 'Show on new resumes' : 'Hide from new resumes'}
+            disabled={setHiddenByDefault.isPending}
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              setHiddenByDefault.mutate({ id: experience.id, hidden_by_default: !experience.hiddenByDefault });
+            }}
+          >
+            {experience.hiddenByDefault ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+          </Button>
           <ConfirmDialog
             title="Delete experience?"
             description="This experience and all its accomplishments will be permanently removed."

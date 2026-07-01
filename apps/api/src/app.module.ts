@@ -44,6 +44,7 @@ import {
   ScoreJobFit,
   ScoreResume,
   SearchSkills,
+  SetExperienceHiddenByDefault,
   SyncExperienceSkills,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -247,6 +248,7 @@ import { SkillController } from './skill/skill.controller.js';
     { provide: DI.Experience.DeleteAccomplishment, useClass: DeleteAccomplishment },
     { provide: DI.Experience.LinkCompany, useClass: LinkCompanyToExperience },
     { provide: DI.Experience.UnlinkCompany, useClass: UnlinkCompanyFromExperience },
+    { provide: DI.Experience.SetHiddenByDefault, useClass: SetExperienceHiddenByDefault },
 
     // Use cases: Skill
     { provide: DI.Skill.List, useClass: ListSkills },

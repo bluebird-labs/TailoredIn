@@ -7,6 +7,7 @@ import type {
   GetExperience,
   LinkCompanyToExperience,
   ListExperiences,
+  SetExperienceHiddenByDefault,
   SyncExperienceSkills,
   UnlinkCompanyFromExperience,
   UpdateAccomplishment,
@@ -18,6 +19,7 @@ import { type AuthUser, CurrentUser } from '../common/decorators/current-user.de
 import { AddAccomplishmentDto } from './dto/add-accomplishment.dto.js';
 import { CreateExperienceDto } from './dto/create-experience.dto.js';
 import { LinkCompanyDto } from './dto/link-company.dto.js';
+import { SetExperienceHiddenByDefaultDto } from './dto/set-experience-hidden-by-default.dto.js';
 import { SyncSkillsDto } from './dto/sync-skills.dto.js';
 import { UpdateAccomplishmentDto } from './dto/update-accomplishment.dto.js';
 import { UpdateExperienceDto } from './dto/update-experience.dto.js';
@@ -35,6 +37,8 @@ export class ExperienceController {
     @Inject(DI.Experience.DeleteAccomplishment) private readonly deleteAccomplishment: DeleteAccomplishment,
     @Inject(DI.Experience.LinkCompany) private readonly linkCompany: LinkCompanyToExperience,
     @Inject(DI.Experience.UnlinkCompany) private readonly unlinkCompany: UnlinkCompanyFromExperience,
+    @Inject(DI.Experience.SetHiddenByDefault)
+    private readonly setHiddenByDefault: SetExperienceHiddenByDefault,
     @Inject(DI.Skill.SyncExperienceSkills) private readonly syncSkills: SyncExperienceSkills
   ) {}
 
@@ -163,6 +167,18 @@ export class ExperienceController {
   @Put(':id/company')
   public async linkCompanyHandler(@Param('id') id: string, @Body() body: LinkCompanyDto) {
     const result = await this.linkCompany.execute({ experienceId: id, companyId: body.company_id });
+    if (!result.isOk) {
+      throw new HttpException({ error: { code: 'NOT_FOUND', message: result.error.message } }, 404);
+    }
+    return { data: result.value };
+  }
+
+  @Put(':id/hidden-by-default')
+  public async setHiddenByDefaultHandler(@Param('id') id: string, @Body() body: SetExperienceHiddenByDefaultDto) {
+    const result = await this.setHiddenByDefault.execute({
+      experienceId: id,
+      hiddenByDefault: body.hidden_by_default
+    });
     if (!result.isOk) {
       throw new HttpException({ error: { code: 'NOT_FOUND', message: result.error.message } }, 404);
     }

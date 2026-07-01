@@ -172,6 +172,11 @@ export class Experience extends AggregateRoot {
     this.updatedAt = new Date();
   }
 
+  public setHiddenByDefault(value: boolean): void {
+    this.hiddenByDefault = value;
+    this.updatedAt = new Date();
+  }
+
   public updateBulletRange(min: number, max: number): void {
     if (min < 0) throw new ValidationError('bulletMin', 'must be >= 0');
     if (max < min) throw new ValidationError('bulletMax', 'must be >= bulletMin');

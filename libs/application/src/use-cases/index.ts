@@ -45,6 +45,8 @@ export { GetExperience } from './experience/GetExperience.js';
 export type { LinkCompanyToExperienceInput } from './experience/LinkCompanyToExperience.js';
 export { LinkCompanyToExperience } from './experience/LinkCompanyToExperience.js';
 export { ListExperiences, toExperienceDto } from './experience/ListExperiences.js';
+export type { SetExperienceHiddenByDefaultInput } from './experience/SetExperienceHiddenByDefault.js';
+export { SetExperienceHiddenByDefault } from './experience/SetExperienceHiddenByDefault.js';
 export type { SyncExperienceSkillsInput } from './experience/SyncExperienceSkills.js';
 export { SyncExperienceSkills } from './experience/SyncExperienceSkills.js';
 export type { UnlinkCompanyFromExperienceInput } from './experience/UnlinkCompanyFromExperience.js';

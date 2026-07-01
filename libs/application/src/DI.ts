@@ -60,7 +60,8 @@ export const DI = {
     DeleteAccomplishment: 'DI.Experience.DeleteAccomplishment' as const,
     Get: 'DI.Experience.Get' as const,
     LinkCompany: 'DI.Experience.LinkCompany' as const,
-    UnlinkCompany: 'DI.Experience.UnlinkCompany' as const
+    UnlinkCompany: 'DI.Experience.UnlinkCompany' as const,
+    SetHiddenByDefault: 'DI.Experience.SetHiddenByDefault' as const
   },
 
   GenerationSettings: {
