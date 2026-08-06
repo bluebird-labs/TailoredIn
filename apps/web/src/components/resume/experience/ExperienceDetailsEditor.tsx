@@ -124,6 +124,7 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
           {experience.companyWebsite && (
             <InfoRow label="Website" value={experience.companyWebsite} href={experience.companyWebsite} />
           )}
+          {experience.companyAccent && <InfoRow label="Company Accent" value={experience.companyAccent} />}
           <InfoRow label="Location" value={experience.location} />
           <InfoRow label="Start Date" value={experience.startDate} />
           <InfoRow label="End Date" value={experience.endDate} />
@@ -161,6 +162,16 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
             isDirty={isDirtyField('companyWebsite')}
             disabled={update.isPending}
             placeholder="e.g. https://acme.com"
+          />
+          <EditableField
+            type="text"
+            label="Company Accent"
+            value={current.companyAccent}
+            onChange={v => setField('companyAccent', v)}
+            isDirty={isDirtyField('companyAccent')}
+            error={errors.companyAccent}
+            disabled={update.isPending}
+            placeholder="e.g. acquired by Volvo Cars"
           />
           <EditableField
             type="text"
