@@ -7,8 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Textarea } from '@/components/ui/textarea';
 import { useEducations } from '@/hooks/use-educations';
 import { useExperiences } from '@/hooks/use-experiences';
-import { type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
-import { useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
+import { type ResumeOutput, type ResumeOutputExperience, useJobDescription } from '@/hooks/use-job-descriptions';
+import { type ResumeContent, useGenerateResumeContent, useUpdateResumeDisplaySettings } from '@/hooks/use-resume';
 import { useScoreResume } from '@/hooks/use-resume-score';
 import { BulletRangePill } from './BulletRangePill.js';
 import { JobSelector } from './JobSelector.js';
@@ -21,49 +21,61 @@ function formatMonthYear(value: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-function formatCurrentContent(summary: string | undefined, bullets: string[]): string {
-  const parts: string[] = [];
-  if (summary) parts.push(`Summary: ${summary}`);
-  for (const [i, b] of bullets.entries()) parts.push(`${i + 1}. ${b}`);
-  return parts.join('\n');
+/**
+ * Resolves what to send as `customInstructions`:
+ * - `undefined` when the user never touched the field — the stored instruction stays as-is
+ * - `null` when the user deliberately emptied a previously non-empty instruction — clears it
+ * - the trimmed text otherwise
+ */
+function resolveInstructionUpdate(current: string, stored: string, isEdited: boolean): string | null | undefined {
+  if (!isEdited) return undefined;
+  const trimmed = current.trim();
+  if (trimmed !== '') return trimmed;
+  return stored.trim() === '' ? undefined : null;
 }
 
-function formatFullOutput(output: { headline?: string; experiences: readonly ResumeOutputExperience[] }): string {
-  const parts: string[] = [];
-  if (output.headline) parts.push(`Headline: ${output.headline}`);
-  for (const exp of output.experiences) {
-    parts.push(`\n${exp.experienceTitle} — ${exp.companyName}`);
-    parts.push(formatCurrentContent(exp.summary, exp.bullets));
-  }
-  return parts.join('\n');
+/** Builds a warning message when some experiences kept their previous content, or `null` on full success. */
+function describePartialFailure(result: ResumeContent, output: ResumeOutput | null): string | null {
+  const failedIds = result?.failedExperienceIds ?? [];
+  if (failedIds.length === 0) return null;
+  const titles = failedIds
+    .map(
+      id =>
+        result.experiences?.find(exp => exp.experienceId === id)?.experienceTitle ??
+        output?.experiences.find(exp => exp.experienceId === id)?.experienceTitle
+    )
+    .filter((title): title is string => Boolean(title));
+  const subject = failedIds.length === 1 ? '1 experience' : `${failedIds.length} experiences`;
+  const detail = titles.length > 0 ? `: ${titles.join(', ')}` : '';
+  return `${subject} kept the previous content${detail}`;
 }
+
+type RegenerateRequest = { customInstructions?: string | null; includeCurrentVersion: boolean };
 
 function RegeneratePopover({
   isRegenerating,
   onRegenerate,
   triggerTitle,
-  currentContent,
-  initialPrompt
+  hasCurrentVersion,
+  storedInstruction
 }: {
   isRegenerating: boolean;
-  onRegenerate: (prompt: string) => void;
+  onRegenerate: (request: RegenerateRequest) => void;
   triggerTitle: string;
-  currentContent?: string;
-  initialPrompt?: string;
+  hasCurrentVersion: boolean;
+  storedInstruction?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [prompt, setPrompt] = useState(initialPrompt ?? '');
+  const [prompt, setPrompt] = useState(storedInstruction ?? '');
+  const [isEdited, setIsEdited] = useState(false);
   const [includeCurrentVersion, setIncludeCurrentVersion] = useState(false);
 
   function handleSubmit() {
-    let finalPrompt = prompt.trim();
-    if (includeCurrentVersion && currentContent) {
-      finalPrompt = `Current version:\n${currentContent}${finalPrompt ? `\n\nInstructions: ${finalPrompt}` : ''}`;
-    }
-    onRegenerate(finalPrompt);
+    onRegenerate({
+      customInstructions: resolveInstructionUpdate(prompt, storedInstruction ?? '', isEdited),
+      includeCurrentVersion
+    });
     setOpen(false);
-    setPrompt('');
-    setIncludeCurrentVersion(false);
   }
 
   return (
@@ -72,7 +84,8 @@ function RegeneratePopover({
       onOpenChange={nextOpen => {
         setOpen(nextOpen);
         if (nextOpen) {
-          setPrompt(initialPrompt ?? '');
+          setPrompt(storedInstruction ?? '');
+          setIsEdited(false);
         }
         if (!nextOpen) {
           setIncludeCurrentVersion(false);
@@ -91,10 +104,13 @@ function RegeneratePopover({
         <Textarea
           placeholder="Optional instructions..."
           value={prompt}
-          onChange={e => setPrompt(e.target.value)}
+          onChange={e => {
+            setPrompt(e.target.value);
+            setIsEdited(true);
+          }}
           className="min-h-[56px] resize-none text-[13px]"
         />
-        {currentContent && (
+        {hasCurrentVersion && (
           <label className="flex cursor-pointer items-center gap-2 py-1 text-[12px] text-muted-foreground">
             <input
               type="checkbox"
@@ -102,7 +118,7 @@ function RegeneratePopover({
               onChange={e => setIncludeCurrentVersion(e.target.checked)}
               className="rounded"
             />
-            Include current version as reference
+            Revise the current version
           </label>
         )}
         <div className="flex justify-end">
@@ -126,7 +142,7 @@ function ExperienceCard({
   onBulletRangeReset,
   onRegenerate,
   isRegenerating,
-  initialPrompt
+  storedInstruction
 }: {
   exp: ResumeOutputExperience;
   defaultBulletMin: number;
@@ -135,9 +151,9 @@ function ExperienceCard({
   onToggleBullet: (experienceId: string, bulletIndex: number) => void;
   onBulletRangeSave: (experienceId: string, min: number, max: number) => void;
   onBulletRangeReset: (experienceId: string) => void;
-  onRegenerate: (prompt: string) => void;
+  onRegenerate: (request: RegenerateRequest) => void;
   isRegenerating: boolean;
-  initialPrompt?: string;
+  storedInstruction?: string;
 }) {
   const startFormatted = formatMonthYear(exp.startDate);
   const endFormatted = formatMonthYear(exp.endDate);
@@ -170,8 +186,8 @@ function ExperienceCard({
           isRegenerating={isRegenerating}
           onRegenerate={onRegenerate}
           triggerTitle="Regenerate this experience"
-          currentContent={formatCurrentContent(exp.summary, exp.bullets)}
-          initialPrompt={initialPrompt}
+          hasCurrentVersion={Boolean(exp.summary) || exp.bullets.length > 0}
+          storedInstruction={storedInstruction}
         />
       </div>
       {exp.summary && <p className="text-[13px] italic text-muted-foreground">{exp.summary}</p>}
@@ -212,7 +228,9 @@ export function GenerationWorkspace({
   onSelectJob: (id: string | null) => void;
   onScoreComplete: () => void;
 }) {
-  const [additionalPrompt, setAdditionalPrompt] = useState('');
+  const [steering, setSteering] = useState('');
+  const [isSteeringEdited, setIsSteeringEdited] = useState(false);
+  const [storedSteering, setStoredSteering] = useState('');
   const [includeCurrentVersion, setIncludeCurrentVersion] = useState(false);
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
   const [sessionOverrides, setSessionOverrides] = useState<Map<string, { min: number; max: number }>>(new Map());
@@ -228,16 +246,25 @@ export function GenerationWorkspace({
 
   const scopedInstructions = resumeOutput?.scopedInstructions ?? {};
 
-  const prevJobIdRef = useRef(selectedJobId);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: additionalPrompt intentionally excluded — only sync on JD/job change
+  // Tracks the job whose stored steering has already been loaded into the textarea, so a refetch
+  // never overwrites what the user has typed — or deliberately cleared.
+  const syncedJobIdRef = useRef<string | null>(null);
   useEffect(() => {
-    const jobChanged = selectedJobId !== prevJobIdRef.current;
-    prevJobIdRef.current = selectedJobId;
-    const resumeInstructions = jd?.resumeOutput?.scopedInstructions?.resume;
-    if (resumeInstructions != null && (jobChanged || additionalPrompt === '')) {
-      setAdditionalPrompt(resumeInstructions);
+    if (syncedJobIdRef.current === selectedJobId) return;
+    if (selectedJobId === null) {
+      syncedJobIdRef.current = null;
+      setStoredSteering('');
+      setSteering('');
+      setIsSteeringEdited(false);
+      return;
     }
-  }, [selectedJobId, jd?.resumeOutput?.scopedInstructions]);
+    if (!jd) return;
+    syncedJobIdRef.current = selectedJobId;
+    const resumeInstructions = jd.resumeOutput?.scopedInstructions?.resume ?? '';
+    setStoredSteering(resumeInstructions);
+    setSteering(resumeInstructions);
+    setIsSteeringEdited(false);
+  }, [selectedJobId, jd]);
 
   const experienceBulletMap = useMemo(() => {
     const map = new Map<string, { min: number; max: number }>();
@@ -252,43 +279,36 @@ export function GenerationWorkspace({
     return [...sessionOverrides.entries()].map(([experienceId, { min, max }]) => ({ experienceId, min, max }));
   }
 
+  function notifyGenerationResult(result: ResumeContent, successMessage: string) {
+    const warning = describePartialFailure(result, resumeOutput);
+    if (warning) toast.warning(warning);
+    else toast.success(successMessage);
+  }
+
   function handleGenerate() {
-    const rawInstructions = additionalPrompt.trim();
-    let prompt = rawInstructions;
-    if (includeCurrentVersion && resumeOutput) {
-      const content = formatFullOutput(resumeOutput);
-      prompt = `Current version:\n${content}${prompt ? `\n\nInstructions: ${prompt}` : ''}`;
-    }
+    const customInstructions = resolveInstructionUpdate(steering, storedSteering, isSteeringEdited);
     generate.mutate(
+      { customInstructions, includeCurrentVersion, bulletOverrides: buildBulletOverrides() },
       {
-        additionalPrompt: prompt || undefined,
-        customInstructions: rawInstructions || undefined,
-        bulletOverrides: buildBulletOverrides()
-      },
-      {
-        onSuccess: () => {
-          setAdditionalPrompt('');
+        onSuccess: result => {
+          if (customInstructions !== undefined) setStoredSteering(customInstructions ?? '');
+          setIsSteeringEdited(false);
           setIncludeCurrentVersion(false);
-          toast.success('Resume content generated');
+          notifyGenerationResult(result, 'Resume content generated');
         },
         onError: err => toast.error(err instanceof Error ? err.message : 'Generation failed')
       }
     );
   }
 
-  function handleRegenerateHeadline(prompt: string) {
+  function handleRegenerateHeadline(request: RegenerateRequest) {
     setRegeneratingId('headline');
     generate.mutate(
+      { ...request, scope: { type: 'headline' }, bulletOverrides: buildBulletOverrides() },
       {
-        additionalPrompt: prompt || undefined,
-        customInstructions: prompt || undefined,
-        scope: { type: 'headline' },
-        bulletOverrides: buildBulletOverrides()
-      },
-      {
-        onSuccess: () => {
+        onSuccess: result => {
           setRegeneratingId(null);
-          toast.success('Headline regenerated');
+          notifyGenerationResult(result, 'Headline regenerated');
         },
         onError: err => {
           setRegeneratingId(null);
@@ -298,19 +318,14 @@ export function GenerationWorkspace({
     );
   }
 
-  function handleRegenerateExperience(experienceId: string, prompt: string) {
+  function handleRegenerateExperience(experienceId: string, request: RegenerateRequest) {
     setRegeneratingId(experienceId);
     generate.mutate(
+      { ...request, scope: { type: 'experience', experienceId }, bulletOverrides: buildBulletOverrides() },
       {
-        additionalPrompt: prompt || undefined,
-        customInstructions: prompt || undefined,
-        scope: { type: 'experience', experienceId },
-        bulletOverrides: buildBulletOverrides()
-      },
-      {
-        onSuccess: () => {
+        onSuccess: result => {
           setRegeneratingId(null);
-          toast.success('Experience regenerated');
+          notifyGenerationResult(result, 'Experience regenerated');
         },
         onError: err => {
           setRegeneratingId(null);
@@ -384,8 +399,11 @@ export function GenerationWorkspace({
         <div className="space-y-3">
           <Textarea
             placeholder="Optional: add instructions to steer the generation..."
-            value={additionalPrompt}
-            onChange={e => setAdditionalPrompt(e.target.value)}
+            value={steering}
+            onChange={e => {
+              setSteering(e.target.value);
+              setIsSteeringEdited(true);
+            }}
             className="min-h-[72px] resize-none text-[13px]"
           />
           {resumeOutput && (
@@ -396,7 +414,7 @@ export function GenerationWorkspace({
                 onChange={e => setIncludeCurrentVersion(e.target.checked)}
                 className="rounded"
               />
-              Include current version as reference
+              Revise the current version
             </label>
           )}
           <div className="flex justify-end gap-2">
@@ -455,8 +473,8 @@ export function GenerationWorkspace({
                   isRegenerating={regeneratingId === 'headline'}
                   onRegenerate={handleRegenerateHeadline}
                   triggerTitle="Regenerate headline"
-                  currentContent={resumeOutput.headline}
-                  initialPrompt={scopedInstructions.headline}
+                  hasCurrentVersion={Boolean(resumeOutput.headline)}
+                  storedInstruction={scopedInstructions.headline}
                 />
               </div>
               <p className="text-[15px] text-foreground">{resumeOutput.headline}</p>
@@ -476,9 +494,9 @@ export function GenerationWorkspace({
                   onToggleBullet={handleToggleBullet}
                   onBulletRangeSave={handleBulletRangeSave}
                   onBulletRangeReset={handleBulletRangeReset}
-                  onRegenerate={prompt => handleRegenerateExperience(exp.experienceId, prompt)}
+                  onRegenerate={request => handleRegenerateExperience(exp.experienceId, request)}
                   isRegenerating={regeneratingId === exp.experienceId}
-                  initialPrompt={scopedInstructions[`experience:${exp.experienceId}`]}
+                  storedInstruction={scopedInstructions[`experience:${exp.experienceId}`]}
                 />
               );
             })}

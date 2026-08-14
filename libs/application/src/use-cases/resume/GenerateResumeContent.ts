@@ -9,7 +9,7 @@ import {
 import { DI } from '../../DI.js';
 import type { ResumeContentDto } from '../../dtos/ResumeContentDto.js';
 import type { ResumeElementGenerator } from '../../ports/ResumeElementGenerator.js';
-import type { GenerationContextBuilder } from '../../services/GenerationContextBuilder.js';
+import type { BulletOverride, GenerationContextBuilder } from '../../services/GenerationContextBuilder.js';
 import type { PromptRegistry } from '../../services/prompt/PromptRegistry.js';
 
 export type GenerateResumeContentScope =
@@ -21,9 +21,12 @@ export type GenerateResumeContentScope =
 export type GenerateResumeContentInput = {
   profileId: string;
   jobDescriptionId: string;
-  additionalPrompt?: string;
-  customInstructions?: string;
+  /** undefined = leave the stored instruction for this scope unchanged; null or '' = clear it; string = set it */
+  customInstructions?: string | null;
+  /** include the previous draft as a labelled prior draft (NOT as an instruction) */
+  includeCurrentVersion?: boolean;
   scope?: GenerateResumeContentScope;
+  bulletOverrides?: BulletOverride[];
 };
 
 type HeadlineResult = { headline: string };
@@ -32,6 +35,14 @@ type SummaryResult = { summary: string };
 type BulletResult = { bullet: string };
 
 type ScopedInstructions = Record<string, string>;
+
+type ExperienceDraft = { summary: string; bullets: string[] };
+
+const RESUME_SCOPE_KEY = 'resume';
+const HEADLINE_SCOPE_KEY = 'headline';
+const RESUME_WIDE_HEADING = '## Resume-wide direction';
+const SCOPE_HEADING = '## Direction for this section (takes precedence over the resume-wide direction)';
+const BULLET_HEADING = '## Direction for this bullet (takes precedence over the directions above)';
 
 function parseScopedInstructions(prompt: string): ScopedInstructions {
   if (!prompt) return {};
@@ -43,15 +54,19 @@ function parseScopedInstructions(prompt: string): ScopedInstructions {
   }
 }
 
+function experienceScopeKey(experienceId: string): string {
+  return `experience:${experienceId}`;
+}
+
 function buildScopeKey(scope: GenerateResumeContentScope | undefined): string {
-  if (!scope) return 'resume';
+  if (!scope) return RESUME_SCOPE_KEY;
   switch (scope.type) {
     case 'headline':
-      return 'headline';
+      return HEADLINE_SCOPE_KEY;
     case 'experience':
     case 'summary':
     case 'bullet':
-      return `experience:${scope.experienceId}`;
+      return experienceScopeKey(scope.experienceId);
   }
 }
 
@@ -66,19 +81,20 @@ export class GenerateResumeContent {
   ) {}
 
   public async execute(input: GenerateResumeContentInput): Promise<ResumeContentDto> {
-    const context = await this.contextBuilder.build(input.profileId, input.jobDescriptionId, input.additionalPrompt);
     const existing = await this.resumeContentRepository.findLatestByJobDescriptionId(input.jobDescriptionId);
 
-    const previousInstructions = parseScopedInstructions(existing?.prompt ?? '');
     const scopeKey = buildScopeKey(input.scope);
-    const scopedInstructions = { ...previousInstructions };
-    const instructionsToStore = input.customInstructions;
-    if (instructionsToStore) {
-      scopedInstructions[scopeKey] = instructionsToStore;
-    } else {
-      delete scopedInstructions[scopeKey];
-    }
-    const promptJson = JSON.stringify(scopedInstructions);
+    const merged = this.mergeInstructions(parseScopedInstructions(existing?.prompt ?? ''), scopeKey, input);
+    const promptJson = JSON.stringify(merged);
+
+    // A full generation fans out into one call per target, so its prior draft is scoped per derived context
+    // in `generateFull` — never shared, to keep one experience's text out of another experience's prompt.
+    const context = await this.contextBuilder.build(input.profileId, input.jobDescriptionId, {
+      userInstructions: this.resolveInstructions(merged, scopeKey),
+      currentVersion:
+        input.scope && input.includeCurrentVersion ? this.renderCurrentVersion(existing, input.scope) : null,
+      bulletOverrides: input.bulletOverrides
+    });
 
     if (input.scope?.type === 'headline') {
       return this.generateHeadline(context, existing, promptJson);
@@ -100,26 +116,95 @@ export class GenerateResumeContent {
       );
     }
 
-    return this.generateFull(context, existing, promptJson);
+    return this.generateFull(context, existing, promptJson, merged, input.includeCurrentVersion === true);
+  }
+
+  /**
+   * Applies this request's steering onto the persisted scoped-instruction map.
+   * `undefined` leaves the stored instruction untouched, `null`/blank clears it, anything else replaces it.
+   */
+  private mergeInstructions(
+    previous: ScopedInstructions,
+    scopeKey: string,
+    input: GenerateResumeContentInput
+  ): ScopedInstructions {
+    const merged = { ...previous };
+    if (input.customInstructions === undefined) return merged;
+
+    const trimmed = input.customInstructions?.trim() ?? '';
+    if (trimmed) {
+      merged[scopeKey] = trimmed;
+    } else {
+      delete merged[scopeKey];
+    }
+    return merged;
+  }
+
+  /** Combines the resume-wide steering with the scope-specific one, most specific last. */
+  private resolveInstructions(merged: ScopedInstructions, scopeKey: string): string | null {
+    const resumeWide = merged[RESUME_SCOPE_KEY]?.trim() ?? '';
+    const scoped = scopeKey === RESUME_SCOPE_KEY ? '' : (merged[scopeKey]?.trim() ?? '');
+
+    const parts: string[] = [];
+    if (resumeWide) parts.push(`${RESUME_WIDE_HEADING}\n${resumeWide}`);
+    if (scoped) parts.push(`${SCOPE_HEADING}\n${scoped}`);
+    return parts.length > 0 ? parts.join('\n\n') : null;
+  }
+
+  /**
+   * Renders the previous draft of a single generation target. Never an instruction — a labelled prior draft.
+   * Always scoped to one target so an experience prompt never sees another experience's text.
+   */
+  private renderCurrentVersion(existing: ResumeContent | null, scope: GenerateResumeContentScope): string | null {
+    if (!existing) return null;
+
+    if (scope.type === 'headline') {
+      return existing.headline ? `## Headline\n${existing.headline}` : null;
+    }
+
+    const target = existing.experiences.find(e => e.experienceId === scope.experienceId);
+    return target ? this.renderExperienceDraft(target) : null;
+  }
+
+  private renderExperienceDraft(experience: ExperienceDraft): string | null {
+    const parts: string[] = [];
+    if (experience.summary) parts.push(`Summary: ${experience.summary}`);
+    if (experience.bullets.length > 0) {
+      parts.push(experience.bullets.map((bullet, index) => `${index + 1}. ${bullet}`).join('\n'));
+    }
+    return parts.length > 0 ? parts.join('\n') : null;
   }
 
   private async generateFull(
     context: GenerationContext,
     existing: ResumeContent | null,
-    promptJson: string
+    promptJson: string,
+    merged: ScopedInstructions,
+    includeCurrentVersion: boolean
   ): Promise<ResumeContentDto> {
     const headlineRecipe = this.registry.getRecipe(GenerationScope.HEADLINE);
     const experienceRecipe = this.registry.getRecipe(GenerationScope.EXPERIENCE);
     const runId = new Date().toISOString().replace(/[:.]/g, '-');
 
+    const headlineContext: GenerationContext = {
+      ...context,
+      userInstructions: this.resolveInstructions(merged, HEADLINE_SCOPE_KEY),
+      currentVersion: includeCurrentVersion ? this.renderCurrentVersion(existing, { type: 'headline' }) : null
+    };
     const headlinePromise = this.elementGenerator
-      .generate(headlineRecipe.compose(context, runId))
+      .generate(headlineRecipe.compose(headlineContext, runId))
       .then(raw => raw as HeadlineResult);
 
     const summaryRecipe = this.registry.getRecipe(GenerationScope.EXPERIENCE_SUMMARY);
 
     const experiencePromises = context.experiences.map(exp => {
-      const expContext = this.withTargetExperience(context, exp.id);
+      const expContext: GenerationContext = {
+        ...this.withTargetExperience(context, exp.id),
+        userInstructions: this.resolveInstructions(merged, experienceScopeKey(exp.id)),
+        currentVersion: includeCurrentVersion
+          ? this.renderCurrentVersion(existing, { type: 'experience', experienceId: exp.id })
+          : null
+      };
       if (exp.bulletMax === 0) {
         return this.elementGenerator
           .generate(summaryRecipe.compose(expContext, runId))
@@ -142,6 +227,8 @@ export class GenerateResumeContent {
     });
 
     const [headlineResult, ...experienceResults] = await Promise.all([headlinePromise, ...experiencePromises]);
+
+    const failedExperienceIds = experienceResults.filter(r => 'error' in r).map(r => r.experienceId);
 
     const experiences = experienceResults.map(r => {
       if ('error' in r) {
@@ -192,7 +279,8 @@ export class GenerateResumeContent {
         experienceTitle: e.experienceTitle,
         companyName: e.companyName,
         bullets: e.bullets
-      }))
+      })),
+      failedExperienceIds
     };
   }
 
@@ -237,7 +325,8 @@ export class GenerateResumeContent {
           companyName: exp?.companyName ?? '',
           bullets: e.bullets
         };
-      })
+      }),
+      failedExperienceIds: []
     };
   }
 
@@ -293,7 +382,7 @@ export class GenerateResumeContent {
 
     const bulletContext: GenerationContext = {
       ...this.withTargetExperience(context, experienceId),
-      userInstructions: instructions
+      userInstructions: this.withBulletInstructions(context.userInstructions, instructions)
     };
 
     const raw = await this.elementGenerator.generate(recipe.compose(bulletContext));
@@ -316,6 +405,15 @@ export class GenerateResumeContent {
       },
       promptJson
     );
+  }
+
+  /** The one-off bullet instruction is the most specific steering — it comes last, after the stored ones. */
+  private withBulletInstructions(resolved: string | null, bulletInstructions: string): string | null {
+    const trimmed = bulletInstructions.trim();
+    const parts: string[] = [];
+    if (resolved) parts.push(resolved);
+    if (trimmed) parts.push(`${BULLET_HEADING}\n${trimmed}`);
+    return parts.length > 0 ? parts.join('\n\n') : null;
   }
 
   private async mergeExperienceResult(
@@ -367,7 +465,8 @@ export class GenerateResumeContent {
           companyName: exp?.companyName ?? '',
           bullets: e.bullets
         };
-      })
+      }),
+      failedExperienceIds: []
     };
   }
 

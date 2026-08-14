@@ -13,6 +13,21 @@ import {
 } from '@tailoredin/domain';
 import { DI } from '../DI.js';
 
+export type BulletOverride = {
+  readonly experienceId: string;
+  readonly min: number;
+  readonly max: number;
+};
+
+export type GenerationContextOptions = {
+  /** Steering text for this generation. Set per target by the caller when it varies by scope. */
+  readonly userInstructions?: string | null;
+  /** Previously generated content, included as a labelled prior draft when revising. */
+  readonly currentVersion?: string | null;
+  /** Per-experience bullet count overrides for this generation only — not persisted. */
+  readonly bulletOverrides?: readonly BulletOverride[];
+};
+
 @Injectable()
 export class GenerationContextBuilder {
   public constructor(
@@ -28,7 +43,7 @@ export class GenerationContextBuilder {
   public async build(
     profileId: string,
     jobDescriptionId: string,
-    userInstructions?: string
+    options: GenerationContextOptions = {}
   ): Promise<GenerationContext> {
     const jd = await this.jobDescriptionRepository.findById(jobDescriptionId);
     if (!jd) throw new EntityNotFoundError('JobDescription', jobDescriptionId);
@@ -50,6 +65,8 @@ export class GenerationContextBuilder {
 
     const allEducation = await this.educationRepository.findAll();
     const education = allEducation.filter(e => e.profileId === profile.id);
+
+    const bulletOverrides = new Map((options.bulletOverrides ?? []).map(o => [o.experienceId, o]));
 
     const adminPrompts = new Map<GenerationScope, string>();
     for (const prompt of settings.prompts.getItems()) {
@@ -73,22 +90,25 @@ export class GenerationContextBuilder {
         soughtSoftSkills: jd.soughtSoftSkills ?? [],
         level: jd.level
       },
-      experiences: experiences.map(exp => ({
-        id: exp.id,
-        title: exp.title,
-        companyName: exp.companyName,
-        summary: exp.summary,
-        accomplishments: exp.accomplishments.getItems().map(a => ({
-          title: a.title,
-          narrative: a.narrative
-        })),
-        startDate: exp.startDate,
-        endDate: exp.endDate,
-        location: exp.location,
-        bulletMin: exp.bulletMin,
-        bulletMax: exp.bulletMax,
-        companyId: exp.companyId
-      })),
+      experiences: experiences.map(exp => {
+        const override = bulletOverrides.get(exp.id);
+        return {
+          id: exp.id,
+          title: exp.title,
+          companyName: exp.companyName,
+          summary: exp.summary,
+          accomplishments: exp.accomplishments.getItems().map(a => ({
+            title: a.title,
+            narrative: a.narrative
+          })),
+          startDate: exp.startDate,
+          endDate: exp.endDate,
+          location: exp.location,
+          bulletMin: override?.min ?? exp.bulletMin,
+          bulletMax: override?.max ?? exp.bulletMax,
+          companyId: exp.companyId
+        };
+      }),
       companies: companies
         .filter((c): c is NonNullable<typeof c> => c !== null)
         .map(c => ({
@@ -112,7 +132,8 @@ export class GenerationContextBuilder {
         bulletMax: settings.bulletMax,
         adminPrompts
       },
-      userInstructions: userInstructions ?? null
+      userInstructions: options.userInstructions ?? null,
+      currentVersion: options.currentVersion ?? null
     };
   }
 }

@@ -6,7 +6,8 @@ import type { GenerateResumePdf } from '../../../src/use-cases/resume/GenerateRe
 function makeContentResult(): ResumeContentDto {
   return {
     headline: 'Staff Engineer | 5+ Years',
-    experiences: [{ experienceId: 'exp-1', experienceTitle: 'Engineer', companyName: 'Acme', bullets: ['Did things'] }]
+    experiences: [{ experienceId: 'exp-1', experienceTitle: 'Engineer', companyName: 'Acme', bullets: ['Did things'] }],
+    failedExperienceIds: []
   };
 }
 
@@ -61,14 +62,16 @@ describe('GenerateResumeContentWithPdf', () => {
     await useCase.execute({
       profileId: 'profile-1',
       jobDescriptionId: 'jd-1',
-      additionalPrompt: 'Focus on leadership',
+      customInstructions: 'Focus on leadership',
+      includeCurrentVersion: true,
       scope: { type: 'headline' }
     });
 
     expect(generateContent.execute).toHaveBeenCalledWith({
       profileId: 'profile-1',
       jobDescriptionId: 'jd-1',
-      additionalPrompt: 'Focus on leadership',
+      customInstructions: 'Focus on leadership',
+      includeCurrentVersion: true,
       scope: { type: 'headline' }
     });
   });

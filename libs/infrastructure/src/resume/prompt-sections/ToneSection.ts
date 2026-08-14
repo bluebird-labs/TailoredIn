@@ -16,7 +16,7 @@ export class ToneSection extends PromptSection {
       cacheTier: this.cacheTier,
       content: `## Tone & Voice
 
-Derive the candidate's voice, tone, and writing style from the following About section. Mirror their personality and communication style in all generated content.
+The following About section is the DEFAULT source for the candidate's voice, tone, and writing style - mirror their personality and communication style unless the user instructions say otherwise. Where the user instructions ask for a different tone, voice, or emphasis, follow the user instructions and set this default aside.
 
 About:
 ${about}`

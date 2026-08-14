@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { BulletParamsSection } from './BulletParamsSection.js';
 import type { CareerTimelineSection } from './CareerTimelineSection.js';
 import type { CompanyContextSection } from './CompanyContextSection.js';
+import type { CurrentVersionSection } from './CurrentVersionSection.js';
 import type { EducationSection } from './EducationSection.js';
 import type { ExperienceDetailSection } from './ExperienceDetailSection.js';
 import type { HeadlineInstructionsSection } from './HeadlineInstructionsSection.js';
@@ -27,6 +28,7 @@ type AllSections = {
   jobDescription: JobDescriptionSection;
   experienceDetail: ExperienceDetailSection;
   otherExperiences: OtherExperiencesSection;
+  currentVersion: CurrentVersionSection;
   userInstructions: UserInstructionsSection;
   bulletParams: BulletParamsSection;
   headlineInstructions: HeadlineInstructionsSection;
@@ -74,6 +76,7 @@ export function createHeadlineRecipe(s: AllSections, model: string): ScopeRecipe
       s.settings,
       s.jobDescription,
       s.careerTimeline,
+      s.currentVersion,
       s.userInstructions
     ],
     model,
@@ -94,6 +97,7 @@ export function createExperienceBulletsRecipe(s: AllSections, model: string): Sc
       s.jobDescription,
       s.experienceDetail,
       s.otherExperiences,
+      s.currentVersion,
       s.userInstructions
     ],
     model,
@@ -113,6 +117,7 @@ export function createExperienceSummaryRecipe(s: AllSections, model: string): Sc
       s.settings,
       s.jobDescription,
       s.experienceDetail,
+      s.currentVersion,
       s.userInstructions
     ],
     model,
@@ -133,6 +138,7 @@ export function createBulletRecipe(s: AllSections, model: string): ScopeRecipe {
       s.jobDescription,
       s.experienceDetail,
       s.bulletParams,
+      s.currentVersion,
       s.userInstructions
     ],
     model,
