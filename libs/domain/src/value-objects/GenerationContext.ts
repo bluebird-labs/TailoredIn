@@ -74,4 +74,9 @@ export type GenerationContext = {
   readonly education: EducationSnapshot[];
   readonly settings: SettingsSnapshot;
   readonly userInstructions: string | null;
+  /**
+   * The previously generated content for this scope, when the user asked to revise it rather than
+   * start fresh. Rendered as a clearly labelled prior draft — never as an instruction to follow.
+   */
+  readonly currentVersion: string | null;
 };

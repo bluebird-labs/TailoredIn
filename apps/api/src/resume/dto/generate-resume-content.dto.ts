@@ -3,8 +3,12 @@ import { z } from 'zod';
 
 const GenerateResumeContentSchema = z.object({
   jobDescriptionId: z.string(),
-  additionalPrompt: z.string().optional(),
-  customInstructions: z.string().optional(),
+  /** undefined = leave the stored instruction for this scope unchanged; null or '' = clear it; string = set it */
+  customInstructions: z.string().nullable().optional(),
+  includeCurrentVersion: z.boolean().optional(),
+  bulletOverrides: z
+    .array(z.object({ experienceId: z.string(), min: z.number().int().min(0), max: z.number().int().min(0) }))
+    .optional(),
   scope: z
     .discriminatedUnion('type', [
       z.object({ type: z.literal('headline') }),

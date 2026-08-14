@@ -47,17 +47,36 @@ type ResumeGenerationScope =
   | { type: 'summary'; experienceId: string }
   | { type: 'bullet'; experienceId: string; bulletIndex: number; instructions: string };
 
+type ResumeBulletOverride = { experienceId: string; min: number; max: number };
+
+type GenerateResumeContentInput = {
+  /** `undefined` leaves the stored instruction unchanged, `null` clears it, a string replaces it. */
+  customInstructions?: string | null;
+  /** Asks the server to render the previous draft as its own labelled prompt section. */
+  includeCurrentVersion?: boolean;
+  scope?: ResumeGenerationScope;
+  bulletOverrides?: ResumeBulletOverride[];
+};
+
+export type ResumeExperienceBullets = {
+  experienceId: string;
+  experienceTitle: string;
+  companyName: string;
+  bullets: string[];
+};
+
+export type ResumeContent = {
+  headline: string;
+  experiences: ResumeExperienceBullets[];
+  /** Experiences whose generation failed and therefore kept their previous content. */
+  failedExperienceIds: string[];
+};
+
 export function useGenerateResumeContent(jobDescriptionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (
-      input: {
-        additionalPrompt?: string;
-        customInstructions?: string;
-        scope?: ResumeGenerationScope;
-        bulletOverrides?: Array<{ experienceId: string; min: number; max: number }>;
-      } = {}
-    ) => api.post('/resume/generate', { jobDescriptionId, ...input }),
+    mutationFn: (input: GenerateResumeContentInput = {}) =>
+      api.post<ResumeContent>('/resume/generate', { jobDescriptionId, ...input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.jobDescriptions.detail(jobDescriptionId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.resume.cachedPdf(jobDescriptionId) });

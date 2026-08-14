@@ -1,6 +1,7 @@
 export { BulletParamsSection } from './BulletParamsSection.js';
 export { CareerTimelineSection } from './CareerTimelineSection.js';
 export { CompanyContextSection } from './CompanyContextSection.js';
+export { CurrentVersionSection } from './CurrentVersionSection.js';
 export { EducationSection } from './EducationSection.js';
 export { ExperienceDetailSection } from './ExperienceDetailSection.js';
 export { HeadlineInstructionsSection } from './HeadlineInstructionsSection.js';

@@ -13,9 +13,9 @@ export class UserInstructionsSection extends PromptSection {
 
     return {
       cacheTier: this.cacheTier,
-      content: `## User Instructions (HIGH PRIORITY)
+      content: `## User Instructions (HIGHEST PRIORITY)
 
-The user has provided the following instructions. Give these heavy weight in your generation - they represent the user's specific intent for this content. Follow them closely while still respecting the structural rules above (length limits, no invention, etc.).
+The user has provided the following instructions. They represent the user's specific intent for this content and they OVERRIDE the tone, voice, emphasis, and content-selection guidance given above wherever the two conflict - including any instruction to mirror the About section's voice. Do not fall back to the default style once the user has asked for something else. Only two things outrank these instructions: the hard length limits, and the no-invention / no-borrowing rules (never invent facts, never take facts from another experience). Everything else is theirs to direct.
 
 ${context.userInstructions}`
     };

@@ -31,8 +31,10 @@ export class ResumeController {
       const data = await this.generateContent.execute({
         profileId: user.profileId,
         jobDescriptionId: body.jobDescriptionId,
-        additionalPrompt: body.additionalPrompt,
+        // `null` (clear the stored instruction) must stay distinct from `undefined` (leave it unchanged)
         customInstructions: body.customInstructions,
+        includeCurrentVersion: body.includeCurrentVersion,
+        bulletOverrides: body.bulletOverrides,
         scope: body.scope
       });
       return { data };

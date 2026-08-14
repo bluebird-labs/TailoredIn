@@ -19,8 +19,8 @@ export class OutputConstraintsSection extends PromptSection {
 
 Before finalizing each field, mentally count its characters. Reference strings at boundary lengths:
 - Bullet at ~${ResumeConstraints.BULLET_MIN_LENGTH} chars: "Led migration of the core payment systems from legacy monolith to microservices."
-- Bullet at ~${ResumeConstraints.BULLET_MAX_LENGTH} chars: "Led the end-to-end migration of the core payment processing system from a legacy monolithic architecture to event-driven microservices, reducing latency by 40%."
-- Headline at ~${ResumeConstraints.HEADLINE_MIN_LENGTH} chars: "Senior Engineering Leader with 15+ years building high-performance distributed systems across fintech and e-commerce, leading teams of 50+ engineers."
+- Bullet at ~${ResumeConstraints.BULLET_MAX_LENGTH} chars: "Led the end-to-end migration of the core payment processing system from a legacy monolithic architecture to event-driven microservices, cutting checkout latency by 40% and ending the weekly release freeze for nine teams."
+- Headline at ~${ResumeConstraints.HEADLINE_MIN_LENGTH} chars: "Senior Engineering Leader with 15+ years building high-performance distributed systems across fintech and e-commerce, leading teams of 120+ engineers."
 
 Return ONLY a valid JSON object matching the required schema.`
     };
