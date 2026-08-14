@@ -101,18 +101,18 @@
       "outputs": ["storybook-static/**"]
     },
 
-    "domain:diagram": {
+    "//#domain:diagram": {
       "description": "Generate domain layer Mermaid diagram",
       "cache": false
     },
 
-    "app:diagram": {
+    "//#app:diagram": {
       "description": "Generate application layer Mermaid diagram",
       "cache": false
     },
 
-    "db:diagram": {
-      "description": "Generate database ER diagram from live DB",
+    "//#db:diagram": {
+      "description": "Generate database ER diagram from the entity definitions",
       "cache": false
     }
   }

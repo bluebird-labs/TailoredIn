@@ -286,6 +286,7 @@ classDiagram
         +JobDescriptionRepository jobDescriptionRepository
         +JobFitScoreRepository jobFitScoreRepository
         +FitScorer fitScorer
+        +SkillRepository skillRepository
         +execute(ScoreJobFitInput) JobFitScoreDto
     }
 
@@ -566,6 +567,7 @@ classDiagram
         +number ordinal
         +number bulletMin
         +number bulletMax
+        +boolean hiddenByDefault
         +AccomplishmentDto[] accomplishments
         +ExperienceSkillDto[] skills
     }
@@ -973,6 +975,7 @@ classDiagram
     ScoreJobFit ..> CompanyRepository : depends
     ScoreJobFit ..> JobDescriptionRepository : depends
     ScoreJobFit ..> JobFitScoreRepository : depends
+    ScoreJobFit ..> SkillRepository : depends
     UpdateJobDescription ..> JobDescriptionRepository : depends
     GenerateResumeContent ..> GenerationContextBuilder : depends
     GenerateResumeContent ..> PromptRegistry : depends

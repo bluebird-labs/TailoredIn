@@ -12,12 +12,13 @@
  */
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { RepoRoot } from '../shared/RepoRoot.js';
 import { TsMorphProjectFactory } from '../shared/TsMorphProjectFactory.js';
 import { DatabaseDiagramAssembler } from './DatabaseDiagramAssembler.js';
 import { DatabaseExtractor } from './DatabaseExtractor.js';
 import { DatabaseRelationshipInferrer } from './DatabaseRelationshipInferrer.js';
 
-const ROOT = resolve(import.meta.dirname, '../../..');
+const ROOT = RepoRoot.PATH;
 const ENTITIES_DIR = resolve(ROOT, 'libs/domain/src/entities');
 const OUTPUT_PATH = resolve(ROOT, 'libs/infrastructure/DATABASE.mmd');
 

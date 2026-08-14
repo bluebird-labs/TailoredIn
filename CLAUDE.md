@@ -55,7 +55,6 @@ pnpm dev:migration:create    # create a new migration
 pnpm dev:migration:up        # run pending migrations
 pnpm dev:seed                # seed the database
 pnpm dev:set-password        # set password for an account (creates if needed)
-pnpm dev:diagram             # regenerate libs/infrastructure/DATABASE.mmd (needs DB running)
 ```
 
 `dev:up` auto-detects the current branch and allocates deterministic ports (DB, API, Web) via branch-name hashing. On `main`, ports are 5432/8000/5173. On feature branches, ports are offset to avoid collisions. State is stored in `.dev-state.json`.
@@ -91,7 +90,7 @@ pnpm --filter @tailoredin/infrastructure run test:integration  # integration tes
 ```bash
 pnpm run domain:diagram      # regenerate libs/domain/DOMAIN.mmd
 pnpm run app:diagram         # regenerate libs/application/APPLICATION.mmd
-pnpm run db:diagram          # regenerate libs/infrastructure/DATABASE.mmd (needs DB running)
+pnpm run db:diagram          # regenerate libs/infrastructure/DATABASE.mmd
 pnpm run diags               # regenerate all three diagrams in parallel (via Turborepo)
 ```
 

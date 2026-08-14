@@ -14,11 +14,12 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { BarrelResolver } from '../shared/BarrelResolver.js';
+import { RepoRoot } from '../shared/RepoRoot.js';
 import { TsMorphProjectFactory } from '../shared/TsMorphProjectFactory.js';
 import { ApplicationDiagramAssembler } from './ApplicationDiagramAssembler.js';
 import { ApplicationExtractor } from './ApplicationExtractor.js';
 
-const ROOT = resolve(import.meta.dirname, '../../..');
+const ROOT = RepoRoot.PATH;
 const BARREL_PATH = resolve(ROOT, 'libs/application/src/index.ts');
 const OUTPUT_PATH = resolve(ROOT, 'libs/application/APPLICATION.mmd');
 

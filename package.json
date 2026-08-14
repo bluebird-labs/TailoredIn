@@ -49,7 +49,7 @@
     "domain:diagram": "tsx scripts/diagrams/domain/generate.ts",
     "app:diagram": "tsx scripts/diagrams/application/generate.ts",
     "db:diagram": "tsx scripts/diagrams/database/generate.ts",
-    "diags": "turbo run domain:diagram app:diagram db:diagram",
+    "diags": "turbo run //#domain:diagram //#app:diagram //#db:diagram",
     "esco:import": "node --env-file=.env.local --import @swc-node/register/esm-register libs/infrastructure/scripts/esco-import.ts",
     "linguist:import": "node --env-file=.env.local --import @swc-node/register/esm-register libs/infrastructure/scripts/linguist-import.ts",
     "mind:import": "node --env-file=.env.local --import @swc-node/register/esm-register libs/infrastructure/scripts/mind-import.ts",

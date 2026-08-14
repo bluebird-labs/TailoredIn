@@ -5,7 +5,7 @@ title: TailoredIn — Database ERD (PostgreSQL)
 erDiagram
 
     %% ──────────────────────────────────────────────
-    %%  Tables
+    %%  Group 1
     %% ──────────────────────────────────────────────
 
     accomplishments {
@@ -14,6 +14,15 @@ erDiagram
         text title
         text narrative
         integer ordinal
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
+    accounts {
+        uuid id PK
+        text email
+        text password_hash
+        uuid profile_id FK
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
@@ -49,6 +58,24 @@ erDiagram
         timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
+    concept_dependencies {
+        uuid id PK
+        uuid skill_id FK
+        uuid concept_id FK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+    }
+
+    concepts {
+        uuid id PK
+        text label
+        text normalized_label UK
+        concept_kind kind
+        text category "nullable"
+        text mind_name "nullable"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
     educations {
         uuid id PK
         uuid profile_id FK
@@ -61,6 +88,13 @@ erDiagram
         boolean hidden_by_default
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
+    experience_skills {
+        uuid id PK
+        uuid experience_id FK
+        uuid skill_id FK
+        timestamp created_at "default: CURRENT_TIMESTAMP"
     }
 
     experiences {
@@ -78,6 +112,7 @@ erDiagram
         integer ordinal
         integer bullet_min
         integer bullet_max
+        boolean hidden_by_default
         timestamp created_at "default: CURRENT_TIMESTAMP"
         timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
@@ -171,18 +206,60 @@ erDiagram
         timestamp updated_at "default: CURRENT_TIMESTAMP"
     }
 
+    skill_dependencies {
+        uuid id PK
+        uuid skill_id FK
+        uuid implied_skill_id
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+    }
+
+    skills {
+        uuid id PK
+        text label
+        text normalized_label UK
+        skill_kind kind
+        uuid category_id "nullable"
+        text description "nullable"
+        json aliases
+        json technical_domains
+        json conceptual_aspects
+        json architectural_patterns
+        text mind_name "nullable"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
+
+    %% ──────────────────────────────────────────────
+    %%  Standalone
+    %% ──────────────────────────────────────────────
+
+    skill_categories {
+        uuid id PK
+        text label
+        text normalized_label UK
+        uuid parent_id "nullable"
+        timestamp created_at "default: CURRENT_TIMESTAMP"
+        timestamp updated_at "default: CURRENT_TIMESTAMP"
+    }
+
     %% ──────────────────────────────────────────────
     %%  Relationships
     %% ──────────────────────────────────────────────
 
     experiences ||--o{ accomplishments : "has"
+    profiles ||--o{ accounts : "has"
     profiles ||--o{ applications : "has"
     companies ||--o{ applications : "has"
     job_descriptions ||--o{ applications : "has"
     resume_contents ||--o{ applications : "has"
+    skills ||--o{ concept_dependencies : "has"
+    concepts ||--o{ concept_dependencies : "has"
     profiles ||--o{ educations : "has"
     profiles ||--o{ experiences : "has"
     companies ||--o{ experiences : "has"
+    experiences ||--o{ experience_skills : "has"
+    skills ||--o{ experience_skills : "has"
     generation_settings ||--o{ generation_prompts : "has"
     profiles ||--o{ generation_settings : "has"
     companies ||--o{ job_descriptions : "has"
@@ -191,6 +268,7 @@ erDiagram
     job_descriptions ||--o{ job_fit_scores : "has"
     profiles ||--o{ resume_contents : "has"
     job_descriptions ||--o{ resume_contents : "has"
+    skills ||--o{ skill_dependencies : "has"
 
     %% ──────────────────────────────────────────────
     %%  Styles
@@ -198,9 +276,13 @@ erDiagram
 
     classDef group0 fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px
     class accomplishments group0
+    class accounts group0
     class applications group0
     class companies group0
+    class concept_dependencies group0
+    class concepts group0
     class educations group0
+    class experience_skills group0
     class experiences group0
     class generation_prompts group0
     class generation_settings group0
@@ -209,3 +291,7 @@ erDiagram
     class job_fit_scores group0
     class profiles group0
     class resume_contents group0
+    class skill_dependencies group0
+    class skills group0
+    classDef group1 fill:#d5e8d4,stroke:#82b366,stroke-width:2px
+    class skill_categories group1

@@ -12,11 +12,12 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { BarrelResolver } from '../shared/BarrelResolver.js';
+import { RepoRoot } from '../shared/RepoRoot.js';
 import { TsMorphProjectFactory } from '../shared/TsMorphProjectFactory.js';
 import { DomainDiagramAssembler } from './DomainDiagramAssembler.js';
 import { DomainExtractor } from './DomainExtractor.js';
 
-const ROOT = resolve(import.meta.dirname, '../../..');
+const ROOT = RepoRoot.PATH;
 const DOMAIN_SRC = resolve(ROOT, 'libs/domain/src');
 const BARREL_PATH = resolve(DOMAIN_SRC, 'index.ts');
 const OUTPUT_PATH = resolve(ROOT, 'libs/domain/DOMAIN.mmd');

@@ -6,7 +6,7 @@ Concrete implementations of all application ports: database repositories. Also o
 
 ## Keeping the diagram in sync
 
-**`libs/infrastructure/DATABASE.mmd` is the source of truth for the database schema.** After adding migrations or modifying entities, regenerate with `pnpm run db:diagram` (requires DB running). The diagram must always reflect the schema.
+**`libs/infrastructure/DATABASE.mmd` is the source of truth for the database schema.** After adding migrations or modifying entities, regenerate with `pnpm run db:diagram`. The diagram is derived from the entity source files, so no database connection is needed. The diagram must always reflect the schema.
 
 ## Directory structure
 
