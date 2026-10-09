@@ -34,7 +34,7 @@ export type ResumeOutputDto = {
     readonly experienceTitle: string;
     readonly companyName: string;
     readonly startDate: string;
-    readonly endDate: string;
+    readonly endDate: string | null;
     readonly summary: string;
     readonly bullets: readonly string[];
     readonly hiddenBulletIndices: readonly number[];
@@ -123,7 +123,7 @@ export function toJobDescriptionDto(
               experienceTitle: exp?.title ?? '',
               companyName: exp?.companyName ?? '',
               startDate: exp?.startDate ?? '',
-              endDate: exp?.endDate ?? '',
+              endDate: exp?.endDate ?? null,
               summary: e.summary,
               bullets: e.bullets,
               hiddenBulletIndices: e.hiddenBulletIndices

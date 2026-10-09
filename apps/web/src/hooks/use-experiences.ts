@@ -26,7 +26,7 @@ export type Experience = {
   company: Company | null;
   location: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   summary: string | null;
   ordinal: number;
   bulletMin: number;
@@ -67,7 +67,7 @@ export function useCreateExperience() {
       company_accent?: string;
       location: string;
       start_date: string;
-      end_date: string;
+      end_date: string | null;
       summary?: string;
       ordinal: number;
       hidden_by_default?: boolean;
@@ -89,7 +89,7 @@ export function useUpdateExperience() {
       company_accent?: string;
       location: string;
       start_date: string;
-      end_date: string;
+      end_date: string | null;
       summary?: string;
       ordinal: number;
       accomplishments: { id: string | null; title: string; narrative: string; ordinal: number }[];

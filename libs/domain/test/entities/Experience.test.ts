@@ -1,7 +1,7 @@
 import { Experience } from '../../src/entities/Experience.js';
 
 describe('Experience', () => {
-  const makeExperience = () =>
+  const makeExperience = (overrides: { endDate?: string | null } = {}) =>
     Experience.create({
       profileId: 'profile-1',
       title: 'Staff Engineer',
@@ -11,11 +11,12 @@ describe('Experience', () => {
       companyId: null,
       location: 'New York, NY',
       startDate: '2022-01',
-      endDate: 'Present',
+      endDate: '2024-06',
       summary: 'Led platform team',
       ordinal: 0,
       bulletMin: 2,
-      bulletMax: 5
+      bulletMax: 5,
+      ...overrides
     });
 
   test('creates with empty accomplishments', () => {
@@ -23,6 +24,14 @@ describe('Experience', () => {
     expect(exp.title).toBe('Staff Engineer');
     expect(exp.companyName).toBe('Acme Corp');
     expect(exp.accomplishments).toHaveLength(0);
+  });
+
+  test('accepts a null end date for a current position', () => {
+    expect(makeExperience({ endDate: null }).endDate).toBeNull();
+  });
+
+  test('rejects an empty end date', () => {
+    expect(() => makeExperience({ endDate: '' })).toThrow('endDate');
   });
 
   test('adds an accomplishment', () => {

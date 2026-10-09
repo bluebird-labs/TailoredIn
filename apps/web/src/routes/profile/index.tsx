@@ -40,7 +40,8 @@ export const Route = createFileRoute('/profile/')({
   }
 });
 
-function formatMonthYear(value: string): string {
+function formatMonthYear(value: string | null): string {
+  if (value === null) return 'Present';
   if (!value) return '';
   const [year, month] = value.split('-');
   if (!year || !month) return value;

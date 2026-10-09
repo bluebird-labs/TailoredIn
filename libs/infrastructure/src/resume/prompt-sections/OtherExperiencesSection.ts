@@ -20,7 +20,7 @@ export class OtherExperiencesSection extends PromptSection {
     ];
 
     for (const exp of others) {
-      lines.push(`- ${exp.title} at ${exp.companyName} (${exp.startDate} - ${exp.endDate})`);
+      lines.push(`- ${exp.title} at ${exp.companyName} (${exp.startDate} - ${exp.endDate ?? 'Present'})`);
     }
 
     return { cacheTier: this.cacheTier, content: lines.join('\n') };

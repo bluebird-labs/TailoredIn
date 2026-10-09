@@ -14,7 +14,7 @@ export type ExperienceDto = {
   company: CompanyDto | null;
   location: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   summary: string | null;
   ordinal: number;
   bulletMin: number;

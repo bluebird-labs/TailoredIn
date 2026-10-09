@@ -13,7 +13,7 @@ export type ResumeOutputExperience = {
   experienceTitle: string;
   companyName: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   summary: string;
   bullets: string[];
   hiddenBulletIndices: number[];

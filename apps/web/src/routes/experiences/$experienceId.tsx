@@ -124,7 +124,7 @@ function ExperienceDetailPage() {
               )}
               <MetaDot />
               <MetaText>
-                {experience.startDate} – {experience.endDate}
+                {experience.startDate} – {experience.endDate ?? 'Present'}
               </MetaText>
             </>
           }

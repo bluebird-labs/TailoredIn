@@ -15,7 +15,7 @@ export type ExperienceCreateProps = {
   companyId: string | null;
   location: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   summary: string | null;
   ordinal: number;
   bulletMin: number;
@@ -52,8 +52,8 @@ export class Experience extends AggregateRoot {
   @Property({ fieldName: 'start_date', type: 'text' })
   public startDate: string;
 
-  @Property({ fieldName: 'end_date', type: 'text' })
-  public endDate: string;
+  @Property({ fieldName: 'end_date', type: 'text', nullable: true })
+  public endDate: string | null;
 
   @Property({ fieldName: 'summary', type: 'text', nullable: true })
   public summary: string | null;
@@ -100,7 +100,7 @@ export class Experience extends AggregateRoot {
     companyId: string | null;
     location: string;
     startDate: string;
-    endDate: string;
+    endDate: string | null;
     summary: string | null;
     ordinal: number;
     bulletMin: number;
@@ -118,8 +118,8 @@ export class Experience extends AggregateRoot {
       throw new ValidationError('location', 'must be between 1 and 500 characters');
     if (!props.startDate || props.startDate.length > 50)
       throw new ValidationError('startDate', 'must be between 1 and 50 characters');
-    if (!props.endDate || props.endDate.length > 50)
-      throw new ValidationError('endDate', 'must be between 1 and 50 characters');
+    if (props.endDate !== null && (!props.endDate || props.endDate.length > 50))
+      throw new ValidationError('endDate', 'must be null (present) or between 1 and 50 characters');
     if (props.bulletMin < 0) throw new ValidationError('bulletMin', 'must be >= 0');
     if (props.bulletMax < props.bulletMin) throw new ValidationError('bulletMax', 'must be >= bulletMin');
     this.id = props.id;

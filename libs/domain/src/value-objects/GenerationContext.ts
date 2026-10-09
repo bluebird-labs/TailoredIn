@@ -35,7 +35,7 @@ export type ExperienceSnapshot = {
   readonly summary: string | null;
   readonly accomplishments: AccomplishmentSnapshot[];
   readonly startDate: string;
-  readonly endDate: string;
+  readonly endDate: string | null;
   readonly location: string;
   readonly bulletMin: number;
   readonly bulletMax: number;

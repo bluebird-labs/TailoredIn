@@ -36,6 +36,28 @@ function HiddenByDefaultCheckbox({
   );
 }
 
+function PresentCheckbox({
+  checked,
+  onChange,
+  isDirty,
+  disabled
+}: {
+  readonly checked: boolean;
+  readonly onChange: (checked: boolean) => void;
+  readonly isDirty?: boolean;
+  readonly disabled?: boolean;
+}) {
+  const fieldId = useId();
+  return (
+    <div className={cn('flex items-center gap-2 py-1', isDirty && 'border-l-2 border-primary/30 pl-3')}>
+      <Checkbox id={fieldId} checked={checked} onCheckedChange={onChange} disabled={disabled} />
+      <Label htmlFor={fieldId} className="text-sm leading-none">
+        I currently work here (end date shows as Present)
+      </Label>
+    </div>
+  );
+}
+
 function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
   const update = useUpdateExperience();
   const [errors, setErrors] = useState<ValidationErrors<ExperienceFormState>>({});
@@ -48,7 +70,8 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
       companyAccent: experience.companyAccent ?? '',
       location: experience.location,
       startDate: experience.startDate,
-      endDate: experience.endDate,
+      endDate: experience.endDate ?? '',
+      isCurrent: experience.endDate === null,
       summary: experience.summary ?? '',
       bulletMin: experience.bulletMin,
       bulletMax: experience.bulletMax,
@@ -85,7 +108,7 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
         company_accent: current.companyAccent.trim() || undefined,
         location: current.location.trim(),
         start_date: current.startDate.trim(),
-        end_date: current.endDate.trim(),
+        end_date: current.isCurrent ? null : current.endDate.trim(),
         summary: experience.summary ?? undefined,
         ordinal: experience.ordinal,
         accomplishments: experience.accomplishments.map(a => ({
@@ -127,7 +150,7 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
           {experience.companyAccent && <InfoRow label="Company Accent" value={experience.companyAccent} />}
           <InfoRow label="Location" value={experience.location} />
           <InfoRow label="Start Date" value={experience.startDate} />
-          <InfoRow label="End Date" value={experience.endDate} />
+          <InfoRow label="End Date" value={experience.endDate ?? 'Present'} />
           <InfoRow label="Bullet Min" value={String(experience.bulletMin)} />
           <InfoRow label="Bullet Max" value={String(experience.bulletMax)} />
         </InfoCard>
@@ -197,14 +220,20 @@ function ExperienceDetailsEditor({ experience }: ExperienceDetailsEditorProps) {
             <EditableField
               type="text"
               label="End Date"
-              required
-              value={current.endDate}
+              required={!current.isCurrent}
+              value={current.isCurrent ? 'Present' : current.endDate}
               onChange={v => setField('endDate', v)}
               isDirty={isDirtyField('endDate')}
               error={errors.endDate}
-              disabled={update.isPending}
+              disabled={update.isPending || current.isCurrent}
             />
           </div>
+          <PresentCheckbox
+            checked={current.isCurrent}
+            onChange={v => setField('isCurrent', v)}
+            isDirty={isDirtyField('isCurrent')}
+            disabled={update.isPending}
+          />
           <div className="grid grid-cols-2 gap-3">
             <EditableField
               type="number"

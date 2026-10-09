@@ -7,7 +7,8 @@ import type { Experience } from '@/hooks/use-experiences';
 import { useDeleteExperience, useSetExperienceHiddenByDefault } from '@/hooks/use-experiences';
 import { cn } from '@/lib/utils';
 
-function formatMonthYear(value: string): string {
+function formatMonthYear(value: string | null): string {
+  if (value === null) return 'Present';
   if (!value) return '';
   const [year, month] = value.split('-');
   if (!year || !month) return value;

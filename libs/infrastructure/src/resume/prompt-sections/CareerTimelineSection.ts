@@ -21,7 +21,7 @@ export class CareerTimelineSection extends PromptSection {
     ];
 
     for (const exp of context.experiences) {
-      lines.push(`### ${exp.title} at ${exp.companyName} (${exp.startDate} - ${exp.endDate})`);
+      lines.push(`### ${exp.title} at ${exp.companyName} (${exp.startDate} - ${exp.endDate ?? 'Present'})`);
 
       const company = context.companies.find(c => c.id === exp.companyId);
       if (company) {

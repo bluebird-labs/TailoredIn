@@ -76,7 +76,7 @@ function formatProfileAsMarkdown(
 
   for (const exp of experiences) {
     parts.push(`\n## ${exp.title} at ${exp.companyName}`);
-    parts.push(`${exp.startDate} – ${exp.endDate} | ${exp.location}`);
+    parts.push(`${exp.startDate} – ${exp.endDate ?? 'Present'} | ${exp.location}`);
 
     if (exp.companyId) {
       const company = companyMap.get(exp.companyId);

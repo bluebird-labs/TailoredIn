@@ -13,7 +13,8 @@ import { useScoreResume } from '@/hooks/use-resume-score';
 import { BulletRangePill } from './BulletRangePill.js';
 import { JobSelector } from './JobSelector.js';
 
-function formatMonthYear(value: string): string {
+function formatMonthYear(value: string | null): string {
+  if (value === null) return 'Present';
   if (!value) return '';
   const [year, month] = value.split('-');
   if (!year || !month) return value;

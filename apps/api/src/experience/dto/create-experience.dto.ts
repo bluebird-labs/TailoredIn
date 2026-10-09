@@ -8,7 +8,7 @@ const CreateExperienceSchema = z.object({
   company_accent: z.string().optional(),
   location: z.string().min(1),
   start_date: z.string().min(1),
-  end_date: z.string().min(1),
+  end_date: z.string().min(1).nullable(),
   summary: z.string().optional(),
   ordinal: z.number().int().min(0),
   hidden_by_default: z.boolean().default(false).optional()

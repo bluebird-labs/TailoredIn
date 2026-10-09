@@ -17,7 +17,7 @@ export class ExperienceDetailSection extends PromptSection {
       '',
       `### Experience ID: ${target.id}`,
       `Role: ${target.title} at ${target.companyName}`,
-      `Dates: ${target.startDate} - ${target.endDate}`,
+      `Dates: ${target.startDate} - ${target.endDate ?? 'Present'}`,
       `Location: ${target.location}`
     ];
 

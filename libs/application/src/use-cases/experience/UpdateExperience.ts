@@ -26,7 +26,7 @@ export type UpdateExperienceInput = {
   companyAccent: string | null;
   location: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   summary: string | null;
   ordinal: number;
   accomplishments: AccomplishmentInput[];

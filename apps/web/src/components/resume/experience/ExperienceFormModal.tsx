@@ -42,6 +42,7 @@ function emptyState(): ExperienceFormState {
     location: '',
     startDate: '',
     endDate: '',
+    isCurrent: false,
     summary: '',
     bulletMin: 2,
     bulletMax: 5,
@@ -57,7 +58,8 @@ function stateFromExperience(exp: Experience): ExperienceFormState {
     companyAccent: exp.companyAccent ?? '',
     location: exp.location,
     startDate: exp.startDate,
-    endDate: exp.endDate,
+    endDate: exp.endDate ?? '',
+    isCurrent: exp.endDate === null,
     summary: exp.summary ?? '',
     bulletMin: exp.bulletMin,
     bulletMax: exp.bulletMax,
@@ -82,6 +84,26 @@ function HiddenByDefaultCheckbox({
       <Checkbox id={fieldId} checked={checked} onCheckedChange={onChange} disabled={disabled} />
       <Label htmlFor={fieldId} className="text-sm leading-none">
         Hidden by default on new resumes
+      </Label>
+    </div>
+  );
+}
+
+function PresentCheckbox({
+  checked,
+  onChange,
+  disabled
+}: {
+  readonly checked: boolean;
+  readonly onChange: (checked: boolean) => void;
+  readonly disabled?: boolean;
+}) {
+  const fieldId = useId();
+  return (
+    <div className="flex items-center gap-1.5">
+      <Checkbox id={fieldId} checked={checked} onCheckedChange={onChange} disabled={disabled} />
+      <Label htmlFor={fieldId} className="text-xs leading-none text-muted-foreground">
+        Present
       </Label>
     </div>
   );
@@ -246,7 +268,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }
           company_accent: current.companyAccent.trim() || undefined,
           location: current.location.trim(),
           start_date: current.startDate.trim(),
-          end_date: current.endDate.trim(),
+          end_date: current.isCurrent ? null : current.endDate.trim(),
           summary: current.summary.trim() || undefined,
           ordinal: modalMode.mode === 'create' ? modalMode.experienceCount : 0,
           hidden_by_default: current.hiddenByDefault
@@ -274,7 +296,7 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }
           company_accent: current.companyAccent.trim() || undefined,
           location: current.location.trim(),
           start_date: current.startDate.trim(),
-          end_date: current.endDate.trim(),
+          end_date: current.isCurrent ? null : current.endDate.trim(),
           summary: current.summary.trim() || undefined,
           ordinal: experience.ordinal,
           accomplishments: localAccomplishments.map((acc, index) => ({
@@ -435,12 +457,24 @@ export function ExperienceFormModal({ open, onOpenChange, modalMode, onCreated }
           <MonthYearPicker value={current.startDate} onChange={v => setField('startDate', v)} />
           <FieldError message={errors.startDate} />
         </div>
-        <div className={cn('space-y-1.5', isDirtyField('endDate') && 'border-l-2 border-primary/30 pl-3')}>
-          <Label>
-            End Date
-            <span className="text-destructive ml-0.5">*</span>
-          </Label>
-          <MonthYearPicker value={current.endDate} onChange={v => setField('endDate', v)} />
+        <div
+          className={cn(
+            'space-y-1.5',
+            (isDirtyField('endDate') || isDirtyField('isCurrent')) && 'border-l-2 border-primary/30 pl-3'
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <Label>
+              End Date
+              {!current.isCurrent && <span className="text-destructive ml-0.5">*</span>}
+            </Label>
+            <PresentCheckbox checked={current.isCurrent} onChange={v => setField('isCurrent', v)} disabled={isSaving} />
+          </div>
+          {current.isCurrent ? (
+            <p className="flex h-9 items-center text-sm text-muted-foreground">Present</p>
+          ) : (
+            <MonthYearPicker value={current.endDate} onChange={v => setField('endDate', v)} />
+          )}
           <FieldError message={errors.endDate} />
         </div>
       </div>

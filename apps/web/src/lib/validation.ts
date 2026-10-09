@@ -56,6 +56,7 @@ interface ExperienceFormState {
   location: string;
   startDate: string;
   endDate: string;
+  isCurrent: boolean;
   summary: string;
   bulletMin: number;
   bulletMax: number;
@@ -69,7 +70,7 @@ function validateExperience(values: ExperienceFormState): ValidationErrors<Exper
   if (values.companyAccent.trim().length > 30) errors.companyAccent = 'Company accent must be 30 characters or fewer';
   if (!values.location.trim()) errors.location = 'Location is required';
   if (!values.startDate.trim()) errors.startDate = 'Start date is required';
-  if (!values.endDate.trim()) errors.endDate = 'End date is required';
+  if (!values.isCurrent && !values.endDate.trim()) errors.endDate = 'End date is required';
   if (values.bulletMin < 0) errors.bulletMin = 'Min must be >= 0';
   if (values.bulletMax < values.bulletMin) errors.bulletMax = 'Max must be >= min';
   return errors;

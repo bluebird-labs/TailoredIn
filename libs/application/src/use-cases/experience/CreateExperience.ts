@@ -17,7 +17,7 @@ export type CreateExperienceInput = {
   companyAccent: string | null;
   location: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   summary: string | null;
   ordinal: number;
   hiddenByDefault?: boolean;
